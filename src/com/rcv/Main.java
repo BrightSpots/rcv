@@ -1,4 +1,4 @@
-package com.BrightSpots;
+package com.rcv;
 
 public class Main {
 
