@@ -1,0 +1,43 @@
+{
+  "comments":"test data for simple election with two RCV contests",
+  "id":0,
+  "name":"Maine 2018 General Election",
+  "contests":[
+    {
+      "id":0,
+      "name":"Governor",
+      "options": [
+        {
+          "id":0,
+          "name":"Steve Miller"
+        },
+        {
+          "id":1,
+          "name":"Eric Clapton"
+        },
+        {
+          "id":2,
+          "name":"Carlos Santana"
+        }
+      ]
+    },
+    {
+      "id":1,
+      "name":"Lieutenant Governor",
+      "options": [
+        {
+          "id":0,
+          "name":"Marvin Gaye"
+        },
+        {
+          "id":1,
+          "name":"Barry White"
+        },
+        {
+          "id":2,
+          "name":"Beyonce"
+        }
+      ]
+    }
+  ]
+}

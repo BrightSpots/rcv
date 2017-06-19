@@ -13,27 +13,10 @@ import java.util.ArrayList;
  */
 public class RCVTabulator {
 
-  public static String TEST_ELECTION_PATH = "data/test_election_config.json";
-
-  public static String readFile(String filename) {
-    String result = "";
-    try {
-      BufferedReader br = new BufferedReader(new FileReader(filename));
-      StringBuilder sb = new StringBuilder();
-      String line = br.readLine();
-      while (line != null) {
-        sb.append(line);
-        line = br.readLine();
-      }
-      result = sb.toString();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return result;
-  }
+  public static String TEST_ELECTION_PATH = "./data/test_election_config.json";
 
   // create a Tabulator by specifying an election configuration file and the cast vote records for it
-  void RCVTabulator(String electionConfigPath, String castVoteRecordsPath) {
+  RCVTabulator(String electionConfigPath, String castVoteRecordsPath) {
 
     // for testing use this for now
     electionConfigPath = TEST_ELECTION_PATH;
@@ -73,11 +56,28 @@ public class RCVTabulator {
         contests.add(contest);
       }
       Election election = new Election(electionID, electionName, contests);
-
+      System.out.print(election);
     } catch (JSONException e) {
       e.printStackTrace();
     }
 //    System.out.println("Keyword: " + contestsArray.getString(i));
-
   }
+
+  private static String readFile(String filename) {
+    String result = "";
+    try {
+      BufferedReader br = new BufferedReader(new FileReader(filename));
+      StringBuilder sb = new StringBuilder();
+      String line = br.readLine();
+      while (line != null) {
+        sb.append(line);
+        line = br.readLine();
+      }
+      result = sb.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
+
 }
