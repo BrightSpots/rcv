@@ -7,23 +7,44 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jon on 6/18/17.
  */
-public class RCVTabulator {
+public class RCVParser {
 
-  public static String TEST_ELECTION_PATH = "./data/test_election_config.json";
 
   // create a Tabulator by specifying an election configuration file and the cast vote records for it
-  RCVTabulator(String electionConfigPath, String castVoteRecordsPath) {
-
-    // for testing use this for now
-    electionConfigPath = TEST_ELECTION_PATH;
+  RCVParser(String electionConfigPath, String castVoteRecordsPath) {
 
     String jsonData = readFile(electionConfigPath);
-    JSONObject electionObject;
+    Election election = parseElectionConfig(jsonData);
 
+    String cvrJsonString = readFile(castVoteRecordsPath);
+    List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(cvrJsonString);
+
+  }
+
+  List<CastVoteRecord> parseCastVoteRecords(String jsonString) {
+
+    try {
+      JSONObject cvrObject = new JSONObject(jsonString);
+
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    ArrayList<CastVoteRecord> castVoteRecords = new ArrayList<CastVoteRecord>();
+
+    return castVoteRecords;
+  }
+
+
+
+  Election parseElectionConfig(String jsonData) {
+
+    JSONObject electionObject;
     // parse the election configuration
     try {
       // election object has id name and a list of contests
@@ -56,11 +77,11 @@ public class RCVTabulator {
         contests.add(contest);
       }
       Election election = new Election(electionID, electionName, contests);
-      System.out.print(election);
+      return election;
     } catch (JSONException e) {
       e.printStackTrace();
     }
-//    System.out.println("Keyword: " + contestsArray.getString(i));
+    return null;
   }
 
   private static String readFile(String filename) {
