@@ -1,8 +1,8 @@
 package com.rcv;
 
 public class ContestOption {
-  int id;
-  String name;
+  private int id;
+  private String name;
 
   public ContestOption(int id, String name) {
     this.id = id;

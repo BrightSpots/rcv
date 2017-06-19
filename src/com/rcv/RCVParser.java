@@ -8,11 +8,9 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.util.*;
 
-/**
- * Created by Jon on 6/18/17.
- */
 public class RCVParser {
 
+  List<CastVoteRecord> castVoteRecords;
 
   // create a Tabulator by specifying an election configuration file and the cast vote records for it
   RCVParser(String electionConfigPath, String castVoteRecordsPath) {
@@ -21,10 +19,11 @@ public class RCVParser {
     Election election = parseElectionConfig(jsonData);
 
     String cvrJsonString = readFile(castVoteRecordsPath);
-    List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(cvrJsonString, election);
+    castVoteRecords = parseCastVoteRecords(cvrJsonString, election);
+  }
 
-
-
+  List<CastVoteRecord> getCastVoteRecords() {
+    return castVoteRecords;
   }
 
   // extract cast vote record data from json string
@@ -50,12 +49,12 @@ public class RCVParser {
         JSONObject voteObject = cvrArray.getJSONObject(i);
 
         // container for parse java object
-        Map<Integer, Map<Integer, Integer>> rankings = new TreeMap<Integer, Map<Integer, Integer>>();
+        Map<Integer, SortedMap<Integer, Integer>> rankings = new HashMap<Integer, SortedMap<Integer, Integer>>();
 
         // for each contest in the election
-        for(Contest contest : election.contests) {
+        for(Contest contest : election.getContests()) {
           // note: contest IDs are stored as strings in cvr json since we use them as keys
-          String contestID = Integer.toString(contest.id);
+          String contestID = Integer.toString(contest.getId());
           // get voter selections
           JSONObject contestSelections = voteObject.getJSONObject(contestID);
           // container for parsed java object

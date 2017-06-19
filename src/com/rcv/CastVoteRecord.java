@@ -1,6 +1,7 @@
 package com.rcv;
 
 import java.util.Map;
+import java.util.SortedMap;
 
 // first integer is the contest ID
 // second integer is Rank
@@ -19,9 +20,13 @@ import java.util.Map;
 
 
 public class CastVoteRecord {
-  Map<Integer, Map<Integer, Integer>> rankings;
+  private Map<Integer, SortedMap<Integer, Integer>> rankings;
 
-  public CastVoteRecord(Map<Integer, Map<Integer, Integer>> rankings) {
+  public CastVoteRecord(Map<Integer, SortedMap<Integer, Integer>> rankings) {
     this.rankings = rankings;
+  }
+
+  SortedMap<Integer, Integer> getRankingsForContest(int contestId) {
+    return rankings.get(contestId);
   }
 }
