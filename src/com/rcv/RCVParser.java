@@ -6,8 +6,7 @@ import sun.misc.IOUtils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Jon on 6/18/17.
@@ -22,21 +21,61 @@ public class RCVParser {
     Election election = parseElectionConfig(jsonData);
 
     String cvrJsonString = readFile(castVoteRecordsPath);
-    List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(cvrJsonString);
+    List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(cvrJsonString, election);
+
+
 
   }
 
-  List<CastVoteRecord> parseCastVoteRecords(String jsonString) {
+  // extract cast vote record data from json string
+  List<CastVoteRecord> parseCastVoteRecords(String jsonString, Election election) {
 
+    ArrayList<CastVoteRecord> castVoteRecords = null;
     try {
+      // cvr file has the election id and name for which these votes were cast
+      // followed by an array of cast vote records
       JSONObject cvrObject = new JSONObject(jsonString);
+      int electionID = cvrObject.getInt("id");
+      String electionName = cvrObject.getString("name");
+      JSONArray cvrArray = cvrObject.getJSONArray("records");
 
+      // array to store the parsed results
+      castVoteRecords = new ArrayList<CastVoteRecord>(cvrArray.length());
+
+      // each cast vote record is a mapping from election contest ID(s) to voter selections
+      // voter selections is a map of rank to contest option ID (a candidate)
+
+      // for each record
+      for(int i = 0; i < cvrArray.length(); i++) {
+        JSONObject voteObject = cvrArray.getJSONObject(i);
+
+        // container for parse java object
+        Map<Integer, Map<Integer, Integer>> rankings = new TreeMap<Integer, Map<Integer, Integer>>();
+
+        // for each contest in the election
+        for(Contest contest : election.contests) {
+          // note: contest IDs are stored as strings in cvr json since we use them as keys
+          String contestID = Integer.toString(contest.id);
+          // get voter selections
+          JSONObject contestSelections = voteObject.getJSONObject(contestID);
+          // container for parsed java object
+          SortedMap<Integer, Integer> userSelections = new TreeMap<Integer, Integer>();
+          // iterate through their selection
+          JSONArray ranks = contestSelections.names();
+          for(int j = 0; j < ranks.length(); j++) {
+            String rank = ranks.getString(j);
+            int selectionID = contestSelections.getInt(rank);
+            userSelections.put( Integer.decode(rank), selectionID);
+          }
+          rankings.put(Integer.decode(contestID), userSelections);
+        }
+
+        CastVoteRecord castVoteRecord = new CastVoteRecord(rankings);
+        castVoteRecords.add(castVoteRecord);
+      }
     } catch (JSONException e) {
       e.printStackTrace();
     }
-
-    ArrayList<CastVoteRecord> castVoteRecords = new ArrayList<CastVoteRecord>();
-
     return castVoteRecords;
   }
 
