@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Tabulator {
 
-  private List<CastVoteRecord> castVoteRecords;
+  private List<CastVoteRecord2> castVoteRecords;
   private int contestId;
   private List<Integer> contestOptions;
 
@@ -53,7 +53,7 @@ public class Tabulator {
 
   private Map<Integer, TieBreak> tieBreaks = new HashMap<Integer, TieBreak>();
 
-  public Tabulator(List<CastVoteRecord> castVoteRecords, int contestId, List<Integer> contestOptions) {
+  public Tabulator(List<CastVoteRecord2> castVoteRecords, int contestId, List<Integer> contestOptions) {
     this.castVoteRecords = castVoteRecords;
     this.contestId = contestId;
     this.contestOptions = contestOptions;
@@ -75,7 +75,7 @@ public class Tabulator {
       }
 
       // count first-place votes considering only non-eliminated options
-      for (CastVoteRecord cvr : castVoteRecords) {
+      for (CastVoteRecord2 cvr : castVoteRecords) {
         SortedMap<Integer, Integer> rankings = cvr.getRankingsForContest(contestId);
         if (rankings == null) {
           continue;

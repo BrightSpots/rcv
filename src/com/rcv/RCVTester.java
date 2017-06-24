@@ -17,7 +17,7 @@ public class RCVTester {
 
   public void runTests() {
 
-    JacksonParser parser1 = new JacksonParser(TEST_ELECTION_PATH, TEST_CVR_PATH);
+    JacksonParser jacksonParser = new JacksonParser(TEST_ELECTION_PATH, TEST_CVR_PATH);
 
 //    int contestId = 1;
 //    List<CastVoteRecord> list = new LinkedList<CastVoteRecord>();
@@ -33,9 +33,9 @@ public class RCVTester {
     contestOptions.add(2);
     RCVParser parser = new RCVParser(TEST_ELECTION_PATH, TEST_CVR_PATH);
     int contestId = 0;
-    Tabulator tabulator = new Tabulator(parser.getCastVoteRecords(), contestId, contestOptions);
+    Tabulator tabulator = new Tabulator(jacksonParser.getCastVoteRecords(), contestId, contestOptions);
     tabulator.tabulate();
-    Tabulator tabulator2 = new Tabulator(parser.getCastVoteRecords(), 1, contestOptions);
+    Tabulator tabulator2 = new Tabulator(jacksonParser.getCastVoteRecords(), 1, contestOptions);
     tabulator2.tabulate();
   }
 
