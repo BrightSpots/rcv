@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class JacksonTester {
 
-  List<CastVoteRecord> mCastVoteRecords;
+//  List<CastVoteRecord> mCastVoteRecords;
 
   Election election;
 

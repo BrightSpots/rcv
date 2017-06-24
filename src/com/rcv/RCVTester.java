@@ -31,7 +31,7 @@ public class RCVTester {
     contestOptions.add(0);
     contestOptions.add(1);
     contestOptions.add(2);
-    RCVParser parser = new RCVParser(TEST_ELECTION_PATH, TEST_CVR_PATH);
+//    RCVParser parser = new RCVParser(TEST_ELECTION_PATH, TEST_CVR_PATH);
     int contestId = 0;
     Tabulator tabulator = new Tabulator(jacksonParser.getCastVoteRecords(), contestId, contestOptions);
     tabulator.tabulate();
@@ -39,13 +39,14 @@ public class RCVTester {
     tabulator2.tabulate();
   }
 
-  private CastVoteRecord makeCVR(int contestId, int rank1, int rank2, int rank3) {
+  private CastVoteRecord2 makeCVR(int contestId, int rank1, int rank2, int rank3) {
     SortedMap<Integer, Integer> rankings = new TreeMap<Integer, Integer>();
     rankings.put(1, rank1);
     rankings.put(2, rank2);
     rankings.put(3, rank3);
-    Map<Integer, SortedMap<Integer, Integer>> map = new HashMap<Integer, SortedMap<Integer, Integer>>();
-    map.put(contestId, rankings);
-    return new CastVoteRecord(map);
+    ContestRankings contestRankings = new ContestRankings(rankings);
+    Map<Integer, ContestRankings> cvrMap = new HashMap<Integer, ContestRankings>();
+    cvrMap.put(contestId, contestRankings);
+    return new CastVoteRecord2(cvrMap);
   }
 }

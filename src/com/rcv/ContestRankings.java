@@ -13,6 +13,10 @@ public class ContestRankings {
     rankings.put(rank, value);
   }
 
+  public ContestRankings(Map<Integer, Integer> rankings) {
+    rankings = rankings;
+  }
+
   public ContestRankings() {}
 
 }
