@@ -39,7 +39,7 @@ public class RCVTester {
     tabulator2.tabulate();
   }
 
-  private CastVoteRecord2 makeCVR(int contestId, int rank1, int rank2, int rank3) {
+  private CastVoteRecord makeCVR(int contestId, int rank1, int rank2, int rank3) {
     SortedMap<Integer, Integer> rankings = new TreeMap<Integer, Integer>();
     rankings.put(1, rank1);
     rankings.put(2, rank2);
@@ -47,6 +47,6 @@ public class RCVTester {
     ContestRankings contestRankings = new ContestRankings(rankings);
     Map<Integer, ContestRankings> cvrMap = new HashMap<Integer, ContestRankings>();
     cvrMap.put(contestId, contestRankings);
-    return new CastVoteRecord2(cvrMap);
+    return new CastVoteRecord(cvrMap);
   }
 }

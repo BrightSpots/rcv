@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class JacksonParser {
 
-  public List<CastVoteRecord2> getCastVoteRecords() {
+  public List<CastVoteRecord> getCastVoteRecords() {
     return mCastVoteRecords.records;
   }
 

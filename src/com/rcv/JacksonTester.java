@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by Jon on 6/19/17.
@@ -53,11 +52,11 @@ public class JacksonTester {
       e.printStackTrace();
     }
 
-    // test parsing a CastVoteRecord2
+    // test parsing a CastVoteRecord
     try {
       ObjectMapper selectionMapper = new ObjectMapper();
       FileReader fileReader = new FileReader("./data/test_CastVoteRecord.json");
-      CastVoteRecord2 cvr2 = selectionMapper.readValue(fileReader, CastVoteRecord2.class);
+      CastVoteRecord cvr2 = selectionMapper.readValue(fileReader, CastVoteRecord.class);
       fileReader.close();
     } catch (FileNotFoundException e) {
       e.printStackTrace();

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.SortedMap;
 
 // maps contest IDs to ContestRankings objects
-public class CastVoteRecord2 {
+public class CastVoteRecord {
   private Map<Integer, ContestRankings> rankings = new HashMap<Integer, ContestRankings>();
 
   @JsonAnySetter
@@ -16,9 +16,9 @@ public class CastVoteRecord2 {
     rankings.put(rank, value);
   }
 
-  public CastVoteRecord2() {}
+  public CastVoteRecord() {}
 
-  public CastVoteRecord2(Map<Integer, ContestRankings> rankings) {
+  public CastVoteRecord(Map<Integer, ContestRankings> rankings) {
     this.rankings = rankings;
   }
 

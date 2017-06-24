@@ -18,7 +18,7 @@ public class CastVoteRecordList {
   // the election id for which these votes were cast
   public int election_id;
   // list of CastVoteRecords
-  public ArrayList<CastVoteRecord2> records = new ArrayList<CastVoteRecord2>();
+  public ArrayList<CastVoteRecord> records = new ArrayList<CastVoteRecord>();
 
   CastVoteRecordList() {}
 
