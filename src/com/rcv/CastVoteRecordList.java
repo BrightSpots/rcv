@@ -1,0 +1,25 @@
+package com.rcv;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.ArrayList;
+
+/**
+ * Created by Jon on 6/20/17.
+ *
+ * Container for multiple CastVoteRecords
+ *
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CastVoteRecordList {
+
+  @JsonIgnoreProperties("comment")
+
+  // the election id for which these votes were cast
+  public int election_id;
+  // list of CastVoteRecords
+  public ArrayList<CastVoteRecord2> records = new ArrayList<CastVoteRecord2>();
+
+  CastVoteRecordList() {}
+
+}

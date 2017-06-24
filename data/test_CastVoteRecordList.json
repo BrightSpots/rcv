@@ -1,7 +1,6 @@
 {
-  "comment":"Test CVR data for the test_election_0.json",
-  "id":0,
-  "name":"Maine 2018 General Election",
+  "comment":"Test CVR data for the test_CastVoteRecordList.json",
+  "election_id":0,
   "records":[
     {
       "0":{

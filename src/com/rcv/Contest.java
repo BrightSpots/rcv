@@ -3,9 +3,11 @@ package com.rcv;
 import java.util.List;
 
 public class Contest {
-  private int id;
-  private String name;
-  private List<ContestOption> options;
+  public int id;
+  public String name;
+  public List<ContestOption> options;
+
+  public Contest() {}
 
   public Contest(int id, String name, List<ContestOption> options) {
     this.id = id;

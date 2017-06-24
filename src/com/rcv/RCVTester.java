@@ -9,13 +9,16 @@ public class RCVTester {
 
 
   public static String TEST_ELECTION_PATH = "./data/test_election_0.json";
-  public static String TEST_CVR_PATH = "./data/test_cvr_0.json";
+  public static String TEST_CVR_PATH = "./data/test_CastVoteRecordList.json";
   public static String TEST_LOG_PATH = "./data/test_results.txt";
 
   public RCVTester() {
   }
 
   public void runTests() {
+
+    JacksonParser parser1 = new JacksonParser(TEST_ELECTION_PATH, TEST_CVR_PATH);
+
 //    int contestId = 1;
 //    List<CastVoteRecord> list = new LinkedList<CastVoteRecord>();
 //    list.add(makeCVR(contestId, 1, 2, 3));

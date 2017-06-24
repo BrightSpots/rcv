@@ -34,15 +34,14 @@ public class RCVParser {
       // cvr file has the election id and name for which these votes were cast
       // followed by an array of cast vote records
       JSONObject cvrObject = new JSONObject(jsonString);
-      int electionID = cvrObject.getInt("id");
-      String electionName = cvrObject.getString("name");
+      int electionID = cvrObject.getInt("election_id");
       JSONArray cvrArray = cvrObject.getJSONArray("records");
 
       // array to store the parsed results
       castVoteRecords = new ArrayList<CastVoteRecord>(cvrArray.length());
 
-      // each cast vote record is a mapping from election contest ID(s) to voter selections
-      // voter selections is a map of rank to contest option ID (a candidate)
+      // each cast vote record is a mapping from election contest ID(s) to voter rankings
+      // voter rankings is a map of rank to contest option ID (a candidate)
 
       // for each record
       for(int i = 0; i < cvrArray.length(); i++) {
@@ -55,7 +54,7 @@ public class RCVParser {
         for(Contest contest : election.getContests()) {
           // note: contest IDs are stored as strings in cvr json since we use them as keys
           String contestID = Integer.toString(contest.getId());
-          // get voter selections
+          // get voter rankings
           JSONObject contestSelections = voteObject.getJSONObject(contestID);
           // container for parsed java object
           SortedMap<Integer, Integer> userSelections = new TreeMap<Integer, Integer>();

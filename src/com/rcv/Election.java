@@ -1,11 +1,19 @@
 package com.rcv;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Election {
-  private int id;
-  private String name;
-  private List<Contest> contests;
+
+  public int id;
+  public String name;
+  public List<Contest> contests;
+
+  Election() {}
 
   Election(int id, String name, List<Contest> contests) {
     this.id = id;
