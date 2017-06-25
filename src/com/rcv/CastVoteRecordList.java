@@ -12,9 +12,7 @@ import java.util.ArrayList;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CastVoteRecordList {
-
-  @JsonIgnoreProperties("comment")
-
+  
   // the election id for which these votes were cast
   public int election_id;
   // list of CastVoteRecords
