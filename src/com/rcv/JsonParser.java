@@ -11,22 +11,12 @@ import java.io.IOException;
 /**
  * Created by Jon on 6/19/17.
  *
- *  Jackson wrapper to help parser json into rcv objects
+ *  Jackson wrapper to help parse json into rcv objects
  *
  */
 public class JsonParser {
 
-  JsonParser() {}
-
-
-  void runTests() {
-    Election election = JsonParser.parseObjectFromFile("./data/test_election_0.json", Election.class);
-    ContestRankings rankings = JsonParser.parseObjectFromFile("./data/test_ContestRankings.json", ContestRankings.class);
-    CastVoteRecord cvr = JsonParser.parseObjectFromFile("./data/test_CastVoteRecord.json", CastVoteRecord.class);
-    CastVoteRecordList cvrList = JsonParser.parseObjectFromFile("./data/test_CastVoteRecordList.json", CastVoteRecordList.class);
-
-  }
-
+  // TODO: add logging and recovery logic
   public static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
     try {
       ObjectMapper electionMapper = new ObjectMapper();

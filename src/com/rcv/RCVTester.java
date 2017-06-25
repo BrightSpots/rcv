@@ -8,17 +8,23 @@ import java.util.*;
 public class RCVTester {
 
 
-  public static String TEST_ELECTION_PATH = "./data/test_election_0.json";
-  public static String TEST_CVR_PATH = "./data/test_CastVoteRecordList.json";
-  public static String TEST_LOG_PATH = "./data/test_results.txt";
+  public static String TEST_ELECTION_PATH = "./data/Election.json";
+  public static String TEST_CVR_LIST_PATH = "./data/CastVoteRecordList.json";
+  public static String TEST_CVR_PATH = "./data/CastVoteRecord.json";
+  public static String TEST_CONTEST_RANKINGS = "./data/ContestRankings.json";
+//  public static String TEST_LOG_PATH = "./data/test_results.txt";
 
   public RCVTester() {
   }
 
   public void runTests() {
 
-    JsonParser parser = new JsonParser();
-    parser.runTests();
+    // test parsing different election objects
+    Election election = JsonParser.parseObjectFromFile(TEST_ELECTION_PATH, Election.class);
+    ContestRankings rankings = JsonParser.parseObjectFromFile(TEST_CONTEST_RANKINGS, ContestRankings.class);
+    CastVoteRecord cvr = JsonParser.parseObjectFromFile(TEST_CVR_PATH, CastVoteRecord.class);
+    // use the cvr list as input to the tabulator below
+    CastVoteRecordList cvrList = JsonParser.parseObjectFromFile(TEST_CVR_LIST_PATH, CastVoteRecordList.class);
 
 //    int contestId = 1;
 //    List<CastVoteRecord> list = new LinkedList<CastVoteRecord>();
@@ -34,10 +40,7 @@ public class RCVTester {
     contestOptions.add(2);
     int contestId = 0;
 
-    Election election = JsonParser.parseObjectFromFile(TEST_ELECTION_PATH, Election.class);
-
-    CastVoteRecordList cvrList = JsonParser.parseObjectFromFile(TEST_CVR_PATH, CastVoteRecordList.class);
-
+    // TODO: Tabulator takes an election object as input and tabulates all the contests defined in Election
     Tabulator tabulator = new Tabulator(cvrList.records, contestId, contestOptions);
     tabulator.tabulate();
     Tabulator tabulator2 = new Tabulator(cvrList.records, 1, contestOptions);
