@@ -4,27 +4,27 @@ import java.util.*;
 
 /**
  * Created by Jon on 6/18/17.
+ *
+ * Test harness for RCV module
+ *
  */
 public class RCVTester {
 
+  public static String ELECTION_PATH = "./test/Election.json";
+  public static String CAST_VOTE_RECORD_PATH = "./test/CastVoteRecord.json";
+  public static String CONTEST_RANKINGS_PATH = "./test/ContestRankings.json";
 
-  public static String TEST_ELECTION_PATH = "./data/Election.json";
-  public static String TEST_CVR_LIST_PATH = "./data/CastVoteRecordList.json";
-  public static String TEST_CVR_PATH = "./data/CastVoteRecord.json";
-  public static String TEST_CONTEST_RANKINGS = "./data/ContestRankings.json";
-//  public static String TEST_LOG_PATH = "./data/test_results.txt";
+  public static String CAST_VOTE_RECORD_LIST_PATH = "./test/CastVoteRecordList.json";
 
-  public RCVTester() {
-  }
+  //  public static String TEST_LOG_PATH = "./data/test_results.txt";
 
-  public void runTests() {
+  public static void runTests() {
 
     // test parsing different election objects
-    Election election = JsonParser.parseObjectFromFile(TEST_ELECTION_PATH, Election.class);
-    ContestRankings rankings = JsonParser.parseObjectFromFile(TEST_CONTEST_RANKINGS, ContestRankings.class);
-    CastVoteRecord cvr = JsonParser.parseObjectFromFile(TEST_CVR_PATH, CastVoteRecord.class);
-    // use the cvr list as input to the tabulator below
-    CastVoteRecordList cvrList = JsonParser.parseObjectFromFile(TEST_CVR_LIST_PATH, CastVoteRecordList.class);
+    Election election = JsonParser.parseObjectFromFile(ELECTION_PATH, Election.class);
+    ContestRankings rankings = JsonParser.parseObjectFromFile(CONTEST_RANKINGS_PATH, ContestRankings.class);
+    CastVoteRecord cvr = JsonParser.parseObjectFromFile(CAST_VOTE_RECORD_PATH, CastVoteRecord.class);
+
 
 //    int contestId = 1;
 //    List<CastVoteRecord> list = new LinkedList<CastVoteRecord>();
@@ -40,7 +40,9 @@ public class RCVTester {
     contestOptions.add(2);
     int contestId = 0;
 
-    // TODO: Tabulator takes an election object as input and tabulates all the contests defined in Election
+    // TODO: Tabulator takes election object as input and tabulates all the contests defined in Election
+    // use the cvr list as input to tabulator below
+    CastVoteRecordList cvrList = JsonParser.parseObjectFromFile(CAST_VOTE_RECORD_LIST_PATH, CastVoteRecordList.class);
     Tabulator tabulator = new Tabulator(cvrList.records, contestId, contestOptions);
     tabulator.tabulate();
     Tabulator tabulator2 = new Tabulator(cvrList.records, 1, contestOptions);
