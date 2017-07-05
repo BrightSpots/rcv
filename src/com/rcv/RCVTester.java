@@ -10,11 +10,10 @@ import java.util.*;
  */
 public class RCVTester {
 
-  public static String ELECTION_PATH = "./test/Election.json";
-  public static String CAST_VOTE_RECORD_PATH = "./test/CastVoteRecord.json";
-  public static String CONTEST_RANKINGS_PATH = "./test/ContestRankings.json";
-
-  public static String CAST_VOTE_RECORD_LIST_PATH = "./test/CastVoteRecordList.json";
+  static String ELECTION_PATH = "./test/Election.json";
+  static String CAST_VOTE_RECORD_PATH = "./test/CastVoteRecord.json";
+  static String CONTEST_RANKINGS_PATH = "./test/ContestRankings.json";
+  static String CAST_VOTE_RECORD_LIST_PATH = "./test/CastVoteRecordList.json";
 
   //  public static String TEST_LOG_PATH = "./data/test_results.txt";
 
@@ -25,28 +24,24 @@ public class RCVTester {
     ContestRankings rankings = JsonParser.parseObjectFromFile(CONTEST_RANKINGS_PATH, ContestRankings.class);
     CastVoteRecord cvr = JsonParser.parseObjectFromFile(CAST_VOTE_RECORD_PATH, CastVoteRecord.class);
 
-
-//    int contestId = 1;
-//    List<CastVoteRecord> list = new LinkedList<CastVoteRecord>();
-//    list.add(new CastVoteRecord(contestId, 1, 2, 3));
-//    list.add(new CastVoteRecord(contestId, 2, 1, 3));
-//    list.add(new CastVoteRecord(contestId, 1, 2, 3));
-//    list.add(new CastVoteRecord(contestId, 2, 1, 3));
-//    list.add(new CastVoteRecord(contestId, 1, 3, 2));
-//    list.add(new CastVoteRecord(contestId, 2, 1, 3));
     List<Integer> contestOptions = new LinkedList<Integer>();
     contestOptions.add(0);
     contestOptions.add(1);
     contestOptions.add(2);
-    int contestId = 0;
 
     // TODO: Tabulator takes election object as input and tabulates all the contests defined in Election
     // use the cvr list as input to tabulator below
     CastVoteRecordList cvrList = JsonParser.parseObjectFromFile(CAST_VOTE_RECORD_LIST_PATH, CastVoteRecordList.class);
-    Tabulator tabulator = new Tabulator(cvrList.records, contestId, contestOptions);
+    System.out.println("\nContest 0:");
+    Tabulator tabulator = new Tabulator(cvrList.records, 0, contestOptions);
     tabulator.tabulate();
+    System.out.println("\nContest 1:");
     Tabulator tabulator2 = new Tabulator(cvrList.records, 1, contestOptions);
     tabulator2.tabulate();
+    System.out.println("\nContest 2:");
+    Tabulator tabulator3 = new Tabulator(cvrList.records, 2, contestOptions);
+    tabulator3.setBatchElimination(true);
+    tabulator3.tabulate();
   }
 
 }
