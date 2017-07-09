@@ -69,20 +69,30 @@ public class Tabulator {
   }
 
   public void tabulate() {
+    // map of round to a map of candidate ID -> vote totals for that round
     Map<Integer, Map<Integer, Integer>> roundTallies = new HashMap<Integer, Map<Integer, Integer>>();
+    // map of candidate IDs to the round they were eliminated in
     Map<Integer, Integer> eliminatedRound = new HashMap<Integer, Integer>();
     int round = 1;
     Integer winner;
 
+    // loop until we achieve a majority winner:
+    // at each iteration we will eliminate the lowest-total candidate OR multiple losing candidates if using batch
+    // elimination logic (Maine rules)
     while (true) {
+      // map of candidate ID to vote tallies
+      // tallies are generated based on eliminated candidates in eliminatedRound object
       Map<Integer, Integer> roundTally = getRoundTally(eliminatedRound);
       roundTallies.put(round, roundTally);
 
       // We fully sort the list in case we want to run batch elimination.
       int totalVotes = 0;
+      // map of vote tally to candidate(s).  A list is used to handle ties.
       SortedMap<Integer, LinkedList<Integer>> countToCandidates = new TreeMap<Integer, LinkedList<Integer>>();
+      // for each candidate record their vote total into the countTOCandidates object
       for (int contestOptionId : roundTally.keySet()) {
         int votes = roundTally.get(contestOptionId);
+        // count the total votes cast in this round
         totalVotes += votes;
         LinkedList<Integer> candidates = countToCandidates.get(votes);
         if (candidates == null) {
@@ -92,26 +102,26 @@ public class Tabulator {
         candidates.add(contestOptionId);
       }
 
-      log("Total votes in round " + round + ": " + totalVotes + ".");
+      RCVLogger.log("Total votes in round " + round + ": " + totalVotes + ".");
 
       int maxVotes = countToCandidates.lastKey();
       // Does the leader have a majority of non-exhausted ballots?
       if (maxVotes > (float)totalVotes / 2.0) {
         winner = countToCandidates.get(maxVotes).getFirst();
-        log(
+        RCVLogger.log(
           winner + " won in round " + round + " with " + maxVotes + " vote(s)."
         );
         break;
       }
 
+      // container for eliminated candidate(s)
       List<Integer> eliminated = new LinkedList<Integer>();
-
       if (batchElimination) {
         eliminated.addAll(runBatchElimination(round, countToCandidates));
       }
 
-      // If batch is enabled and it caught anyone, don't apply regular elimination logic on this iteration.
-      // Otherwise, eliminate last place (breaking tie if necessary).
+      // If batch elimination caught anyone, don't apply regular elimination logic on this iteration.
+      // Otherwise, eliminate last place, breaking tie if necessary.
       if (eliminated.isEmpty()) {
         int loser;
         int minVotes = countToCandidates.firstKey();
@@ -120,13 +130,13 @@ public class Tabulator {
           TieBreak tieBreak = new TieBreak(lastPlace);
           loser = tieBreak.getSelection();
           tieBreaks.put(round, tieBreak);
-          log(
+          RCVLogger.log(
             loser + " lost a tie-breaker in round " + round + " against " + tieBreak.nonSelectedString() +
               ". Each candidate had " + minVotes + " vote(s)."
           );
         } else {
           loser = lastPlace.getFirst();
-          log(loser + " was eliminated in round " + round + " with " + minVotes + " vote(s).");
+          RCVLogger.log(loser + " was eliminated in round " + round + " with " + minVotes + " vote(s).");
         }
         eliminated.add(loser);
       }
@@ -151,7 +161,7 @@ public class Tabulator {
       if (runningTotal < currentVoteCount) {
         eliminated.addAll(candidatesSeen);
         for (int candidate : candidatesSeen) {
-          log(
+          RCVLogger.log(
             "Batch-eliminated " + candidate + " in round " + round + ". The running total was " + runningTotal +
               " vote(s) and the next-highest count was " + currentVoteCount + " vote(s)."
           );
