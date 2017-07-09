@@ -11,10 +11,10 @@ import java.io.IOException;
 public class ContestRanking {
 
   int optionId;
-  int ranking;
+  int rank;
 
-  ContestRanking(int ranking, int optionId) {
-    this.ranking = ranking;
+  ContestRanking(int rank, int optionId) {
+    this.rank = rank;
     this.optionId = optionId;
   }
 
@@ -22,8 +22,8 @@ public class ContestRanking {
     return optionId;
   }
 
-  public int getRanking() {
-    return ranking;
+  public int getRank() {
+    return rank;
   }
 
   static class ContestRankingDeserializer extends JsonDeserializer<ContestRanking> {

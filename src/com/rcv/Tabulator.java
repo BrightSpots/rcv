@@ -178,7 +178,7 @@ public class Tabulator {
   private SortedMap<Integer, Integer> makeMap(List<ContestRanking> rankings) {
     SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
     for (ContestRanking ranking : rankings) {
-      System.out.println(ranking.getRanking() + ": " + ranking.getOptionId());
+      map.put(ranking.getRank(), ranking.getOptionId());
     }
     return map;
   }
