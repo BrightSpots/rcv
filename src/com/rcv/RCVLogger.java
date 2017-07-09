@@ -3,7 +3,6 @@ package com.rcv;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Created by Jon on 7/8/17.
@@ -25,7 +24,7 @@ public class RCVLogger {
 
   public static void setup(String log_output_path) throws IOException {
     sFileHandler = new FileHandler(log_output_path);
-    SimpleFormatter formatter = new SimpleFormatter();
+    LogFormatter formatter = new LogFormatter();
     sFileHandler.setFormatter(formatter);
     sLogger.addHandler(sFileHandler);
   }
