@@ -96,7 +96,7 @@ public class Tabulator {
 
       int maxVotes = countToCandidates.lastKey();
       // Does the leader have a majority of non-exhausted ballots?
-      if (maxVotes >= ((float)totalVotes + 1.0) / 2.0) {
+      if (maxVotes > (float)totalVotes / 2.0) {
         winner = countToCandidates.get(maxVotes).getFirst();
         log(
           winner + " won in round " + round + " with " + maxVotes + " vote(s)."
