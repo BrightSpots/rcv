@@ -3,6 +3,7 @@ package com.rcv;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jon on 6/20/17.
@@ -14,10 +15,13 @@ import java.util.ArrayList;
 public class CastVoteRecordList {
   
   // the election id for which these votes were cast
-  public int election_id;
+  int electionId;
   // list of CastVoteRecords
-  public ArrayList<CastVoteRecord> records = new ArrayList<CastVoteRecord>();
+  List<CastVoteRecord> records = new ArrayList<CastVoteRecord>();
 
   CastVoteRecordList() {}
 
+  List<CastVoteRecord> getRecords() {
+    return records;
+  }
 }

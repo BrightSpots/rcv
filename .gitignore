@@ -1,3 +1,4 @@
 .idea
 out
 tmp
+test/election_summary_report.txt

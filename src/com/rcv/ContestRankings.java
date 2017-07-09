@@ -1,22 +1,30 @@
 package com.rcv;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import java.util.*;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-// Maps contest ID(s) to rankings a voter made for that contest
+import java.io.IOException;
+
+// Maps contest option ID(s) to rankings a voter made for that contest
+@JsonDeserialize(using = ContestRankings.ContestRankingsDeserializer.class)
 public class ContestRankings {
-  public SortedMap<Integer, Integer> rankings = new TreeMap<Integer, Integer>();
+  List<ContestRanking> rankings = new LinkedList<ContestRanking>();
 
-  @JsonAnySetter
-  public void add(String key, Integer value) {
-    Integer rank = Integer.parseInt(key);
-    rankings.put(rank, value);
+  public ContestRankings(List<ContestRanking> rankings) {
+    this.rankings = rankings;
   }
 
-  public ContestRankings(SortedMap<Integer, Integer> _rankings) {
-    rankings = _rankings;
+  static class ContestRankingsDeserializer extends JsonDeserializer<ContestRankings> {
+    @Override
+    public ContestRankings deserialize(
+      JsonParser jsonParser,
+      DeserializationContext deserializationContext
+    ) throws IOException {
+      final ContestRanking[] array = jsonParser.readValueAs(ContestRanking[].class);
+      return new ContestRankings(Arrays.asList(array));
+    }
   }
-
-  public ContestRankings() {}
-
 }

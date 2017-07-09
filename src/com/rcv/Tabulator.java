@@ -175,6 +175,14 @@ public class Tabulator {
     return eliminated;
   }
 
+  private SortedMap<Integer, Integer> makeMap(List<ContestRanking> rankings) {
+    SortedMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
+    for (ContestRanking ranking : rankings) {
+      System.out.println(ranking.getRanking() + ": " + ranking.getOptionId());
+    }
+    return map;
+  }
+
   private Map<Integer, Integer> getRoundTally(Map<Integer, Integer> eliminatedRound) {
     Map<Integer, Integer> roundTally = new HashMap<Integer, Integer>();
 
@@ -186,7 +194,7 @@ public class Tabulator {
 
     // count first-place votes, considering only non-eliminated options
     for (CastVoteRecord cvr : castVoteRecords) {
-      SortedMap<Integer, Integer> rankings = cvr.getRankingsForContest(contestId);
+      SortedMap<Integer, Integer> rankings = makeMap(cvr.getRankingsForContest(contestId));
       if (rankings == null) {
         continue;
       }

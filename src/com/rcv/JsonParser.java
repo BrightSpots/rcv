@@ -8,12 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-/**
- * Created by Jon on 6/19/17.
- *
- *  Jackson wrapper to help parse json into rcv objects
- *
- */
+// Jackson wrapper to help parse json into rcv objects
 public class JsonParser {
 
   // TODO: add logging and recovery logic
