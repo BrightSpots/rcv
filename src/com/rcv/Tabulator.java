@@ -69,6 +69,14 @@ public class Tabulator {
   }
 
   public void tabulate() {
+
+    RCVLogger.log("Beginning tabulation for contest:%d", this.contestId);
+    RCVLogger.log("there are %d candidates for this contest:", this.contestOptions.size());
+    for (Integer option : this.contestOptions) {
+      RCVLogger.log("%d", option);
+    }
+    RCVLogger.log("there are %d cast vote records for this contest", this.castVoteRecords.size());
+
     // map of round to a map of candidate ID -> vote totals for that round
     Map<Integer, Map<Integer, Integer>> roundTallies = new HashMap<Integer, Map<Integer, Integer>>();
     // map of candidate IDs to the round they were eliminated in
@@ -82,8 +90,10 @@ public class Tabulator {
     // at each iteration we will eliminate the lowest-total candidate OR multiple losing candidates if using batch
     // elimination logic (Maine rules)
     while (true) {
+      RCVLogger.log("Round: %d", round);
+
       // map of candidate ID to vote tallies
-      // tallies are generated based on eliminated candidates in eliminatedRound object
+      // tallies are generated based on previously eliminated candidates (contained in eliminatedRound object)
       Map<Integer, Integer> roundTally = getRoundTally(sortedRankings, eliminatedRound);
       roundTallies.put(round, roundTally);
 
@@ -94,6 +104,9 @@ public class Tabulator {
       // for each candidate record their vote total into the countTOCandidates object
       for (int contestOptionId : roundTally.keySet()) {
         int votes = roundTally.get(contestOptionId);
+
+        RCVLogger.log("candidate %d got %d votes", contestOptionId, votes);
+        
         // count the total votes cast in this round
         totalVotes += votes;
         LinkedList<Integer> candidates = countToCandidates.get(votes);
@@ -104,15 +117,14 @@ public class Tabulator {
         candidates.add(contestOptionId);
       }
 
-      log("Total votes in round " + round + ": " + totalVotes + ".");
+      RCVLogger.log("Total votes in round %d:%d", round , totalVotes);
 
       int maxVotes = countToCandidates.lastKey();
       // Does the leader have a majority of non-exhausted ballots?
       if (maxVotes > (float)totalVotes / 2.0) {
         winner = countToCandidates.get(maxVotes).getFirst();
-        log(
-          winner + " won in round " + round + " with " + maxVotes + " vote(s)."
-        );
+        RCVLogger.log(
+          winner + " won in round %d with %d votes",round , maxVotes);
         break;
       }
 
@@ -132,13 +144,13 @@ public class Tabulator {
           TieBreak tieBreak = new TieBreak(lastPlace);
           loser = tieBreak.getSelection();
           tieBreaks.put(round, tieBreak);
-          log(
+          RCVLogger.log(
             loser + " lost a tie-breaker in round " + round + " against " + tieBreak.nonSelectedString() +
               ". Each candidate had " + minVotes + " vote(s)."
           );
         } else {
           loser = lastPlace.getFirst();
-          log(loser + " was eliminated in round " + round + " with " + minVotes + " vote(s).");
+          RCVLogger.log(loser + " was eliminated in round " + round + " with " + minVotes + " vote(s).");
         }
         eliminated.add(loser);
       }
@@ -183,6 +195,7 @@ public class Tabulator {
   ) {
     Map<Integer, Integer> roundTally = new HashMap<Integer, Integer>();
 
+    // if a candidate has already been eliminated they get 0 votes
     for (int contestOptionId : contestOptions) {
       if (eliminatedRound.get(contestOptionId) == null) {
         roundTally.put(contestOptionId, 0);
@@ -199,6 +212,7 @@ public class Tabulator {
         }
         int contestOptionId = contestOptionIds.iterator().next();
         if (eliminatedRound.get(contestOptionId) == null) {
+          // found a continuing candidate so increase their tally by 1
           roundTally.put(contestOptionId, roundTally.get(contestOptionId) + 1);
           break;
         }

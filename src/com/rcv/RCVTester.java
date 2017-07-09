@@ -26,9 +26,6 @@ public class RCVTester {
       System.out.println("failed to open log file:" + TEST_LOG_PATH);
       return 1;
     }
-    RCVLogger.log("running RCV test");
-    RCVLogger.log("test %d", 2);
-
     List<Integer> contestOptions = new LinkedList<Integer>();
     contestOptions.add(0);
     contestOptions.add(1);
@@ -38,15 +35,12 @@ public class RCVTester {
     // use the cvr list as input to tabulator below
     CastVoteRecordList cvrList = JsonParser.parseObjectFromFile(CAST_VOTE_RECORD_LIST_PATH, CastVoteRecordList.class);
 
-    RCVLogger.log("Contest 0:");
     Tabulator tabulator = new Tabulator(cvrList.getRecords(), 0, contestOptions);
     tabulator.tabulate();
 
-    RCVLogger.log("Contest 1:");
     Tabulator tabulator2 = new Tabulator(cvrList.getRecords(), 1, contestOptions);
     tabulator2.tabulate();
 
-    RCVLogger.log("Contest 2:");
     Tabulator tabulator3 = new Tabulator(cvrList.getRecords(), 2, contestOptions);
     tabulator3.setBatchElimination(true);
     tabulator3.tabulate();
