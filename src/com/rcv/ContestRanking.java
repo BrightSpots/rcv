@@ -10,15 +10,15 @@ import java.io.IOException;
 @JsonDeserialize(using = ContestRanking.ContestRankingDeserializer.class)
 public class ContestRanking {
 
-  int optionId;
+  String optionId;
   int rank;
 
-  ContestRanking(int rank, int optionId) {
+  ContestRanking(int rank, String optionId) {
     this.rank = rank;
     this.optionId = optionId;
   }
 
-  public int getOptionId() {
+  public String getOptionId() {
     return optionId;
   }
 
@@ -32,8 +32,8 @@ public class ContestRanking {
       JsonParser jsonParser,
       DeserializationContext deserializationContext
     ) throws IOException {
-      final Integer[] array = jsonParser.readValueAs(Integer[].class);
-      return new ContestRanking(array[0], array[1]);
+      final Object[] array = jsonParser.readValueAs(Object[].class);
+      return new ContestRanking((Integer)array[0], (String)array[1]);
     }
   }
 }

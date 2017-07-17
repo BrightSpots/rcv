@@ -6,18 +6,18 @@ public class Tabulator {
 
   private List<CastVoteRecord> castVoteRecords;
   private int contestId;
-  private List<Integer> contestOptions;
+  private List<String> contestOptions;
   private boolean batchElimination = false;
 
   static class TieBreak {
-    List<Integer> contestOptionIds;
-    Integer selection;
+    List<String> contestOptionIds;
+    String selection;
 
-    TieBreak(List<Integer> contestOptionIds) {
+    TieBreak(List<String> contestOptionIds) {
       this.contestOptionIds = contestOptionIds;
     }
 
-    int getSelection() {
+    String getSelection() {
       if (selection == null) {
         selection = breakTie();
       }
@@ -25,8 +25,8 @@ public class Tabulator {
     }
 
     String nonSelectedString() {
-      ArrayList<Integer> options = new ArrayList<Integer>();
-      for (int contestOptionId : contestOptionIds) {
+      ArrayList<String> options = new ArrayList<String>();
+      for (String contestOptionId : contestOptionIds) {
         if (contestOptionId != selection) {
           options.add(contestOptionId);
         }
@@ -44,7 +44,7 @@ public class Tabulator {
       return sb.toString();
     }
 
-    private int breakTie() {
+    private String breakTie() {
       // TODO: use java.security.SecureRandom
       double r = Math.random();
       int index = (int)Math.floor(r * (double)contestOptionIds.size());
@@ -57,7 +57,7 @@ public class Tabulator {
   public Tabulator(
     List<CastVoteRecord> castVoteRecords,
     int contestId,
-    List<Integer> contestOptions
+    List<String> contestOptions
   ) {
     this.castVoteRecords = castVoteRecords;
     this.contestId = contestId;
@@ -72,19 +72,20 @@ public class Tabulator {
 
     RCVLogger.log("Beginning tabulation for contest:%d", this.contestId);
     RCVLogger.log("there are %d candidates for this contest:", this.contestOptions.size());
-    for (Integer option : this.contestOptions) {
-      RCVLogger.log("%d", option);
+    for (String option : this.contestOptions) {
+      RCVLogger.log("%s", option);
     }
     RCVLogger.log("there are %d cast vote records for this contest", this.castVoteRecords.size());
 
-    // map of round to a map of candidate ID -> vote totals for that round
-    Map<Integer, Map<Integer, Integer>> roundTallies = new HashMap<Integer, Map<Integer, Integer>>();
-    // map of candidate IDs to the round they were eliminated in
-    Map<Integer, Integer> eliminatedRound = new HashMap<Integer, Integer>();
-    int round = 1;
-    Integer winner;
+    // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
+    Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
 
-    List<SortedMap<Integer, Set<Integer>>> sortedRankings = sortCastVoteRecords(castVoteRecords);
+    // eliminatedRound object is a map of candidate IDs to the round in which they were eliminated
+    Map<String, Integer> eliminatedRound = new HashMap<String, Integer>();
+    int round = 1;
+    String winner;
+
+    List<SortedMap<Integer, Set<String>>> sortedRankings = sortCastVoteRecords(castVoteRecords);
 
     // loop until we achieve a majority winner:
     // at each iteration we will eliminate the lowest-total candidate OR multiple losing candidates if using batch
@@ -92,26 +93,29 @@ public class Tabulator {
     while (true) {
       RCVLogger.log("Round: %d", round);
 
-      // map of candidate ID to vote tallies
-      // tallies are generated based on previously eliminated candidates (contained in eliminatedRound object)
-      Map<Integer, Integer> roundTally = getRoundTally(sortedRankings, eliminatedRound);
+      // roundTally is map of candidate ID to vote tallies
+      // generated based on previously eliminated candidates contained in eliminatedRound object
+      // at each iteration of this loop, the eliminatedRound object will get more entries as candidates are eliminated
+      // conversely the roundTally object returned here will contain fewer entries each of which will have more votes
+      // eventually a winner will be chosen
+      Map<String, Integer> roundTally = getRoundTally(sortedRankings, eliminatedRound);
       roundTallies.put(round, roundTally);
 
       // We fully sort the list in case we want to run batch elimination.
       int totalVotes = 0;
       // map of vote tally to candidate(s).  A list is used to handle ties.
-      SortedMap<Integer, LinkedList<Integer>> countToCandidates = new TreeMap<Integer, LinkedList<Integer>>();
+      SortedMap<Integer, LinkedList<String>> countToCandidates = new TreeMap<Integer, LinkedList<String>>();
       // for each candidate record their vote total into the countTOCandidates object
-      for (int contestOptionId : roundTally.keySet()) {
+      for (String contestOptionId : roundTally.keySet()) {
         int votes = roundTally.get(contestOptionId);
 
-        RCVLogger.log("candidate %d got %d votes", contestOptionId, votes);
+        RCVLogger.log("candidate %s got %d votes", contestOptionId, votes);
         
         // count the total votes cast in this round
         totalVotes += votes;
-        LinkedList<Integer> candidates = countToCandidates.get(votes);
+        LinkedList<String> candidates = countToCandidates.get(votes);
         if (candidates == null) {
-          candidates = new LinkedList<Integer>();
+          candidates = new LinkedList<String>();
           countToCandidates.put(votes, candidates);
         }
         candidates.add(contestOptionId);
@@ -129,7 +133,7 @@ public class Tabulator {
       }
 
       // container for eliminated candidate(s)
-      List<Integer> eliminated = new LinkedList<Integer>();
+      List<String> eliminated = new LinkedList<String>();
       if (batchElimination) {
         eliminated.addAll(runBatchElimination(round, countToCandidates));
       }
@@ -137,9 +141,9 @@ public class Tabulator {
       // If batch elimination caught anyone, don't apply regular elimination logic on this iteration.
       // Otherwise, eliminate last place, breaking tie if necessary.
       if (eliminated.isEmpty()) {
-        int loser;
+        String loser;
         int minVotes = countToCandidates.firstKey();
-        LinkedList<Integer> lastPlace = countToCandidates.get(minVotes);
+        LinkedList<String> lastPlace = countToCandidates.get(minVotes);
         if (lastPlace.size() > 1) {
           TieBreak tieBreak = new TieBreak(lastPlace);
           loser = tieBreak.getSelection();
@@ -155,7 +159,7 @@ public class Tabulator {
         eliminated.add(loser);
       }
 
-      for (int loser : eliminated) {
+      for (String loser : eliminated) {
         eliminatedRound.put(loser, round);
       }
 
@@ -167,21 +171,21 @@ public class Tabulator {
     RCVLogger.log(s);
   }
 
-  private List<Integer> runBatchElimination(int round, SortedMap<Integer, LinkedList<Integer>> countToCandidates) {
+  private List<String> runBatchElimination(int round, SortedMap<Integer, LinkedList<String>> countToCandidates) {
     int runningTotal = 0;
-    List<Integer> candidatesSeen = new LinkedList<Integer>();
-    List<Integer> eliminated = new LinkedList<Integer>();
+    List<String> candidatesSeen = new LinkedList<String>();
+    List<String> eliminated = new LinkedList<String>();
     for (int currentVoteCount : countToCandidates.keySet()) {
       if (runningTotal < currentVoteCount) {
         eliminated.addAll(candidatesSeen);
-        for (int candidate : candidatesSeen) {
+        for (String candidate : candidatesSeen) {
           log(
             "Batch-eliminated " + candidate + " in round " + round + ". The running total was " + runningTotal +
               " vote(s) and the next-highest count was " + currentVoteCount + " vote(s)."
           );
         }
       }
-      List<Integer> currentCandidates = countToCandidates.get(currentVoteCount);
+      List<String> currentCandidates = countToCandidates.get(currentVoteCount);
       runningTotal += currentVoteCount * currentCandidates.size();
       candidatesSeen.addAll(currentCandidates);
     }
@@ -189,28 +193,33 @@ public class Tabulator {
     return eliminated;
   }
 
-  private Map<Integer, Integer> getRoundTally(
-    List<SortedMap<Integer, Set<Integer>>> allSortedRankings,
-    Map<Integer, Integer> eliminatedRound
+  // roundTally returns a map of candidate ID to vote tallies
+  // generated based on previously eliminated candidates contained in eliminatedRound object
+  // at each iteration of this loop, the eliminatedRound object will get more entries as candidates are eliminated
+  // conversely the roundTally object returned here will contain fewer entries each of which will have more votes
+  // eventually a winner will be chosen
+  private Map<String, Integer> getRoundTally(
+    List<SortedMap<Integer, Set<String>>> allSortedRankings,
+    Map<String, Integer> eliminatedRound
   ) {
-    Map<Integer, Integer> roundTally = new HashMap<Integer, Integer>();
+    Map<String, Integer> roundTally = new HashMap<String, Integer>();
 
     // if a candidate has already been eliminated they get 0 votes
-    for (int contestOptionId : contestOptions) {
+    for (String contestOptionId : contestOptions) {
       if (eliminatedRound.get(contestOptionId) == null) {
         roundTally.put(contestOptionId, 0);
       }
     }
 
     // count first-place votes, considering only non-eliminated options
-    for (SortedMap<Integer, Set<Integer>> rankings : allSortedRankings) {
+    for (SortedMap<Integer, Set<String>> rankings : allSortedRankings) {
       for (int rank : rankings.keySet()) {
-        Set<Integer> contestOptionIds = rankings.get(rank);
+        Set<String> contestOptionIds = rankings.get(rank);
         if (contestOptionIds.size() > 1) {
           System.out.println("Overvote!");
           continue;
         }
-        int contestOptionId = contestOptionIds.iterator().next();
+        String contestOptionId = contestOptionIds.iterator().next();
         if (eliminatedRound.get(contestOptionId) == null) {
           // found a continuing candidate so increase their tally by 1
           roundTally.put(contestOptionId, roundTally.get(contestOptionId) + 1);
@@ -222,16 +231,27 @@ public class Tabulator {
     return roundTally;
   }
 
-  private List<SortedMap<Integer, Set<Integer>>> sortCastVoteRecords(List<CastVoteRecord> castVoteRecords) {
-    List<SortedMap<Integer, Set<Integer>>> allSortedRankings = new LinkedList<SortedMap<Integer, Set<Integer>>>();
+  // input is a list of CastVoteRecords
+  // 
+  private List<SortedMap<Integer, Set<String>>> sortCastVoteRecords(List<CastVoteRecord> castVoteRecords) {
+    // returns a list of "sortedCVRs"
+    List<SortedMap<Integer, Set<String>>> allSortedRankings = new LinkedList<SortedMap<Integer, Set<String>>>();
+
+    // for each input CVR see what rankings were given for the contest of interest
     for (CastVoteRecord cvr : castVoteRecords) {
-      SortedMap<Integer, Set<Integer>> sortedCVR = new TreeMap<Integer, Set<Integer>>();
+      // sortedCVR will contain the rankings for the contest of interest in order from low to high
+      // note: we use a set<Integer> here because there may be overvotes with different candidates getting
+      // the same ranking, for example ranking 3 could map to candidates 1 and 2
+      SortedMap<Integer, Set<String>> sortedCVR = new TreeMap<Integer, Set<String>>();
       for (ContestRanking ranking : cvr.getRankingsForContest(contestId)) {
-        Set<Integer> optionsAtRank = sortedCVR.get(ranking.getRank());
+        // set of candidates given this rank
+        Set<String> optionsAtRank = sortedCVR.get(ranking.getRank());
         if (optionsAtRank == null) {
-          optionsAtRank = new HashSet<Integer>();
+          // create the new optionsAtRank and add to the sorted cvr
+          optionsAtRank = new HashSet<String>();
           sortedCVR.put(ranking.getRank(), optionsAtRank);
         }
+        // add this option into the map
         optionsAtRank.add(ranking.getOptionId());
       }
       allSortedRankings.add(sortedCVR);

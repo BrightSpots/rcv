@@ -4,46 +4,46 @@
   "records":[
     {
       "0":[
-        [1,2], [2,1], [3,0]
+        [1,"Eric Clapton"], [2,"Eric Clapton"], [3,"Santana"]
       ],
       "1":[
-        [1,1], [2,0], [3,2]
+        [1,"Eric Clapton"], [2,"Santana"], [3,"Van Halen"]
       ],
       "2":[
-        [1,0], [2,1], [3,2]
+        [1,"Santana"], [2,"Eric Clapton"], [3,"Van Halen"]
       ]
     },
     {
       "0":[
-        [1,2], [2,1], [3,0]
+        [1,"Van Halen"], [2,"Eric Clapton"], [3,"Santana"]
       ],
       "1":[
-        [1,1], [2,0], [3,2]
+        [1,"Eric Clapton"], [2,"Santana"], [3,"Van Halen"]
       ],
       "2":[
-        [1,0], [2,2], [3,1]
+        [1,"Santana"], [2,"Van Halen"], [3,"Eric Clapton"]
       ]
     },
     {
       "0":[
-        [1,0], [2,1], [3,2]
+        [1,"Santana"], [2,"Eric Clapton"], [3,"Van Halen"]
       ],
       "1":[
-        [1,2], [2,0], [3,1]
+        [1,"Van Halen"], [2,"Santana"], [3,"Eric Clapton"]
       ],
       "2":[
-        [1,1], [2,0], [3,2]
+        [1,"Eric Clapton"], [2,"Santana"], [3,"Van Halen"]
       ]
     },
     {
       "0":[
-        [1,0], [2,2], [3,1]
+        [1,"Santana"], [2,"Van Halen"], [3,"Eric Clapton"]
       ],
       "1":[
-        [1,2], [2,0], [3,0]
+        [1,"Van Halen"], [2,"Santana"], [3,"Santana"]
       ],
       "2":[
-        [1,1], [2,2], [3,0]
+        [1,"Eric Clapton"], [2,"Van Halen"], [3,"Santana"]
       ]
     }
   ]

@@ -26,10 +26,10 @@ public class RCVTester {
       System.out.println("failed to open log file:" + TEST_LOG_PATH);
       return 1;
     }
-    List<Integer> contestOptions = new LinkedList<Integer>();
-    contestOptions.add(0);
-    contestOptions.add(1);
-    contestOptions.add(2);
+    List<String> contestOptions = new LinkedList<String>();
+    contestOptions.add("Eric Clapton");
+    contestOptions.add("Santana");
+    contestOptions.add("Van Halen");
 
     // TODO: Tabulator takes election object as input and tabulates all the contests defined in Election
     // use the cvr list as input to tabulator below
