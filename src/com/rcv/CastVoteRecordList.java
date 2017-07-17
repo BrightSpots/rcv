@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Container for multiple CastVoteRecords
+// this could be a group of Ballots cast in a particular election
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CastVoteRecordList {
   

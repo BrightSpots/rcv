@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 import java.util.*;
 
-// maps contest IDs to ContestRankings objects
+// map of contest IDs to ContestRankings objects
+// i.e. a Ballot
 public class CastVoteRecord {
   private Map<Integer, ContestRankings> rankings = new HashMap<Integer, ContestRankings>();
 

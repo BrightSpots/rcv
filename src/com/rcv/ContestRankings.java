@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.IOException;
 
-// Maps contest option ID(s) to rankings a voter made for that contest
+// list of contest rankings for a given contest, i.e. a Ballot entry
 @JsonDeserialize(using = ContestRankings.ContestRankingsDeserializer.class)
 public class ContestRankings {
   List<ContestRanking> rankings = new LinkedList<ContestRanking>();
