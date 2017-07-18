@@ -57,15 +57,13 @@ public class Tabulator {
   public Tabulator(
     List<CastVoteRecord> castVoteRecords,
     int contestId,
-    List<String> contestOptions
+    List<String> contestOptions,
+    Boolean batchElimination
   ) {
     this.castVoteRecords = castVoteRecords;
     this.contestId = contestId;
     this.contestOptions = contestOptions;
-  }
-
-  public void setBatchElimination(boolean value) {
-    this.batchElimination = value;
+    this.batchElimination = batchElimination;
   }
 
   public void tabulate() {

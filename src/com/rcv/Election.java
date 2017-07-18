@@ -1,25 +1,20 @@
 package com.rcv;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.util.List;
+
+// container for an election configuration
+// Has a name, e.g. "2018 Maine General Election"
+// and a list of contests which will appear on the ballot
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Election {
 
-  public int id;
   public String name;
   public List<Contest> contests;
+  public Boolean batch_elimination;
 
   Election() {}
-
-  Election(int id, String name, List<Contest> contests) {
-    this.id = id;
-    this.name = name;
-    this.contests = contests;
-  }
 
   List<Contest> getContests() {
     return contests;

@@ -2,20 +2,17 @@ package com.rcv;
 
 import java.util.List;
 
+// container for a Contest:
+// has an id and a list of "options" i.e. candidates competing for this office
+// TODO: extend this to support configuring contests to be rcv or plurality
 public class Contest {
-  public int id;
+  // the name of this contest i.e. "2018 Governor"
   public String name;
-  public List<ContestOption> options;
+  // unique identifier
+  public int id;
+  // all candidates competing for this office
+  public List<String> options;
 
   public Contest() {}
 
-  public Contest(int id, String name, List<ContestOption> options) {
-    this.id = id;
-    this.name = name;
-    this.options = options;
-  }
-
-  int getId() {
-    return id;
-  }
 }

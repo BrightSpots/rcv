@@ -17,10 +17,6 @@ public class CastVoteRecord {
 
   public CastVoteRecord() {}
 
-  public CastVoteRecord(Map<Integer, ContestRankings> rankings) {
-    this.rankings = rankings;
-  }
-
   List<ContestRanking> getRankingsForContest(int contestId) {
     return rankings.get(contestId).rankings;
   }
