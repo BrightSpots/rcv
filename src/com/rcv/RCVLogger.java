@@ -1,6 +1,7 @@
 package com.rcv;
 
 import java.io.IOException;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
@@ -11,6 +12,7 @@ public class RCVLogger {
 
   private final static Logger sLogger = Logger.getLogger("RCV");
   private static FileHandler sFileHandler = null;
+  private static ConsoleHandler sConsoleHandler = null;
 
   public static void log(String msg) {
     sLogger.info(msg);
@@ -26,7 +28,11 @@ public class RCVLogger {
     sFileHandler = new FileHandler(log_output_path);
     LogFormatter formatter = new LogFormatter();
     sFileHandler.setFormatter(formatter);
+    sConsoleHandler = new ConsoleHandler();
+    sConsoleHandler.setFormatter(formatter);
+    sLogger.addHandler(sConsoleHandler);
     sLogger.addHandler(sFileHandler);
+    sLogger.setUseParentHandlers(false);
   }
 
 }
