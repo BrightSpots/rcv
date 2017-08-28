@@ -27,7 +27,7 @@ public class Tabulator {
     String nonSelectedString() {
       ArrayList<String> options = new ArrayList<String>();
       for (String contestOptionId : contestOptionIds) {
-        if (contestOptionId != selection) {
+        if (!contestOptionId.equals(selection)) {
           options.add(contestOptionId);
         }
       }
