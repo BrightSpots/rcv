@@ -30,9 +30,21 @@ public class RCVTester {
 
     CastVoteRecordList cvrList = JsonParser.parseObjectFromFile(CAST_VOTE_RECORD_LIST_PATH, CastVoteRecordList.class);
 
-    for(Contest contest : testElection.getContests()) {
-      Tabulator tabulator =new Tabulator(cvrList.getRecords(), contest.id, contest.options, testElection.batch_elimination);
-      tabulator.tabulate();
+    for (Contest contest : testElection.getContests()) {
+      Tabulator tabulator = new Tabulator(
+        cvrList.getRecords(),
+        contest.id,
+        contest.options,
+        testElection.batch_elimination,
+        1,
+        Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING
+      );
+      try {
+        tabulator.tabulate();
+      } catch (Exception e) {
+        e.printStackTrace();
+        return 1;
+      }
     }
     
     return 0;
