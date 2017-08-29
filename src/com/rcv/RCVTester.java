@@ -23,13 +23,28 @@ public class RCVTester {
     try {
       RCVLogger.setup(TEST_LOG_PATH);
     } catch (IOException e) {
-      e.printStackTrace();
       System.out.println("failed to open log file:" + TEST_LOG_PATH);
       return 1;
     }
 
     CVRReader reader = new CVRReader();
-    CastVoteRecordList test_list = reader.parseCVRFile(TEST_XLSX_CVR_FILE);
+    if( reader.parseCVRFile(TEST_XLSX_CVR_FILE) ) {
+      Tabulator testTabulator = new Tabulator(reader.castVoteRecords,
+          1,
+          reader.candidateOptions,
+          true,
+          1,
+          Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING);
+      try {
+        testTabulator.tabulate();
+      } catch (Exception e) {
+        e.printStackTrace();
+        return 1;
+      }
+
+    } else {
+      RCVLogger.log("failed to parse %s!  skipping tabulation!", TEST_XLSX_CVR_FILE);
+    }
 
 
     Election testElection = JsonParser.parseObjectFromFile(ELECTION_PATH, Election.class);

@@ -18,22 +18,24 @@ import java.util.*;
  * we assume the first sheet is the only one we're interested in
  * we assume the first column contains ballot ids, second column contains precinct id and third column contains ballot style.
  * we assume columns after ballot style are the ballot selections ordered by rank, low to high, left to right
- * we assume the string "undervote" means no vote
+ * we assume the strings "undervote" or "overvote" mean no vote
  * we assume a non-existant cell (image of a ballot mark when workbook is opened in excel?) means no vote
  *
  */
 
 public class CVRReader {
 
+  public List<String> candidateOptions = null;
+  public List<CastVoteRecord> castVoteRecords = new ArrayList<CastVoteRecord>();
 
   // call this to parse the given file path into a CastVoteRecordList suitable for tabulation
   // Note: this is specific for the Maine example file we were provided
-  public static CastVoteRecordList parseCVRFile(String excelFilePath) {
+  public boolean parseCVRFile(String excelFilePath) {
 
     Sheet contestSheet = getBallotSheet(excelFilePath);
     if (contestSheet == null) {
       RCVLogger.log("invalid RCV format: could not obtain ballot data.");
-      return null;
+      return false;
     }
 
     // validate header
@@ -41,20 +43,20 @@ public class CVRReader {
     org.apache.poi.ss.usermodel.Row headerRow = iterator.next();
     if (headerRow == null || contestSheet.getLastRowNum() < 2) {
       RCVLogger.log("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
-      return null;
+      return false;
     }
 
     // number of ranks user may assign for this contest
     int allowableRanks = headerRow.getLastCellNum() - 3;
     if (allowableRanks <= 0) {
       RCVLogger.log("invalid RCV format: not enough columns: %d ", headerRow.getLastCellNum());
-      return null;
+      return false;
     }
 
-    // Iterate through all rows and create a CastVoteRecord for each row
-    List<CastVoteRecord> castVoteRecords = new ArrayList<CastVoteRecord>();
-    CastVoteRecordList list = new CastVoteRecordList();
+    // create list of candidates as we go
+    Set<String> candidates = new HashSet<String>();
 
+    // Iterate through all rows and create a CastVoteRecord for each row
     while (iterator.hasNext()) {
       org.apache.poi.ss.usermodel.Row castVoteRecord = iterator.next();
 
@@ -88,15 +90,24 @@ public class CVRReader {
           continue;
         }
 
-        String selection = cellForRanking.getStringCellValue();
-        if (selection.equals("undervote")) {
+        String candidate = cellForRanking.getStringCellValue();
+        if (candidate.equals("undervote")) {
           RCVLogger.log("undervote at ranking %d ballot %f", rank, ballotID);
           continue;
         }
 
+        if (candidate.equals("overvote")) {
+          RCVLogger.log("overvote at ranking %d ballot %f", rank, ballotID);
+          continue;
+        }
+
         // create and add ranking to this ballot
-        ContestRanking ranking = new ContestRanking(rank, selection);
+        ContestRanking ranking = new ContestRanking(rank, candidate);
         ballot.add(ranking);
+
+        // update the candidates set
+        candidates.add(candidate);
+        
       }
 
       // TODO: use an actual contest ID here
@@ -106,9 +117,10 @@ public class CVRReader {
       castVoteRecords.add(cvr);
 
     }
-    // done parsing
-    list.records = castVoteRecords;
-    return list;
+
+    // parsing succeeded
+    candidateOptions = new ArrayList<String>(candidates);
+    return true;
   }
 
   // helper function to wrap file IO with error handling
