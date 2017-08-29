@@ -11,7 +11,7 @@ import java.util.List;
 public class CastVoteRecordList {
   
   public int electionId;
-  List<CastVoteRecord> records = new ArrayList<CastVoteRecord>();
+  public List<CastVoteRecord> records = new ArrayList<CastVoteRecord>();
 
   CastVoteRecordList() {}
 

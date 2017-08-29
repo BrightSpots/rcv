@@ -17,6 +17,8 @@ public class RCVTester {
 
   static String TEST_LOG_PATH = "./test/election_summary_report.txt";
 
+  static final String TEST_XLSX_CVR_FILE = "./test/Portland-Cast-Vote-Records-July 2015.xlsx";
+
   public static int runTests() {
     try {
       RCVLogger.setup(TEST_LOG_PATH);
@@ -25,6 +27,10 @@ public class RCVTester {
       System.out.println("failed to open log file:" + TEST_LOG_PATH);
       return 1;
     }
+
+    CVRReader reader = new CVRReader();
+    CastVoteRecordList test_list = reader.parseCVRFile(TEST_XLSX_CVR_FILE);
+
 
     Election testElection = JsonParser.parseObjectFromFile(ELECTION_PATH, Election.class);
 
