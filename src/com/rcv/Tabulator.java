@@ -21,9 +21,21 @@ public class Tabulator {
   private List<CastVoteRecord> castVoteRecords;
   private int contestId;
   private List<String> contestOptions;
-  private boolean batchElimination = true;
+  private boolean useBatchElimination = true;
   private Integer maxNumberOfSkippedRanks = 1;
   private OvervoteRule overvoteRule = OvervoteRule.EXHAUST_IF_ANY_CONTINUING;
+
+  static class BatchElimination {
+    String optionId;
+    int runningTotal;
+    int nextHighestCount;
+
+    BatchElimination(String optionId, int runningTotal, int nextHighestCount) {
+      this.optionId = optionId;
+      this.runningTotal = runningTotal;
+      this.nextHighestCount = nextHighestCount;
+    }
+  }
 
   static class TieBreak {
     List<String> contestOptionIds;
@@ -74,14 +86,14 @@ public class Tabulator {
     List<CastVoteRecord> castVoteRecords,
     int contestId,
     List<String> contestOptions,
-    Boolean batchElimination,
+    Boolean useBatchElimination,
     Integer maxNumberOfSkippedRanks,
     OvervoteRule overvoteRule
   ) {
     this.castVoteRecords = castVoteRecords;
     this.contestId = contestId;
     this.contestOptions = contestOptions;
-    this.batchElimination = batchElimination;
+    this.useBatchElimination = useBatchElimination;
     this.maxNumberOfSkippedRanks = maxNumberOfSkippedRanks;
     this.overvoteRule = overvoteRule;
   }
@@ -155,12 +167,27 @@ public class Tabulator {
 
       // container for eliminated candidate(s)
       List<String> eliminated = new LinkedList<String>();
-      if (batchElimination) {
-        eliminated.addAll(runBatchElimination(round, countToCandidates));
+
+      if (useBatchElimination) {
+        List<BatchElimination> batchEliminations = runBatchElimination(countToCandidates);
+        // If batch elimination caught multiple candidates, don't apply regular elimination logic on
+        // this iteration.
+        if (batchEliminations.size() > 1) {
+          for (BatchElimination elimination : batchEliminations) {
+            eliminated.add(elimination.optionId);
+            log(
+              "Batch-eliminated %s in round %d. The running total was %d vote(s) and the " +
+                "next-highest count was %d vote(s).",
+              elimination.optionId,
+              round,
+              elimination.runningTotal,
+              elimination.nextHighestCount
+            );
+          }
+        }
       }
 
-      // If batch elimination caught anyone, don't apply regular elimination logic on this iteration.
-      // Otherwise, eliminate last place, breaking tie if necessary.
+      // If we didn't do batch elimination, eliminate last place now, breaking tie if necessary.
       if (eliminated.isEmpty()) {
         String loser;
         int minVotes = countToCandidates.firstKey();
@@ -200,22 +227,22 @@ public class Tabulator {
     RCVLogger.log(s, var1);
   }
 
-  private List<String> runBatchElimination(int round, SortedMap<Integer, LinkedList<String>> countToCandidates) {
+  private List<BatchElimination> runBatchElimination(
+    SortedMap<Integer, LinkedList<String>> countToCandidates
+  ) {
     int runningTotal = 0;
     List<String> candidatesSeen = new LinkedList<String>();
-    List<String> eliminated = new LinkedList<String>();
+    Set<String> candidatesEliminated = new HashSet<String>();
+    List<BatchElimination> eliminations = new LinkedList<BatchElimination>();
     for (int currentVoteCount : countToCandidates.keySet()) {
       if (runningTotal < currentVoteCount) {
-        eliminated.addAll(candidatesSeen);
         for (String candidate : candidatesSeen) {
-          log(
-            "Batch-eliminated %s in round %d. The running total was %d vote(s) and the " +
-              "next-highest count was %d vote(s).",
-            candidate,
-            round,
-            runningTotal,
-            currentVoteCount
-          );
+          if (!candidatesEliminated.contains(candidate)) {
+            candidatesEliminated.add(candidate);
+            eliminations.add(
+              new BatchElimination(candidate, runningTotal, currentVoteCount)
+            );
+          }
         }
       }
       List<String> currentCandidates = countToCandidates.get(currentVoteCount);
@@ -223,7 +250,7 @@ public class Tabulator {
       candidatesSeen.addAll(currentCandidates);
     }
 
-    return eliminated;
+    return eliminations;
   }
 
   private boolean exhaustBallot(
