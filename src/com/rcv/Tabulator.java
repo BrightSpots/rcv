@@ -221,6 +221,95 @@ public class Tabulator {
 
       round++;
     }
+
+    generateSummarySpreadsheet(round, roundTallies, eliminatedRound);
+  }
+
+  private void generateSummarySpreadsheet(
+    int finalRound,
+    Map<Integer, Map<String, Integer>> roundTallies,
+    Map<String, Integer> eliminatedRound
+  ) {
+    Map<Integer, List<String>> eliminationsByRound = new HashMap<Integer, List<String>>();
+    for (String candidate : eliminatedRound.keySet()) {
+      int round = eliminatedRound.get(candidate);
+      if (eliminationsByRound.get(round) == null) {
+        eliminationsByRound.put(round, new LinkedList<String>());
+      }
+      eliminationsByRound.get(round).add(candidate);
+    }
+    StringBuilder sb = new StringBuilder("Eliminations: ");
+    for (int round = 1; round <= finalRound; round++) {
+      sb.append(round).append(": ");
+      List<String> eliminated = eliminationsByRound.get(round);
+      if (eliminated != null) {
+        sb.append(String.join(", ", eliminated));
+      } else {
+        sb.append("none");
+      }
+      sb.append(", ");
+    }
+    log(sb.toString());
+
+    Map<Integer, Integer> totalVotesPerRound = new HashMap<Integer, Integer>();
+    for (int round = 1; round <= finalRound; round++) {
+      Map<String, Integer> tally = roundTallies.get(round);
+      int total = 0;
+      for (int votes : tally.values()) {
+        total += votes;
+      }
+      totalVotesPerRound.put(round, total);
+    }
+
+    Map<String, Integer> initialTally = roundTallies.get(1);
+    List<String> sortedCandidates = sortTally(initialTally);
+
+    for (String candidate : sortedCandidates) {
+      sb = new StringBuilder(candidate).append(": ");
+      sb.append("Initial count: ").append(roundTallies.get(1).get(candidate)).append(", ");
+      for (int round = 2; round <= finalRound; round++) {
+        Integer total = roundTallies.get(round).get(candidate);
+        if (total == null) {
+          total = 0;
+        }
+        Integer prevTotal = roundTallies.get(round - 1).get(candidate);
+        if (prevTotal == null) {
+          prevTotal = 0;
+        }
+        int delta = total - prevTotal;
+
+        sb.append("Round ").append(round - 1).append(" delta: ").append(delta).append(", ");
+        sb.append("Round ").append(round - 1).append(" total: ").append(total).append(", ");
+      }
+      log(sb.toString());
+    }
+
+    sb = new StringBuilder("Exhausted: ");
+    int totalVotes = totalVotesPerRound.get(1);
+    for (int round = 2; round <= finalRound; round++) {
+      int total = totalVotes - totalVotesPerRound.get(round);
+      int prevTotal = totalVotes - totalVotesPerRound.get(round - 1);
+      int delta = total - prevTotal;
+
+      sb.append("Round ").append(round - 1).append(" delta: ").append(delta).append(", ");
+      sb.append("Round ").append(round - 1).append(" total: ").append(total).append(", ");
+    }
+    log(sb.toString());
+  }
+
+  private List<String> sortTally(Map<String, Integer> tally) {
+    List<Map.Entry<String, Integer>> entries =
+      new LinkedList<Map.Entry<String, Integer>>(tally.entrySet());
+    Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
+      public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+        return (o2.getValue()).compareTo(o1.getValue());
+      }
+    });
+    List<String> sortedCandidates = new LinkedList<String>();
+    for (Map.Entry<String, Integer> entry : entries) {
+      sortedCandidates.add(entry.getKey());
+    }
+    return sortedCandidates;
   }
 
   private void log(String s, Object... var1) {
