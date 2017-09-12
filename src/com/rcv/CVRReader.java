@@ -81,7 +81,7 @@ public class CVRReader {
 
         // if ballot mark was illegible there will be no cell
         if (cellForRanking == null) {
-          RCVLogger.log("no cell at ranking %d ballot %f", rank, ballotID);
+//          RCVLogger.log("no cell at ranking %d ballot %f", rank, ballotID);
           continue;
         }
 
@@ -92,12 +92,12 @@ public class CVRReader {
 
         String candidate = cellForRanking.getStringCellValue();
         if (candidate.equals("undervote")) {
-          RCVLogger.log("undervote at ranking %d ballot %f", rank, ballotID);
+//          RCVLogger.log("undervote at ranking %d ballot %f", rank, ballotID);
           continue;
         }
 
         if (candidate.equals("overvote")) {
-          RCVLogger.log("overvote at ranking %d ballot %f", rank, ballotID);
+//          RCVLogger.log("overvote at ranking %d ballot %f", rank, ballotID);
           continue;
         }
 
