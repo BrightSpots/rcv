@@ -230,14 +230,17 @@ public class Tabulator {
     Map<Integer, Map<String, Integer>> roundTallies,
     Map<String, Integer> eliminatedRound
   ) {
+    // build map of all candidates eliminated in each round
     Map<Integer, List<String>> eliminationsByRound = new HashMap<Integer, List<String>>();
     for (String candidate : eliminatedRound.keySet()) {
+      // for each round we build a string showing which candidates were eliminated
       int round = eliminatedRound.get(candidate);
       if (eliminationsByRound.get(round) == null) {
         eliminationsByRound.put(round, new LinkedList<String>());
       }
       eliminationsByRound.get(round).add(candidate);
     }
+    // build string to display the eliminations
     StringBuilder sb = new StringBuilder("Eliminations: ");
     for (int round = 1; round <= finalRound; round++) {
       sb.append(round).append(": ");
@@ -250,7 +253,7 @@ public class Tabulator {
       sb.append(", ");
     }
     log(sb.toString());
-
+    // build map of total votes cast in each round
     Map<Integer, Integer> totalVotesPerRound = new HashMap<Integer, Integer>();
     for (int round = 1; round <= finalRound; round++) {
       Map<String, Integer> tally = roundTallies.get(round);
@@ -261,9 +264,12 @@ public class Tabulator {
       totalVotesPerRound.put(round, total);
     }
 
+    // map of candidates to their first round tally, sorted from most votes to least
     Map<String, Integer> initialTally = roundTallies.get(1);
     List<String> sortedCandidates = sortTally(initialTally);
 
+    // iterate through the list of candidates (ordered by initial round tallies)
+    // spit out delta votes and total votes
     for (String candidate : sortedCandidates) {
       sb = new StringBuilder(candidate).append(": ");
       sb.append("Initial count: ").append(roundTallies.get(1).get(candidate)).append(", ");
@@ -284,6 +290,7 @@ public class Tabulator {
       log(sb.toString());
     }
 
+    // bottom row we output exhausted ballots on each round
     sb = new StringBuilder("Exhausted: ");
     int totalVotes = totalVotesPerRound.get(1);
     for (int round = 2; round <= finalRound; round++) {
