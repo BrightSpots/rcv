@@ -1,7 +1,6 @@
 package com.rcv;
 
 import java.io.IOException;
-import java.util.*;
 
 /**
  * Created by Jon on 6/18/17.
@@ -18,6 +17,7 @@ public class RCVTester {
   static String TEST_LOG_PATH = "./test/election_summary_report.txt";
 
   static final String TEST_XLSX_CVR_FILE = "./test/Portland-Cast-Vote-Records-July 2015.xlsx";
+  static final String TEST_RESULTS_XLSX_FILE = "./test/Portland-Tabulation-Results.xlsx";
 
   public static int runTests() {
     try {
@@ -46,6 +46,9 @@ public class RCVTester {
       RCVLogger.log("failed to parse %s!  skipping tabulation!", TEST_XLSX_CVR_FILE);
     }
 
+    ResultsWriter writer = new ResultsWriter();
+    writer.writeXLSX(TEST_RESULTS_XLSX_FILE);
+    
 
     Election testElection = JsonParser.parseObjectFromFile(ELECTION_PATH, Election.class);
 
