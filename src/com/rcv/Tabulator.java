@@ -25,6 +25,18 @@ public class Tabulator {
   private Integer maxNumberOfSkippedRanks = 1;
   private OvervoteRule overvoteRule = OvervoteRule.EXHAUST_IF_ANY_CONTINUING;
 
+  public Integer roundsToDecideWinner = -1;
+
+  // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
+  Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
+
+  // eliminatedRound is a map of candidate IDs to the round in which they were eliminated
+  Map<String, Integer> eliminatedRound = new HashMap<String, Integer>();
+
+  // how many rounds did it take to determine a winner
+  int finalRound = 1;
+
+
   static class BatchElimination {
     String optionId;
     int runningTotal;
@@ -107,16 +119,10 @@ public class Tabulator {
     }
     log("There are %d cast vote records for this contest.", this.castVoteRecords.size());
 
-    // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
-    Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
-
-    // eliminatedRound is a map of candidate IDs to the round in which they were eliminated
-    Map<String, Integer> eliminatedRound = new HashMap<String, Integer>();
 
     // exhaustedBallots is a map of ballot indexes to the round in which they were exhausted
     Map<Integer, Integer> exhaustedBallots = new HashMap<Integer, Integer>();
 
-    int round = 1;
     String winner;
 
     ArrayList<SortedMap<Integer, Set<String>>> sortedRankings = sortCastVoteRecords(castVoteRecords);
@@ -125,15 +131,15 @@ public class Tabulator {
     // at each iteration we will eliminate the lowest-total candidate OR multiple losing candidates if using batch
     // elimination logic (Maine rules)
     while (true) {
-      log("Round: %d", round);
+      log("Round: %d", finalRound);
 
       // roundTally is map of candidate ID to vote tallies
       // generated based on previously eliminated candidates contained in eliminatedRound object
       // at each iteration of this loop, the eliminatedRound object will get more entries as candidates are eliminated
       // conversely the roundTally object returned here will contain fewer entries each of which will have more votes
       // eventually a winner will be chosen
-      Map<String, Integer> roundTally = getRoundTally(sortedRankings, eliminatedRound, exhaustedBallots, round);
-      roundTallies.put(round, roundTally);
+      Map<String, Integer> roundTally = getRoundTally(sortedRankings, eliminatedRound, exhaustedBallots, finalRound);
+      roundTallies.put(finalRound, roundTally);
 
       // We fully sort the list in case we want to run batch elimination.
       int totalVotes = 0;
@@ -155,13 +161,13 @@ public class Tabulator {
         candidates.add(contestOptionId);
       }
 
-      log("Total votes in round %d: %d.", round, totalVotes);
+      log("Total votes in round %d: %d.", finalRound, totalVotes);
 
       int maxVotes = countToCandidates.lastKey();
       // Does the leader have a majority of non-exhausted ballots?
       if (maxVotes > (float)totalVotes / 2.0) {
         winner = countToCandidates.get(maxVotes).getFirst();
-        log("%s won in round %d with %d votes.", winner, round, maxVotes);
+        log("%s won in round %d with %d votes.", winner, finalRound, maxVotes);
         break;
       }
 
@@ -179,7 +185,7 @@ public class Tabulator {
               "Batch-eliminated %s in round %d. The running total was %d vote(s) and the " +
                 "next-highest count was %d vote(s).",
               elimination.optionId,
-              round,
+                finalRound,
               elimination.runningTotal,
               elimination.nextHighestCount
             );
@@ -195,11 +201,11 @@ public class Tabulator {
         if (lastPlace.size() > 1) {
           TieBreak tieBreak = new TieBreak(lastPlace);
           loser = tieBreak.getSelection();
-          tieBreaks.put(round, tieBreak);
+          tieBreaks.put(finalRound, tieBreak);
           log(
             "%s lost a tie-breaker in round %d against %s. Each candidate had %d vote(s).",
             loser,
-            round,
+              finalRound,
             tieBreak.nonSelectedString(),
             minVotes
           );
@@ -208,7 +214,7 @@ public class Tabulator {
           log(
             "%s was eliminated in round %d with %d vote(s).",
             loser,
-            round,
+              finalRound,
             minVotes
           );
         }
@@ -216,107 +222,17 @@ public class Tabulator {
       }
 
       for (String loser : eliminated) {
-        eliminatedRound.put(loser, round);
+        eliminatedRound.put(loser, finalRound);
       }
 
-      round++;
+      finalRound++;
     }
 
-    generateSummarySpreadsheet(round, roundTallies, eliminatedRound);
   }
 
-  private void generateSummarySpreadsheet(
-    int finalRound,
-    Map<Integer, Map<String, Integer>> roundTallies,
-    Map<String, Integer> eliminatedRound
-  ) {
-    // build map of all candidates eliminated in each round
-    Map<Integer, List<String>> eliminationsByRound = new HashMap<Integer, List<String>>();
-    for (String candidate : eliminatedRound.keySet()) {
-      // for each round we build a string showing which candidates were eliminated
-      int round = eliminatedRound.get(candidate);
-      if (eliminationsByRound.get(round) == null) {
-        eliminationsByRound.put(round, new LinkedList<String>());
-      }
-      eliminationsByRound.get(round).add(candidate);
-    }
-    // build string to display the eliminations
-    StringBuilder sb = new StringBuilder("Eliminations: ");
-    for (int round = 1; round <= finalRound; round++) {
-      sb.append(round).append(": ");
-      List<String> eliminated = eliminationsByRound.get(round);
-      if (eliminated != null) {
-        sb.append(String.join(", ", eliminated));
-      } else {
-        sb.append("none");
-      }
-      sb.append(", ");
-    }
-    log(sb.toString());
-    // build map of total votes cast in each round
-    Map<Integer, Integer> totalVotesPerRound = new HashMap<Integer, Integer>();
-    for (int round = 1; round <= finalRound; round++) {
-      Map<String, Integer> tally = roundTallies.get(round);
-      int total = 0;
-      for (int votes : tally.values()) {
-        total += votes;
-      }
-      totalVotesPerRound.put(round, total);
-    }
-
-    // map of candidates to their first round tally, sorted from most votes to least
-    Map<String, Integer> initialTally = roundTallies.get(1);
-    List<String> sortedCandidates = sortTally(initialTally);
-
-    // iterate through the list of candidates (ordered by initial round tallies)
-    // spit out delta votes and total votes
-    for (String candidate : sortedCandidates) {
-      sb = new StringBuilder(candidate).append(": ");
-      sb.append("Initial count: ").append(roundTallies.get(1).get(candidate)).append(", ");
-      for (int round = 2; round <= finalRound; round++) {
-        Integer total = roundTallies.get(round).get(candidate);
-        if (total == null) {
-          total = 0;
-        }
-        Integer prevTotal = roundTallies.get(round - 1).get(candidate);
-        if (prevTotal == null) {
-          prevTotal = 0;
-        }
-        int delta = total - prevTotal;
-
-        sb.append("Round ").append(round - 1).append(" delta: ").append(delta).append(", ");
-        sb.append("Round ").append(round - 1).append(" total: ").append(total).append(", ");
-      }
-      log(sb.toString());
-    }
-
-    // bottom row we output exhausted ballots on each round
-    sb = new StringBuilder("Exhausted: ");
-    int totalVotes = totalVotesPerRound.get(1);
-    for (int round = 2; round <= finalRound; round++) {
-      int total = totalVotes - totalVotesPerRound.get(round);
-      int prevTotal = totalVotes - totalVotesPerRound.get(round - 1);
-      int delta = total - prevTotal;
-
-      sb.append("Round ").append(round - 1).append(" delta: ").append(delta).append(", ");
-      sb.append("Round ").append(round - 1).append(" total: ").append(total).append(", ");
-    }
-    log(sb.toString());
-  }
-
-  private List<String> sortTally(Map<String, Integer> tally) {
-    List<Map.Entry<String, Integer>> entries =
-      new LinkedList<Map.Entry<String, Integer>>(tally.entrySet());
-    Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
-      public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-        return (o2.getValue()).compareTo(o1.getValue());
-      }
-    });
-    List<String> sortedCandidates = new LinkedList<String>();
-    for (Map.Entry<String, Integer> entry : entries) {
-      sortedCandidates.add(entry.getKey());
-    }
-    return sortedCandidates;
+  public void generateSummarySpreadsheet(String outputFile) {
+    ResultsWriter writer = new ResultsWriter();
+    writer.generateSummarySpreadsheet(this.finalRound, this.roundTallies, this.eliminatedRound, outputFile);
   }
 
   private void log(String s, Object... var1) {

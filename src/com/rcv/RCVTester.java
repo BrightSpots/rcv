@@ -37,6 +37,9 @@ public class RCVTester {
           Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING);
       try {
         testTabulator.tabulate();
+        testTabulator.generateSummarySpreadsheet(TEST_RESULTS_XLSX_FILE);
+
+
       } catch (Exception e) {
         e.printStackTrace();
         return 1;
@@ -46,9 +49,6 @@ public class RCVTester {
       RCVLogger.log("failed to parse %s!  skipping tabulation!", TEST_XLSX_CVR_FILE);
     }
 
-    ResultsWriter writer = new ResultsWriter();
-    writer.writeXLSX(TEST_RESULTS_XLSX_FILE);
-    
 
     Election testElection = JsonParser.parseObjectFromFile(ELECTION_PATH, Election.class);
 
