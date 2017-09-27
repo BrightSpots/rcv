@@ -31,7 +31,10 @@ public class Tabulator {
   // eliminatedRound is a map of candidate IDs to the round in which they were eliminated
   Map<String, Integer> eliminatedRound = new HashMap<String, Integer>();
 
-  // how many rounds did it take to determine a winner
+  // the winner
+  String winner;
+
+  // when tabulation is complete this will be how many rounds did it take to determine a winner
   int finalRound = 1;
 
 
@@ -121,8 +124,6 @@ public class Tabulator {
     // exhaustedBallots is a map of ballot indexes to the round in which they were exhausted
     Map<Integer, Integer> exhaustedBallots = new HashMap<Integer, Integer>();
 
-    String winner;
-
     ArrayList<SortedMap<Integer, Set<String>>> sortedRankings = sortCastVoteRecords(castVoteRecords);
 
     // loop until we achieve a majority winner:
@@ -164,7 +165,17 @@ public class Tabulator {
       int maxVotes = countToCandidates.lastKey();
       // Does the leader have a majority of non-exhausted ballots?
       if (maxVotes > (float)totalVotes / 2.0) {
-        winner = countToCandidates.get(maxVotes).getFirst();
+        // we have a winner
+        for(Integer votes : countToCandidates.keySet()) {
+          // record winner and loser(s)
+          if(votes == maxVotes) {
+            winner = countToCandidates.get(votes).getFirst();
+          } else {
+            String loser = countToCandidates.get(votes).getFirst();
+            eliminatedRound.put(loser, finalRound);
+            log("%s was eliminated in round %d with %d vote(s).", loser, finalRound, votes);
+          }
+        }
         log("%s won in round %d with %d votes.", winner, finalRound, maxVotes);
         break;
       }
