@@ -24,9 +24,7 @@ public class Tabulator {
   private boolean useBatchElimination = true;
   private Integer maxNumberOfSkippedRanks = 1;
   private OvervoteRule overvoteRule = OvervoteRule.EXHAUST_IF_ANY_CONTINUING;
-
-  public Integer roundsToDecideWinner = -1;
-
+  
   // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
   Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
 

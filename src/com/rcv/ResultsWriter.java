@@ -20,10 +20,10 @@ public class ResultsWriter {
 
   // takes tabulation round tallies and generates a spreadsheet from them
   public boolean generateSummarySpreadsheet(
-      int finalRound,
-      Map<Integer, Map<String, Integer>> roundTallies,
-      Map<String, Integer> candidatesToRoundEliminated,
-      String outputFilePath
+    int finalRound,
+    Map<Integer, Map<String, Integer>> roundTallies,
+    Map<String, Integer> candidatesToRoundEliminated,
+    String outputFilePath
   ) {
     XSSFWorkbook workbook = new XSSFWorkbook();
     XSSFSheet worksheet = workbook.createSheet("Election Results");
@@ -222,7 +222,4 @@ public class ResultsWriter {
     }
     return sortedCandidates;
   }
-
-
-
 }
