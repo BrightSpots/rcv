@@ -38,8 +38,6 @@ public class RCVTester {
       try {
         testTabulator.tabulate();
         testTabulator.generateSummarySpreadsheet(TEST_RESULTS_XLSX_FILE);
-
-
       } catch (Exception e) {
         e.printStackTrace();
         return 1;
