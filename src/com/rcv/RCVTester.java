@@ -29,12 +29,15 @@ public class RCVTester {
 
     CVRReader reader = new CVRReader();
     if( reader.parseCVRFile(TEST_XLSX_CVR_FILE) ) {
-      Tabulator testTabulator = new Tabulator(reader.castVoteRecords,
-          1,
-          reader.candidateOptions,
-          true,
-          1,
-          Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING);
+      Tabulator testTabulator = new Tabulator(
+        reader.castVoteRecords,
+        1,
+        reader.candidateOptions,
+        true,
+        1,
+        Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING,
+        null
+      );
       try {
         testTabulator.tabulate();
         testTabulator.generateSummarySpreadsheet(TEST_RESULTS_XLSX_FILE);
@@ -59,7 +62,8 @@ public class RCVTester {
         contest.options,
         testElection.batch_elimination,
         1,
-        Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING
+        Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING,
+        null
       );
       try {
         tabulator.tabulate();

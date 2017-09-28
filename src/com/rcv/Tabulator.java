@@ -24,19 +24,19 @@ public class Tabulator {
   private boolean useBatchElimination = true;
   private Integer maxNumberOfSkippedRanks = 1;
   private OvervoteRule overvoteRule = OvervoteRule.EXHAUST_IF_ANY_CONTINUING;
-  
+  private Integer minVoteThreshold;
+
   // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
-  Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
+  private Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
 
   // eliminatedRound is a map of candidate IDs to the round in which they were eliminated
-  Map<String, Integer> eliminatedRound = new HashMap<String, Integer>();
+  private Map<String, Integer> eliminatedRound = new HashMap<String, Integer>();
 
   // the winner
-  String winner;
+  private String winner;
 
   // when tabulation is complete this will be how many rounds did it take to determine a winner
-  int finalRound = 1;
-
+  private int finalRound = 1;
 
   static class BatchElimination {
     String optionId;
@@ -101,7 +101,8 @@ public class Tabulator {
     List<String> contestOptions,
     Boolean useBatchElimination,
     Integer maxNumberOfSkippedRanks,
-    OvervoteRule overvoteRule
+    OvervoteRule overvoteRule,
+    Integer minVoteThreshold
   ) {
     this.castVoteRecords = castVoteRecords;
     this.contestId = contestId;
@@ -109,6 +110,7 @@ public class Tabulator {
     this.useBatchElimination = useBatchElimination;
     this.maxNumberOfSkippedRanks = maxNumberOfSkippedRanks;
     this.overvoteRule = overvoteRule;
+    this.minVoteThreshold = minVoteThreshold;
   }
 
   public void tabulate() throws Exception {
@@ -144,7 +146,7 @@ public class Tabulator {
       int totalVotes = 0;
       // map of vote tally to candidate(s).  A list is used to handle ties.
       SortedMap<Integer, LinkedList<String>> countToCandidates = new TreeMap<Integer, LinkedList<String>>();
-      // for each candidate record their vote total into the countTOCandidates object
+      // for each candidate record their vote total into the countToCandidates object
       for (String contestOptionId : roundTally.keySet()) {
         int votes = roundTally.get(contestOptionId);
 
@@ -183,7 +185,27 @@ public class Tabulator {
       // container for eliminated candidate(s)
       List<String> eliminated = new LinkedList<String>();
 
-      if (useBatchElimination) {
+      // Three mutually exclusive ways to eliminate candidates.
+      // 1. If there's a minimum vote threshold, drop all candidates failing to meet that threshold in round 1.
+      if (finalRound == 1 && minVoteThreshold != null) {
+        for (int count : countToCandidates.keySet()) {
+          if (count < minVoteThreshold) {
+            for (String candidate : countToCandidates.get(count)) {
+              eliminated.add(candidate);
+              log(
+                "Eliminated %s in round %d because they only had %d votes, below the minimum threshold of %d.",
+                candidate,
+                finalRound,
+                count,
+                minVoteThreshold
+              );
+            }
+          }
+        }
+      }
+
+      // 2. Otherwise, try batch elimination.
+      if (eliminated.isEmpty() && useBatchElimination) {
         List<BatchElimination> batchEliminations = runBatchElimination(countToCandidates);
         // If batch elimination caught multiple candidates, don't apply regular elimination logic on
         // this iteration.
@@ -202,7 +224,7 @@ public class Tabulator {
         }
       }
 
-      // If we didn't do batch elimination, eliminate last place now, breaking tie if necessary.
+      // 3. And if we didn't do batch elimination, eliminate last place now, breaking a tie if necessary.
       if (eliminated.isEmpty()) {
         String loser;
         int minVotes = countToCandidates.firstKey();
