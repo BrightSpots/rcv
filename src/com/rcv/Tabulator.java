@@ -263,7 +263,8 @@ public class Tabulator {
 
   public void generateSummarySpreadsheet(String outputFile) {
     ResultsWriter writer = new ResultsWriter();
-    writer.generateSummarySpreadsheet(this.finalRound, this.roundTallies, this.eliminatedRound, outputFile);
+    writer.generateSummarySpreadsheet(this.finalRound, this.roundTallies, this.eliminatedRound,
+        outputFile, "Portland", winner);
   }
 
   private void log(String s, Object... var1) {
