@@ -25,6 +25,7 @@ public class Tabulator {
   private Integer maxNumberOfSkippedRanks = 1;
   private OvervoteRule overvoteRule = OvervoteRule.EXHAUST_IF_ANY_CONTINUING;
   private Integer minVoteThreshold;
+  private String undeclaredWriteInString;
 
   // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
   private Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
@@ -102,7 +103,8 @@ public class Tabulator {
     Boolean useBatchElimination,
     Integer maxNumberOfSkippedRanks,
     OvervoteRule overvoteRule,
-    Integer minVoteThreshold
+    Integer minVoteThreshold,
+    String undeclaredWriteInString
   ) {
     this.castVoteRecords = castVoteRecords;
     this.contestId = contestId;
@@ -111,6 +113,7 @@ public class Tabulator {
     this.maxNumberOfSkippedRanks = maxNumberOfSkippedRanks;
     this.overvoteRule = overvoteRule;
     this.minVoteThreshold = minVoteThreshold;
+    this.undeclaredWriteInString = undeclaredWriteInString;
   }
 
   public void tabulate() throws Exception {
@@ -185,9 +188,21 @@ public class Tabulator {
       // container for eliminated candidate(s)
       List<String> eliminated = new LinkedList<String>();
 
-      // Three mutually exclusive ways to eliminate candidates.
-      // 1. If there's a minimum vote threshold, drop all candidates failing to meet that threshold in round 1.
-      if (finalRound == 1 && minVoteThreshold != null) {
+      // Four mutually exclusive ways to eliminate candidates.
+
+      // 1. Some races contain undeclared write-ins that should be dropped immediately.
+      if (finalRound == 1 && undeclaredWriteInString != null && contestOptions.contains(undeclaredWriteInString)) {
+        eliminated.add(undeclaredWriteInString);
+        log(
+          "Eliminated %s in round %d because it represents undeclared write-ins. It had %d votes.",
+          undeclaredWriteInString,
+          finalRound,
+          roundTally.get(undeclaredWriteInString)
+        );
+      }
+
+      // 2. If there's a minimum vote threshold, drop all candidates failing to meet that threshold.
+      if (eliminated.isEmpty() && minVoteThreshold != null && countToCandidates.firstKey() < minVoteThreshold) {
         for (int count : countToCandidates.keySet()) {
           if (count < minVoteThreshold) {
             for (String candidate : countToCandidates.get(count)) {
@@ -204,7 +219,7 @@ public class Tabulator {
         }
       }
 
-      // 2. Otherwise, try batch elimination.
+      // 3. Otherwise, try batch elimination.
       if (eliminated.isEmpty() && useBatchElimination) {
         List<BatchElimination> batchEliminations = runBatchElimination(countToCandidates);
         // If batch elimination caught multiple candidates, don't apply regular elimination logic on
@@ -224,7 +239,7 @@ public class Tabulator {
         }
       }
 
-      // 3. And if we didn't do batch elimination, eliminate last place now, breaking a tie if necessary.
+      // 4. And if we didn't do batch elimination, eliminate last place now, breaking a tie if necessary.
       if (eliminated.isEmpty()) {
         String loser;
         int minVotes = countToCandidates.firstKey();
