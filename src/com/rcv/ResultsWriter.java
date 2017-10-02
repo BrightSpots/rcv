@@ -1,7 +1,6 @@
 package com.rcv;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -54,16 +53,13 @@ public class ResultsWriter {
       }
       totalVotesPerRound.put(round, total);
     }
-    // total votes cast overall
-    Integer totalVotesCast = totalVotesPerRound.get(1);
-
 
     // create the workbook and worksheet
     XSSFWorkbook workbook = new XSSFWorkbook();
     XSSFSheet worksheet = workbook.createSheet(electionName);
 
     ////////////////////////////
-    // header information
+    // Global Header
     /////////////////////////
     int rowCounter = 0;
     // title
@@ -73,12 +69,13 @@ public class ResultsWriter {
     headerCell = titleRow.createCell(1);
     headerCell.setCellValue(electionName);
 
-    // total votes cast
+    // total votes cast in election
     org.apache.poi.ss.usermodel.Row totalVoteRow = worksheet.createRow(rowCounter++);
     headerCell = totalVoteRow.createCell(0);
     headerCell.setCellValue("Total votes cast:");
     headerCell = totalVoteRow.createCell(1);
-    headerCell.setCellValue(totalVotesCast);
+    Integer totalActiveVotesFirstRound = totalVotesPerRound.get(1);
+    headerCell.setCellValue(totalActiveVotesFirstRound);
 
     // number of seats (we don't yet support multi-seat races)
     org.apache.poi.ss.usermodel.Row numSeatsRow = worksheet.createRow(rowCounter++);
@@ -88,7 +85,7 @@ public class ResultsWriter {
     headerCell.setCellValue(1);
 
     // threshold
-    int threshold =  (totalVotesCast / 2) + 1;
+    int threshold = (totalActiveVotesFirstRound / 2) + 1;
     org.apache.poi.ss.usermodel.Row thresholdRow = worksheet.createRow(rowCounter++);
     headerCell = thresholdRow.createCell(0);
     headerCell.setCellValue("Threshold:");
@@ -100,26 +97,30 @@ public class ResultsWriter {
 
 
     /////////////////////////////////////
-    // Round-by-round elections results
+    // Round-by-round reports
     /////////////////////////////////////
 
-    // Round headers
+    // each round (except the first) has three pieces of data for each candidate row:
+    // - change in votes from previous round
+    // - total votes in current round
+    // - percentage of total active votes
+    // in the first round we omit change in votes because... we were asked to do so
+    int COLUMNS_PER_ROUND = 3;
+
+    // column indexes are computed for all cells in the output xlsx spreadsheet
+    // columnIndex is (round - 1) because rounds are 1-based (cells are 0-based)
+    // columnIndex is offset by 1 to account for row "headers" which are the candidate names
+    int columnIndex;
+
+    // Headers for each round
     org.apache.poi.ss.usermodel.Row headerRow1 = worksheet.createRow(rowCounter++);
     for(int round = 1; round <= finalRound; round++) {
-    // cellIndex is (round - 1) because rounds are 1-based while cells are 0-based
-    // cellIndex is multiplied by two because for each round we create two entries
-    // cellIndex is offset by 1 to account for row headers
-      int cellIndex = ((round-1)*2)+1;
-      Cell roundLabelCell = headerRow1.createCell(cellIndex);
+      columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
+      Cell roundLabelCell = headerRow1.createCell(columnIndex);
       roundLabelCell.setCellValue(String.format("ROUND %d", round));
     }
 
-    // header for the percentage column
-    int cellIndex = ((finalRound*2)+1);
-    Cell percentageHeader = headerRow1.createCell(cellIndex);
-    percentageHeader.setCellValue("Final Round Percentage");
-
-    // Show elimination(s) for each round
+    // Eliminations for each round
     StringBuilder sb = new StringBuilder("Eliminations: ");
     org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
     Cell eliminationsRowHeader = eliminationsRow.createCell(0);
@@ -128,8 +129,8 @@ public class ResultsWriter {
       sb.append(round).append(": ");
       List<String> eliminated = roundToCandidatesEliminated.get(round);
       String cellText = String.join(", ", eliminated);
-      cellIndex = ((round-1)*2)+1;
-      Cell cell = eliminationsRow.createCell(cellIndex);
+      columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
+      Cell cell = eliminationsRow.createCell(columnIndex);
       cell.setCellValue(cellText);
       sb.append(cellText);
       sb.append(", ");
@@ -137,34 +138,40 @@ public class ResultsWriter {
     }
     RCVLogger.log(sb.toString());
 
-    // Elected row:
+    // Winners for each round
     org.apache.poi.ss.usermodel.Row electedRow = worksheet.createRow(rowCounter++);
     Cell electedCell = electedRow.createCell(0);
     electedCell.setCellValue("ELECTED:");
-    cellIndex = ((finalRound)*2)+1;
-    electedCell = electedRow.createCell(cellIndex);
+    columnIndex = ((finalRound)*COLUMNS_PER_ROUND)+1;
+    electedCell = electedRow.createCell(columnIndex);
     electedCell.setCellValue(winner);
 
 
-      //  Total / Change headers
+    // Show total, change, precentage for each round EXCEPT skip "change" for first round
     org.apache.poi.ss.usermodel.Row headerRow2 = worksheet.createRow(rowCounter++);
     for(int round = 1; round <= finalRound; round++) {
-      cellIndex = ((round-1)*2)+1;
-      Cell roundTotalCell = headerRow2.createCell(cellIndex++);
+      columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
+      if(round > 1) {
+        String roundDeltaText = String.format("Change");
+        Cell roundDeltaCell = headerRow2.createCell(columnIndex);
+        roundDeltaCell.setCellValue(roundDeltaText);
+      }
+      columnIndex++;
+      Cell roundTotalCell = headerRow2.createCell(columnIndex++);
       String roundTotalText = String.format("Total");
       roundTotalCell.setCellValue(roundTotalText);
-      String roundDeltaText = String.format("Change");
-      Cell roundDeltaCell = headerRow2.createCell(cellIndex);
-      roundDeltaCell.setCellValue(roundDeltaText);
+      String roundPercentageText = String.format("Percentage");
+      Cell roundPercentageCell = headerRow2.createCell(columnIndex);
+      roundPercentageCell.setCellValue(roundPercentageText);
     }
-
 
     // TODO: elected candidate lists
 
-    // Rows 2..n: Candidate votes [total, delta] | Final percentage
+    // Rows 2..n: Candidate votes [total, delta, percentage]
 
 
     // for each candidate: for each round: output total votes, delta votes, and final vote percentage of total
+    // EXCEPT skip "change" for first round
     for (String candidate : sortedCandidates) {
       org.apache.poi.ss.usermodel.Row candidateRow = worksheet.createRow(rowCounter++);
       Cell rowHeaderCell = candidateRow.createCell(0);
@@ -187,27 +194,29 @@ public class ResultsWriter {
         }
         int delta = total - prevTotal;
 
-        // output delta and total counts
-        sb.append("Round ").append(round - 1).append(" delta: ").append(delta).append(", ");
+        // percentage
+        Integer totalActiveVotes = totalVotesPerRound.get(round);
+        float percentage = ((float)total / (float)totalActiveVotes) * 100f;
+
+        // log output
+        sb.append("Round ").append(round - 1).append(" change: ").append(delta).append(", ");
         sb.append("Round ").append(round - 1).append(" total: ").append(total).append(", ");
-        cellIndex = ((round-1)*2)+1;
-        Cell totalVotesCell = candidateRow.createCell(cellIndex++);
+        sb.append("Round ").append(round - 1).append(" percentage: ").append(percentage).append(", ");
+
+        // create cells for spreadsheet
+        columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
+        if(round > 1) {
+          Cell deltaVotesCell = candidateRow.createCell(columnIndex);
+          deltaVotesCell.setCellValue(delta);
+        }
+        columnIndex++;
+        Cell totalVotesCell = candidateRow.createCell(columnIndex++);
         totalVotesCell.setCellValue(total);
-        Cell deltaVotesCell = candidateRow.createCell(cellIndex);
-        deltaVotesCell.setCellValue(delta);
+        Cell percentageCell = candidateRow.createCell(columnIndex);
+        String percentageText = String.format("%.2f%%", percentage);
+        percentageCell.setCellValue(percentageText);
       }
 
-      // final cell for each row contains the percentage of overall vote each candidate received in the final round
-      int percentageCellIndex = (finalRound*2)+1;
-      Cell percentageCell = candidateRow.createCell(percentageCellIndex);
-      Integer lastRoundTally = roundTallies.get(finalRound).get(candidate);
-      float lastRoundPercentage = 0;
-      if(lastRoundTally != null) {
-        lastRoundPercentage = ((float)lastRoundTally / (float)totalVotesCast) * 100f;
-      }
-      String percentageText = String.format("%.2f%%", lastRoundPercentage);
-      sb.append(percentageText);
-      percentageCell.setCellValue(percentageText);
     }
 
     RCVLogger.log(sb.toString());
@@ -230,24 +239,27 @@ public class ResultsWriter {
         int prevTotal = totalVotesInElection - totalVotesPerRound.get(round - 1);
         delta = total - prevTotal;
       }
-      cellIndex = ((round-1)*2)+1;
-      Cell totalVotesCell = exhaustedRow.createCell(cellIndex++);
-      totalVotesCell.setCellValue(total);
-      Cell deltaVotesCell = exhaustedRow.createCell(cellIndex);
-      deltaVotesCell.setCellValue(delta);
 
+      // percentage
+      float percentage = ((float)total / (float)totalActiveVotesFirstRound) * 100f;
+
+      // log file output
       sb.append("Round ").append(round - 1).append(" delta: ").append(delta).append(", ");
       sb.append("Round ").append(round - 1).append(" total: ").append(total).append(", ");
+      sb.append("Round ").append(round - 1).append(" percentage: ").append(percentage).append(", ");
 
-      if (round == finalRound) {
-        // add trailer percentage cell
-        int percentageCellIndex = (finalRound*2)+1;
-        Cell percentageCell = exhaustedRow.createCell(percentageCellIndex);
-        float lastRoundPercentage = ((float)total / (float)totalVotesCast) * 100f;
-        String percentageText = String.format("%.2f%%", lastRoundPercentage);
-        percentageCell.setCellValue(percentageText);
-        sb.append(percentageText);
+      // xls output
+      columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
+      if(round > 1) {
+        Cell deltaVotesCell = exhaustedRow.createCell(columnIndex);
+        deltaVotesCell.setCellValue(delta);
       }
+      columnIndex++;
+      Cell totalVotesCell = exhaustedRow.createCell(columnIndex++);
+      totalVotesCell.setCellValue(total);
+      String percentageText = String.format("%.2f%%", percentage);
+      Cell percentageCell = exhaustedRow.createCell(columnIndex);
+      percentageCell.setCellValue(percentageText);
     }
 
     // write to log
