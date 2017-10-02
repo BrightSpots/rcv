@@ -30,7 +30,7 @@ public class CVRReader {
 
   // call this to parse the given file path into a CastVoteRecordList suitable for tabulation
   // Note: this is specific for the Maine example file we were provided
-  public boolean parseCVRFile(String excelFilePath) {
+  public boolean parseCVRFile(String excelFilePath, int firstVoteColumnIndex, int allowableRanks) {
 
     Sheet contestSheet = getBallotSheet(excelFilePath);
     if (contestSheet == null) {
@@ -46,12 +46,12 @@ public class CVRReader {
       return false;
     }
 
-    // number of ranks user may assign for this contest
-    int allowableRanks = headerRow.getLastCellNum() - 3;
-    if (allowableRanks <= 0) {
-      RCVLogger.log("invalid RCV format: not enough columns: %d ", headerRow.getLastCellNum());
-      return false;
-    }
+//    // number of ranks user may assign for this contest
+//    int allowableRanks = headerRow.getLastCellNum() - 3;
+//    if (allowableRanks <= 0) {
+//      RCVLogger.log("invalid RCV format: not enough columns: %d ", headerRow.getLastCellNum());
+//      return false;
+//    }
 
     // create list of candidates as we go
     Set<String> candidates = new HashSet<String>();
@@ -69,10 +69,15 @@ public class CVRReader {
         RCVLogger.log("no id for ballot row %d, skipping!", castVoteRecords.size());
         continue;
       }
-      double ballotID = idCell.getNumericCellValue();
+      String ballotID;
+      if (idCell.getCellTypeEnum() == CellType.STRING) {
+        ballotID = idCell.getStringCellValue();
+      } else {
+        ballotID = String.valueOf(idCell.getNumericCellValue());
+      }
 
-      // iterate cells in this row.  Offset is used to skip ballot id, precinct and style columns
-      for (int cellIndex = 3; cellIndex < 3 + allowableRanks; cellIndex++) {
+      // Iterate cells in this row. Offset is used to skip ballot ID etc.
+      for (int cellIndex = firstVoteColumnIndex; cellIndex < firstVoteColumnIndex + allowableRanks; cellIndex++) {
 
         // rank for this cell
         int rank = cellIndex - 2;
