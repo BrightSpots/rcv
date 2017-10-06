@@ -44,14 +44,14 @@ public class ResultsWriter {
 
     // build map of total votes cast in each round -- this will be used to calculate
     // the percentage of total votes each candidate achieves
-    Map<Integer, Integer> totalVotesPerRound = new HashMap<Integer, Integer>();
+    Map<Integer, Integer> totalActiveVotesPerRound = new HashMap<Integer, Integer>();
     for (int round = 1; round <= finalRound; round++) {
       Map<String, Integer> tally = roundTallies.get(round);
       int total = 0;
       for (int votes : tally.values()) {
         total += votes;
       }
-      totalVotesPerRound.put(round, total);
+      totalActiveVotesPerRound.put(round, total);
     }
 
     // create the workbook and worksheet
@@ -74,7 +74,7 @@ public class ResultsWriter {
     headerCell = totalVoteRow.createCell(0);
     headerCell.setCellValue("Total votes cast:");
     headerCell = totalVoteRow.createCell(1);
-    Integer totalActiveVotesFirstRound = totalVotesPerRound.get(1);
+    Integer totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
     headerCell.setCellValue(totalActiveVotesFirstRound);
 
     // number of seats (we don't yet support multi-seat races)
@@ -117,8 +117,17 @@ public class ResultsWriter {
     for(int round = 1; round <= finalRound; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
       Cell roundLabelCell = headerRow1.createCell(columnIndex);
-      roundLabelCell.setCellValue(String.format("ROUND %d", round));
+      String label = String.format("ROUND %d", round);
+      if(round ==1) {
+        label = "INITIAL COUNT";
+      }
+      roundLabelCell.setCellValue(label);
     }
+
+    // Header for winner
+    columnIndex = (finalRound*COLUMNS_PER_ROUND)+1;
+    Cell winnerLabelCell = headerRow1.createCell(columnIndex);
+    winnerLabelCell.setCellValue("Elected");
 
     // Eliminations for each round
     StringBuilder sb = new StringBuilder("Eliminations: ");
@@ -158,7 +167,7 @@ public class ResultsWriter {
       Cell roundTotalCell = headerRow2.createCell(columnIndex++);
       String roundTotalText = String.format("Total");
       roundTotalCell.setCellValue(roundTotalText);
-      String roundPercentageText = String.format("Percentage");
+      String roundPercentageText = String.format("Percentage (active votes)");
       Cell roundPercentageCell = headerRow2.createCell(columnIndex);
       roundPercentageCell.setCellValue(roundPercentageText);
     }
@@ -193,7 +202,7 @@ public class ResultsWriter {
         int delta = total - prevTotal;
 
         // percentage
-        Integer totalActiveVotes = totalVotesPerRound.get(round);
+        Integer totalActiveVotes = totalActiveVotesPerRound.get(round);
         float percentage = ((float)total / (float)totalActiveVotes) * 100f;
 
         // log output
@@ -224,40 +233,54 @@ public class ResultsWriter {
     // exhausted ballots for each round
     org.apache.poi.ss.usermodel.Row exhaustedRow = worksheet.createRow(rowCounter++);
     Cell exhaustedRowHeaderCell = exhaustedRow.createCell(0);
-    exhaustedRowHeaderCell.setCellValue("Exhausted:");
+    exhaustedRowHeaderCell.setCellValue("Exhausted Votes:");
 
-    sb = new StringBuilder("Exhausted: ");
-    int totalVotesInElection = totalVotesPerRound.get(1);
+    sb = new StringBuilder("Exhausted Votes: ");
     for (int round = 1; round <= finalRound; round++) {
-      int total = 0;
-      int delta = 0;
-
-      // in round 1 there are never any exhausted ballots
-      // after round 1 the exhausted count is delta from previous round's total count
+      int thisRoundExhausted = 0;
+      int deltaExhausted = 0;
+      // exhausted count is the difference between the total votes in round 1 and total votes in current round
       if (round > 1) {
-        total = totalVotesInElection - totalVotesPerRound.get(round);
-        int prevTotal = totalVotesInElection - totalVotesPerRound.get(round - 1);
-        delta = total - prevTotal;
+        thisRoundExhausted = totalActiveVotesFirstRound - totalActiveVotesPerRound.get(round);
+        int prevRoundExhausted = totalActiveVotesFirstRound - totalActiveVotesPerRound.get(round - 1);
+        deltaExhausted = thisRoundExhausted - prevRoundExhausted;
       }
 
-      // percentage
-      float percentage = ((float)total / (float)totalActiveVotesFirstRound) * 100f;
+      // exhausted votes as percentage of ALL votes (note: this differs from the candidate vote percentages
+      // which are percentage of ACTIVE votes for the given round
+      float percentage = ((float)thisRoundExhausted / (float)totalActiveVotesFirstRound) * 100f;
 
       // log file output
-      sb.append("Round ").append(round - 1).append(" delta: ").append(delta).append(", ");
-      sb.append("Round ").append(round - 1).append(" total: ").append(total).append(", ");
+      sb.append("Round ").append(round - 1).append(" delta: ").append(deltaExhausted).append(", ");
+      sb.append("Round ").append(round - 1).append(" total: ").append(thisRoundExhausted).append(", ");
       sb.append("Round ").append(round - 1).append(" percentage: ").append(percentage).append(", ");
 
       // xls output
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
       Cell deltaVotesCell = exhaustedRow.createCell(columnIndex);
-      deltaVotesCell.setCellValue(delta);
+      deltaVotesCell.setCellValue(deltaExhausted);
       columnIndex++;
       Cell totalVotesCell = exhaustedRow.createCell(columnIndex++);
-      totalVotesCell.setCellValue(total);
+      totalVotesCell.setCellValue(thisRoundExhausted);
       String percentageText = String.format("%.2f%%", percentage);
       Cell percentageCell = exhaustedRow.createCell(columnIndex);
       percentageCell.setCellValue(percentageText);
+    }
+
+    // Total active votes in this round
+    org.apache.poi.ss.usermodel.Row totalActiveVotesRow = worksheet.createRow(rowCounter++);
+    Cell totalActiveVotesHeader = totalActiveVotesRow.createCell(0);
+    totalActiveVotesHeader.setCellValue("Active Votes:");
+    sb = new StringBuilder("Active Votes:");
+
+    for (int round = 1; round <= finalRound; round++) {
+      int total = totalActiveVotesPerRound.get(round);
+      sb.append("Round ").append(round - 1).append(" active: ").append(total).append(", ");
+
+      // xls output
+      columnIndex = ((round-1)*COLUMNS_PER_ROUND)+2;
+      Cell totalVotesCell = totalActiveVotesRow.createCell(columnIndex);
+      totalVotesCell.setCellValue(total);
     }
 
     // Total votes in this round
@@ -267,14 +290,15 @@ public class ResultsWriter {
     sb = new StringBuilder("Total Votes:");
 
     for (int round = 1; round <= finalRound; round++) {
-      int total = totalVotesPerRound.get(round);
-      sb.append("Round ").append(round - 1).append(" total: ").append(total).append(", ");
+      // TODO: actually calculate this value
+      sb.append("Round ").append(round - 1).append(" total: ").append(totalActiveVotesFirstRound).append(", ");
 
       // xls output
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+2;
       Cell totalVotesCell = totalVotesRow.createCell(columnIndex);
-      totalVotesCell.setCellValue(total);
+      totalVotesCell.setCellValue(totalActiveVotesFirstRound);
     }
+
 
     // write to log
     RCVLogger.log(sb.toString());
