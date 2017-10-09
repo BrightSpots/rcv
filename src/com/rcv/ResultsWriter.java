@@ -100,11 +100,10 @@ public class ResultsWriter {
     // Round-by-round reports
     /////////////////////////////////////
 
-    // each round (except the first) has three pieces of data for each candidate row:
+    // each round has three pieces of data for each candidate row:
     // - change in votes from previous round
     // - total votes in current round
     // - percentage of total active votes
-    // in the first round we omit change in votes because... we were asked to do so
     int COLUMNS_PER_ROUND = 3;
 
     // column indexes are computed for all cells in the output xlsx spreadsheet
@@ -124,11 +123,6 @@ public class ResultsWriter {
       roundLabelCell.setCellValue(label);
     }
 
-    // Header for winner
-    columnIndex = (finalRound*COLUMNS_PER_ROUND)+1;
-    Cell winnerLabelCell = headerRow1.createCell(columnIndex);
-    winnerLabelCell.setCellValue("Elected");
-
     // Eliminations for each round
     StringBuilder sb = new StringBuilder("Eliminations: ");
     org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
@@ -138,7 +132,8 @@ public class ResultsWriter {
       sb.append(round).append(": ");
       List<String> eliminated = roundToCandidatesEliminated.get(round);
       String cellText = String.join(", ", eliminated);
-      columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
+      // note we shift the eliminated candidate(s) display into the subsequent column
+      columnIndex = ((round-1+1)*COLUMNS_PER_ROUND)+1;
       Cell cell = eliminationsRow.createCell(columnIndex);
       cell.setCellValue(cellText);
       sb.append(cellText);
@@ -151,12 +146,18 @@ public class ResultsWriter {
     org.apache.poi.ss.usermodel.Row electedRow = worksheet.createRow(rowCounter++);
     Cell electedCell = electedRow.createCell(0);
     electedCell.setCellValue("ELECTED:");
-    columnIndex = ((finalRound)*COLUMNS_PER_ROUND)+1;
+    columnIndex = ((finalRound-1)*COLUMNS_PER_ROUND)+1;
     electedCell = electedRow.createCell(columnIndex);
     electedCell.setCellValue(winner);
 
 
-    // Show total, change, percentage for each round EXCEPT skip "change" for first round
+    // create a row for votes redistributed total -- we will fill it in after we tabulate all the candidates' data
+    org.apache.poi.ss.usermodel.Row votesRedistributedRow = worksheet.createRow(rowCounter++);
+    Cell votesRedistributedHeaderCell = votesRedistributedRow.createCell(0);
+    votesRedistributedHeaderCell.setCellValue("VOTES REDISTRIBUTED");
+    int[] votesRedistributedEachRound = new int[finalRound+1];
+
+    // Headers for total, change, percentage for each round
     org.apache.poi.ss.usermodel.Row headerRow2 = worksheet.createRow(rowCounter++);
     for(int round = 1; round <= finalRound; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
@@ -171,15 +172,11 @@ public class ResultsWriter {
       Cell roundPercentageCell = headerRow2.createCell(columnIndex);
       roundPercentageCell.setCellValue(roundPercentageText);
     }
-
-    // TODO: elected candidate lists
-
-    // Rows 2..n: Candidate votes [total, delta, percentage]
-
-
+    
+    // Candidate votes [total, delta, percentage]
     // for each candidate: for each round: output total votes, delta votes, and final vote percentage of total
-    // EXCEPT skip "change" for first round
     for (String candidate : sortedCandidates) {
+      // show each candidate row with their totals for each round
       org.apache.poi.ss.usermodel.Row candidateRow = worksheet.createRow(rowCounter++);
       Cell rowHeaderCell = candidateRow.createCell(0);
       rowHeaderCell.setCellValue(candidate);
@@ -201,6 +198,10 @@ public class ResultsWriter {
         }
         int delta = total - prevTotal;
 
+        // sum total votes redistributed
+        if(delta > 0) {
+          votesRedistributedEachRound[round] += delta;
+        }
         // percentage
         Integer totalActiveVotes = totalActiveVotesPerRound.get(round);
         float percentage = ((float)total / (float)totalActiveVotes) * 100f;
@@ -225,6 +226,15 @@ public class ResultsWriter {
     }
 
     RCVLogger.log(sb.toString());
+
+    // total votes redistributed
+    for (int round = 1; round <= finalRound; round++) {
+      columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
+      Cell votesRedistributedRowCell = votesRedistributedRow.createCell(columnIndex);
+      int votesRedistributed = votesRedistributedEachRound[round];
+      votesRedistributedRowCell.setCellValue(votesRedistributed);
+    }
+
 
     /////////////////
     // Bottom rows:
