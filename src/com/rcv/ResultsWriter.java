@@ -6,6 +6,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -17,16 +19,69 @@ import java.util.*;
  */
 public class ResultsWriter {
 
-  // takes tabulation round tallies and generates a spreadsheet from them
-  public boolean generateSummarySpreadsheet(
-    int finalRound,
-    Map<Integer, Map<String, Integer>> roundTallies,
-    Map<String, Integer> candidatesToRoundEliminated,
-    String outputFilePath,
-    String electionName,
-    String winner
-  ) {
+  private int numRounds;
+  private Map<Integer, Map<String, Integer>> roundTallies;
+  private Map<String, Integer> candidatesToRoundEliminated;
+  private String outputFilePath;
+  private String contestName;
+  private String jurisdiction;
+  private String office;
+  private String electionDate;
+  private int numCandidates;
+  private String winner;
 
+  public ResultsWriter setNumRounds(int numRounds) {
+    this.numRounds = numRounds;
+    return this;
+  }
+
+  public ResultsWriter setRoundTallies(Map<Integer, Map<String, Integer>> roundTallies) {
+    this.roundTallies = roundTallies;
+    return this;
+  }
+
+  public ResultsWriter setCandidatesToRoundEliminated(Map<String, Integer> candidatesToRoundEliminated) {
+    this.candidatesToRoundEliminated = candidatesToRoundEliminated;
+    return this;
+  }
+
+  public ResultsWriter setOutputFilePath(String outputFilePath) {
+    this.outputFilePath = outputFilePath;
+    return this;
+  }
+
+  public ResultsWriter setContestName(String contestName) {
+    this.contestName = contestName;
+    return this;
+  }
+
+  public ResultsWriter setJurisdiction(String jurisdiction) {
+    this.jurisdiction = jurisdiction;
+    return this;
+  }
+
+  public ResultsWriter setOffice(String office) {
+    this.office = office;
+    return this;
+  }
+
+  public ResultsWriter setElectionDate(String electionDate) {
+    this.electionDate = electionDate;
+    return this;
+  }
+
+  public ResultsWriter setNumCandidates(int numCandidates) {
+    this.numCandidates = numCandidates;
+    return this;
+  }
+
+  public ResultsWriter setWinner(String winner) {
+    this.winner = winner;
+    return this;
+  }
+
+  // takes tabulation round tallies and generates a spreadsheet from them
+  public boolean generateSummarySpreadsheet() {
     // some pre-processing on the tabulation data:
     // invert candidatesToRoundEliminated map so we can lookup who got eliminated for each round
     Map<Integer, List<String>> roundToCandidatesEliminated = new HashMap<Integer, List<String>>();
@@ -45,7 +100,7 @@ public class ResultsWriter {
     // build map of total votes cast in each round -- this will be used to calculate
     // the percentage of total votes each candidate achieves
     Map<Integer, Integer> totalActiveVotesPerRound = new HashMap<Integer, Integer>();
-    for (int round = 1; round <= finalRound; round++) {
+    for (int round = 1; round <= numRounds; round++) {
       Map<String, Integer> tally = roundTallies.get(round);
       int total = 0;
       for (int votes : tally.values()) {
@@ -56,45 +111,12 @@ public class ResultsWriter {
 
     // create the workbook and worksheet
     XSSFWorkbook workbook = new XSSFWorkbook();
-    XSSFSheet worksheet = workbook.createSheet(electionName);
+    XSSFSheet worksheet = workbook.createSheet(jurisdiction + " " + office);
 
     ////////////////////////////
     // Global Header
     /////////////////////////
-    int rowCounter = 0;
-    // title
-    org.apache.poi.ss.usermodel.Row titleRow = worksheet.createRow(rowCounter++);
-    Cell headerCell = titleRow.createCell(0);
-    headerCell.setCellValue("Contest:");
-    headerCell = titleRow.createCell(1);
-    headerCell.setCellValue(electionName);
-
-    // total votes cast in election
-    org.apache.poi.ss.usermodel.Row totalVoteRow = worksheet.createRow(rowCounter++);
-    headerCell = totalVoteRow.createCell(0);
-    headerCell.setCellValue("Total votes cast:");
-    headerCell = totalVoteRow.createCell(1);
-    Integer totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
-    headerCell.setCellValue(totalActiveVotesFirstRound);
-
-    // number of seats (we don't yet support multi-seat races)
-    org.apache.poi.ss.usermodel.Row numSeatsRow = worksheet.createRow(rowCounter++);
-    headerCell = numSeatsRow.createCell(0);
-    headerCell.setCellValue("Number to be elected:");
-    headerCell = numSeatsRow.createCell(1);
-    headerCell.setCellValue(1);
-
-    // threshold
-    int threshold = (totalActiveVotesFirstRound / 2) + 1;
-    org.apache.poi.ss.usermodel.Row thresholdRow = worksheet.createRow(rowCounter++);
-    headerCell = thresholdRow.createCell(0);
-    headerCell.setCellValue("Threshold:");
-    headerCell = thresholdRow.createCell(1);
-    headerCell.setCellValue(threshold);
-
-    // skip a row for visual clarity
-    worksheet.createRow(rowCounter++);
-
+    int rowCounter = addHeaderRows(worksheet, totalActiveVotesPerRound);
 
     /////////////////////////////////////
     // Round-by-round reports
@@ -114,7 +136,7 @@ public class ResultsWriter {
 
     // Headers for each round
     org.apache.poi.ss.usermodel.Row headerRow1 = worksheet.createRow(rowCounter++);
-    for(int round = 1; round <= finalRound; round++) {
+    for(int round = 1; round <= numRounds; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
       Cell roundLabelCell = headerRow1.createCell(columnIndex);
       String label = String.format("ROUND %d", round);
@@ -125,7 +147,7 @@ public class ResultsWriter {
     }
 
     // Header for winner
-    columnIndex = (finalRound*COLUMNS_PER_ROUND)+1;
+    columnIndex = (numRounds*COLUMNS_PER_ROUND)+1;
     Cell winnerLabelCell = headerRow1.createCell(columnIndex);
     winnerLabelCell.setCellValue("Elected");
 
@@ -134,7 +156,7 @@ public class ResultsWriter {
     org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
     Cell eliminationsRowHeader = eliminationsRow.createCell(0);
     eliminationsRowHeader.setCellValue("DEFEATED: ");
-    for (int round = 1; round <= finalRound; round++) {
+    for (int round = 1; round <= numRounds; round++) {
       sb.append(round).append(": ");
       List<String> eliminated = roundToCandidatesEliminated.get(round);
       String cellText = String.join(", ", eliminated);
@@ -151,14 +173,14 @@ public class ResultsWriter {
     org.apache.poi.ss.usermodel.Row electedRow = worksheet.createRow(rowCounter++);
     Cell electedCell = electedRow.createCell(0);
     electedCell.setCellValue("ELECTED:");
-    columnIndex = ((finalRound)*COLUMNS_PER_ROUND)+1;
+    columnIndex = ((numRounds)*COLUMNS_PER_ROUND)+1;
     electedCell = electedRow.createCell(columnIndex);
     electedCell.setCellValue(winner);
 
 
     // Show total, change, percentage for each round EXCEPT skip "change" for first round
     org.apache.poi.ss.usermodel.Row headerRow2 = worksheet.createRow(rowCounter++);
-    for(int round = 1; round <= finalRound; round++) {
+    for(int round = 1; round <= numRounds; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
       String roundDeltaText = String.format("Change");
       Cell roundDeltaCell = headerRow2.createCell(columnIndex);
@@ -184,7 +206,7 @@ public class ResultsWriter {
       Cell rowHeaderCell = candidateRow.createCell(0);
       rowHeaderCell.setCellValue(candidate);
       sb = new StringBuilder(candidate).append(": ");
-      for (int round = 1; round <= finalRound; round++) {
+      for (int round = 1; round <= numRounds; round++) {
 
         // not all candidates may have a tally in every round
         Integer total = roundTallies.get(round).get(candidate);
@@ -235,8 +257,10 @@ public class ResultsWriter {
     Cell exhaustedRowHeaderCell = exhaustedRow.createCell(0);
     exhaustedRowHeaderCell.setCellValue("Exhausted Votes:");
 
+    int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
+
     sb = new StringBuilder("Exhausted Votes: ");
-    for (int round = 1; round <= finalRound; round++) {
+    for (int round = 1; round <= numRounds; round++) {
       int thisRoundExhausted = 0;
       int deltaExhausted = 0;
       // exhausted count is the difference between the total votes in round 1 and total votes in current round
@@ -273,7 +297,7 @@ public class ResultsWriter {
     totalActiveVotesHeader.setCellValue("Active Votes:");
     sb = new StringBuilder("Active Votes:");
 
-    for (int round = 1; round <= finalRound; round++) {
+    for (int round = 1; round <= numRounds; round++) {
       int total = totalActiveVotesPerRound.get(round);
       sb.append("Round ").append(round - 1).append(" active: ").append(total).append(", ");
 
@@ -289,7 +313,7 @@ public class ResultsWriter {
     totalVotesHeader.setCellValue("Total Votes:");
     sb = new StringBuilder("Total Votes:");
 
-    for (int round = 1; round <= finalRound; round++) {
+    for (int round = 1; round <= numRounds; round++) {
       // TODO: actually calculate this value
       sb.append("Round ").append(round - 1).append(" total: ").append(totalActiveVotesFirstRound).append(", ");
 
@@ -315,6 +339,58 @@ public class ResultsWriter {
       return false;
     }
     
+  }
+
+  private int addHeaderRows(XSSFSheet worksheet, Map<Integer, Integer> totalActiveVotesPerRound) {
+    int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
+    DateFormat dateFormat = new SimpleDateFormat("M/d/yyyy");
+    String dateString = dateFormat.format(new Date());
+
+    Object[][] fields = {
+      {"About this contest", null, false},
+      {"Date/time or version", "Updated " + dateString, false},
+      {"Contest information", null, false},
+      {"Enter information about the contest as it will be displayed", null, false},
+      {"Contest name", contestName, false},
+      {"Jurisdiction name", jurisdiction, false},
+      {"Office name", office, false},
+      {"Election date", electionDate, false},
+      {null, null, false},
+      {"Counting information", null, false},
+      {"Details of the tally to be used in the display screens", null, false},
+      {"Counting method", "Ranked-choice voting", false},
+      {"Formula for winning", "Half of total votes cast for office + 1", false},
+      {"Formula example", "n/a", false},
+      {"Threshold number", "50%", false},
+      {"Graph threshold label", "50% of votes required to win", false},
+      {null, null, false},
+      {"Contest summary data", null, false},
+      {"Tally detail", null, false},
+      {"Single/multi winner", "single-winner", false},
+      {"Number to be elected", 1, true},
+      {"Number of candidates", numCandidates, true},
+      {"Number of votes cast", totalActiveVotesFirstRound, true},
+      {"Undervotes", 0, true},
+      {"Total # of rounds", totalActiveVotesPerRound.size(), true},
+      {null, null, false}
+    };
+
+    int rowCounter = 0;
+    for (Object[] rowFields : fields) {
+      org.apache.poi.ss.usermodel.Row row = worksheet.createRow(rowCounter++);
+      if (rowFields[0] != null) {
+        row.createCell(0).setCellValue((String)rowFields[0]);
+      }
+      if (rowFields[1] != null) {
+        if ((boolean)rowFields[2]) {
+          row.createCell(1).setCellValue((int)rowFields[1]);
+        } else {
+          row.createCell(1).setCellValue((String)rowFields[1]);
+        }
+      }
+    }
+
+    return rowCounter;
   }
 
   // helper
