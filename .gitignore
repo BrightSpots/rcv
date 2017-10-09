@@ -1,4 +1,5 @@
 .idea
+.DS_Store
 out
 tmp
 test/election_summary_report.txt
