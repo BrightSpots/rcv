@@ -27,6 +27,11 @@ public class Tabulator {
   private Integer minVoteThreshold;
   private String undeclaredWriteInString;
 
+  private String contestName;
+  private String jurisdiction;
+  private String office;
+  private String electionDate;
+
   // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
   private Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
 
@@ -118,12 +123,12 @@ public class Tabulator {
 
   public void tabulate() throws Exception {
 
-    log("Beginning tabulation for contest: %d", this.contestId);
-    log("There are %d candidates for this contest:", this.contestOptions.size());
-    for (String option : this.contestOptions) {
+    log("Beginning tabulation for contest: %d", contestId);
+    log("There are %d candidates for this contest:", numCandidates());
+    for (String option : contestOptions) {
       log("%s", option);
     }
-    log("There are %d cast vote records for this contest.", this.castVoteRecords.size());
+    log("There are %d cast vote records for this contest.", castVoteRecords.size());
 
 
     // exhaustedBallots is a map of ballot indexes to the round in which they were exhausted
@@ -171,9 +176,9 @@ public class Tabulator {
       // Does the leader have a majority of non-exhausted ballots?
       if (maxVotes > (float)totalVotes / 2.0) {
         // we have a winner
-        for(Integer votes : countToCandidates.keySet()) {
+        for (Integer votes : countToCandidates.keySet()) {
           // record winner and loser(s)
-          if(votes == maxVotes) {
+          if (votes == maxVotes) {
             winner = countToCandidates.get(votes).getFirst();
           } else {
             String loser = countToCandidates.get(votes).getFirst();
@@ -277,9 +282,39 @@ public class Tabulator {
   }
 
   public void generateSummarySpreadsheet(String outputFile) {
-    ResultsWriter writer = new ResultsWriter();
-    writer.generateSummarySpreadsheet(this.finalRound, this.roundTallies, this.eliminatedRound,
-        outputFile, "Portland", winner);
+    ResultsWriter writer = new ResultsWriter().
+      setNumRounds(finalRound).
+      setRoundTallies(roundTallies).
+      setCandidatesToRoundEliminated(eliminatedRound).
+      setOutputFilePath(outputFile).
+      setContestName(contestName).
+      setJurisdiction(jurisdiction).
+      setOffice(office).
+      setElectionDate(electionDate).
+      setNumCandidates(numCandidates()).
+      setWinner(winner);
+
+    writer.generateSummarySpreadsheet();
+  }
+
+  public Tabulator setContestName(String contestName) {
+    this.contestName = contestName;
+    return this;
+  }
+
+  public Tabulator setJurisdiction(String jurisdiction) {
+    this.jurisdiction = jurisdiction;
+    return this;
+  }
+
+  public Tabulator setOffice(String office) {
+    this.office = office;
+    return this;
+  }
+
+  public Tabulator setElectionDate(String electionDate) {
+    this.electionDate = electionDate;
+    return this;
   }
 
   private void log(String s, Object... var1) {
@@ -464,7 +499,7 @@ public class Tabulator {
 
   // input is a list of CastVoteRecords
   // output is that same list, but the rankings are sorted from low to high
-    private ArrayList<SortedMap<Integer, Set<String>>> sortCastVoteRecords(List<CastVoteRecord> castVoteRecords) {
+  private ArrayList<SortedMap<Integer, Set<String>>> sortCastVoteRecords(List<CastVoteRecord> castVoteRecords) {
     // returns a list of "sortedCVRs"
     ArrayList<SortedMap<Integer, Set<String>>> allSortedRankings = new ArrayList<SortedMap<Integer, Set<String>>>();
 
@@ -489,5 +524,13 @@ public class Tabulator {
     }
 
     return allSortedRankings;
+  }
+
+  private int numCandidates() {
+    int num = contestOptions.size();
+    if (undeclaredWriteInString != null && contestOptions.contains(undeclaredWriteInString)) {
+      num--;
+    }
+    return num;
   }
 }

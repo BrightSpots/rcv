@@ -36,7 +36,11 @@ public class RCVTester {
       15,
       null,
       1,
-      Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING
+      Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING,
+      "2013 Portland Mayoral Election",
+      "City of Portland",
+      "Mayor",
+      "November 5, 2013"
     )) {
       return 1;
     }
@@ -48,7 +52,11 @@ public class RCVTester {
       3,
       "UWI",
       null,
-      Tabulator.OvervoteRule.IGNORE_IF_MULTIPLE_CONTINUING
+      Tabulator.OvervoteRule.IGNORE_IF_MULTIPLE_CONTINUING,
+      "2013 Minneapolis Mayor Election",
+      "City of Minneapolis",
+      "Mayor",
+      "November 5, 2013"
     )) {
       return 1;
     }
@@ -86,11 +94,15 @@ public class RCVTester {
     int allowableRanks,
     String undeclaredWriteInString,
     Integer maxNumberOfSkippedRanks,
-    Tabulator.OvervoteRule overvoteRule
+    Tabulator.OvervoteRule overvoteRule,
+    String contestName,
+    String jurisdiction,
+    String office,
+    String electionDate
   ) {
     CVRReader reader = new CVRReader();
     if (reader.parseCVRFile(inFile, firstVoteColumnIndex, allowableRanks)) {
-      Tabulator testTabulator = new Tabulator(
+      Tabulator tabulator = new Tabulator(
         reader.castVoteRecords,
         1,
         reader.candidateOptions,
@@ -99,10 +111,13 @@ public class RCVTester {
         overvoteRule,
         null,
         undeclaredWriteInString
-      );
+      ).setContestName(contestName).
+        setJurisdiction(jurisdiction).
+        setOffice(office).
+        setElectionDate(electionDate);
       try {
-        testTabulator.tabulate();
-        testTabulator.generateSummarySpreadsheet(outFile);
+        tabulator.tabulate();
+        tabulator.generateSummarySpreadsheet(outFile);
       } catch (Exception e) {
         e.printStackTrace();
         return false;
