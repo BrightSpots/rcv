@@ -145,26 +145,30 @@ public class ResultsWriter {
       roundLabelCell.setCellValue(label);
     }
 
-    // Eliminations for each round
+    // Action row and header
+    org.apache.poi.ss.usermodel.Row actionRow = worksheet.createRow(rowCounter++);
+    Cell actionLabelCell = actionRow.createCell(0);
+    actionLabelCell.setCellValue("Action in this round");
+    
+    // Candidate eliminations for each round
     StringBuilder sb = new StringBuilder("Eliminations: ");
     org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
     Cell eliminationsRowHeader = eliminationsRow.createCell(0);
     eliminationsRowHeader.setCellValue("DEFEATED: ");
     for (int round = 1; round <= numRounds; round++) {
-      sb.append(round).append(": ");
       List<String> eliminated = roundToCandidatesEliminated.get(round);
-      String cellText = String.join(", ", eliminated);
-      // note we shift the eliminated candidate(s) display into the subsequent column
-      columnIndex = ((round-1+1)*COLUMNS_PER_ROUND)+1;
-      Cell cell = eliminationsRow.createCell(columnIndex);
-      cell.setCellValue(cellText);
-      sb.append(cellText);
-      sb.append(", ");
-
+      // note we shift the eliminated candidate(s) display and action into the subsequent column
+      if(eliminated.size() > 0) {
+        String eliminatedCellText = String.join(", ", eliminated);
+        columnIndex = ((round - 1 + 1) * COLUMNS_PER_ROUND) + 1;
+        Cell cell = eliminationsRow.createCell(columnIndex);
+        cell.setCellValue(eliminatedCellText);
+        Cell actionCell = actionRow.createCell(columnIndex);
+        actionCell.setCellValue("Elimination");
+      }
     }
-    RCVLogger.log(sb.toString());
 
-    // Winners for each round
+    // Winner -- note display is shifted to subsequent round for display
     org.apache.poi.ss.usermodel.Row electedRow = worksheet.createRow(rowCounter++);
     Cell electedCell = electedRow.createCell(0);
     electedCell.setCellValue("ELECTED:");
@@ -172,6 +176,9 @@ public class ResultsWriter {
     electedCell = electedRow.createCell(columnIndex);
     electedCell.setCellValue(winner);
 
+    // Winner action
+    Cell actionCell = actionRow.createCell(((numRounds*COLUMNS_PER_ROUND)+1));
+    actionCell.setCellValue("Winner");
 
     // create a row for votes redistributed total -- we will fill it in after we tabulate all the candidates' data
     org.apache.poi.ss.usermodel.Row votesRedistributedRow = worksheet.createRow(rowCounter++);
