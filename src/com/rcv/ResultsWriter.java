@@ -135,14 +135,20 @@ public class ResultsWriter {
 
     // Headers for each round
     org.apache.poi.ss.usermodel.Row headerRow1 = worksheet.createRow(rowCounter++);
-    for(int round = 1; round <= numRounds; round++) {
+    for(int round = 1; round <= numRounds+1; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
-      Cell roundLabelCell = headerRow1.createCell(columnIndex);
-      String label = String.format("ROUND %d", round);
-      if(round ==1) {
-        label = "INITIAL COUNT";
+      String label;
+      if(round == 1) {
+        label = "Initial Count";
+      } else if (round == numRounds+1) {
+        label = "Final Results";
+      } else {
+        label = String.format("Round %d", round);
       }
-      roundLabelCell.setCellValue(label);
+      for(int i = 0; i < COLUMNS_PER_ROUND; i++) {
+        Cell roundLabelCell = headerRow1.createCell(columnIndex++);
+        roundLabelCell.setCellValue(label);
+      }
     }
 
     // Action row and header
