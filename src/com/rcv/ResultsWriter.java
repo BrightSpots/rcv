@@ -135,58 +135,79 @@ public class ResultsWriter {
 
     // Headers for each round
     org.apache.poi.ss.usermodel.Row headerRow1 = worksheet.createRow(rowCounter++);
-    for (int round = 1; round <= numRounds; round++) {
+    Cell roundTitleHeaderCell = headerRow1.createCell(0);
+    roundTitleHeaderCell.setCellValue("Round Title");
+    for (int round = 1; round <= numRounds+1; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
-      Cell roundLabelCell = headerRow1.createCell(columnIndex);
-      String label = String.format("ROUND %d", round);
-      if (round == 1) {
-        label = "INITIAL COUNT";
+      String label;
+      if(round == 1) {
+        label = "Initial Count";
+      } else if (round == numRounds+1) {
+        label = "Final Results";
+      } else {
+        label = String.format("Round %d", round);
       }
-      roundLabelCell.setCellValue(label);
-    }
-
-    // Eliminations for each round
-    org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
-    Cell eliminationsRowHeader = eliminationsRow.createCell(0);
-    eliminationsRowHeader.setCellValue("DEFEATED: ");
-    for (int round = 1; round < numRounds; round++) {
-      List<String> eliminated = roundToCandidatesEliminated.get(round);
-      String cellText = String.join("; ", eliminated);
-      // note we shift the eliminated candidate(s) display into the subsequent column
-      columnIndex = ((round-1+1)*COLUMNS_PER_ROUND)+1;
-      Cell cell = eliminationsRow.createCell(columnIndex);
-      cell.setCellValue(cellText);
+      for(int i = 0; i < COLUMNS_PER_ROUND; i++) {
+        Cell roundLabelCell = headerRow1.createCell(columnIndex++);
+        roundLabelCell.setCellValue(label);
+      }
     }
 
     // Winner: show them in final round and in final results
+    // Action row and header
+    org.apache.poi.ss.usermodel.Row actionRow = worksheet.createRow(rowCounter++);
+    Cell actionLabelCell = actionRow.createCell(0);
+    actionLabelCell.setCellValue("Action in this round");
+    
+    // Candidate eliminations for each round
+    org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
+    Cell eliminationsRowHeader = eliminationsRow.createCell(0);
+    eliminationsRowHeader.setCellValue("Candidates defeated");
+    for (int round = 1; round < numRounds; round++) {
+      List<String> eliminated = roundToCandidatesEliminated.get(round);
+      // note we shift the eliminated candidate(s) display and action into the subsequent column
+      if(eliminated.size() > 0) {
+        String eliminatedCellText = String.join("; ", eliminated);
+        columnIndex = ((round - 1 + 1) * COLUMNS_PER_ROUND) + 1;
+        Cell cell = eliminationsRow.createCell(columnIndex);
+        cell.setCellValue(eliminatedCellText);
+        Cell actionCell = actionRow.createCell(columnIndex);
+        actionCell.setCellValue("Elimination");
+      }
+    }
+
+    // Winner -- note display is shifted to subsequent round for display
     org.apache.poi.ss.usermodel.Row electedRow = worksheet.createRow(rowCounter++);
     Cell electedCell = electedRow.createCell(0);
-    electedCell.setCellValue("ELECTED:");
-    columnIndex = ((numRounds-1)*COLUMNS_PER_ROUND)+1;
-    electedCell = electedRow.createCell(columnIndex);
-    electedCell.setCellValue(winner);
+    electedCell.setCellValue("Winners");
     columnIndex = (numRounds*COLUMNS_PER_ROUND)+1;
     electedCell = electedRow.createCell(columnIndex);
     electedCell.setCellValue(winner);
 
+    // Winner action
+    Cell actionCell = actionRow.createCell(((numRounds*COLUMNS_PER_ROUND)+1));
+    actionCell.setCellValue("Winner");
+
     // create a row for votes redistributed total -- we will fill it in after we tabulate all the candidates' data
     org.apache.poi.ss.usermodel.Row votesRedistributedRow = worksheet.createRow(rowCounter++);
     Cell votesRedistributedHeaderCell = votesRedistributedRow.createCell(0);
-    votesRedistributedHeaderCell.setCellValue("VOTES REDISTRIBUTED");
+    votesRedistributedHeaderCell.setCellValue("Votes redistributed");
     int[] votesRedistributedEachRound = new int[numRounds+1];
 
     // Headers for total, change, percentage for each round
     org.apache.poi.ss.usermodel.Row headerRow2 = worksheet.createRow(rowCounter++);
+    Cell candidateNameCell = headerRow2.createCell(0);
+    candidateNameCell.setCellValue("Candidate Name");
     for (int round = 1; round <= numRounds+1; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
-      String roundDeltaText = String.format("Change");
+      String roundDeltaText = "Vote change";
       Cell roundDeltaCell = headerRow2.createCell(columnIndex);
       roundDeltaCell.setCellValue(roundDeltaText);
       columnIndex++;
       Cell roundTotalCell = headerRow2.createCell(columnIndex++);
-      String roundTotalText = String.format("Total");
+      String roundTotalText = (round == 1) ? "First preferences" : "Result of round";
       roundTotalCell.setCellValue(roundTotalText);
-      String roundPercentageText = String.format("Percentage (active votes)");
+      String roundPercentageText = "% of vote";
       Cell roundPercentageCell = headerRow2.createCell(columnIndex);
       roundPercentageCell.setCellValue(roundPercentageText);
     }
@@ -239,7 +260,7 @@ public class ResultsWriter {
     }
 
     // total votes redistributed
-    for (int round = 1; round <= numRounds+1; round++) {
+    for (int round = 2; round <= numRounds+1; round++) {
       columnIndex = ((round - 1) * COLUMNS_PER_ROUND) + 1;
       Cell votesRedistributedRowCell = votesRedistributedRow.createCell(columnIndex);
       if (round <= numRounds) {
@@ -257,7 +278,7 @@ public class ResultsWriter {
     // exhausted ballots for each round
     org.apache.poi.ss.usermodel.Row exhaustedRow = worksheet.createRow(rowCounter++);
     Cell exhaustedRowHeaderCell = exhaustedRow.createCell(0);
-    exhaustedRowHeaderCell.setCellValue("Exhausted Votes:");
+    exhaustedRowHeaderCell.setCellValue("Inactive Ballots");
 
     int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
 
@@ -288,6 +309,17 @@ public class ResultsWriter {
       percentageCell.setCellValue(percentageText);
     }
 
+    // Total votes in this round
+    org.apache.poi.ss.usermodel.Row totalVotesRow = worksheet.createRow(rowCounter++);
+    Cell totalVotesHeader = totalVotesRow.createCell(0);
+    totalVotesHeader.setCellValue("Total Votes");
+
+    for (int displayRound = 1; displayRound <= numRounds+1; displayRound++) {
+      columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+2;
+      Cell totalVotesCell = totalVotesRow.createCell(columnIndex);
+      totalVotesCell.setCellValue(totalActiveVotesFirstRound);
+    }
+
     // Total active votes in this round
     org.apache.poi.ss.usermodel.Row totalActiveVotesRow = worksheet.createRow(rowCounter++);
     Cell totalActiveVotesHeader = totalActiveVotesRow.createCell(0);
@@ -303,16 +335,6 @@ public class ResultsWriter {
       totalVotesCell.setCellValue(total);
     }
 
-    // Total votes in this round
-    org.apache.poi.ss.usermodel.Row totalVotesRow = worksheet.createRow(rowCounter++);
-    Cell totalVotesHeader = totalVotesRow.createCell(0);
-    totalVotesHeader.setCellValue("Total Votes:");
-
-    for (int displayRound = 1; displayRound <= numRounds+1; displayRound++) {
-      columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+2;
-      Cell totalVotesCell = totalVotesRow.createCell(columnIndex);
-      totalVotesCell.setCellValue(totalActiveVotesFirstRound);
-    }
 
     // write xls to disk
     try {
