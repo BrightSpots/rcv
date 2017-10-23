@@ -295,6 +295,7 @@ public class Tabulator {
       setOffice(office).
       setElectionDate(electionDate).
       setNumCandidates(numCandidates()).
+      setUndeclaredWriteInString(undeclaredWriteInString).
       setWinner(winner);
 
     writer.generateSummarySpreadsheet();

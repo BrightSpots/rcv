@@ -4,6 +4,6 @@ out
 tmp
 test/election_summary_report.txt
 test/2013-minneapolis-mayor-tabulation-results.xlsx
-test/~2013-minneapolis-mayor-tabulation-results.xlsx
+test/~$2013-minneapolis-mayor-tabulation-results.xlsx
 test/Portland-Tabulation-Results.xlsx
 test/~$Portland-Tabulation-Results.xlsx
