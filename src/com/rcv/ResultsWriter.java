@@ -28,6 +28,7 @@ public class ResultsWriter {
   private String office;
   private String electionDate;
   private int numCandidates;
+  private String undeclaredWriteInString;
   private String winner;
 
   public ResultsWriter setNumRounds(int numRounds) {
@@ -72,6 +73,11 @@ public class ResultsWriter {
 
   public ResultsWriter setNumCandidates(int numCandidates) {
     this.numCandidates = numCandidates;
+    return this;
+  }
+
+  public ResultsWriter setUndeclaredWriteInString(String undeclaredWriteInString) {
+    this.undeclaredWriteInString = undeclaredWriteInString;
     return this;
   }
 
@@ -211,10 +217,15 @@ public class ResultsWriter {
       Cell roundPercentageCell = headerRow2.createCell(columnIndex);
       roundPercentageCell.setCellValue(roundPercentageText);
     }
-    
+
+    org.apache.poi.ss.usermodel.Row specialCasesHeaderRow = null;
     // Candidate votes [total, delta, percentage]
     // for each candidate: for each round: output total votes, delta votes, and final vote percentage of total
     for (String candidate : sortedCandidates) {
+      if (candidate.equals(undeclaredWriteInString)) {
+        specialCasesHeaderRow = worksheet.createRow(rowCounter++);
+        populateSpecialCasesHeaderRow(specialCasesHeaderRow);
+      }
       // show each candidate row with their totals for each round
       org.apache.poi.ss.usermodel.Row candidateRow = worksheet.createRow(rowCounter++);
       Cell rowHeaderCell = candidateRow.createCell(0);
@@ -263,10 +274,15 @@ public class ResultsWriter {
     // Bottom rows:
     ////////////////
 
+    if (specialCasesHeaderRow == null) {
+      specialCasesHeaderRow = worksheet.createRow(rowCounter++);
+      populateSpecialCasesHeaderRow(specialCasesHeaderRow);
+    }
+
     // exhausted ballots for each round
     org.apache.poi.ss.usermodel.Row inactiveBallotRow = worksheet.createRow(rowCounter++);
     Cell exhaustedRowHeaderCell = inactiveBallotRow.createCell(0);
-    exhaustedRowHeaderCell.setCellValue("Inactive Ballots");
+    exhaustedRowHeaderCell.setCellValue("Inactive ballots");
 
     int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
 
@@ -303,7 +319,7 @@ public class ResultsWriter {
     // Total votes in this round
     org.apache.poi.ss.usermodel.Row totalVotesRow = worksheet.createRow(rowCounter++);
     Cell totalVotesHeader = totalVotesRow.createCell(0);
-    totalVotesHeader.setCellValue("Total Votes");
+    totalVotesHeader.setCellValue("Balance check");
 
     for (int displayRound = 1; displayRound <= numRounds+1; displayRound++) {
       columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+2;
@@ -314,7 +330,7 @@ public class ResultsWriter {
     // Total active votes in this round
     org.apache.poi.ss.usermodel.Row totalActiveVotesRow = worksheet.createRow(rowCounter++);
     Cell totalActiveVotesHeader = totalActiveVotesRow.createCell(0);
-    totalActiveVotesHeader.setCellValue("Active Votes:");
+    totalActiveVotesHeader.setCellValue("Active votes");
 
     for (int displayRound = 1; displayRound <= numRounds+1; displayRound++) {
       boolean isFinalResults = displayRound == numRounds+1;
@@ -353,6 +369,11 @@ public class ResultsWriter {
     
   }
 
+  private void populateSpecialCasesHeaderRow(org.apache.poi.ss.usermodel.Row row) {
+    Cell cell = row.createCell(0);
+    cell.setCellValue("Special Cases Data");
+  }
+
   private int addHeaderRows(XSSFSheet worksheet, Map<Integer, Integer> totalActiveVotesPerRound) {
     int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
     DateFormat dateFormat = new SimpleDateFormat("M/d/yyyy");
@@ -384,7 +405,8 @@ public class ResultsWriter {
       {"Number of votes cast", totalActiveVotesFirstRound, true},
       {"Undervotes", 0, true},
       {"Total # of rounds", totalActiveVotesPerRound.size(), true},
-      {null, null, false}
+      {null, null, false},
+      {"Tally Data Starts Here", null, false}
     };
 
     int rowCounter = 0;
@@ -411,7 +433,13 @@ public class ResultsWriter {
         new LinkedList<Map.Entry<String, Integer>>(tally.entrySet());
     Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
       public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-        return (o2.getValue()).compareTo(o1.getValue());
+        if (o1.getKey().equals(undeclaredWriteInString)) {
+          return 1;
+        } else if (o2.getKey().equals(undeclaredWriteInString)) {
+          return -1;
+        } else {
+          return (o2.getValue()).compareTo(o1.getValue());
+        }
       }
     });
     List<String> sortedCandidates = new LinkedList<String>();
