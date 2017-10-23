@@ -146,23 +146,17 @@ public class ResultsWriter {
     }
 
     // Eliminations for each round
-    StringBuilder sb = new StringBuilder("Eliminations: ");
     org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
     Cell eliminationsRowHeader = eliminationsRow.createCell(0);
     eliminationsRowHeader.setCellValue("DEFEATED: ");
     for (int round = 1; round <= numRounds; round++) {
-      sb.append(round).append(": ");
       List<String> eliminated = roundToCandidatesEliminated.get(round);
       String cellText = String.join(", ", eliminated);
       // note we shift the eliminated candidate(s) display into the subsequent column
       columnIndex = ((round-1+1)*COLUMNS_PER_ROUND)+1;
       Cell cell = eliminationsRow.createCell(columnIndex);
       cell.setCellValue(cellText);
-      sb.append(cellText);
-      sb.append(", ");
-
     }
-    RCVLogger.log(sb.toString());
 
     // Winners for each round
     org.apache.poi.ss.usermodel.Row electedRow = worksheet.createRow(rowCounter++);
@@ -202,7 +196,6 @@ public class ResultsWriter {
       org.apache.poi.ss.usermodel.Row candidateRow = worksheet.createRow(rowCounter++);
       Cell rowHeaderCell = candidateRow.createCell(0);
       rowHeaderCell.setCellValue(candidate);
-      sb = new StringBuilder(candidate).append(": ");
       for (int round = 1; round <= numRounds; round++) {
 
         // not all candidates may have a tally in every round
@@ -228,11 +221,6 @@ public class ResultsWriter {
         Integer totalActiveVotes = totalActiveVotesPerRound.get(round);
         float percentage = ((float)total / (float)totalActiveVotes) * 100f;
 
-        // log output
-        sb.append("Round ").append(round - 1).append(" change: ").append(delta).append(", ");
-        sb.append("Round ").append(round - 1).append(" total: ").append(total).append(", ");
-        sb.append("Round ").append(round - 1).append(" percentage: ").append(percentage).append(", ");
-
         // create cells for spreadsheet
         columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
         Cell deltaVotesCell = candidateRow.createCell(columnIndex);
@@ -244,10 +232,7 @@ public class ResultsWriter {
         String percentageText = String.format("%.2f%%", percentage);
         percentageCell.setCellValue(percentageText);
       }
-
     }
-
-    RCVLogger.log(sb.toString());
 
     // total votes redistributed
     for (int round = 1; round <= numRounds; round++) {
@@ -269,7 +254,6 @@ public class ResultsWriter {
 
     int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
 
-    sb = new StringBuilder("Exhausted Votes: ");
     for (int round = 1; round <= numRounds; round++) {
       int thisRoundExhausted = 0;
       int deltaExhausted = 0;
@@ -283,11 +267,6 @@ public class ResultsWriter {
       // exhausted votes as percentage of ALL votes (note: this differs from the candidate vote percentages
       // which are percentage of ACTIVE votes for the given round
       float percentage = ((float)thisRoundExhausted / (float)totalActiveVotesFirstRound) * 100f;
-
-      // log file output
-      sb.append("Round ").append(round - 1).append(" delta: ").append(deltaExhausted).append(", ");
-      sb.append("Round ").append(round - 1).append(" total: ").append(thisRoundExhausted).append(", ");
-      sb.append("Round ").append(round - 1).append(" percentage: ").append(percentage).append(", ");
 
       // xls output
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
@@ -305,11 +284,9 @@ public class ResultsWriter {
     org.apache.poi.ss.usermodel.Row totalActiveVotesRow = worksheet.createRow(rowCounter++);
     Cell totalActiveVotesHeader = totalActiveVotesRow.createCell(0);
     totalActiveVotesHeader.setCellValue("Active Votes:");
-    sb = new StringBuilder("Active Votes:");
 
     for (int round = 1; round <= numRounds; round++) {
       int total = totalActiveVotesPerRound.get(round);
-      sb.append("Round ").append(round - 1).append(" active: ").append(total).append(", ");
 
       // xls output
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+2;
@@ -321,22 +298,14 @@ public class ResultsWriter {
     org.apache.poi.ss.usermodel.Row totalVotesRow = worksheet.createRow(rowCounter++);
     Cell totalVotesHeader = totalVotesRow.createCell(0);
     totalVotesHeader.setCellValue("Total Votes:");
-    sb = new StringBuilder("Total Votes:");
 
     for (int round = 1; round <= numRounds; round++) {
-      // TODO: actually calculate this value
-      sb.append("Round ").append(round - 1).append(" total: ").append(totalActiveVotesFirstRound).append(", ");
-
       // xls output
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+2;
       Cell totalVotesCell = totalVotesRow.createCell(columnIndex);
       totalVotesCell.setCellValue(totalActiveVotesFirstRound);
     }
 
-
-    // write to log
-    RCVLogger.log(sb.toString());
-    
     // write xls to disk
     try {
       FileOutputStream outputStream = new FileOutputStream(outputFilePath);
