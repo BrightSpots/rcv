@@ -181,9 +181,12 @@ public class Tabulator {
           if (votes == maxVotes) {
             winner = countToCandidates.get(votes).getFirst();
           } else {
+            // Once we have a winner, there's no need to eliminate the runners-up.
+            /*
             String loser = countToCandidates.get(votes).getFirst();
             eliminatedRound.put(loser, finalRound);
             log("%s was eliminated in round %d with %d vote(s).", loser, finalRound, votes);
+            */
           }
         }
         log("%s won in round %d with %d votes.", winner, finalRound, maxVotes);
