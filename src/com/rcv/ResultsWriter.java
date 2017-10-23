@@ -135,6 +135,8 @@ public class ResultsWriter {
 
     // Headers for each round
     org.apache.poi.ss.usermodel.Row headerRow1 = worksheet.createRow(rowCounter++);
+    Cell roundTitleHeaderCell = headerRow1.createCell(0);
+    roundTitleHeaderCell.setCellValue("Round Title");
     for(int round = 1; round <= numRounds+1; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
       String label;
@@ -160,7 +162,7 @@ public class ResultsWriter {
     StringBuilder sb = new StringBuilder("Eliminations: ");
     org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
     Cell eliminationsRowHeader = eliminationsRow.createCell(0);
-    eliminationsRowHeader.setCellValue("Candidates defeated: ");
+    eliminationsRowHeader.setCellValue("Candidates defeated");
     for (int round = 1; round <= numRounds; round++) {
       List<String> eliminated = roundToCandidatesEliminated.get(round);
       // note we shift the eliminated candidate(s) display and action into the subsequent column
@@ -177,7 +179,7 @@ public class ResultsWriter {
     // Winner -- note display is shifted to subsequent round for display
     org.apache.poi.ss.usermodel.Row electedRow = worksheet.createRow(rowCounter++);
     Cell electedCell = electedRow.createCell(0);
-    electedCell.setCellValue("Winners:");
+    electedCell.setCellValue("Winners");
     columnIndex = ((numRounds-1)*COLUMNS_PER_ROUND)+1;
     electedCell = electedRow.createCell(columnIndex);
     electedCell.setCellValue(winner);
@@ -194,6 +196,8 @@ public class ResultsWriter {
 
     // Headers for total, change, percentage for each round
     org.apache.poi.ss.usermodel.Row headerRow2 = worksheet.createRow(rowCounter++);
+    Cell candidateNameCell = headerRow2.createCell(0);
+    candidateNameCell.setCellValue("Candidate Name");
     for(int round = 1; round <= numRounds; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
       String roundDeltaText = String.format("Change");
@@ -201,7 +205,7 @@ public class ResultsWriter {
       roundDeltaCell.setCellValue(roundDeltaText);
       columnIndex++;
       Cell roundTotalCell = headerRow2.createCell(columnIndex++);
-      String roundTotalText = String.format("Total");
+      String roundTotalText = (round == 1) ? "First Preferences" : String.format("Total");
       roundTotalCell.setCellValue(roundTotalText);
       String roundPercentageText = String.format("Percentage (active votes)");
       Cell roundPercentageCell = headerRow2.createCell(columnIndex);
@@ -278,7 +282,7 @@ public class ResultsWriter {
     // exhausted ballots for each round
     org.apache.poi.ss.usermodel.Row exhaustedRow = worksheet.createRow(rowCounter++);
     Cell exhaustedRowHeaderCell = exhaustedRow.createCell(0);
-    exhaustedRowHeaderCell.setCellValue("Exhausted Votes:");
+    exhaustedRowHeaderCell.setCellValue("Inactive Ballots");
 
     int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
 
@@ -317,8 +321,8 @@ public class ResultsWriter {
     // Total votes in this round
     org.apache.poi.ss.usermodel.Row totalVotesRow = worksheet.createRow(rowCounter++);
     Cell totalVotesHeader = totalVotesRow.createCell(0);
-    totalVotesHeader.setCellValue("Total Votes:");
-    sb = new StringBuilder("Total Votes:");
+    totalVotesHeader.setCellValue("Total Votes");
+    sb = new StringBuilder("Total Votes");
 
     for (int round = 1; round <= numRounds; round++) {
       // TODO: actually calculate this value
