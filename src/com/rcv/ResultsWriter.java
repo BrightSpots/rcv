@@ -259,25 +259,13 @@ public class ResultsWriter {
       }
     }
 
-    // total votes redistributed
-    for (int round = 2; round <= numRounds+1; round++) {
-      columnIndex = ((round - 1) * COLUMNS_PER_ROUND) + 1;
-      Cell votesRedistributedRowCell = votesRedistributedRow.createCell(columnIndex);
-      if (round <= numRounds) {
-        int votesRedistributed = votesRedistributedEachRound[round];
-        votesRedistributedRowCell.setCellValue(votesRedistributed);
-      } else {
-        votesRedistributedRowCell.setCellValue("NA");
-      }
-    }
-
     /////////////////
     // Bottom rows:
     ////////////////
 
     // exhausted ballots for each round
-    org.apache.poi.ss.usermodel.Row exhaustedRow = worksheet.createRow(rowCounter++);
-    Cell exhaustedRowHeaderCell = exhaustedRow.createCell(0);
+    org.apache.poi.ss.usermodel.Row inactiveBallotRow = worksheet.createRow(rowCounter++);
+    Cell exhaustedRowHeaderCell = inactiveBallotRow.createCell(0);
     exhaustedRowHeaderCell.setCellValue("Inactive Ballots");
 
     int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
@@ -292,6 +280,9 @@ public class ResultsWriter {
         thisRoundExhausted = totalActiveVotesFirstRound - totalActiveVotesPerRound.get(round);
         int prevRoundExhausted = totalActiveVotesFirstRound - totalActiveVotesPerRound.get(round - 1);
         deltaExhausted = isFinalResults ? 0 : thisRoundExhausted - prevRoundExhausted;
+
+        // add exhausted votes to the votes redistributed totals
+        votesRedistributedEachRound[round] += deltaExhausted;
       }
 
       // exhausted votes as percentage of ALL votes (note: this differs from the candidate vote percentages
@@ -300,12 +291,12 @@ public class ResultsWriter {
 
       // xls output
       columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+1;
-      Cell deltaVotesCell = exhaustedRow.createCell(columnIndex++);
+      Cell deltaVotesCell = inactiveBallotRow.createCell(columnIndex++);
       deltaVotesCell.setCellValue(deltaExhausted);
-      Cell totalVotesCell = exhaustedRow.createCell(columnIndex++);
+      Cell totalVotesCell = inactiveBallotRow.createCell(columnIndex++);
       totalVotesCell.setCellValue(thisRoundExhausted);
       String percentageText = String.format("%.2f%%", percentage);
-      Cell percentageCell = exhaustedRow.createCell(columnIndex);
+      Cell percentageCell = inactiveBallotRow.createCell(columnIndex);
       percentageCell.setCellValue(percentageText);
     }
 
@@ -335,6 +326,18 @@ public class ResultsWriter {
       totalVotesCell.setCellValue(total);
     }
 
+    // total votes redistributed
+    // this calculation happens last because it depends on the inactive vote totals
+    for (int round = 2; round <= numRounds+1; round++) {
+      columnIndex = ((round - 1) * COLUMNS_PER_ROUND) + 1;
+      Cell votesRedistributedRowCell = votesRedistributedRow.createCell(columnIndex);
+      if (round <= numRounds) {
+        int votesRedistributed = votesRedistributedEachRound[round];
+        votesRedistributedRowCell.setCellValue(votesRedistributed);
+      } else {
+        votesRedistributedRowCell.setCellValue("NA");
+      }
+    }
 
     // write xls to disk
     try {
