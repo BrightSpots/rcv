@@ -160,7 +160,7 @@ public class ResultsWriter {
     StringBuilder sb = new StringBuilder("Eliminations: ");
     org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
     Cell eliminationsRowHeader = eliminationsRow.createCell(0);
-    eliminationsRowHeader.setCellValue("DEFEATED: ");
+    eliminationsRowHeader.setCellValue("Candidates defeated: ");
     for (int round = 1; round <= numRounds; round++) {
       List<String> eliminated = roundToCandidatesEliminated.get(round);
       // note we shift the eliminated candidate(s) display and action into the subsequent column
@@ -177,7 +177,7 @@ public class ResultsWriter {
     // Winner -- note display is shifted to subsequent round for display
     org.apache.poi.ss.usermodel.Row electedRow = worksheet.createRow(rowCounter++);
     Cell electedCell = electedRow.createCell(0);
-    electedCell.setCellValue("ELECTED:");
+    electedCell.setCellValue("Winners:");
     columnIndex = ((numRounds-1)*COLUMNS_PER_ROUND)+1;
     electedCell = electedRow.createCell(columnIndex);
     electedCell.setCellValue(winner);
@@ -189,7 +189,7 @@ public class ResultsWriter {
     // create a row for votes redistributed total -- we will fill it in after we tabulate all the candidates' data
     org.apache.poi.ss.usermodel.Row votesRedistributedRow = worksheet.createRow(rowCounter++);
     Cell votesRedistributedHeaderCell = votesRedistributedRow.createCell(0);
-    votesRedistributedHeaderCell.setCellValue("VOTES REDISTRIBUTED");
+    votesRedistributedHeaderCell.setCellValue("Total votes redistributed");
     int[] votesRedistributedEachRound = new int[numRounds+1];
 
     // Headers for total, change, percentage for each round
