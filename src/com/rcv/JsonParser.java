@@ -14,9 +14,9 @@ public class JsonParser {
   // TODO: add logging and recovery logic
   public static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
     try {
-      ObjectMapper electionMapper = new ObjectMapper();
-      FileReader electionReader = new FileReader(jsonFilePath);
-      T object = electionMapper.readValue(electionReader, valueType);
+      ObjectMapper objectMapper = new ObjectMapper();
+      FileReader fileReader = new FileReader(jsonFilePath);
+      T object = objectMapper.readValue(fileReader, valueType);
       return object;
     } catch (FileNotFoundException e) {
       e.printStackTrace();
