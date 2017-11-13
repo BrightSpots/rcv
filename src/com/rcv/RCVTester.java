@@ -100,31 +100,31 @@ public class RCVTester {
     String office,
     String electionDate
   ) {
-    CVRReader reader = new CVRReader();
-    if (reader.parseCVRFile(inFile, firstVoteColumnIndex, allowableRanks)) {
-      Tabulator tabulator = new Tabulator(
-        reader.castVoteRecords,
-        1,
-        reader.candidateOptions,
-        true,
-        maxNumberOfSkippedRanks,
-        overvoteRule,
-        null,
-        undeclaredWriteInString
-      ).setContestName(contestName).
-        setJurisdiction(jurisdiction).
-        setOffice(office).
-        setElectionDate(electionDate);
-      try {
-        tabulator.tabulate();
-        tabulator.generateSummarySpreadsheet(outFile);
-      } catch (Exception e) {
-        e.printStackTrace();
-        return false;
-      }
-    } else {
-      RCVLogger.log("failed to parse %s!  skipping tabulation!", inFile);
-    }
+//    CVRReader reader = new CVRReader();
+//    if (reader.parseCVRFile(inFile, firstVoteColumnIndex, allowableRanks)) {
+//      Tabulator tabulator = new Tabulator(
+//        reader.castVoteRecords,
+//        1,
+//        reader.candidateOptions,
+//        true,
+//        maxNumberOfSkippedRanks,
+//        overvoteRule,
+//        null,
+//        undeclaredWriteInString
+//      ).setContestName(contestName).
+//        setJurisdiction(jurisdiction).
+//        setOffice(office).
+//        setElectionDate(electionDate);
+//      try {
+//        tabulator.tabulate();
+//        tabulator.generateSummarySpreadsheet(outFile);
+//      } catch (Exception e) {
+//        e.printStackTrace();
+//        return false;
+//      }
+//    } else {
+//      RCVLogger.log("failed to parse %s!  skipping tabulation!", inFile);
+//    }
     return true;
   }
 }

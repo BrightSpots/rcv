@@ -25,12 +25,15 @@ import java.util.*;
 
 public class CVRReader {
 
-  public List<String> candidateOptions = null;
-  public List<CastVoteRecord> castVoteRecords = new ArrayList<CastVoteRecord>();
+  public List<CastVoteRecord> castVoteRecords = new ArrayList<>();
 
   // call this to parse the given file path into a CastVoteRecordList suitable for tabulation
   // Note: this is specific for the Maine example file we were provided
-  public boolean parseCVRFile(String excelFilePath, int firstVoteColumnIndex, int allowableRanks) {
+  public boolean parseCVRFile(String excelFilePath,
+                              int firstVoteColumnIndex,
+                              int allowableRanks,
+                              List<String>options,
+                              String undeclaredOption) {
 
     Sheet contestSheet = getBallotSheet(excelFilePath);
     if (contestSheet == null) {
@@ -45,17 +48,7 @@ public class CVRReader {
       RCVLogger.log("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
       return false;
     }
-
-//    // number of ranks user may assign for this contest
-//    int allowableRanks = headerRow.getLastCellNum() - 3;
-//    if (allowableRanks <= 0) {
-//      RCVLogger.log("invalid RCV format: not enough columns: %d ", headerRow.getLastCellNum());
-//      return false;
-//    }
-
-    // create list of candidates as we go
-    Set<String> candidates = new HashSet<String>();
-
+    
     // Iterate through all rows and create a CastVoteRecord for each row
     while (iterator.hasNext()) {
       org.apache.poi.ss.usermodel.Row castVoteRecord = iterator.next();
@@ -84,35 +77,34 @@ public class CVRReader {
         // cell for this rank
         Cell cellForRanking = castVoteRecord.getCell(cellIndex);
 
-        // if ballot mark was illegible there will be no cell
+        String candidate;
         if (cellForRanking == null) {
-//          RCVLogger.log("no cell at ranking %d ballot %f", rank, ballotID);
-          continue;
-        }
+          // empty cells are treated as undeclared write-ins (for Portland / ES&S)
+          candidate = undeclaredOption;
+          RCVLogger.log("Empty cell -- treating as UDW");
+        } else {
+          if (cellForRanking.getCellType() != Cell.CELL_TYPE_STRING) {
+            RCVLogger.log("unexpected cell type at ranking %d ballot %f", rank, ballotID);
+            continue;
+          }
 
-        if (cellForRanking.getCellType() != Cell.CELL_TYPE_STRING) {
-          RCVLogger.log("unexpected cell type at ranking %d ballot %f", rank, ballotID);
-          continue;
-        }
+          candidate = cellForRanking.getStringCellValue().trim();
+          if (candidate.equals("undervote")) {
+            continue;
+          }
 
-        String candidate = cellForRanking.getStringCellValue();
-        if (candidate.equals("undervote")) {
-//          RCVLogger.log("undervote at ranking %d ballot %f", rank, ballotID);
-          continue;
-        }
+          if (candidate.equals("overvote")) {
+            continue;
+          }
 
-        if (candidate.equals("overvote")) {
-//          RCVLogger.log("overvote at ranking %d ballot %f", rank, ballotID);
-          continue;
+          if (!options.contains(candidate)) {
+            RCVLogger.log("no match for candidate:%s", candidate);
+            candidate = undeclaredOption;
+          }
         }
-
         // create and add ranking to this ballot
         ContestRanking ranking = new ContestRanking(rank, candidate);
         ballot.add(ranking);
-
-        // update the candidates set
-        candidates.add(candidate);
-        
       }
 
       // TODO: use an actual contest ID here
@@ -120,11 +112,9 @@ public class CVRReader {
       ContestRankings contestRankings = new ContestRankings(ballot);
       cvr.add("1", contestRankings);
       castVoteRecords.add(cvr);
-
     }
 
     // parsing succeeded
-    candidateOptions = new ArrayList<String>(candidates);
     return true;
   }
 
