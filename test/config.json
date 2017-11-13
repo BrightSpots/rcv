@@ -1,0 +1,18 @@
+{
+  "audit_output":"portland_audit_log.txt",
+  "visualizer_output":"portland_visualizer.xlsx",
+  "contest_name":"This is the name of the contest",
+  "rules": {
+    "description":"Main Rules",
+    "batch_elimination":true
+  },
+  "candidates":[
+    "candidate 1",
+    "candidate 2",
+    "candidate 3"
+  ],
+  "sources": [
+    "portland01.xlsx",
+    "portland02.xlsx"
+  ]
+}
