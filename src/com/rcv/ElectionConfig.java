@@ -16,6 +16,7 @@ public class ElectionConfig {
     public Boolean batch_elimination;
     public String overvote_rule;
     public Integer max_skipped_ranks_allowed;
+    public String undeclared_write_in_label;
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,7 +32,7 @@ public class ElectionConfig {
   public Integer max_rankings_allowed;
   public ElectionRules rules;
   public List<String> candidates;
-  public List<CVRSource> sources;
+  public List<CVRSource> cvr_file_sources;
 
   ElectionConfig() {}
 

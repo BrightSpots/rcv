@@ -143,6 +143,8 @@ public class Tabulator {
     }
     log("There are %d cast vote records for this contest.", castVoteRecords.size());
 
+    // add UWI string to contest options so it will be tallied similarly to other candidates
+    this.contestOptions.add(undeclaredWriteInString);
 
     // exhaustedBallots is a map of ballot indexes to the round in which they were exhausted
     Map<Integer, Integer> exhaustedBallots = new HashMap<Integer, Integer>();

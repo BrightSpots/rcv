@@ -26,12 +26,13 @@ public class Main {
       RCVLogger.log("parsed config file:%s",args[0]);
 
       // parse input files
-      CVRReader reader = null;
+      CVRReader reader;
       List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-      for (ElectionConfig.CVRSource source : config.sources) {
+      for (ElectionConfig.CVRSource source : config.cvr_file_sources) {
         RCVLogger.log("reading RCV:%s provider:%s",source.file_path, source.provider);
         reader = new CVRReader();
-        reader.parseCVRFile(source.file_path, source.first_vote_column_index, config.max_rankings_allowed);
+        reader.parseCVRFile(source.file_path, source.first_vote_column_index, config.max_rankings_allowed, config.candidates,
+            config.rules.undeclared_write_in_label);
         castVoteRecords.addAll(reader.castVoteRecords);
       }
 
@@ -40,12 +41,12 @@ public class Main {
       Tabulator tabulator = new Tabulator(
           castVoteRecords,
           1,
-          reader.candidateOptions,
+          config.candidates,
           config.rules.batch_elimination,
           config.rules.max_skipped_ranks_allowed,
           Tabulator.overvoteRuleForConfigSetting(config.rules.overvote_rule),
           null,
-          null
+          config.rules.undeclared_write_in_label
       ).setContestName(config.contest_name).
           setJurisdiction("jurisdiction").
           setOffice("office").
