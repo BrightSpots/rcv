@@ -4,7 +4,9 @@
   "contest_name":"This is the name of the contest",
   "rules": {
     "description":"Main Rules",
-    "batch_elimination":true
+    "batch_elimination":true,
+    "overvote_rule":"exhaust_immediately",
+    "max_skipped_ranks_allowed":1
   },
   "candidates":[
     "candidate 1",
@@ -12,7 +14,15 @@
     "candidate 3"
   ],
   "sources": [
-    "portland01.xlsx",
-    "portland02.xlsx"
+    {
+      "provider": "ES&S",
+      "file_path": "portland01.xlsx",
+      "first_vote_column_index": 3
+    },
+    {
+      "provider": "ES&S",
+      "file_path": "portland02.xlsx",
+      "first_vote_column_index": 3
+    }
   ]
 }

@@ -28,10 +28,10 @@ public class Main {
       // parse input files
       CVRReader reader = null;
       List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-      for (String source : config.sources) {
-        RCVLogger.log("reading RCV:%s",source);
+      for (ElectionConfig.CVRSource source : config.sources) {
+        RCVLogger.log("reading RCV:%s provider:%s",source.file_path, source.provider);
         reader = new CVRReader();
-        reader.parseCVRFile(source, 3,15);
+        reader.parseCVRFile(source.file_path, source.first_vote_column_index, config.max_rankings_allowed);
         castVoteRecords.addAll(reader.castVoteRecords);
       }
 
@@ -41,9 +41,9 @@ public class Main {
           castVoteRecords,
           1,
           reader.candidateOptions,
-          true,
-          2,
-          Tabulator.OvervoteRule.IMMEDIATE_EXHAUSTION,
+          config.rules.batch_elimination,
+          config.rules.max_skipped_ranks_allowed,
+          Tabulator.overvoteRuleForConfigSetting(config.rules.overvote_rule),
           null,
           null
       ).setContestName(config.contest_name).

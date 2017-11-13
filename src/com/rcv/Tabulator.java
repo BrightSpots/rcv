@@ -5,11 +5,12 @@ import java.util.*;
 public class Tabulator {
 
   enum OvervoteRule {
-    IMMEDIATE_EXHAUSTION,
+    EXHAUST_IMMEDIATELY,
     EXHAUST_IF_ANY_CONTINUING,
     IGNORE_IF_ANY_CONTINUING,
     EXHAUST_IF_MULTIPLE_CONTINUING,
     IGNORE_IF_MULTIPLE_CONTINUING,
+    RULE_UNKNOWN
   }
 
   enum OvervoteDecision {
@@ -17,6 +18,18 @@ public class Tabulator {
     EXHAUST,
     IGNORE,
   }
+
+  static OvervoteRule overvoteRuleForConfigSetting(String setting) {
+    switch(setting) {
+      case "exhaust_immediately":
+        return OvervoteRule.EXHAUST_IMMEDIATELY;
+      default:
+        RCVLogger.log("Unrecognized overvote rule setting:%s", setting);
+        System.exit(1);
+    }
+    return OvervoteRule.RULE_UNKNOWN;
+  }
+
 
   private List<CastVoteRecord> castVoteRecords;
   private int contestId;
@@ -377,7 +390,7 @@ public class Tabulator {
       return OvervoteDecision.NONE;
     }
 
-    if (overvoteRule == OvervoteRule.IMMEDIATE_EXHAUSTION) {
+    if (overvoteRule == OvervoteRule.EXHAUST_IMMEDIATELY) {
       return OvervoteDecision.EXHAUST;
     }
 

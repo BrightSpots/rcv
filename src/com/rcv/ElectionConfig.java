@@ -10,13 +10,28 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ElectionConfig {
 
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public class ElectionRules {
+    public String description;
+    public Boolean batch_elimination;
+    public String overvote_rule;
+    public Integer max_skipped_ranks_allowed;
+  }
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class CVRSource {
+    public String provider;
+    public String file_path;
+    public Integer first_vote_column_index;
+  }
+
   public String audit_output;
   public String visualizer_output;
   public String contest_name;
-
-  public Map<String, ?> rules;
+  public Integer max_rankings_allowed;
+  public ElectionRules rules;
   public List<String> candidates;
-  public List<String> sources;
+  public List<CVRSource> sources;
 
   ElectionConfig() {}
 
