@@ -149,8 +149,6 @@ public class Tabulator {
     // exhaustedBallots is a map of ballot indexes to the round in which they were exhausted
     Map<Integer, Integer> exhaustedBallots = new HashMap<Integer, Integer>();
 
-    ArrayList<SortedMap<Integer, Set<String>>> sortedRankings = sortCastVoteRecords(castVoteRecords);
-
     // loop until we achieve a majority winner:
     // at each iteration we will eliminate the lowest-total candidate OR multiple losing candidates if using batch
     // elimination logic (Maine rules)
@@ -162,7 +160,7 @@ public class Tabulator {
       // at each iteration of this loop, the eliminatedRound object will get more entries as candidates are eliminated
       // conversely the roundTally object returned here will contain fewer entries each of which will have more votes
       // eventually a winner will be chosen
-      Map<String, Integer> roundTally = getRoundTally(sortedRankings, eliminatedRound, exhaustedBallots, finalRound);
+      Map<String, Integer> roundTally = getRoundTally(castVoteRecords, eliminatedRound, exhaustedBallots, finalRound);
       roundTallies.put(finalRound, roundTally);
 
       // We fully sort the list in case we want to run batch elimination.
@@ -442,7 +440,7 @@ public class Tabulator {
   // conversely the roundTally object returned here will contain fewer entries each of which will have more votes
   // eventually a winner will be chosen
   private Map<String, Integer> getRoundTally(
-    ArrayList<SortedMap<Integer, Set<String>>> allSortedRankings,
+    List<CastVoteRecord> castVoteRecords,
     Map<String, Integer> eliminatedRound,
     Map<Integer, Integer> exhaustedBallots,
     int round
@@ -456,13 +454,13 @@ public class Tabulator {
       }
     }
 
-    // loop over the ballots and count first-place votes, considering only continuing candidates
-    for (int i = 0; i < allSortedRankings.size(); i++) {
+    // loop over the ballots and count first-place votes for continuing candidates
+    for (int i = 0; i < castVoteRecords.size(); i++) {
       if (exhaustedBallots.get(i) != null) {
         continue;
       }
-
-      SortedMap<Integer, Set<String>> rankings = allSortedRankings.get(i);
+      CastVoteRecord cvr = castVoteRecords.get(i);
+      SortedMap<Integer, Set<String>> rankings = cvr.sortedRankings();
 
       if (!hasContinuingCandidates(rankings, eliminatedRound)) {
         exhaustBallot(i, round, exhaustedBallots, "no continuing candidates");
@@ -516,34 +514,6 @@ public class Tabulator {
     return roundTally;
   }
 
-  // input is a list of CastVoteRecords
-  // output is that same list, but the rankings are sorted from low to high
-  private ArrayList<SortedMap<Integer, Set<String>>> sortCastVoteRecords(List<CastVoteRecord> castVoteRecords) {
-    // returns a list of "sortedCVRs"
-    ArrayList<SortedMap<Integer, Set<String>>> allSortedRankings = new ArrayList<SortedMap<Integer, Set<String>>>();
-
-    // for each input CVR see what rankings were given for the contest of interest
-    for (CastVoteRecord cvr : castVoteRecords) {
-      // sortedCVR will contain the rankings for the contest of interest in order from low to high
-      // note: we use a set<Integer> here because there may be overvotes with different candidates getting
-      // the same ranking, for example ranking 3 could map to candidates 1 and 2
-      SortedMap<Integer, Set<String>> sortedCVR = new TreeMap<Integer, Set<String>>();
-      for (ContestRanking ranking : cvr.getRankingsForContest(contestId)) {
-        // set of candidates given this rank
-        Set<String> optionsAtRank = sortedCVR.get(ranking.getRank());
-        if (optionsAtRank == null) {
-          // create the new optionsAtRank and add to the sorted cvr
-          optionsAtRank = new HashSet<String>();
-          sortedCVR.put(ranking.getRank(), optionsAtRank);
-        }
-        // add this option into the map
-        optionsAtRank.add(ranking.getOptionId());
-      }
-      allSortedRankings.add(sortedCVR);
-    }
-
-    return allSortedRankings;
-  }
 
   private int numCandidates() {
     int num = contestOptions.size();
