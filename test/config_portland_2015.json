@@ -1,14 +1,19 @@
 {
-  "audit_output":"portland_audit_log.txt",
-  "visualizer_output":"portland_visualizer.xlsx",
-  "contest_name":"This is the name of the contest",
+  "audit_output":"portland_2015_mayor_audit_log.txt",
+  "visualizer_output":"portland_2015_mayor_visualizer.xlsx",
+  "contest_name":"Portland 2015 Mayoral Race",
+  "jurisdiction":"Portland, ME",
+  "office":"Mayor",
+  "date":"2015-11-03",
   "max_rankings_allowed":15,
   "rules": {
     "description":"Maine Rules",
     "batch_elimination":true,
     "overvote_rule":"exhaust_immediately",
     "max_skipped_ranks_allowed":1,
-    "undeclared_write_in_label":"UWI"
+    "undeclared_write_in_label":"UWI",
+    "overvote_flag":"overvote",
+    "undervote_flag":"undervote"
   },
   "candidates":[
     "Brennan, Michael F.",
@@ -30,12 +35,7 @@
   "cvr_file_sources": [
     {
       "provider": "ES&S",
-      "file_path": "portland01.xlsx",
-      "first_vote_column_index": 3
-    },
-    {
-      "provider": "ES&S",
-      "file_path": "portland02.xlsx",
+      "file_path": "test/2015-portland-mayor-cvr.xlsx",
       "first_vote_column_index": 3
     }
   ]
