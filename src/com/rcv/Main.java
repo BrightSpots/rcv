@@ -68,9 +68,7 @@ public class Main {
       System.exit(1);
     }
 
-    // disable test for prototype
-    //RCVTester.runTests();
   }
 
 
-}  // Main
+}
