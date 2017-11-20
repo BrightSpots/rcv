@@ -368,9 +368,11 @@ public class Tabulator {
     int ballotIndex,
     int round,
     Map<Integer, Integer> exhaustedBallots,
-    String reason
+    String reason,
+    CastVoteRecord cvr
   ) {
-    log("Exhausted ballot #%d in round %d due to %s.", ballotIndex, round, reason);
+    String description = String.format("Round %d exhausted ballot #%d due to %s. ", round,ballotIndex, reason);
+    cvr.addRoundDescription(description);
     exhaustedBallots.put(ballotIndex, round);
     return true;
   }
@@ -378,10 +380,13 @@ public class Tabulator {
   private void ignoreBallot(
     int ballotIndex,
     int round,
-    String reason
+    String reason,
+    CastVoteRecord cvr
   ) {
-    log("Ignored ballot #%d in round %d due to %s.", ballotIndex, round, reason);
+    String description = String.format("Round %d ignored ballot #%d due to %s. ", round,ballotIndex, reason);
+    cvr.addRoundDescription(description);
   }
+
 
   private OvervoteDecision getOvervoteDecision(
     Set<String> contestOptionIds,
@@ -445,7 +450,7 @@ public class Tabulator {
     Map<Integer, Integer> exhaustedBallots,
     int round
   ) throws Exception {
-    Map<String, Integer> roundTally = new HashMap<String, Integer>();
+    Map<String, Integer> roundTally = new HashMap<>();
 
     // initialize round tallies for non-eliminated candidates
     for (String contestOptionId : contestOptions) {
@@ -454,7 +459,7 @@ public class Tabulator {
       }
     }
 
-    // loop over the ballots and count first-place votes for continuing candidates
+    // loop over the ballots and count votes for continuing candidates
     for (int i = 0; i < castVoteRecords.size(); i++) {
       if (exhaustedBallots.get(i) != null) {
         continue;
@@ -463,7 +468,7 @@ public class Tabulator {
       SortedMap<Integer, Set<String>> rankings = cvr.sortedRankings();
 
       if (!hasContinuingCandidates(rankings, eliminatedRound)) {
-        exhaustBallot(i, round, exhaustedBallots, "no continuing candidates");
+        exhaustBallot(i, round, exhaustedBallots, "no continuing candidates", cvr);
         continue;
       }
 
@@ -475,17 +480,17 @@ public class Tabulator {
         // handle possible overvote
         OvervoteDecision overvoteDecision = getOvervoteDecision(contestOptionIds, eliminatedRound);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          exhaustBallot(i, round, exhaustedBallots, "overvote");
+          exhaustBallot(i, round, exhaustedBallots, "overvote", cvr);
           break;
         } else if (overvoteDecision == OvervoteDecision.IGNORE) {
-          ignoreBallot(i, round, "overvote");
+          ignoreBallot(i, round, "overvote", cvr);
           break;
         }
 
         // and possible undervote
         if (maxNumberOfSkippedRanks != null &&
             lastRank != null && rank - lastRank > maxNumberOfSkippedRanks + 1) {
-          exhaustBallot(i, round, exhaustedBallots, "undervote");
+          exhaustBallot(i, round, exhaustedBallots, "undervote", cvr);
           break;
         }
 
@@ -498,7 +503,10 @@ public class Tabulator {
               );
             } else {
               // found a continuing candidate, so increase their tally by 1
+              // TODO: could put this into a helper fxn like exhaust ballot
               selectedOptionId = optionId;
+              String description = String.format("Round %d voted for %s ", round, selectedOptionId);
+              cvr.addRoundDescription(description);
               roundTally.put(optionId, roundTally.get(optionId) + 1);
             }
           }
@@ -522,4 +530,16 @@ public class Tabulator {
     }
     return num;
   }
+
+  public void doAudit(List<CastVoteRecord> castVoteRecords) {
+    for(CastVoteRecord cvr : castVoteRecords) {
+      String auditString = String.format("%s:",cvr.mBallotID);
+      for(String what : cvr.mDescriptionsByRound) {
+        auditString += what;
+      }
+      log(auditString);
+    }
+  }
+
+
 }

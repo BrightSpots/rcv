@@ -13,23 +13,32 @@ public class CastVoteRecord {
   List<ContestRanking> mRankings;
   SortedMap<Integer, Set<String>> mSortedRankings;
 
+  // mDescriptionsByRound contains who this ballot counted for in each round
+  // followed by reason for exhaustion if it is ever exhausted
+  public List<String> mDescriptionsByRound = new ArrayList<>();
+
+  // adds the string to this CVR round by round descriptions for auditing
+  public void addRoundDescription(String description) {
+    mDescriptionsByRound.add(description);
+  }
+  
   // output is our rankings sorted from high to low
   // Set is used to accommodate overvotes
   public SortedMap<Integer, Set<String>> sortedRankings() {
-      if(mSortedRankings == null) {
-        mSortedRankings = new TreeMap<>();
-        for (ContestRanking ranking : mRankings) {
-          // set of candidates given this rank
-          Set<String> optionsAtRank = mSortedRankings.get(ranking.getRank());
-          if (optionsAtRank == null) {
-            // create the new optionsAtRank and add to the sorted cvr
-            optionsAtRank = new HashSet<>();
-            mSortedRankings.put(ranking.getRank(), optionsAtRank);
-          }
-          // add this option into the map
-          optionsAtRank.add(ranking.getOptionId());
+    if(mSortedRankings == null) {
+      mSortedRankings = new TreeMap<>();
+      for (ContestRanking ranking : mRankings) {
+        // set of candidates given this rank
+        Set<String> optionsAtRank = mSortedRankings.get(ranking.getRank());
+        if (optionsAtRank == null) {
+          // create the new optionsAtRank and add to the sorted cvr
+          optionsAtRank = new HashSet<>();
+          mSortedRankings.put(ranking.getRank(), optionsAtRank);
         }
+        // add this option into the map
+        optionsAtRank.add(ranking.getOptionId());
       }
+    }
     return mSortedRankings;
   }
 

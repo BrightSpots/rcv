@@ -58,7 +58,7 @@ public class CVRReader {
       org.apache.poi.ss.usermodel.Row castVoteRecord = iterator.next();
 
       // TODO: determine how ballot IDs will be handled for different ballot styles
-      String ballotID =  String.format("%s(%d)",cvrFileName,ballotIndex);
+      String ballotID =  String.format("%s(%d)",cvrFileName,ballotIndex++);
 
       // create object for this row
       ArrayList<ContestRanking> rankings = new ArrayList<>();

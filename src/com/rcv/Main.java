@@ -54,6 +54,7 @@ public class Main {
       try {
         tabulator.tabulate();
         tabulator.generateSummarySpreadsheet(config.visualizer_output);
+        tabulator.doAudit(castVoteRecords);
       } catch (Exception e) {
         e.printStackTrace();
       }
