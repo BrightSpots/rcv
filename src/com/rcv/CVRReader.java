@@ -41,7 +41,7 @@ public class CVRReader {
     Sheet contestSheet = getBallotSheet(excelFilePath);
     if (contestSheet == null) {
       RCVLogger.log("invalid RCV format: could not obtain ballot data.");
-      return false;
+      System.exit(1);
     }
 
     // validate header
@@ -49,7 +49,7 @@ public class CVRReader {
     org.apache.poi.ss.usermodel.Row headerRow = iterator.next();
     if (headerRow == null || contestSheet.getLastRowNum() < 2) {
       RCVLogger.log("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
-      return false;
+      System.exit(1);
     }
     
     // Iterate through all rows and create a CastVoteRecord for each row
