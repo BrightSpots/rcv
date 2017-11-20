@@ -10,9 +10,6 @@ import java.io.IOException;
  */
 public class RCVTester {
 
-  private static String ELECTION_PATH = "./test/Election.json";
-  private static String CAST_VOTE_RECORD_LIST_PATH = "./test/CastVoteRecordList.json";
-
   private static String TEST_LOG_PATH = "./test/election_summary_report.txt";
 
   private static final String TEST_PORTLAND_XLSX_CVR_FILE = "./test/Portland-Cast-Vote-Records-July 2015.xlsx";
@@ -61,29 +58,6 @@ public class RCVTester {
       return 1;
     }
 
-    Election testElection = JsonParser.parseObjectFromFile(ELECTION_PATH, Election.class);
-
-    CastVoteRecordList cvrList = JsonParser.parseObjectFromFile(CAST_VOTE_RECORD_LIST_PATH, CastVoteRecordList.class);
-
-    for (Contest contest : testElection.getContests()) {
-      Tabulator tabulator = new Tabulator(
-        cvrList.getRecords(),
-        contest.id,
-        contest.options,
-        testElection.batch_elimination,
-        1,
-        Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING,
-        null,
-        null
-      );
-      try {
-        tabulator.tabulate();
-      } catch (Exception e) {
-        e.printStackTrace();
-        return 1;
-      }
-    }
-    
     return 0;
   }
 
