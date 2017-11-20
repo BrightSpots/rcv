@@ -1,0 +1,45 @@
+{
+  "audit_output":"minneapolis_2017_audit_log.txt",
+  "visualizer_output":"minneapolis_2017_visualizer.xlsx",
+  "contest_name":"2017 Minneapolis mayoral race",
+  "jurisdiction":"Minneapolis, MN",
+  "office":"Mayor",
+  "date":"2017-11-07",
+  "max_rankings_allowed":3,
+  "rules": {
+    "description":"Minneapolis Rules",
+    "batch_elimination":true,
+    "overvote_rule":"always_skip_to_next_rank",
+    "overvote_flag":"overvote",
+    "undervote_flag":"undervote",
+    "max_skipped_ranks_allowed":null,
+    "undeclared_write_in_label":"UWI"
+  },
+  "candidates": [
+    "Jacob Frey",
+    "Tom Hoch",
+    "Betsy Hodges",
+    "Raymond Dehn",
+    "Nekima Levy-Pounds",
+    "Charlie Gers",
+    "Aswar Rahman",
+    "Al Flowers",
+    "L.A. Nik",
+    "David Rosenfeld",
+    "Captain Jack Sparrow",
+    "Gregg A. Iverson",
+    "Ronald Lischeid",
+    "David John Wilson",
+    "Troy Benjegerdes",
+    "Ian Simpson",
+    "Christopher Zimmerman",
+    "Theron Preston Washington"
+  ],
+  "cvr_file_sources": [
+    {
+      "provider": "ES&S",
+      "file_path": "test/2017-minneapolis-mayor-cvr.xlsx",
+      "first_vote_column_index": 1
+    }
+  ]
+}
