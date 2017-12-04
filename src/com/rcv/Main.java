@@ -43,7 +43,7 @@ public class Main {
           source.file_path,
           source.first_vote_column_index,
           config.max_rankings_allowed,
-          config.candidates,
+          config.getCandidateCodeList(),
           config.rules.undeclared_write_in_label,
           config.rules.overvote_flag,
           config.rules.undervote_flag);
@@ -55,7 +55,7 @@ public class Main {
       Tabulator tabulator = new Tabulator(
           castVoteRecords,
           1,
-          config.candidates,
+          config.getCandidateCodeList(),
           config.rules.batch_elimination,
           config.rules.max_skipped_ranks_allowed,
           Tabulator.overvoteRuleForConfigSetting(config.rules.overvote_rule),

@@ -2,6 +2,7 @@ package com.rcv;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,9 +37,27 @@ public class ElectionConfig {
   public String date;
   public Integer max_rankings_allowed;
   public ElectionRules rules;
-  public List<String> candidates;
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class Candidate {
+    public String name;
+    public String code;
+  }
+
+  public List<Candidate> candidates;
   public List<CVRSource> cvr_file_sources;
 
   ElectionConfig() {}
 
+  // returns list of strings for use in matching CVR selections to candidates
+  // looks for candidate code first and fallback to candidate name
+  public List<String> getCandidateCodeList() {
+    List<String> candidateCodes = new ArrayList<>();
+    for(Candidate candidate : candidates) {
+      String code = candidate.code != null ? candidate.code : candidate.name;
+      candidateCodes.add(code);
+    }
+    return candidateCodes;
+  }
+  
 }
