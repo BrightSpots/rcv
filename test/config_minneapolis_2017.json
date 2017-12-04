@@ -13,7 +13,8 @@
     "overvote_flag":"overvote",
     "undervote_flag":"undervote",
     "max_skipped_ranks_allowed":null,
-    "undeclared_write_in_label":"UWI"
+    "undeclared_write_in_label":"UWI",
+    "tiebreak_mode":"random"
   },
   "candidates": [
     {"name":"Jacob Frey"},

@@ -60,7 +60,8 @@ public class Main {
           config.rules.max_skipped_ranks_allowed,
           Tabulator.overvoteRuleForConfigSetting(config.rules.overvote_rule),
           null,
-          config.rules.undeclared_write_in_label
+          config.rules.undeclared_write_in_label,
+          Tabulator.tieBreakModeForConfigSetting(config.rules.tiebreak_mode)
       ).setContestName(config.contest_name).
         setJurisdiction(config.jurisdiction).
         setOffice(config.office).
