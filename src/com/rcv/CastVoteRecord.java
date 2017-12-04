@@ -1,13 +1,10 @@
 package com.rcv;
-
-
 import java.util.*;
 
 // internal representation of a cast vote record
 // contains an ID
 // contains a mapping of rank (integer) to a set of candidate ID(s) selected at that rank
 // a set is used to handle overvotes
-
 public class CastVoteRecord {
   public String mBallotID;
   List<ContestRanking> mRankings;
@@ -15,14 +12,14 @@ public class CastVoteRecord {
 
   // mDescriptionsByRound contains who this ballot counted for in each round
   // followed by reason for exhaustion if it is ever exhausted
-  public List<String> mDescriptionsByRound = new ArrayList<>();
+  public Map<Integer, String> mDescriptionsByRound = new HashMap<>();
 
   // adds the string to this CVR round by round descriptions for auditing
-  public void addRoundDescription(String description) {
-    mDescriptionsByRound.add(description);
+  public void addRoundDescription(String description, int round) {
+    mDescriptionsByRound.put(round-1, description);
   }
   
-  // output is our rankings sorted from high to low
+  // output is our rankings sorted from first to last preference
   // Set is used to accommodate overvotes
   public SortedMap<Integer, Set<String>> sortedRankings() {
     if(mSortedRankings == null) {
@@ -47,4 +44,11 @@ public class CastVoteRecord {
     mRankings = rankings;
   }
 
+  String getAuditString() {
+    StringBuilder auditStringBuilder = new StringBuilder(String.format("%s:",mBallotID));
+    for(Integer round : mDescriptionsByRound.keySet()) {
+      auditStringBuilder.append(String.format("round:%d:%s",round,mDescriptionsByRound.get(round)));
+    }
+    return auditStringBuilder.toString();
+  }
 }

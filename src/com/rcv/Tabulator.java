@@ -372,7 +372,7 @@ public class Tabulator {
     CastVoteRecord cvr
   ) {
     String description = String.format("Round %d exhausted ballot #%d due to %s. ", round,ballotIndex, reason);
-    cvr.addRoundDescription(description);
+    cvr.addRoundDescription(description, round);
     exhaustedBallots.put(ballotIndex, round);
     return true;
   }
@@ -384,7 +384,7 @@ public class Tabulator {
     CastVoteRecord cvr
   ) {
     String description = String.format("Round %d ignored ballot #%d due to %s. ", round,ballotIndex, reason);
-    cvr.addRoundDescription(description);
+    cvr.addRoundDescription(description, round);
   }
 
 
@@ -506,7 +506,7 @@ public class Tabulator {
               // TODO: could put this into a helper fxn like exhaust ballot
               selectedOptionId = optionId;
               String description = String.format("Round %d voted for %s ", round, selectedOptionId);
-              cvr.addRoundDescription(description);
+              cvr.addRoundDescription(description, round);
               roundTally.put(optionId, roundTally.get(optionId) + 1);
             }
           }
@@ -533,11 +533,7 @@ public class Tabulator {
 
   public void doAudit(List<CastVoteRecord> castVoteRecords) {
     for(CastVoteRecord cvr : castVoteRecords) {
-      String auditString = String.format("%s:",cvr.mBallotID);
-      for(String what : cvr.mDescriptionsByRound) {
-        auditString += what;
-      }
-      log(auditString);
+      log(cvr.getAuditString());
     }
   }
 
