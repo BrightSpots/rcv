@@ -7,6 +7,7 @@ package com.rcv;
  *
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +16,16 @@ public class Main {
 
   public static void main(String[] args) {
     if(args.length < 1) {
-      System.out.print("Usage: rcv [path-to-config-file]");
-      System.exit(0);
+      System.err.print("Usage: rcv [path-to-config-file]");
+      System.exit(1);
     }
+    // look for config file
+    File configFile = new File(args[0]);
+    if(!configFile.exists()) {
+      System.err.print(String.format("Config file:%s does not exist", args[0]));
+      System.exit(1);
+    }
+
     // parse config object
     ElectionConfig config = JsonParser.parseObjectFromFile(args[0], ElectionConfig.class);
     try {
@@ -68,9 +76,7 @@ public class Main {
       System.exit(1);
     }
 
-    // disable test for prototype
-    //RCVTester.runTests();
   }
 
 
-}  // Main
+}
