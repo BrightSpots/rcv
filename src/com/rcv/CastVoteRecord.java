@@ -16,7 +16,7 @@ public class CastVoteRecord {
 
   // adds the string to this CVR round by round descriptions for auditing
   public void addRoundDescription(String description, int round) {
-    mDescriptionsByRound.put(round-1, description);
+    mDescriptionsByRound.put(round, description);
   }
   
   // output is our rankings sorted from first to last preference
