@@ -16,21 +16,21 @@
     "undervote_flag":"undervote"
   },
   "candidates":[
-    "Brennan, Michael F.",
-    "Bragdon, Charles E.",
-    "Bryant, Peter G.",
-    "Carmona, Ralph C.",
-    "Dodge, Richard A.",
-    "Duson, Jill C.",
-    "Eder, John M.",
-    "Haadoow, Hamza A.",
-    "Lapchick, Jodie L.",
-    "Marshall, David A.",
-    "Mavodones, Nicholas M. Jr.",
-    "Miller, Markos S.",
-    "Rathband, Jed",
-    "Strimling, Ethan K.",
-    "Vail, Christopher L."
+    {"name":"Brennan, Michael F."},
+    {"name":"Bragdon, Charles E."},
+    {"name":"Bryant, Peter G."},
+    {"name":"Carmona, Ralph C."},
+    {"name":"Dodge, Richard A."},
+    {"name":"Duson, Jill C."},
+    {"name":"Eder, John M."},
+    {"name":"Haadoow, Hamza A."},
+    {"name":"Lapchick, Jodie L."},
+    {"name":"Marshall, David A."},
+    {"name":"Mavodones, Nicholas M. Jr."},
+    {"name":"Miller, Markos S."},
+    {"name":"Rathband, Jed"},
+    {"name":"Strimling, Ethan K."},
+    {"name":"Vail, Christopher L."}
   ],
   "cvr_file_sources": [
     {
