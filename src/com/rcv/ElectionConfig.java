@@ -17,6 +17,8 @@ public class ElectionConfig {
     public String overvote_rule;
     public Integer max_skipped_ranks_allowed;
     public String undeclared_write_in_label;
+    public String overvote_flag;
+    public String undervote_flag;
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,6 +31,9 @@ public class ElectionConfig {
   public String audit_output;
   public String visualizer_output;
   public String contest_name;
+  public String jurisdiction;
+  public String office;
+  public String date;
   public Integer max_rankings_allowed;
   public ElectionRules rules;
   public List<String> candidates;

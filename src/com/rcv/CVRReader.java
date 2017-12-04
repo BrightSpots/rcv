@@ -29,11 +29,14 @@ public class CVRReader {
 
   // call this to parse the given file path into a CastVoteRecordList suitable for tabulation
   // Note: this is specific for the Maine example file we were provided
-  public boolean parseCVRFile(String excelFilePath,
-                              int firstVoteColumnIndex,
-                              int allowableRanks,
-                              List<String>options,
-                              String undeclaredOption) {
+  public boolean parseCVRFile(
+    String excelFilePath,
+    int firstVoteColumnIndex,
+    int allowableRanks,
+    List<String>options,
+    String undeclaredOption,
+    String overvoteFlag,
+    String undervoteFlag) {
 
     Sheet contestSheet = getBallotSheet(excelFilePath);
     if (contestSheet == null) {
@@ -75,7 +78,7 @@ public class CVRReader {
         if (cellForRanking == null) {
           // empty cells are treated as undeclared write-ins (for Portland / ES&S)
           candidate = undeclaredOption;
-          RCVLogger.log("Empty cell -- treating as UDW");
+          RCVLogger.log("Empty cell -- treating as UWI");
         } else {
           if (cellForRanking.getCellType() != Cell.CELL_TYPE_STRING) {
             RCVLogger.log("unexpected cell type at ranking %d ballot %f", rank, ballotID);
@@ -83,19 +86,19 @@ public class CVRReader {
           }
 
           candidate = cellForRanking.getStringCellValue().trim();
-          if (candidate.equals("undervote")) {
-            continue;
-          }
 
-          if (candidate.equals("overvote")) {
+          if (candidate.equals(undervoteFlag)) {
             continue;
-          }
-
-          if (!options.contains(candidate)) {
-            RCVLogger.log("no match for candidate:%s", candidate);
+          } else if (candidate.equals(overvoteFlag)) {
+            candidate = Tabulator.explicitOvervoteFlag;
+          } else if (!options.contains(candidate)) {
+            if (!candidate.equals(undeclaredOption)) {
+              RCVLogger.log("no match for candidate: %s", candidate);
+            }
             candidate = undeclaredOption;
           }
         }
+
         // create and add ranking to this ballot
         ContestRanking ranking = new ContestRanking(rank, candidate);
         rankings.add(ranking);

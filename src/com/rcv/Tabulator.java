@@ -4,8 +4,12 @@ import java.util.*;
 
 public class Tabulator {
 
+  // When the CVR communicates an overvote with an explicit flag, we translate it to a vote for this dummy candidate.
+  static String explicitOvervoteFlag = "overvote";
+
   enum OvervoteRule {
     EXHAUST_IMMEDIATELY,
+    ALWAYS_SKIP_TO_NEXT_RANK,
     EXHAUST_IF_ANY_CONTINUING,
     IGNORE_IF_ANY_CONTINUING,
     EXHAUST_IF_MULTIPLE_CONTINUING,
@@ -17,10 +21,13 @@ public class Tabulator {
     NONE,
     EXHAUST,
     IGNORE,
+    SKIP_TO_NEXT_RANK,
   }
 
   static OvervoteRule overvoteRuleForConfigSetting(String setting) {
     switch(setting) {
+      case "always_skip_to_next_rank":
+        return OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
       case "exhaust_immediately":
         return OvervoteRule.EXHAUST_IMMEDIATELY;
       default:
@@ -392,12 +399,15 @@ public class Tabulator {
     Set<String> contestOptionIds,
     Map<String, Integer> eliminatedRound
   ) {
-    if (contestOptionIds.size() <= 1) {
+    if (contestOptionIds.size() == 0 ||
+        (contestOptionIds.size() == 1 && contestOptionIds.toArray()[0] != explicitOvervoteFlag)) {
       return OvervoteDecision.NONE;
     }
 
     if (overvoteRule == OvervoteRule.EXHAUST_IMMEDIATELY) {
       return OvervoteDecision.EXHAUST;
+    } else if (overvoteRule == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
+      return OvervoteDecision.SKIP_TO_NEXT_RANK;
     }
 
     List<String> continuingAtThisRank = new LinkedList<String>();
@@ -485,6 +495,8 @@ public class Tabulator {
         } else if (overvoteDecision == OvervoteDecision.IGNORE) {
           ignoreBallot(i, round, "overvote", cvr);
           break;
+        } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
+          continue;
         }
 
         // and possible undervote

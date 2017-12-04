@@ -31,8 +31,14 @@ public class Main {
       for (ElectionConfig.CVRSource source : config.cvr_file_sources) {
         RCVLogger.log("reading RCV:%s provider:%s",source.file_path, source.provider);
         reader = new CVRReader();
-        reader.parseCVRFile(source.file_path, source.first_vote_column_index, config.max_rankings_allowed, config.candidates,
-            config.rules.undeclared_write_in_label);
+        reader.parseCVRFile(
+          source.file_path,
+          source.first_vote_column_index,
+          config.max_rankings_allowed,
+          config.candidates,
+          config.rules.undeclared_write_in_label,
+          config.rules.overvote_flag,
+          config.rules.undervote_flag);
         castVoteRecords.addAll(reader.castVoteRecords);
       }
 
@@ -48,9 +54,9 @@ public class Main {
           null,
           config.rules.undeclared_write_in_label
       ).setContestName(config.contest_name).
-          setJurisdiction("jurisdiction").
-          setOffice("office").
-          setElectionDate("date");
+        setJurisdiction(config.jurisdiction).
+        setOffice(config.office).
+        setElectionDate(config.date);
       try {
         tabulator.tabulate();
         tabulator.generateSummarySpreadsheet(config.visualizer_output);
