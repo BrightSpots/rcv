@@ -20,6 +20,7 @@ public class ElectionConfig {
     public String undeclared_write_in_label;
     public String overvote_flag;
     public String undervote_flag;
+    public String tiebreak_mode;
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)

@@ -13,10 +13,11 @@
     "max_skipped_ranks_allowed":1,
     "undeclared_write_in_label":"UWI",
     "overvote_flag":"overvote",
-    "undervote_flag":"undervote"
+    "undervote_flag":"undervote",
+    "tiebreak_mode":"random"
   },
   "candidates":[
-    {"name":"Brennan, Michael F.", "code":"MFB" },
+    {"name":"Brennan, Michael F.", "code":"MFB"},
     {"name":"Bragdon, Charles E.", "code":"CEB"},
     {"name":"Bryant, Peter G.", "code":"PGB"},
     {"name":"Carmona, Ralph C.", "code":"RCC"},
