@@ -156,8 +156,6 @@ public class Tabulator {
     // exhaustedBallots is a map of ballot indexes to the round in which they were exhausted
     Map<Integer, Integer> exhaustedBallots = new HashMap<Integer, Integer>();
 
-    ArrayList<SortedMap<Integer, Set<String>>> sortedRankings = sortCastVoteRecords(castVoteRecords);
-
     // loop until we achieve a majority winner:
     // at each iteration we will eliminate the lowest-total candidate OR multiple losing candidates if using batch
     // elimination logic (Maine rules)
@@ -169,7 +167,7 @@ public class Tabulator {
       // at each iteration of this loop, the eliminatedRound object will get more entries as candidates are eliminated
       // conversely the roundTally object returned here will contain fewer entries each of which will have more votes
       // eventually a winner will be chosen
-      Map<String, Integer> roundTally = getRoundTally(sortedRankings, eliminatedRound, exhaustedBallots, finalRound);
+      Map<String, Integer> roundTally = getRoundTally(castVoteRecords, eliminatedRound, exhaustedBallots, finalRound);
       roundTallies.put(finalRound, roundTally);
 
       // We fully sort the list in case we want to run batch elimination.
@@ -377,9 +375,11 @@ public class Tabulator {
     int ballotIndex,
     int round,
     Map<Integer, Integer> exhaustedBallots,
-    String reason
+    String reason,
+    CastVoteRecord cvr
   ) {
-    log("Exhausted ballot #%d in round %d due to %s.", ballotIndex, round, reason);
+    String description = String.format("Round %d exhausted ballot #%d due to %s. ", round,ballotIndex, reason);
+    cvr.addRoundDescription(description, round);
     exhaustedBallots.put(ballotIndex, round);
     return true;
   }
@@ -387,10 +387,13 @@ public class Tabulator {
   private void ignoreBallot(
     int ballotIndex,
     int round,
-    String reason
+    String reason,
+    CastVoteRecord cvr
   ) {
-    log("Ignored ballot #%d in round %d due to %s.", ballotIndex, round, reason);
+    String description = String.format("Round %d ignored ballot #%d due to %s. ", round,ballotIndex, reason);
+    cvr.addRoundDescription(description, round);
   }
+
 
   private OvervoteDecision getOvervoteDecision(
     Set<String> contestOptionIds,
@@ -452,12 +455,12 @@ public class Tabulator {
   // conversely the roundTally object returned here will contain fewer entries each of which will have more votes
   // eventually a winner will be chosen
   private Map<String, Integer> getRoundTally(
-    ArrayList<SortedMap<Integer, Set<String>>> allSortedRankings,
+    List<CastVoteRecord> castVoteRecords,
     Map<String, Integer> eliminatedRound,
     Map<Integer, Integer> exhaustedBallots,
     int round
   ) throws Exception {
-    Map<String, Integer> roundTally = new HashMap<String, Integer>();
+    Map<String, Integer> roundTally = new HashMap<>();
 
     // initialize round tallies for non-eliminated candidates
     for (String contestOptionId : contestOptions) {
@@ -466,16 +469,16 @@ public class Tabulator {
       }
     }
 
-    // loop over the ballots and count first-place votes, considering only continuing candidates
-    for (int i = 0; i < allSortedRankings.size(); i++) {
+    // loop over the ballots and count votes for continuing candidates
+    for (int i = 0; i < castVoteRecords.size(); i++) {
       if (exhaustedBallots.get(i) != null) {
         continue;
       }
-
-      SortedMap<Integer, Set<String>> rankings = allSortedRankings.get(i);
+      CastVoteRecord cvr = castVoteRecords.get(i);
+      SortedMap<Integer, Set<String>> rankings = cvr.sortedRankings();
 
       if (!hasContinuingCandidates(rankings, eliminatedRound)) {
-        exhaustBallot(i, round, exhaustedBallots, "no continuing candidates");
+        exhaustBallot(i, round, exhaustedBallots, "no continuing candidates", cvr);
         continue;
       }
 
@@ -487,10 +490,10 @@ public class Tabulator {
         // handle possible overvote
         OvervoteDecision overvoteDecision = getOvervoteDecision(contestOptionIds, eliminatedRound);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          exhaustBallot(i, round, exhaustedBallots, "overvote");
+          exhaustBallot(i, round, exhaustedBallots, "overvote", cvr);
           break;
         } else if (overvoteDecision == OvervoteDecision.IGNORE) {
-          ignoreBallot(i, round, "overvote");
+          ignoreBallot(i, round, "overvote", cvr);
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           continue;
@@ -499,7 +502,7 @@ public class Tabulator {
         // and possible undervote
         if (maxNumberOfSkippedRanks != null &&
             lastRank != null && rank - lastRank > maxNumberOfSkippedRanks + 1) {
-          exhaustBallot(i, round, exhaustedBallots, "undervote");
+          exhaustBallot(i, round, exhaustedBallots, "undervote", cvr);
           break;
         }
 
@@ -512,7 +515,10 @@ public class Tabulator {
               );
             } else {
               // found a continuing candidate, so increase their tally by 1
+              // TODO: could put this into a helper fxn like exhaust ballot
               selectedOptionId = optionId;
+              String description = String.format("Round %d voted for %s ", round, selectedOptionId);
+              cvr.addRoundDescription(description, round);
               roundTally.put(optionId, roundTally.get(optionId) + 1);
             }
           }
@@ -528,34 +534,6 @@ public class Tabulator {
     return roundTally;
   }
 
-  // input is a list of CastVoteRecords
-  // output is that same list, but the rankings are sorted from low to high
-  private ArrayList<SortedMap<Integer, Set<String>>> sortCastVoteRecords(List<CastVoteRecord> castVoteRecords) {
-    // returns a list of "sortedCVRs"
-    ArrayList<SortedMap<Integer, Set<String>>> allSortedRankings = new ArrayList<SortedMap<Integer, Set<String>>>();
-
-    // for each input CVR see what rankings were given for the contest of interest
-    for (CastVoteRecord cvr : castVoteRecords) {
-      // sortedCVR will contain the rankings for the contest of interest in order from low to high
-      // note: we use a set<Integer> here because there may be overvotes with different candidates getting
-      // the same ranking, for example ranking 3 could map to candidates 1 and 2
-      SortedMap<Integer, Set<String>> sortedCVR = new TreeMap<Integer, Set<String>>();
-      for (ContestRanking ranking : cvr.getRankingsForContest(contestId)) {
-        // set of candidates given this rank
-        Set<String> optionsAtRank = sortedCVR.get(ranking.getRank());
-        if (optionsAtRank == null) {
-          // create the new optionsAtRank and add to the sorted cvr
-          optionsAtRank = new HashSet<String>();
-          sortedCVR.put(ranking.getRank(), optionsAtRank);
-        }
-        // add this option into the map
-        optionsAtRank.add(ranking.getOptionId());
-      }
-      allSortedRankings.add(sortedCVR);
-    }
-
-    return allSortedRankings;
-  }
 
   private int numCandidates() {
     int num = contestOptions.size();
@@ -564,4 +542,12 @@ public class Tabulator {
     }
     return num;
   }
+
+  public void doAudit(List<CastVoteRecord> castVoteRecords) {
+    for(CastVoteRecord cvr : castVoteRecords) {
+      log(cvr.getAuditString());
+    }
+  }
+
+
 }

@@ -51,26 +51,20 @@ public class CVRReader {
       RCVLogger.log("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
       System.exit(1);
     }
-    
+
+    // extract file name -- this along with ballot index will be used to generate ballot IDs
+    File inFile = new File(excelFilePath);
+    String cvrFileName = inFile.getName();
+    int ballotIndex = 1;
     // Iterate through all rows and create a CastVoteRecord for each row
     while (iterator.hasNext()) {
       org.apache.poi.ss.usermodel.Row castVoteRecord = iterator.next();
 
-      // create object for this row
-      ArrayList<ContestRanking> ballot = new ArrayList<ContestRanking>();
+      // TODO: determine how ballot IDs will be handled for different ballot styles
+      String ballotID =  String.format("%s(%d)",cvrFileName,ballotIndex++);
 
-      // parse ID
-      Cell idCell = castVoteRecord.getCell(0);
-      if(idCell == null) {
-        RCVLogger.log("no id for ballot row %d, skipping!", castVoteRecords.size());
-        continue;
-      }
-      String ballotID;
-      if (idCell.getCellTypeEnum() == CellType.STRING) {
-        ballotID = idCell.getStringCellValue();
-      } else {
-        ballotID = String.valueOf(idCell.getNumericCellValue());
-      }
+      // create object for this row
+      ArrayList<ContestRanking> rankings = new ArrayList<>();
 
       // Iterate cells in this row. Offset is used to skip ballot ID etc.
       for (int cellIndex = firstVoteColumnIndex; cellIndex < firstVoteColumnIndex + allowableRanks; cellIndex++) {
@@ -107,13 +101,10 @@ public class CVRReader {
 
         // create and add ranking to this ballot
         ContestRanking ranking = new ContestRanking(rank, candidate);
-        ballot.add(ranking);
+        rankings.add(ranking);
       }
 
-      // TODO: use an actual contest ID here
-      CastVoteRecord cvr = new CastVoteRecord();
-      ContestRankings contestRankings = new ContestRankings(ballot);
-      cvr.add("1", contestRankings);
+      CastVoteRecord cvr = new CastVoteRecord(ballotID, rankings);
       castVoteRecords.add(cvr);
     }
 
