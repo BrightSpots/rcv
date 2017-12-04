@@ -45,9 +45,11 @@ public class CastVoteRecord {
   }
 
   String getAuditString() {
-    StringBuilder auditStringBuilder = new StringBuilder(String.format("%s:",mBallotID));
+    StringBuilder auditStringBuilder = new StringBuilder();
+    auditStringBuilder.append(mBallotID);
+    auditStringBuilder.append(":");
     for(Integer round : mDescriptionsByRound.keySet()) {
-      auditStringBuilder.append(String.format("round:%d:%s",round,mDescriptionsByRound.get(round)));
+      auditStringBuilder.append(mDescriptionsByRound.get(round));
     }
     return auditStringBuilder.toString();
   }
