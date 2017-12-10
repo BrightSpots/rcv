@@ -66,11 +66,34 @@ public class CVRReader {
       // create object for this row
       ArrayList<ContestRanking> rankings = new ArrayList<>();
 
-      // Iterate cells in this row. Offset is used to skip ballot ID etc.
-      for (int cellIndex = firstVoteColumnIndex; cellIndex < firstVoteColumnIndex + allowableRanks; cellIndex++) {
+      // create an object to store CVR data for auditing
+      ArrayList<String> fullCVRData = new ArrayList<>();
+
+      // Iterate cells in this row:
+      for (int cellIndex = 0; cellIndex < firstVoteColumnIndex + allowableRanks; cellIndex++) {
+
+        // cache cell data for audit report
+        Cell dataCell = castVoteRecord.getCell(cellIndex);
+        if(dataCell == null) {
+          fullCVRData.add("empty cell");
+        } else if(dataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+          double data = dataCell.getNumericCellValue();
+          fullCVRData.add(new String(Double.toString(data)));
+        } else if (dataCell.getCellType() == Cell.CELL_TYPE_STRING) {
+          fullCVRData.add(dataCell.getStringCellValue());
+        } else {
+          fullCVRData.add("unexpected data type");
+        }
+
+        // if we haven't reached a vote cell continue to the next cell
+        if(cellIndex < firstVoteColumnIndex) {
+          continue;
+        }
+
+        // vote processing
 
         // rank for this cell
-        int rank = cellIndex - 2;
+        int rank = cellIndex - firstVoteColumnIndex + 1;
         // cell for this rank
         Cell cellForRanking = castVoteRecord.getCell(cellIndex);
 
@@ -104,7 +127,7 @@ public class CVRReader {
         rankings.add(ranking);
       }
 
-      CastVoteRecord cvr = new CastVoteRecord(ballotID, rankings);
+      CastVoteRecord cvr = new CastVoteRecord(ballotID, rankings, fullCVRData);
       castVoteRecords.add(cvr);
     }
 
