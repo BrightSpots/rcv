@@ -29,7 +29,7 @@ public class CVRReader {
 
   // call this to parse the given file path into a CastVoteRecordList suitable for tabulation
   // Note: this is specific for the Maine example file we were provided
-  public boolean parseCVRFile(
+  public void parseCVRFile(
     String excelFilePath,
     int firstVoteColumnIndex,
     int allowableRanks,
@@ -69,18 +69,18 @@ public class CVRReader {
       // create an object to store CVR data for auditing
       ArrayList<String> fullCVRData = new ArrayList<>();
 
-      // Iterate cells in this row:
+      // Iterate all expected cells in this row:
       for (int cellIndex = 0; cellIndex < firstVoteColumnIndex + allowableRanks; cellIndex++) {
 
-        // cache cell data for audit report
-        Cell dataCell = castVoteRecord.getCell(cellIndex);
-        if(dataCell == null) {
+        // cache all cvr cell data for audit report
+        Cell cvrDataCell = castVoteRecord.getCell(cellIndex);
+        if(cvrDataCell == null) {
           fullCVRData.add("empty cell");
-        } else if(dataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-          double data = dataCell.getNumericCellValue();
-          fullCVRData.add(new String(Double.toString(data)));
-        } else if (dataCell.getCellType() == Cell.CELL_TYPE_STRING) {
-          fullCVRData.add(dataCell.getStringCellValue());
+        } else if(cvrDataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+          double data = cvrDataCell.getNumericCellValue();
+          fullCVRData.add(Double.toString(data));
+        } else if (cvrDataCell.getCellType() == Cell.CELL_TYPE_STRING) {
+          fullCVRData.add(cvrDataCell.getStringCellValue());
         } else {
           fullCVRData.add("unexpected data type");
         }
@@ -90,25 +90,21 @@ public class CVRReader {
           continue;
         }
 
-        // vote processing
-
         // rank for this cell
         int rank = cellIndex - firstVoteColumnIndex + 1;
-        // cell for this rank
-        Cell cellForRanking = castVoteRecord.getCell(cellIndex);
 
         String candidate;
-        if (cellForRanking == null) {
+        if (cvrDataCell == null) {
           // empty cells are treated as undeclared write-ins (for Portland / ES&S)
           candidate = undeclaredOption;
           RCVLogger.log("Empty cell -- treating as UWI");
         } else {
-          if (cellForRanking.getCellType() != Cell.CELL_TYPE_STRING) {
+          if (cvrDataCell.getCellType() != Cell.CELL_TYPE_STRING) {
             RCVLogger.log("unexpected cell type at ranking %d ballot %f", rank, ballotID);
             continue;
           }
 
-          candidate = cellForRanking.getStringCellValue().trim();
+          candidate = cvrDataCell.getStringCellValue().trim();
 
           if (candidate.equals(undervoteFlag)) {
             continue;
@@ -131,8 +127,7 @@ public class CVRReader {
       castVoteRecords.add(cvr);
     }
 
-    // parsing succeeded
-    return true;
+    // parsing complete
   }
 
   // helper function to wrap file IO with error handling
