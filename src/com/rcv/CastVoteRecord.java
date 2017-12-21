@@ -6,7 +6,9 @@ import java.util.*;
 // contains a mapping of rank (integer) to a set of candidate ID(s) selected at that rank
 // a set is used to handle overvotes
 public class CastVoteRecord {
-  public String mBallotID;
+
+  String mBallotID;
+  List<String> mFullCVRData;
   List<ContestRanking> mRankings;
   SortedMap<Integer, Set<String>> mSortedRankings;
 
@@ -21,6 +23,7 @@ public class CastVoteRecord {
   
   // output is our rankings sorted from first to last preference
   // Set is used to accommodate overvotes
+  // TODO: build this map during the CVR reader process
   public SortedMap<Integer, Set<String>> sortedRankings() {
     if(mSortedRankings == null) {
       mSortedRankings = new TreeMap<>();
@@ -39,9 +42,10 @@ public class CastVoteRecord {
     return mSortedRankings;
   }
 
-  public CastVoteRecord(String ballotID, List<ContestRanking> rankings) {
+  public CastVoteRecord(String ballotID, List<ContestRanking> rankings, List<String> fullCVRData) {
     mBallotID = ballotID;
     mRankings = rankings;
+    mFullCVRData = fullCVRData;
   }
 
   String getAuditString() {
