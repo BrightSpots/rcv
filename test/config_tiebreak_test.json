@@ -17,10 +17,10 @@
     "tiebreak_mode":"previous_round_counts_then_interactive"
   },
   "candidates": [
-    "Mookie Blaylock",
-    "Yinka Dare",
-    "George Gervin",
-    "Sedale Threatt"
+    {"name": "Mookie Blaylock"},
+    {"name": "Yinka Dare"},
+    {"name": "George Gervin"},
+    {"name": "Sedale Threatt"}
   ],
   "cvr_file_sources": [
     {
