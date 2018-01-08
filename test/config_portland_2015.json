@@ -12,8 +12,8 @@
     "overvote_rule":"exhaust_immediately",
     "max_skipped_ranks_allowed":1,
     "undeclared_write_in_label":"UWI",
-    "overvote_flag":"overvote",
-    "undervote_flag":"undervote",
+    "overvote_label":"overvote",
+    "undervote_label":"undervote",
     "tiebreak_mode":"random"
   },
   "candidates":[

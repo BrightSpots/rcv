@@ -7,7 +7,7 @@ import java.util.*;
 public class Tabulator {
 
   // When the CVR communicates an overvote with an explicit flag, we translate it to a vote for this dummy candidate.
-  static String explicitOvervoteFlag = "overvote";
+  static String explicitOvervoteLabel = "overvote";
 
   enum OvervoteRule {
     EXHAUST_IMMEDIATELY,
@@ -67,17 +67,12 @@ public class Tabulator {
   private List<CastVoteRecord> castVoteRecords;
   private int contestId;
   private List<String> contestOptions;
-  private boolean useBatchElimination = true;
-  private Integer maxNumberOfSkippedRanks = 1;
-  private OvervoteRule overvoteRule = OvervoteRule.RULE_UNKNOWN;
-  private Integer minVoteThreshold;
-  private String undeclaredWriteInString;
-  private TieBreakMode tiebreakMode = TieBreakMode.MODE_UNKNOWN;
+  private ElectionConfig config;
 
-  private String contestName;
-  private String jurisdiction;
-  private String office;
-  private String electionDate;
+//  private String contestName;
+//  private String jurisdiction;
+//  private String office;
+//  private String electionDate;
 
   // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
   private Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
@@ -236,22 +231,12 @@ public class Tabulator {
     List<CastVoteRecord> castVoteRecords,
     int contestId,
     List<String> contestOptions,
-    Boolean useBatchElimination,
-    Integer maxNumberOfSkippedRanks,
-    OvervoteRule overvoteRule,
-    Integer minVoteThreshold,
-    String undeclaredWriteInString,
-    TieBreakMode tieBreakMode
+    ElectionConfig config
   ) {
     this.castVoteRecords = castVoteRecords;
     this.contestId = contestId;
     this.contestOptions = contestOptions;
-    this.useBatchElimination = useBatchElimination;
-    this.maxNumberOfSkippedRanks = maxNumberOfSkippedRanks;
-    this.overvoteRule = overvoteRule;
-    this.minVoteThreshold = minVoteThreshold;
-    this.undeclaredWriteInString = undeclaredWriteInString;
-    this.tiebreakMode = tieBreakMode;
+    this.config = config;
   }
 
   public void tabulate() throws Exception {
@@ -264,7 +249,9 @@ public class Tabulator {
     log("There are %d cast vote records for this contest.", castVoteRecords.size());
 
     // add UWI string to contest options so it will be tallied similarly to other candidates
-    this.contestOptions.add(undeclaredWriteInString);
+    if (config.undeclaredWriteInLabel() != null) {
+      this.contestOptions.add(config.undeclaredWriteInLabel());
+    }
 
     // exhaustedBallots is a map of ballot indexes to the round in which they were exhausted
     Map<Integer, Integer> exhaustedBallots = new HashMap<Integer, Integer>();
@@ -325,23 +312,24 @@ public class Tabulator {
       // 1. Some races contain undeclared write-ins that should be dropped immediately.
       if (
         finalRound == 1 &&
-        undeclaredWriteInString != null &&
-        contestOptions.contains(undeclaredWriteInString) &&
-        roundTally.get(undeclaredWriteInString) > 0
+        config.undeclaredWriteInLabel() != null &&
+        contestOptions.contains(config.undeclaredWriteInLabel()) &&
+        roundTally.get(config.undeclaredWriteInLabel()) > 0
       ) {
-        eliminated.add(undeclaredWriteInString);
+        eliminated.add(config.undeclaredWriteInLabel());
         log(
           "Eliminated %s in round %d because it represents undeclared write-ins. It had %d votes.",
-          undeclaredWriteInString,
+          config.undeclaredWriteInLabel(),
           finalRound,
-          roundTally.get(undeclaredWriteInString)
+          roundTally.get(config.undeclaredWriteInLabel())
         );
       }
 
       // 2. If there's a minimum vote threshold, drop all candidates failing to meet that threshold.
-      if (eliminated.isEmpty() && minVoteThreshold != null && countToCandidates.firstKey() < minVoteThreshold) {
+      if (eliminated.isEmpty() && config.minimumVoteThreshold() != null &&
+        countToCandidates.firstKey() < config.minimumVoteThreshold()) {
         for (int count : countToCandidates.keySet()) {
-          if (count < minVoteThreshold) {
+          if (count < config.minimumVoteThreshold()) {
             for (String candidate : countToCandidates.get(count)) {
               eliminated.add(candidate);
               log(
@@ -349,7 +337,7 @@ public class Tabulator {
                 candidate,
                 finalRound,
                 count,
-                minVoteThreshold
+                config.minimumVoteThreshold()
               );
             }
           }
@@ -357,7 +345,7 @@ public class Tabulator {
       }
 
       // 3. Otherwise, try batch elimination.
-      if (eliminated.isEmpty() && useBatchElimination) {
+      if (eliminated.isEmpty() && config.batchElimination()) {
         List<BatchElimination> batchEliminations = runBatchElimination(countToCandidates);
         // If batch elimination caught multiple candidates, don't apply regular elimination logic on
         // this iteration.
@@ -382,7 +370,7 @@ public class Tabulator {
         int minVotes = countToCandidates.firstKey();
         LinkedList<String> lastPlace = countToCandidates.get(minVotes);
         if (lastPlace.size() > 1) {
-          TieBreak tieBreak = new TieBreak(lastPlace, tiebreakMode, finalRound, minVotes, roundTallies);
+          TieBreak tieBreak = new TieBreak(lastPlace, config.tiebreakMode(), finalRound, minVotes, roundTallies);
           loser = tieBreak.getSelection();
           tieBreaks.put(finalRound, tieBreak);
           log(
@@ -444,35 +432,15 @@ public class Tabulator {
       setRoundTallies(roundTallies).
       setCandidatesToRoundEliminated(eliminatedRound).
       setOutputFilePath(outputFile).
-      setContestName(contestName).
-      setJurisdiction(jurisdiction).
-      setOffice(office).
-      setElectionDate(electionDate).
+      setContestName(config.contestName()).
+      setJurisdiction(config.jurisdiction()).
+      setOffice(config.office()).
+      setElectionDate(config.electionDate()).
       setNumCandidates(numCandidates()).
-      setUndeclaredWriteInString(undeclaredWriteInString).
+      setUndeclaredWriteInString(config.undeclaredWriteInLabel()).
       setWinner(winner);
 
     writer.generateSummarySpreadsheet();
-  }
-
-  public Tabulator setContestName(String contestName) {
-    this.contestName = contestName;
-    return this;
-  }
-
-  public Tabulator setJurisdiction(String jurisdiction) {
-    this.jurisdiction = jurisdiction;
-    return this;
-  }
-
-  public Tabulator setOffice(String office) {
-    this.office = office;
-    return this;
-  }
-
-  public Tabulator setElectionDate(String electionDate) {
-    this.electionDate = electionDate;
-    return this;
   }
 
   static void log(String s, Object... var1) {
@@ -534,13 +502,13 @@ public class Tabulator {
     Map<String, Integer> eliminatedRound
   ) {
     if (contestOptionIds.size() == 0 ||
-        (contestOptionIds.size() == 1 && contestOptionIds.toArray()[0] != explicitOvervoteFlag)) {
+        (contestOptionIds.size() == 1 && contestOptionIds.toArray()[0] != explicitOvervoteLabel)) {
       return OvervoteDecision.NONE;
     }
 
-    if (overvoteRule == OvervoteRule.EXHAUST_IMMEDIATELY) {
+    if (config.overvoteRule() == OvervoteRule.EXHAUST_IMMEDIATELY) {
       return OvervoteDecision.EXHAUST;
-    } else if (overvoteRule == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
+    } else if (config.overvoteRule() == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       return OvervoteDecision.SKIP_TO_NEXT_RANK;
     }
 
@@ -552,12 +520,12 @@ public class Tabulator {
     }
 
     if (continuingAtThisRank.size() > 0) {
-      if (overvoteRule == OvervoteRule.EXHAUST_IF_ANY_CONTINUING) {
+      if (config.overvoteRule() == OvervoteRule.EXHAUST_IF_ANY_CONTINUING) {
         return OvervoteDecision.EXHAUST;
-      } else if (overvoteRule == OvervoteRule.IGNORE_IF_ANY_CONTINUING) {
+      } else if (config.overvoteRule() == OvervoteRule.IGNORE_IF_ANY_CONTINUING) {
         return OvervoteDecision.IGNORE;
       } else if (continuingAtThisRank.size() > 1) {
-        if (overvoteRule == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
+        if (config.overvoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
           return OvervoteDecision.EXHAUST;
         } else { // if there's > 1 continuing, OvervoteDecision.NONE is not a valid option
           return OvervoteDecision.IGNORE;
@@ -634,8 +602,8 @@ public class Tabulator {
         }
 
         // and possible undervote
-        if (maxNumberOfSkippedRanks != null &&
-            lastRank != null && rank - lastRank > maxNumberOfSkippedRanks + 1) {
+        if (config.maxSkippedRanksAllowed() != null &&
+            lastRank != null && rank - lastRank > config.maxSkippedRanksAllowed() + 1) {
           exhaustBallot(i, round, exhaustedBallots, "undervote", cvr);
           break;
         }
@@ -671,7 +639,8 @@ public class Tabulator {
 
   private int numCandidates() {
     int num = contestOptions.size();
-    if (undeclaredWriteInString != null && contestOptions.contains(undeclaredWriteInString)) {
+    if (config.undeclaredWriteInLabel()!= null &&
+      contestOptions.contains(config.undeclaredWriteInLabel())) {
       num--;
     }
     return num;
