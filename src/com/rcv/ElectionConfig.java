@@ -1,10 +1,19 @@
 package com.rcv;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
 public class ElectionConfig {
   RawElectionConfig rawConfig;
 
+  private ArrayList<String> mCandidateCodeList = null;
+  private Map<String, String> mCandidateCodeToNameMap = null;
+
   ElectionConfig(RawElectionConfig rawConfig) {
     this.rawConfig = rawConfig;
+    this.processCandidateData();
   }
 
   public String auditOutput() {
@@ -82,4 +91,33 @@ public class ElectionConfig {
       false :
       rawConfig.rules.treat_blank_as_uwi;
   }
+
+  // returns list of strings for use in matching CVR cells to candidates
+  // looks for candidate code first and fallback to candidate name to support both variants
+  public List<String> getCandidateCodeList() {
+    return mCandidateCodeList;
+  }
+
+  // returns String for display in the visualizer
+  public String getNameForCandidateID(String candidateID) {
+    return mCandidateCodeToNameMap.get(candidateID);
+  }
+
+  // generate list of matching IDs for CVR parsing
+  // and mapping of IDs back to names for visualizer output
+  private void processCandidateData() {
+    mCandidateCodeList = new ArrayList<>();
+    mCandidateCodeToNameMap = new HashMap<>();
+    for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
+      if(candidate.code != null) {
+        mCandidateCodeList.add(candidate.code);
+        mCandidateCodeToNameMap.put(candidate.code, candidate.name);
+      } else {
+        mCandidateCodeList.add(candidate.name);
+        mCandidateCodeToNameMap.put(candidate.name, candidate.name);
+      }
+    }
+  }
+
+
 }

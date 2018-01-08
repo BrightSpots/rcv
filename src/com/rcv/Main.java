@@ -44,7 +44,7 @@ public class Main {
           source.file_path,
           source.first_vote_column_index,
           config.maxRankingsAllowed(),
-          rawConfig.getCandidateCodeList(),
+          config.getCandidateCodeList(),
           config
         );
         castVoteRecords.addAll(reader.castVoteRecords);
@@ -55,7 +55,7 @@ public class Main {
       Tabulator tabulator = new Tabulator(
         castVoteRecords,
         1,
-        rawConfig.getCandidateCodeList(),
+        config.getCandidateCodeList(),
         config
       );
       try {

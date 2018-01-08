@@ -53,15 +53,4 @@ public class RawElectionConfig {
 
   RawElectionConfig() {}
 
-  // returns list of strings for use in matching CVR selections to candidates
-  // looks for candidate code first and fallback to candidate name
-  public List<String> getCandidateCodeList() {
-    List<String> candidateCodes = new ArrayList<>();
-    for(Candidate candidate : candidates) {
-      String code = candidate.code != null ? candidate.code : candidate.name;
-      candidateCodes.add(code);
-    }
-    return candidateCodes;
-  }
-  
 }
