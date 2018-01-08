@@ -333,7 +333,7 @@ public class Tabulator {
             for (String candidate : countToCandidates.get(count)) {
               eliminated.add(candidate);
               log(
-                "Eliminated %s in round %d because they only had %d votes, below the minimum threshold of %d.",
+                "Eliminated %s in round %d because they only had %d vote(s), below the minimum threshold of %d.",
                 candidate,
                 finalRound,
                 count,
