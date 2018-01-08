@@ -68,12 +68,7 @@ public class Tabulator {
   private int contestId;
   private List<String> contestOptions;
   private ElectionConfig config;
-
-//  private String contestName;
-//  private String jurisdiction;
-//  private String office;
-//  private String electionDate;
-
+  
   // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
   private Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
 
@@ -438,7 +433,8 @@ public class Tabulator {
       setElectionDate(config.electionDate()).
       setNumCandidates(numCandidates()).
       setUndeclaredWriteInString(config.undeclaredWriteInLabel()).
-      setWinner(winner);
+      setWinner(winner).
+      setElectionConfig(config);
 
     writer.generateSummarySpreadsheet();
   }
@@ -480,22 +476,11 @@ public class Tabulator {
     String reason,
     CastVoteRecord cvr
   ) {
-    String description = String.format("Round %d exhausted ballot #%d due to %s. ", round,ballotIndex, reason);
+    String description = String.format("%d|exhausted:%s|", round, reason);
     cvr.addRoundDescription(description, round);
     exhaustedBallots.put(ballotIndex, round);
     return true;
   }
-
-  private void ignoreBallot(
-    int ballotIndex,
-    int round,
-    String reason,
-    CastVoteRecord cvr
-  ) {
-    String description = String.format("Round %d ignored ballot #%d due to %s. ", round,ballotIndex, reason);
-    cvr.addRoundDescription(description, round);
-  }
-
 
   private OvervoteDecision getOvervoteDecision(
     Set<String> contestOptionIds,
@@ -595,7 +580,8 @@ public class Tabulator {
           exhaustBallot(i, round, exhaustedBallots, "overvote", cvr);
           break;
         } else if (overvoteDecision == OvervoteDecision.IGNORE) {
-          ignoreBallot(i, round, "overvote", cvr);
+          String description = String.format("%d|ignored:%s|", round, "overvote");
+          cvr.addRoundDescription(description, round);
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           continue;
@@ -617,11 +603,10 @@ public class Tabulator {
               );
             } else {
               // found a continuing candidate, so increase their tally by 1
-              // TODO: could put this into a helper fxn like exhaust ballot
               selectedOptionId = optionId;
-              String description = String.format("Round %d voted for %s ", round, selectedOptionId);
+              String description = String.format("%d|%s|", round, selectedOptionId);
               cvr.addRoundDescription(description, round);
-              roundTally.put(optionId, roundTally.get(optionId) + 1);
+              roundTally.put(selectedOptionId, roundTally.get(selectedOptionId) + 1);
             }
           }
         }

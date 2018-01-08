@@ -125,7 +125,7 @@ public class CVRReader {
         rankings.add(ranking);
       }
 
-      CastVoteRecord cvr = new CastVoteRecord(ballotID, rankings, fullCVRData);
+      CastVoteRecord cvr = new CastVoteRecord(excelFilePath, ballotID, rankings, fullCVRData);
       castVoteRecords.add(cvr);
     }
 

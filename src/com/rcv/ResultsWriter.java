@@ -30,6 +30,7 @@ public class ResultsWriter {
   private int numCandidates;
   private String undeclaredWriteInString;
   private String winner;
+  private ElectionConfig config;
 
   public ResultsWriter setNumRounds(int numRounds) {
     this.numRounds = numRounds;
@@ -43,6 +44,11 @@ public class ResultsWriter {
 
   public ResultsWriter setCandidatesToRoundEliminated(Map<String, Integer> candidatesToRoundEliminated) {
     this.candidatesToRoundEliminated = candidatesToRoundEliminated;
+    return this;
+  }
+
+  public ResultsWriter setElectionConfig(ElectionConfig config) {
+    this.config = config;
     return this;
   }
 
@@ -229,7 +235,8 @@ public class ResultsWriter {
       // show each candidate row with their totals for each round
       org.apache.poi.ss.usermodel.Row candidateRow = worksheet.createRow(rowCounter++);
       Cell rowHeaderCell = candidateRow.createCell(0);
-      rowHeaderCell.setCellValue(candidate);
+      String candidateDisplayName = this.config.getNameForCandidateID(candidate);
+      rowHeaderCell.setCellValue(candidateDisplayName);
 
       for (int displayRound = 1; displayRound <= numRounds+1; displayRound++) {
         boolean isFinalResults = displayRound == numRounds + 1;

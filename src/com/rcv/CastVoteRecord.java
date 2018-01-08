@@ -7,6 +7,7 @@ import java.util.*;
 // a set is used to handle overvotes
 public class CastVoteRecord {
 
+  String mSource;
   String mBallotID;
   List<String> mFullCVRData;
   List<ContestRanking> mRankings;
@@ -42,7 +43,8 @@ public class CastVoteRecord {
     return mSortedRankings;
   }
 
-  public CastVoteRecord(String ballotID, List<ContestRanking> rankings, List<String> fullCVRData) {
+  public CastVoteRecord(String source, String ballotID, List<ContestRanking> rankings, List<String> fullCVRData) {
+    mSource = source;
     mBallotID = ballotID;
     mRankings = rankings;
     mFullCVRData = fullCVRData;
@@ -50,11 +52,16 @@ public class CastVoteRecord {
 
   String getAuditString() {
     StringBuilder auditStringBuilder = new StringBuilder();
+    auditStringBuilder.append("[CVR Source] ");
+    auditStringBuilder.append(mSource);
+    auditStringBuilder.append(" [Ballot ID] ");
     auditStringBuilder.append(mBallotID);
-    auditStringBuilder.append(":");
+    auditStringBuilder.append(" [Round by Round Report] ");
     for(Integer round : mDescriptionsByRound.keySet()) {
       auditStringBuilder.append(mDescriptionsByRound.get(round));
     }
+    auditStringBuilder.append(" [Raw Data] ");
+    auditStringBuilder.append(mFullCVRData);
     return auditStringBuilder.toString();
   }
 }
