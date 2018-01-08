@@ -1,0 +1,27 @@
+{
+  "audit_output":"minimum_threshold_test_audit_log.txt",
+  "visualizer_output":"minimum_threshold_test_visualizer.xlsx",
+  "contest_name":"Minimum threshold test",
+  "jurisdiction":"Funkytown, USA",
+  "office":"Sergeant-at-Arms",
+  "date":"2018-01-07",
+  "max_rankings_allowed":3,
+  "rules": {
+    "description":"Doyle Rules",
+    "minimum_vote_threshold":3
+  },
+  "candidates": [
+    {"name": "Gargamel"},
+    {"name": "Skeletor"},
+    {"name": "Megatron"},
+    {"name": "Garfield"},
+    {"name": "Odie"}
+  ],
+  "cvr_file_sources": [
+    {
+      "provider": "ES&S",
+      "file_path": "test/minimum-threshold-test-cvr.xlsx",
+      "first_vote_column_index": 1
+    }
+  ]
+}
