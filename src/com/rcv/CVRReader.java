@@ -19,7 +19,7 @@ import java.util.*;
  * we assume the first column contains ballot ids, second column contains precinct id and third column contains ballot style.
  * we assume columns after ballot style are the ballot selections ordered by rank, low to high, left to right
  * we assume the strings "undervote" or "overvote" mean no vote
- * we assume a non-existant cell (image of a ballot mark when workbook is opened in excel?) means no vote
+ * we assume a non-existent cell (image of a ballot mark when workbook is opened in excel?) means no vote
  *
  */
 
@@ -34,9 +34,7 @@ public class CVRReader {
     int firstVoteColumnIndex,
     int allowableRanks,
     List<String>options,
-    String undeclaredOption,
-    String overvoteFlag,
-    String undervoteFlag) {
+    ElectionConfig config) {
 
     Sheet contestSheet = getBallotSheet(excelFilePath);
     if (contestSheet == null) {
@@ -95,9 +93,13 @@ public class CVRReader {
 
         String candidate;
         if (cvrDataCell == null) {
-          // empty cells are treated as undeclared write-ins (for Portland / ES&S)
-          candidate = undeclaredOption;
-          RCVLogger.log("Empty cell -- treating as UWI");
+          // empty cells are sometimes treated as undeclared write-ins (for Portland / ES&S)
+          if (config.treatBlankAsUWI()) {
+            candidate = config.undeclaredWriteInLabel();
+            RCVLogger.log("Empty cell -- treating as UWI");
+          } else {
+            continue; // just ignore this cell
+          }
         } else {
           if (cvrDataCell.getCellType() != Cell.CELL_TYPE_STRING) {
             RCVLogger.log("unexpected cell type at ranking %d ballot %f", rank, ballotID);
@@ -106,15 +108,15 @@ public class CVRReader {
 
           candidate = cvrDataCell.getStringCellValue().trim();
 
-          if (candidate.equals(undervoteFlag)) {
+          if (candidate.equals(config.undervoteLabel())) {
             continue;
-          } else if (candidate.equals(overvoteFlag)) {
-            candidate = Tabulator.explicitOvervoteFlag;
+          } else if (candidate.equals(config.overvoteLabel())) {
+            candidate = Tabulator.explicitOvervoteLabel;
           } else if (!options.contains(candidate)) {
-            if (!candidate.equals(undeclaredOption)) {
+            if (!candidate.equals(config.undeclaredWriteInLabel())) {
               RCVLogger.log("no match for candidate: %s", candidate);
             }
-            candidate = undeclaredOption;
+            candidate = config.undeclaredWriteInLabel();
           }
         }
 
