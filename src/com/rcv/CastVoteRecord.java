@@ -56,7 +56,7 @@ public class CastVoteRecord {
     auditStringBuilder.append(mSource);
     auditStringBuilder.append(" [Ballot ID] ");
     auditStringBuilder.append(mBallotID);
-    auditStringBuilder.append(" [Round by Round Report] ");
+    auditStringBuilder.append(" [Round by Round Report] |");
     for(Integer round : mDescriptionsByRound.keySet()) {
       auditStringBuilder.append(mDescriptionsByRound.get(round));
     }

@@ -8,6 +8,9 @@ import java.util.Map;
 public class ElectionConfig {
   RawElectionConfig rawConfig;
 
+  private ArrayList<String> mCandidateCodeList = null;
+  private Map<String, String> mCandidateCodeToNameMap = null;
+
   ElectionConfig(RawElectionConfig rawConfig) {
     this.rawConfig = rawConfig;
     this.processCandidateData();
@@ -99,9 +102,6 @@ public class ElectionConfig {
   public String getNameForCandidateID(String candidateID) {
     return mCandidateCodeToNameMap.get(candidateID);
   }
-  
-  private ArrayList<String> mCandidateCodeList = null;
-  private Map<String, String> mCandidateCodeToNameMap = null;
 
   // generate list of matching IDs for CVR parsing
   // and mapping of IDs back to names for visualizer output
