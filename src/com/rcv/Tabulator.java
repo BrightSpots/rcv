@@ -440,7 +440,7 @@ public class Tabulator {
   }
 
   static void log(String s, Object... var1) {
-    RCVLogger.log(s, var1);
+    Logger.log(s, var1);
   }
 
   private List<BatchElimination> runBatchElimination(

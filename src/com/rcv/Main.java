@@ -31,14 +31,14 @@ public class Main {
     ElectionConfig config = new ElectionConfig(rawConfig);
     try {
       // setup log output
-      RCVLogger.setup(config.auditOutput());
-      RCVLogger.log("parsed config file:%s",args[0]);
+      Logger.setup(config.auditOutput());
+      Logger.log("parsed config file:%s",args[0]);
 
       // parse input files
       CVRReader reader;
       List<CastVoteRecord> castVoteRecords = new ArrayList<>();
       for (RawElectionConfig.CVRSource source : rawConfig.cvr_file_sources) {
-        RCVLogger.log("reading RCV:%s provider:%s",source.file_path, source.provider);
+        Logger.log("reading RCV:%s provider:%s",source.file_path, source.provider);
         reader = new CVRReader();
         reader.parseCVRFile(
           source.file_path,
@@ -50,7 +50,7 @@ public class Main {
         castVoteRecords.addAll(reader.castVoteRecords);
       }
 
-      RCVLogger.log("read %d records",castVoteRecords.size());
+      Logger.log("read %d records",castVoteRecords.size());
       // tabulate
       Tabulator tabulator = new Tabulator(
         castVoteRecords,

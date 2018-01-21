@@ -370,7 +370,7 @@ public class ResultsWriter {
       return true;
     } catch (IOException e) {
       e.printStackTrace();
-      RCVLogger.log("failed to write " + outputFilePath + " to disk!");
+      Logger.log("failed to write " + outputFilePath + " to disk!");
       return false;
     }
     

@@ -38,7 +38,7 @@ public class CVRReader {
 
     Sheet contestSheet = getBallotSheet(excelFilePath);
     if (contestSheet == null) {
-      RCVLogger.log("invalid RCV format: could not obtain ballot data.");
+      Logger.log("invalid RCV format: could not obtain ballot data.");
       System.exit(1);
     }
 
@@ -46,7 +46,7 @@ public class CVRReader {
     Iterator<org.apache.poi.ss.usermodel.Row> iterator = contestSheet.iterator();
     org.apache.poi.ss.usermodel.Row headerRow = iterator.next();
     if (headerRow == null || contestSheet.getLastRowNum() < 2) {
-      RCVLogger.log("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
+      Logger.log("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
       System.exit(1);
     }
 
@@ -96,13 +96,13 @@ public class CVRReader {
           // empty cells are sometimes treated as undeclared write-ins (for Portland / ES&S)
           if (config.treatBlankAsUWI()) {
             candidate = config.undeclaredWriteInLabel();
-            RCVLogger.log("Empty cell -- treating as UWI");
+            Logger.log("Empty cell -- treating as UWI");
           } else {
             continue; // just ignore this cell
           }
         } else {
           if (cvrDataCell.getCellType() != Cell.CELL_TYPE_STRING) {
-            RCVLogger.log("unexpected cell type at ranking %d ballot %f", rank, ballotID);
+            Logger.log("unexpected cell type at ranking %d ballot %f", rank, ballotID);
             continue;
           }
 
@@ -114,7 +114,7 @@ public class CVRReader {
             candidate = Tabulator.explicitOvervoteLabel;
           } else if (!options.contains(candidate)) {
             if (!candidate.equals(config.undeclaredWriteInLabel())) {
-              RCVLogger.log("no match for candidate: %s", candidate);
+              Logger.log("no match for candidate: %s", candidate);
             }
             candidate = config.undeclaredWriteInLabel();
           }
@@ -138,7 +138,7 @@ public class CVRReader {
     try {
       inputStream = new FileInputStream(new File(excelFilePath));
     } catch (IOException ex) {
-      RCVLogger.log("failed to open CVR file: %s, %s", excelFilePath, ex.getMessage());
+      Logger.log("failed to open CVR file: %s, %s", excelFilePath, ex.getMessage());
       return null;
     }
 
@@ -146,7 +146,7 @@ public class CVRReader {
     try {
       workbook = new XSSFWorkbook(inputStream);
     } catch (IOException ex) {
-      RCVLogger.log("failed to parse CVR file: %s, %s", excelFilePath, ex.getMessage());
+      Logger.log("failed to parse CVR file: %s, %s", excelFilePath, ex.getMessage());
       return null;
     }
     Sheet firstSheet = workbook.getSheetAt(0);
@@ -154,7 +154,7 @@ public class CVRReader {
       inputStream.close();
       workbook.close();
     } catch (IOException ex) {
-      RCVLogger.log("error closing CVR file: %s, %s", excelFilePath, ex.getMessage());
+      Logger.log("error closing CVR file: %s, %s", excelFilePath, ex.getMessage());
       return null;
     }
     return firstSheet;
