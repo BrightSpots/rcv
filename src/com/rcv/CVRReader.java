@@ -134,28 +134,15 @@ public class CVRReader {
 
   // helper function to wrap file IO with error handling
   private static Sheet getBallotSheet(String excelFilePath) {
-    FileInputStream inputStream;
+    Sheet firstSheet = null;
     try {
-      inputStream = new FileInputStream(new File(excelFilePath));
-    } catch (IOException ex) {
-      Logger.log("failed to open CVR file: %s, %s", excelFilePath, ex.getMessage());
-      return null;
-    }
-
-    Workbook workbook;
-    try {
-      workbook = new XSSFWorkbook(inputStream);
-    } catch (IOException ex) {
-      Logger.log("failed to parse CVR file: %s, %s", excelFilePath, ex.getMessage());
-      return null;
-    }
-    Sheet firstSheet = workbook.getSheetAt(0);
-    try {
+      FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
+      Workbook workbook = new XSSFWorkbook(inputStream);
+      firstSheet = workbook.getSheetAt(0);
       inputStream.close();
       workbook.close();
     } catch (IOException ex) {
-      Logger.log("error closing CVR file: %s, %s", excelFilePath, ex.getMessage());
-      return null;
+      Logger.log("failed to process CVR file: %s, %s", excelFilePath, ex.getMessage());
     }
     return firstSheet;
   }

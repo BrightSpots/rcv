@@ -35,40 +35,48 @@ public class Tabulator {
   }
 
   static OvervoteRule overvoteRuleForConfigSetting(String setting) {
+    OvervoteRule rule = OvervoteRule.RULE_UNKNOWN;
     switch (setting) {
       case "always_skip_to_next_rank":
-        return OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
+        rule = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
+        break;
       case "exhaust_immediately":
-        return OvervoteRule.EXHAUST_IMMEDIATELY;
+        rule = OvervoteRule.EXHAUST_IMMEDIATELY;
+        break;
       default:
         log("Unrecognized overvote rule setting:%s", setting);
         System.exit(1);
     }
-    return OvervoteRule.RULE_UNKNOWN;
+    return rule;
   }
 
   static TieBreakMode tieBreakModeForConfigSetting(String setting) {
+    TieBreakMode mode = TieBreakMode.MODE_UNKNOWN;
     switch (setting) {
       case "random":
-        return TieBreakMode.RANDOM;
+        mode = TieBreakMode.RANDOM;
+        break;
       case "interactive":
-        return TieBreakMode.INTERACTIVE;
+        mode = TieBreakMode.INTERACTIVE;
+        break;
       case "previous_round_counts_then_random":
-        return TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM;
+        mode = TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM;
+        break;
       case "previous_round_counts_then_interactive":
-        return TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
+        mode = TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
+        break;
       default:
         log("Unrecognized tiebreaker mode rule setting: %s", setting);
         System.exit(1);
     }
-    return TieBreakMode.MODE_UNKNOWN;
+    return mode;
   }
 
   private List<CastVoteRecord> castVoteRecords;
   private int contestId;
   private List<String> contestOptions;
   private ElectionConfig config;
-  
+
   // roundTallies is a map of round # --> a map of candidate ID -> vote totals for that round
   private Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
 
@@ -131,43 +139,49 @@ public class Tabulator {
       return explanation;
     }
 
-    String nonSelectedString() {
+    String nonselectedString() {
       ArrayList<String> options = new ArrayList<String>();
       for (String contestOptionId : tiedCandidates) {
         if (!contestOptionId.equals(selection)) {
           options.add(contestOptionId);
         }
       }
+      String nonselected;
       if (options.size() == 1) {
-        return options.get(0);
+        nonselected = options.get(0);
       } else if (options.size() == 2) {
-        return options.get(0) + " and " + options.get(1);
+        nonselected = options.get(0) + " and " + options.get(1);
       } else {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < options.size() - 1; i++) {
           sb.append(options.get(i)).append(", ");
         }
         sb.append("and ").append(options.get(options.size() - 1));
-        return sb.toString();
+        nonselected = sb.toString();
       }
+      return nonselected;
     }
 
     private String breakTie() {
+      String selection;
       switch (tieBreakMode) {
         case INTERACTIVE:
-          return doInteractive();
+          selection = doInteractive();
+          break;
         case RANDOM:
-          return doRandom();
+          selection = doRandom();
+          break;
         default:
           String loser = doPreviousRounds();
           if (loser != null) {
-            return loser;
+            selection = loser;
           } else if (tieBreakMode == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
-            return doInteractive();
+            selection = doInteractive();
           } else {
-            return doRandom();
+            selection = doRandom();
           }
       }
+      return selection;
     }
 
     private String doInteractive() {
@@ -201,6 +215,7 @@ public class Tabulator {
 
     private String doPreviousRounds() {
       Set<String> candidatesInContention = new HashSet<>(tiedCandidates);
+      String selected = null;
       for (int roundToCheck = round - 1; roundToCheck > 0; roundToCheck--) {
         SortedMap<Integer, LinkedList<String>> countToCandidates = buildCountToCandidates(
           roundTallies.get(roundToCheck),
@@ -211,12 +226,13 @@ public class Tabulator {
         LinkedList<String> candidatesWithLowestTotal = countToCandidates.get(minVotes);
         if (candidatesWithLowestTotal.size() == 1) {
           explanation = "The loser had the fewest votes (" + minVotes + ") in round " + roundToCheck + ".";
-          return candidatesWithLowestTotal.getFirst();
+          selected = candidatesWithLowestTotal.getFirst();
+          break;
         } else {
           candidatesInContention = new HashSet<>(candidatesWithLowestTotal);
         }
       }
-      return null;
+      return selected;
     }
   }
 
@@ -372,7 +388,7 @@ public class Tabulator {
             "%s lost a tie-breaker in round %d against %s. Each candidate had %d vote(s). %s",
             loser,
             finalRound,
-            tieBreak.nonSelectedString(),
+            tieBreak.nonselectedString(),
             minVotes,
             tieBreak.getExplanation()
           );
@@ -486,54 +502,63 @@ public class Tabulator {
     Set<String> contestOptionIds,
     Map<String, Integer> eliminatedRound
   ) {
+    OvervoteDecision decision;
+
     if (contestOptionIds.size() == 0 ||
         (contestOptionIds.size() == 1 && contestOptionIds.toArray()[0] != explicitOvervoteLabel)) {
-      return OvervoteDecision.NONE;
-    }
-
-    if (config.overvoteRule() == OvervoteRule.EXHAUST_IMMEDIATELY) {
-      return OvervoteDecision.EXHAUST;
+      decision = OvervoteDecision.NONE;
+    } else if (config.overvoteRule() == OvervoteRule.EXHAUST_IMMEDIATELY) {
+      decision = OvervoteDecision.EXHAUST;
     } else if (config.overvoteRule() == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
-      return OvervoteDecision.SKIP_TO_NEXT_RANK;
-    }
-
-    List<String> continuingAtThisRank = new LinkedList<String>();
-    for (String optionId : contestOptionIds) {
-      if (eliminatedRound.get(optionId) == null) {
-        continuingAtThisRank.add(optionId);
-      }
-    }
-
-    if (continuingAtThisRank.size() > 0) {
-      if (config.overvoteRule() == OvervoteRule.EXHAUST_IF_ANY_CONTINUING) {
-        return OvervoteDecision.EXHAUST;
-      } else if (config.overvoteRule() == OvervoteRule.IGNORE_IF_ANY_CONTINUING) {
-        return OvervoteDecision.IGNORE;
-      } else if (continuingAtThisRank.size() > 1) {
-        if (config.overvoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
-          return OvervoteDecision.EXHAUST;
-        } else { // if there's > 1 continuing, OvervoteDecision.NONE is not a valid option
-          return OvervoteDecision.IGNORE;
+      decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
+    } else {
+      List<String> continuingAtThisRank = new LinkedList<String>();
+      for (String optionId : contestOptionIds) {
+        if (eliminatedRound.get(optionId) == null) {
+          continuingAtThisRank.add(optionId);
         }
       }
+
+      if (continuingAtThisRank.size() > 0) {
+        if (config.overvoteRule() == OvervoteRule.EXHAUST_IF_ANY_CONTINUING) {
+          decision = OvervoteDecision.EXHAUST;
+        } else if (config.overvoteRule() == OvervoteRule.IGNORE_IF_ANY_CONTINUING) {
+          decision = OvervoteDecision.IGNORE;
+        } else if (continuingAtThisRank.size() > 1) {
+          if (config.overvoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
+            decision = OvervoteDecision.EXHAUST;
+          } else { // if there's > 1 continuing, OvervoteDecision.NONE is not a valid option
+            decision = OvervoteDecision.IGNORE;
+          }
+        } else {
+          decision = OvervoteDecision.NONE;
+        }
+      } else {
+        decision = OvervoteDecision.NONE;
+      }
     }
 
-    return OvervoteDecision.NONE;
+    return decision;
   }
 
   private boolean hasContinuingCandidates(
     SortedMap<Integer, Set<String>> rankings,
     Map<String, Integer> eliminatedRound
   ) {
+    boolean found = false;
     for (Set<String> optionIds : rankings.values()) {
       for (String optionId : optionIds) {
         if (eliminatedRound.get(optionId) == null) {
-          return true;
+          found = true;
+          break;
         }
+      }
+      if (found) {
+        break;
       }
     }
 
-    return false;
+    return found;
   }
 
   // roundTally returns a map of candidate ID to vote tallies
@@ -636,6 +661,4 @@ public class Tabulator {
       log(cvr.getAuditString());
     }
   }
-
-
 }

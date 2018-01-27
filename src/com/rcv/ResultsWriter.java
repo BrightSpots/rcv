@@ -93,7 +93,7 @@ public class ResultsWriter {
   }
 
   // takes tabulation round tallies and generates a spreadsheet from them
-  public boolean generateSummarySpreadsheet() {
+  public void generateSummarySpreadsheet() {
     // some pre-processing on the tabulation data:
     // invert candidatesToRoundEliminated map so we can lookup who got eliminated for each round
     Map<Integer, List<String>> roundToCandidatesEliminated = new HashMap<Integer, List<String>>();
@@ -170,7 +170,7 @@ public class ResultsWriter {
     org.apache.poi.ss.usermodel.Row actionRow = worksheet.createRow(rowCounter++);
     Cell actionLabelCell = actionRow.createCell(0);
     actionLabelCell.setCellValue("Action in this round");
-    
+
     // Candidate eliminations for each round
     org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
     Cell eliminationsRowHeader = eliminationsRow.createCell(0);
@@ -367,13 +367,10 @@ public class ResultsWriter {
       FileOutputStream outputStream = new FileOutputStream(outputFilePath);
       workbook.write(outputStream);
       outputStream.close();
-      return true;
     } catch (IOException e) {
       e.printStackTrace();
       Logger.log("failed to write " + outputFilePath + " to disk!");
-      return false;
     }
-    
   }
 
   private void populateSpecialCasesHeaderRow(org.apache.poi.ss.usermodel.Row row) {
@@ -437,16 +434,18 @@ public class ResultsWriter {
   // helper
   private List<String> sortTally(Map<String, Integer> tally) {
     List<Map.Entry<String, Integer>> entries =
-        new LinkedList<Map.Entry<String, Integer>>(tally.entrySet());
+        new LinkedList<>(tally.entrySet());
     Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
       public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+        int ret;
         if (o1.getKey().equals(undeclaredWriteInString)) {
-          return 1;
+          ret = 1;
         } else if (o2.getKey().equals(undeclaredWriteInString)) {
-          return -1;
+          ret = -1;
         } else {
-          return (o2.getValue()).compareTo(o1.getValue());
+          ret = (o2.getValue()).compareTo(o1.getValue());
         }
+        return ret;
       }
     });
     List<String> sortedCandidates = new LinkedList<String>();
