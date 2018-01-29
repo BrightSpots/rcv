@@ -76,8 +76,6 @@ public class Main {
     // tabulator object handles high-level logic of tabulating the election
     Tabulator tabulator = new Tabulator(
       castVoteRecords,
-      1,
-      config.getCandidateCodeList(),
       config
     );
     try {

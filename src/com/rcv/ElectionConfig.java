@@ -54,10 +54,57 @@ public class ElectionConfig {
     return rawConfig.rules.batch_elimination == null ? false : rawConfig.rules.batch_elimination;
   }
 
+  // returns the OvervoteRule enum value for the input setting string
+  // param setting: string read from election config corresponding to the OvervoteRule enum value
+  // we will use for handling overvotes
+  static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
+    // rule: return value determined by input setting string
+    Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
+    switch (setting) {
+      case "always_skip_to_next_rank":
+        rule = Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
+        break;
+      case "exhaust_immediately":
+        rule = Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY;
+        break;
+      default:
+        Logger.log("Unrecognized overvote rule setting:%s", setting);
+        System.exit(1);
+    }
+    return rule;
+  }
+
+  // returns the TieBreakMode enum value for the input setting string
+  // param setting: string read from election config corresponding to the TieBreakMode enum value
+  // we will use for tiebreaks
+  static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
+    // mode: will contain the return value determined by input setting string
+    Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.MODE_UNKNOWN;
+    switch (setting) {
+      case "random":
+        mode = Tabulator.TieBreakMode.RANDOM;
+        break;
+      case "interactive":
+        mode = Tabulator.TieBreakMode.INTERACTIVE;
+        break;
+      case "previous_round_counts_then_random":
+        mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM;
+        break;
+      case "previous_round_counts_then_interactive":
+        mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
+        break;
+      default:
+        Logger.log("Unrecognized tiebreaker mode rule setting: %s", setting);
+        System.exit(1);
+    }
+    return mode;
+  }
+
+
   public Tabulator.OvervoteRule overvoteRule() {
     return rawConfig.rules.overvote_rule == null ?
       Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY :
-      Tabulator.overvoteRuleForConfigSetting(rawConfig.rules.overvote_rule);
+      ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvote_rule);
   }
 
   public Integer minimumVoteThreshold() {
@@ -83,7 +130,7 @@ public class ElectionConfig {
   public Tabulator.TieBreakMode tiebreakMode() {
     return rawConfig.rules.tiebreak_mode == null ?
       Tabulator.TieBreakMode.RANDOM :
-      Tabulator.tieBreakModeForConfigSetting(rawConfig.rules.tiebreak_mode);
+      ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreak_mode);
   }
 
   public boolean treatBlankAsUWI() {
