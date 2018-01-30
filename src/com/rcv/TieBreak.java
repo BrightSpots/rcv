@@ -20,11 +20,11 @@ class TieBreak {
   String explanation;
 
   TieBreak(
-      List<String> tiedCandidates,
-      Tabulator.TieBreakMode tieBreakMode,
-      int round,
-      int numVotes,
-      Map<Integer, Map<String, Integer>> roundTallies
+    List<String> tiedCandidates,
+    Tabulator.TieBreakMode tieBreakMode,
+    int round,
+    int numVotes,
+    Map<Integer, Map<String, Integer>> roundTallies
   ) {
     this.tiedCandidates = tiedCandidates;
     this.tieBreakMode = tieBreakMode;
@@ -99,59 +99,20 @@ class TieBreak {
     }
     Console c = System.console();
     System.out.println("Enter the number corresponding to the candidate who should lose this tiebreaker.");
-    while (true) {
+    String selectedCandidate = null;
+    while (selectedCandidate == null) {
       String line = c.readLine();
       try {
         int choice = Integer.parseInt(line);
         if (choice >= 1 && choice <= tiedCandidates.size()) {
           explanation = "The loser was supplied by the operator.";
-          return tiedCandidates.get(choice - 1);
+          selectedCandidate = tiedCandidates.get(choice - 1);
         }
       } catch (NumberFormatException e) {
       }
       System.out.println("Invalid selection. Please try again.");
     }
-  }
-
-  // purpose: utility function to "invert" the input map of candidateID => tally
-  // into a sorted map of tally => List<candidateID>
-  // a list is used because multiple candidates may have the same (tying) tally
-  // this is used to determine when a final winner is picked, and running tiebreak logic
-  // param: roundTally
-  //  input map of candidateID to tally for a particular round
-  // param candidatesToInclude:
-  //  input list of candidateIDs may appear in the output.
-  //  This filters out candidates when running a tiebreak tabulation which relies
-  //  on the tied candidate's previous round totals to break the tie
-  // param: soundLog
-  //  if set output the candidate tally to console and audit
-  // return: map of tally => List<candidateID> from the input data (excluding candidates
-  //  not appearing in candidatesToInclude
-  public static SortedMap<Integer, LinkedList<String>> buildTallyToCandidates(
-      Map<String, Integer> roundTally,
-      Set<String> candidatesToInclude,
-      boolean shouldLog
-  ) {
-    // output map structure containing the map of vote tally to candidate(s)
-    SortedMap<Integer, LinkedList<String>> tallyToCandidates = new TreeMap<>();
-    // for each candidate record their vote total into the countToCandidates object
-    // candidate is the current candidate as we iterate all candidates under consideration
-    for (String candidate : candidatesToInclude) {
-      // vote count for this candidate
-      int votes = roundTally.get(candidate);
-      if (shouldLog) {
-        Logger.log("Candidate %s got %d votes.", candidate, votes);
-      }
-      // all candidates in the existing output structure (if any) who received the same vote tally
-      LinkedList<String> candidates = tallyToCandidates.get(votes);
-      if (candidates == null) {
-        // new container list for candidates who recieved this vote tally
-        candidates = new LinkedList<>();
-        tallyToCandidates.put(votes, candidates);
-      }
-      candidates.add(candidate);
-    }
-    return tallyToCandidates;
+    return selectedCandidate;
   }
 
   private String doRandom() {
@@ -166,10 +127,10 @@ class TieBreak {
     Set<String> candidatesInContention = new HashSet<>(tiedCandidates);
     String selected = null;
     for (int roundToCheck = round - 1; roundToCheck > 0; roundToCheck--) {
-      SortedMap<Integer, LinkedList<String>> countToCandidates = buildTallyToCandidates(
-          roundTallies.get(roundToCheck),
-          candidatesInContention,
-          false
+      SortedMap<Integer, LinkedList<String>> countToCandidates = Tabulator.buildTallyToCandidates(
+        roundTallies.get(roundToCheck),
+        candidatesInContention,
+        false
       );
       int minVotes = countToCandidates.firstKey();
       LinkedList<String> candidatesWithLowestTotal = countToCandidates.get(minVotes);
@@ -183,6 +144,4 @@ class TieBreak {
     }
     return selected;
   }
-
-
 }
