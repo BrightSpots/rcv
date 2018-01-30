@@ -66,14 +66,16 @@ public class Tabulator {
   // when tabulation is complete this will be how many rounds did it take to determine a winner
   private int currentRound = 0;
 
-  // simple container class used during batch elemination process
+  // simple container class used during batch elimination process to store the results
   static class BatchElimination {
-    String optionId;
+    // the candidate eliminated
+    String candidateID;
+    // how many votes
     int runningTotal;
     int nextHighestCount;
 
-    BatchElimination(String optionId, int runningTotal, int nextHighestCount) {
-      this.optionId = optionId;
+    BatchElimination(String candidateID, int runningTotal, int nextHighestCount) {
+      this.candidateID = candidateID;
       this.runningTotal = runningTotal;
       this.nextHighestCount = nextHighestCount;
     }
@@ -239,11 +241,11 @@ public class Tabulator {
       List<BatchElimination> batchEliminations = runBatchElimination(currentRoundTallyToCandidates);
       if (batchEliminations.size() > 1) {
         for (BatchElimination elimination : batchEliminations) {
-          eliminated.add(elimination.optionId);
+          eliminated.add(elimination.candidateID);
           log(
             "Batch-eliminated %s in round %d. The running total was %d vote(s) and the " +
               "next-highest count was %d vote(s).",
-            elimination.optionId,
+            elimination.candidateID,
             currentRound,
             elimination.runningTotal,
             elimination.nextHighestCount
@@ -306,36 +308,57 @@ public class Tabulator {
     writer.generateSummarySpreadsheet();
   }
 
+  // helper function for logging to console and audit
+  // param: s input s to be logged
+  // param: var1 ... objects to be formatted into the log output
   static void log(String s, Object... var1) {
     Logger.log(s, var1);
   }
 
-  // purpose: applies batch elimination logic to the input vote counts
-  // batch elimination removes multiple candidates in a single round if
-  // their vote count is so low they could not possibly advance
+  // function: runBatchElimination
+  // purpose: applies batch elimination logic to the input vote counts to remove multiple candidates in
+  // a single round if their vote counts are so low they could not possibly advance.
+  // Consider, after each round of voting a candidate not eliminated could potentially receive ALL the votes
+  // from candidates who ARE eliminated, keeping them in the race and "leapfrogging"
+  // ahead of candidates who were leading them.
+  //
+  // In this algorithm we sum candidate vote totals (low to high) and find where this leapfrogging is impossible,
+  // that is, when the sum of all batch-eliminated candidate's votes cannot equal or exceed the next-highest candidate
+  // vote total.
+  // param: currentRoundTallyToCandidates map of
+  // returns: list of BatchElimination objects, one for each batch eliminated candidate
   private List<BatchElimination> runBatchElimination(
-    SortedMap<Integer, LinkedList<String>> countToCandidates
+    SortedMap<Integer, LinkedList<String>> currentRoundTallyToCandidates
   ) {
+    // the sum total of all vote counts examined.  this must equal or exceed the next-highest vote total
+    // to stop the batch elimination.
     int runningTotal = 0;
-    List<String> candidatesSeen = new LinkedList<String>();
-    Set<String> candidatesEliminated = new HashSet<String>();
-    List<BatchElimination> eliminations = new LinkedList<BatchElimination>();
-    for (int currentVoteCount : countToCandidates.keySet()) {
-      if (runningTotal < currentVoteCount) {
+    // tracks candidates whose totals have been included in the runningTotal and thus are being considered
+    // for batch elimination
+    List<String> candidatesSeen = new LinkedList<>();
+    // tracks candidates who have been batch eliminated (to prevent them from being eliminated twice)
+    Set<String> candidatesEliminated = new HashSet<>();
+    // BatchElimination objects contain resulting data which will be used by the tabulation to process
+    // the batch elimination results
+    List<BatchElimination> eliminations = new LinkedList<>();
+    // at each iteration currentVoteTally is the next highest vote count received for any candidate(s)
+    for (int currentVoteTally : currentRoundTallyToCandidates.keySet()) {
+      // see if leapfrogging is possible
+      if (runningTotal < currentVoteTally) {
+        // not possible so eliminate everyone who has been seen and not eliminated yet
         for (String candidate : candidatesSeen) {
           if (!candidatesEliminated.contains(candidate)) {
             candidatesEliminated.add(candidate);
-            eliminations.add(
-              new BatchElimination(candidate, runningTotal, currentVoteCount)
-            );
+            eliminations.add(new BatchElimination(candidate, runningTotal, currentVoteTally));
           }
         }
       }
-      List<String> currentCandidates = countToCandidates.get(currentVoteCount);
-      runningTotal += currentVoteCount * currentCandidates.size();
+      // add the candidates for the currentVoteTally to the seen list and accumulate their votes
+      // currentCandidates contains all candidates who received the next highest vote total
+      List<String> currentCandidates = currentRoundTallyToCandidates.get(currentVoteTally);
+      runningTotal += currentVoteTally * currentCandidates.size();
       candidatesSeen.addAll(currentCandidates);
     }
-
     return eliminations;
   }
 
