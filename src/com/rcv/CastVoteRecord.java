@@ -21,7 +21,7 @@ public class CastVoteRecord {
   public void addRoundDescription(String description, int round) {
     mDescriptionsByRound.put(round, description);
   }
-  
+
   // output is our rankings sorted from first to last preference
   // Set is used to accommodate overvotes
   // TODO: build this map during the CVR reader process
@@ -43,7 +43,11 @@ public class CastVoteRecord {
     return mSortedRankings;
   }
 
-  public CastVoteRecord(String source, String ballotID, List<ContestRanking> rankings, List<String> fullCVRData) {
+  public CastVoteRecord(
+    String source,
+    String ballotID,
+    List<ContestRanking> rankings, List<String> fullCVRData
+  ) {
     mSource = source;
     mBallotID = ballotID;
     mRankings = rankings;

@@ -93,12 +93,16 @@ class TieBreak {
   }
 
   private String doInteractive() {
-    System.out.println("Tie in round " + round + " for these candidateIDs, each of whom has " + numVotes + " votes:");
+    System.out.println(
+      "Tie in round " + round + " for these candidateIDs, each of whom has " + numVotes + " votes:"
+    );
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i+1) + ". " + tiedCandidates.get(i));
     }
     Console c = System.console();
-    System.out.println("Enter the number corresponding to the candidate who should lose this tiebreaker.");
+    System.out.println(
+      "Enter the number corresponding to the candidate who should lose this tiebreaker."
+    );
     String selectedCandidate = null;
     while (selectedCandidate == null) {
       String line = c.readLine();
@@ -135,7 +139,8 @@ class TieBreak {
       int minVotes = countToCandidates.firstKey();
       LinkedList<String> candidatesWithLowestTotal = countToCandidates.get(minVotes);
       if (candidatesWithLowestTotal.size() == 1) {
-        explanation = "The loser had the fewest votes (" + minVotes + ") in round " + roundToCheck + ".";
+        explanation =
+          "The loser had the fewest votes (" + minVotes + ") in round " + roundToCheck + ".";
         selected = candidatesWithLowestTotal.getFirst();
         break;
       } else {

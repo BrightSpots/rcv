@@ -2,7 +2,7 @@
  * Created by Jonathan Moldover on 7/8/17
  * Copyright 2018 Bright Spots
  * Purpose: Wrapper for console and file logging functions
- * All logging and audit output should use these methods to ensure output goes into audit file 
+ * All logging and audit output should use these methods to ensure output goes into audit file
  * Version: 1.0
  */
 
@@ -73,5 +73,4 @@ public class Logger {
 
   // the logger object this class wraps
   private final static java.util.logging.Logger sLogger = java.util.logging.Logger.getLogger("RCV");
-
 }

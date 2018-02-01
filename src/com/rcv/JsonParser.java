@@ -19,7 +19,9 @@ public class JsonParser {
   // jsonFilePath: path to json file to be parsed into java
   // valueType: class of the object to be created from parsed json
   // returns: instance of the object parsed from json
-  public static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) throws Exception {
+  public static <T> T parseObjectFromFile(
+    String jsonFilePath, Class<T> valueType
+  ) throws Exception {
     try {
       // fileReader will read the json file from disk
       FileReader fileReader = new FileReader(jsonFilePath);
