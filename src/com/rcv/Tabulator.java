@@ -3,7 +3,7 @@
  * Copyright 2018 Bright Spots
  * Purpose: perform ranked choice tabulation calculations
  * round-by-round tabulation of votes to each candidate
- * handles overvote / undervote decisions and tiebreaks
+ * handles overvote / undervote decisions batch elimination and tiebreaks
  * results are logged to console and audit file
  * Version: 1.0
  */
@@ -15,7 +15,6 @@ import java.util.*;
 public class Tabulator {
 
   // When the CVR contains an overvote we "normalize" it to use this string
-  // TODO: find a better place for this
   static String explicitOvervoteLabel = "overvote";
 
   // OvervoteRule determines how overvotes are handled
@@ -55,10 +54,10 @@ public class Tabulator {
   // roundTallies is a map of round number to maps of candidate IDs to vote totals for that round
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes received by that candidate in round 1
   // this structure is created during the course of tabulation
-  private Map<Integer, Map<String, Integer>> roundTallies = new HashMap<Integer, Map<String, Integer>>();
+  private Map<Integer, Map<String, Integer>> roundTallies = new HashMap<>();
 
-  // eliminatedRound is a map of candidate IDs to the round in which they were eliminated
-  private Map<String, Integer> eliminatedRound = new HashMap<String, Integer>();
+  // candidateToRoundEliminated is a map of candidate IDs to the round in which they were eliminated
+  private Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
 
   // the winning candidateID
   private String winner;
@@ -67,22 +66,33 @@ public class Tabulator {
   private int currentRound = 0;
 
   // simple container class used during batch elimination process to store the results
+  // for later logging output
   static class BatchElimination {
     // the candidate eliminated
     String candidateID;
-    // how many votes
+    // how many total votes were totaled when this candidate was eliminated
     int runningTotal;
-    int nextHighestCount;
+    // next highest count total (validates that we were correctly batch eliminated)
+    int nextHighestTally;
 
-    BatchElimination(String candidateID, int runningTotal, int nextHighestCount) {
+    // constructor simply assigns input params to member variables
+    // param: candidateID the candidate eliminated
+    // param: runningTotal how many total votes were totaled when this candidate was eliminated
+    // param: nextHighestTally next highest count total (validates that we were correctly batch eliminated)
+    BatchElimination(String candidateID, int runningTotal, int nextHighestTally) {
       this.candidateID = candidateID;
       this.runningTotal = runningTotal;
-      this.nextHighestCount = nextHighestCount;
+      this.nextHighestTally = nextHighestTally;
     }
   }
 
-  private Map<Integer, TieBreak> tieBreaks = new HashMap<>();
+  // map of round to TieBreak objects to record how tiebreaks were decided
+  private Map<Integer, TieBreak> roundToTieBreak = new HashMap<>();
 
+  // Tabulator constructor assigns input params to member variables and caches the candidateIDs
+  // which will be used when reading input cast vote records
+  // param: castVoteRecords list of all cast vote records to be tabulated for this contest
+  // param: config describes various tabulation rules to be used for tabulation
   Tabulator(
       List<CastVoteRecord> castVoteRecords,
       ElectionConfig config
@@ -92,7 +102,9 @@ public class Tabulator {
     this.config = config;
   }
 
-  // purpose: run the main tabulation routine
+  // purpose: run the main tabulation routine to determine election results
+  //  this is the high-level control of the tabulation algorithm
+  // throws: Exception when no candidates are eliminated in a round
   public void tabulate() throws Exception {
 
     log("Beginning tabulation for contest.");
@@ -107,21 +119,22 @@ public class Tabulator {
       this.candidateIDs.add(config.undeclaredWriteInLabel());
     }
 
-    // exhaustedBallots is a map of ballot indexes to the round in which they were exhausted
-    Map<Integer, Integer> exhaustedBallots = new HashMap<>();
+    // map of ballot indexes to the round in which they were exhausted
+    // getRoundTally will add entries to this object at each iteration
+    Map<Integer, Integer> ballotIDtoRoundExhausted = new HashMap<>();
 
     // loop until we achieve a majority winner: at each iteration we will eliminate one or more candidates and
-    // gradually transfer votes to the remaining candidates
+    // transfer votes to the remaining candidates
     while (winner == null) {
       currentRound++;
       log("Round: %d", currentRound);
 
       // roundTally is map of candidateID to vote tally for the current round.
-      // It is generated based on previously eliminated candidateIDs (contained in eliminatedRound object).
-      // At each iteration of this loop the eliminatedRound object will gain entries as candidateIDs are eliminated.
+      // It is generated based on previously eliminated candidateIDs (contained in candidateToRoundEliminated object).
+      // At each iteration of this loop the candidateToRoundEliminated object will gain entries as candidateIDs are eliminated.
       // Conversely the roundTally object returned here will contain fewer entries, each of which will have more votes.
       // Eventually a winner will be chosen.
-      Map<String, Integer> currentRoundCandidateToTally = getRoundTally(castVoteRecords, eliminatedRound, exhaustedBallots, currentRound);
+      Map<String, Integer> currentRoundCandidateToTally = getRoundTally(castVoteRecords, candidateToRoundEliminated, ballotIDtoRoundExhausted, currentRound);
       roundTallies.put(currentRound, currentRoundCandidateToTally);
 
       // Map of vote tally to candidate(s). A list is used to handle ties.
@@ -130,9 +143,10 @@ public class Tabulator {
         currentRoundCandidateToTally.keySet(),
         true
       );
-
+      // see if a winner is determined in this iteration
       winner = identifyWinner(currentRoundCandidateToTally, currentRoundTallyToCandidates);
 
+      // if no winner determine who will be eliminated in this round
       if (winner == null) {
         // container for eliminated candidate(s)
         List<String> eliminated = new LinkedList<>();
@@ -151,9 +165,9 @@ public class Tabulator {
         if (!foundCandidateToEliminate) {
           throw new Exception("Failed to eliminate any candidates.");
         }
-
+        // store the losers
         for (String loser : eliminated) {
-          eliminatedRound.put(loser, currentRound);
+          candidateToRoundEliminated.put(loser, currentRound);
         }
       }
     }
@@ -248,7 +262,7 @@ public class Tabulator {
             elimination.candidateID,
             currentRound,
             elimination.runningTotal,
-            elimination.nextHighestCount
+            elimination.nextHighestTally
           );
         }
       }
@@ -267,7 +281,7 @@ public class Tabulator {
       if (lastPlace.size() > 1) {
         TieBreak tieBreak = new TieBreak(lastPlace, config.tiebreakMode(), currentRound, minVotes, roundTallies);
         loser = tieBreak.getSelection();
-        tieBreaks.put(currentRound, tieBreak);
+        roundToTieBreak.put(currentRound, tieBreak);
         log(
           "%s lost a tie-breaker in round %d against %s. Each candidate had %d vote(s). %s",
           loser,
@@ -294,7 +308,7 @@ public class Tabulator {
     ResultsWriter writer = new ResultsWriter().
       setNumRounds(currentRound).
       setRoundTallies(roundTallies).
-      setCandidatesToRoundEliminated(eliminatedRound).
+      setCandidatesToRoundEliminated(candidateToRoundEliminated).
       setOutputFilePath(outputFile).
       setContestName(config.contestName()).
       setJurisdiction(config.jurisdiction()).
@@ -418,72 +432,89 @@ public class Tabulator {
     return decision;
   }
 
+  // purpose: determine if the input rankings specify a candidate who has not been eliminated
+  // i.e. a continuing candidate
+  // param: rankToCandidateIDs ordered map of rankings (most preferred to least) to candidateIDs
+  // a set is used to accomodate overvotes
+  // param: candidateToRoundEliminated map of candidateID to round in which they were eliminated
+  // return: true if there is a continuing candidate otherwise false
   private boolean hasContinuingCandidates(
-    SortedMap<Integer, Set<String>> rankings,
-    Map<String, Integer> eliminatedRound
+    SortedMap<Integer, Set<String>> rankToCandidateIDs,
+    Map<String, Integer> candidateToRoundEliminated
   ) {
-    boolean found = false;
-    for (Set<String> optionIds : rankings.values()) {
-      for (String optionId : optionIds) {
-        if (eliminatedRound.get(optionId) == null) {
-          found = true;
+    // the result of this function
+    boolean foundContinuingCandidate = false;
+    // iterate through all candidateID sets
+    for (Set<String> candidateIDSet : rankToCandidateIDs.values()) {
+      // iterate through all candidateIDs in the set
+      for (String candidateID : candidateIDSet) {
+        // see if the candidate has been eliminated
+        if (candidateToRoundEliminated.get(candidateID) == null) {
+          foundContinuingCandidate = true;
           break;
         }
       }
-      if (found) {
+      if (foundContinuingCandidate) {
         break;
       }
     }
-
-    return found;
+    return foundContinuingCandidate;
   }
 
-  // roundTally returns a map of candidate ID to vote tallies
-  // generated based on previously eliminated candidateIDs contained in eliminatedRound object
-  // at each iteration of this loop, the eliminatedRound object will get more entries as candidateIDs are eliminated
+  // roundTally returns a map of candidate ID to vote tallies for this round
+  // generated based on previously eliminated candidateIDs contained in candidateToRoundEliminated object
+  // at each iteration of this loop, the candidateToRoundEliminated object will get more entries as candidateIDs are eliminated
   // conversely the roundTally object returned here will contain fewer entries each of which will have more votes
-  // eventually a winner will be chosen
+  // param: castVoteRecords contains all castVoteRecords for this election
+  // param: candidateToRoundEliminated map of candidateID to round in which they are eliminated
+  // param: ballotIDtoRoundExhausted map of ballot index to round in which it was exhausted
+  // param: the current round
+  // return: map of candidateID to vote tallies for this round
   private Map<String, Integer> getRoundTally(
     List<CastVoteRecord> castVoteRecords,
-    Map<String, Integer> eliminatedRound,
-    Map<Integer, Integer> exhaustedBallots,
-    int round
+    Map<String, Integer> candidateToRoundEliminated,
+    Map<Integer, Integer> ballotIDtoRoundExhausted,
+    int currentRound
   ) throws Exception {
+    // map of candidateID to vote tally to store the results
     Map<String, Integer> roundTally = new HashMap<>();
 
-    // initialize round tallies for non-eliminated candidateIDs
-    for (String contestOptionId : candidateIDs) {
-      if (eliminatedRound.get(contestOptionId) == null) {
-        roundTally.put(contestOptionId, 0);
+    // initialize round tallies to 0 for all eliminated candidateIDs
+    for (String candidateID : candidateIDs) {
+      if (candidateToRoundEliminated.get(candidateID) == null) {
+        roundTally.put(candidateID, 0);
       }
     }
 
     // loop over the ballots and count votes for continuing candidateIDs
     for (int i = 0; i < castVoteRecords.size(); i++) {
-      if (exhaustedBallots.get(i) != null) {
+      // skip exhausted ballots
+      if (ballotIDtoRoundExhausted.get(i) != null) {
         continue;
       }
+      // the cast vote record under consideration
       CastVoteRecord cvr = castVoteRecords.get(i);
-      SortedMap<Integer, Set<String>> rankings = cvr.sortedRankings();
+      // rankings for this cvr sorted from most preferred to least (a set is used to accommodate overvotes)
+      SortedMap<Integer, Set<String>> rankToCandidateIDs = cvr.sortedRankings();
 
-      if (!hasContinuingCandidates(rankings, eliminatedRound)) {
-        exhaustBallot(i, round, exhaustedBallots, "no continuing candidateIDs", cvr);
+      if (!hasContinuingCandidates(rankToCandidateIDs, candidateToRoundEliminated)) {
+        exhaustBallot(i, currentRound, ballotIDtoRoundExhausted, "no continuing candidateIDs", cvr);
         continue;
       }
 
       Integer lastRank = null;
 
-      for (int rank : rankings.keySet()) { // loop over the rankings within one ballot
-        Set<String> contestOptionIds = rankings.get(rank);
+      for (int rank : rankToCandidateIDs.keySet()) { // loop over the rankings within one ballot
+        Set<String> contestOptionIds = rankToCandidateIDs.get(rank);
 
         // handle possible overvote
-        OvervoteDecision overvoteDecision = getOvervoteDecision(contestOptionIds, eliminatedRound);
+        OvervoteDecision overvoteDecision = getOvervoteDecision(contestOptionIds, candidateToRoundEliminated);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          exhaustBallot(i, round, exhaustedBallots, "overvote", cvr);
+          exhaustBallot(i, currentRound, ballotIDtoRoundExhausted, "overvote", cvr);
           break;
         } else if (overvoteDecision == OvervoteDecision.IGNORE) {
-          String description = String.format("%d|ignored:%s|", round, "overvote");
-          cvr.addRoundDescription(description, round);
+          String description = String.format("%d|ignored:%s|", currentRound, "overvote");
+          cvr.addRoundDescription(description, currentRound);
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           continue;
@@ -492,13 +523,13 @@ public class Tabulator {
         // and possible undervote
         if (config.maxSkippedRanksAllowed() != null &&
             lastRank != null && rank - lastRank > config.maxSkippedRanksAllowed() + 1) {
-          exhaustBallot(i, round, exhaustedBallots, "undervote", cvr);
+          exhaustBallot(i, currentRound, ballotIDtoRoundExhausted, "undervote", cvr);
           break;
         }
 
         String selectedOptionId = null;
         for (String optionId : contestOptionIds) {
-          if (eliminatedRound.get(optionId) == null) {
+          if (candidateToRoundEliminated.get(optionId) == null) {
             if (selectedOptionId != null) {
               throw new Exception(
                 "Our code failed to handle an overvote with multiple continuing candidateIDs properly."
@@ -506,8 +537,8 @@ public class Tabulator {
             } else {
               // found a continuing candidate, so increase their tally by 1
               selectedOptionId = optionId;
-              String description = String.format("%d|%s|", round, selectedOptionId);
-              cvr.addRoundDescription(description, round);
+              String description = String.format("%d|%s|", currentRound, selectedOptionId);
+              cvr.addRoundDescription(description, currentRound);
               roundTally.put(selectedOptionId, roundTally.get(selectedOptionId) + 1);
             }
           }
