@@ -110,13 +110,13 @@ public class Tabulator {
   public void tabulate() throws Exception {
 
     log("Beginning tabulation for contest.");
-    log("There are %d candidateIDs for this contest:", numCandidates());
-    for (String option : candidateIDs) {
-      log("%s", option);
+    log("There are %d candidates for this contest:", numCandidates());
+    for (String candidateID : candidateIDs) {
+      log("%s", candidateID);
     }
     log("There are %d cast vote records for this contest.", castVoteRecords.size());
 
-    // add UWI string to contest options so it will be tallied similarly to other candidateIDs
+    // add UWI string to candidateIDs so it will be tallied similarly to other candidates
     if (config.undeclaredWriteInLabel() != null) {
       this.candidateIDs.add(config.undeclaredWriteInLabel());
     }
@@ -128,7 +128,7 @@ public class Tabulator {
       log("Round: %d", currentRound);
 
       // currentRoundCandidateToTally is a map from candidateID to vote tally for the current round.
-      // At each iteration of this loop the eliminatedRound object will gain entries as candidateIDs
+      // At each iteration of this loop the eliminatedRound object will gain entries as candidates
       // are eliminated.
       // Conversely, the currentRoundCandidateToTally object returned here will contain fewer
       // entries, each of which will have as many or more votes than they did in prior rounds.
@@ -151,7 +151,7 @@ public class Tabulator {
         // container for eliminated candidate(s)
         List<String> eliminated = new LinkedList<>();
 
-        // Four mutually exclusive ways to eliminate candidateIDs.
+        // Four mutually exclusive ways to eliminate candidates.
         boolean foundCandidateToEliminate =
           // 1. Some races contain undeclared write-ins that should be dropped immediately.
           dropUWI(eliminated, currentRoundCandidateToTally) ||
@@ -383,13 +383,13 @@ public class Tabulator {
   }
 
   private OvervoteDecision getOvervoteDecision(
-    Set<String> contestOptionIds,
+    Set<String> candidateIDs,
     Map<String, Integer> eliminatedRound
   ) {
     OvervoteDecision decision;
 
-    if (contestOptionIds.size() == 0 ||
-        (contestOptionIds.size() == 1 && contestOptionIds.toArray()[0] != explicitOvervoteLabel)) {
+    if (candidateIDs.size() == 0 ||
+        (candidateIDs.size() == 1 && candidateIDs.toArray()[0] != explicitOvervoteLabel)) {
       decision = OvervoteDecision.NONE;
     } else if (config.overvoteRule() == OvervoteRule.EXHAUST_IMMEDIATELY) {
       decision = OvervoteDecision.EXHAUST;
@@ -397,9 +397,9 @@ public class Tabulator {
       decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
     } else {
       List<String> continuingAtThisRank = new LinkedList<>();
-      for (String optionId : contestOptionIds) {
-        if (eliminatedRound.get(optionId) == null) {
-          continuingAtThisRank.add(optionId);
+      for (String candidateID : candidateIDs) {
+        if (eliminatedRound.get(candidateID) == null) {
+          continuingAtThisRank.add(candidateID);
         }
       }
 
@@ -467,34 +467,34 @@ public class Tabulator {
     // map of candidateID to vote tally to store the results
     Map<String, Integer> roundTally = new HashMap<>();
 
-    // initialize round tallies to 0 for all eliminated candidateIDs
+    // initialize round tallies to 0 for all continuing candidates
     for (String candidateID : candidateIDs) {
       if (candidateToRoundEliminated.get(candidateID) == null) {
         roundTally.put(candidateID, 0);
       }
     }
 
-    // loop over the ballots and count votes for continuing candidateIDs
+    // loop over the ballots and count votes for continuing candidates
     for (CastVoteRecord cvr : castVoteRecords) {
       if (cvr.isExhausted()) {
         continue;
       }
-      SortedMap<Integer, Set<String>> rankings = cvr.sortedRankings();
+      SortedMap<Integer, Set<String>> rankToCandidateIDs = cvr.sortedRankings();
 
-      if (!hasContinuingCandidates(rankings, candidateToRoundEliminated)) {
-        cvr.exhaust(currentRound, "no continuing candidateIDs");
+      if (!hasContinuingCandidates(rankToCandidateIDs, candidateToRoundEliminated)) {
+        cvr.exhaust(currentRound, "no continuing candidates");
         continue;
       }
 
       Integer lastRank = null;
 
       for (int rank : rankToCandidateIDs.keySet()) { // loop over the rankings within one ballot
-        Set<String> contestOptionIds = rankToCandidateIDs.get(rank);
+        Set<String> candidateIDs = rankToCandidateIDs.get(rank);
 
         // handle possible overvote
-        OvervoteDecision overvoteDecision = getOvervoteDecision(contestOptionIds, candidateToRoundEliminated);
+        OvervoteDecision overvoteDecision = getOvervoteDecision(candidateIDs, candidateToRoundEliminated);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          cvr.exhaust(round, "overvote");
+          cvr.exhaust(currentRound, "overvote");
           break;
         } else if (overvoteDecision == OvervoteDecision.IGNORE) {
           String description = String.format("%d|ignored:%s|", currentRound, "overvote");
@@ -507,28 +507,28 @@ public class Tabulator {
         // and possible undervote
         if (config.maxSkippedRanksAllowed() != null &&
             lastRank != null && rank - lastRank > config.maxSkippedRanksAllowed() + 1) {
-          cvr.exhaust(round, "undervote");
+          cvr.exhaust(currentRound, "undervote");
           break;
         }
 
-        String selectedOptionId = null;
-        for (String optionId : contestOptionIds) {
-          if (candidateToRoundEliminated.get(optionId) == null) {
-            if (selectedOptionId != null) {
+        String selectedCandidateID = null;
+        for (String candidateID : candidateIDs) {
+          if (candidateToRoundEliminated.get(candidateID) == null) {
+            if (selectedCandidateID != null) {
               throw new Exception(
-                "We failed to handle an overvote with multiple continuing candidateIDs properly."
+                "We failed to handle an overvote with multiple continuing candidates properly."
               );
             } else {
               // found a continuing candidate, so increase their tally by 1
-              selectedOptionId = optionId;
-              String description = String.format("%d|%s|", currentRound, selectedOptionId);
+              selectedCandidateID = candidateID;
+              String description = String.format("%d|%s|", currentRound, selectedCandidateID);
               cvr.addRoundDescription(description, currentRound);
-              roundTally.put(selectedOptionId, roundTally.get(selectedOptionId) + 1);
+              roundTally.put(selectedCandidateID, roundTally.get(selectedCandidateID) + 1);
             }
           }
         }
 
-        if (selectedOptionId != null) {
+        if (selectedCandidateID != null) {
           break; // we've found our candidate already
         }
         lastRank = rank;

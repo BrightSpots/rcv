@@ -44,14 +44,14 @@ public class CastVoteRecord {
       mSortedRankings = new TreeMap<>();
       for (ContestRanking ranking : mRankings) {
         // set of candidates given this rank
-        Set<String> optionsAtRank = mSortedRankings.get(ranking.getRank());
-        if (optionsAtRank == null) {
+        Set<String> candidatesAtRank = mSortedRankings.get(ranking.getRank());
+        if (candidatesAtRank == null) {
           // create the new optionsAtRank and add to the sorted cvr
-          optionsAtRank = new HashSet<>();
-          mSortedRankings.put(ranking.getRank(), optionsAtRank);
+          candidatesAtRank = new HashSet<>();
+          mSortedRankings.put(ranking.getRank(), candidatesAtRank);
         }
         // add this option into the map
-        optionsAtRank.add(ranking.getOptionId());
+        candidatesAtRank.add(ranking.getOptionId());
       }
     }
     return mSortedRankings;
