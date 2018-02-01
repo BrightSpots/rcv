@@ -7,19 +7,33 @@ import java.util.*;
 // a set is used to handle overvotes
 public class CastVoteRecord {
 
-  String mSource;
-  String mBallotID;
-  List<String> mFullCVRData;
-  List<ContestRanking> mRankings;
-  SortedMap<Integer, Set<String>> mSortedRankings;
+  private String mSource;
+  private String mBallotID;
+  private List<String> mFullCVRData;
+  private List<ContestRanking> mRankings;
+  private SortedMap<Integer, Set<String>> mSortedRankings;
+  private boolean mExhausted;
 
   // mDescriptionsByRound contains who this ballot counted for in each round
   // followed by reason for exhaustion if it is ever exhausted
-  public Map<Integer, String> mDescriptionsByRound = new HashMap<>();
+  private Map<Integer, String> mDescriptionsByRound = new HashMap<>();
 
   // adds the string to this CVR round by round descriptions for auditing
   public void addRoundDescription(String description, int round) {
     mDescriptionsByRound.put(round, description);
+  }
+
+  public void exhaust(int round, String reason) throws Exception {
+    if (mExhausted) {
+      throw new Exception("Trying to exhaust a ballot that's already been exhausted.");
+    }
+    mExhausted = true;
+    String description = String.format("%d|exhausted:%s|", round, reason);
+    addRoundDescription(description, round);
+  }
+
+  public boolean isExhausted() {
+    return mExhausted;
   }
 
   // output is our rankings sorted from first to last preference

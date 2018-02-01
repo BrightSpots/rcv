@@ -121,10 +121,6 @@ public class Tabulator {
       this.candidateIDs.add(config.undeclaredWriteInLabel());
     }
 
-    // map of ballot indexes to the round in which they were exhausted
-    // getRoundTally will add entries to this object at each iteration
-    Map<Integer, Integer> ballotIDtoRoundExhausted = new HashMap<>();
-
     // Loop until we achieve a majority winner: at each iteration we will eliminate one or more
     // candidates and gradually transfer votes to the remaining candidates.
     while (winner == null) {
@@ -192,7 +188,8 @@ public class Tabulator {
     log("Total votes in round %d: %d.", currentRound, currentRoundTotalVotes);
 
     int maxVotes = currentRoundTallyToCandidates.lastKey();
-    // Does the leader have a majority of non-exhausted ballots?
+    // Does the leader have a majority of non-exhausted ballots? In other words, is maxVotes
+    // greater than half of the total votes counted in this round?
     if (maxVotes > (float)currentRoundTotalVotes / 2.0) {
       // we have a winner
       for (Integer votes : currentRoundTallyToCandidates.keySet()) {
@@ -385,19 +382,6 @@ public class Tabulator {
     return eliminations;
   }
 
-  private boolean exhaustBallot(
-    int ballotIndex,
-    int round,
-    Map<Integer, Integer> exhaustedBallots,
-    String reason,
-    CastVoteRecord cvr
-  ) {
-    String description = String.format("%d|exhausted:%s|", round, reason);
-    cvr.addRoundDescription(description, round);
-    exhaustedBallots.put(ballotIndex, round);
-    return true;
-  }
-
   private OvervoteDecision getOvervoteDecision(
     Set<String> contestOptionIds,
     Map<String, Integer> eliminatedRound
@@ -412,7 +396,7 @@ public class Tabulator {
     } else if (config.overvoteRule() == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
     } else {
-      List<String> continuingAtThisRank = new LinkedList<String>();
+      List<String> continuingAtThisRank = new LinkedList<>();
       for (String optionId : contestOptionIds) {
         if (eliminatedRound.get(optionId) == null) {
           continuingAtThisRank.add(optionId);
@@ -490,19 +474,15 @@ public class Tabulator {
       }
     }
 
-    // loop over the ballots and count votes for continuing candidates
+    // loop over the ballots and count votes for continuing candidateIDs
     for (CastVoteRecord cvr : castVoteRecords) {
-      // skip exhausted ballots
       if (cvr.isExhausted()) {
         continue;
       }
-      // the cast vote record under consideration
-      CastVoteRecord cvr = castVoteRecords.get(i);
-      // rankings for this cvr sorted from most preferred to least (a set is used to accommodate overvotes)
-      SortedMap<Integer, Set<String>> rankToCandidateIDs = cvr.sortedRankings();
+      SortedMap<Integer, Set<String>> rankings = cvr.sortedRankings();
 
-      if (!hasContinuingCandidates(rankToCandidateIDs, candidateToRoundEliminated)) {
-        exhaustBallot(i, currentRound, ballotIDtoRoundExhausted, "no continuing candidateIDs", cvr);
+      if (!hasContinuingCandidates(rankings, candidateToRoundEliminated)) {
+        cvr.exhaust(currentRound, "no continuing candidateIDs");
         continue;
       }
 
@@ -514,7 +494,7 @@ public class Tabulator {
         // handle possible overvote
         OvervoteDecision overvoteDecision = getOvervoteDecision(contestOptionIds, candidateToRoundEliminated);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          exhaustBallot(i, currentRound, ballotIDtoRoundExhausted, "overvote", cvr);
+          cvr.exhaust(round, "overvote");
           break;
         } else if (overvoteDecision == OvervoteDecision.IGNORE) {
           String description = String.format("%d|ignored:%s|", currentRound, "overvote");
@@ -527,7 +507,7 @@ public class Tabulator {
         // and possible undervote
         if (config.maxSkippedRanksAllowed() != null &&
             lastRank != null && rank - lastRank > config.maxSkippedRanksAllowed() + 1) {
-          exhaustBallot(i, currentRound, ballotIDtoRoundExhausted, "undervote", cvr);
+          cvr.exhaust(round, "undervote");
           break;
         }
 
