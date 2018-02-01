@@ -11,15 +11,13 @@ import java.util.*;
 /**
  * Created by Jon on 8/27/17.
  *
- * Helper class to read and parse an xlsl "Maine Style" Cast Vote Record File?
+ * Helper class to read and parse an xls Cast Vote Record File
  *
- * Whole lotta assumptions going on here:
- * We assume one contest per file
- * we assume the first sheet is the only one we're interested in
- * we assume the first column contains ballot ids, second column contains precinct id and third column contains ballot style.
- * we assume columns after ballot style are the ballot selections ordered by rank, low to high, left to right
- * we assume the strings "undervote" or "overvote" mean no vote
- * we assume a non-existent cell (image of a ballot mark when workbook is opened in excel?) means no vote
+ * Assumptions:
+ * - one contest per file
+ * - the first sheet is the only one we're interested in
+ * - columns after ballot style are the ballot selections ordered by rank (most to least preferred)
+ * - a non-existent cell (image of a ballot mark when workbook is opened in excel?) means no vote
  *
  */
 
@@ -27,15 +25,15 @@ public class CVRReader {
 
   public List<CastVoteRecord> castVoteRecords = new ArrayList<>();
 
-  // call this to parse the given file path into a CastVoteRecordList suitable for tabulation
+  // Call this to parse the given file path into a CastVoteRecordList suitable for tabulation
   // Note: this is specific for the Maine example file we were provided
   public void parseCVRFile(
     String excelFilePath,
     int firstVoteColumnIndex,
     int allowableRanks,
     List<String>options,
-    ElectionConfig config) {
-
+    ElectionConfig config
+  ) {
     Sheet contestSheet = getBallotSheet(excelFilePath);
     if (contestSheet == null) {
       Logger.log("invalid RCV format: could not obtain ballot data.");
@@ -128,7 +126,6 @@ public class CVRReader {
       CastVoteRecord cvr = new CastVoteRecord(cvrFileName, ballotID, rankings, fullCVRData);
       castVoteRecords.add(cvr);
     }
-
     // parsing complete
   }
 

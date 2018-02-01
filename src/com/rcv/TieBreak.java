@@ -93,12 +93,16 @@ class TieBreak {
   }
 
   private String doInteractive() {
-    System.out.println("Tie in round " + round + " for these candidateIDs, each of whom has " + numVotes + " votes:");
+    System.out.println(
+      "Tie in round " + round + " for these candidateIDs, each of whom has " + numVotes + " votes:"
+    );
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i+1) + ". " + tiedCandidates.get(i));
     }
+    System.out.println(
+      "Enter the number corresponding to the candidate who should lose this tiebreaker."
+    );
     Console c = System.console();
-    System.out.println("Enter the number corresponding to the candidate who should lose this tiebreaker.");
     String selectedCandidate = null;
     while (selectedCandidate == null) {
       String line = c.readLine();
@@ -106,11 +110,14 @@ class TieBreak {
         int choice = Integer.parseInt(line);
         if (choice >= 1 && choice <= tiedCandidates.size()) {
           explanation = "The loser was supplied by the operator.";
+          // Convert from 1-indexed list back to 0-indexed list.
           selectedCandidate = tiedCandidates.get(choice - 1);
         }
       } catch (NumberFormatException e) {
       }
-      System.out.println("Invalid selection. Please try again.");
+      if (selectedCandidate == null) {
+        System.out.println("Invalid selection. Please try again.");
+      }
     }
     return selectedCandidate;
   }
@@ -135,7 +142,8 @@ class TieBreak {
       int minVotes = countToCandidates.firstKey();
       LinkedList<String> candidatesWithLowestTotal = countToCandidates.get(minVotes);
       if (candidatesWithLowestTotal.size() == 1) {
-        explanation = "The loser had the fewest votes (" + minVotes + ") in round " + roundToCheck + ".";
+        explanation =
+          "The loser had the fewest votes (" + minVotes + ") in round " + roundToCheck + ".";
         selected = candidatesWithLowestTotal.getFirst();
         break;
       } else {

@@ -52,5 +52,4 @@ public class RawElectionConfig {
   public List<CVRSource> cvr_file_sources;
 
   RawElectionConfig() {}
-
 }

@@ -42,7 +42,9 @@ public class ResultsWriter {
     return this;
   }
 
-  public ResultsWriter setCandidatesToRoundEliminated(Map<String, Integer> candidatesToRoundEliminated) {
+  public ResultsWriter setCandidatesToRoundEliminated(
+    Map<String, Integer> candidatesToRoundEliminated
+  ) {
     this.candidatesToRoundEliminated = candidatesToRoundEliminated;
     return this;
   }
@@ -105,13 +107,14 @@ public class ResultsWriter {
       roundToCandidatesEliminated.get(round).add(candidate);
     }
 
-    // get a list of all candidates sorted by their first round tally -- that determines the display order
+    // Get a list of all candidates sorted by their first round tally. This determines the display
+    // order.
     Map<String, Integer> firstRoundTally = roundTallies.get(1);
     List<String> sortedCandidates = sortTally(firstRoundTally);
 
     // build map of total votes cast in each round -- this will be used to calculate
     // the percentage of total votes each candidate achieves
-    Map<Integer, Integer> totalActiveVotesPerRound = new HashMap<Integer, Integer>();
+    Map<Integer, Integer> totalActiveVotesPerRound = new HashMap<>();
     for (int round = 1; round <= numRounds; round++) {
       Map<String, Integer> tally = roundTallies.get(round);
       int total = 0;
@@ -200,7 +203,8 @@ public class ResultsWriter {
     Cell actionCell = actionRow.createCell(((numRounds*COLUMNS_PER_ROUND)+1));
     actionCell.setCellValue("Winner");
 
-    // create a row for votes redistributed total -- we will fill it in after we tabulate all the candidates' data
+    // Create a row for the number of votes redistributed per round. We'll fill it in after we
+    // tabulate all the candidates' data.
     org.apache.poi.ss.usermodel.Row votesRedistributedRow = worksheet.createRow(rowCounter++);
     Cell votesRedistributedHeaderCell = votesRedistributedRow.createCell(0);
     votesRedistributedHeaderCell.setCellValue("Votes redistributed");
@@ -226,7 +230,8 @@ public class ResultsWriter {
 
     org.apache.poi.ss.usermodel.Row specialCasesHeaderRow = null;
     // Candidate votes [total, delta, percentage]
-    // for each candidate: for each round: output total votes, delta votes, and final vote percentage of total
+    // For each candidate: for each round: output total votes, delta votes, and final vote
+    // percentage of total.
     for (String candidate : sortedCandidates) {
       if (candidate.equals(undeclaredWriteInString)) {
         specialCasesHeaderRow = worksheet.createRow(rowCounter++);
@@ -298,7 +303,8 @@ public class ResultsWriter {
       int round = isFinalResults ? numRounds : displayRound;
       int thisRoundExhausted = 0;
       int deltaExhausted = 0;
-      // exhausted count is the difference between the total votes in round 1 and total votes in current round
+      // Exhausted count is the difference between the total votes in round 1 and the total votes in
+      // the current round.
       if (round > 1) {
         thisRoundExhausted = totalActiveVotesFirstRound - totalActiveVotesPerRound.get(round);
         int prevRoundExhausted = totalActiveVotesFirstRound - totalActiveVotesPerRound.get(round - 1);
@@ -308,8 +314,8 @@ public class ResultsWriter {
         votesRedistributedEachRound[round] += deltaExhausted;
       }
 
-      // exhausted votes as percentage of ALL votes (note: this differs from the candidate vote percentages
-      // which are percentage of ACTIVE votes for the given round
+      // Exhausted votes as percentage of ALL votes (note: this differs from the candidate vote
+      // percentage, which are the percentage of ACTIVE votes for the given round.
       float percentage = ((float)thisRoundExhausted / (float)totalActiveVotesFirstRound) * 100f;
 
       // xls output
