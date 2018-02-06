@@ -84,7 +84,7 @@ public class Main {
       // do the tabulation
       tabulator.tabulate();
       // generate the visualizer spreadsheet data
-      tabulator.generateSummarySpreadsheet(config.visualizerOutput());
+      tabulator.generateSummarySpreadsheet();
       // generate audit data
       tabulator.doAudit(castVoteRecords);
     } catch (Exception e) {

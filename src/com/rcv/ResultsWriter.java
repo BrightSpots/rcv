@@ -1,47 +1,53 @@
+/**
+ * Created by Jonathan Moldover on 7/8/17
+ * Copyright 2018 Bright Spots
+ * Helper class takes tabulation results data as input and generates results xls file which
+ * contains results summary information.
+ * Currently we support an xlsx spreadsheet which can be visualized in a web browser
+ * Version: 1.0
+ */
+
 package com.rcv;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * Created by Jon Moldover on 9/4/17.
- *
- * Helper class takes tabulation results data as input and generates results file
- * Currently we support an xlsx spreadsheet which can be visualized in a web browser
- *
- */
 public class ResultsWriter {
-
+  // number of round needed to declare a winner
   private int numRounds;
+  // map of round to map of candidateID to tally
   private Map<Integer, Map<String, Integer>> roundTallies;
+  // map of candidate to round in which they were eliminated
   private Map<String, Integer> candidatesToRoundEliminated;
-  private String outputFilePath;
-  private String contestName;
-  private String jurisdiction;
-  private String office;
-  private String electionDate;
-  private int numCandidates;
-  private String undeclaredWriteInString;
+  // the winning candidateID
   private String winner;
+  // configuration file in use for this election
   private ElectionConfig config;
-
+  // function: setNumRound
+  // purpose: setter for total number of rounds to declare a winner
+  // param: numRounds total number of rounds to declare a winner
   public ResultsWriter setNumRounds(int numRounds) {
     this.numRounds = numRounds;
     return this;
   }
 
+  // function: setRoundTallies
+  // purpose: setter for round to tally object
+  // param: roundTallies map of round to map of candidateID to their tally for that round
   public ResultsWriter setRoundTallies(Map<Integer, Map<String, Integer>> roundTallies) {
     this.roundTallies = roundTallies;
     return this;
   }
 
+  // function: setCandidatesToRoundEliminated
+  // purpose: setter for map of candidateID to round in which they were eliminated
+  // param: candidatesToRoundEliminated map of candidateID to round in which they were eliminated
   public ResultsWriter setCandidatesToRoundEliminated(
     Map<String, Integer> candidatesToRoundEliminated
   ) {
@@ -51,41 +57,6 @@ public class ResultsWriter {
 
   public ResultsWriter setElectionConfig(ElectionConfig config) {
     this.config = config;
-    return this;
-  }
-
-  public ResultsWriter setOutputFilePath(String outputFilePath) {
-    this.outputFilePath = outputFilePath;
-    return this;
-  }
-
-  public ResultsWriter setContestName(String contestName) {
-    this.contestName = contestName;
-    return this;
-  }
-
-  public ResultsWriter setJurisdiction(String jurisdiction) {
-    this.jurisdiction = jurisdiction;
-    return this;
-  }
-
-  public ResultsWriter setOffice(String office) {
-    this.office = office;
-    return this;
-  }
-
-  public ResultsWriter setElectionDate(String electionDate) {
-    this.electionDate = electionDate;
-    return this;
-  }
-
-  public ResultsWriter setNumCandidates(int numCandidates) {
-    this.numCandidates = numCandidates;
-    return this;
-  }
-
-  public ResultsWriter setUndeclaredWriteInString(String undeclaredWriteInString) {
-    this.undeclaredWriteInString = undeclaredWriteInString;
     return this;
   }
 
@@ -126,7 +97,8 @@ public class ResultsWriter {
 
     // create the workbook and worksheet
     XSSFWorkbook workbook = new XSSFWorkbook();
-    XSSFSheet worksheet = workbook.createSheet(jurisdiction + " " + office);
+    XSSFSheet worksheet = workbook.createSheet(config.jurisdiction() + " "
+        + config.office());
 
     ////////////////////////////
     // Global Header
@@ -233,7 +205,7 @@ public class ResultsWriter {
     // For each candidate: for each round: output total votes, delta votes, and final vote
     // percentage of total.
     for (String candidate : sortedCandidates) {
-      if (candidate.equals(undeclaredWriteInString)) {
+      if (candidate.equals(config.undeclaredWriteInLabel())) {
         specialCasesHeaderRow = worksheet.createRow(rowCounter++);
         populateSpecialCasesHeaderRow(specialCasesHeaderRow);
       }
@@ -370,12 +342,12 @@ public class ResultsWriter {
 
     // write xls to disk
     try {
-      FileOutputStream outputStream = new FileOutputStream(outputFilePath);
+      FileOutputStream outputStream = new FileOutputStream(config.visualizerOutput());
       workbook.write(outputStream);
       outputStream.close();
     } catch (IOException e) {
       e.printStackTrace();
-      Logger.log("failed to write " + outputFilePath + " to disk!");
+      Logger.log("failed to write " + config.visualizerOutput() + " to disk!");
     }
   }
 
@@ -394,10 +366,10 @@ public class ResultsWriter {
       {"Date/time or version", "Updated " + dateString, false},
       {"Contest information", null, false},
       {"Enter information about the contest as it will be displayed", null, false},
-      {"Contest name", contestName, false},
-      {"Jurisdiction name", jurisdiction, false},
-      {"Office name", office, false},
-      {"Election date", electionDate, false},
+      {"Contest name", config.contestName(), false},
+      {"Jurisdiction name", config.jurisdiction(), false},
+      {"Office name", config.office(), false},
+      {"Election date", config.electionDate(), false},
       {null, null, false},
       {"Counting information", null, false},
       {"Details of the tally to be used in the display screens", null, false},
@@ -411,7 +383,7 @@ public class ResultsWriter {
       {"Tally detail", null, false},
       {"Single/multi winner", "single-winner", false},
       {"Number to be elected", 1, true},
-      {"Number of candidates", numCandidates, true},
+      {"Number of candidates", config.numCandidates(), true},
       {"Number of votes cast", totalActiveVotesFirstRound, true},
       {"Undervotes", 0, true},
       {"Total # of rounds", totalActiveVotesPerRound.size(), true},
@@ -444,9 +416,9 @@ public class ResultsWriter {
     Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
       public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
         int ret;
-        if (o1.getKey().equals(undeclaredWriteInString)) {
+        if (o1.getKey().equals(config.undeclaredWriteInLabel())) {
           ret = 1;
-        } else if (o2.getKey().equals(undeclaredWriteInString)) {
+        } else if (o2.getKey().equals(config.undeclaredWriteInLabel())) {
           ret = -1;
         } else {
           ret = (o2.getValue()).compareTo(o1.getValue());

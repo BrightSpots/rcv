@@ -111,7 +111,7 @@ public class Tabulator {
   public void tabulate() throws Exception {
 
     log("Beginning tabulation for contest.");
-    log("There are %d candidates for this contest:", numCandidates());
+    log("There are %d candidates for this contest:", config.numCandidates());
     for (String candidateID : candidateIDs) {
       log("%s", candidateID);
     }
@@ -355,19 +355,12 @@ public class Tabulator {
   // purpose: create a spreadsheet with the tabulation results summary which can be used
   // to visualize the tabulation
   // param: outputFile path to write the output file to
-  public void generateSummarySpreadsheet(String outputFile) {
+  public void generateSummarySpreadsheet() {
     // writer object will create the output xls
     ResultsWriter writer = new ResultsWriter().
       setNumRounds(currentRound).
       setRoundTallies(roundTallies).
       setCandidatesToRoundEliminated(candidateToRoundEliminated).
-      setOutputFilePath(outputFile).
-      setContestName(config.contestName()).
-      setJurisdiction(config.jurisdiction()).
-      setOffice(config.office()).
-      setElectionDate(config.electionDate()).
-      setNumCandidates(numCandidates()).
-      setUndeclaredWriteInString(config.undeclaredWriteInLabel()).
       setWinner(winner).
       setElectionConfig(config);
 
@@ -549,20 +542,18 @@ public class Tabulator {
       if (cvr.isExhausted()) {
         continue;
       }
-      // rankings for this cvr sorted from most preferred to least
-      // (a set is used to accommodate overvotes)
-      SortedMap<Integer, Set<String>> rankToCandidateIDs = cvr.sortedRankings();
       // if this cvr has no continuing candidate exhaust it
-      if (!hasContinuingCandidates(rankToCandidateIDs, candidateToRoundEliminated)) {
+      if (!hasContinuingCandidates(cvr.rankToCandidateIDs, candidateToRoundEliminated)) {
         cvr.exhaust(currentRound, "no continuing candidates");
         continue;
       }
 
       Integer lastRank = null;
-
-      for (int rank : rankToCandidateIDs.keySet()) {
-        // loop over the rankings within one cvr
-        Set<String> candidateIDSet = rankToCandidateIDs.get(rank);
+      // loop over all rankings in this cvr from most preferred to least and see how they will
+      // be applied
+      for (int rank : cvr.rankToCandidateIDs.keySet()) {
+        // consider the candidates selected at each rank
+        Set<String> candidateIDSet = cvr.rankToCandidateIDs.get(rank);
 
         // store result from overvote decision to branch on it
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidateIDSet, candidateToRoundEliminated);
@@ -609,16 +600,6 @@ public class Tabulator {
     } // end looping over all ballots
 
     return roundTally;
-  }
-
-
-  private int numCandidates() {
-    int num = candidateIDs.size();
-    if (config.undeclaredWriteInLabel()!= null &&
-      candidateIDs.contains(config.undeclaredWriteInLabel())) {
-      num--;
-    }
-    return num;
   }
 
   public void doAudit(List<CastVoteRecord> castVoteRecords) {

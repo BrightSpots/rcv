@@ -16,8 +16,11 @@ import java.io.IOException;
 public class JsonParser {
 
   // purpose: parse input json file path into an object of the specified type
-  // jsonFilePath: path to json file to be parsed into java
-  // valueType: class of the object to be created from parsed json
+  // param: jsonFilePath path to json file to be parsed into java
+  // param: valueType class of the object to be created from parsed json
+  // throws: JsonParseException | JsonMappingException if there was a problem mapping json data
+  // throws: IOException if there was a problem reading the file
+  // file access: read
   // returns: instance of the object parsed from json
   public static <T> T parseObjectFromFile(
     String jsonFilePath, Class<T> valueType
