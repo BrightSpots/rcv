@@ -55,39 +55,54 @@ public class ResultsWriter {
     return this;
   }
 
+  // function: setElection config
+  // purpose: setter for ElectionConfig object
+  // param: config the ElectionConfig object to use when writing results
   public ResultsWriter setElectionConfig(ElectionConfig config) {
     this.config = config;
     return this;
   }
 
+  // function: setWinner
+  // purpose: setter for the winning candidate ID
+  // param: winner the winning candidate ID
   public ResultsWriter setWinner(String winner) {
     this.winner = winner;
     return this;
   }
 
-  // takes tabulation round tallies and generates a spreadsheet from them
+  // function: generateSummarySpreadsheet
+  // purpose: creates the summary spreadsheet xls file
   public void generateSummarySpreadsheet() {
     // some pre-processing on the tabulation data:
-    // invert candidatesToRoundEliminated map so we can lookup who got eliminated for each round
-    Map<Integer, List<String>> roundToCandidatesEliminated = new HashMap<Integer, List<String>>();
+    // roundToCandidatesEliminated map is the inverse of candidatesToRoundEliminated map
+    // so we can lookup who got eliminated for each round
+    Map<Integer, List<String>> roundToCandidatesEliminated = new HashMap<>();
+    // candidate is used for indexing over all candidates in candidatesToRoundEliminated
     for (String candidate : candidatesToRoundEliminated.keySet()) {
+      // round is the current candidate round of elimination
       int round = candidatesToRoundEliminated.get(candidate);
+      // create a new entry for this round if needed
       if (roundToCandidatesEliminated.get(round) == null) {
-        roundToCandidatesEliminated.put(round, new LinkedList<String>());
+        roundToCandidatesEliminated.put(round, new LinkedList<>());
       }
       roundToCandidatesEliminated.get(round).add(candidate);
     }
 
-    // Get a list of all candidates sorted by their first round tally. This determines the display
-    // order.
+    // Get all candidates sorted by their first round tally. This determines the display order.
+    // container for firstRoundTally
     Map<String, Integer> firstRoundTally = roundTallies.get(1);
+    // candidates sorted by first round tally
     List<String> sortedCandidates = sortTally(firstRoundTally);
 
-    // build map of total votes cast in each round -- this will be used to calculate
-    // the percentage of total votes each candidate achieves
+    // totalActiveVotesPerRound is a map of total votes cast in each round
+    // this will be used to calculate the percentage of total votes each candidate achieves
     Map<Integer, Integer> totalActiveVotesPerRound = new HashMap<>();
+    // round is index for iterating all rounds
     for (int round = 1; round <= numRounds; round++) {
+      // tally is the tally for the current round
       Map<String, Integer> tally = roundTallies.get(round);
+      // total will contain total votes for this candidate in this round
       int total = 0;
       for (int votes : tally.values()) {
         total += votes;
@@ -95,37 +110,37 @@ public class ResultsWriter {
       totalActiveVotesPerRound.put(round, total);
     }
 
-    // create the workbook and worksheet
+    // create the output workbook
     XSSFWorkbook workbook = new XSSFWorkbook();
+    // create the output worksheet
     XSSFSheet worksheet = workbook.createSheet(config.jurisdiction() + " "
         + config.office());
 
-    ////////////////////////////
-    // Global Header
-    /////////////////////////
+    // rowCounter contains the next empty row after all header rows have been created
+    // this is where we start adding the round-by-round reports
     int rowCounter = addHeaderRows(worksheet, totalActiveVotesPerRound);
 
-    /////////////////////////////////////
-    // Round-by-round reports
-    /////////////////////////////////////
-
     // each round has three pieces of data for each candidate row:
-    // - change in votes from previous round
-    // - total votes in current round
-    // - percentage of total active votes
+    //   change in votes from previous round
+    //   total votes in current round
+    //   percentage of total active votes
     int COLUMNS_PER_ROUND = 3;
 
-    // column indexes are computed for all cells in the output xlsx spreadsheet
-    // columnIndex is (round - 1) because rounds are 1-based (cells are 0-based)
-    // columnIndex is offset by 1 to account for row "headers" which are the candidate names
+    // column indexes are computed for all cells as we create the output xlsx spreadsheet
     int columnIndex;
 
-    // Headers for each round
+    // Round headers:
+    // headerRow1 is the row for round headers
     org.apache.poi.ss.usermodel.Row headerRow1 = worksheet.createRow(rowCounter++);
+    // the round header title cell will be used to create all the round headers
     Cell roundTitleHeaderCell = headerRow1.createCell(0);
     roundTitleHeaderCell.setCellValue("Round Title");
+    // round indexes from 1 to rounds+1 to include a "final results" column
     for (int round = 1; round <= numRounds+1; round++) {
+      // columnIndex = round - 1 (rounds are 1-based cells are 0-based)
+      // columnIndex is offset by 1 to account for row headers
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
+      // label string will have the actual text which goes in the cell
       String label;
       if(round == 1) {
         label = "Initial Count";
