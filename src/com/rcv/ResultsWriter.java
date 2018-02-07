@@ -497,15 +497,18 @@ public class ResultsWriter {
   }
 
   // function: sortCandidatesByTally
-  // purpose: given a map of candidates to their tally return a list of all input candidates
+  // purpose: given a map of candidates to tally return a list of all input candidates
   // sorted from highest tally to lowest
   // param: tally map of candidateID to tally
   // return: list of all input candidates sorted from highest tally to lowest
   private List<String> sortCandidatesByTally(Map<String, Integer> tally) {
+    // entries will contain all the input tally entries in sorted order
     List<Map.Entry<String, Integer>> entries =
-        new LinkedList<>(tally.entrySet());
+        new ArrayList<>(tally.entrySet());
+    // anonymous custom comparator will sort undeclared write in candidates to last place
     Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
       public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+        // result of the comparison
         int ret;
         if (o1.getKey().equals(config.undeclaredWriteInLabel())) {
           ret = 1;
@@ -517,7 +520,9 @@ public class ResultsWriter {
         return ret;
       }
     });
+    // container list for the final results
     List<String> sortedCandidates = new LinkedList<>();
+    // index over all entries
     for (Map.Entry<String, Integer> entry : entries) {
       sortedCandidates.add(entry.getKey());
     }
