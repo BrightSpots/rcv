@@ -207,6 +207,7 @@ public class Tabulator {
           break;
         }
       }
+      // TODO: this is not logging winner correctly
       log("%s won in round %d with %d votes.", winner, currentRound, maxVotes);
     }
     return selectedWinner;

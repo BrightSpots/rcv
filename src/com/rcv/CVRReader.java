@@ -26,7 +26,7 @@ public class CVRReader {
   // param: excelFilePath path to location of input cast vote record file
   // param: firstVoteColumnIndex the 0-based index where rankings begin for this ballot style
   // prarm: allowableRanks how many ranks are allowed for each cast vote record
-  // param: candidateIDs list of all declared candidates' IDs
+  // param: candidateIDs list of all declared candidate IDs
   // param: config an ElectionConfig object specifying rules for interpreting cvr file data
   public void parseCVRFile(
     String excelFilePath,
@@ -38,7 +38,7 @@ public class CVRReader {
     // contestSheet contains all the cvr data we will be parsing
     Sheet contestSheet = getFirstSheet(excelFilePath);
     if (contestSheet == null) {
-      // TODO: this should probably throw
+      // TODO: getFirstSheet should probably throw and be caught by our caller
       Logger.log("invalid RCV format: could not obtain ballot data.");
       System.exit(1);
     }
@@ -48,7 +48,7 @@ public class CVRReader {
     Iterator<org.apache.poi.ss.usermodel.Row> iterator = contestSheet.iterator();
     // headerRow contains the first row
     org.apache.poi.ss.usermodel.Row headerRow = iterator.next();
-    // we require at least one row
+    // require at least one row
     if (headerRow == null || contestSheet.getLastRowNum() < 2) {
       Logger.log("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
       // TODO: this should probably throw
@@ -81,7 +81,7 @@ public class CVRReader {
         } else if(cvrDataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
           // parsed numeric data
           double doubleValue = cvrDataCell.getNumericCellValue();
-          // convert back to a string (we only store String data from cvr files)
+          // convert back to String (we only store String data from cvr files)
           fullCVRData.add(Double.toString(doubleValue));
         } else if (cvrDataCell.getCellType() == Cell.CELL_TYPE_STRING) {
           fullCVRData.add(cvrDataCell.getStringCellValue());
@@ -112,7 +112,7 @@ public class CVRReader {
             Logger.log("unexpected cell type at ranking %d ballot %f", rank, castVoteRecordID);
             continue;
           }
-          // TODO: how are overvotes parsed?  
+          // TODO: how are overvotes input / parsed?
           candidate = cvrDataCell.getStringCellValue().trim();
 
           if (candidate.equals(config.undervoteLabel())) {
@@ -143,17 +143,18 @@ public class CVRReader {
   // file access: read
   // returns: the first xls sheet object in the file or null if there was a problem
   private static Sheet getFirstSheet(String excelFilePath) {
-    // container for function results
+    // container for result
     Sheet firstSheet = null;
     try {
-      // inputStream is used to parse file data into memory
+      // inputStream for parsing file data into memory
       FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
-      // excel workbook object allows access to sheet objects it contains
+      // excel workbook object to access to sheet objects it contains
       Workbook workbook = new XSSFWorkbook(inputStream);
       firstSheet = workbook.getSheetAt(0);
       inputStream.close();
       workbook.close();
     } catch (IOException ex) {
+      // TODO: throw
       Logger.log("failed to process CVR file: %s, %s", excelFilePath, ex.getMessage());
     }
     return firstSheet;

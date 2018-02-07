@@ -13,24 +13,23 @@ class TieBreak {
   Tabulator.TieBreakMode tieBreakMode;
   // round in which this tiebreak occurred
   int round;
-  // number of votes tying candidates received
+  // number of votes the tying candidates received
   int numVotes;
-  // roundTallies is a map from round number to a map from candidate ID to vote total for the round
-  // e.g. roundTallies[1] contains a map of candidate IDs to votes for each candidate in round 1
+  // roundTallies: map from round number to map of candidate ID to vote total (for that round)
+  // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
   Map<Integer, Map<String, Integer>> roundTallies;
-  // candidate ID selected to lose
+  // candidate ID selected to lose the tiebreak
   String loser;
-  // reason for the loser
+  // reason for the selection
   String explanation;
 
   // function: TieBreak
-  // purpose: TieBreak constructor will store data for the tiebreak and select a loser
+  // purpose: TieBreak constructor stores member data and selects the loser
   // param: tiedCandidates list of all candidate IDs tied at this vote total
   // param: tieBreakMode rule to use for selecting the loser
   // param: round in which this tie occurs
   // param: numVotes tally of votes for tying candidates
-  // param: roundTallies map from round number to a map from candidate ID to vote
-  //  total for the round
+  // param: roundTallies map from round number to map of candidate ID to vote total (for that round)
   // return newly constructed TieBreak object
   TieBreak(
     List<String> tiedCandidates,
@@ -46,26 +45,34 @@ class TieBreak {
     this.roundTallies = roundTallies;
     this.loser = breakTie();
   }
-  
+
+  // function: nonLosingCandidateDescription
+  // purpose: generate a string listing candidate(s) not selected to lose this tiebreak
+  // return: string listing candidate(s) note selected to lose
   String nonLosingCandidateDescription() {
+    // options: container for non selected candidate IDs
     ArrayList<String> options = new ArrayList<>();
+    // contestOptionId indexes over tied candidates
     for (String contestOptionId : tiedCandidates) {
       if (!contestOptionId.equals(loser)) {
         options.add(contestOptionId);
       }
     }
+    // container for results
     String nonselected;
     if (options.size() == 1) {
       nonselected = options.get(0);
     } else if (options.size() == 2) {
       nonselected = options.get(0) + " and " + options.get(1);
     } else {
-      StringBuilder sb = new StringBuilder();
+      // stringbuilder for faster string construction
+      StringBuilder stringBuilder = new StringBuilder();
+      // i indexes over all candidates
       for (int i = 0; i < options.size() - 1; i++) {
-        sb.append(options.get(i)).append(", ");
+        stringBuilder.append(options.get(i)).append(", ");
       }
-      sb.append("and ").append(options.get(options.size() - 1));
-      nonselected = sb.toString();
+      stringBuilder.append("and ").append(options.get(options.size() - 1));
+      nonselected = stringBuilder.toString();
     }
     return nonselected;
   }
@@ -84,10 +91,10 @@ class TieBreak {
         losingCandidate = doRandom();
         break;
       default:
-        // TODO: rewrite this 
+        // TODO: rewrite this with explicit case labels
         // handle tiebreaks which involve previous round tallies
 
-        // loser will be set if there is a previous round count loser
+        // loser: will be set if there is a previous round count loser
         // it will be null if candidates were still tied at first round
         String loser = doPreviousRounds();
         if (loser != null) {
@@ -108,6 +115,7 @@ class TieBreak {
     System.out.println(
       "Tie in round " + round + " for the following candidateIDs each of whom has " + numVotes + " votes:"
     );
+    // i: index over tied candidates
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i+1) + ". " + tiedCandidates.get(i));
     }
@@ -117,10 +125,10 @@ class TieBreak {
     // the candidate selected to lose
     String selectedCandidate = null;
     while (selectedCandidate == null) {
-      // whatever the user entered in console
+      // container for user console input
       String userInput = System.console().readLine();
       try {
-        // user loser parsed to int
+        // user selected loser parsed to int
         int choice = Integer.parseInt(userInput);
         if (choice >= 1 && choice <= tiedCandidates.size()) {
           explanation = "The losing candidate was supplied by the operator.";
@@ -161,7 +169,7 @@ class TieBreak {
     String loser = null;
     // round indexes from the previous round back to round 1
     for (int round = this.round - 1; round > 0; round--) {
-      // map of tally to candidate(s) for the round under consideration
+      // map of tally to candidate IDs for round under consideration
       SortedMap<Integer, LinkedList<String>> tallyToCandidates = Tabulator.buildTallyToCandidates(
         roundTallies.get(round),
         candidatesInContention,

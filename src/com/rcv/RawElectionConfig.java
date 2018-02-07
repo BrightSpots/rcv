@@ -1,8 +1,8 @@
 /**
  * Created by Jonathan Moldover on 7/8/17
  * Copyright 2018 Bright Spots
- * Purpose: RawElectionConfig is used to map json configuration file into Java objects
- * This class is simply a container and contains no logic.
+ * Purpose: RawElectionConfig defines the data model used for an election configuration.
+ * It is used by JsonParser to map json configuration files into Java objects.
  * We use jackson json parser with annotations below to facilitate parsing (see JsonParser.java)
  * Version: 1.0
  */
@@ -15,8 +15,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawElectionConfig {
 
-  // ElectionRules object encapsulates the set of rules required to perform election tabulation
+  // ElectionRules: encapsulates the set of rules required to perform election tabulation
   // See Tabulator.java for more info on rules enums
+  // Note: all jackson parsed variables names must match name exactly
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class ElectionRules {
@@ -42,10 +43,10 @@ public class RawElectionConfig {
     public Boolean treat_blank_as_uwi;
   }
 
-  // CVRSource encapsulates a source cast vote record file
+  // CVRSource: encapsulates a source cast vote record file
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class CVRSource {
-    // provider for this source (e.g. ES&S)
+    // provider for this source e.g. "ES&S"
     public String provider;
     // path to the file on disk
     public String file_path;
@@ -53,7 +54,7 @@ public class RawElectionConfig {
     public Integer first_vote_column_index;
   }
 
-  // Candidate object contains a full candidate name and optionally a candidate ID
+  // Candidate: contains a full candidate name and optionally a candidate ID
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Candidate {
     // full candidate name
@@ -79,10 +80,9 @@ public class RawElectionConfig {
   // rules object
   public ElectionRules rules;
 
-
-  // list of all Candidates in this config
+  // list of all Candidates
   public List<Candidate> candidates;
-  // list of all cast vote record source files in this config
+  // list of all cast vote record source files
   public List<CVRSource> cvr_file_sources;
 
   // function: RawElectionConfig

@@ -19,8 +19,9 @@ import java.util.List;
 
 public class Main {
 
+  // function: main
   // purpose: main entry point to the rcv tabulator program
-  // args: command line argument array
+  // param: args command line argument array
   public static void main(String[] args) {
     // validate at least one arg passed in
     if(args.length < 1) {
@@ -32,7 +33,7 @@ public class Main {
     try {
       // parse raw config
       rawConfig = JsonParser.parseObjectFromFile(args[0], RawElectionConfig.class);
-    } catch (Exception e) {
+    } catch (Exception exception) {
       System.err.print("Error parsing config file.  Exiting");
       System.exit(1);
     }
@@ -43,8 +44,9 @@ public class Main {
       Logger.setup(config.auditOutput());
       Logger.log("parsed config file:%s", args[0]);
       Logger.log("logging to:%s", config.auditOutput());
-    } catch (IOException e) {
-      System.err.print(String.format("failed to configure logging output: %s",e.toString()));
+    } catch (IOException exception) {
+      System.err.print(String.format("failed to configure logging output: %s",
+          exception.toString()));
       System.err.print("Exiting");
       System.exit(1);
     }
@@ -54,9 +56,10 @@ public class Main {
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     // at each iteration of the following loop we add records from another source file
+    // source: index over config sources
     for (RawElectionConfig.CVRSource source : rawConfig.cvr_file_sources) {
       Logger.log("reading cvr file:%s provider:%s",source.file_path, source.provider);
-      // reader does the work of reading an input file into a list of cast vote records
+      // reader: read input file into a list of cast vote records
       CVRReader reader = new CVRReader();
       reader.parseCVRFile(
         source.file_path,
@@ -73,11 +76,8 @@ public class Main {
 
     // tabulate the election results
 
-    // tabulator object handles high-level logic of tabulating the election
-    Tabulator tabulator = new Tabulator(
-      castVoteRecords,
-      config
-    );
+    // tabulator: handles most tabulation logic
+    Tabulator tabulator = new Tabulator(castVoteRecords, config);
     try {
       // TODO: break these steps into separate try / catch blocks and provide error messages
       

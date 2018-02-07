@@ -18,9 +18,9 @@ public class ElectionConfig {
   // underlying rawConfig object data
   RawElectionConfig rawConfig;
   // list of all declared candidate codes
-  private ArrayList<String> mCandidateCodeList = null;
+  private ArrayList<String> candidateCodeList;
   // mapping from candidate code to full name
-  private Map<String, String> mCandidateCodeToNameMap = null;
+  private Map<String, String> candidateCodeToNameMap;
 
   // function: ElectionConfig
   // purpose: create a new ElectionConfig object
@@ -32,7 +32,7 @@ public class ElectionConfig {
 
   // function: auditOutput
   // purpose: getter for auditOutput
-  // returns: path to write audit output file
+  // returns: path to audit output file
   public String auditOutput() {
     return rawConfig.audit_output;
   }
@@ -46,28 +46,28 @@ public class ElectionConfig {
 
   // function: contestName
   // purpose: getter for contestName
-  // returns: contest name string
+  // returns: contest name
   public String contestName() {
     return rawConfig.contest_name;
   }
 
   // function: jurisdiction
   // purpose: getter for jurisdiction
-  // returns: jurisdiction name string
+  // returns: jurisdiction name
   public String jurisdiction() {
     return rawConfig.jurisdiction;
   }
 
   // function: office
   // purpose: getter for office
-  // returns: office name string
+  // returns: office name
   public String office() {
     return rawConfig.office;
   }
 
   // function: electionDate
   // purpose: getter for electionDate
-  // returns: election date string
+  // returns: election date
   public String electionDate() {
     return rawConfig.date;
   }
@@ -81,7 +81,7 @@ public class ElectionConfig {
 
   // function: description
   // purpose: getter for description
-  // returns: description of this rules configuration
+  // returns: description
   public String description() {
     return rawConfig.rules.description;
   }
@@ -95,8 +95,7 @@ public class ElectionConfig {
 
   // function: overvoteRuleForConfigSetting
   // purpose: given setting String return the corresponding rules enum
-  // param: setting string read from election config corresponding to the OvervoteRule enum value
-  // we will use for handling overvotes
+  // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
   static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
     // rule: return value determined by input setting string
@@ -109,6 +108,7 @@ public class ElectionConfig {
         rule = Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY;
         break;
       default:
+        // TODO: throw and handle with helpful output
         Logger.log("Unrecognized overvote rule setting:%s", setting);
         System.exit(1);
     }
@@ -117,11 +117,10 @@ public class ElectionConfig {
 
   // function: tieBreakModeForConfigSetting
   // purpose: given setting string return corresponding rule enum
-  // param: setting string read from election config corresponding to the TieBreakMode enum value
-  // we will use for tiebreaks
+  // param: TieBreakMode setting string read from election config
   // returns: TieBreakMode enum value for the input setting string
   static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
-    // mode: will contain the return value determined by input setting string
+    // mode: return value determined by input setting string
     Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.MODE_UNKNOWN;
     switch (setting) {
       case "random":
@@ -137,6 +136,7 @@ public class ElectionConfig {
         mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
         break;
       default:
+        // TODO: throw and handle with helpful output
         Logger.log("Unrecognized tiebreaker mode rule setting: %s", setting);
         System.exit(1);
     }
@@ -148,17 +148,17 @@ public class ElectionConfig {
   // returns: the number of declared candidates from the election configuration
   public int numCandidates() {
     // num will contain the resulting number of candidates
-    int num = mCandidateCodeList.size();
+    int num = candidateCodeList.size();
     if (undeclaredWriteInLabel()!= null &&
-        mCandidateCodeList.contains(undeclaredWriteInLabel())) {
+        candidateCodeList.contains(undeclaredWriteInLabel())) {
       num--;
     }
     return num;
   }
 
   // function: overvoteRule
-  // purpose: return overvote rule to use
-  // returns: overvote rule to use for this election
+  // purpose: return overvote rule enum to use
+  // returns: overvote rule to use for this config
   public Tabulator.OvervoteRule overvoteRule() {
     // by default we exhaust immediately
     return rawConfig.rules.overvote_rule == null ?
@@ -167,43 +167,43 @@ public class ElectionConfig {
   }
 
   // function: minimumVoteThreshold
-  // purpose: return minimumVoteThreshold rule to use
-  // returns: minimum vote threshold to use for this election
+  // purpose: getter for minimumVoteThreshold rule
+  // returns: minimum vote threshold to use for this config
   public Integer minimumVoteThreshold() {
     return rawConfig.rules.minimum_vote_threshold;
   }
 
   // function: maxSkippedRanksAllowed
-  // purpose: return maxSkippedRanksAllowed rule to use
-  // returns: max skipped ranks allowed in this election
+  // purpose: getter for maxSkippedRanksAllowed rule
+  // returns: max skipped ranks allowed in this config
   public Integer maxSkippedRanksAllowed() {
     return rawConfig.rules.max_skipped_ranks_allowed;
   }
 
   // function: undeclaredWriteInLabel
-  // purpose: return UWI label to use
-  // returns: overvote rule to use for this election
+  // purpose: getter for UWI label
+  // returns: overvote rule for this config
   public String undeclaredWriteInLabel() {
     return rawConfig.rules.undeclared_write_in_label;
   }
 
   // function: overvoteLabel
-  // purpose: return overvote label rule to use
-  // returns: overvote label to use for this election
+  // purpose: getter for overvote label rule
+  // returns: overvote label for this config
   public String overvoteLabel() {
     return rawConfig.rules.overvote_label;
   }
 
   // function: undervoteLabel
-  // purpose: return undervote label to use
-  // returns: undervote label to use for this election
+  // purpose: getter for undervote label
+  // returns: undervote label for this config
   public String undervoteLabel() {
     return rawConfig.rules.undervote_label;
   }
 
   // function: tiebreakMode
   // purpose: return tiebreak mode to use
-  // returns: tiebreak mode to use for this election
+  // returns: tiebreak mode to use for this config
   public Tabulator.TieBreakMode tiebreakMode() {
     // by default we use random tiebreak
     return rawConfig.rules.tiebreak_mode == null ?
@@ -212,7 +212,7 @@ public class ElectionConfig {
   }
 
   // function: treatBlankAsUWI
-  // purpose: return true if we are to treat blank cell as UWI
+  // purpose: getter for treatBlankAsUWI rule
   // returns: return true if we are to treat blank cell as UWI
   public boolean treatBlankAsUWI() {
     // by default we do not treat blank as UWI
@@ -222,10 +222,10 @@ public class ElectionConfig {
   }
 
   // function: getCandidateCodeList
-  // purpose: return list of candidate codes to use for matching in this election
-  // returns: return list of candidate codes to use for matching in this election
+  // purpose: return list of candidate codes for this config
+  // returns: return list of candidate codes for this config
   public List<String> getCandidateCodeList() {
-    return mCandidateCodeList;
+    return candidateCodeList;
   }
 
   // function: getNameForCandidateID
@@ -233,22 +233,22 @@ public class ElectionConfig {
   // param: candidateID the ID of the candidate whose name we want to lookup
   // returns: the full name for the given candidateID
   public String getNameForCandidateID(String candidateID) {
-    return mCandidateCodeToNameMap.get(candidateID);
+    return candidateCodeToNameMap.get(candidateID);
   }
 
   // function: processCandidateData
   // purpose: builds map of candidate ID to candidate name
   private void processCandidateData() {
-    mCandidateCodeList = new ArrayList<>();
-    mCandidateCodeToNameMap = new HashMap<>();
+    candidateCodeList = new ArrayList<>();
+    candidateCodeToNameMap = new HashMap<>();
     // candidate is used to index through all candidates for this election
     for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
       if(candidate.code != null) {
-        mCandidateCodeList.add(candidate.code);
-        mCandidateCodeToNameMap.put(candidate.code, candidate.name);
+        candidateCodeList.add(candidate.code);
+        candidateCodeToNameMap.put(candidate.code, candidate.name);
       } else {
-        mCandidateCodeList.add(candidate.name);
-        mCandidateCodeToNameMap.put(candidate.name, candidate.name);
+        candidateCodeList.add(candidate.name);
+        candidateCodeToNameMap.put(candidate.name, candidate.name);
       }
     }
   }

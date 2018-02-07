@@ -17,22 +17,28 @@ import java.util.logging.LogRecord;
 
 public class Logger {
 
+  // Logger object this class wraps
+  private final static java.util.logging.Logger logger = java.util.logging.Logger.getLogger("RCV");
+
+  // function: log
   // purpose: log output to console and audit file
-  // msg: the message to be logged to console and audit file
+  // param: msg the message to be logged to console and audit file
   public static void log(String msg) {
-    sLogger.info(msg);
+    logger.info(msg);
   }
 
+  // function: log
   // purpose: log formatted output to console and audit file
   // format: format string into which object params will be formatted
-  // obj: object to be parsed into format string
+  // param: obj object to be parsed into format string
   public static void log(String format, Object... obj) {
-    sLogger.info(String.format(format, obj));
+    logger.info(String.format(format, obj));
   }
 
+  // function: setup
   // purpose: initialize logging module
-  // file_output_path: File path for audit output.  write access.
-  // Any existing file will be overwritten.
+  // param: file_output_path: File path for audit output
+  // file access: write (existing file will be overwritten)
   // throws: IOException if unable to open file_output_path
   public static void setup(String file_output_path) throws IOException {
     // specifies how logging output lines should appear
@@ -43,17 +49,18 @@ public class Logger {
     // controls logging console output filters
     ConsoleHandler consoleHandler = new ConsoleHandler();
     consoleHandler.setFormatter(formatter);
-    sLogger.addHandler(consoleHandler);
-    sLogger.addHandler(fileHandler);
-    sLogger.setUseParentHandlers(false);
+    logger.addHandler(consoleHandler);
+    logger.addHandler(fileHandler);
+    logger.setUseParentHandlers(false);
   }
 
-  // custom log formatter for log output string formatting
+  // custom LogFormatter class for log output string formatting
   // extends the default logging Formatter class
   private static class LogFormatter extends Formatter {
 
-    // overrides the format function with our custom formatter
-    // record: the LogRecord to be formatted into a string for output
+    // function: format
+    // purpose: overrides the format function with our custom formatter
+    // param: record the LogRecord to be formatted into a string for output
     // returns: the formatted string for output
     @Override
     public String format(LogRecord record) {
@@ -71,6 +78,4 @@ public class Logger {
     }
   }
 
-  // the logger object this class wraps
-  private final static java.util.logging.Logger sLogger = java.util.logging.Logger.getLogger("RCV");
 }
