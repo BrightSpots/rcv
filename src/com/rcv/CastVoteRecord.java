@@ -13,6 +13,13 @@ import com.sun.tools.javac.util.Pair;
 import java.util.*;
 
 public class CastVoteRecord {
+
+  private final String AUDIT_LABEL_SOURCE = "[CVR Source] ";
+  private final String AUDIT_LABEL_BALLOT_ID = " [Ballot ID] ";
+  private final String AUDIT_LABEL_ROUNDS = " [Round by Round Report] |";
+  private final String AUDIT_LABEL_RAW = " [Raw Data] ";
+
+
   // name of the vendor, this becomes part of the audit output but is not used in tabulation
   private String sourceName;
   // unique identifier for this cast vote record
@@ -100,16 +107,16 @@ public class CastVoteRecord {
   String getAuditString() {
     // use a string builder for more efficient string creation
     StringBuilder auditStringBuilder = new StringBuilder();
-    auditStringBuilder.append("[CVR Source] ");
+    auditStringBuilder.append(AUDIT_LABEL_SOURCE);
     auditStringBuilder.append(sourceName);
-    auditStringBuilder.append(" [Ballot ID] ");
+    auditStringBuilder.append(AUDIT_LABEL_BALLOT_ID);
     auditStringBuilder.append(cvrID);
-    auditStringBuilder.append(" [Round by Round Report] |");
+    auditStringBuilder.append(AUDIT_LABEL_ROUNDS);
     // index to to iterate over all round descriptions
     for(Integer round : descriptionsByRound.keySet()) {
       auditStringBuilder.append(descriptionsByRound.get(round));
     }
-    auditStringBuilder.append(" [Raw Data] ");
+    auditStringBuilder.append(AUDIT_LABEL_RAW);
     auditStringBuilder.append(fullCVRData);
     return auditStringBuilder.toString();
   }
