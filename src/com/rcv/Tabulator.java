@@ -109,7 +109,7 @@ public class Tabulator {
 
   // purpose: run the main tabulation routine to determine election results
   //  this is the high-level control of the tabulation algorithm
-  // throws: Exception when no candidates are eliminated in a round
+  // throws: AssertionError when no candidates are eliminated in a round
   public void tabulate() throws Exception {
 
     log("Beginning tabulation for contest.");
@@ -155,23 +155,28 @@ public class Tabulator {
         // container for eliminated candidate(s)
         List<String> eliminated = new LinkedList<>();
 
-        // TODO: rewrite this with explicit logic
         // Four mutually exclusive ways to eliminate candidates.
-        boolean foundCandidateToEliminate =
-          // 1. Some races contain undeclared write-ins that should be dropped immediately.
-          dropUWI(eliminated, currentRoundCandidateToTally) ||
-          // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
-          dropCandidatesBelowThreshold(eliminated, currentRoundTallyToCandidates) ||
-          // 3. Otherwise, try batch elimination.
-          doBatchElimination(eliminated, currentRoundTallyToCandidates) ||
-          // 4. If we didn't do batch elimination, eliminate the remaining candidate with the lowest
-          //    tally, breaking a tie if needed.
-          doRegularElimination(eliminated, currentRoundTallyToCandidates);
-
+        // 1. Some races contain undeclared write-ins that should be dropped immediately.
+        boolean foundCandidateToEliminate = dropUWI(eliminated, currentRoundCandidateToTally);
+        // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
         if (!foundCandidateToEliminate) {
-          // TODO: this should probably be an assert
-          throw new Exception("Failed to eliminate any candidates.");
+          foundCandidateToEliminate =
+            dropCandidatesBelowThreshold(eliminated, currentRoundTallyToCandidates);
         }
+        // 3. Otherwise, try batch elimination.
+        if (!foundCandidateToEliminate) {
+          foundCandidateToEliminate = doBatchElimination(eliminated, currentRoundTallyToCandidates);
+        }
+        // 4. If we didn't do batch elimination, eliminate the remaining candidate with the lowest
+        //    tally, breaking a tie if needed.
+        if (!foundCandidateToEliminate) {
+          foundCandidateToEliminate =
+            doRegularElimination(eliminated, currentRoundTallyToCandidates);
+        }
+
+        // If we failed to eliminate anyone, there's a bug in the code.
+        assert foundCandidateToEliminate;
+
         // store the losers
         for (String loser : eliminated) {
           candidateToRoundEliminated.put(loser, currentRound);
@@ -537,13 +542,12 @@ public class Tabulator {
   // param: candidateToRoundEliminated map of candidateID to round in which they are eliminated
   // param: cvrIndexToRoundExhausted map of ballot index to round in which it was exhausted
   // param: the current round
-  // throws: Exception if we failed to process the overvote correctly
   // return: map of candidateID to vote tallies for this round
   private Map<String, Integer> getTallyForRound(
     List<CastVoteRecord> castVoteRecords,
     Map<String, Integer> candidateToRoundEliminated,
     int currentRound
-  ) throws Exception {
+  ) {
     // map of candidateID to vote tally to store the results
     Map<String, Integer> roundTally = new HashMap<>();
 
