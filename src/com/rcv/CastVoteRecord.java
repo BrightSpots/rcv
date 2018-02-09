@@ -59,7 +59,7 @@ public class CastVoteRecord {
   // purpose: transition the cvr into exhausted state with the given reason
   // param: round the exhaustion occurs
   // param: reason: the reason for exhaustion
-  public void exhaust(int round, String reason) throws Exception {
+  public void exhaust(int round, String reason) {
     assert(!isExhausted);
     isExhausted = true;
     // formatted description string
