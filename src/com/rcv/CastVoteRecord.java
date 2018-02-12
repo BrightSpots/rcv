@@ -10,7 +10,13 @@
 package com.rcv;
 
 import com.sun.tools.javac.util.Pair;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class CastVoteRecord {
 
