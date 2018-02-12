@@ -9,11 +9,11 @@
   "rules": {
     "description":"Doyle Rules",
     "batchElimination":true,
-    "overvoteRule":"always_skip_to_next_rank",
+    "overvoteRule":"alwaysSkipToNextRank",
     "overvoteLabel":"overvote",
     "undervoteLabel":"undervote",
     "maxSkippedRanksAllowed":null,
-    "tiebreakMode":"previous_round_counts_then_interactive"
+    "tiebreakMode":"previousRoundCountsThenInteractive"
   },
   "candidates": [
     {"name": "Mookie Blaylock"},

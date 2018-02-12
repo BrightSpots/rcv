@@ -9,7 +9,7 @@
   "rules": {
     "description":"Maine Rules",
     "batchElimination":true,
-    "overvoteRule":"exhaust_immediately",
+    "overvoteRule":"exhaustImmediately",
     "maxSkippedRanksAllowed":1,
     "undeclaredWriteInLabel":"UWI",
     "overvoteLabel":"overvote",
