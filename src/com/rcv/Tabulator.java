@@ -444,29 +444,45 @@ public class Tabulator {
   // param: candidateIDToRoundEliminated map of candidate IDs to the round in which they were eliminated
   // return: an OvervoteDecision enum to be applied to the cvr under consideration
   private OvervoteDecision getOvervoteDecision(
-    Set<String> candidateIDset,
+    Set<String> candidateIDSet,
     Map<String, Integer> candidateIDToRoundEliminated
   ) {
     // the resulting decision
     OvervoteDecision decision;
-    // if undervote or one vote which is not the overvote label there is no overvote
-    if (candidateIDset.size() == 0 ||
-        (candidateIDset.size() == 1 && candidateIDset.toArray()[0] != explicitOvervoteLabel)) {
+    // the rule we're using
+    OvervoteRule rule = config.overvoteRule();
+
+    // does this set include the explicit overvote label?
+    boolean explicitOvervote = candidateIDSet.contains(explicitOvervoteLabel);
+    if (explicitOvervote) {
+      // we should never have the explicit overvote flag AND other candidates for a given ranking
+      assert candidateIDSet.size() == 1;
+
+      // if we have an explicit overvote, the only valid rules are exhaust immediately or
+      // always skip. (this is enforced when we load the config also)
+      assert rule == OvervoteRule.EXHAUST_IMMEDIATELY ||
+        rule == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
+
+      if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
+        decision = OvervoteDecision.EXHAUST;
+      } else {
+        decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
+      }
+    } else if (candidateIDSet.size() <= 1) {
+      // if undervote or one vote which is not the overvote label, then there is no overvote
       decision = OvervoteDecision.NONE;
-    } else if (config.overvoteRule() == OvervoteRule.EXHAUST_IMMEDIATELY) {
+    } else if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
       decision = OvervoteDecision.EXHAUST;
-    } else if (config.overvoteRule() == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
+    } else if (rule == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
     } else {
-      // if we got here there is some overvote scenario:
-      // multiple candidates in the set or explicitOvervoteLabel
-      // TODO: get some clarity on the following scenarios
-      // TODO: validate that explicitOvervoteLabel is handled correctly
+      // if we got here, there are multiple candidates, and the decision depends on how the rule
+      // handles continuing candidates
 
       // build a list of all continuing candidates from the input set
       List<String> continuingAtThisRank = new LinkedList<>();
       // candidateID indexes over all candidate IDs in this ranking set
-      for (String candidateID : candidateIDset) {
+      for (String candidateID : candidateIDSet) {
         if (candidateIDToRoundEliminated.get(candidateID) == null) {
           continuingAtThisRank.add(candidateID);
         }
@@ -474,20 +490,20 @@ public class Tabulator {
 
       if (continuingAtThisRank.size() > 0) {
         // at least 1 continuing candidate
-        if (config.overvoteRule() == OvervoteRule.EXHAUST_IF_ANY_CONTINUING) {
+        if (rule == OvervoteRule.EXHAUST_IF_ANY_CONTINUING) {
           decision = OvervoteDecision.EXHAUST;
-        } else if (config.overvoteRule() == OvervoteRule.IGNORE_IF_ANY_CONTINUING) {
+        } else if (rule == OvervoteRule.IGNORE_IF_ANY_CONTINUING) {
           decision = OvervoteDecision.IGNORE;
         } else if (continuingAtThisRank.size() > 1) {
           // multiple continuing candidates at this rank
-          if (config.overvoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
+          if (rule == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
             decision = OvervoteDecision.EXHAUST;
           } else {
             // if there's > 1 continuing, OvervoteDecision.NONE is not a valid option
             decision = OvervoteDecision.IGNORE;
           }
         } else {
-          // 1 continuing candidate at this rank
+          // exactly 1 continuing candidate at this rank
           decision = OvervoteDecision.NONE;
         }
       } else {
