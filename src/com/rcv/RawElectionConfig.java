@@ -1,5 +1,5 @@
 /**
- * Created by Jonathan Moldover on 7/8/17
+ * Created by Jonathan Moldover and Louis Eisenberg
  * Copyright 2018 Bright Spots
  * Purpose: RawElectionConfig defines the data model used for an election configuration.
  * It is used by JsonParser to map json configuration files into Java objects.

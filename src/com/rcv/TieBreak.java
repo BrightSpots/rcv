@@ -1,5 +1,5 @@
 /**
- * Created by Jonathan Moldover on 1/28/18
+ * Created by Jonathan Moldover and Louis Eisenberg
  * Copyright 2018 Bright Spots
  * Purpose: Handle tie break scenarios based on rules configuration
  * Version: 1.0

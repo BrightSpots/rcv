@@ -1,5 +1,5 @@
 /**
- * Created by Jonathan Moldover on 7/8/17
+ * Created by Jonathan Moldover and Louis Eisenberg
  * Copyright 2018 Bright Spots
  * Purpose: Main entry point for the rcv module
  * Controls high-level flow for program execution:

@@ -1,5 +1,5 @@
 /**
- * Created by Jonathan Moldover on 7/8/17
+ * Created by Jonathan Moldover and Louis Eisenberg
  * Copyright 2018 Bright Spots
  * Helper class takes tabulation results data as input and generates results xls file which
  * contains results summary information.
@@ -358,6 +358,7 @@ public class ResultsWriter {
     totalVotesHeader.setCellValue("Balance check");
     // displayRound indexes over all rounds plus final results round
     for (int displayRound = 1; displayRound <= numRounds+1; displayRound++) {
+      // Add 2 to the index because total votes is the third column in each round group
       columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+2;
       // total votes cell
       Cell totalVotesCell = totalVotesRow.createCell(columnIndex);
@@ -376,17 +377,18 @@ public class ResultsWriter {
       boolean isFinalResults = displayRound == numRounds+1;
       // total votes in this round
       int total = totalActiveVotesPerRound.get(isFinalResults ? displayRound - 1 : displayRound);
+      // Add 2 to the index because total votes is the third column in each round group
       columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+2;
       // total votes cell
       Cell totalVotesCell = totalActiveVotesRow.createCell(columnIndex);
       totalVotesCell.setCellValue(total);
     }
 
-    // total votes redistributed i.e. exhausted in this round
-    // this calculation happens last because it depends on the inactive vote totals
-    // round indexes from second round (since no transfer happens in first round
-    // to last round + 1 for the final winner round
-    for (int round = 2; round <= numRounds+1; round++) {
+    // Total votes redistributed:
+    // this calculation happens last because it depends on the inactive vote totals.
+    // Round index starts at round 2 (since no transfer happens in first round) and continues to
+    // last round + 1 (the final special winner reporting round)
+    for (int round = 2; round <= numRounds + 1; round++) {
       columnIndex = ((round - 1) * COLUMNS_PER_ROUND) + 1;
       // votes redistributed cell
       Cell votesRedistributedRowCell = votesRedistributedRow.createCell(columnIndex);
@@ -467,8 +469,8 @@ public class ResultsWriter {
         row.createCell(0).setCellValue((String)rowFields[0]);
       }
       // if second element is non-null create a cell for it
-      // type (string or numeric) is determined by third element
       if (rowFields[1] != null) {
+        // type (numeric or string) is determined by third element (true = numeric, false = string)
         if ((boolean)rowFields[2]) {
           row.createCell(1).setCellValue((int)rowFields[1]);
         } else {
@@ -491,16 +493,21 @@ public class ResultsWriter {
         new ArrayList<>(tally.entrySet());
     // anonymous custom comparator will sort undeclared write in candidates to last place
     Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
-      public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+      public int compare(
+        Map.Entry<String, Integer> firstObject,
+        Map.Entry<String, Integer> secondObject
+      ) {
         // result of the comparison
         int ret;
-        if (o1.getKey().equals(config.undeclaredWriteInLabel())) {
+
+        if (firstObject.getKey().equals(config.undeclaredWriteInLabel())) {
           ret = 1;
-        } else if (o2.getKey().equals(config.undeclaredWriteInLabel())) {
+        } else if (secondObject.getKey().equals(config.undeclaredWriteInLabel())) {
           ret = -1;
         } else {
-          ret = (o2.getValue()).compareTo(o1.getValue());
+          ret = (secondObject.getValue()).compareTo(firstObject.getValue());
         }
+
         return ret;
       }
     });

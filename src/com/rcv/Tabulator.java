@@ -1,5 +1,5 @@
 /**
- * Created by Jonathan Moldover on 7/8/17
+ * Created by Jonathan Moldover and Louis Eisenberg
  * Copyright 2018 Bright Spots
  * Purpose: perform ranked choice tabulation calculations
  * round-by-round tabulation of votes to each candidate
