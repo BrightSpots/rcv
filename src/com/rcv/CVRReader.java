@@ -74,9 +74,9 @@ public class CVRReader {
       for (int cellIndex = 0; cellIndex < firstVoteColumnIndex + allowableRanks; cellIndex++) {
         // cell object contains data the the current cell
         Cell cvrDataCell = castVoteRecordRow.getCell(cellIndex);
-        if(cvrDataCell == null) {
+        if (cvrDataCell == null) {
           fullCVRData.add("empty cell");
-        } else if(cvrDataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+        } else if (cvrDataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
           // parsed numeric data
           double doubleValue = cvrDataCell.getNumericCellValue();
           // convert back to String (we only store String data from cvr files)
@@ -88,7 +88,7 @@ public class CVRReader {
         }
 
         // if we haven't reached a vote cell continue to the next cell
-        if(cellIndex < firstVoteColumnIndex) {
+        if (cellIndex < firstVoteColumnIndex) {
           continue;
         }
 

@@ -23,6 +23,8 @@ public class RawElectionConfig {
   public static class ElectionRules {
     // human description of this rules set
     public String description;
+    // max rankings allowed
+    public Integer maxRankingsAllowed;
     // are we using batch elimination
     public Boolean batchElimination;
     // which overvote rule to use
@@ -75,8 +77,6 @@ public class RawElectionConfig {
   public String office;
   // election date
   public String date;
-  // max rankings allowed
-  public Integer maxRankingsAllowed;
   // rules object
   public ElectionRules rules;
 

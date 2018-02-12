@@ -119,7 +119,7 @@ public class CastVoteRecord {
     auditStringBuilder.append(cvrID);
     auditStringBuilder.append(AUDIT_LABEL_ROUNDS);
     // index to to iterate over all round descriptions
-    for(Integer round : descriptionsByRound.keySet()) {
+    for (Integer round : descriptionsByRound.keySet()) {
       auditStringBuilder.append(descriptionsByRound.get(round));
     }
     auditStringBuilder.append(AUDIT_LABEL_RAW);

@@ -660,7 +660,7 @@ public class Tabulator {
   // purpose: log the audit info to console and audit file
   // param: castVoteRecords list of all cvrs which have been tabulated
   public void doAudit(List<CastVoteRecord> castVoteRecords) {
-    for(CastVoteRecord cvr : castVoteRecords) {
+    for (CastVoteRecord cvr : castVoteRecords) {
       log(cvr.getAuditString());
     }
   }

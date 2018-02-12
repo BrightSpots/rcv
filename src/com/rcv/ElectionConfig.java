@@ -47,6 +47,12 @@ public class ElectionConfig {
       overvoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
     ) {
       valid = false;
+    } else if (maxSkippedRanksAllowed() == null || maxSkippedRanksAllowed() < 0) {
+      valid = false;
+    } else if (maxRankingsAllowed() == null || maxRankingsAllowed() < 1) {
+      valid = false;
+    } else if (rawConfig.rules.batchElimination == null) {
+      valid = false;
     }
 
     return valid;
@@ -98,7 +104,7 @@ public class ElectionConfig {
   // purpose: getter for maxRankingsAllowed
   // returns: max rankings allowed
   public Integer maxRankingsAllowed() {
-    return rawConfig.maxRankingsAllowed;
+    return rawConfig.rules.maxRankingsAllowed;
   }
 
   // function: description
@@ -112,7 +118,7 @@ public class ElectionConfig {
   // purpose: getter for batchElimination
   // returns: true if we should use batch elimination
   public boolean batchElimination() {
-    return rawConfig.rules.batchElimination == null ? false : rawConfig.rules.batchElimination;
+    return rawConfig.rules.batchElimination;
   }
 
   // function: overvoteRuleForConfigSetting
@@ -122,6 +128,7 @@ public class ElectionConfig {
   static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
     // rule: return value determined by input setting string
     Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
+
     switch (setting) {
       case "alwaysSkipToNextRank":
         rule = Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
@@ -129,8 +136,20 @@ public class ElectionConfig {
       case "exhaustImmediately":
         rule = Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY;
         break;
+      case "exhaustIfAnyContinuing":
+        rule = Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING;
+        break;
+      case "ignoreIfAnyContinuing":
+        rule = Tabulator.OvervoteRule.IGNORE_IF_ANY_CONTINUING;
+        break;
+      case "exhaustIfMultipleContinuing":
+        rule = Tabulator.OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING;
+        break;
+      case "ignoreIfMultipleContinuing":
+        rule = Tabulator.OvervoteRule.IGNORE_IF_MULTIPLE_CONTINUING;
+        break;
       default:
-        Logger.log("Unrecognized overvote rule setting:%s", setting);
+        Logger.log("Unrecognized overvote rule setting: %s", setting);
     }
     return rule;
   }
@@ -261,7 +280,7 @@ public class ElectionConfig {
     candidateCodeToNameMap = new HashMap<>();
     // candidate is used to index through all candidates for this election
     for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
-      if(candidate.code != null) {
+      if (candidate.code != null) {
         candidateCodeList.add(candidate.code);
         candidateCodeToNameMap.put(candidate.code, candidate.name);
       } else {

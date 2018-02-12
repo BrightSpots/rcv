@@ -5,9 +5,9 @@
   "jurisdiction":"Minneapolis, MN",
   "office":"Mayor",
   "date":"2017-11-07",
-  "maxRankingsAllowed":3,
   "rules": {
     "description":"Minneapolis Rules",
+    "maxRankingsAllowed":3,
     "batchElimination":true,
     "overvoteRule":"alwaysSkipToNextRank",
     "overvoteLabel":"overvote",

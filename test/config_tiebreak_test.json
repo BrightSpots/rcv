@@ -5,9 +5,9 @@
   "jurisdiction":"Funkytown, USA",
   "office":"Sergeant-at-Arms",
   "date":"2017-12-03",
-  "maxRankingsAllowed":3,
   "rules": {
     "description":"Doyle Rules",
+    "maxRankingsAllowed":3,
     "batchElimination":true,
     "overvoteRule":"alwaysSkipToNextRank",
     "overvoteLabel":"overvote",

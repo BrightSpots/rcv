@@ -1,0 +1,23 @@
+This document lists the parameters that can be included in a config file. Required parameters are denoted with an asterisk.
+- *auditOutput: the filename for the audit file that the program will create. Example: portland_2015_mayor_audit_log.txt
+- *visualizerOutput: the filename for the Excel spreadsheet with a summary of the results that the program will create. Example: portland_2015_mayor_visualizer.xlsx
+- contestName: the name of the election. Example: Portland Mayoral Race
+- jurisdiction: the jurisdiction in which this election is being contested. Example: Portland, ME
+- office: the office being contested. Example: Mayor
+- date: the date of the election. Example: 2015-11-03
+- *maxRankingsAllowed: the maximum number of candidates that a ballot is allowed to rank. Example: 15
+- *rules: a set of options that determine exactly how the program should implement the instant runoff.
+  - description: the name of the set of the rules. Example: Maine Rules
+  - *batchElimination: whether batch elimination should be used. Valid options: true, false.
+  - *overvoteRule: how the program should handle an overvote when it encounters one. Valid options: alwaysSkipToNextRank, exhaustImmediately, exhaustIfAnyContinuing, ignoreIfAnyContinuing, exhaustIfMultipleContinuing, ignoreIfMultipleContinuing.
+  - *maxSkippedRanksAllowed: the maximum number of skipped ranks (i.e. undervotes) on a ballot before the ballot should be considered exhausted. Example: 1
+  - *tiebreakMode: how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round. Valid options: random, interactive, previousRoundCountsThenRandom, previousRoundCountsThenInteractive.
+  - minimumVoteThreshold: the minimum number of votes a candidate must receive in the first round to avoid automatic elimination. Example: 150
+  - undeclaredWriteInLabel: the special label used in the cast vote records to denote a vote for an undeclared write-in. Example: UWI
+  - overvoteLabel: the special label used in the cast vote records to denote an overvote. Example: OVERVOTE (Note: if this parameter is present, overvoteRule must be set to either alwaysSkipToNextRank or exhaustImmediately.)
+  - undervoteLabel: the special label used in the cast vote records to denote an undervote. Example: UNDERVOTE
+- *candidates: a list of the candidates who appear in the cast vote records. Each candidate must have a name. If the cast vote records use candidate codes, each candidate must also have a code.
+- *cvrFileSources: a list of the cast vote record source files. Each file must have three fields:
+  - *provider: the voting machine format of the file. Example: ES&S
+  - *filePath: the location of the file. Example: test/2015-portland-mayor-cvr.xlsx
+  - *firstVoteColumnIndex: the index of the column that contains each ballot’s top-ranked candidate. Example: 3
