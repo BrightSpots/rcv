@@ -33,17 +33,21 @@ public class Main {
 
         // Read cast vote records from cvr files
         // castVoteRecords will contain all cast vote records parsed by the reader
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
-
-        // tabulator for tabulation logic
-        Tabulator tabulator = new Tabulator(castVoteRecords, config);
-        // do the tabulation
-        tabulator.tabulate();
-        // generate visualizer spreadsheet data
-        tabulator.generateSummarySpreadsheet();
-        // generate audit data
-        tabulator.doAudit(castVoteRecords);
-
+        List<CastVoteRecord> castVoteRecords;
+        try {
+          // parse the cast vote records
+          castVoteRecords = parseCastVoteRecords(config);
+          // tabulator for tabulation logic
+          Tabulator tabulator = new Tabulator(castVoteRecords, config);
+          // do the tabulation
+          tabulator.tabulate();
+          // generate visualizer spreadsheet data
+          tabulator.generateSummarySpreadsheet();
+          // generate audit data
+          tabulator.doAudit(castVoteRecords);
+        } catch (Exception exception) {
+          Logger.log("Error parsing cast vote record file(s):" + exception.toString());
+        }
       } catch (IOException exception) {
         System.err.print(
           String.format(
@@ -87,7 +91,8 @@ public class Main {
   // purpose: parse cvr files referenced in the ElectionConfig object into a list of CastVoteRecords
   // param: config object containing cvr file paths to parse
   // returns: list of all CastVoteRecord objects parsed from cvr files
-  public static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config) {
+  public static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config)
+  throws Exception {
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     // at each iteration of the following loop we add records from another source file

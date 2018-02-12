@@ -34,14 +34,9 @@ public class CVRReader {
     int allowableRanks,
     List<String>candidateIDs,
     ElectionConfig config
-  ) {
+  ) throws Exception {
     // contestSheet contains all the cvr data we will be parsing
     Sheet contestSheet = getFirstSheet(excelFilePath);
-    if (contestSheet == null) {
-      // TODO: getFirstSheet should probably throw and be caught by our caller
-      Logger.log("invalid RCV format: could not obtain ballot data.");
-      System.exit(1);
-    }
 
     // validate header
     // Row iterator is used to iterate through a row of data from the sheet object
@@ -51,8 +46,7 @@ public class CVRReader {
     // require at least one row
     if (headerRow == null || contestSheet.getLastRowNum() < 2) {
       Logger.log("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
-      // TODO: this should probably throw
-      System.exit(1);
+      throw new Exception();
     }
 
     // cvrFileName for generating cvrIDs
@@ -140,10 +134,11 @@ public class CVRReader {
   // purpose: helper function to wrap file IO with error handling
   // param: excelFilePath path to file for parsing
   // file access: read
+  // throws: IOException if there was a problem opening or reading the file
   // returns: the first xls sheet object in the file or null if there was a problem
-  private static Sheet getFirstSheet(String excelFilePath) {
+  private static Sheet getFirstSheet(String excelFilePath) throws IOException {
     // container for result
-    Sheet firstSheet = null;
+    Sheet firstSheet;
     try {
       // inputStream for parsing file data into memory
       FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
@@ -152,9 +147,9 @@ public class CVRReader {
       firstSheet = workbook.getSheetAt(0);
       inputStream.close();
       workbook.close();
-    } catch (IOException ex) {
-      // TODO: throw
-      Logger.log("failed to process CVR file: %s, %s", excelFilePath, ex.getMessage());
+    } catch (IOException exception) {
+      Logger.log("failed to open CVR file: %s, %s", excelFilePath, exception.getMessage());
+      throw exception;
     }
     return firstSheet;
   }
