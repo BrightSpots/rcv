@@ -69,6 +69,7 @@ class TieBreak {
     if (options.size() == 1) {
       nonselected = options.get(0);
     } else if (options.size() == 2) {
+      // if there are only 2 candidates don't use a comma
       nonselected = options.get(0) + " and " + options.get(1);
     } else {
       // stringbuilder for faster string construction
