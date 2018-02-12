@@ -61,13 +61,13 @@ public class Main {
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     // at each iteration of the following loop we add records from another source file
     // source: index over config sources
-    for (RawElectionConfig.CVRSource source : rawConfig.cvr_file_sources) {
-      Logger.log("reading cvr file:%s provider:%s",source.file_path, source.provider);
+    for (RawElectionConfig.CVRSource source : rawConfig.cvrFileSources) {
+      Logger.log("reading cvr file:%s provider:%s",source.filePath, source.provider);
       // reader: read input file into a list of cast vote records
       CVRReader reader = new CVRReader();
       reader.parseCVRFile(
-        source.file_path,
-        source.first_vote_column_index,
+        source.filePath,
+        source.firstVoteColumnIndex,
         config.maxRankingsAllowed(),
         config.getCandidateCodeList(),
         config

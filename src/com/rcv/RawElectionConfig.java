@@ -24,23 +24,23 @@ public class RawElectionConfig {
     // human description of this rules set
     public String description;
     // are we using batch elimination
-    public Boolean batch_elimination;
+    public Boolean batchElimination;
     // which overvote rule to use
-    public String overvote_rule;
+    public String overvoteRule;
     // max number of skipped rankings allowed
-    public Integer max_skipped_ranks_allowed;
+    public Integer maxSkippedRanksAllowed;
     // minimum votes needed to continue
-    public Integer minimum_vote_threshold;
+    public Integer minimumVoteThreshold;
     // UWI label
-    public String undeclared_write_in_label;
+    public String undeclaredWriteInLabel;
     // overvote label
-    public String overvote_label;
+    public String overvoteLabel;
     // undervote label
-    public String undervote_label;
+    public String undervoteLabel;
     // tiebreak mode to use
-    public String tiebreak_mode;
+    public String tiebreakMode;
     // shall we treat blank cells as UWIs
-    public Boolean treat_blank_as_uwi;
+    public Boolean treatBlankAsUwi;
   }
 
   // CVRSource: encapsulates a source cast vote record file
@@ -49,9 +49,9 @@ public class RawElectionConfig {
     // provider for this source e.g. "ES&S"
     public String provider;
     // path to the file on disk
-    public String file_path;
+    public String filePath;
     // column where rankings data begins
-    public Integer first_vote_column_index;
+    public Integer firstVoteColumnIndex;
   }
 
   // Candidate: contains a full candidate name and optionally a candidate ID
@@ -64,11 +64,11 @@ public class RawElectionConfig {
   }
 
   // location to write audit output
-  public String audit_output;
+  public String auditOutput;
   // location to write visualizer output
-  public String visualizer_output;
+  public String visualizerOutput;
   // contest name
-  public String contest_name;
+  public String contestName;
   // jurisdiction
   public String jurisdiction;
   // office
@@ -76,14 +76,14 @@ public class RawElectionConfig {
   // election date
   public String date;
   // max rankings allowed
-  public Integer max_rankings_allowed;
+  public Integer maxRankingsAllowed;
   // rules object
   public ElectionRules rules;
 
   // list of all Candidates
   public List<Candidate> candidates;
   // list of all cast vote record source files
-  public List<CVRSource> cvr_file_sources;
+  public List<CVRSource> cvrFileSources;
 
   // function: RawElectionConfig
   // purpose: create a new RawElectionConfig object

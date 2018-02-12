@@ -1,20 +1,20 @@
 {
-  "audit_output":"minneapolis_2017_audit_log.txt",
-  "visualizer_output":"minneapolis_2017_visualizer.xlsx",
-  "contest_name":"2017 Minneapolis mayoral race",
+  "auditOutput":"minneapolis_2017_audit_log.txt",
+  "visualizerOutput":"minneapolis_2017_visualizer.xlsx",
+  "contestName":"2017 Minneapolis mayoral race",
   "jurisdiction":"Minneapolis, MN",
   "office":"Mayor",
   "date":"2017-11-07",
-  "max_rankings_allowed":3,
+  "maxRankingsAllowed":3,
   "rules": {
     "description":"Minneapolis Rules",
-    "batch_elimination":true,
-    "overvote_rule":"always_skip_to_next_rank",
-    "overvote_label":"overvote",
-    "undervote_label":"undervote",
-    "max_skipped_ranks_allowed":null,
-    "undeclared_write_in_label":"UWI",
-    "tiebreak_mode":"random"
+    "batchElimination":true,
+    "overvoteRule":"always_skip_to_next_rank",
+    "overvoteLabel":"overvote",
+    "undervoteLabel":"undervote",
+    "maxSkippedRanksAllowed":null,
+    "undeclaredWriteInLabel":"UWI",
+    "tiebreakMode":"random"
   },
   "candidates": [
     {"name":"Jacob Frey"},
@@ -36,11 +36,11 @@
     {"name":"Christopher Zimmerman"},
     {"name":"Theron Preston Washington"}
   ],
-  "cvr_file_sources": [
+  "cvrFileSources": [
     {
       "provider": "ES&S",
-      "file_path": "test/2017-minneapolis-mayor-cvr.xlsx",
-      "first_vote_column_index": 1
+      "filePath": "test/2017-minneapolis-mayor-cvr.xlsx",
+      "firstVoteColumnIndex": 1
     }
   ]
 }

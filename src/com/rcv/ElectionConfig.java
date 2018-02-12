@@ -56,21 +56,21 @@ public class ElectionConfig {
   // purpose: getter for auditOutput
   // returns: path to audit output file
   public String auditOutput() {
-    return rawConfig.audit_output;
+    return rawConfig.auditOutput;
   }
 
   // function: visualizerOutput
   // purpose: getter for visualizerOutput
   // returns: path to write visualizer output file
   public String visualizerOutput() {
-    return rawConfig.visualizer_output;
+    return rawConfig.visualizerOutput;
   }
 
   // function: contestName
   // purpose: getter for contestName
   // returns: contest name
   public String contestName() {
-    return rawConfig.contest_name;
+    return rawConfig.contestName;
   }
 
   // function: jurisdiction
@@ -98,7 +98,7 @@ public class ElectionConfig {
   // purpose: getter for maxRankingsAllowed
   // returns: max rankings allowed
   public Integer maxRankingsAllowed() {
-    return rawConfig.max_rankings_allowed;
+    return rawConfig.maxRankingsAllowed;
   }
 
   // function: description
@@ -112,7 +112,7 @@ public class ElectionConfig {
   // purpose: getter for batchElimination
   // returns: true if we should use batch elimination
   public boolean batchElimination() {
-    return rawConfig.rules.batch_elimination == null ? false : rawConfig.rules.batch_elimination;
+    return rawConfig.rules.batchElimination == null ? false : rawConfig.rules.batchElimination;
   }
 
   // function: overvoteRuleForConfigSetting
@@ -123,10 +123,10 @@ public class ElectionConfig {
     // rule: return value determined by input setting string
     Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
     switch (setting) {
-      case "always_skip_to_next_rank":
+      case "alwaysSkipToNextRank":
         rule = Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
         break;
-      case "exhaust_immediately":
+      case "exhaustImmediately":
         rule = Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY;
         break;
       default:
@@ -149,10 +149,10 @@ public class ElectionConfig {
       case "interactive":
         mode = Tabulator.TieBreakMode.INTERACTIVE;
         break;
-      case "previous_round_counts_then_random":
+      case "previousRoundCountsThenRandom":
         mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM;
         break;
-      case "previous_round_counts_then_interactive":
+      case "previousRoundCountsThenInteractive":
         mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
         break;
       default:
@@ -179,44 +179,44 @@ public class ElectionConfig {
   // returns: overvote rule to use for this config
   public Tabulator.OvervoteRule overvoteRule() {
     // by default we exhaust immediately
-    return rawConfig.rules.overvote_rule == null ?
+    return rawConfig.rules.overvoteRule == null ?
       Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY :
-      ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvote_rule);
+      ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
   }
 
   // function: minimumVoteThreshold
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use for this config
   public Integer minimumVoteThreshold() {
-    return rawConfig.rules.minimum_vote_threshold;
+    return rawConfig.rules.minimumVoteThreshold;
   }
 
   // function: maxSkippedRanksAllowed
   // purpose: getter for maxSkippedRanksAllowed rule
   // returns: max skipped ranks allowed in this config
   public Integer maxSkippedRanksAllowed() {
-    return rawConfig.rules.max_skipped_ranks_allowed;
+    return rawConfig.rules.maxSkippedRanksAllowed;
   }
 
   // function: undeclaredWriteInLabel
   // purpose: getter for UWI label
   // returns: overvote rule for this config
   public String undeclaredWriteInLabel() {
-    return rawConfig.rules.undeclared_write_in_label;
+    return rawConfig.rules.undeclaredWriteInLabel;
   }
 
   // function: overvoteLabel
   // purpose: getter for overvote label rule
   // returns: overvote label for this config
   public String overvoteLabel() {
-    return rawConfig.rules.overvote_label;
+    return rawConfig.rules.overvoteLabel;
   }
 
   // function: undervoteLabel
   // purpose: getter for undervote label
   // returns: undervote label for this config
   public String undervoteLabel() {
-    return rawConfig.rules.undervote_label;
+    return rawConfig.rules.undervoteLabel;
   }
 
   // function: tiebreakMode
@@ -224,9 +224,9 @@ public class ElectionConfig {
   // returns: tiebreak mode to use for this config
   public Tabulator.TieBreakMode tiebreakMode() {
     // by default we use random tiebreak
-    return rawConfig.rules.tiebreak_mode == null ?
+    return rawConfig.rules.tiebreakMode == null ?
       Tabulator.TieBreakMode.RANDOM :
-      ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreak_mode);
+      ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
   }
 
   // function: treatBlankAsUWI
@@ -234,9 +234,9 @@ public class ElectionConfig {
   // returns: return true if we are to treat blank cell as UWI
   public boolean treatBlankAsUWI() {
     // by default we do not treat blank as UWI
-    return rawConfig.rules.treat_blank_as_uwi == null ?
+    return rawConfig.rules.treatBlankAsUwi == null ?
       false :
-      rawConfig.rules.treat_blank_as_uwi;
+      rawConfig.rules.treatBlankAsUwi;
   }
 
   // function: getCandidateCodeList

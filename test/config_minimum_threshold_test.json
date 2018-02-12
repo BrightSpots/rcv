@@ -1,14 +1,14 @@
 {
-  "audit_output":"minimum_threshold_test_audit_log.txt",
-  "visualizer_output":"minimum_threshold_test_visualizer.xlsx",
-  "contest_name":"Minimum threshold test",
+  "auditOutput":"minimum_threshold_test_audit_log.txt",
+  "visualizerOutput":"minimum_threshold_test_visualizer.xlsx",
+  "contestName":"Minimum threshold test",
   "jurisdiction":"Funkytown, USA",
   "office":"Sergeant-at-Arms",
   "date":"2018-01-07",
-  "max_rankings_allowed":3,
+  "maxRankingsAllowed":3,
   "rules": {
     "description":"Doyle Rules",
-    "minimum_vote_threshold":3
+    "minimumVoteThreshold":3
   },
   "candidates": [
     {"name": "Gargamel"},
@@ -17,11 +17,11 @@
     {"name": "Garfield"},
     {"name": "Odie"}
   ],
-  "cvr_file_sources": [
+  "cvrFileSources": [
     {
       "provider": "ES&S",
-      "file_path": "test/minimum-threshold-test-cvr.xlsx",
-      "first_vote_column_index": 1
+      "filePath": "test/minimum-threshold-test-cvr.xlsx",
+      "firstVoteColumnIndex": 1
     }
   ]
 }

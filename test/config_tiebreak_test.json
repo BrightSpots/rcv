@@ -1,19 +1,19 @@
 {
-  "audit_output":"tiebreak_test_audit_log.txt",
-  "visualizer_output":"tiebreak_test_visualizer.xlsx",
-  "contest_name":"Tiebreak test",
+  "auditOutput":"tiebreak_test_audit_log.txt",
+  "visualizerOutput":"tiebreak_test_visualizer.xlsx",
+  "contestName":"Tiebreak test",
   "jurisdiction":"Funkytown, USA",
   "office":"Sergeant-at-Arms",
   "date":"2017-12-03",
-  "max_rankings_allowed":3,
+  "maxRankingsAllowed":3,
   "rules": {
     "description":"Doyle Rules",
-    "batch_elimination":true,
-    "overvote_rule":"always_skip_to_next_rank",
-    "overvote_label":"overvote",
-    "undervote_label":"undervote",
-    "max_skipped_ranks_allowed":null,
-    "tiebreak_mode":"previous_round_counts_then_interactive"
+    "batchElimination":true,
+    "overvoteRule":"always_skip_to_next_rank",
+    "overvoteLabel":"overvote",
+    "undervoteLabel":"undervote",
+    "maxSkippedRanksAllowed":null,
+    "tiebreakMode":"previous_round_counts_then_interactive"
   },
   "candidates": [
     {"name": "Mookie Blaylock"},
@@ -21,11 +21,11 @@
     {"name": "George Gervin"},
     {"name": "Sedale Threatt"}
   ],
-  "cvr_file_sources": [
+  "cvrFileSources": [
     {
       "provider": "ES&S",
-      "file_path": "test/tiebreak-test-cvr.xlsx",
-      "first_vote_column_index": 1
+      "filePath": "test/tiebreak-test-cvr.xlsx",
+      "firstVoteColumnIndex": 1
     }
   ]
 }

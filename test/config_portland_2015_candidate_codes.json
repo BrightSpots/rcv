@@ -1,20 +1,20 @@
 {
-  "audit_output":"portland_2015_mayor_audit_log.txt",
-  "visualizer_output":"portland_2015_mayor_visualizer.xlsx",
-  "contest_name":"Portland 2015 Mayoral Race",
+  "auditOutput":"portland_2015_mayor_audit_log.txt",
+  "visualizerOutput":"portland_2015_mayor_visualizer.xlsx",
+  "contestName":"Portland 2015 Mayoral Race",
   "jurisdiction":"Portland, ME",
   "office":"Mayor",
   "date":"2015-11-03",
-  "max_rankings_allowed":15,
+  "maxRankingsAllowed":15,
   "rules": {
     "description":"Maine Rules",
-    "batch_elimination":true,
-    "overvote_rule":"exhaust_immediately",
-    "max_skipped_ranks_allowed":1,
-    "undeclared_write_in_label":"UWI",
-    "overvote_label":"overvote",
-    "undervote_label":"undervote",
-    "tiebreak_mode":"random"
+    "batchElimination":true,
+    "overvoteRule":"exhaust_immediately",
+    "maxSkippedRanksAllowed":1,
+    "undeclaredWriteInLabel":"UWI",
+    "overvoteLabel":"overvote",
+    "undervoteLabel":"undervote",
+    "tiebreakMode":"random"
   },
   "candidates":[
     {"name":"Brennan, Michael F.", "code":"MFB"},
@@ -33,11 +33,11 @@
     {"name":"Strimling, Ethan K.", "code":"EKS"},
     {"name":"Vail, Christopher L.", "code":"CLV"}
   ],
-  "cvr_file_sources": [
+  "cvrFileSources": [
     {
       "provider": "ES&S",
-      "file_path": "test/2015-portland-mayor-cvr-candidate-codes.xlsx",
-      "first_vote_column_index": 3
+      "filePath": "test/2015-portland-mayor-cvr-candidate-codes.xlsx",
+      "firstVoteColumnIndex": 3
     }
   ]
 }
