@@ -91,9 +91,7 @@ class TieBreak {
         losingCandidate = doRandom();
         break;
       default:
-        // TODO: rewrite this with explicit case labels
         // handle tiebreaks which involve previous round tallies
-
         // loser: will be set if there is a previous round count loser
         // it will be null if candidates were still tied at first round
         String loser = doPreviousRounds();
@@ -149,7 +147,6 @@ class TieBreak {
   // purpose: randomly select the loser for this tiebreak
   // return: candidateID of the selected loser
   private String doRandom() {
-    // TODO: use java.security.SecureRandom
     // random number used for random candidate ID loser
     double randomNormalFloat = Math.random();
     // index of randomly selected candidate

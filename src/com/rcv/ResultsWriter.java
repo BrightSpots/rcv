@@ -242,19 +242,11 @@ public class ResultsWriter {
       roundPercentageCell.setCellValue("% of vote");
     }
 
-    // row for for "special cases"
-    // TODO: what is the special cases data?  It seems like only the header cell is ever created
-    org.apache.poi.ss.usermodel.Row specialCasesHeaderRow = null;
-
     // Candidate votes [total, delta, percentage]
     // For each candidate: for each round: output total votes, delta votes, and final vote
     // percentage of total.
     // candidate indexes over all candidates
     for (String candidate : sortedCandidates) {
-      if (candidate.equals(config.undeclaredWriteInLabel())) {
-        specialCasesHeaderRow = worksheet.createRow(rowCounter++);
-        populateSpecialCasesHeaderRow(specialCasesHeaderRow);
-      }
       // show each candidate row with their totals for each round
       // row for the current candidate
       org.apache.poi.ss.usermodel.Row candidateRow = worksheet.createRow(rowCounter++);
@@ -308,12 +300,6 @@ public class ResultsWriter {
         String percentageText = String.format("%.2f%%", percentage);
         percentageCell.setCellValue(percentageText);
       }
-    }
-
-    // create a special cases divider row
-    if (specialCasesHeaderRow == null) {
-      specialCasesHeaderRow = worksheet.createRow(rowCounter++);
-      populateSpecialCasesHeaderRow(specialCasesHeaderRow);
     }
 
     // row for the exhausted cvr counts
@@ -424,16 +410,7 @@ public class ResultsWriter {
       Logger.log("failed to write " + config.visualizerOutput() + " to disk!");
     }
   }
-
-  // function: populateSpecialCasesHeaderRow
-  // purpose: good question
-  // param: row to add header cell to
-  private void populateSpecialCasesHeaderRow(org.apache.poi.ss.usermodel.Row row) {
-    // cell for header text
-    Cell cell = row.createCell(0);
-    cell.setCellValue("Special Cases Data");
-  }
-
+  
   // function: addHeaderRows
   // purpose: add header rows and cell to the top of the visualizer spreadsheet
   // param: worksheet to which we will be adding rows and cells

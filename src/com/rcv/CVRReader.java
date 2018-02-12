@@ -112,7 +112,6 @@ public class CVRReader {
             Logger.log("unexpected cell type at ranking %d ballot %f", rank, castVoteRecordID);
             continue;
           }
-          // TODO: how are overvotes input / parsed?
           candidate = cvrDataCell.getStringCellValue().trim();
 
           if (candidate.equals(config.undervoteLabel())) {
