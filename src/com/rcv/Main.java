@@ -24,7 +24,7 @@ public class Main {
   // param: args command line argument array
   public static void main(String[] args) {
     // validate at least one arg passed in
-    if(args.length < 1) {
+    if (args.length < 1) {
       System.err.print("No config file specified.  Exiting.");
       System.exit(1);
     }
@@ -39,7 +39,7 @@ public class Main {
     }
     // config wraps the rawConfig and provides helper logic to handle various election parameters
     ElectionConfig config = new ElectionConfig(rawConfig);
-    if(!config.validate()) {
+    if (!config.validate()) {
       Logger.log("there was a problem validating the election config.  Exiting");
       System.exit(1);
     }

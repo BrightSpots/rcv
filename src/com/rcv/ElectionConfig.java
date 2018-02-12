@@ -32,15 +32,24 @@ public class ElectionConfig {
 
   // function: validate
   // purpose: validate the correctness of the config data
-  // returns False if there was a problem
+  // returns false if there was a problem
   public boolean validate() {
-    if(this.overvoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
-      return false;
+    // does this config meet our validation standards?
+    boolean valid = true;
+
+    if (this.overvoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
+      valid = false;
+    } else if (this.tiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
+      valid = false;
+    } else if (
+      overvoteLabel() != null &&
+      overvoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
+      overvoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
+    ) {
+      valid = false;
     }
-    if(this.tiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
-      return false;
-    }
-    return true;
+
+    return valid;
   }
 
   // function: auditOutput
