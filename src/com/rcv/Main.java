@@ -39,6 +39,10 @@ public class Main {
     }
     // config wraps the rawConfig and provides helper logic to handle various election parameters
     ElectionConfig config = new ElectionConfig(rawConfig);
+    if(!config.validate()) {
+      Logger.log("there was a problem validating the election config.  Exiting");
+      System.exit(1);
+    }
     try {
       // setup log output
       Logger.setup(config.auditOutput());
@@ -74,22 +78,14 @@ public class Main {
 
     Logger.log("read %d records",castVoteRecords.size());
 
-    // tabulate the election results
-
-    // tabulator: handles most tabulation logic
+    // tabulator: handles tabulation logic
     Tabulator tabulator = new Tabulator(castVoteRecords, config);
-    try {
-      // TODO: break these steps into separate try / catch blocks and provide error messages
-      
-      // do the tabulation
-      tabulator.tabulate();
-      // generate the visualizer spreadsheet data
-      tabulator.generateSummarySpreadsheet();
-      // generate audit data
-      tabulator.doAudit(castVoteRecords);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    // do the tabulation
+    tabulator.tabulate();
+    // generate the visualizer spreadsheet data
+    tabulator.generateSummarySpreadsheet();
+    // generate audit data
+    tabulator.doAudit(castVoteRecords);
   }
 
 }

@@ -109,8 +109,7 @@ public class Tabulator {
 
   // purpose: run the main tabulation routine to determine election results
   //  this is the high-level control of the tabulation algorithm
-  // throws: AssertionError when no candidates are eliminated in a round
-  public void tabulate() throws Exception {
+  public void tabulate() {
 
     log("Beginning tabulation for contest.");
     log("There are %d candidates for this contest:", config.numCandidates());

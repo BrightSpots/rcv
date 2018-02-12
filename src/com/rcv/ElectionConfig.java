@@ -30,6 +30,19 @@ public class ElectionConfig {
     this.processCandidateData();
   }
 
+  // function: validate
+  // purpose: validate the correctness of the config data
+  // returns False if there was a problem
+  public boolean validate() {
+    if(this.overvoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
+      return false;
+    }
+    if(this.tiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
+      return false;
+    }
+    return true;
+  }
+
   // function: auditOutput
   // purpose: getter for auditOutput
   // returns: path to audit output file
@@ -108,9 +121,7 @@ public class ElectionConfig {
         rule = Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY;
         break;
       default:
-        // TODO: throw and handle with helpful output
         Logger.log("Unrecognized overvote rule setting:%s", setting);
-        System.exit(1);
     }
     return rule;
   }
@@ -136,9 +147,7 @@ public class ElectionConfig {
         mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
         break;
       default:
-        // TODO: throw and handle with helpful output
         Logger.log("Unrecognized tiebreaker mode rule setting: %s", setting);
-        System.exit(1);
     }
     return mode;
   }
