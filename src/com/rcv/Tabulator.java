@@ -341,7 +341,7 @@ public class Tabulator {
           roundTallies);
 
         // results of tiebreak stored here
-        eliminatedCandidate = tieBreak.loser;
+        eliminatedCandidate = tieBreak.loser();
         roundToTieBreak.put(currentRound, tieBreak);
         log(
           "%s lost a tie-breaker in round %d against %s. Each candidate had %d vote(s). %s",
@@ -349,7 +349,7 @@ public class Tabulator {
           currentRound,
           tieBreak.nonLosingCandidateDescription(),
           minVotes,
-          tieBreak.explanation
+          tieBreak.explanation()
         );
       } else {
         // last place candidate will be eliminated
@@ -626,8 +626,9 @@ public class Tabulator {
         for (String candidateID : candidateIDSet) {
           // skip eliminated candidates
           if (candidateToRoundEliminated.get(candidateID) == null) {
-            // if this fails we failed to handle an overvote with multiple continuing candidates
-            assert(selectedCandidateID != null);
+            // If this fails, it means the code failed to handle an overvote with multiple
+            // continuing candidates.
+            assert selectedCandidateID == null;
             // we found a continuing candidate, so increase their tally by 1
             selectedCandidateID = candidateID;
             // text description of the vote

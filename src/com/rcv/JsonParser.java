@@ -28,8 +28,7 @@ public class JsonParser {
       // objectMapper will map json values into the new java object
       ObjectMapper objectMapper = new ObjectMapper();
       // object is the newly created object populated with json values
-      T object = objectMapper.readValue(fileReader, valueType);
-      return object;
+      return objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException jsonException) {
       Logger.log("Error parsing json file:%s", jsonFilePath);
       Logger.log("Check your file formatting and values to make sure they are correct.");

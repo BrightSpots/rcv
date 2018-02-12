@@ -118,8 +118,8 @@ public class ResultsWriter {
     // create the output workbook
     XSSFWorkbook workbook = new XSSFWorkbook();
     // create the output worksheet
-    XSSFSheet worksheet = workbook.createSheet(config.jurisdiction() + " "
-        + config.office());
+    XSSFSheet worksheet =
+      workbook.createSheet(config.jurisdiction() + " " + config.office());
 
     // rowCounter contains the next empty row after all header rows have been created
     // this is where we start adding round-by-round reports
@@ -135,10 +135,10 @@ public class ResultsWriter {
     int columnIndex;
 
     // Round headers:
-    // headerRow1 is the row for round headers
-    org.apache.poi.ss.usermodel.Row headerRow1 = worksheet.createRow(rowCounter++);
+    // firstHeaderRow is the row for round headers
+    org.apache.poi.ss.usermodel.Row firstHeaderRow = worksheet.createRow(rowCounter++);
     // the round header title cell will be used to create all the round headers
-    Cell roundTitleHeaderCell = headerRow1.createCell(0);
+    Cell roundTitleHeaderCell = firstHeaderRow.createCell(0);
     roundTitleHeaderCell.setCellValue("Round Title");
     // round indexes over all rounds plus final results round
     for (int round = 1; round <= numRounds+1; round++) {
@@ -148,16 +148,16 @@ public class ResultsWriter {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
       // label string will have the actual text which goes in the cell
       String label;
-      if(round == 1) {
+      if (round == 1) {
         label = "Initial Count";
       } else if (round == numRounds+1) {
         label = "Final Results";
       } else {
         label = String.format("Round %d", round);
       }
-      for(int i = 0; i < COLUMNS_PER_ROUND; i++) {
+      for (int i = 0; i < COLUMNS_PER_ROUND; i++) {
         // cell for round label
-        Cell roundLabelCell = headerRow1.createCell(columnIndex++);
+        Cell roundLabelCell = firstHeaderRow.createCell(columnIndex++);
         roundLabelCell.setCellValue(label);
       }
     }
@@ -181,7 +181,7 @@ public class ResultsWriter {
       // list of all candidates eliminated in this round
       List<String> eliminated = roundToCandidatesEliminated.get(round);
       // note we shift the eliminated candidate(s) display and action into the subsequent column
-      if(eliminated.size() > 0) {
+      if (eliminated.size() > 0) {
         // eliminatedCellText contains formatted candidate names
         String eliminatedCellText = String.join("; ", eliminated);
         // here we dont subtract 1 from round because the eliminated text is displayed in the
@@ -220,25 +220,25 @@ public class ResultsWriter {
     // array for calculating the votes redistributed between rounds
     int[] votesRedistributedEachRound = new int[numRounds+1];
 
-    // headerRow2 will be the row object for vote total, change, percentage headers for each round
-    org.apache.poi.ss.usermodel.Row headerRow2 = worksheet.createRow(rowCounter++);
+    // secondHeaderRow will be the row object for vote total, change, percentage headers for each round
+    org.apache.poi.ss.usermodel.Row secondHeaderRow = worksheet.createRow(rowCounter++);
     // container for candidate name
-    Cell candidateNameCell = headerRow2.createCell(0);
+    Cell candidateNameCell = secondHeaderRow.createCell(0);
     candidateNameCell.setCellValue("Candidate Name");
     // round indexes over all rounds plus final results round
     for (int round = 1; round <= numRounds+1; round++) {
       columnIndex = ((round-1)*COLUMNS_PER_ROUND)+1;
       // cell for round delta header
-      Cell roundDeltaCell = headerRow2.createCell(columnIndex);
+      Cell roundDeltaCell = secondHeaderRow.createCell(columnIndex);
       roundDeltaCell.setCellValue("Vote change");
       columnIndex++;
       // round total header cell
-      Cell roundTotalCell = headerRow2.createCell(columnIndex++);
+      Cell roundTotalCell = secondHeaderRow.createCell(columnIndex++);
       // text for the round total header cell
       String roundTotalText = (round == 1) ? "First preferences" : "Result of round";
       roundTotalCell.setCellValue(roundTotalText);
       // cell for round percentage header cell
-      Cell roundPercentageCell = headerRow2.createCell(columnIndex);
+      Cell roundPercentageCell = secondHeaderRow.createCell(columnIndex);
       roundPercentageCell.setCellValue("% of vote");
     }
 
@@ -410,7 +410,7 @@ public class ResultsWriter {
       Logger.log("failed to write " + config.visualizerOutput() + " to disk!");
     }
   }
-  
+
   // function: addHeaderRows
   // purpose: add header rows and cell to the top of the visualizer spreadsheet
   // param: worksheet to which we will be adding rows and cells

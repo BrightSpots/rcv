@@ -43,10 +43,10 @@ public class CastVoteRecord {
   // param: rankings list of rank->candidateID selections parsed for this cvr
   // param: fullCVRData list of strings containting ALL data parsed for this cvr
   public CastVoteRecord(
-      String source,
-      String ballotID,
-      List<Pair<Integer, String>> rankings,
-      List<String> fullCVRData
+    String source,
+    String ballotID,
+    List<Pair<Integer, String>> rankings,
+    List<String> fullCVRData
   ) {
     sourceName = source;
     cvrID = ballotID;
@@ -85,19 +85,19 @@ public class CastVoteRecord {
   // purpose: create a map of ranking to candidates selected at that rank
   // param: rankings list of rankings (rank, candidateID pairs) to be sorted
   private void sortRankings(List<Pair<Integer, String>> rankings) {
-      rankToCandidateIDs = new TreeMap<>();
-      // index for iterating over all rankings
-      for (Pair<Integer, String> ranking : rankings) {
-        // set of candidates given this rank
-        Set<String> candidatesAtRank = rankToCandidateIDs.get(ranking.fst);
-        if (candidatesAtRank == null) {
-          // create the new optionsAtRank and add to the sorted cvr
-          candidatesAtRank = new HashSet<>();
-          rankToCandidateIDs.put(ranking.fst, candidatesAtRank);
-        }
-        // add this option into the map
-        candidatesAtRank.add(ranking.snd);
+    rankToCandidateIDs = new TreeMap<>();
+    // index for iterating over all rankings
+    for (Pair<Integer, String> ranking : rankings) {
+      // set of candidates given this rank
+      Set<String> candidatesAtRank = rankToCandidateIDs.get(ranking.fst);
+      if (candidatesAtRank == null) {
+        // create the new optionsAtRank and add to the sorted cvr
+        candidatesAtRank = new HashSet<>();
+        rankToCandidateIDs.put(ranking.fst, candidatesAtRank);
       }
+      // add this option into the map
+      candidatesAtRank.add(ranking.snd);
+    }
   }
 
   // function: getAuditString

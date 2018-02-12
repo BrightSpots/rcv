@@ -23,14 +23,13 @@ public class Main {
   // purpose: main entry point to the rcv tabulator program
   // param: args command line argument array
   public static void main(String[] args) {
-
     ElectionConfig config = makeElectionConfig(args);
     if (config != null) {
       try {
         // setup log output
         Logger.setup(config.auditOutput());
-        Logger.log("parsed config file:%s", args[0]);
-        Logger.log("logging to:%s", config.auditOutput());
+        Logger.log("Parsed config file: %s", args[0]);
+        Logger.log("Logging to: %s", config.auditOutput());
 
         // Read cast vote records from cvr files
         // castVoteRecords will contain all cast vote records parsed by the reader
@@ -46,9 +45,13 @@ public class Main {
         tabulator.doAudit(castVoteRecords);
 
       } catch (IOException exception) {
-        System.err.print(String.format("failed to configure logging output to file:" +
-                config.auditOutput(),
-            exception.toString()));
+        System.err.print(
+          String.format(
+            "Failed to configure logging output to file: %s\n%s",
+            config.auditOutput(),
+            exception.toString()
+          )
+        );
       }
     }
   }
@@ -69,13 +72,13 @@ public class Main {
       if (rawConfig != null) {
         config = new ElectionConfig(rawConfig);
         if (!config.validate()) {
-          Logger.log("there was a problem validating the election configuration.");
+          Logger.log("There was a problem validating the election configuration.");
           Logger.log("Please see the README.txt for details.");
         }
       }
     } else {
-      System.err.print("No election configuration file specified as input.");
-      System.err.print("Please see the README.txt for details.");
+      System.err.println("No election configuration file specified as input.");
+      System.err.println("Please see the README.txt for details.");
     }
     return config;
   }
@@ -90,20 +93,20 @@ public class Main {
     // at each iteration of the following loop we add records from another source file
     // source: index over config sources
     for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      Logger.log("reading cvr file:%s provider:%s",source.filePath, source.provider);
+      Logger.log("Reading cvr file: %s (provider: %s)", source.filePath, source.provider);
       // reader: read input file into a list of cast vote records
       CVRReader reader = new CVRReader();
       reader.parseCVRFile(
-          source.filePath,
-          source.firstVoteColumnIndex,
-          config.maxRankingsAllowed(),
-          config.getCandidateCodeList(),
-          config
+        source.filePath,
+        source.firstVoteColumnIndex,
+        config.maxRankingsAllowed(),
+        config.getCandidateCodeList(),
+        config
       );
       // add records to the master list
       castVoteRecords.addAll(reader.castVoteRecords);
     }
-    Logger.log("read %d records",castVoteRecords.size());
+    Logger.log("Read %d records", castVoteRecords.size());
     return castVoteRecords;
   }
 

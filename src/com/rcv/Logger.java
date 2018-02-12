@@ -64,18 +64,12 @@ public class Logger {
     // returns: the formatted string for output
     @Override
     public String format(LogRecord record) {
-      // builder to create the formatted log output string
-      StringBuilder stringBuilder = new StringBuilder();
-      // populate the string with output data
-      stringBuilder.append(new Date(record.getMillis()))
-          .append(" ")
-          .append(record.getLevel().getLocalizedName())
-          .append(": ")
-          .append(formatMessage(record))
-          .append(System.getProperty("line.separator"));
-
-      return stringBuilder.toString();
+      return new Date(record.getMillis()) +
+        " " +
+        record.getLevel().getLocalizedName() +
+        ": " +
+        formatMessage(record) +
+        System.getProperty("line.separator");
     }
   }
-
 }

@@ -9,19 +9,19 @@ package com.rcv;
 import java.util.*;
 
 class TieBreak {
-  List<String> tiedCandidates;
-  Tabulator.TieBreakMode tieBreakMode;
+  private List<String> tiedCandidates;
+  private Tabulator.TieBreakMode tieBreakMode;
   // round in which this tiebreak occurred
-  int round;
+  private int round;
   // number of votes the tying candidates received
-  int numVotes;
+  private int numVotes;
   // roundTallies: map from round number to map of candidate ID to vote total (for that round)
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
-  Map<Integer, Map<String, Integer>> roundTallies;
+  private Map<Integer, Map<String, Integer>> roundTallies;
   // candidate ID selected to lose the tiebreak
-  String loser;
+  private String loser;
   // reason for the selection
-  String explanation;
+  private String explanation;
 
   // function: TieBreak
   // purpose: TieBreak constructor stores member data and selects the loser
@@ -75,6 +75,14 @@ class TieBreak {
       nonselected = stringBuilder.toString();
     }
     return nonselected;
+  }
+
+  String loser() {
+    return loser;
+  }
+
+  String explanation() {
+    return explanation;
   }
 
   // function: breakTie
@@ -178,7 +186,8 @@ class TieBreak {
       LinkedList<String> candidatesWithLowestTotal = tallyToCandidates.get(minVotes);
       if (candidatesWithLowestTotal.size() == 1) {
         loser = candidatesWithLowestTotal.getFirst();
-        explanation = "%s had the fewest votes (%d) in round %d.".format(loser, minVotes, round);
+        explanation =
+          String.format("%s had the fewest votes (%d) in round %d.", loser, minVotes, round);
         break;
       } else {
         // update candidatesInContention and check the previous round
