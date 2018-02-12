@@ -19,13 +19,9 @@ public class JsonParser {
   // purpose: parse input json file into an object of the specified type
   // param: jsonFilePath path to json file to be parsed into java
   // param: valueType class of the object to be created from parsed json
-  // throws: JsonParseException | JsonMappingException if there was a problem mapping json data
-  // throws: IOException if there was a problem reading the file
   // file access: read
-  // returns: instance of the object parsed from json
-  public static <T> T parseObjectFromFile(String jsonFilePath,
-    Class<T> valueType
-  ) throws Exception {
+  // returns: instance of the object parsed from json or null if there was a problem
+  public static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
     try {
       // fileReader will read the json file from disk
       FileReader fileReader = new FileReader(jsonFilePath);
@@ -35,16 +31,15 @@ public class JsonParser {
       T object = objectMapper.readValue(fileReader, valueType);
       return object;
     } catch (JsonParseException | JsonMappingException jsonException) {
-      Logger.log("Error parsing file:%s", jsonFilePath);
+      Logger.log("Error parsing json file:%s", jsonFilePath);
       Logger.log("Check your file formatting and values to make sure they are correct.");
       Logger.log(jsonException.getMessage());
-      throw jsonException;
     } catch (IOException fileException) {
       Logger.log("Error opening file:%s", jsonFilePath);
       Logger.log("Check your file path and make sure it is correct.");
       Logger.log(fileException.toString());
-      throw fileException;
     }
+    return null;
   }
 }
 
