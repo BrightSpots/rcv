@@ -35,7 +35,7 @@ public class CastVoteRecord {
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
   public SortedMap<Integer, Set<String>> rankToCandidateIDs;
-  // weather this cvr is exhausted or not
+  // whether this cvr is exhausted or not
   private boolean isExhausted;
 
   // contains who this cvr counted for in each round
@@ -82,7 +82,7 @@ public class CastVoteRecord {
 
   // function: isExhausted
   // purpose: getter for exhausted state
-  // returns: true of cvr is exhausted otherwise false
+  // returns: true if cvr is exhausted otherwise false
   public boolean isExhausted() {
     return isExhausted;
   }
