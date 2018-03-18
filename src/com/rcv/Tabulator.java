@@ -203,18 +203,18 @@ public class Tabulator {
     // store result here
     String selectedWinner = null;
     // currentRoundTotalVotes is total votes across all candidates in this round
-    int currentRoundTotalVotes = 0;
+    float currentRoundTotalVotes = 0;
     // numVotes indexes over all vote tallies in this round
     for (Float numVotes : currentRoundCandidateToTally.values()) {
       currentRoundTotalVotes += numVotes;
     }
-    log("Total votes in round %d: %d.", currentRound, currentRoundTotalVotes);
+    log("Total votes in round %d: %f.", currentRound, currentRoundTotalVotes);
 
     // the highest vote total amongst all candidates
     Float maxVotes = currentRoundTallyToCandidates.lastKey();
     // Does the leader have a majority of non-exhausted ballots? In other words, is maxVotes
     // greater than half of the total votes counted in this round?
-    if (maxVotes > (float)currentRoundTotalVotes / 2.0) {
+    if (maxVotes > currentRoundTotalVotes / 2.0) {
       // we have a winner
       // votes indexes over all tallies to find the winning one
       for (Float votes : currentRoundTallyToCandidates.keySet()) {
@@ -225,7 +225,7 @@ public class Tabulator {
           break;
         }
       }
-      log("%s won in round %d with %d votes.", selectedWinner, currentRound, maxVotes);
+      log("%s won in round %d with %f votes.", selectedWinner, currentRound, maxVotes);
     }
     return selectedWinner;
   }
@@ -247,7 +247,7 @@ public class Tabulator {
     ) {
       eliminated.add(config.undeclaredWriteInLabel());
       log(
-        "Eliminated %s in round %d because it represents undeclared write-ins. It had %d votes.",
+        "Eliminated %s in round %d because it represents undeclared write-ins. It had %f votes.",
         config.undeclaredWriteInLabel(),
         currentRound,
         currentRoundCandidateToTally.get(config.undeclaredWriteInLabel())
@@ -277,7 +277,7 @@ public class Tabulator {
           for (String candidate : currentRoundTallyToCandidates.get(tally)) {
             eliminated.add(candidate);
             log(
-              "Eliminated %s in round %d because they only had %d vote(s), below the minimum " +
+              "Eliminated %s in round %d because they only had %f vote(s), below the minimum " +
                 "threshold of %d.",
               candidate,
               currentRound,
@@ -308,7 +308,7 @@ public class Tabulator {
         for (BatchElimination elimination : batchEliminations) {
           eliminated.add(elimination.candidateID);
           log(
-            "Batch-eliminated %s in round %d. The running total was %d vote(s) and the " +
+            "Batch-eliminated %s in round %d. The running total was %f vote(s) and the " +
               "next-highest count was %d vote(s).",
             elimination.candidateID,
             currentRound,
@@ -351,7 +351,7 @@ public class Tabulator {
         eliminatedCandidate = tieBreak.loser();
         roundToTieBreak.put(currentRound, tieBreak);
         log(
-          "%s lost a tie-breaker in round %d against %s. Each candidate had %d vote(s). %s",
+          "%s lost a tie-breaker in round %d against %s. Each candidate had %f vote(s). %s",
           eliminatedCandidate,
           currentRound,
           tieBreak.nonLosingCandidateDescription(),
@@ -361,7 +361,7 @@ public class Tabulator {
       } else {
         // last place candidate will be eliminated
         eliminatedCandidate = lastPlaceCandidates.getFirst();
-        log("%s was eliminated in round %d with %d vote(s).",
+        log("%s was eliminated in round %d with %f vote(s).",
           eliminatedCandidate,
           currentRound,
           minVotes
@@ -690,7 +690,7 @@ public class Tabulator {
       // vote count for this candidate
       Float votes = roundTally.get(candidate);
       if (shouldLog) {
-        Logger.log("Candidate %s got %d votes.", candidate, votes);
+        Logger.log("Candidate %s got %f votes.", candidate, votes);
       }
       // all candidates in the existing output structure (if any) who received the same vote tally
       LinkedList<String> candidates = tallyToCandidates.get(votes);

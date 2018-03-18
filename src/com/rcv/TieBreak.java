@@ -194,7 +194,7 @@ class TieBreak {
       if (candidatesWithLowestTotal.size() == 1) {
         loser = candidatesWithLowestTotal.getFirst();
         explanation =
-          String.format("%s had the fewest votes (%d) in round %d.", loser, minVotes, round);
+          String.format("%s had the fewest votes (%f) in round %d.", loser, minVotes, round);
         break;
       } else {
         // update candidatesInContention and check the previous round
