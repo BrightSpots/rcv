@@ -40,13 +40,13 @@ public class ResultsWriter {
   // map of candidate to round in which they were eliminated
   private Map<String, Integer> candidatesToRoundEliminated;
   // the winning candidateID
-  private String winner;
+  private Map<String, Integer> winnerToRound;
   // configuration file in use for this election
   private ElectionConfig config;
 
-  // function: setNumRound
-  // purpose: setter for total number of rounds to declare a winner
-  // param: numRounds total number of rounds to declare a winner
+  // function: setNumRounds
+  // purpose: setter for total number of rounds to declare the winner(s)
+  // param: numRounds total number of rounds to declare the winner(s)
   public ResultsWriter setNumRounds(int numRounds) {
     this.numRounds = numRounds;
     return this;
@@ -78,11 +78,11 @@ public class ResultsWriter {
     return this;
   }
 
-  // function: setWinner
-  // purpose: setter for the winning candidate name
-  // param: winner the winning candidate name
-  public ResultsWriter setWinner(String winner) {
-    this.winner = winner;
+  // function: setWinnerToRound
+  // purpose: setter for the winning candidates
+  // param: map from winning candidate name to the round in which they won
+  public ResultsWriter setWinnerToRound(Map<String, Integer> winnerToRound) {
+    this.winnerToRound = winnerToRound;
     return this;
   }
 
@@ -176,7 +176,7 @@ public class ResultsWriter {
       }
     }
 
-    // "action" row describes weather an elimination happened or a winner was selected
+    // "action" row describes whether an elimination happened or one or more winners were selected
     // we create the row header and will fill in the action cells while we iterate through
     // the candidate eliminations row since the indexing logic is identical
     // actionRow is the row object which will contain the action cells
@@ -218,7 +218,7 @@ public class ResultsWriter {
     electedCell.setCellValue("Winners");
     columnIndex = (numRounds*COLUMNS_PER_ROUND)+1;
     electedCell = electedRow.createCell(columnIndex);
-    electedCell.setCellValue(winner);
+    electedCell.setCellValue((String)winnerToRound.keySet().toArray()[0]); // TODO: update for multiple winners
 
     // Winner action
     // actionCell is created from the actionRow (above) for the final "winner" action
@@ -463,7 +463,7 @@ public class ResultsWriter {
       {null, null, OutputType.STRING},
       {"Contest summary data", null, OutputType.STRING},
       {"Tally detail", null, OutputType.STRING},
-      {"Single/multi winner", "single-winner", OutputType.STRING},
+      {"Single/multi winner", "single-winner", OutputType.STRING}, // TODO: update for multi-winners
       {"Number to be elected", 1, OutputType.INT},
       {"Number of candidates", config.numCandidates(), OutputType.INT},
       {"Number of votes cast", totalActiveVotesFirstRound, OutputType.FLOAT},

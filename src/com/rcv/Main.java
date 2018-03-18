@@ -46,7 +46,7 @@ public class Main {
           // generate audit data
           tabulator.doAudit(castVoteRecords);
         } catch (Exception exception) {
-          Logger.log("Error parsing cast vote record file(s):" + exception.toString());
+          Logger.log("Tabulation error: " + exception.toString());
         }
       } catch (IOException exception) {
         System.err.print(

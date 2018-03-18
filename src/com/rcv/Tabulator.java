@@ -68,9 +68,9 @@ public class Tabulator {
   private Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
 
   // the winning candidateID
-  private String winner;
+  private Map<String, Integer> winnerToRound = new HashMap<>();
 
-  // when tabulation is complete this will be how many rounds did it take to determine a winner
+  // when tabulation is complete, this will be how many rounds it took to determine the winner(s)
   private int currentRound = 0;
 
   // simple container class used during batch elimination process to store the results
@@ -131,18 +131,20 @@ public class Tabulator {
       this.candidateIDs.add(config.undeclaredWriteInLabel());
     }
 
-    // Loop until we achieve a majority winner: at each iteration we will eliminate one or more
-    // candidates and gradually transfer votes to the remaining candidates.
-    while (winner == null) {
+    // Loop until we've found our winner(s). At each iteration, we'll either a) identify one or more
+    // winners and transfer their votes to the remaining candidates (if we still need to find more
+    // winners), or b) eliminate one or more candidates and gradually transfer votes to the
+    // remaining candidates.
+    while (winnerToRound.size() < 1) { // config.numberOfWinners()) {
       currentRound++;
       log("Round: %d", currentRound);
 
       // currentRoundCandidateToTally is a map from candidateID to vote tally for the current round.
-      // At each iteration of this loop the eliminatedRound object will gain entries as candidates
-      // are eliminated.
+      // At each iteration of this loop that involves eliminating candidates, the eliminatedRound
+      // object will gain entries.
       // Conversely, the currentRoundCandidateToTally object returned here will contain fewer
       // entries, each of which will have as many or more votes than they did in prior rounds.
-      // Eventually a winner will be chosen.
+      // Eventually the winner(s) will be chosen.
       Map<String, Float> currentRoundCandidateToTally =
         getTallyForRound(castVoteRecords, candidateToRoundEliminated, currentRound);
       roundTallies.put(currentRound, currentRoundCandidateToTally);
@@ -154,10 +156,14 @@ public class Tabulator {
         true
       );
       // see if a winner is determined in this iteration
-      winner = identifyWinner(currentRoundCandidateToTally, currentRoundTallyToCandidates);
+      List<String> winners = identifyWinners(currentRoundCandidateToTally, currentRoundTallyToCandidates);
 
-      // if no winner determine who will be eliminated in this round
-      if (winner == null) {
+      // if no winners in this round, determine who will be eliminated
+      if (winners.size() > 0) {
+        for (String winner : winners) {
+          winnerToRound.put(winner, currentRound);
+        }
+      } else {
         // container for eliminated candidate(s)
         List<String> eliminated = new LinkedList<>();
 
@@ -191,17 +197,17 @@ public class Tabulator {
     }
   }
 
-  // function: identifyWinner
-  // purpose: determine if a winner has been identified in this round
+  // function: identifyWinners
+  // purpose: determine if one or more winners have been identified in this round
   // param: currentRoundCandidateToTally map of candidateID to their tally in a particular round
   // param: currntRoundTallyToCandidates map of tally to candidate ID(s) for a particular round
-  // return: winning candidateID or nil if no winner yet
-  private String identifyWinner(
+  // return: list of winning candidates in this round (if any)
+  private List<String> identifyWinners(
     Map<String, Float> currentRoundCandidateToTally,
     SortedMap<Float, LinkedList<String>> currentRoundTallyToCandidates
   ) {
     // store result here
-    String selectedWinner = null;
+    List<String> selectedWinners = new LinkedList<>();
     // currentRoundTotalVotes is total votes across all candidates in this round
     float currentRoundTotalVotes = 0;
     // numVotes indexes over all vote tallies in this round
@@ -219,15 +225,16 @@ public class Tabulator {
       // votes indexes over all tallies to find the winning one
       for (Float votes : currentRoundTallyToCandidates.keySet()) {
         // record winner
-        if (votes == maxVotes) {
+        if (votes.equals(maxVotes)) {
           // set the winner
-          selectedWinner = currentRoundTallyToCandidates.get(votes).getFirst();
+          String selectedWinner = currentRoundTallyToCandidates.get(votes).getFirst();
+          selectedWinners.add(selectedWinner);
+          log("%s won in round %d with %f votes.", selectedWinner, currentRound, maxVotes);
           break;
         }
       }
-      log("%s won in round %d with %f votes.", selectedWinner, currentRound, maxVotes);
     }
-    return selectedWinner;
+    return selectedWinners;
   }
 
   // function: dropUWI
@@ -382,7 +389,7 @@ public class Tabulator {
       setNumRounds(currentRound).
       setRoundTallies(roundTallies).
       setCandidatesToRoundEliminated(candidateToRoundEliminated).
-      setWinner(winner).
+      setWinnerToRound(winnerToRound).
       setElectionConfig(config);
 
     writer.generateSummarySpreadsheet();
@@ -669,7 +676,7 @@ public class Tabulator {
   // purpose: utility function to "invert" the input map of candidateID to tally
   //   into a sorted map of tally to List of candidateIDs.
   //   A list is used because multiple candidates may have the same tally.
-  //   This is used to determine when a final winner is picked and for running tiebreak logic.
+  //   This is used to determine when winners are selected and for running tiebreak logic.
   // param: roundTally input map of candidateID to tally for a particular round
   // param candidatesToInclude: list of candidateIDs which may be included in the output.
   //   This filters out candidates when running a tiebreak tabulation which relies
