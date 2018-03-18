@@ -59,6 +59,12 @@ public class Tabulator {
     MODE_UNKNOWN
   }
 
+  enum CandidateStatus {
+    CONTINUING,
+    WINNER,
+    ELIMINATED,
+  }
+
   // cast vote records parsed from CVR input files
   private List<CastVoteRecord> castVoteRecords;
   // all candidateIDs for this election parsed from the election config (does not include UWIs)
@@ -74,7 +80,7 @@ public class Tabulator {
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
   private Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
 
-  // the winning candidateID
+  // map from candidate ID to the round in which they won
   private Map<String, Integer> winnerToRound = new HashMap<>();
 
   // when tabulation is complete, this will be how many rounds it took to determine the winner(s)
@@ -142,7 +148,7 @@ public class Tabulator {
     // winners and transfer their votes to the remaining candidates (if we still need to find more
     // winners), or b) eliminate one or more candidates and gradually transfer votes to the
     // remaining candidates.
-    while (winnerToRound.size() < 1) { // config.numberOfWinners()) {
+    while (winnerToRound.size() < config.numberOfWinners()) {
       currentRound++;
       log("Round: %d", currentRound);
 
@@ -152,8 +158,7 @@ public class Tabulator {
       // Conversely, the currentRoundCandidateToTally object returned here will contain fewer
       // entries, each of which will have as many or more votes than they did in prior rounds.
       // Eventually the winner(s) will be chosen.
-      Map<String, Float> currentRoundCandidateToTally =
-        getTallyForRound(castVoteRecords, candidateToRoundEliminated, currentRound);
+      Map<String, Float> currentRoundCandidateToTally = getTallyForRound(currentRound);
       roundTallies.put(currentRound, currentRoundCandidateToTally);
 
       // currentRoundTallyToCandidates is a sorted map from tally to candidate(s) with that tally.
@@ -165,12 +170,25 @@ public class Tabulator {
       // see if a winner is determined in this iteration
       List<String> winners = identifyWinners(currentRoundCandidateToTally, currentRoundTallyToCandidates);
 
-      // if no winners in this round, determine who will be eliminated
       if (winners.size() > 0) {
         for (String winner : winners) {
           winnerToRound.put(winner, currentRound);
         }
-      } else {
+        for (String winner : winners) {
+          // are there still more winners to select in future rounds?
+          if (winnerToRound.size() < config.numberOfWinners()) {
+            // fractional transfer based on surplus votes
+            float candidateVotes = currentRoundCandidateToTally.get(winner);
+            float extraVotes = candidateVotes - getThreshold(currentRoundCandidateToTally);
+            float surplusFraction = extraVotes / candidateVotes; // TODO: round based on config
+            for (CastVoteRecord cvr : castVoteRecords) {
+              if (cvr.getCurrentRecipientOfVote().equals(winner)) {
+                cvr.setFractionalTransferValue(cvr.getFractionalTransferValue() * surplusFraction);
+              }
+            }
+          }
+        }
+      } else {  // if no winners in this round, determine who will be eliminated
         // container for eliminated candidate(s)
         List<String> eliminated = new LinkedList<>();
 
@@ -209,25 +227,33 @@ public class Tabulator {
   // param: currentRoundCandidateToTally map of candidateID to their tally for a particular round
   // param: winnerToRound map of candidateID to round in which they won
   // return: threshold to determine a winner
-  private Float getThreshold(
-      Map<String, Float> currentRoundCandidateToTally,
-      Map<String, Integer> winnerToRound
-  ) {
+  private float getThreshold(Map<String, Float> currentRoundCandidateToTally) {
     // currentRoundTotalVotes holds total active votes in this round
-    Float currentRoundTotalVotes = 0f;
+    float currentRoundTotalVotes = 0f;
     // numVotes indexes over all vote tallies in this round
-    for (Float numVotes : currentRoundCandidateToTally.values()) {
+    for (float numVotes : currentRoundCandidateToTally.values()) {
       currentRoundTotalVotes += numVotes;
     }
     // how many seats have been filled
-    Integer numPreviousWinners = winnerToRound.keySet().size();
+    int numPreviousWinners = winnerToRound.size();
     // how many seats remain to be filled
-    Integer seatsRemaining = config.numberOfWinners() - numPreviousWinners;
+    int seatsRemaining = config.numberOfWinners() - numPreviousWinners;
 
     // return value
-    Float threshold = currentRoundTotalVotes / (seatsRemaining + 1f);
+    float threshold = currentRoundTotalVotes / (seatsRemaining + 1);
     // TODO: some multi-seat rules require an epsilon value to be added
-    return  threshold;
+    return threshold;
+  }
+
+  private CandidateStatus getCandidateStatus(String candidate) {
+    CandidateStatus status = CandidateStatus.CONTINUING;
+    if (winnerToRound.containsKey(candidate)) {
+      status = CandidateStatus.WINNER;
+    } else if (candidateToRoundEliminated.containsKey(candidate)) {
+      status = CandidateStatus.ELIMINATED;
+    }
+
+    return status;
   }
 
   // function: identifyWinners
@@ -488,12 +514,8 @@ public class Tabulator {
   // purpose: determine if any overvote has occurred for this ranking set (from a cvr)
   // and if so return how to handle it based on the rules configuration in use
   // param: candidateIDSet all candidates this cvr contains at a particular rank
-  // param: candidateIDToRoundEliminated map of candidate IDs to the round in which they were eliminated
   // return: an OvervoteDecision enum to be applied to the cvr under consideration
-  private OvervoteDecision getOvervoteDecision(
-    Set<String> candidateIDSet,
-    Map<String, Integer> candidateIDToRoundEliminated
-  ) {
+  private OvervoteDecision getOvervoteDecision(Set<String> candidateIDSet) {
     // the resulting decision
     OvervoteDecision decision;
     // the rule we're using
@@ -530,7 +552,7 @@ public class Tabulator {
       List<String> continuingAtThisRank = new LinkedList<>();
       // candidateID indexes over all candidate IDs in this ranking set
       for (String candidateID : candidateIDSet) {
-        if (candidateIDToRoundEliminated.get(candidateID) == null) {
+        if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
           continuingAtThisRank.add(candidateID);
         }
       }
@@ -567,12 +589,8 @@ public class Tabulator {
   //   i.e. a continuing candidate
   // param: rankToCandidateIDs ordered map of rankings (most preferred to least) to candidateIDs
   // a set is used to accommodate overvotes
-  // param: candidateToRoundEliminated map of candidateID to round in which they were eliminated
   // return: true if there is a continuing candidate otherwise false
-  private boolean hasContinuingCandidates(
-    SortedMap<Integer, Set<String>> rankToCandidateIDs,
-    Map<String, Integer> candidateToRoundEliminated
-  ) {
+  private boolean hasContinuingCandidates(SortedMap<Integer, Set<String>> rankToCandidateIDs) {
     // the result of this function
     boolean foundContinuingCandidate = false;
     // iterate through all candidateID sets
@@ -580,7 +598,7 @@ public class Tabulator {
       // iterate through all candidateIDs in the set
       for (String candidateID : candidateIDSet) {
         // see if the candidate has been eliminated
-        if (candidateToRoundEliminated.get(candidateID) == null) {
+        if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
           foundContinuingCandidate = true;
           break;
         }
@@ -600,34 +618,28 @@ public class Tabulator {
   //   more entries as candidateIDs are eliminated.
   //   Conversely the roundTally object returned here will contain fewer entries each
   //   of which will have more votes.
-  // param: castVoteRecords contains all castVoteRecords for this election
-  // param: candidateToRoundEliminated map of candidateID to round in which they are eliminated
-  // param: cvrIndexToRoundExhausted map of ballot index to round in which it was exhausted
   // param: the current round
   // return: map of candidateID to vote tallies for this round
-  private Map<String, Float> getTallyForRound(
-    List<CastVoteRecord> castVoteRecords,
-    Map<String, Integer> candidateToRoundEliminated,
-    int currentRound
-  ) {
+  private Map<String, Float> getTallyForRound(int currentRound) {
     // map of candidateID to vote tally to store the results
     Map<String, Float> roundTally = new HashMap<>();
 
     // initialize round tallies to 0 for all continuing candidates
     // candidateID indexes through all candidateIDs
     for (String candidateID : candidateIDs) {
-      if (candidateToRoundEliminated.get(candidateID) == null) {
+      if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
         roundTally.put(candidateID, 0f);
       }
     }
 
     // cvr indexes over the cast vote records to count votes for continuing candidateIDs
     for (CastVoteRecord cvr : castVoteRecords) {
+      cvr.setCurrentRecipientOfVote(null);
       if (cvr.isExhausted()) {
         continue;
       }
       // if this cvr has no continuing candidate exhaust it
-      if (!hasContinuingCandidates(cvr.rankToCandidateIDs, candidateToRoundEliminated)) {
+      if (!hasContinuingCandidates(cvr.rankToCandidateIDs)) {
         cvr.exhaust(currentRound, "no continuing candidates");
         continue;
       }
@@ -635,7 +647,7 @@ public class Tabulator {
       // lastRank tracks the last rank in this rankings set as we iterate through it
       // this is used to determine how many skipped rankings occurred in the case of
       // undervotes
-      Integer lastRank = null;
+      int lastRank = 0;
       // loop over all rankings in this cvr from most preferred to least and see how they will
       // be rendered
       // rank iterates through all ranks in this cvr ranking set
@@ -645,7 +657,7 @@ public class Tabulator {
 
         // check for an overvote
         // overvoteDecision is the overvote decision for this ranking
-        OvervoteDecision overvoteDecision = getOvervoteDecision(candidateIDSet, candidateToRoundEliminated);
+        OvervoteDecision overvoteDecision = getOvervoteDecision(candidateIDSet);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
           cvr.exhaust(currentRound, "overvote");
           break;
@@ -660,7 +672,6 @@ public class Tabulator {
 
         // check for an undervote
         if ((config.maxSkippedRanksAllowed() != null) &&
-            (lastRank != null) &&
             (rank - lastRank > config.maxSkippedRanksAllowed() + 1))
         {
           cvr.exhaust(currentRound, "undervote");
@@ -671,8 +682,8 @@ public class Tabulator {
         String selectedCandidateID = null;
         // candidateID indexes through all candidates selected at this rank
         for (String candidateID : candidateIDSet) {
-          // skip eliminated candidates
-          if (candidateToRoundEliminated.get(candidateID) == null) {
+          // skip non-continuing candidates
+          if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
             // If this fails, it means the code failed to handle an overvote with multiple
             // continuing candidates.
             assert selectedCandidateID == null;
@@ -681,7 +692,14 @@ public class Tabulator {
             // text description of the vote
             String description = String.format("%d|%s|", currentRound, selectedCandidateID);
             cvr.addRoundDescription(description, currentRound);
-            roundTally.put(selectedCandidateID, roundTally.get(selectedCandidateID) + 1);
+            // Increment the tally for this candidate by the fractional transfer value of the CVR.
+            // (By default the FTV is exactly one vote, but it could be less than one in a multi-
+            // winner election if this CVR already helped elect a winner.)
+            roundTally.put(
+              selectedCandidateID,
+              roundTally.get(selectedCandidateID) + cvr.getFractionalTransferValue()
+            );
+            cvr.setCurrentRecipientOfVote(selectedCandidateID);
           }
         }
 

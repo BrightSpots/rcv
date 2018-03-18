@@ -42,6 +42,13 @@ public class CastVoteRecord {
   // followed by reason for exhaustion if it is ever exhausted
   private Map<Integer, String> descriptionsByRound = new HashMap<>();
 
+  // For multi-winner elections that use fractional vote transfers, this represents the current
+  // fractional value of this CVR.
+  private float fractionalTransferValue = 1.0f;
+
+  // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
+  private String currentRecipientOfVote = null;
+
   // function: CastVoteRecord
   // purpose: create a new cvr object
   // param: source what vendor created the cvr file from which this cvr was parsed
@@ -86,6 +93,35 @@ public class CastVoteRecord {
   public boolean isExhausted() {
     return isExhausted;
   }
+
+  // function: getFractionalTransferValue
+  // purpose: getter for fractionalTransferValue
+  // returns: value of field
+  public float getFractionalTransferValue() {
+    return fractionalTransferValue;
+  }
+
+  // function: setFractionalTransferValue
+  // purpose: setter for fractionalTransferValue
+  // param: new value of field
+  public void setFractionalTransferValue(float fractionalTransferValue) {
+    this.fractionalTransferValue = fractionalTransferValue;
+  }
+
+  // function: getCurrentRecipientOfVote
+  // purpose: getter for currentRecipientOfVote
+  // returns: value of field
+  public String getCurrentRecipientOfVote() {
+    return currentRecipientOfVote;
+  }
+
+  // function: setCurrentRecipientOfVote
+  // purpose: setter for currentRecipientOfVote
+  // param: new value of field
+  public void setCurrentRecipientOfVote(String currentRecipientOfVote) {
+    this.currentRecipientOfVote = currentRecipientOfVote;
+  }
+
 
   // function: sortRankings
   // purpose: create a map of ranking to candidates selected at that rank
