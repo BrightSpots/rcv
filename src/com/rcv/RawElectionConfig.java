@@ -43,6 +43,12 @@ public class RawElectionConfig {
     public String tiebreakMode;
     // shall we treat blank cells as UWIs
     public Boolean treatBlankAsUwi;
+    // setting for number of winners
+    public Integer numberOfWinners;
+    // how far to round vote values when performing arithmetic
+    public Integer decimalPlacesForVoteArithmetic;
+    // which transfer rule to use on surplus votes in multi-seat elections
+    public String multiSeatTransferRule;
   }
 
   // CVRSource: encapsulates a source cast vote record file

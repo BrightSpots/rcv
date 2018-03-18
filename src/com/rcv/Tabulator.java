@@ -24,6 +24,13 @@ public class Tabulator {
   // When the CVR contains an overvote we "normalize" it to use this string
   static String explicitOvervoteLabel = "overvote";
 
+  // vote transfer rule to use in multi-seat elections
+  enum MultiSeatTransferRule {
+    TRANSFER_FRACTIONAL_SURPLUS,
+    TRANSFER_WHOLE_SURPLUS,
+    TRANSFER_RULE_UNKNOWN
+  }
+
   // OvervoteRule determines how overvotes are handled
   enum OvervoteRule {
     EXHAUST_IMMEDIATELY,

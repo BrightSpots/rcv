@@ -55,7 +55,62 @@ public class ElectionConfig {
       valid = false;
     }
 
+    // if multi-seat is indicated we validate decimal count and rules style
+    //
+    if(this.numberOfWinners() > 1) {
+      if(this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 1000) {
+        valid = false;
+      }
+      if(multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
+        valid = false;
+      }
+    }
     return valid;
+  }
+
+  // function: overvoteRuleForConfigSetting
+  // purpose: given setting String return the corresponding rules enum
+  // param: OvervoteRule setting string from election config
+  // returns: the OvervoteRule enum value for the input setting string
+  public static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(String setting) {
+    // rule: return value determined by input setting string
+    Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
+
+    switch (setting) {
+      case "transferFractionalSurplus":
+        rule = Tabulator.MultiSeatTransferRule.TRANSFER_FRACTIONAL_SURPLUS;
+        break;
+      case "transferWholeSurplus":
+        rule = Tabulator.MultiSeatTransferRule.TRANSFER_WHOLE_SURPLUS;
+        break;
+      default:
+        Logger.log("Unrecognized MultiSeatTransferRule setting: %s", setting);
+    }
+    return rule;
+  }
+
+
+  // function: numberWinners
+  // purpose: how many winners for this election
+  // returns from settings config or 1 of no setting is specified
+  public Integer numberOfWinners() {
+    return rawConfig.rules.numberOfWinners == null ? 1 : rawConfig.rules.numberOfWinners;
+  }
+
+  // function: decimalPlacesForVoteArithmetic
+  // purpose: how many places to round votes to after performing fractional vote transfers
+  // returns: number of places to round to or 0 if no setting is specified
+  public Integer decimalPlacesForVoteArithmetic() {
+    // w default to using 4 places for fractional transfer vote arithmetic
+    return rawConfig.rules.decimalPlacesForVoteArithmetic == null ? 4 :
+        rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
+  // function: multiSeatTransferRule
+  // purpose: which surplus transfer rule to use in multi-seat elections
+  // returns: enum indicating which transfer rule to use
+  public Tabulator.MultiSeatTransferRule multiSeatTransferRule() {
+    return multiSeatTransferRuleForConfigSetting( rawConfig.rules.multiSeatTransferRule );
   }
 
   // function: auditOutput

@@ -21,3 +21,11 @@ This document lists the parameters that can be included in a config file. Requir
   - *provider: the voting machine format of the file. Example: ES&S
   - *filePath: the location of the file. Example: test/2015-portland-mayor-cvr.xlsx
   - *firstVoteColumnIndex: the index of the column that contains each ballot’s top-ranked candidate. Example: 3
+-- multi-seat:
+  - if numberOfWinners is specified AND it is more than 1 this will be a multi-seat tabulation
+  - numberOfWinners: Integer how many winners will be picked in this elections
+  - for multi-seat you must specify a multiSeatTransferRule
+  - multiSeatTransferRule: must be either "transferFractionalSurplus" or "transferWholeSurplus"
+    currently we only support "transferFractionalSurplus"
+  - decimalPlacesForVoteArithmetic: how many places to do rounding when computing the size of
+    fractional vote transfers.  Optional.  Defaults to 4 places.
