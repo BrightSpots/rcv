@@ -29,7 +29,7 @@ public class ResultsWriter {
   // number of round needed to declare a winner
   private int numRounds;
   // map of round to map of candidateID to their tally for that round
-  private Map<Integer, Map<String, Integer>> roundTallies;
+  private Map<Integer, Map<String, Float>> roundTallies;
   // map of candidate to round in which they were eliminated
   private Map<String, Integer> candidatesToRoundEliminated;
   // the winning candidateID
@@ -48,7 +48,7 @@ public class ResultsWriter {
   // function: setRoundTallies
   // purpose: setter for round to tally object
   // param: roundTallies map of round to map of candidateID to their tally for that round
-  public ResultsWriter setRoundTallies(Map<Integer, Map<String, Integer>> roundTallies) {
+  public ResultsWriter setRoundTallies(Map<Integer, Map<String, Float>> roundTallies) {
     this.roundTallies = roundTallies;
     return this;
   }
@@ -101,22 +101,22 @@ public class ResultsWriter {
 
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
-    Map<String, Integer> firstRoundTally = roundTallies.get(1);
+    Map<String, Float> firstRoundTally = roundTallies.get(1);
     // candidates sorted by first round tally
     List<String> sortedCandidates = sortCandidatesByTally(firstRoundTally);
 
     // totalActiveVotesPerRound is a map of round to total votes cast in each round
     // this will be used to calculate the percentage of total votes each candidate achieves
-    Map<Integer, Integer> totalActiveVotesPerRound = new HashMap<>();
+    Map<Integer, Float> totalActiveVotesPerRound = new HashMap<>();
     // round indexes over all rounds plus final results round
     for (int round = 1; round <= numRounds; round++) {
       // tally is map of candidate to tally for the current round
-      Map<String, Integer> tallies = roundTallies.get(round);
+      Map<String, Float> tallies = roundTallies.get(round);
       // total will contain total votes for all candidates in this round
       // this is used for calculating other derived data
-      int total = 0;
+      float total = 0;
       // tally indexes over all tallies for the current round
-      for (int tally : tallies.values()) {
+      for (float tally : tallies.values()) {
         total += tally;
       }
       totalActiveVotesPerRound.put(round, total);
@@ -225,7 +225,7 @@ public class ResultsWriter {
     Cell votesRedistributedHeaderCell = votesRedistributedRow.createCell(0);
     votesRedistributedHeaderCell.setCellValue("Votes redistributed");
     // array for calculating the votes redistributed between rounds
-    int[] votesRedistributedEachRound = new int[numRounds+1];
+    float[] votesRedistributedEachRound = new float[numRounds+1];
 
     // secondHeaderRow will be the row object for vote total, change, percentage headers for each round
     org.apache.poi.ss.usermodel.Row secondHeaderRow = worksheet.createRow(rowCounter++);
@@ -270,30 +270,30 @@ public class ResultsWriter {
         // round from which to display data
         int dataUseRound = isFinalResults ? numRounds : displayRound;
         // vote tally this round
-        Integer thisRoundTally = roundTallies.get(dataUseRound).get(candidate);
+        Float thisRoundTally = roundTallies.get(dataUseRound).get(candidate);
         // not all candidates may have a tally in every round
         if (thisRoundTally == null) {
-          thisRoundTally = 0;
+          thisRoundTally = (float)0;
         }
         // previous round tally for calculating deltas
-        Integer prevRoundTally = 0;
+        Float prevRoundTally = (float)0;
         if (dataUseRound > 1) {
           prevRoundTally = roundTallies.get(dataUseRound - 1).get(candidate);
           if (prevRoundTally == null) {
-            prevRoundTally = 0;
+            prevRoundTally = (float)0;
           }
         }
         // vote tally delta
-        int deltaVotes = isFinalResults ? 0 : thisRoundTally - prevRoundTally;
+        float deltaVotes = isFinalResults ? 0 : thisRoundTally - prevRoundTally;
 
         // accumulate total votes redistributed
         if (deltaVotes > 0) {
           votesRedistributedEachRound[dataUseRound] += deltaVotes;
         }
         //  total active votes in this round
-        Integer totalActiveVotes = totalActiveVotesPerRound.get(dataUseRound);
+        Float totalActiveVotes = totalActiveVotesPerRound.get(dataUseRound);
         // percentage of active votes
-        float percentage = ((float)thisRoundTally / (float)totalActiveVotes) * 100f;
+        float percentage = (thisRoundTally / totalActiveVotes) * 100f;
         columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+1;
         // delta votes cell
         Cell deltaVotesCell = candidateRow.createCell(columnIndex++);
@@ -315,7 +315,7 @@ public class ResultsWriter {
     Cell exhaustedRowHeaderCell = exhaustedCVRRow.createCell(0);
     exhaustedRowHeaderCell.setCellValue("Inactive ballots");
     // active votes are calculated wrt active votes in the first round
-    int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
+    float totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
     // displayRound indexes through all rounds plus final results round
     for (int displayRound = 1; displayRound <= numRounds+1; displayRound++) {
       // flag for final round special cases
@@ -323,16 +323,16 @@ public class ResultsWriter {
       // data to display for this round
       int dataUseRound = isFinalResults ? numRounds : displayRound;
       // count of votes exhausted this round
-      int thisRoundExhausted = 0;
+      float thisRoundExhausted = 0;
       // vote change over previous round
-      int deltaExhausted = 0;
+      float deltaExhausted = 0;
       // Exhausted count is the difference between the total votes in round 1 and the total votes in
       // the current round.
       if (dataUseRound > 1) {
         thisRoundExhausted = totalActiveVotesFirstRound -
             totalActiveVotesPerRound.get(dataUseRound);
         // save previous round exhausted votes to calculate exhausted vote change
-        int prevRoundExhausted = totalActiveVotesFirstRound -
+        float prevRoundExhausted = totalActiveVotesFirstRound -
             totalActiveVotesPerRound.get(dataUseRound - 1);
         deltaExhausted = isFinalResults ? 0 : thisRoundExhausted - prevRoundExhausted;
 
@@ -342,7 +342,7 @@ public class ResultsWriter {
 
       // Exhausted votes as percentage of ALL votes (note: this differs from the candidate vote
       // percentages which are percentage of ACTIVE votes for the given round.
-      float percentage = ((float)thisRoundExhausted / (float)totalActiveVotesFirstRound) * 100f;
+      float percentage = (thisRoundExhausted / totalActiveVotesFirstRound) * 100f;
       columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+1;
       // delta votes cell
       Cell deltaVotesCell = exhaustedCVRRow.createCell(columnIndex++);
@@ -383,7 +383,7 @@ public class ResultsWriter {
       // flag for final round special cases
       boolean isFinalResults = displayRound == numRounds+1;
       // total votes in this round
-      int total = totalActiveVotesPerRound.get(isFinalResults ? displayRound - 1 : displayRound);
+      float total = totalActiveVotesPerRound.get(isFinalResults ? displayRound - 1 : displayRound);
       // Add 2 to the index because total votes is the third column in each round group
       columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+2;
       // total votes cell
@@ -401,7 +401,7 @@ public class ResultsWriter {
       Cell votesRedistributedRowCell = votesRedistributedRow.createCell(columnIndex);
       if (round <= numRounds) {
         // tally of votes redistributed this round
-        int votesRedistributed = votesRedistributedEachRound[round];
+        float votesRedistributed = votesRedistributedEachRound[round];
         votesRedistributedRowCell.setCellValue(votesRedistributed);
       } else {
         votesRedistributedRowCell.setCellValue("NA");
@@ -425,9 +425,9 @@ public class ResultsWriter {
   // param: worksheet to which we will be adding rows and cells
   // param: totalActiveVotesPerRound map of round to votes active in that round
   // returns: the next (empty) row index
-  private int addHeaderRows(XSSFSheet worksheet, Map<Integer, Integer> totalActiveVotesPerRound) {
+  private int addHeaderRows(XSSFSheet worksheet, Map<Integer, Float> totalActiveVotesPerRound) {
     // total active votes in this round
-    int totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
+    float totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
     // dateFormat helps create a formatted date string with the current date
     DateFormat dateFormat = new SimpleDateFormat("M/d/yyyy");
     // string for formatted date
@@ -494,15 +494,15 @@ public class ResultsWriter {
   // sorted from highest tally to lowest
   // param: tally map of candidateID to tally
   // return: list of all input candidates sorted from highest tally to lowest
-  private List<String> sortCandidatesByTally(Map<String, Integer> tally) {
+  private List<String> sortCandidatesByTally(Map<String, Float> tally) {
     // entries will contain all the input tally entries in sorted order
-    List<Map.Entry<String, Integer>> entries =
+    List<Map.Entry<String, Float>> entries =
         new ArrayList<>(tally.entrySet());
     // anonymous custom comparator will sort undeclared write in candidates to last place
-    Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
+    Collections.sort(entries, new Comparator<Map.Entry<String, Float>>() {
       public int compare(
-        Map.Entry<String, Integer> firstObject,
-        Map.Entry<String, Integer> secondObject
+        Map.Entry<String, Float> firstObject,
+        Map.Entry<String, Float> secondObject
       ) {
         // result of the comparison
         int ret;
@@ -521,7 +521,7 @@ public class ResultsWriter {
     // container list for the final results
     List<String> sortedCandidates = new LinkedList<>();
     // index over all entries
-    for (Map.Entry<String, Integer> entry : entries) {
+    for (Map.Entry<String, Float> entry : entries) {
       sortedCandidates.add(entry.getKey());
     }
     return sortedCandidates;
