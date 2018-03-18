@@ -204,6 +204,32 @@ public class Tabulator {
     }
   }
 
+  // function: getThreshold
+  // purpose: determine the threshold to win for the given round
+  // param: currentRoundCandidateToTally map of candidateID to their tally for a particular round
+  // param: winnerToRound map of candidateID to round in which they won
+  // return: threshold to determine a winner
+  private Float getThreshold(
+      Map<String, Float> currentRoundCandidateToTally,
+      Map<String, Integer> winnerToRound
+  ) {
+    // currentRoundTotalVotes holds total active votes in this round
+    Float currentRoundTotalVotes = 0f;
+    // numVotes indexes over all vote tallies in this round
+    for (Float numVotes : currentRoundCandidateToTally.values()) {
+      currentRoundTotalVotes += numVotes;
+    }
+    // how many seats have been filled
+    Integer numPreviousWinners = winnerToRound.keySet().size();
+    // how many seats remain to be filled
+    Integer seatsRemaining = config.numberOfWinners() - numPreviousWinners;
+
+    // return value
+    Float threshold = currentRoundTotalVotes / (seatsRemaining + 1f);
+    // TODO: some multi-seat rules require an epsilon value to be added
+    return  threshold;
+  }
+
   // function: identifyWinners
   // purpose: determine if one or more winners have been identified in this round
   // param: currentRoundCandidateToTally map of candidateID to their tally in a particular round
@@ -216,7 +242,7 @@ public class Tabulator {
     // store result here
     List<String> selectedWinners = new LinkedList<>();
     // currentRoundTotalVotes is total votes across all candidates in this round
-    float currentRoundTotalVotes = 0;
+    Float currentRoundTotalVotes = 0f;
     // numVotes indexes over all vote tallies in this round
     for (Float numVotes : currentRoundCandidateToTally.values()) {
       currentRoundTotalVotes += numVotes;
