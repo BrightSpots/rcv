@@ -26,6 +26,13 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ResultsWriter {
+
+  private enum OutputType {
+    STRING,
+    INT,
+    FLOAT,
+  };
+
   // number of round needed to declare a winner
   private int numRounds;
   // map of round to map of candidateID to their tally for that round
@@ -437,33 +444,33 @@ public class ResultsWriter {
     // second cell contains a value or null
     // third cell is true if second cell is numeric data, false if string
     Object[][] fields = {
-      {"About this contest", null, false},
-      {"Date/time or version", "Updated " + dateString, false},
-      {"Contest information", null, false},
-      {"Enter information about the contest as it will be displayed", null, false},
-      {"Contest name", config.contestName(), false},
-      {"Jurisdiction name", config.jurisdiction(), false},
-      {"Office name", config.office(), false},
-      {"Election date", config.electionDate(), false},
-      {null, null, false},
-      {"Counting information", null, false},
-      {"Details of the tally to be used in the display screens", null, false},
-      {"Counting method", "Ranked-choice voting", false},
-      {"Formula for winning", "Half of total votes cast for office + 1", false},
-      {"Formula example", "n/a", false},
-      {"Threshold number", "50%", false},
-      {"Graph threshold label", "50% of votes required to win", false},
-      {null, null, false},
-      {"Contest summary data", null, false},
-      {"Tally detail", null, false},
-      {"Single/multi winner", "single-winner", false},
-      {"Number to be elected", 1, true},
-      {"Number of candidates", config.numCandidates(), true},
-      {"Number of votes cast", totalActiveVotesFirstRound, true},
-      {"Undervotes", 0, true},
-      {"Total # of rounds", totalActiveVotesPerRound.size(), true},
-      {null, null, false},
-      {"Tally Data Starts Here", null, false}
+      {"About this contest", null, OutputType.STRING},
+      {"Date/time or version", "Updated " + dateString, OutputType.STRING},
+      {"Contest information", null, OutputType.STRING},
+      {"Enter information about the contest as it will be displayed", null, OutputType.STRING},
+      {"Contest name", config.contestName(), OutputType.STRING},
+      {"Jurisdiction name", config.jurisdiction(), OutputType.STRING},
+      {"Office name", config.office(), OutputType.STRING},
+      {"Election date", config.electionDate(), OutputType.STRING},
+      {null, null, OutputType.STRING},
+      {"Counting information", null, OutputType.STRING},
+      {"Details of the tally to be used in the display screens", null, OutputType.STRING},
+      {"Counting method", "Ranked-choice voting", OutputType.STRING},
+      {"Formula for winning", "Half of total votes cast for office + 1", OutputType.STRING},
+      {"Formula example", "n/a", OutputType.STRING},
+      {"Threshold number", "50%", OutputType.STRING},
+      {"Graph threshold label", "50% of votes required to win", OutputType.STRING},
+      {null, null, OutputType.STRING},
+      {"Contest summary data", null, OutputType.STRING},
+      {"Tally detail", null, OutputType.STRING},
+      {"Single/multi winner", "single-winner", OutputType.STRING},
+      {"Number to be elected", 1, OutputType.INT},
+      {"Number of candidates", config.numCandidates(), OutputType.INT},
+      {"Number of votes cast", totalActiveVotesFirstRound, OutputType.FLOAT},
+      {"Undervotes", 0, OutputType.INT},
+      {"Total # of rounds", totalActiveVotesPerRound.size(), OutputType.INT},
+      {null, null, OutputType.STRING},
+      {"Tally Data Starts Here", null, OutputType.STRING}
     };
     // count the row we create so we can return the next empty row
     int rowCounter = 0;
@@ -477,9 +484,10 @@ public class ResultsWriter {
       }
       // if second element is non-null create a cell for it
       if (rowFields[1] != null) {
-        // type (numeric or string) is determined by third element (true = numeric, false = string)
-        if ((boolean)rowFields[2]) {
+        if (rowFields[2] == OutputType.INT) {
           row.createCell(1).setCellValue((int)rowFields[1]);
+        } else if (rowFields[2] == OutputType.FLOAT) {
+          row.createCell(1).setCellValue((float)rowFields[1]);
         } else {
           row.createCell(1).setCellValue((String)rowFields[1]);
         }
