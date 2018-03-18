@@ -20,10 +20,10 @@ class TieBreak {
   // round in which this tiebreak occurred
   private int round;
   // number of votes the tying candidates received
-  private int numVotes;
+  private Float numVotes;
   // roundTallies: map from round number to map of candidate ID to vote total (for that round)
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
-  private Map<Integer, Map<String, Integer>> roundTallies;
+  private Map<Integer, Map<String, Float>> roundTallies;
   // candidate ID selected to lose the tiebreak
   private String loser;
   // reason for the selection
@@ -41,8 +41,8 @@ class TieBreak {
     List<String> tiedCandidates,
     Tabulator.TieBreakMode tieBreakMode,
     int round,
-    int numVotes,
-    Map<Integer, Map<String, Integer>> roundTallies
+    Float numVotes,
+    Map<Integer, Map<String, Float>> roundTallies
   ) {
     this.tiedCandidates = tiedCandidates;
     this.tieBreakMode = tieBreakMode;
@@ -182,13 +182,13 @@ class TieBreak {
     // round indexes from the previous round back to round 1
     for (int round = this.round - 1; round > 0; round--) {
       // map of tally to candidate IDs for round under consideration
-      SortedMap<Integer, LinkedList<String>> tallyToCandidates = Tabulator.buildTallyToCandidates(
+      SortedMap<Float, LinkedList<String>> tallyToCandidates = Tabulator.buildTallyToCandidates(
         roundTallies.get(round),
         candidatesInContention,
         false
       );
       // lowest tally for this round
-      int minVotes = tallyToCandidates.firstKey();
+      Float minVotes = tallyToCandidates.firstKey();
       // candidates receiving the lowest tally
       LinkedList<String> candidatesWithLowestTotal = tallyToCandidates.get(minVotes);
       if (candidatesWithLowestTotal.size() == 1) {

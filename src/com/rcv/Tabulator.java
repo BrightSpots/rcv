@@ -62,7 +62,7 @@ public class Tabulator {
   // roundTallies is a map from round number to a map from candidate ID to vote total for the round
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes for each candidate in round 1
   // this structure is computed over the course of tabulation
-  private Map<Integer, Map<String, Integer>> roundTallies = new HashMap<>();
+  private Map<Integer, Map<String, Float>> roundTallies = new HashMap<>();
 
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
   private Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
@@ -79,9 +79,9 @@ public class Tabulator {
     // the candidate eliminated
     String candidateID;
     // how many total votes were totaled when this candidate was eliminated
-    int runningTotal;
+    float runningTotal;
     // next highest count total (validates that we were correctly batch eliminated)
-    int nextHighestTally;
+    float nextHighestTally;
 
     // function: BatchElimination constructor
     // purpose: create a new BatchElimination object simple container
@@ -89,7 +89,7 @@ public class Tabulator {
     // param: runningTotal how many total votes were totaled when this candidate was eliminated
     // param: nextHighestTally next highest count total
     // returns: the new object
-    BatchElimination(String candidateID, int runningTotal, int nextHighestTally) {
+    BatchElimination(String candidateID, Float runningTotal, Float nextHighestTally) {
       this.candidateID = candidateID;
       this.runningTotal = runningTotal;
       this.nextHighestTally = nextHighestTally;
@@ -143,12 +143,12 @@ public class Tabulator {
       // Conversely, the currentRoundCandidateToTally object returned here will contain fewer
       // entries, each of which will have as many or more votes than they did in prior rounds.
       // Eventually a winner will be chosen.
-      Map<String, Integer> currentRoundCandidateToTally =
+      Map<String, Float> currentRoundCandidateToTally =
         getTallyForRound(castVoteRecords, candidateToRoundEliminated, currentRound);
       roundTallies.put(currentRound, currentRoundCandidateToTally);
 
       // currentRoundTallyToCandidates is a sorted map from tally to candidate(s) with that tally.
-      SortedMap<Integer, LinkedList<String>> currentRoundTallyToCandidates = buildTallyToCandidates(
+      SortedMap<Float, LinkedList<String>> currentRoundTallyToCandidates = buildTallyToCandidates(
         currentRoundCandidateToTally,
         currentRoundCandidateToTally.keySet(),
         true
@@ -197,27 +197,27 @@ public class Tabulator {
   // param: currntRoundTallyToCandidates map of tally to candidate ID(s) for a particular round
   // return: winning candidateID or nil if no winner yet
   private String identifyWinner(
-    Map<String, Integer> currentRoundCandidateToTally,
-    SortedMap<Integer, LinkedList<String>> currentRoundTallyToCandidates
+    Map<String, Float> currentRoundCandidateToTally,
+    SortedMap<Float, LinkedList<String>> currentRoundTallyToCandidates
   ) {
     // store result here
     String selectedWinner = null;
     // currentRoundTotalVotes is total votes across all candidates in this round
     int currentRoundTotalVotes = 0;
     // numVotes indexes over all vote tallies in this round
-    for (int numVotes : currentRoundCandidateToTally.values()) {
+    for (Float numVotes : currentRoundCandidateToTally.values()) {
       currentRoundTotalVotes += numVotes;
     }
     log("Total votes in round %d: %d.", currentRound, currentRoundTotalVotes);
 
     // the highest vote total amongst all candidates
-    int maxVotes = currentRoundTallyToCandidates.lastKey();
+    Float maxVotes = currentRoundTallyToCandidates.lastKey();
     // Does the leader have a majority of non-exhausted ballots? In other words, is maxVotes
     // greater than half of the total votes counted in this round?
     if (maxVotes > (float)currentRoundTotalVotes / 2.0) {
       // we have a winner
       // votes indexes over all tallies to find the winning one
-      for (Integer votes : currentRoundTallyToCandidates.keySet()) {
+      for (Float votes : currentRoundTallyToCandidates.keySet()) {
         // record winner
         if (votes == maxVotes) {
           // set the winner
@@ -237,7 +237,7 @@ public class Tabulator {
   // returns: true if any candidates were eliminated
   private boolean dropUWI(
     List<String> eliminated,
-    Map<String, Integer> currentRoundCandidateToTally
+    Map<String, Float> currentRoundCandidateToTally
   ) {
     if (
       currentRound == 1 &&
@@ -263,7 +263,7 @@ public class Tabulator {
   // returns: true if any candidates were eliminated
   private boolean dropCandidatesBelowThreshold(
     List<String> eliminated,
-    SortedMap<Integer, LinkedList<String>> currentRoundTallyToCandidates
+    SortedMap<Float, LinkedList<String>> currentRoundTallyToCandidates
   ) {
     if (
       eliminated.isEmpty() &&
@@ -271,7 +271,7 @@ public class Tabulator {
       currentRoundTallyToCandidates.firstKey() < config.minimumVoteThreshold()
     ) {
       // tally indexes over all tallies in the current round
-      for (int tally : currentRoundTallyToCandidates.keySet()) {
+      for (Float tally : currentRoundTallyToCandidates.keySet()) {
         if (tally < config.minimumVoteThreshold()) {
           // candidate indexes over all candidates who received this tally
           for (String candidate : currentRoundTallyToCandidates.get(tally)) {
@@ -298,7 +298,7 @@ public class Tabulator {
   // returns: true if any candidates were eliminated
   private boolean doBatchElimination(
     List<String> eliminated,
-    SortedMap<Integer, LinkedList<String>> currentRoundTallyToCandidates
+    SortedMap<Float, LinkedList<String>> currentRoundTallyToCandidates
   ) {
     if (eliminated.isEmpty() && config.batchElimination()) {
       // container for results
@@ -328,13 +328,13 @@ public class Tabulator {
   // returns: true if any candidates were eliminated
   private boolean doRegularElimination(
     List<String> eliminated,
-    SortedMap<Integer, LinkedList<String>> currentRoundTallyToCandidates
+    SortedMap<Float, LinkedList<String>> currentRoundTallyToCandidates
   ) {
     if (eliminated.isEmpty()) {
       // eliminated candidate
       String eliminatedCandidate;
       // lowest tally in this round
-      int minVotes = currentRoundTallyToCandidates.firstKey();
+      Float minVotes = currentRoundTallyToCandidates.firstKey();
       // list of candidates receiving the lowest tally
       LinkedList<String> lastPlaceCandidates = currentRoundTallyToCandidates.get(minVotes);
       if (lastPlaceCandidates.size() > 1) {
@@ -409,11 +409,11 @@ public class Tabulator {
   // param: currentRoundTallyToCandidates map from vote tally to candidates with that tally
   // returns: list of BatchElimination objects, one for each batch-eliminated candidate
   private List<BatchElimination> runBatchElimination(
-    SortedMap<Integer, LinkedList<String>> currentRoundTallyToCandidates
+    SortedMap<Float, LinkedList<String>> currentRoundTallyToCandidates
   ) {
     // The sum total of all vote counts examined. This must equal or exceed the next-lowest
     // candidate tally to prevent batch elimination.
-    int runningTotal = 0;
+    Float runningTotal = 0f;
     // Tracks candidates whose totals have been included in the runningTotal and thus are being
     // considered for batch elimination.
     List<String> candidatesSeen = new LinkedList<>();
@@ -424,7 +424,7 @@ public class Tabulator {
     List<BatchElimination> eliminations = new LinkedList<>();
     // At each iteration, currentVoteTally is the next-lowest vote count received by one or more
     // candidate(s) in the current round.
-    for (int currentVoteTally : currentRoundTallyToCandidates.keySet()) {
+    for (Float currentVoteTally : currentRoundTallyToCandidates.keySet()) {
       // Test whether leapfrogging is possible.
       if (runningTotal < currentVoteTally) {
         // Not possible, so eliminate everyone who has been seen and not eliminated yet.
@@ -565,19 +565,19 @@ public class Tabulator {
   // param: cvrIndexToRoundExhausted map of ballot index to round in which it was exhausted
   // param: the current round
   // return: map of candidateID to vote tallies for this round
-  private Map<String, Integer> getTallyForRound(
+  private Map<String, Float> getTallyForRound(
     List<CastVoteRecord> castVoteRecords,
     Map<String, Integer> candidateToRoundEliminated,
     int currentRound
   ) {
     // map of candidateID to vote tally to store the results
-    Map<String, Integer> roundTally = new HashMap<>();
+    Map<String, Float> roundTally = new HashMap<>();
 
     // initialize round tallies to 0 for all continuing candidates
     // candidateID indexes through all candidateIDs
     for (String candidateID : candidateIDs) {
       if (candidateToRoundEliminated.get(candidateID) == null) {
-        roundTally.put(candidateID, 0);
+        roundTally.put(candidateID, 0f);
       }
     }
 
@@ -677,18 +677,18 @@ public class Tabulator {
   // param: shouldLog is set to log to console and log file
   // return: sorted map of tally to List of candidateIDs drawn from the input data and excluding
   //   candidates not appearing in candidatesToInclude)
-  public static SortedMap<Integer, LinkedList<String>> buildTallyToCandidates(
-    Map<String, Integer> roundTally,
+  public static SortedMap<Float, LinkedList<String>> buildTallyToCandidates(
+    Map<String, Float> roundTally,
     Set<String> candidatesToInclude,
     boolean shouldLog
   ) {
     // output map structure containing the map of vote tally to candidate(s)
-    SortedMap<Integer, LinkedList<String>> tallyToCandidates = new TreeMap<>();
+    SortedMap<Float, LinkedList<String>> tallyToCandidates = new TreeMap<>();
     // for each candidate record their vote total into the countToCandidates object
     // candidate is the current candidate as we iterate all candidates under consideration
     for (String candidate : candidatesToInclude) {
       // vote count for this candidate
-      int votes = roundTally.get(candidate);
+      Float votes = roundTally.get(candidate);
       if (shouldLog) {
         Logger.log("Candidate %s got %d votes.", candidate, votes);
       }
