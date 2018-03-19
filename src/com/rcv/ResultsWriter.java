@@ -31,7 +31,7 @@ public class ResultsWriter {
     STRING,
     INT,
     FLOAT,
-  };
+  }
 
   // number of round needed to declare a winner
   private int numRounds;
