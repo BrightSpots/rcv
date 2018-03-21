@@ -15,14 +15,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -197,7 +191,7 @@ public class ResultsWriter {
       // list of all candidates eliminated in this round
       List<String> eliminated = roundToCandidatesEliminated.get(round);
       // note we shift the eliminated candidate(s) display and action into the subsequent column
-      if (eliminated.size() > 0) {
+      if (eliminated != null && eliminated.size() > 0) {
         // eliminatedCellText contains formatted candidate names
         String eliminatedCellText = String.join("; ", eliminated);
         // here we dont subtract 1 from round because the eliminated text is displayed in the
@@ -235,6 +229,7 @@ public class ResultsWriter {
     votesRedistributedHeaderCell.setCellValue("Votes redistributed");
     // array for calculating the votes redistributed between rounds
     BigDecimal[] votesRedistributedEachRound = new BigDecimal[numRounds+1];
+    Arrays.fill(votesRedistributedEachRound, BigDecimal.ZERO);
 
     // secondHeaderRow will be the row object for vote total, change, percentage headers for each round
     org.apache.poi.ss.usermodel.Row secondHeaderRow = worksheet.createRow(rowCounter++);
@@ -370,7 +365,7 @@ public class ResultsWriter {
       Cell totalVotesCell = exhaustedCVRRow.createCell(columnIndex++);
       totalVotesCell.setCellValue(thisRoundExhausted.toString());
       // formatted percentage text
-      String percentageText = String.format("%.2f%%", percentage);
+      String percentageText = String.format("%s%%", percentage.toString());
       // percentage cell
       Cell percentageCell = exhaustedCVRRow.createCell(columnIndex);
       percentageCell.setCellValue(percentageText);
@@ -478,7 +473,7 @@ public class ResultsWriter {
       {"Single/multi winner", "single-winner", OutputType.STRING}, // TODO: update for multi-winners
       {"Number to be elected", 1, OutputType.INT},
       {"Number of candidates", config.numCandidates(), OutputType.INT},
-      {"Number of votes cast", totalActiveVotesFirstRound, OutputType.FLOAT},
+      {"Number of votes cast", totalActiveVotesFirstRound.toString(), OutputType.STRING},
       {"Undervotes", 0, OutputType.INT},
       {"Total # of rounds", totalActiveVotesPerRound.size(), OutputType.INT},
       {null, null, OutputType.STRING},

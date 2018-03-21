@@ -188,7 +188,8 @@ public class Tabulator {
                 candidateVotes.subtract(winningThresholdThisRound, config.mathContext());
             BigDecimal surplusFraction = extraVotes.divide(candidateVotes, config.mathContext());
             for (CastVoteRecord cvr : castVoteRecords) {
-              if (cvr.getCurrentRecipientOfVote().equals(winner)) {
+              if (cvr.getCurrentRecipientOfVote() != null &&
+                  cvr.getCurrentRecipientOfVote().equals(winner)) {
                 cvr.setFractionalTransferValue(
                     cvr.getFractionalTransferValue().multiply(surplusFraction,
                         config.mathContext()));
