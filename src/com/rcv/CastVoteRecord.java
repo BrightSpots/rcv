@@ -10,6 +10,9 @@
 package com.rcv;
 
 import com.sun.tools.javac.util.Pair;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +47,7 @@ public class CastVoteRecord {
 
   // For multi-winner elections that use fractional vote transfers, this represents the current
   // fractional value of this CVR.
-  private float fractionalTransferValue = 1.0f;
+  private BigDecimal fractionalTransferValue;
 
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
@@ -97,14 +100,17 @@ public class CastVoteRecord {
   // function: getFractionalTransferValue
   // purpose: getter for fractionalTransferValue
   // returns: value of field
-  public float getFractionalTransferValue() {
+  public BigDecimal getFractionalTransferValue() {
+    if(fractionalTransferValue == null) {
+      fractionalTransferValue = new BigDecimal(BigInteger.ONE);
+    }
     return fractionalTransferValue;
   }
 
   // function: setFractionalTransferValue
   // purpose: setter for fractionalTransferValue
   // param: new value of field
-  public void setFractionalTransferValue(float fractionalTransferValue) {
+  public void setFractionalTransferValue(BigDecimal fractionalTransferValue) {
     this.fractionalTransferValue = fractionalTransferValue;
   }
 
