@@ -9,10 +9,14 @@
  */
 package com.rcv;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.math.RoundingMode.HALF_EVEN;
 
 public class ElectionConfig {
   // underlying rawConfig object data
@@ -21,6 +25,10 @@ public class ElectionConfig {
   private ArrayList<String> candidateCodeList;
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
+  // MathContext to be shared by all vote calculations
+  private MathContext contextForVoteArithmetic;
+  // minimum vote threshold if one is specified
+  private BigDecimal minimumVoteThreshold;
 
   // function: ElectionConfig
   // purpose: create a new ElectionConfig object
@@ -57,11 +65,11 @@ public class ElectionConfig {
 
     // if multi-seat is indicated we validate decimal count and rules style
     //
-    if(this.numberOfWinners() > 1) {
-      if(this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 1000) {
+    if (this.numberOfWinners() > 1) {
+      if (this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 1000) {
         valid = false;
       }
-      if(multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
+      if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
         valid = false;
       }
     }
@@ -95,6 +103,16 @@ public class ElectionConfig {
   // returns from settings config or 1 of no setting is specified
   public Integer numberOfWinners() {
     return rawConfig.rules.numberOfWinners == null ? 1 : rawConfig.rules.numberOfWinners;
+  }
+
+  // function: mathContext
+  // purpose: getter for mathContext for vote tally arithmetic
+  // return: context for doing vote tally arithmetic to be used with BigDecimal
+  public MathContext mathContext() {
+    if (contextForVoteArithmetic == null) {
+      contextForVoteArithmetic = new MathContext(decimalPlacesForVoteArithmetic().intValue(), HALF_EVEN);
+    }
+    return contextForVoteArithmetic;
   }
 
   // function: decimalPlacesForVoteArithmetic
@@ -261,8 +279,15 @@ public class ElectionConfig {
   // function: minimumVoteThreshold
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use for this config
-  public Integer minimumVoteThreshold() {
-    return rawConfig.rules.minimumVoteThreshold;
+  public BigDecimal minimumVoteThreshold() {
+    if (minimumVoteThreshold == null) {
+      if (rawConfig.rules.minimumVoteThreshold == null) {
+        minimumVoteThreshold = BigDecimal.ZERO;
+      } else {
+        minimumVoteThreshold = new BigDecimal(rawConfig.rules.minimumVoteThreshold.intValue());
+      }
+    }
+    return minimumVoteThreshold;
   }
 
   // function: maxSkippedRanksAllowed

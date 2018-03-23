@@ -107,7 +107,7 @@ public class CVRReader {
           }
         } else {
           if (cvrDataCell.getCellType() != Cell.CELL_TYPE_STRING) {
-            Logger.log("unexpected cell type at ranking %d ballot %f", rank, castVoteRecordID);
+            Logger.log("unexpected cell type at ranking %d ballot %s", rank, castVoteRecordID);
             continue;
           }
           candidate = cvrDataCell.getStringCellValue().trim();
