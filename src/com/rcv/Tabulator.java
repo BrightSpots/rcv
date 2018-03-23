@@ -282,7 +282,7 @@ public class Tabulator {
     // tally indexes over all tallies to find any winners
     for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
       // TODO: some rules require >= than here
-      if(tally.compareTo(thresholdToWin) == 1) {
+      if (tally.compareTo(thresholdToWin) == 1) {
         // we have winner(s)
         List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
         for(String winningCandidate : winningCandidates) {
@@ -351,6 +351,8 @@ public class Tabulator {
               config.minimumVoteThreshold().toString()
             );
           }
+        } else {
+          break;
         }
       }
     }

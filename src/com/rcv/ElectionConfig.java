@@ -11,14 +11,12 @@ package com.rcv;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
 import static java.math.RoundingMode.HALF_EVEN;
-import static java.math.RoundingMode.HALF_UP;
 
 public class ElectionConfig {
   // underlying rawConfig object data
@@ -67,11 +65,11 @@ public class ElectionConfig {
 
     // if multi-seat is indicated we validate decimal count and rules style
     //
-    if(this.numberOfWinners() > 1) {
-      if(this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 1000) {
+    if (this.numberOfWinners() > 1) {
+      if (this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 1000) {
         valid = false;
       }
-      if(multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
+      if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
         valid = false;
       }
     }
@@ -282,8 +280,8 @@ public class ElectionConfig {
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use for this config
   public BigDecimal minimumVoteThreshold() {
-    if(minimumVoteThreshold == null) {
-      if(rawConfig.rules.minimumVoteThreshold == null) {
+    if (minimumVoteThreshold == null) {
+      if (rawConfig.rules.minimumVoteThreshold == null) {
         minimumVoteThreshold = BigDecimal.ZERO;
       } else {
         minimumVoteThreshold = new BigDecimal(rawConfig.rules.minimumVoteThreshold.intValue());

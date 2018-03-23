@@ -288,7 +288,8 @@ public class ResultsWriter {
           }
         }
         // vote tally delta
-        BigDecimal deltaVotes = isFinalResults ? BigDecimal.ZERO :
+        BigDecimal deltaVotes = isFinalResults ?
+            BigDecimal.ZERO :
             thisRoundTally.subtract(prevRoundTally, config.mathContext());
 
         // accumulate total votes redistributed
@@ -312,7 +313,7 @@ public class ResultsWriter {
         // percentage active cell
         Cell percentageCell = candidateRow.createCell(columnIndex);
         // percentage text
-        String percentageText = String.format("%.2f%%", percentage);
+        String percentageText = String.format("%s%%", percentage.toString());
         percentageCell.setCellValue(percentageText);
       }
     }
@@ -339,7 +340,8 @@ public class ResultsWriter {
         // Exhausted count is the difference between the total votes in round 1 and the total votes
         // in the current round.
         thisRoundExhausted = totalActiveVotesFirstRound.subtract(
-            totalActiveVotesPerRound.get(dataUseRound), config.mathContext());
+            totalActiveVotesPerRound.get(dataUseRound),
+            config.mathContext());
         // save previous round exhausted votes to calculate exhausted vote change
         BigDecimal prevRoundExhausted = totalActiveVotesFirstRound.subtract(
             totalActiveVotesPerRound.get(dataUseRound - 1), config.mathContext());

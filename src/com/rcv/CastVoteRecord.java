@@ -47,7 +47,7 @@ public class CastVoteRecord {
 
   // For multi-winner elections that use fractional vote transfers, this represents the current
   // fractional value of this CVR.
-  private BigDecimal fractionalTransferValue;
+  private BigDecimal fractionalTransferValue = new BigDecimal(BigInteger.ONE);
 
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
@@ -101,9 +101,6 @@ public class CastVoteRecord {
   // purpose: getter for fractionalTransferValue
   // returns: value of field
   public BigDecimal getFractionalTransferValue() {
-    if(fractionalTransferValue == null) {
-      fractionalTransferValue = new BigDecimal(BigInteger.ONE);
-    }
     return fractionalTransferValue;
   }
 
