@@ -198,29 +198,27 @@ public class Tabulator {
         }
       } else {  // if no winners in this round, determine who will be eliminated
         // container for eliminated candidate(s)
-        List<String> eliminated = new LinkedList<>();
+        List<String> eliminated;
 
         // Four mutually exclusive ways to eliminate candidates.
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
-        boolean foundCandidateToEliminate = dropUWI(eliminated, currentRoundCandidateToTally);
+        eliminated = dropUWI(currentRoundCandidateToTally);
         // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
-        if (!foundCandidateToEliminate) {
-          foundCandidateToEliminate =
-            dropCandidatesBelowThreshold(eliminated, currentRoundTallyToCandidates);
+        if (eliminated.isEmpty()) {
+          eliminated = dropCandidatesBelowThreshold(currentRoundTallyToCandidates);
         }
         // 3. Otherwise, try batch elimination.
-        if (!foundCandidateToEliminate) {
-          foundCandidateToEliminate = doBatchElimination(eliminated, currentRoundTallyToCandidates);
+        if (eliminated.isEmpty()) {
+          eliminated = doBatchElimination(currentRoundTallyToCandidates);
         }
         // 4. If we didn't do batch elimination, eliminate the remaining candidate with the lowest
         //    tally, breaking a tie if needed.
-        if (!foundCandidateToEliminate) {
-          foundCandidateToEliminate =
-            doRegularElimination(eliminated, currentRoundTallyToCandidates);
+        if (eliminated.isEmpty()) {
+          eliminated = doRegularElimination(currentRoundTallyToCandidates);
         }
 
         // If we failed to eliminate anyone, there's a bug in the code.
-        assert foundCandidateToEliminate;
+        assert !eliminated.isEmpty();
 
         // store the losers
         for (String loser : eliminated) {
@@ -297,13 +295,10 @@ public class Tabulator {
 
   // function: dropUWI
   // purpose: eliminate all undeclared write in candidates
-  // param: on exit eliminated will contain newly eliminated undeclared write in candidate IDs
   // param: currentRoundCandidateToTally map of candidate IDs to their tally for a given round
-  // returns: true if any candidates were eliminated
-  private boolean dropUWI(
-    List<String> eliminated,
-    Map<String, BigDecimal> currentRoundCandidateToTally
-  ) {
+  // returns: eliminated candidates
+  private List<String> dropUWI(Map<String, BigDecimal> currentRoundCandidateToTally) {
+    List<String> eliminated = new LinkedList<>();
     if (
       currentRound == 1 &&
       config.undeclaredWriteInLabel() != null &&
@@ -318,26 +313,24 @@ public class Tabulator {
         currentRoundCandidateToTally.get(config.undeclaredWriteInLabel()).toString()
       );
     }
-    return !eliminated.isEmpty();
+    return eliminated;
   }
 
   // function: dropCandidatesBelowThreshold
   // purpose: eliminate all candidates below a certain tally threshold
-  // param: eliminated will contain any newly eliminated candidate IDs
   // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
-  // returns: true if any candidates were eliminated
-  private boolean dropCandidatesBelowThreshold(
-    List<String> eliminated,
+  // returns: eliminated candidates
+  private List<String> dropCandidatesBelowThreshold(
     SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates
   ) {
+    List<String> eliminated = new LinkedList<>();
     if (
-      eliminated.isEmpty() && // <-- TODO: Louis should this condition be here?
       config.minimumVoteThreshold().signum() == 1 &&
-      currentRoundTallyToCandidates.firstKey().compareTo(config.minimumVoteThreshold()) == -1
+      currentRoundTallyToCandidates.firstKey().compareTo(config.minimumVoteThreshold()) < 0
     ) {
       // tally indexes over all tallies in the current round
       for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
-        if (tally.compareTo(config.minimumVoteThreshold()) == -1) {
+        if (tally.compareTo(config.minimumVoteThreshold()) < 0) {
           // candidate indexes over all candidates who received this tally
           for (String candidate : currentRoundTallyToCandidates.get(tally)) {
             eliminated.add(candidate);
@@ -355,18 +348,17 @@ public class Tabulator {
         }
       }
     }
-    return !eliminated.isEmpty();
+    return eliminated;
   }
 
   // function: doBatchElimination
   // purpose: eliminate all candidates who are mathematically unable to win
-  // param: eliminated will contain any newly eliminated candidate IDs
   // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
-  // returns: true if any candidates were eliminated
-  private boolean doBatchElimination(
-    List<String> eliminated,
+  // returns: eliminated candidates
+  private List<String> doBatchElimination(
     SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates
   ) {
+    List<String> eliminated = new LinkedList<>();
     if (eliminated.isEmpty() && config.batchElimination()) {
       // container for results
       List<BatchElimination> batchEliminations = runBatchElimination(currentRoundTallyToCandidates);
@@ -385,58 +377,55 @@ public class Tabulator {
         }
       }
     }
-    return !eliminated.isEmpty();
+    return eliminated;
   }
 
   // function: doRegularElimination
   // purpose: eliminate candidate with the lowest tally using tiebreak if necessary
-  // param: eliminated will contain newly eliminated candidate ID
   // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
-  // returns: true if any candidates were eliminated
-  private boolean doRegularElimination(
-    List<String> eliminated,
+  // returns: eliminated candidates
+  private List<String> doRegularElimination(
     SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates
   ) {
-    if (eliminated.isEmpty()) {
-      // eliminated candidate
-      String eliminatedCandidate;
-      // lowest tally in this round
-      BigDecimal minVotes = currentRoundTallyToCandidates.firstKey();
-      // list of candidates receiving the lowest tally
-      LinkedList<String> lastPlaceCandidates = currentRoundTallyToCandidates.get(minVotes);
-      if (lastPlaceCandidates.size() > 1) {
-        // there was a tie for last place
-        // create new tieBreak object to pick a loser
-        TieBreak tieBreak =
-          new TieBreak(lastPlaceCandidates,
-          config.tiebreakMode(),
-          currentRound,
-          minVotes,
-          roundTallies);
+    List<String> eliminated = new LinkedList<>();
+    // eliminated candidate
+    String eliminatedCandidate;
+    // lowest tally in this round
+    BigDecimal minVotes = currentRoundTallyToCandidates.firstKey();
+    // list of candidates receiving the lowest tally
+    LinkedList<String> lastPlaceCandidates = currentRoundTallyToCandidates.get(minVotes);
+    if (lastPlaceCandidates.size() > 1) {
+      // there was a tie for last place
+      // create new TieBreak object to pick a loser
+      TieBreak tieBreak =
+        new TieBreak(lastPlaceCandidates,
+        config.tiebreakMode(),
+        currentRound,
+        minVotes,
+        roundTallies);
 
-        // results of tiebreak stored here
-        eliminatedCandidate = tieBreak.loser();
-        roundToTieBreak.put(currentRound, tieBreak);
-        log(
-          "%s lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
-          eliminatedCandidate,
-          currentRound,
-          tieBreak.nonLosingCandidateDescription(),
-          minVotes.toString(),
-          tieBreak.explanation()
-        );
-      } else {
-        // last place candidate will be eliminated
-        eliminatedCandidate = lastPlaceCandidates.getFirst();
-        log("%s was eliminated in round %d with %s vote(s).",
-          eliminatedCandidate,
-          currentRound,
-          minVotes.toString()
-        );
-      }
-      eliminated.add(eliminatedCandidate);
+      // results of tiebreak stored here
+      eliminatedCandidate = tieBreak.loser();
+      roundToTieBreak.put(currentRound, tieBreak);
+      log(
+        "%s lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
+        eliminatedCandidate,
+        currentRound,
+        tieBreak.nonLosingCandidateDescription(),
+        minVotes.toString(),
+        tieBreak.explanation()
+      );
+    } else {
+      // last place candidate will be eliminated
+      eliminatedCandidate = lastPlaceCandidates.getFirst();
+      log("%s was eliminated in round %d with %s vote(s).",
+        eliminatedCandidate,
+        currentRound,
+        minVotes.toString()
+      );
     }
-    return !eliminated.isEmpty();
+    eliminated.add(eliminatedCandidate);
+    return eliminated;
   }
 
   // function: generateSummarySpreadsheet
