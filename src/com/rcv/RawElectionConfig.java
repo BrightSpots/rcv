@@ -49,6 +49,9 @@ public class RawElectionConfig {
     public Integer decimalPlacesForVoteArithmetic;
     // which transfer rule to use on surplus votes in multi-seat elections
     public String multiSeatTransferRule;
+    // keep tabulating beyond selecting winner(s) till all candidates have been eliminated
+    // (used in CA to provide additional context for the strength of support for losing candidates)
+    public Boolean continueTabulationTillAllCandidatesEliminated;
   }
 
   // CVRSource: encapsulates a source cast vote record file

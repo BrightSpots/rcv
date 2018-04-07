@@ -16,6 +16,8 @@ This document lists the parameters that can be included in a config file. Requir
   - undeclaredWriteInLabel: the special label used in the cast vote records to denote a vote for an undeclared write-in. Example: UWI
   - overvoteLabel: the special label used in the cast vote records to denote an overvote. Example: OVERVOTE (Note: if this parameter is present, overvoteRule must be set to either alwaysSkipToNextRank or exhaustImmediately.)
   - undervoteLabel: the special label used in the cast vote records to denote an undervote. Example: UNDERVOTE
+  - continueTabulationTillAllCandidatesEliminated: keep tabulating beyond selecting winner(s) till all candidates have been eliminated (used in CA to provide additional context for the strength of support for losing candidates)
+    optional, default FALSE
 - *candidates: a list of the candidates who appear in the cast vote records. Each candidate must have a name. If the cast vote records use candidate codes, each candidate must also have a code.
 - *cvrFileSources: a list of the cast vote record source files. Each file must have three fields:
   - *provider: the voting machine format of the file. Example: ES&S

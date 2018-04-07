@@ -145,6 +145,16 @@ public class ElectionConfig {
     return rawConfig.visualizerOutput;
   }
 
+  // function: continueTabulationTillAllCandidatesEliminated
+  // purpose: getter for setting to keep tabulating beyond selecting winner(s) till all candidates
+  // have been eliminated
+  // returns: weather to keep tabulating past selecting all winner(s)
+  public Boolean continueTabulationTillAllCandidatesEliminated() {
+    return rawConfig.rules.continueTabulationTillAllCandidatesEliminated != null ?
+        rawConfig.rules.continueTabulationTillAllCandidatesEliminated :
+        false;
+  }
+
   // function: contestName
   // purpose: getter for contestName
   // returns: contest name
