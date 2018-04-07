@@ -190,8 +190,11 @@ public class Tabulator {
             for (CastVoteRecord cvr : castVoteRecords) {
               if (winner.equals(cvr.getCurrentRecipientOfVote())) {
                 cvr.setFractionalTransferValue(
-                    cvr.getFractionalTransferValue().multiply(surplusFraction,
-                        config.mathContext()));
+                    cvr.getFractionalTransferValue().multiply(
+                      surplusFraction,
+                      config.mathContext()
+                    )
+                );
               }
             }
           }
@@ -201,6 +204,7 @@ public class Tabulator {
         List<String> eliminated;
 
         // Four mutually exclusive ways to eliminate candidates.
+
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
         eliminated = dropUWI(currentRoundCandidateToTally);
         // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
@@ -278,15 +282,18 @@ public class Tabulator {
     BigDecimal thresholdToWin = getThreshold(currentRoundCandidateToTally);
     // tally indexes over all tallies to find any winners
     for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
-      // TODO: some rules require >= than here
-      if (tally.compareTo(thresholdToWin) == 1) {
+      // TODO: some rules require >= instead of just > here
+      if (tally.compareTo(thresholdToWin) > 0) {
         // we have winner(s)
         List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
-        for(String winningCandidate : winningCandidates) {
+        for (String winningCandidate : winningCandidates) {
           selectedWinners.add(winningCandidate);
-          log("%s won in round %d with %s votes.", winningCandidate, currentRound,
-              tally.toString());
-          break;
+          log(
+            "%s won in round %d with %s votes.",
+            winningCandidate,
+            currentRound,
+            tally.toString()
+          );
         }
       }
     }
