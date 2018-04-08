@@ -32,6 +32,7 @@ public class Main {
       // Assume user wants to use CLI
       String configPath = args[0];
       ElectionConfig config = makeElectionConfig(configPath);
+      Logger.log("Tabulator is being used via the CLI.");
       executeTabulation(config);
     }
   }
