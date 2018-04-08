@@ -10,13 +10,11 @@
 package com.rcv;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.math.RoundingMode.HALF_EVEN;
 
 public class ElectionConfig {
   // underlying rawConfig object data
@@ -25,8 +23,6 @@ public class ElectionConfig {
   private ArrayList<String> candidateCodeList;
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
-  // MathContext to be shared by all vote calculations
-  private MathContext contextForVoteArithmetic;
   // minimum vote threshold if one is specified
   private BigDecimal minimumVoteThreshold;
 
@@ -105,23 +101,20 @@ public class ElectionConfig {
     return rawConfig.rules.numberOfWinners == null ? 1 : rawConfig.rules.numberOfWinners;
   }
 
-  // function: mathContext
-  // purpose: getter for mathContext for vote tally arithmetic
-  // return: context for doing vote tally arithmetic to be used with BigDecimal
-  public MathContext mathContext() {
-    if (contextForVoteArithmetic == null) {
-      contextForVoteArithmetic = new MathContext(decimalPlacesForVoteArithmetic().intValue(), HALF_EVEN);
-    }
-    return contextForVoteArithmetic;
-  }
-
   // function: decimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to or 0 if no setting is specified
-  public Integer decimalPlacesForVoteArithmetic() {
+  private Integer decimalPlacesForVoteArithmetic() {
     // w default to using 4 places for fractional transfer vote arithmetic
     return rawConfig.rules.decimalPlacesForVoteArithmetic == null ? 4 :
         rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
+  // function: roundDecimal
+  // purpose: round a number according to the config settings
+  // returns: the rounded value
+  public BigDecimal roundDecimal(BigDecimal bd) {
+    return bd.setScale(decimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
   }
 
   // function: multiSeatTransferRule

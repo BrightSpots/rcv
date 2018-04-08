@@ -12,7 +12,7 @@ package com.rcv;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -131,7 +131,7 @@ public class ResultsWriter {
       BigDecimal total = BigDecimal.ZERO;
       // tally indexes over all tallies for the current round
       for (BigDecimal tally : tallies.values()) {
-        total = total.add(tally,config.mathContext());
+        total = total.add(tally);
       }
       totalActiveVotesPerRound.put(round, total);
     }
@@ -249,21 +249,22 @@ public class ResultsWriter {
         // vote tally delta
         BigDecimal deltaVotes = BigDecimal.ZERO;
         if (!isFinalResults && thisRoundTally.compareTo(prevRoundTally) != 0) {
-          deltaVotes = thisRoundTally.subtract(prevRoundTally, config.mathContext());
+          deltaVotes = thisRoundTally.subtract(prevRoundTally);
         }
 
         // accumulate total votes redistributed
         if (deltaVotes.signum() == 1) { // count all the positive redistributions
           votesRedistributedEachRound[dataUseRound] =
-            votesRedistributedEachRound[dataUseRound].add(deltaVotes, config.mathContext());
+            votesRedistributedEachRound[dataUseRound].add(deltaVotes);
         }
         //  total active votes in this round
         BigDecimal totalActiveVotes = totalActiveVotesPerRound.get(dataUseRound);
         // fractional percent
-        BigDecimal fraction = thisRoundTally.divide(totalActiveVotes, config.mathContext());
+        BigDecimal fraction =
+          config.roundDecimal(thisRoundTally.divide(totalActiveVotes, RoundingMode.HALF_EVEN));
         // percentage of active votes
         BigDecimal percentage = fraction.signum() == 1 ?
-          fraction.multiply(new BigDecimal(100), config.mathContext()) :
+          fraction.multiply(new BigDecimal(100)) :
           BigDecimal.ZERO;
         columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+1;
         // delta votes cell
@@ -301,26 +302,27 @@ public class ResultsWriter {
       if (dataUseRound > 1) {
         // Exhausted count is the difference between the total votes in round 1 and the total votes
         // in the current round.
-        thisRoundExhausted = totalActiveVotesFirstRound.subtract(
-            totalActiveVotesPerRound.get(dataUseRound),
-            config.mathContext());
+        thisRoundExhausted =
+          totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(dataUseRound));
         // save previous round exhausted votes to calculate exhausted vote change
         BigDecimal prevRoundExhausted = totalActiveVotesFirstRound.subtract(
-            totalActiveVotesPerRound.get(dataUseRound - 1), config.mathContext());
-        deltaExhausted = isFinalResults ? BigDecimal.ZERO :
-            thisRoundExhausted.subtract(prevRoundExhausted, config.mathContext());
+          totalActiveVotesPerRound.get(dataUseRound - 1)
+        );
+        deltaExhausted = isFinalResults ?
+          BigDecimal.ZERO :
+          thisRoundExhausted.subtract(prevRoundExhausted);
 
         // add exhausted votes to the votes redistributed totals
         votesRedistributedEachRound[dataUseRound] =
-            votesRedistributedEachRound[dataUseRound].add(deltaExhausted, config.mathContext());
+          votesRedistributedEachRound[dataUseRound].add(deltaExhausted);
       }
 
       // Exhausted votes as percentage of ALL votes (note: this differs from the candidate vote
       // percentages which are percentage of ACTIVE votes for the given round.
-      BigDecimal decimalPercentage = thisRoundExhausted.divide(totalActiveVotesFirstRound,
-          config.mathContext());
-      BigDecimal percentage = decimalPercentage.multiply(new BigDecimal("100"),
-          config.mathContext());
+      BigDecimal decimalPercentage = config.roundDecimal(
+        thisRoundExhausted.divide(totalActiveVotesFirstRound, RoundingMode.HALF_EVEN)
+      );
+      BigDecimal percentage = decimalPercentage.multiply(new BigDecimal(100));
       columnIndex = ((displayRound-1)*COLUMNS_PER_ROUND)+1;
       // delta votes cell
       Cell deltaVotesCell = exhaustedCVRRow.createCell(columnIndex++);
