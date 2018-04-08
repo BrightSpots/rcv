@@ -23,9 +23,17 @@ public class Main {
   // purpose: main entry point to the rcv tabulator program
   // param: args command line argument array
   public static void main(String[] args) {
-    String configPath = args[0];
-    ElectionConfig config = makeElectionConfig(configPath);
-    executeTabulation(config);
+    if (args.length == 0) {
+      // If no args provided, assume user wants to use the GUI
+      System.out.println("No arguments provided; starting GUI...");
+      RcvGui gui = new RcvGui();
+      gui.launch();
+    } else {
+      // Assume user wants to use CLI
+      String configPath = args[0];
+      ElectionConfig config = makeElectionConfig(configPath);
+      executeTabulation(config);
+    }
   }
 
   // function: makeElectionConfig
@@ -50,6 +58,7 @@ public class Main {
         if (!config.validate()) {
           Logger.log("There was a problem validating the election configuration.");
           Logger.log("Please see the README.txt for details.");
+          config = null;
         }
       }
     } catch (IOException exception) {
@@ -68,10 +77,11 @@ public class Main {
   // function: executeTabulation
   // purpose: execute tabulation for given ElectionConfig
   // param: config object containing cvr file paths to parse
-  static void executeTabulation(ElectionConfig config) {
+  static String executeTabulation(ElectionConfig config) {
     // Read cast vote records from cvr files
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords;
+    String response = "Tabulation successful!";
     try {
       // parse the cast vote records
       castVoteRecords = parseCastVoteRecords(config);
@@ -84,8 +94,10 @@ public class Main {
       // generate audit data
       tabulator.doAudit(castVoteRecords);
     } catch (Exception exception) {
-      Logger.log("Tabulation error: " + exception.toString());
+      response = String.format("ERROR during tabulation: %s", exception.toString());
+      Logger.log(response);
     }
+    return response;
   }
 
   // function: parseCastVoteRecords
