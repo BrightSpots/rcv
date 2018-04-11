@@ -1,5 +1,5 @@
-/**
- * Created by Jonathan Moldover and Louis Eisenberg
+/*
+ * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  * Copyright 2018 Bright Spots
  * Purpose: Helper class to read and parse an xls cast vote record file into
  * cast vote record objects.

@@ -1,14 +1,14 @@
 /*
-  Created by Jonathan Moldover and Louis Eisenberg
-  Copyright 2018 Bright Spots
-  Purpose: Main entry point for the rcv module
-  Controls high-level flow for program execution:
-  parse command line
-  parse config file
-  read cast vote records
-  tabulate election
-  output results
-  Version: 1.0
+ * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright 2018 Bright Spots
+ * Purpose: Main entry point for the rcv module
+ * Controls high-level flow for program execution:
+ * parse command line
+ * parse config file
+ * read cast vote records
+ * tabulate election
+ * output results
+ * Version: 1.0
  */
 
 package com.rcv;
@@ -22,26 +22,29 @@ public class Main {
   // function: main
   // purpose: main entry point to the rcv tabulator program
   // param: args command line argument array
+  // returns: N/A
   public static void main(String[] args) {
     if (args.length == 0) {
-      // If no args provided, assume user wants to use the GUI
+      // if no args provided, assume user wants to use the GUI
       System.out.println("No arguments provided; starting GUI...");
+      // graphical user interface (GUI)
       RcvGui gui = new RcvGui();
       gui.launch();
     } else {
-      // Assume user wants to use CLI
+      // assume user wants to use CLI
       String configPath = args[0];
-      ElectionConfig config = makeElectionConfig(configPath);
+      // config file for running the tabulator
+      ElectionConfig config = loadElectionConfig(configPath);
       Logger.log("Tabulator is being used via the CLI.");
       executeTabulation(config);
     }
   }
 
-  // function: makeElectionConfig
+  // function: loadElectionConfig
   // purpose: create config object
   // param: path to config file
   // returns: the new ElectionConfig object or null if there was a problem
-  static ElectionConfig makeElectionConfig(String configPath) {
+  static ElectionConfig loadElectionConfig(String configPath) {
     // config: the new object
     ElectionConfig config = null;
     try {
@@ -78,10 +81,12 @@ public class Main {
   // function: executeTabulation
   // purpose: execute tabulation for given ElectionConfig
   // param: config object containing cvr file paths to parse
+  // returns: String indicating whether or not execution was successful
   static String executeTabulation(ElectionConfig config) {
     // Read cast vote records from cvr files
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords;
+    // String indicating whether or not execution was successful
     String response = "Tabulation successful!";
     try {
       // parse the cast vote records
@@ -98,6 +103,7 @@ public class Main {
       response = String.format("ERROR during tabulation: %s", exception.toString());
       Logger.log(response);
     }
+    // TODO: Redesign this later so as not to return a user-facing status string
     return response;
   }
 
@@ -105,8 +111,7 @@ public class Main {
   // purpose: parse cvr files referenced in the ElectionConfig object into a list of CastVoteRecords
   // param: config object containing cvr file paths to parse
   // returns: list of all CastVoteRecord objects parsed from cvr files
-  private static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config)
-  throws Exception {
+  private static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config) throws Exception {
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     // at each iteration of the following loop we add records from another source file
@@ -116,11 +121,11 @@ public class Main {
       // reader: read input file into a list of cast vote records
       CVRReader reader = new CVRReader();
       reader.parseCVRFile(
-        source.filePath,
-        source.firstVoteColumnIndex,
-        config.maxRankingsAllowed(),
-        config.getCandidateCodeList(),
-        config
+          source.filePath,
+          source.firstVoteColumnIndex,
+          config.maxRankingsAllowed(),
+          config.getCandidateCodeList(),
+          config
       );
       // add records to the master list
       castVoteRecords.addAll(reader.castVoteRecords);

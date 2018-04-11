@@ -1,5 +1,5 @@
-/**
- * Created by Jonathan Moldover and Louis Eisenberg
+/*
+ * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  * Copyright 2018 Bright Spots
  * Helper class takes tabulation results data as input and generates results xls file which
  * contains results summary information.

@@ -1,5 +1,5 @@
-/**
- * Created by Jonathan Moldover and Louis Eisenberg
+/*
+ * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  * Copyright 2018 Bright Spots
  * Purpose: Wrapper for Jackson json parser to parse json files into java objects
  * Version: 1.0
