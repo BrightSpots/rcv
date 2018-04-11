@@ -11,13 +11,11 @@
 package com.rcv;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.math.RoundingMode.HALF_EVEN;
 
 public class ElectionConfig {
   // underlying rawConfig object data
@@ -26,8 +24,6 @@ public class ElectionConfig {
   private ArrayList<String> candidateCodeList;
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
-  // MathContext to be shared by all vote calculations
-  private MathContext contextForVoteArithmetic;
   // minimum vote threshold if one is specified
   private BigDecimal minimumVoteThreshold;
 
@@ -67,7 +63,7 @@ public class ElectionConfig {
     // if multi-seat is indicated we validate decimal count and rules style
     //
     if (this.numberOfWinners() > 1) {
-      if (this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 1000) {
+      if (this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 20) {
         valid = false;
       }
       if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
@@ -81,7 +77,7 @@ public class ElectionConfig {
   // purpose: given setting String return the corresponding rules enum
   // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
-  public static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(String setting) {
+  private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(String setting) {
     // rule: return value determined by input setting string
     Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
 
@@ -106,30 +102,28 @@ public class ElectionConfig {
     return rawConfig.rules.numberOfWinners == null ? 1 : rawConfig.rules.numberOfWinners;
   }
 
-  // function: mathContext
-  // purpose: getter for mathContext for vote tally arithmetic
-  // return: context for doing vote tally arithmetic to be used with BigDecimal
-  public MathContext mathContext() {
-    if (contextForVoteArithmetic == null) {
-      contextForVoteArithmetic = new MathContext(decimalPlacesForVoteArithmetic().intValue(), HALF_EVEN);
-    }
-    return contextForVoteArithmetic;
-  }
-
   // function: decimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to or 0 if no setting is specified
-  public Integer decimalPlacesForVoteArithmetic() {
-    // w default to using 4 places for fractional transfer vote arithmetic
-    return rawConfig.rules.decimalPlacesForVoteArithmetic == null ? 4 :
-        rawConfig.rules.decimalPlacesForVoteArithmetic;
+  private Integer decimalPlacesForVoteArithmetic() {
+    // we default to using 4 places for fractional transfer vote arithmetic
+    return rawConfig.rules.decimalPlacesForVoteArithmetic == null ?
+      4 :
+      rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
+  // function: roundDecimal
+  // purpose: round a number according to the config settings
+  // returns: the rounded value
+  public BigDecimal roundDecimal(BigDecimal bd) {
+    return bd.setScale(decimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
   }
 
   // function: multiSeatTransferRule
   // purpose: which surplus transfer rule to use in multi-seat elections
   // returns: enum indicating which transfer rule to use
   public Tabulator.MultiSeatTransferRule multiSeatTransferRule() {
-    return multiSeatTransferRuleForConfigSetting( rawConfig.rules.multiSeatTransferRule );
+    return multiSeatTransferRuleForConfigSetting(rawConfig.rules.multiSeatTransferRule);
   }
 
   // function: auditOutput
@@ -285,7 +279,7 @@ public class ElectionConfig {
       if (rawConfig.rules.minimumVoteThreshold == null) {
         minimumVoteThreshold = BigDecimal.ZERO;
       } else {
-        minimumVoteThreshold = new BigDecimal(rawConfig.rules.minimumVoteThreshold.intValue());
+        minimumVoteThreshold = new BigDecimal(rawConfig.rules.minimumVoteThreshold);
       }
     }
     return minimumVoteThreshold;

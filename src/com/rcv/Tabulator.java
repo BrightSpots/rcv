@@ -11,6 +11,7 @@
 package com.rcv;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -184,14 +185,14 @@ public class Tabulator {
           if (winnerToRound.size() < config.numberOfWinners()) {
             // fractional transfer based on surplus votes
             BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
-            BigDecimal extraVotes =
-                candidateVotes.subtract(winningThresholdThisRound, config.mathContext());
-            BigDecimal surplusFraction = extraVotes.divide(candidateVotes, config.mathContext());
+            BigDecimal extraVotes = candidateVotes.subtract(winningThresholdThisRound);
+            BigDecimal surplusFraction =
+              config.roundDecimal(extraVotes.divide(candidateVotes, RoundingMode.HALF_EVEN));
             for (CastVoteRecord cvr : castVoteRecords) {
               if (winner.equals(cvr.getCurrentRecipientOfVote())) {
                 cvr.setFractionalTransferValue(
-                    cvr.getFractionalTransferValue().multiply(surplusFraction,
-                        config.mathContext()));
+                  config.roundDecimal(cvr.getFractionalTransferValue().multiply(surplusFraction))
+                );
               }
             }
           }
@@ -201,6 +202,7 @@ public class Tabulator {
         List<String> eliminated;
 
         // Four mutually exclusive ways to eliminate candidates.
+
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
         eliminated = dropUWI(currentRoundCandidateToTally);
         // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
@@ -238,7 +240,7 @@ public class Tabulator {
     BigDecimal currentRoundTotalVotes = BigDecimal.ZERO;
     // numVotes indexes over all vote tallies in this round
     for (BigDecimal numVotes : currentRoundCandidateToTally.values()) {
-      currentRoundTotalVotes = currentRoundTotalVotes.add(numVotes, config.mathContext());
+      currentRoundTotalVotes = currentRoundTotalVotes.add(numVotes);
     }
     // how many seats have been filled
     int numPreviousWinners = winnerToRound.size();
@@ -248,8 +250,7 @@ public class Tabulator {
     // divisor for threshold is seats remaining to fill + 1
     BigDecimal divisor = new BigDecimal(seatsRemaining + 1);
     // return value
-    BigDecimal threshold = currentRoundTotalVotes.divide(divisor, config.mathContext());
-    return threshold;
+    return config.roundDecimal(currentRoundTotalVotes.divide(divisor, RoundingMode.HALF_EVEN));
   }
 
   private CandidateStatus getCandidateStatus(String candidate) {
@@ -278,15 +279,18 @@ public class Tabulator {
     BigDecimal thresholdToWin = getThreshold(currentRoundCandidateToTally);
     // tally indexes over all tallies to find any winners
     for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
-      // TODO: some rules require >= than here
-      if (tally.compareTo(thresholdToWin) == 1) {
+      // TODO: some rules require >= instead of just > here
+      if (tally.compareTo(thresholdToWin) > 0) {
         // we have winner(s)
         List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
-        for(String winningCandidate : winningCandidates) {
+        for (String winningCandidate : winningCandidates) {
           selectedWinners.add(winningCandidate);
-          log("%s won in round %d with %s votes.", winningCandidate, currentRound,
-              tally.toString());
-          break;
+          log(
+            "%s won in round %d with %s votes.",
+            winningCandidate,
+            currentRound,
+            tally.toString()
+          );
         }
       }
     }
@@ -496,7 +500,7 @@ public class Tabulator {
       // currentCandidates is all candidates receiving the current vote tally
       List<String> currentCandidates = currentRoundTallyToCandidates.get(currentVoteTally);
       BigDecimal totalForThisRound = currentVoteTally.multiply(new BigDecimal(currentCandidates.size()));
-      runningTotal = runningTotal.add(totalForThisRound,config.mathContext());
+      runningTotal = runningTotal.add(totalForThisRound);
       candidatesSeen.addAll(currentCandidates);
     }
     return eliminations;
@@ -690,8 +694,7 @@ public class Tabulator {
             // current tally for this candidate
             BigDecimal currentTally = roundTally.get(selectedCandidateID);
             // new tally after adding this vote
-            BigDecimal newTally = currentTally.add(cvr.getFractionalTransferValue(),
-                config.mathContext());
+            BigDecimal newTally = currentTally.add(cvr.getFractionalTransferValue());
             roundTally.put(selectedCandidateID, newTally);
             cvr.setCurrentRecipientOfVote(selectedCandidateID);
           }

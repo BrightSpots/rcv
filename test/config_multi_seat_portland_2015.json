@@ -41,7 +41,8 @@
     {
       "provider": "ES&S",
       "filePath": "test/2015-portland-mayor-cvr.xlsx",
-      "firstVoteColumnIndex": 3
+      "firstVoteColumnIndex": 3,
+      "precinctColumnIndex": 1
     }
   ]
 }

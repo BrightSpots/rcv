@@ -40,7 +40,8 @@
     {
       "provider": "ES&S",
       "filePath": "test/2017-minneapolis-mayor-cvr.xlsx",
-      "firstVoteColumnIndex": 1
+      "firstVoteColumnIndex": 1,
+      "precinctColumnIndex": 0
     }
   ]
 }
