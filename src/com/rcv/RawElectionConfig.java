@@ -60,6 +60,8 @@ public class RawElectionConfig {
     public String filePath;
     // column where rankings data begins
     public Integer firstVoteColumnIndex;
+    // column containing precinct (if any)
+    public Integer precinctColumnIndex;
   }
 
   // Candidate: contains a full candidate name and optionally a candidate ID
