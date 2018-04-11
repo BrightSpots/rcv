@@ -58,7 +58,7 @@ public class CastVoteRecord {
   // param: source what vendor created the cvr file from which this cvr was parsed
   // param: ballotID unique ID of this ballot
   // param: rankings list of rank->candidateID selections parsed for this cvr
-  // param: fullCVRData list of strings containting ALL data parsed for this cvr
+  // param: fullCVRData list of strings containing ALL data parsed for this cvr
   public CastVoteRecord(
     String sourceName,
     String cvrID,

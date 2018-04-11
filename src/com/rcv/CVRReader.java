@@ -30,7 +30,7 @@ public class CVRReader {
   // param: excelFilePath path to location of input cast vote record file
   // param: firstVoteColumnIndex the 0-based index where rankings begin for this ballot style
   // param: precinctColumnIndex the column containing precinct names (possibly null)
-  // prarm: allowableRanks how many ranks are allowed for each cast vote record
+  // param: allowableRanks how many ranks are allowed for each cast vote record
   // param: candidateIDs list of all declared candidate IDs
   // param: config an ElectionConfig object specifying rules for interpreting cvr file data
   public void parseCVRFile(
@@ -136,7 +136,7 @@ public class CVRReader {
         rankings.add(ranking);
       }
       // we now have all required data for the new CastVoteRecord object
-      // create it and add to the list of all cvrs
+      // create it and add to the list of all CVRs
       CastVoteRecord cvr =
         new CastVoteRecord(cvrFileName, castVoteRecordID, rankings, fullCVRData, precinct);
       castVoteRecords.add(cvr);

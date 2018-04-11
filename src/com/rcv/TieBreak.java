@@ -74,7 +74,7 @@ class TieBreak {
       // if there are only 2 candidates don't use a comma
       nonselected = options.get(0) + " and " + options.get(1);
     } else {
-      // stringbuilder for faster string construction
+      // StringBuilder for faster string construction
       StringBuilder stringBuilder = new StringBuilder();
       // i indexes over all candidates
       for (int i = 0; i < options.size() - 1; i++) {

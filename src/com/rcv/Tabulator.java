@@ -115,7 +115,7 @@ public class Tabulator {
   private Map<Integer, TieBreak> roundToTieBreak = new HashMap<>();
 
   // function: Tabulator constructor
-  // purpose: assigns input params to member variables and caches the candidateIDlist
+  // purpose: assigns input params to member variables and caches the candidateID list
   // which will be used when reading input cast vote records
   // param: castVoteRecords list of all cast vote records to be tabulated for this contest
   // param: config describes various tabulation rules to be used for tabulation
@@ -579,7 +579,7 @@ public class Tabulator {
     return decision;
   }
 
-  // function: hasContinuingCnadidates
+  // function: hasContinuingCandidates
   // purpose: determine if the input rankings specify a candidate who has not been eliminated
   //   i.e. a continuing candidate
   // param: rankToCandidateIDs ordered map of rankings (most preferred to least) to candidateIDs
@@ -713,7 +713,7 @@ public class Tabulator {
 
   // function: doAudit
   // purpose: log the audit info to console and audit file
-  // param: castVoteRecords list of all cvrs which have been tabulated
+  // param: castVoteRecords list of all CVRs which have been tabulated
   public void doAudit(List<CastVoteRecord> castVoteRecords) {
     for (CastVoteRecord cvr : castVoteRecords) {
       log(cvr.getAuditString());
@@ -750,7 +750,7 @@ public class Tabulator {
       // all candidates in the existing output structure (if any) who received the same vote tally
       LinkedList<String> candidates = tallyToCandidates.get(votes);
       if (candidates == null) {
-        // new container list for candidates who recieved this vote tally
+        // new container list for candidates who received this vote tally
         candidates = new LinkedList<>();
         tallyToCandidates.put(votes, candidates);
       }
