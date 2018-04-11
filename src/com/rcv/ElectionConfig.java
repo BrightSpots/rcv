@@ -62,7 +62,7 @@ public class ElectionConfig {
     // if multi-seat is indicated we validate decimal count and rules style
     //
     if (this.numberOfWinners() > 1) {
-      if (this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 1000) {
+      if (this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 20) {
         valid = false;
       }
       if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
@@ -76,7 +76,7 @@ public class ElectionConfig {
   // purpose: given setting String return the corresponding rules enum
   // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
-  public static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(String setting) {
+  private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(String setting) {
     // rule: return value determined by input setting string
     Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
 
@@ -105,9 +105,10 @@ public class ElectionConfig {
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to or 0 if no setting is specified
   private Integer decimalPlacesForVoteArithmetic() {
-    // w default to using 4 places for fractional transfer vote arithmetic
-    return rawConfig.rules.decimalPlacesForVoteArithmetic == null ? 4 :
-        rawConfig.rules.decimalPlacesForVoteArithmetic;
+    // we default to using 4 places for fractional transfer vote arithmetic
+    return rawConfig.rules.decimalPlacesForVoteArithmetic == null ?
+      4 :
+      rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
   // function: roundDecimal
@@ -121,7 +122,7 @@ public class ElectionConfig {
   // purpose: which surplus transfer rule to use in multi-seat elections
   // returns: enum indicating which transfer rule to use
   public Tabulator.MultiSeatTransferRule multiSeatTransferRule() {
-    return multiSeatTransferRuleForConfigSetting( rawConfig.rules.multiSeatTransferRule );
+    return multiSeatTransferRuleForConfigSetting(rawConfig.rules.multiSeatTransferRule);
   }
 
   // function: auditOutput
@@ -277,7 +278,7 @@ public class ElectionConfig {
       if (rawConfig.rules.minimumVoteThreshold == null) {
         minimumVoteThreshold = BigDecimal.ZERO;
       } else {
-        minimumVoteThreshold = new BigDecimal(rawConfig.rules.minimumVoteThreshold.intValue());
+        minimumVoteThreshold = new BigDecimal(rawConfig.rules.minimumVoteThreshold);
       }
     }
     return minimumVoteThreshold;

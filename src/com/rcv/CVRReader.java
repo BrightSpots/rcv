@@ -29,12 +29,14 @@ public class CVRReader {
   // Note: this is specific for the Maine example file we were provided
   // param: excelFilePath path to location of input cast vote record file
   // param: firstVoteColumnIndex the 0-based index where rankings begin for this ballot style
+  // param: precinctColumnIndex the column containing precinct names (possibly null)
   // prarm: allowableRanks how many ranks are allowed for each cast vote record
   // param: candidateIDs list of all declared candidate IDs
   // param: config an ElectionConfig object specifying rules for interpreting cvr file data
   public void parseCVRFile(
     String excelFilePath,
     int firstVoteColumnIndex,
+    Integer precinctColumnIndex,
     int allowableRanks,
     List<String>candidateIDs,
     ElectionConfig config
@@ -68,6 +70,8 @@ public class CVRReader {
       ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
       // create an object to store CVR data for auditing
       ArrayList<String> fullCVRData = new ArrayList<>();
+      // the precinct for this ballot
+      String precinct = null;
 
       // Iterate all expected cells in this row storing cvrData and rankings as we go
       // cellIndex ranges from 0 to the last expected rank column index
@@ -85,6 +89,10 @@ public class CVRReader {
           fullCVRData.add(cvrDataCell.getStringCellValue());
         } else {
           fullCVRData.add("unexpected data type");
+        }
+
+        if (precinctColumnIndex != null && cellIndex == precinctColumnIndex) {
+          precinct = cvrDataCell.getStringCellValue();
         }
 
         // if we haven't reached a vote cell continue to the next cell
@@ -129,7 +137,8 @@ public class CVRReader {
       }
       // we now have all required data for the new CastVoteRecord object
       // create it and add to the list of all cvrs
-      CastVoteRecord cvr = new CastVoteRecord(cvrFileName, castVoteRecordID, rankings, fullCVRData);
+      CastVoteRecord cvr =
+        new CastVoteRecord(cvrFileName, castVoteRecordID, rankings, fullCVRData, precinct);
       castVoteRecords.add(cvr);
     }
     // parsing complete

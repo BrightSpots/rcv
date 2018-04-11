@@ -28,11 +28,12 @@ public class CastVoteRecord {
   private final String AUDIT_LABEL_ROUNDS = " [Round by Round Report] |";
   private final String AUDIT_LABEL_RAW = " [Raw Data] ";
 
-
   // name of the vendor, this becomes part of the audit output but is not used in tabulation
   private String sourceName;
   // unique identifier for this cast vote record
   private String cvrID;
+  // which precinct this ballot came from
+  private String precinct;
   // container for ALL cvr data parsed from the source cvr file
   private List<String> fullCVRData;
   // map of round to all candidates selected for that round
@@ -59,14 +60,16 @@ public class CastVoteRecord {
   // param: rankings list of rank->candidateID selections parsed for this cvr
   // param: fullCVRData list of strings containting ALL data parsed for this cvr
   public CastVoteRecord(
-    String source,
-    String ballotID,
+    String sourceName,
+    String cvrID,
     List<Pair<Integer, String>> rankings,
-    List<String> fullCVRData
+    List<String> fullCVRData,
+    String precinct
   ) {
-    sourceName = source;
-    cvrID = ballotID;
+    this.sourceName = sourceName;
+    this.cvrID = cvrID;
     this.fullCVRData = fullCVRData;
+    this.precinct = precinct;
     sortRankings(rankings);
   }
 

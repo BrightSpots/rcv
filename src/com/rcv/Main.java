@@ -104,6 +104,7 @@ public class Main {
       reader.parseCVRFile(
         source.filePath,
         source.firstVoteColumnIndex,
+        source.precinctColumnIndex,
         config.maxRankingsAllowed(),
         config.getCandidateCodeList(),
         config
