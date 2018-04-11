@@ -23,11 +23,6 @@ import java.util.TreeMap;
 
 public class CastVoteRecord {
 
-  private final String AUDIT_LABEL_SOURCE = "[CVR Source] ";
-  private final String AUDIT_LABEL_BALLOT_ID = " [Ballot ID] ";
-  private final String AUDIT_LABEL_ROUNDS = " [Round by Round Report] |";
-  private final String AUDIT_LABEL_RAW = " [Raw Data] ";
-
   // name of the vendor, this becomes part of the audit output but is not used in tabulation
   private String sourceName;
   // unique identifier for this cast vote record
@@ -155,16 +150,16 @@ public class CastVoteRecord {
   String getAuditString() {
     // use a string builder for more efficient string creation
     StringBuilder auditStringBuilder = new StringBuilder();
-    auditStringBuilder.append(AUDIT_LABEL_SOURCE);
+    auditStringBuilder.append("[CVR Source] ");
     auditStringBuilder.append(sourceName);
-    auditStringBuilder.append(AUDIT_LABEL_BALLOT_ID);
+    auditStringBuilder.append(" [Ballot ID] ");
     auditStringBuilder.append(cvrID);
-    auditStringBuilder.append(AUDIT_LABEL_ROUNDS);
+    auditStringBuilder.append(" [Round by Round Report] |");
     // index to to iterate over all round descriptions
     for (Integer round : descriptionsByRound.keySet()) {
       auditStringBuilder.append(descriptionsByRound.get(round));
     }
-    auditStringBuilder.append(AUDIT_LABEL_RAW);
+    auditStringBuilder.append(" [Raw Data] ");
     auditStringBuilder.append(fullCVRData);
     return auditStringBuilder.toString();
   }
