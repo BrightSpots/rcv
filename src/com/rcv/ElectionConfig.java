@@ -1,5 +1,5 @@
-/**
- * Created by Jonathan Moldover and Louis Eisenberg
+/*
+ * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  * Copyright 2018 Bright Spots
  * Purpose: Wrapper for RawElectionConfig object
  * This class adds logic for looking up rule enum names
@@ -7,6 +7,7 @@
  * cast vote record objects.
  * Version: 1.0
  */
+
 package com.rcv;
 
 import java.math.BigDecimal;

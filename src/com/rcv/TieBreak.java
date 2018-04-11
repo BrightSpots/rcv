@@ -1,9 +1,10 @@
-/**
- * Created by Jonathan Moldover and Louis Eisenberg
+/*
+ * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  * Copyright 2018 Bright Spots
  * Purpose: Handle tie break scenarios based on rules configuration
  * Version: 1.0
  */
+
 package com.rcv;
 
 import java.math.BigDecimal;
