@@ -80,10 +80,10 @@ public class Main {
 
   // function: executeTabulation
   // purpose: execute tabulation for given ElectionConfig
-  // param: config object containing cvr file paths to parse
+  // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
   static String executeTabulation(ElectionConfig config) {
-    // Read cast vote records from cvr files
+    // Read cast vote records from CVR files
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords;
     // String indicating whether or not execution was successful
@@ -108,16 +108,16 @@ public class Main {
   }
 
   // function: parseCastVoteRecords
-  // purpose: parse cvr files referenced in the ElectionConfig object into a list of CastVoteRecords
-  // param: config object containing cvr file paths to parse
-  // returns: list of all CastVoteRecord objects parsed from cvr files
+  // purpose: parse CVR files referenced in the ElectionConfig object into a list of CastVoteRecords
+  // param: config object containing CVR file paths to parse
+  // returns: list of all CastVoteRecord objects parsed from CVR files
   private static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config) throws Exception {
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     // at each iteration of the following loop we add records from another source file
     // source: index over config sources
     for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      Logger.log("Reading cvr file: %s (provider: %s)", source.filePath, source.provider);
+      Logger.log("Reading CVR file: %s (provider: %s)", source.filePath, source.provider);
       // reader: read input file into a list of cast vote records
       CVRReader reader = new CVRReader();
       reader.parseCVRFile(

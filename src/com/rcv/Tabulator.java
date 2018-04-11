@@ -506,10 +506,10 @@ public class Tabulator {
     return eliminations;
   }
 
-  // purpose: determine if any overvote has occurred for this ranking set (from a cvr)
+  // purpose: determine if any overvote has occurred for this ranking set (from a CVR)
   // and if so return how to handle it based on the rules configuration in use
-  // param: candidateIDSet all candidates this cvr contains at a particular rank
-  // return: an OvervoteDecision enum to be applied to the cvr under consideration
+  // param: candidateIDSet all candidates this CVR contains at a particular rank
+  // return: an OvervoteDecision enum to be applied to the CVR under consideration
   private OvervoteDecision getOvervoteDecision(Set<String> candidateIDSet) {
     // the resulting decision
     OvervoteDecision decision;
@@ -627,13 +627,13 @@ public class Tabulator {
       }
     }
 
-    // cvr indexes over the cast vote records to count votes for continuing candidateIDs
+    // CVR indexes over the cast vote records to count votes for continuing candidateIDs
     for (CastVoteRecord cvr : castVoteRecords) {
       cvr.setCurrentRecipientOfVote(null);
       if (cvr.isExhausted()) {
         continue;
       }
-      // if this cvr has no continuing candidate exhaust it
+      // if this CVR has no continuing candidate exhaust it
       if (!hasContinuingCandidates(cvr.rankToCandidateIDs)) {
         cvr.exhaust(currentRound, "no continuing candidates");
         continue;
@@ -643,9 +643,9 @@ public class Tabulator {
       // this is used to determine how many skipped rankings occurred in the case of
       // undervotes
       int lastRank = 0;
-      // loop over all rankings in this cvr from most preferred to least and see how they will
+      // loop over all rankings in this CVR from most preferred to least and see how they will
       // be rendered
-      // rank iterates through all ranks in this cvr ranking set
+      // rank iterates through all ranks in this CVR ranking set
       for (int rank : cvr.rankToCandidateIDs.keySet()) {
         // candidateIDSet is all candidates selected at the current rank
         Set<String> candidateIDSet = cvr.rankToCandidateIDs.get(rank);

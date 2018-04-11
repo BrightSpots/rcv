@@ -29,15 +29,15 @@ public class CastVoteRecord {
   private String cvrID;
   // which precinct this ballot came from
   private String precinct;
-  // container for ALL cvr data parsed from the source cvr file
+  // container for ALL CVR data parsed from the source CVR file
   private List<String> fullCVRData;
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
   public SortedMap<Integer, Set<String>> rankToCandidateIDs;
-  // whether this cvr is exhausted or not
+  // whether this CVR is exhausted or not
   private boolean isExhausted;
 
-  // contains who this cvr counted for in each round
+  // contains who this CVR counted for in each round
   // followed by reason for exhaustion if it is ever exhausted
   private Map<Integer, String> descriptionsByRound = new HashMap<>();
 
@@ -49,11 +49,11 @@ public class CastVoteRecord {
   private String currentRecipientOfVote = null;
 
   // function: CastVoteRecord
-  // purpose: create a new cvr object
-  // param: source what vendor created the cvr file from which this cvr was parsed
+  // purpose: create a new CVR object
+  // param: source what vendor created the CVR file from which this CVR was parsed
   // param: ballotID unique ID of this ballot
-  // param: rankings list of rank->candidateID selections parsed for this cvr
-  // param: fullCVRData list of strings containing ALL data parsed for this cvr
+  // param: rankings list of rank->candidateID selections parsed for this CVR
+  // param: fullCVRData list of strings containing ALL data parsed for this CVR
   public CastVoteRecord(
     String sourceName,
     String cvrID,
@@ -77,7 +77,7 @@ public class CastVoteRecord {
   }
 
   // function: exhaust
-  // purpose: transition the cvr into exhausted state with the given reason
+  // purpose: transition the CVR into exhausted state with the given reason
   // param: round the exhaustion occurs
   // param: reason: the reason for exhaustion
   public void exhaust(int round, String reason) {
@@ -90,7 +90,7 @@ public class CastVoteRecord {
 
   // function: isExhausted
   // purpose: getter for exhausted state
-  // returns: true if cvr is exhausted otherwise false
+  // returns: true if CVR is exhausted otherwise false
   public boolean isExhausted() {
     return isExhausted;
   }
@@ -134,7 +134,7 @@ public class CastVoteRecord {
       // set of candidates given this rank
       Set<String> candidatesAtRank = rankToCandidateIDs.get(ranking.fst);
       if (candidatesAtRank == null) {
-        // create the new optionsAtRank and add to the sorted cvr
+        // create the new optionsAtRank and add to the sorted CVR
         candidatesAtRank = new HashSet<>();
         rankToCandidateIDs.put(ranking.fst, candidatesAtRank);
       }
@@ -144,7 +144,7 @@ public class CastVoteRecord {
   }
 
   // function: getAuditString
-  // purpose: return a formatted string describing this cvr and how state changes over
+  // purpose: return a formatted string describing this CVR and how state changes over
   //  the course of the tabulation.  Used for audit output.
   // returns: the formatted string for audit output
   String getAuditString() {

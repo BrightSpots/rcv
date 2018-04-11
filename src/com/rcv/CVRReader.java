@@ -32,7 +32,7 @@ public class CVRReader {
   // param: precinctColumnIndex the column containing precinct names (possibly null)
   // param: allowableRanks how many ranks are allowed for each cast vote record
   // param: candidateIDs list of all declared candidate IDs
-  // param: config an ElectionConfig object specifying rules for interpreting cvr file data
+  // param: config an ElectionConfig object specifying rules for interpreting CVR file data
   public void parseCVRFile(
     String excelFilePath,
     int firstVoteColumnIndex,
@@ -41,7 +41,7 @@ public class CVRReader {
     List<String>candidateIDs,
     ElectionConfig config
   ) throws Exception {
-    // contestSheet contains all the cvr data we will be parsing
+    // contestSheet contains all the CVR data we will be parsing
     Sheet contestSheet = getFirstSheet(excelFilePath);
 
     // validate header
@@ -62,7 +62,7 @@ public class CVRReader {
 
     // Iterate through all rows and create a CastVoteRecord for each row
     while (iterator.hasNext()) {
-      // row object is used to iterate cvr file data for this cvr
+      // row object is used to iterate CVR file data for this CVR
       org.apache.poi.ss.usermodel.Row castVoteRecordRow = iterator.next();
       // unique ID for this castVoteRecord
       String castVoteRecordID =  String.format("%s(%d)",cvrFileName,cvrIndex++);
@@ -83,7 +83,7 @@ public class CVRReader {
         } else if (cvrDataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
           // parsed numeric data
           double doubleValue = cvrDataCell.getNumericCellValue();
-          // convert back to String (we only store String data from cvr files)
+          // convert back to String (we only store String data from CVR files)
           fullCVRData.add(Double.toString(doubleValue));
         } else if (cvrDataCell.getCellType() == Cell.CELL_TYPE_STRING) {
           fullCVRData.add(cvrDataCell.getStringCellValue());
