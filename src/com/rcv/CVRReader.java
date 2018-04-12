@@ -93,7 +93,9 @@ class CVRReader {
         }
 
         if (precinctColumnIndex != null && cellIndex == precinctColumnIndex) {
-          precinct = cvrDataCell.getStringCellValue();
+          if (cvrDataCell != null) {
+            precinct = cvrDataCell.getStringCellValue();
+          }
         }
 
         // if we haven't reached a vote cell continue to the next cell

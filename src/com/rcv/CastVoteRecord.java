@@ -57,14 +57,14 @@ class CastVoteRecord {
   public CastVoteRecord(
     String sourceName,
     String cvrID,
-    List<Pair<Integer, String>> rankings,
+    String precinct,
     List<String> fullCVRData,
-    String precinct
+    List<Pair<Integer, String>> rankings
   ) {
     this.sourceName = sourceName;
     this.cvrID = cvrID;
-    this.fullCVRData = fullCVRData;
     this.precinct = precinct;
+    this.fullCVRData = fullCVRData;
     sortRankings(rankings);
   }
 
@@ -154,6 +154,8 @@ class CastVoteRecord {
     auditStringBuilder.append(sourceName);
     auditStringBuilder.append(" [Ballot ID] ");
     auditStringBuilder.append(cvrID);
+    auditStringBuilder.append(" [Precinct] ");
+    auditStringBuilder.append(precinct);
     auditStringBuilder.append(" [Round by Round Report] |");
     // index to to iterate over all round descriptions
     for (Integer round : descriptionsByRound.keySet()) {
