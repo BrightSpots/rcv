@@ -141,7 +141,7 @@ class CVRReader {
       // we now have all required data for the new CastVoteRecord object
       // create it and add to the list of all CVRs
       CastVoteRecord cvr =
-        new CastVoteRecord(cvrFileName, castVoteRecordID, rankings, fullCVRData, precinct);
+        new CastVoteRecord(cvrFileName, castVoteRecordID, precinct, fullCVRData, rankings);
       castVoteRecords.add(cvr);
     }
     // parsing complete
