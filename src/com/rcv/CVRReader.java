@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -80,12 +81,12 @@ public class CVRReader {
         Cell cvrDataCell = castVoteRecordRow.getCell(cellIndex);
         if (cvrDataCell == null) {
           fullCVRData.add("empty cell");
-        } else if (cvrDataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+        } else if (cvrDataCell.getCellTypeEnum() == CellType.NUMERIC) {
           // parsed numeric data
           double doubleValue = cvrDataCell.getNumericCellValue();
           // convert back to String (we only store String data from CVR files)
           fullCVRData.add(Double.toString(doubleValue));
-        } else if (cvrDataCell.getCellType() == Cell.CELL_TYPE_STRING) {
+        } else if (cvrDataCell.getCellTypeEnum() == CellType.STRING) {
           fullCVRData.add(cvrDataCell.getStringCellValue());
         } else {
           fullCVRData.add("unexpected data type");
@@ -114,7 +115,7 @@ public class CVRReader {
             continue;
           }
         } else {
-          if (cvrDataCell.getCellType() != Cell.CELL_TYPE_STRING) {
+          if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
             Logger.log("unexpected cell type at ranking %d ballot %s", rank, castVoteRecordID);
             continue;
           }
