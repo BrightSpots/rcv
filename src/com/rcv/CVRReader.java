@@ -21,7 +21,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class CVRReader {
+class CVRReader {
 
   // container for all CastVoteRecords parsed from the input file
   public List<CastVoteRecord> castVoteRecords = new ArrayList<>();

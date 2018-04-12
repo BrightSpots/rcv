@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class CastVoteRecord {
+class CastVoteRecord {
 
   // name of the vendor, this becomes part of the audit output but is not used in tabulation
   private String sourceName;

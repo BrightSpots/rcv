@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
+class Main {
 
   // function: main
   // purpose: main entry point to the rcv tabulator program

@@ -452,7 +452,7 @@ public class Tabulator {
   // purpose: helper function for logging to console and audit
   // param: s input s to be logged
   // param: var1 ... objects to be formatted into the log output
-  static void log(String s, Object... var1) {
+  private static void log(String s, Object... var1) {
     Logger.log(s, var1);
   }
 
