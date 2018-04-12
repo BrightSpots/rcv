@@ -24,7 +24,7 @@ import java.util.TreeMap;
 public class Tabulator {
 
   // When the CVR contains an overvote we "normalize" it to use this string
-  static String explicitOvervoteLabel = "overvote";
+  static final String explicitOvervoteLabel = "overvote";
 
   // vote transfer rule to use in multi-seat elections
   enum MultiSeatTransferRule {
@@ -68,22 +68,22 @@ public class Tabulator {
   }
 
   // cast vote records parsed from CVR input files
-  private List<CastVoteRecord> castVoteRecords;
+  private final List<CastVoteRecord> castVoteRecords;
   // all candidateIDs for this election parsed from the election config (does not include UWIs)
-  private List<String> candidateIDs;
+  private final List<String> candidateIDs;
   // election config contains specific rules and file paths to be used during tabulation
-  private ElectionConfig config;
+  private final ElectionConfig config;
 
   // roundTallies is a map from round number to a map from candidate ID to vote total for the round
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes for each candidate in round 1
   // this structure is computed over the course of tabulation
-  private Map<Integer, Map<String, BigDecimal>> roundTallies = new HashMap<>();
+  private final Map<Integer, Map<String, BigDecimal>> roundTallies = new HashMap<>();
 
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
-  private Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
+  private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
 
   // map from candidate ID to the round in which they won
-  private Map<String, Integer> winnerToRound = new HashMap<>();
+  private final Map<String, Integer> winnerToRound = new HashMap<>();
 
   // when tabulation is complete, this will be how many rounds it took to determine the winner(s)
   private int currentRound = 0;
@@ -92,11 +92,11 @@ public class Tabulator {
   // for later logging output
   static class BatchElimination {
     // the candidate eliminated
-    String candidateID;
+    final String candidateID;
     // how many total votes were totaled when this candidate was eliminated
-    BigDecimal runningTotal;
+    final BigDecimal runningTotal;
     // next highest count total (validates that we were correctly batch eliminated)
-    BigDecimal nextHighestTally;
+    final BigDecimal nextHighestTally;
 
     // function: BatchElimination constructor
     // purpose: create a new BatchElimination object simple container
@@ -112,7 +112,7 @@ public class Tabulator {
   }
 
   // map of round to TieBreak objects to record how tiebreaks were decided
-  private Map<Integer, TieBreak> roundToTieBreak = new HashMap<>();
+  private final Map<Integer, TieBreak> roundToTieBreak = new HashMap<>();
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list

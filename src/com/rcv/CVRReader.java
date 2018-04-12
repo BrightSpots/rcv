@@ -24,7 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 class CVRReader {
 
   // container for all CastVoteRecords parsed from the input file
-  public List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+  public final List<CastVoteRecord> castVoteRecords = new ArrayList<>();
 
   // purpose: parse the given file path into a CastVoteRecordList suitable for tabulation
   // Note: this is specific for the Maine example file we were provided

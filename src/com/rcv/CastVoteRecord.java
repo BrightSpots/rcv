@@ -24,13 +24,13 @@ import java.util.TreeMap;
 class CastVoteRecord {
 
   // name of the vendor, this becomes part of the audit output but is not used in tabulation
-  private String sourceName;
+  private final String sourceName;
   // unique identifier for this cast vote record
-  private String cvrID;
+  private final String cvrID;
   // which precinct this ballot came from
-  private String precinct;
+  private final String precinct;
   // container for ALL CVR data parsed from the source CVR file
-  private List<String> fullCVRData;
+  private final List<String> fullCVRData;
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
   public SortedMap<Integer, Set<String>> rankToCandidateIDs;
@@ -39,7 +39,7 @@ class CastVoteRecord {
 
   // contains who this CVR counted for in each round
   // followed by reason for exhaustion if it is ever exhausted
-  private Map<Integer, String> descriptionsByRound = new HashMap<>();
+  private final Map<Integer, String> descriptionsByRound = new HashMap<>();
 
   // For multi-winner elections that use fractional vote transfers, this represents the current
   // fractional value of this CVR.

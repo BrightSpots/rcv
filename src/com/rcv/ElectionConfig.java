@@ -19,7 +19,7 @@ import java.util.Map;
 
 class ElectionConfig {
   // underlying rawConfig object data
-  RawElectionConfig rawConfig;
+  final RawElectionConfig rawConfig;
   // list of all declared candidate codes
   private ArrayList<String> candidateCodeList;
   // mapping from candidate code to full name
