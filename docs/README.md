@@ -4,7 +4,7 @@ Copyright 2018 Bright Spots
 
 Dependencies:
 
-Java 1.8
+Java 9
 
 Apache POI Java API for Microsoft Documents 3.16
 Main website: https://poi.apache.org/index.html
