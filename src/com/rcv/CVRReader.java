@@ -16,23 +16,24 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class CVRReader {
+class CVRReader {
 
   // container for all CastVoteRecords parsed from the input file
-  public List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+  public final List<CastVoteRecord> castVoteRecords = new ArrayList<>();
 
   // purpose: parse the given file path into a CastVoteRecordList suitable for tabulation
   // Note: this is specific for the Maine example file we were provided
   // param: excelFilePath path to location of input cast vote record file
   // param: firstVoteColumnIndex the 0-based index where rankings begin for this ballot style
   // param: precinctColumnIndex the column containing precinct names (possibly null)
-  // prarm: allowableRanks how many ranks are allowed for each cast vote record
+  // param: allowableRanks how many ranks are allowed for each cast vote record
   // param: candidateIDs list of all declared candidate IDs
-  // param: config an ElectionConfig object specifying rules for interpreting cvr file data
+  // param: config an ElectionConfig object specifying rules for interpreting CVR file data
   public void parseCVRFile(
     String excelFilePath,
     int firstVoteColumnIndex,
@@ -41,7 +42,7 @@ public class CVRReader {
     List<String>candidateIDs,
     ElectionConfig config
   ) throws Exception {
-    // contestSheet contains all the cvr data we will be parsing
+    // contestSheet contains all the CVR data we will be parsing
     Sheet contestSheet = getFirstSheet(excelFilePath);
 
     // validate header
@@ -62,7 +63,7 @@ public class CVRReader {
 
     // Iterate through all rows and create a CastVoteRecord for each row
     while (iterator.hasNext()) {
-      // row object is used to iterate cvr file data for this cvr
+      // row object is used to iterate CVR file data for this CVR
       org.apache.poi.ss.usermodel.Row castVoteRecordRow = iterator.next();
       // unique ID for this castVoteRecord
       String castVoteRecordID =  String.format("%s(%d)",cvrFileName,cvrIndex++);
@@ -80,19 +81,21 @@ public class CVRReader {
         Cell cvrDataCell = castVoteRecordRow.getCell(cellIndex);
         if (cvrDataCell == null) {
           fullCVRData.add("empty cell");
-        } else if (cvrDataCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+        } else if (cvrDataCell.getCellTypeEnum() == CellType.NUMERIC) {
           // parsed numeric data
           double doubleValue = cvrDataCell.getNumericCellValue();
-          // convert back to String (we only store String data from cvr files)
+          // convert back to String (we only store String data from CVR files)
           fullCVRData.add(Double.toString(doubleValue));
-        } else if (cvrDataCell.getCellType() == Cell.CELL_TYPE_STRING) {
+        } else if (cvrDataCell.getCellTypeEnum() == CellType.STRING) {
           fullCVRData.add(cvrDataCell.getStringCellValue());
         } else {
           fullCVRData.add("unexpected data type");
         }
 
         if (precinctColumnIndex != null && cellIndex == precinctColumnIndex) {
-          precinct = cvrDataCell.getStringCellValue();
+          if (cvrDataCell != null) {
+            precinct = cvrDataCell.getStringCellValue();
+          }
         }
 
         // if we haven't reached a vote cell continue to the next cell
@@ -114,7 +117,7 @@ public class CVRReader {
             continue;
           }
         } else {
-          if (cvrDataCell.getCellType() != Cell.CELL_TYPE_STRING) {
+          if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
             Logger.log("unexpected cell type at ranking %d ballot %s", rank, castVoteRecordID);
             continue;
           }
@@ -136,9 +139,9 @@ public class CVRReader {
         rankings.add(ranking);
       }
       // we now have all required data for the new CastVoteRecord object
-      // create it and add to the list of all cvrs
+      // create it and add to the list of all CVRs
       CastVoteRecord cvr =
-        new CastVoteRecord(cvrFileName, castVoteRecordID, rankings, fullCVRData, precinct);
+        new CastVoteRecord(cvrFileName, castVoteRecordID, precinct, fullCVRData, rankings);
       castVoteRecords.add(cvr);
     }
     // parsing complete

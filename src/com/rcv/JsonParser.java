@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class JsonParser {
+class JsonParser {
 
   // function: parseObjectFromFile
   // purpose: parse input json file into an object of the specified type

@@ -17,17 +17,17 @@ import java.util.Set;
 import java.util.SortedMap;
 
 class TieBreak {
-  private List<String> tiedCandidates;
-  private Tabulator.TieBreakMode tieBreakMode;
+  private final List<String> tiedCandidates;
+  private final Tabulator.TieBreakMode tieBreakMode;
   // round in which this tiebreak occurred
-  private int round;
+  private final int round;
   // number of votes the tying candidates received
-  private BigDecimal numVotes;
+  private final BigDecimal numVotes;
   // roundTallies: map from round number to map of candidate ID to vote total (for that round)
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
-  private Map<Integer, Map<String, BigDecimal>> roundTallies;
+  private final Map<Integer, Map<String, BigDecimal>> roundTallies;
   // candidate ID selected to lose the tiebreak
-  private String loser;
+  private final String loser;
   // reason for the selection
   private String explanation;
 
@@ -74,7 +74,7 @@ class TieBreak {
       // if there are only 2 candidates don't use a comma
       nonselected = options.get(0) + " and " + options.get(1);
     } else {
-      // stringbuilder for faster string construction
+      // StringBuilder for faster string construction
       StringBuilder stringBuilder = new StringBuilder();
       // i indexes over all candidates
       for (int i = 0; i < options.size() - 1; i++) {

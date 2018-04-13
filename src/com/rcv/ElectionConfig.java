@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ElectionConfig {
+class ElectionConfig {
   // underlying rawConfig object data
-  RawElectionConfig rawConfig;
+  final RawElectionConfig rawConfig;
   // list of all declared candidate codes
   private ArrayList<String> candidateCodeList;
   // mapping from candidate code to full name
@@ -122,7 +122,7 @@ public class ElectionConfig {
   // function: multiSeatTransferRule
   // purpose: which surplus transfer rule to use in multi-seat elections
   // returns: enum indicating which transfer rule to use
-  public Tabulator.MultiSeatTransferRule multiSeatTransferRule() {
+  private Tabulator.MultiSeatTransferRule multiSeatTransferRule() {
     return multiSeatTransferRuleForConfigSetting(rawConfig.rules.multiSeatTransferRule);
   }
 
@@ -193,7 +193,7 @@ public class ElectionConfig {
   // purpose: given setting String return the corresponding rules enum
   // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
-  static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
+  private static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
     // rule: return value determined by input setting string
     Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
 
@@ -226,7 +226,7 @@ public class ElectionConfig {
   // purpose: given setting string return corresponding rule enum
   // param: TieBreakMode setting string read from election config
   // returns: TieBreakMode enum value for the input setting string
-  static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
+  private static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
     // mode: return value determined by input setting string
     Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.MODE_UNKNOWN;
     switch (setting) {

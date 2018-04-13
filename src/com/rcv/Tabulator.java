@@ -24,7 +24,7 @@ import java.util.TreeMap;
 public class Tabulator {
 
   // When the CVR contains an overvote we "normalize" it to use this string
-  static String explicitOvervoteLabel = "overvote";
+  static final String explicitOvervoteLabel = "overvote";
 
   // vote transfer rule to use in multi-seat elections
   enum MultiSeatTransferRule {
@@ -68,22 +68,22 @@ public class Tabulator {
   }
 
   // cast vote records parsed from CVR input files
-  private List<CastVoteRecord> castVoteRecords;
+  private final List<CastVoteRecord> castVoteRecords;
   // all candidateIDs for this election parsed from the election config (does not include UWIs)
-  private List<String> candidateIDs;
+  private final List<String> candidateIDs;
   // election config contains specific rules and file paths to be used during tabulation
-  private ElectionConfig config;
+  private final ElectionConfig config;
 
   // roundTallies is a map from round number to a map from candidate ID to vote total for the round
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes for each candidate in round 1
   // this structure is computed over the course of tabulation
-  private Map<Integer, Map<String, BigDecimal>> roundTallies = new HashMap<>();
+  private final Map<Integer, Map<String, BigDecimal>> roundTallies = new HashMap<>();
 
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
-  private Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
+  private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
 
   // map from candidate ID to the round in which they won
-  private Map<String, Integer> winnerToRound = new HashMap<>();
+  private final Map<String, Integer> winnerToRound = new HashMap<>();
 
   // when tabulation is complete, this will be how many rounds it took to determine the winner(s)
   private int currentRound = 0;
@@ -92,11 +92,11 @@ public class Tabulator {
   // for later logging output
   static class BatchElimination {
     // the candidate eliminated
-    String candidateID;
+    final String candidateID;
     // how many total votes were totaled when this candidate was eliminated
-    BigDecimal runningTotal;
+    final BigDecimal runningTotal;
     // next highest count total (validates that we were correctly batch eliminated)
-    BigDecimal nextHighestTally;
+    final BigDecimal nextHighestTally;
 
     // function: BatchElimination constructor
     // purpose: create a new BatchElimination object simple container
@@ -111,11 +111,8 @@ public class Tabulator {
     }
   }
 
-  // map of round to TieBreak objects to record how tiebreaks were decided
-  private Map<Integer, TieBreak> roundToTieBreak = new HashMap<>();
-
   // function: Tabulator constructor
-  // purpose: assigns input params to member variables and caches the candidateIDlist
+  // purpose: assigns input params to member variables and caches the candidateID list
   // which will be used when reading input cast vote records
   // param: castVoteRecords list of all cast vote records to be tabulated for this contest
   // param: config describes various tabulation rules to be used for tabulation
@@ -410,7 +407,6 @@ public class Tabulator {
 
       // results of tiebreak stored here
       eliminatedCandidate = tieBreak.loser();
-      roundToTieBreak.put(currentRound, tieBreak);
       log(
         "%s lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
         eliminatedCandidate,
@@ -452,7 +448,7 @@ public class Tabulator {
   // purpose: helper function for logging to console and audit
   // param: s input s to be logged
   // param: var1 ... objects to be formatted into the log output
-  static void log(String s, Object... var1) {
+  private static void log(String s, Object... var1) {
     Logger.log(s, var1);
   }
 
@@ -486,7 +482,7 @@ public class Tabulator {
     // candidate(s) in the current round.
     for (BigDecimal currentVoteTally : currentRoundTallyToCandidates.keySet()) {
       // Test whether leapfrogging is possible.
-      if (runningTotal.compareTo(currentVoteTally) == -1) {
+      if (runningTotal.compareTo(currentVoteTally) < 0) {
         // Not possible, so eliminate everyone who has been seen and not eliminated yet.
         // candidate indexes over all seen candidates
         for (String candidate : candidatesSeen) {
@@ -506,10 +502,10 @@ public class Tabulator {
     return eliminations;
   }
 
-  // purpose: determine if any overvote has occurred for this ranking set (from a cvr)
+  // purpose: determine if any overvote has occurred for this ranking set (from a CVR)
   // and if so return how to handle it based on the rules configuration in use
-  // param: candidateIDSet all candidates this cvr contains at a particular rank
-  // return: an OvervoteDecision enum to be applied to the cvr under consideration
+  // param: candidateIDSet all candidates this CVR contains at a particular rank
+  // return: an OvervoteDecision enum to be applied to the CVR under consideration
   private OvervoteDecision getOvervoteDecision(Set<String> candidateIDSet) {
     // the resulting decision
     OvervoteDecision decision;
@@ -579,7 +575,7 @@ public class Tabulator {
     return decision;
   }
 
-  // function: hasContinuingCnadidates
+  // function: hasContinuingCandidates
   // purpose: determine if the input rankings specify a candidate who has not been eliminated
   //   i.e. a continuing candidate
   // param: rankToCandidateIDs ordered map of rankings (most preferred to least) to candidateIDs
@@ -627,13 +623,13 @@ public class Tabulator {
       }
     }
 
-    // cvr indexes over the cast vote records to count votes for continuing candidateIDs
+    // CVR indexes over the cast vote records to count votes for continuing candidateIDs
     for (CastVoteRecord cvr : castVoteRecords) {
       cvr.setCurrentRecipientOfVote(null);
       if (cvr.isExhausted()) {
         continue;
       }
-      // if this cvr has no continuing candidate exhaust it
+      // if this CVR has no continuing candidate exhaust it
       if (!hasContinuingCandidates(cvr.rankToCandidateIDs)) {
         cvr.exhaust(currentRound, "no continuing candidates");
         continue;
@@ -643,9 +639,9 @@ public class Tabulator {
       // this is used to determine how many skipped rankings occurred in the case of
       // undervotes
       int lastRank = 0;
-      // loop over all rankings in this cvr from most preferred to least and see how they will
+      // loop over all rankings in this CVR from most preferred to least and see how they will
       // be rendered
-      // rank iterates through all ranks in this cvr ranking set
+      // rank iterates through all ranks in this CVR ranking set
       for (int rank : cvr.rankToCandidateIDs.keySet()) {
         // candidateIDSet is all candidates selected at the current rank
         Set<String> candidateIDSet = cvr.rankToCandidateIDs.get(rank);
@@ -713,7 +709,7 @@ public class Tabulator {
 
   // function: doAudit
   // purpose: log the audit info to console and audit file
-  // param: castVoteRecords list of all cvrs which have been tabulated
+  // param: castVoteRecords list of all CVRs which have been tabulated
   public void doAudit(List<CastVoteRecord> castVoteRecords) {
     for (CastVoteRecord cvr : castVoteRecords) {
       log(cvr.getAuditString());
@@ -750,7 +746,7 @@ public class Tabulator {
       // all candidates in the existing output structure (if any) who received the same vote tally
       LinkedList<String> candidates = tallyToCandidates.get(votes);
       if (candidates == null) {
-        // new container list for candidates who recieved this vote tally
+        // new container list for candidates who received this vote tally
         candidates = new LinkedList<>();
         tallyToCandidates.put(votes, candidates);
       }

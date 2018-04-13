@@ -21,30 +21,25 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class CastVoteRecord {
-
-  private final String AUDIT_LABEL_SOURCE = "[CVR Source] ";
-  private final String AUDIT_LABEL_BALLOT_ID = " [Ballot ID] ";
-  private final String AUDIT_LABEL_ROUNDS = " [Round by Round Report] |";
-  private final String AUDIT_LABEL_RAW = " [Raw Data] ";
+class CastVoteRecord {
 
   // name of the vendor, this becomes part of the audit output but is not used in tabulation
-  private String sourceName;
+  private final String sourceName;
   // unique identifier for this cast vote record
-  private String cvrID;
+  private final String cvrID;
   // which precinct this ballot came from
-  private String precinct;
-  // container for ALL cvr data parsed from the source cvr file
-  private List<String> fullCVRData;
+  private final String precinct;
+  // container for ALL CVR data parsed from the source CVR file
+  private final List<String> fullCVRData;
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
   public SortedMap<Integer, Set<String>> rankToCandidateIDs;
-  // whether this cvr is exhausted or not
+  // whether this CVR is exhausted or not
   private boolean isExhausted;
 
-  // contains who this cvr counted for in each round
+  // contains who this CVR counted for in each round
   // followed by reason for exhaustion if it is ever exhausted
-  private Map<Integer, String> descriptionsByRound = new HashMap<>();
+  private final Map<Integer, String> descriptionsByRound = new HashMap<>();
 
   // For multi-winner elections that use fractional vote transfers, this represents the current
   // fractional value of this CVR.
@@ -54,22 +49,22 @@ public class CastVoteRecord {
   private String currentRecipientOfVote = null;
 
   // function: CastVoteRecord
-  // purpose: create a new cvr object
-  // param: source what vendor created the cvr file from which this cvr was parsed
+  // purpose: create a new CVR object
+  // param: source what vendor created the CVR file from which this CVR was parsed
   // param: ballotID unique ID of this ballot
-  // param: rankings list of rank->candidateID selections parsed for this cvr
-  // param: fullCVRData list of strings containting ALL data parsed for this cvr
+  // param: rankings list of rank->candidateID selections parsed for this CVR
+  // param: fullCVRData list of strings containing ALL data parsed for this CVR
   public CastVoteRecord(
     String sourceName,
     String cvrID,
-    List<Pair<Integer, String>> rankings,
+    String precinct,
     List<String> fullCVRData,
-    String precinct
+    List<Pair<Integer, String>> rankings
   ) {
     this.sourceName = sourceName;
     this.cvrID = cvrID;
-    this.fullCVRData = fullCVRData;
     this.precinct = precinct;
+    this.fullCVRData = fullCVRData;
     sortRankings(rankings);
   }
 
@@ -82,7 +77,7 @@ public class CastVoteRecord {
   }
 
   // function: exhaust
-  // purpose: transition the cvr into exhausted state with the given reason
+  // purpose: transition the CVR into exhausted state with the given reason
   // param: round the exhaustion occurs
   // param: reason: the reason for exhaustion
   public void exhaust(int round, String reason) {
@@ -95,7 +90,7 @@ public class CastVoteRecord {
 
   // function: isExhausted
   // purpose: getter for exhausted state
-  // returns: true if cvr is exhausted otherwise false
+  // returns: true if CVR is exhausted otherwise false
   public boolean isExhausted() {
     return isExhausted;
   }
@@ -139,7 +134,7 @@ public class CastVoteRecord {
       // set of candidates given this rank
       Set<String> candidatesAtRank = rankToCandidateIDs.get(ranking.fst);
       if (candidatesAtRank == null) {
-        // create the new optionsAtRank and add to the sorted cvr
+        // create the new optionsAtRank and add to the sorted CVR
         candidatesAtRank = new HashSet<>();
         rankToCandidateIDs.put(ranking.fst, candidatesAtRank);
       }
@@ -149,22 +144,24 @@ public class CastVoteRecord {
   }
 
   // function: getAuditString
-  // purpose: return a formatted string describing this cvr and how state changes over
+  // purpose: return a formatted string describing this CVR and how state changes over
   //  the course of the tabulation.  Used for audit output.
   // returns: the formatted string for audit output
   String getAuditString() {
     // use a string builder for more efficient string creation
     StringBuilder auditStringBuilder = new StringBuilder();
-    auditStringBuilder.append(AUDIT_LABEL_SOURCE);
+    auditStringBuilder.append("[CVR Source] ");
     auditStringBuilder.append(sourceName);
-    auditStringBuilder.append(AUDIT_LABEL_BALLOT_ID);
+    auditStringBuilder.append(" [Ballot ID] ");
     auditStringBuilder.append(cvrID);
-    auditStringBuilder.append(AUDIT_LABEL_ROUNDS);
+    auditStringBuilder.append(" [Precinct] ");
+    auditStringBuilder.append(precinct);
+    auditStringBuilder.append(" [Round by Round Report] |");
     // index to to iterate over all round descriptions
     for (Integer round : descriptionsByRound.keySet()) {
       auditStringBuilder.append(descriptionsByRound.get(round));
     }
-    auditStringBuilder.append(AUDIT_LABEL_RAW);
+    auditStringBuilder.append(" [Raw Data] ");
     auditStringBuilder.append(fullCVRData);
     return auditStringBuilder.toString();
   }

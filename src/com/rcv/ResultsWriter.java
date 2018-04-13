@@ -281,9 +281,9 @@ public class ResultsWriter {
       }
     }
 
-    // row for the exhausted cvr counts
+    // row for the exhausted CVR counts
     org.apache.poi.ss.usermodel.Row exhaustedCVRRow = worksheet.createRow(rowCounter++);
-    // exhausted cvr header cell
+    // exhausted CVR header cell
     Cell exhaustedRowHeaderCell = exhaustedCVRRow.createCell(0);
     exhaustedRowHeaderCell.setCellValue("Inactive ballots");
     // active votes are calculated wrt active votes in the first round
