@@ -9,8 +9,6 @@
 
 package com.rcv;
 
-import com.sun.tools.javac.util.Pair;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -20,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import javafx.util.Pair;
 
 class CastVoteRecord {
 
@@ -132,14 +131,14 @@ class CastVoteRecord {
     // index for iterating over all rankings
     for (Pair<Integer, String> ranking : rankings) {
       // set of candidates given this rank
-      Set<String> candidatesAtRank = rankToCandidateIDs.get(ranking.fst);
+      Set<String> candidatesAtRank = rankToCandidateIDs.get(ranking.getKey());
       if (candidatesAtRank == null) {
         // create the new optionsAtRank and add to the sorted CVR
         candidatesAtRank = new HashSet<>();
-        rankToCandidateIDs.put(ranking.fst, candidatesAtRank);
+        rankToCandidateIDs.put(ranking.getKey(), candidatesAtRank);
       }
       // add this option into the map
-      candidatesAtRank.add(ranking.snd);
+      candidatesAtRank.add(ranking.getValue());
     }
   }
 
