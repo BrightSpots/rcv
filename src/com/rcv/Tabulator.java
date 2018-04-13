@@ -111,9 +111,6 @@ public class Tabulator {
     }
   }
 
-  // map of round to TieBreak objects to record how tiebreaks were decided
-  private final Map<Integer, TieBreak> roundToTieBreak = new HashMap<>();
-
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
   // which will be used when reading input cast vote records
@@ -410,7 +407,6 @@ public class Tabulator {
 
       // results of tiebreak stored here
       eliminatedCandidate = tieBreak.loser();
-      roundToTieBreak.put(currentRound, tieBreak);
       log(
         "%s lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
         eliminatedCandidate,
@@ -486,7 +482,7 @@ public class Tabulator {
     // candidate(s) in the current round.
     for (BigDecimal currentVoteTally : currentRoundTallyToCandidates.keySet()) {
       // Test whether leapfrogging is possible.
-      if (runningTotal.compareTo(currentVoteTally) == -1) {
+      if (runningTotal.compareTo(currentVoteTally) < 0) {
         // Not possible, so eliminate everyone who has been seen and not eliminated yet.
         // candidate indexes over all seen candidates
         for (String candidate : candidatesSeen) {
