@@ -58,12 +58,12 @@ class CVRReader {
   // param: candidateIDs list of all declared candidate IDs
   // param: config an ElectionConfig object specifying rules for interpreting CVR file data
   public void parseCVRFile(
-    String excelFilePath,
-    int firstVoteColumnIndex,
-    Integer precinctColumnIndex,
-    int allowableRanks,
-    List<String>candidateIDs,
-    ElectionConfig config
+      String excelFilePath,
+      int firstVoteColumnIndex,
+      Integer precinctColumnIndex,
+      int allowableRanks,
+      List<String> candidateIDs,
+      ElectionConfig config
   ) throws Exception {
     // contestSheet contains all the CVR data we will be parsing
     Sheet contestSheet = getFirstSheet(excelFilePath);
@@ -89,7 +89,7 @@ class CVRReader {
       // row object is used to iterate CVR file data for this CVR
       org.apache.poi.ss.usermodel.Row castVoteRecordRow = iterator.next();
       // unique ID for this castVoteRecord
-      String castVoteRecordID =  String.format("%s(%d)",cvrFileName,cvrIndex++);
+      String castVoteRecordID = String.format("%s(%d)", cvrFileName, cvrIndex++);
       // create object for this row
       ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
       // create an object to store CVR data for auditing
@@ -164,7 +164,7 @@ class CVRReader {
       // we now have all required data for the new CastVoteRecord object
       // create it and add to the list of all CVRs
       CastVoteRecord cvr =
-        new CastVoteRecord(cvrFileName, castVoteRecordID, precinct, fullCVRData, rankings);
+          new CastVoteRecord(cvrFileName, castVoteRecordID, precinct, fullCVRData, rankings);
       castVoteRecords.add(cvr);
     }
     // parsing complete

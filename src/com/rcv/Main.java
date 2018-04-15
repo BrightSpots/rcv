@@ -121,12 +121,12 @@ class Main {
       // reader: read input file into a list of cast vote records
       CVRReader reader = new CVRReader();
       reader.parseCVRFile(
-        source.filePath,
-        source.firstVoteColumnIndex,
-        source.precinctColumnIndex,
-        config.maxRankingsAllowed(),
-        config.getCandidateCodeList(),
-        config
+          source.filePath,
+          source.firstVoteColumnIndex,
+          source.precinctColumnIndex,
+          config.maxRankingsAllowed(),
+          config.getCandidateCodeList(),
+          config
       );
       // add records to the master list
       castVoteRecords.addAll(reader.castVoteRecords);

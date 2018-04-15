@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 class ElectionConfig {
+
   // underlying rawConfig object data
   final RawElectionConfig rawConfig;
   // list of all declared candidate codes
@@ -39,7 +40,8 @@ class ElectionConfig {
   // purpose: given setting String return the corresponding rules enum
   // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
-  private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(String setting) {
+  private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(
+      String setting) {
     // rule: return value determined by input setting string
     Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
 
@@ -127,10 +129,10 @@ class ElectionConfig {
     } else if (this.tiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
       valid = false;
     } else if (
-      overvoteLabel() != null &&
-      overvoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
-      overvoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-    ) {
+        overvoteLabel() != null &&
+            overvoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
+            overvoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
+        ) {
       valid = false;
     } else if (maxSkippedRanksAllowed() == null || maxSkippedRanksAllowed() < 0) {
       valid = false;
@@ -166,8 +168,8 @@ class ElectionConfig {
   private Integer decimalPlacesForVoteArithmetic() {
     // we default to using 4 places for fractional transfer vote arithmetic
     return rawConfig.rules.decimalPlacesForVoteArithmetic == null ?
-      4 :
-      rawConfig.rules.decimalPlacesForVoteArithmetic;
+        4 :
+        rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
   // function: roundDecimal
@@ -253,7 +255,7 @@ class ElectionConfig {
   public int numCandidates() {
     // num will contain the resulting number of candidates
     int num = candidateCodeList.size();
-    if (undeclaredWriteInLabel()!= null &&
+    if (undeclaredWriteInLabel() != null &&
         candidateCodeList.contains(undeclaredWriteInLabel())) {
       num--;
     }
@@ -266,8 +268,8 @@ class ElectionConfig {
   public Tabulator.OvervoteRule overvoteRule() {
     // by default we exhaust immediately
     return rawConfig.rules.overvoteRule == null ?
-      Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY :
-      ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
+        Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY :
+        ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
   }
 
   // function: minimumVoteThreshold
@@ -318,8 +320,8 @@ class ElectionConfig {
   public Tabulator.TieBreakMode tiebreakMode() {
     // by default we use random tiebreak
     return rawConfig.rules.tiebreakMode == null ?
-      Tabulator.TieBreakMode.RANDOM :
-      ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
+        Tabulator.TieBreakMode.RANDOM :
+        ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
   }
 
   // function: treatBlankAsUWI
@@ -328,8 +330,8 @@ class ElectionConfig {
   public boolean treatBlankAsUWI() {
     // by default we do not treat blank as UWI
     return rawConfig.rules.treatBlankAsUwi == null ?
-      false :
-      rawConfig.rules.treatBlankAsUwi;
+        false :
+        rawConfig.rules.treatBlankAsUwi;
   }
 
   // function: getCandidateCodeList

@@ -71,11 +71,11 @@ class Logger {
     @Override
     public String format(LogRecord record) {
       return new Date(record.getMillis()) +
-        " " +
-        record.getLevel().getLocalizedName() +
-        ": " +
-        formatMessage(record) +
-        System.getProperty("line.separator");
+          " " +
+          record.getLevel().getLocalizedName() +
+          ": " +
+          formatMessage(record) +
+          System.getProperty("line.separator");
     }
   }
 }
