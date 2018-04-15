@@ -16,6 +16,30 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawElectionConfig {
 
+  // location to write audit output
+  public String auditOutput;
+  // location to write visualizer output
+  public String visualizerOutput;
+  // contest name
+  public String contestName;
+  // jurisdiction
+  public String jurisdiction;
+  // office
+  public String office;
+  // election date
+  public String date;
+  // rules object
+  public ElectionRules rules;
+  // list of all Candidates
+  public List<Candidate> candidates;
+  // list of all cast vote record source files
+  public List<CVRSource> cvrFileSources;
+
+  // function: RawElectionConfig
+  // purpose: create a new RawElectionConfig object
+  // returns: the newly created RawElectionConfig object
+  RawElectionConfig() {}
+
   // ElectionRules: encapsulates the set of rules required to perform election tabulation
   // See Tabulator.java for more info on rules enums
   // Note: all jackson parsed variables names must match name exactly
@@ -73,30 +97,5 @@ public class RawElectionConfig {
     // candidate ID
     public String code;
   }
-
-  // location to write audit output
-  public String auditOutput;
-  // location to write visualizer output
-  public String visualizerOutput;
-  // contest name
-  public String contestName;
-  // jurisdiction
-  public String jurisdiction;
-  // office
-  public String office;
-  // election date
-  public String date;
-  // rules object
-  public ElectionRules rules;
-
-  // list of all Candidates
-  public List<Candidate> candidates;
-  // list of all cast vote record source files
-  public List<CVRSource> cvrFileSources;
-
-  // function: RawElectionConfig
-  // purpose: create a new RawElectionConfig object
-  // returns: the newly created RawElectionConfig object
-  RawElectionConfig() {}
 
 }

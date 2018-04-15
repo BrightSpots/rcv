@@ -15,27 +15,26 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ResultsWriter {
 
-  private enum OutputType {
-    STRING,
-    INT,
-    FLOAT,
-  }
-
   // each round has three columns of data for each candidate:
   // - change in votes for candidate compared to previous round
   // - total votes for candidate in current round
   // - candidate percentage of total active votes in current round
   private static final int COLUMNS_PER_ROUND = 3;
-
-
   // number of round needed to declare a winner
   private int numRounds;
   // map of round to map of candidateID to their tally for that round
@@ -570,5 +569,11 @@ public class ResultsWriter {
       sortedCandidates.add(entry.getKey());
     }
     return sortedCandidates;
+  }
+
+  private enum OutputType {
+    STRING,
+    INT,
+    FLOAT,
   }
 }

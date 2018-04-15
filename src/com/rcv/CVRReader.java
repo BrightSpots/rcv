@@ -26,6 +26,29 @@ class CVRReader {
   // container for all CastVoteRecords parsed from the input file
   public final List<CastVoteRecord> castVoteRecords = new ArrayList<>();
 
+  // purpose: helper function to wrap file IO with error handling
+  // param: excelFilePath path to file for parsing
+  // file access: read
+  // throws: IOException if there was a problem opening or reading the file
+  // returns: the first xls sheet object in the file or null if there was a problem
+  private static Sheet getFirstSheet(String excelFilePath) throws IOException {
+    // container for result
+    Sheet firstSheet;
+    try {
+      // inputStream for parsing file data into memory
+      FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
+      // excel workbook object to access to sheet objects it contains
+      Workbook workbook = new XSSFWorkbook(inputStream);
+      firstSheet = workbook.getSheetAt(0);
+      inputStream.close();
+      workbook.close();
+    } catch (IOException exception) {
+      Logger.log("failed to open CVR file: %s, %s", excelFilePath, exception.getMessage());
+      throw exception;
+    }
+    return firstSheet;
+  }
+
   // purpose: parse the given file path into a CastVoteRecordList suitable for tabulation
   // Note: this is specific for the Maine example file we were provided
   // param: excelFilePath path to location of input cast vote record file
@@ -145,29 +168,6 @@ class CVRReader {
       castVoteRecords.add(cvr);
     }
     // parsing complete
-  }
-
-  // purpose: helper function to wrap file IO with error handling
-  // param: excelFilePath path to file for parsing
-  // file access: read
-  // throws: IOException if there was a problem opening or reading the file
-  // returns: the first xls sheet object in the file or null if there was a problem
-  private static Sheet getFirstSheet(String excelFilePath) throws IOException {
-    // container for result
-    Sheet firstSheet;
-    try {
-      // inputStream for parsing file data into memory
-      FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
-      // excel workbook object to access to sheet objects it contains
-      Workbook workbook = new XSSFWorkbook(inputStream);
-      firstSheet = workbook.getSheetAt(0);
-      inputStream.close();
-      workbook.close();
-    } catch (IOException exception) {
-      Logger.log("failed to open CVR file: %s, %s", excelFilePath, exception.getMessage());
-      throw exception;
-    }
-    return firstSheet;
   }
 
 }

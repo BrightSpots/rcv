@@ -21,8 +21,6 @@ import javax.swing.filechooser.FileSystemView;
 
 class RcvGui {
 
-  // currently-loaded tabulator config
-  private static ElectionConfig config;
   // label which communicates the status of the tabulator's operations
   private static final JLabel labelStatus;
   // FileChooser used as a dialog box for loading a config
@@ -31,6 +29,8 @@ class RcvGui {
   private static final JFrame frame;
   // filter used by FileChooser to restrict it to loading JSON files
   private static final FileNameExtensionFilter filterJson;
+  // currently-loaded tabulator config
+  private static ElectionConfig config;
 
   static {
     labelStatus = new JLabel("Welcome to the Universal RCV Tabulator!");

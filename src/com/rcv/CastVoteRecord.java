@@ -30,20 +30,17 @@ class CastVoteRecord {
   private final String precinct;
   // container for ALL CVR data parsed from the source CVR file
   private final List<String> fullCVRData;
+  // contains who this CVR counted for in each round
+  // followed by reason for exhaustion if it is ever exhausted
+  private final Map<Integer, String> descriptionsByRound = new HashMap<>();
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
   public SortedMap<Integer, Set<String>> rankToCandidateIDs;
   // whether this CVR is exhausted or not
   private boolean isExhausted;
-
-  // contains who this CVR counted for in each round
-  // followed by reason for exhaustion if it is ever exhausted
-  private final Map<Integer, String> descriptionsByRound = new HashMap<>();
-
   // For multi-winner elections that use fractional vote transfers, this represents the current
   // fractional value of this CVR.
   private BigDecimal fractionalTransferValue = new BigDecimal(BigInteger.ONE);
-
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 

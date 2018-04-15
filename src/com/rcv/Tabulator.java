@@ -25,91 +25,22 @@ public class Tabulator {
 
   // When the CVR contains an overvote we "normalize" it to use this string
   static final String explicitOvervoteLabel = "overvote";
-
-  // vote transfer rule to use in multi-seat elections
-  enum MultiSeatTransferRule {
-    TRANSFER_FRACTIONAL_SURPLUS,
-    TRANSFER_WHOLE_SURPLUS,
-    TRANSFER_RULE_UNKNOWN
-  }
-
-  // OvervoteRule determines how overvotes are handled
-  enum OvervoteRule {
-    EXHAUST_IMMEDIATELY,
-    ALWAYS_SKIP_TO_NEXT_RANK,
-    EXHAUST_IF_ANY_CONTINUING,
-    IGNORE_IF_ANY_CONTINUING,
-    EXHAUST_IF_MULTIPLE_CONTINUING,
-    IGNORE_IF_MULTIPLE_CONTINUING,
-    RULE_UNKNOWN
-  }
-
-  // OvervoteDecision is the result of applying an OvervoteRule to a CVR in a particular round
-  enum OvervoteDecision {
-    NONE,
-    EXHAUST,
-    IGNORE,
-    SKIP_TO_NEXT_RANK,
-  }
-
-  // TieBreakMode determines how ties will be handled
-  enum TieBreakMode {
-    RANDOM,
-    INTERACTIVE,
-    PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
-    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
-    MODE_UNKNOWN
-  }
-
-  enum CandidateStatus {
-    CONTINUING,
-    WINNER,
-    ELIMINATED,
-  }
-
   // cast vote records parsed from CVR input files
   private final List<CastVoteRecord> castVoteRecords;
   // all candidateIDs for this election parsed from the election config (does not include UWIs)
   private final List<String> candidateIDs;
   // election config contains specific rules and file paths to be used during tabulation
   private final ElectionConfig config;
-
   // roundTallies is a map from round number to a map from candidate ID to vote total for the round
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes for each candidate in round 1
   // this structure is computed over the course of tabulation
   private final Map<Integer, Map<String, BigDecimal>> roundTallies = new HashMap<>();
-
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
-
   // map from candidate ID to the round in which they won
   private final Map<String, Integer> winnerToRound = new HashMap<>();
-
   // when tabulation is complete, this will be how many rounds it took to determine the winner(s)
   private int currentRound = 0;
-
-  // simple container class used during batch elimination process to store the results
-  // for later logging output
-  static class BatchElimination {
-    // the candidate eliminated
-    final String candidateID;
-    // how many total votes were totaled when this candidate was eliminated
-    final BigDecimal runningTotal;
-    // next highest count total (validates that we were correctly batch eliminated)
-    final BigDecimal nextHighestTally;
-
-    // function: BatchElimination constructor
-    // purpose: create a new BatchElimination object simple container
-    // param: candidateID the candidate eliminated
-    // param: runningTotal how many total votes were totaled when this candidate was eliminated
-    // param: nextHighestTally next highest count total
-    // returns: the new object
-    BatchElimination(String candidateID, BigDecimal runningTotal, BigDecimal nextHighestTally) {
-      this.candidateID = candidateID;
-      this.runningTotal = runningTotal;
-      this.nextHighestTally = nextHighestTally;
-    }
-  }
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
@@ -124,6 +55,53 @@ public class Tabulator {
     this.castVoteRecords = castVoteRecords;
     this.candidateIDs = config.getCandidateCodeList();
     this.config = config;
+  }
+
+  // function: log
+  // purpose: helper function for logging to console and audit
+  // param: s input s to be logged
+  // param: var1 ... objects to be formatted into the log output
+  private static void log(String s, Object... var1) {
+    Logger.log(s, var1);
+  }
+
+  // function: buildTallyToCandidates
+  // purpose: utility function to "invert" the input map of candidateID to tally
+  //   into a sorted map of tally to List of candidateIDs.
+  //   A list is used because multiple candidates may have the same tally.
+  //   This is used to determine when winners are selected and for running tiebreak logic.
+  // param: roundTally input map of candidateID to tally for a particular round
+  // param candidatesToInclude: list of candidateIDs which may be included in the output.
+  //   This filters out candidates when running a tiebreak tabulation which relies
+  //   on the tied candidate's previous round totals to break the tie.
+  // param: shouldLog is set to log to console and log file
+  // return: sorted map of tally to List of candidateIDs drawn from the input data and excluding
+  //   candidates not appearing in candidatesToInclude)
+  public static SortedMap<BigDecimal, LinkedList<String>> buildTallyToCandidates(
+    Map<String, BigDecimal> roundTally,
+    Set<String> candidatesToInclude,
+    boolean shouldLog
+  ) {
+    // output map structure containing the map of vote tally to candidate(s)
+    SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates = new TreeMap<>();
+    // for each candidate record their vote total into the countToCandidates object
+    // candidate is the current candidate as we iterate all candidates under consideration
+    for (String candidate : candidatesToInclude) {
+      // vote count for this candidate
+      BigDecimal votes = roundTally.get(candidate);
+      if (shouldLog) {
+        Logger.log("Candidate %s got %s votes.", candidate, votes.toString());
+      }
+      // all candidates in the existing output structure (if any) who received the same vote tally
+      LinkedList<String> candidates = tallyToCandidates.get(votes);
+      if (candidates == null) {
+        // new container list for candidates who received this vote tally
+        candidates = new LinkedList<>();
+        tallyToCandidates.put(votes, candidates);
+      }
+      candidates.add(candidate);
+    }
+    return tallyToCandidates;
   }
 
   // purpose: run the main tabulation routine to determine election results
@@ -444,14 +422,6 @@ public class Tabulator {
     writer.generateSummarySpreadsheet();
   }
 
-  // function: log
-  // purpose: helper function for logging to console and audit
-  // param: s input s to be logged
-  // param: var1 ... objects to be formatted into the log output
-  private static void log(String s, Object... var1) {
-    Logger.log(s, var1);
-  }
-
   // Function: runBatchElimination
   // Purpose: applies batch elimination logic to the input vote counts to remove multiple candidates
   //   in a single round if their vote counts are so low that they could not possibly end up winning
@@ -716,42 +686,67 @@ public class Tabulator {
     }
   }
 
-  // function: buildTallyToCandidates
-  // purpose: utility function to "invert" the input map of candidateID to tally
-  //   into a sorted map of tally to List of candidateIDs.
-  //   A list is used because multiple candidates may have the same tally.
-  //   This is used to determine when winners are selected and for running tiebreak logic.
-  // param: roundTally input map of candidateID to tally for a particular round
-  // param candidatesToInclude: list of candidateIDs which may be included in the output.
-  //   This filters out candidates when running a tiebreak tabulation which relies
-  //   on the tied candidate's previous round totals to break the tie.
-  // param: shouldLog is set to log to console and log file
-  // return: sorted map of tally to List of candidateIDs drawn from the input data and excluding
-  //   candidates not appearing in candidatesToInclude)
-  public static SortedMap<BigDecimal, LinkedList<String>> buildTallyToCandidates(
-    Map<String, BigDecimal> roundTally,
-    Set<String> candidatesToInclude,
-    boolean shouldLog
-  ) {
-    // output map structure containing the map of vote tally to candidate(s)
-    SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates = new TreeMap<>();
-    // for each candidate record their vote total into the countToCandidates object
-    // candidate is the current candidate as we iterate all candidates under consideration
-    for (String candidate : candidatesToInclude) {
-      // vote count for this candidate
-      BigDecimal votes = roundTally.get(candidate);
-      if (shouldLog) {
-        Logger.log("Candidate %s got %s votes.", candidate, votes.toString());
-      }
-      // all candidates in the existing output structure (if any) who received the same vote tally
-      LinkedList<String> candidates = tallyToCandidates.get(votes);
-      if (candidates == null) {
-        // new container list for candidates who received this vote tally
-        candidates = new LinkedList<>();
-        tallyToCandidates.put(votes, candidates);
-      }
-      candidates.add(candidate);
+  // vote transfer rule to use in multi-seat elections
+  enum MultiSeatTransferRule {
+    TRANSFER_FRACTIONAL_SURPLUS,
+    TRANSFER_WHOLE_SURPLUS,
+    TRANSFER_RULE_UNKNOWN
+  }
+
+  // OvervoteRule determines how overvotes are handled
+  enum OvervoteRule {
+    EXHAUST_IMMEDIATELY,
+    ALWAYS_SKIP_TO_NEXT_RANK,
+    EXHAUST_IF_ANY_CONTINUING,
+    IGNORE_IF_ANY_CONTINUING,
+    EXHAUST_IF_MULTIPLE_CONTINUING,
+    IGNORE_IF_MULTIPLE_CONTINUING,
+    RULE_UNKNOWN
+  }
+
+  // OvervoteDecision is the result of applying an OvervoteRule to a CVR in a particular round
+  enum OvervoteDecision {
+    NONE,
+    EXHAUST,
+    IGNORE,
+    SKIP_TO_NEXT_RANK,
+  }
+
+  // TieBreakMode determines how ties will be handled
+  enum TieBreakMode {
+    RANDOM,
+    INTERACTIVE,
+    PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
+    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
+    MODE_UNKNOWN
+  }
+
+  enum CandidateStatus {
+    CONTINUING,
+    WINNER,
+    ELIMINATED,
+  }
+
+  // simple container class used during batch elimination process to store the results
+  // for later logging output
+  static class BatchElimination {
+    // the candidate eliminated
+    final String candidateID;
+    // how many total votes were totaled when this candidate was eliminated
+    final BigDecimal runningTotal;
+    // next highest count total (validates that we were correctly batch eliminated)
+    final BigDecimal nextHighestTally;
+
+    // function: BatchElimination constructor
+    // purpose: create a new BatchElimination object simple container
+    // param: candidateID the candidate eliminated
+    // param: runningTotal how many total votes were totaled when this candidate was eliminated
+    // param: nextHighestTally next highest count total
+    // returns: the new object
+    BatchElimination(String candidateID, BigDecimal runningTotal, BigDecimal nextHighestTally) {
+      this.candidateID = candidateID;
+      this.runningTotal = runningTotal;
+      this.nextHighestTally = nextHighestTally;
     }
-    return tallyToCandidates;
   }
 }

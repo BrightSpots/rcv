@@ -13,8 +13,8 @@ package com.rcv;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class ElectionConfig {
@@ -33,6 +33,86 @@ class ElectionConfig {
   ElectionConfig(RawElectionConfig rawConfig) {
     this.rawConfig = rawConfig;
     this.processCandidateData();
+  }
+
+  // function: overvoteRuleForConfigSetting
+  // purpose: given setting String return the corresponding rules enum
+  // param: OvervoteRule setting string from election config
+  // returns: the OvervoteRule enum value for the input setting string
+  private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(String setting) {
+    // rule: return value determined by input setting string
+    Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
+
+    switch (setting) {
+      case "transferFractionalSurplus":
+        rule = Tabulator.MultiSeatTransferRule.TRANSFER_FRACTIONAL_SURPLUS;
+        break;
+      case "transferWholeSurplus":
+        rule = Tabulator.MultiSeatTransferRule.TRANSFER_WHOLE_SURPLUS;
+        break;
+      default:
+        Logger.log("Unrecognized MultiSeatTransferRule setting: %s", setting);
+    }
+    return rule;
+  }
+
+  // function: overvoteRuleForConfigSetting
+  // purpose: given setting String return the corresponding rules enum
+  // param: OvervoteRule setting string from election config
+  // returns: the OvervoteRule enum value for the input setting string
+  private static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
+    // rule: return value determined by input setting string
+    Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
+
+    switch (setting) {
+      case "alwaysSkipToNextRank":
+        rule = Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
+        break;
+      case "exhaustImmediately":
+        rule = Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY;
+        break;
+      case "exhaustIfAnyContinuing":
+        rule = Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING;
+        break;
+      case "ignoreIfAnyContinuing":
+        rule = Tabulator.OvervoteRule.IGNORE_IF_ANY_CONTINUING;
+        break;
+      case "exhaustIfMultipleContinuing":
+        rule = Tabulator.OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING;
+        break;
+      case "ignoreIfMultipleContinuing":
+        rule = Tabulator.OvervoteRule.IGNORE_IF_MULTIPLE_CONTINUING;
+        break;
+      default:
+        Logger.log("Unrecognized overvote rule setting: %s", setting);
+    }
+    return rule;
+  }
+
+  // function: tieBreakModeForConfigSetting
+  // purpose: given setting string return corresponding rule enum
+  // param: TieBreakMode setting string read from election config
+  // returns: TieBreakMode enum value for the input setting string
+  private static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
+    // mode: return value determined by input setting string
+    Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.MODE_UNKNOWN;
+    switch (setting) {
+      case "random":
+        mode = Tabulator.TieBreakMode.RANDOM;
+        break;
+      case "interactive":
+        mode = Tabulator.TieBreakMode.INTERACTIVE;
+        break;
+      case "previousRoundCountsThenRandom":
+        mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM;
+        break;
+      case "previousRoundCountsThenInteractive":
+        mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
+        break;
+      default:
+        Logger.log("Unrecognized tiebreaker mode rule setting: %s", setting);
+    }
+    return mode;
   }
 
   // function: validate
@@ -72,28 +152,6 @@ class ElectionConfig {
     }
     return valid;
   }
-
-  // function: overvoteRuleForConfigSetting
-  // purpose: given setting String return the corresponding rules enum
-  // param: OvervoteRule setting string from election config
-  // returns: the OvervoteRule enum value for the input setting string
-  private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(String setting) {
-    // rule: return value determined by input setting string
-    Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
-
-    switch (setting) {
-      case "transferFractionalSurplus":
-        rule = Tabulator.MultiSeatTransferRule.TRANSFER_FRACTIONAL_SURPLUS;
-        break;
-      case "transferWholeSurplus":
-        rule = Tabulator.MultiSeatTransferRule.TRANSFER_WHOLE_SURPLUS;
-        break;
-      default:
-        Logger.log("Unrecognized MultiSeatTransferRule setting: %s", setting);
-    }
-    return rule;
-  }
-
 
   // function: numberWinners
   // purpose: how many winners for this election
@@ -187,65 +245,6 @@ class ElectionConfig {
   // returns: true if we should use batch elimination
   public boolean batchElimination() {
     return rawConfig.rules.batchElimination;
-  }
-
-  // function: overvoteRuleForConfigSetting
-  // purpose: given setting String return the corresponding rules enum
-  // param: OvervoteRule setting string from election config
-  // returns: the OvervoteRule enum value for the input setting string
-  private static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
-    // rule: return value determined by input setting string
-    Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
-
-    switch (setting) {
-      case "alwaysSkipToNextRank":
-        rule = Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
-        break;
-      case "exhaustImmediately":
-        rule = Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY;
-        break;
-      case "exhaustIfAnyContinuing":
-        rule = Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING;
-        break;
-      case "ignoreIfAnyContinuing":
-        rule = Tabulator.OvervoteRule.IGNORE_IF_ANY_CONTINUING;
-        break;
-      case "exhaustIfMultipleContinuing":
-        rule = Tabulator.OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING;
-        break;
-      case "ignoreIfMultipleContinuing":
-        rule = Tabulator.OvervoteRule.IGNORE_IF_MULTIPLE_CONTINUING;
-        break;
-      default:
-        Logger.log("Unrecognized overvote rule setting: %s", setting);
-    }
-    return rule;
-  }
-
-  // function: tieBreakModeForConfigSetting
-  // purpose: given setting string return corresponding rule enum
-  // param: TieBreakMode setting string read from election config
-  // returns: TieBreakMode enum value for the input setting string
-  private static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
-    // mode: return value determined by input setting string
-    Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.MODE_UNKNOWN;
-    switch (setting) {
-      case "random":
-        mode = Tabulator.TieBreakMode.RANDOM;
-        break;
-      case "interactive":
-        mode = Tabulator.TieBreakMode.INTERACTIVE;
-        break;
-      case "previousRoundCountsThenRandom":
-        mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM;
-        break;
-      case "previousRoundCountsThenInteractive":
-        mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
-        break;
-      default:
-        Logger.log("Unrecognized tiebreaker mode rule setting: %s", setting);
-    }
-    return mode;
   }
 
   // function: numCandidates
