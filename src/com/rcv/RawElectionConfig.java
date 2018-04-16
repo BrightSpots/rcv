@@ -16,12 +16,38 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawElectionConfig {
 
+  // location to write audit output
+  public String auditOutput;
+  // location to write visualizer output
+  public String visualizerOutput;
+  // contest name
+  public String contestName;
+  // jurisdiction
+  public String jurisdiction;
+  // office
+  public String office;
+  // election date
+  public String date;
+  // rules object
+  public ElectionRules rules;
+  // list of all Candidates
+  public List<Candidate> candidates;
+  // list of all cast vote record source files
+  public List<CVRSource> cvrFileSources;
+
+  // function: RawElectionConfig
+  // purpose: create a new RawElectionConfig object
+  // returns: the newly created RawElectionConfig object
+  RawElectionConfig() {
+  }
+
   // ElectionRules: encapsulates the set of rules required to perform election tabulation
   // See Tabulator.java for more info on rules enums
   // Note: all jackson parsed variables names must match name exactly
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class ElectionRules {
+
     // human description of this rules set
     public String description;
     // max rankings allowed
@@ -55,6 +81,7 @@ public class RawElectionConfig {
   // CVRSource: encapsulates a source cast vote record file
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class CVRSource {
+
     // provider for this source e.g. "ES&S"
     public String provider;
     // path to the file on disk
@@ -68,35 +95,11 @@ public class RawElectionConfig {
   // Candidate: contains a full candidate name and optionally a candidate ID
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Candidate {
+
     // full candidate name
     public String name;
     // candidate ID
     public String code;
   }
-
-  // location to write audit output
-  public String auditOutput;
-  // location to write visualizer output
-  public String visualizerOutput;
-  // contest name
-  public String contestName;
-  // jurisdiction
-  public String jurisdiction;
-  // office
-  public String office;
-  // election date
-  public String date;
-  // rules object
-  public ElectionRules rules;
-
-  // list of all Candidates
-  public List<Candidate> candidates;
-  // list of all cast vote record source files
-  public List<CVRSource> cvrFileSources;
-
-  // function: RawElectionConfig
-  // purpose: create a new RawElectionConfig object
-  // returns: the newly created RawElectionConfig object
-  RawElectionConfig() {}
 
 }

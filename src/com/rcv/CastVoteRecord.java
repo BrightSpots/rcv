@@ -30,20 +30,17 @@ class CastVoteRecord {
   private final String precinct;
   // container for ALL CVR data parsed from the source CVR file
   private final List<String> fullCVRData;
+  // contains who this CVR counted for in each round
+  // followed by reason for exhaustion if it is ever exhausted
+  private final Map<Integer, String> descriptionsByRound = new HashMap<>();
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
   public SortedMap<Integer, Set<String>> rankToCandidateIDs;
   // whether this CVR is exhausted or not
   private boolean isExhausted;
-
-  // contains who this CVR counted for in each round
-  // followed by reason for exhaustion if it is ever exhausted
-  private final Map<Integer, String> descriptionsByRound = new HashMap<>();
-
   // For multi-winner elections that use fractional vote transfers, this represents the current
   // fractional value of this CVR.
   private BigDecimal fractionalTransferValue = new BigDecimal(BigInteger.ONE);
-
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -54,11 +51,11 @@ class CastVoteRecord {
   // param: rankings list of rank->candidateID selections parsed for this CVR
   // param: fullCVRData list of strings containing ALL data parsed for this CVR
   public CastVoteRecord(
-    String sourceName,
-    String cvrID,
-    String precinct,
-    List<String> fullCVRData,
-    List<Pair<Integer, String>> rankings
+      String sourceName,
+      String cvrID,
+      String precinct,
+      List<String> fullCVRData,
+      List<Pair<Integer, String>> rankings
   ) {
     this.sourceName = sourceName;
     this.cvrID = cvrID;
@@ -80,7 +77,7 @@ class CastVoteRecord {
   // param: round the exhaustion occurs
   // param: reason: the reason for exhaustion
   public void exhaust(int round, String reason) {
-    assert(!isExhausted);
+    assert !isExhausted;
     isExhausted = true;
     // formatted description string
     String description = String.format("%d|exhausted:%s|", round, reason);

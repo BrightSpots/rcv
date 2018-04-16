@@ -11,9 +11,9 @@ package com.rcv;
 import java.io.IOException;
 import java.util.Date;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 class Logger {
@@ -71,11 +71,11 @@ class Logger {
     @Override
     public String format(LogRecord record) {
       return new Date(record.getMillis()) +
-        " " +
-        record.getLevel().getLocalizedName() +
-        ": " +
-        formatMessage(record) +
-        System.getProperty("line.separator");
+          " " +
+          record.getLevel().getLocalizedName() +
+          ": " +
+          formatMessage(record) +
+          System.getProperty("line.separator");
     }
   }
 }

@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 class TieBreak {
+
   private final List<String> tiedCandidates;
   private final Tabulator.TieBreakMode tieBreakMode;
   // round in which this tiebreak occurred
@@ -40,11 +41,11 @@ class TieBreak {
   // param: roundTallies map from round number to map of candidate ID to vote total (for that round)
   // return newly constructed TieBreak object
   TieBreak(
-    List<String> tiedCandidates,
-    Tabulator.TieBreakMode tieBreakMode,
-    int round,
-    BigDecimal numVotes,
-    Map<Integer, Map<String, BigDecimal>> roundTallies
+      List<String> tiedCandidates,
+      Tabulator.TieBreakMode tieBreakMode,
+      int round,
+      BigDecimal numVotes,
+      Map<Integer, Map<String, BigDecimal>> roundTallies
   ) {
     this.tiedCandidates = tiedCandidates;
     this.tieBreakMode = tieBreakMode;
@@ -128,14 +129,15 @@ class TieBreak {
   // return: candidateID of the selected loser
   private String doInteractive() {
     System.out.println(
-      "Tie in round " + round + " for the following candidateIDs each of whom has " + numVotes + " votes:"
+        "Tie in round " + round + " for the following candidateIDs each of whom has " + numVotes
+            + " votes:"
     );
     // i: index over tied candidates
     for (int i = 0; i < tiedCandidates.size(); i++) {
-      System.out.println((i+1) + ". " + tiedCandidates.get(i));
+      System.out.println((i + 1) + ". " + tiedCandidates.get(i));
     }
     System.out.println(
-      "Enter the number corresponding to the candidate who should lose this tiebreaker."
+        "Enter the number corresponding to the candidate who should lose this tiebreaker."
     );
     // the candidate selected to lose
     String selectedCandidate = null;
@@ -167,7 +169,7 @@ class TieBreak {
     // random number used for random candidate ID loser
     double randomNormalFloat = Math.random();
     // index of randomly selected candidate
-    int randomCandidateIndex = (int)Math.floor(randomNormalFloat * (double)tiedCandidates.size());
+    int randomCandidateIndex = (int) Math.floor(randomNormalFloat * (double) tiedCandidates.size());
     explanation = "The loser was randomly selected.";
     return tiedCandidates.get(randomCandidateIndex);
   }
@@ -184,11 +186,12 @@ class TieBreak {
     // round indexes from the previous round back to round 1
     for (int round = this.round - 1; round > 0; round--) {
       // map of tally to candidate IDs for round under consideration
-      SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates = Tabulator.buildTallyToCandidates(
-        roundTallies.get(round),
-        candidatesInContention,
-        false
-      );
+      SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates =
+          Tabulator.buildTallyToCandidates(
+              roundTallies.get(round),
+              candidatesInContention,
+              false
+          );
       // lowest tally for this round
       BigDecimal minVotes = tallyToCandidates.firstKey();
       // candidates receiving the lowest tally
@@ -196,7 +199,8 @@ class TieBreak {
       if (candidatesWithLowestTotal.size() == 1) {
         loser = candidatesWithLowestTotal.getFirst();
         explanation =
-          String.format("%s had the fewest votes (%s) in round %d.", loser, minVotes.toString(), round);
+            String.format("%s had the fewest votes (%s) in round %d.", loser, minVotes.toString(),
+                round);
         break;
       } else {
         // update candidatesInContention and check the previous round
