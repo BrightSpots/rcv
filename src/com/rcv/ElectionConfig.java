@@ -41,7 +41,8 @@ class ElectionConfig {
   // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
   private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(
-      String setting) {
+      String setting
+  ) {
     // rule: return value determined by input setting string
     Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
 
@@ -128,10 +129,9 @@ class ElectionConfig {
       valid = false;
     } else if (this.tiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
       valid = false;
-    } else if (
-        overvoteLabel() != null &&
-            overvoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
-            overvoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
+    } else if (overvoteLabel() != null &&
+        overvoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
+        overvoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
         ) {
       valid = false;
     } else if (maxSkippedRanksAllowed() == null || maxSkippedRanksAllowed() < 0) {

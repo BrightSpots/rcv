@@ -186,8 +186,8 @@ class TieBreak {
     // round indexes from the previous round back to round 1
     for (int round = this.round - 1; round > 0; round--) {
       // map of tally to candidate IDs for round under consideration
-      SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates = Tabulator
-          .buildTallyToCandidates(
+      SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates =
+          Tabulator.buildTallyToCandidates(
               roundTallies.get(round),
               candidatesInContention,
               false

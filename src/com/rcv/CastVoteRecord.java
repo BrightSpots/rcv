@@ -77,7 +77,7 @@ class CastVoteRecord {
   // param: round the exhaustion occurs
   // param: reason: the reason for exhaustion
   public void exhaust(int round, String reason) {
-    assert (!isExhausted);
+    assert !isExhausted;
     isExhausted = true;
     // formatted description string
     String description = String.format("%d|exhausted:%s|", round, reason);

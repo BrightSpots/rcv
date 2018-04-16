@@ -362,8 +362,8 @@ public class ResultsWriter {
       // flag for final round special cases
       boolean isFinalResults = displayRound == numRounds + 1;
       // total votes in this round
-      BigDecimal total = totalActiveVotesPerRound
-          .get(isFinalResults ? displayRound - 1 : displayRound);
+      BigDecimal total =
+          totalActiveVotesPerRound.get(isFinalResults ? displayRound - 1 : displayRound);
       // Add 2 to the index because total votes is the third column in each round group
       columnIndex = ((displayRound - 1) * COLUMNS_PER_ROUND) + 2;
       // total votes cell
@@ -469,8 +469,10 @@ public class ResultsWriter {
   // param: worksheet to which we will be adding rows and cells
   // param: totalActiveVotesPerRound map of round to votes active in that round
   // returns: the next (empty) row index
-  private int addHeaderRows(XSSFSheet worksheet,
-      Map<Integer, BigDecimal> totalActiveVotesPerRound) {
+  private int addHeaderRows(
+      XSSFSheet worksheet,
+      Map<Integer, BigDecimal> totalActiveVotesPerRound
+  ) {
     // total active votes in this round
     BigDecimal totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
     // dateFormat helps create a formatted date string with the current date
