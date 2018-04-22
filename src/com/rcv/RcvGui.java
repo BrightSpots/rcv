@@ -8,19 +8,26 @@
 package com.rcv;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
 class RcvGui {
 
+  // label showing the title of the application
+  private static final JLabel labelTitle;
   // label which communicates the status of the tabulator's operations
   private static final JLabel labelStatus;
   // FileChooser used as a dialog box for loading a config
@@ -33,7 +40,8 @@ class RcvGui {
   private static ElectionConfig config;
 
   static {
-    labelStatus = new JLabel("Welcome to the Universal RCV Tabulator!");
+    labelTitle = new JLabel("Universal RCV Tabulator", SwingConstants.CENTER);
+    labelStatus = new JLabel("Welcome to the Universal RCV Tabulator!", SwingConstants.CENTER);
     fc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
     frame = new JFrame("Universal RCV Tabulator");
     filterJson = new FileNameExtensionFilter("JSON file", "json");
@@ -46,24 +54,32 @@ class RcvGui {
   void launch() {
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+    // main panel to render GUI elements
+    JPanel panelMain = new JPanel(new BorderLayout());
+    panelMain.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+    // box to contain the buttons
+    Box boxButtons = new Box(BoxLayout.Y_AXIS);
+
     // button that summons the dialog box to load the config
     JButton buttonLoadConfig = new JButton("Load config");
     buttonLoadConfig.addActionListener(new LoadConfigListener());
+    buttonLoadConfig.setAlignmentX(Component.CENTER_ALIGNMENT);
+    boxButtons.add(buttonLoadConfig);
 
     // button that starts tabulation after config is loaded
     JButton buttonTabulate = new JButton("Tabulate");
     buttonTabulate.addActionListener(new TabulateListener());
+    buttonTabulate.setAlignmentX(Component.CENTER_ALIGNMENT);
+    boxButtons.add(buttonTabulate);
 
-    // main panel to render GUI elements
-    JPanel panelMain = new JPanel();
-    frame.setContentPane(panelMain);
-
-    frame.getContentPane().add(BorderLayout.NORTH, buttonLoadConfig);
-    frame.getContentPane().add(BorderLayout.CENTER, buttonTabulate);
-    frame.getContentPane().add(BorderLayout.SOUTH, labelStatus);
+    panelMain.add(BorderLayout.NORTH, labelTitle);
+    panelMain.add(BorderLayout.CENTER, boxButtons);
+    panelMain.add(BorderLayout.SOUTH, labelStatus);
+    frame.getContentPane().add(panelMain);
 
     // TODO: Make below a % of window size if possible
-    frame.setSize(800, 800);
+    frame.setSize(400, 400);
     frame.setVisible(true);
 
     fc.setDialogTitle("Select a config file");
