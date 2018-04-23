@@ -1,6 +1,6 @@
 {
-  "auditOutput":"portland_2015_mayor_audit_log.txt",
-  "visualizerOutput":"portland_2015_mayor_visualizer.xlsx",
+  "auditOutput":"test/test_continue_tabulation_log.txt",
+  "visualizerOutput":"test/test_continue_tabulation_visualizer.xlsx",
   "contestName":"Portland 2015 Mayoral Race",
   "jurisdiction":"Portland, ME",
   "office":"Mayor",
@@ -40,7 +40,7 @@
   "cvrFileSources": [
     {
       "provider": "ES&S",
-      "filePath": "test/2015-portland-mayor-cvr.xlsx",
+      "filePath": "test/test_continue_tabulation_cvr.xlsx",
       "firstVoteColumnIndex": 3
     }
   ]

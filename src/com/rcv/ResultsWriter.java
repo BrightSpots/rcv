@@ -12,7 +12,6 @@ package com.rcv;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -185,26 +184,7 @@ public class ResultsWriter {
     org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
     // eliminationsRowHeader is the header cell for the eliminations row
     Cell eliminationsRowHeader = eliminationsRow.createCell(0);
-    eliminationsRowHeader.setCellValue("Candidates defeated");
-    // round indexes through all rounds plus final winner round
-    for (int round = 1; round < numRounds; round++) {
-      // list of all candidates eliminated in this round
-      List<String> eliminated = roundToCandidatesEliminated.get(round);
-      // note we shift the eliminated candidate(s) display and action into the subsequent column
-      if (eliminated != null && eliminated.size() > 0) {
-        // eliminatedCellText contains formatted candidate names
-        String eliminatedCellText = String.join("; ", eliminated);
-        // here we dont subtract 1 from round because the eliminated text is displayed in the
-        // subsequent column
-        columnIndex = ((round) * COLUMNS_PER_ROUND) + 1;
-        // eliminatedCandidateCell will contain the candidates who were eliminated in this round
-        Cell eliminatedCandidateCell = eliminationsRow.createCell(columnIndex);
-        eliminatedCandidateCell.setCellValue(eliminatedCellText);
-        // actionCell will contain the "elimination" action
-        Cell actionCell = actionRow.createCell(columnIndex);
-        actionCell.setCellValue("Elimination");
-      }
-    }
+    eliminationsRowHeader.setCellValue("Candidate(s) defeated");
 
     // Winner -- display is shifted to subsequent round for display
     // electedRow will contain the winning candidate(s) name
@@ -212,6 +192,49 @@ public class ResultsWriter {
     // electedCell will contain the elected row header text and the winning candidate name(s)
     Cell electedCell = electedRow.createCell(0);
     electedCell.setCellValue("Winners");
+
+
+    // round indexes through all rounds plus final winner round
+    for (int round = 1; round < numRounds; round++) {
+      // we do not subtract 1 from round because the text is displayed in the
+      // subsequent column
+      columnIndex = ((round) * COLUMNS_PER_ROUND) + 1;
+      // list of all candidates eliminated in this round
+      List<String> eliminated = roundToCandidatesEliminated.get(round);
+      // note we shift the eliminated candidate(s) display and action into the subsequent column
+      if (eliminated != null && eliminated.size() > 0) {
+        // eliminatedCellText contains formatted candidate names
+        String eliminatedCellText = String.join("; ", eliminated);
+        // eliminatedCandidateCell will contain the candidates who were eliminated in this round
+        Cell eliminatedCandidateCell = eliminationsRow.createCell(columnIndex);
+        eliminatedCandidateCell.setCellValue(eliminatedCellText);
+        // actionCell will contain the "elimination" action
+        Cell actionCell = actionRow.createCell(columnIndex);
+        actionCell.setCellValue("Elimination");
+      } else {
+        // see if anyone was elected in this round by iterating all winners for this round
+        for (Map.Entry<String, Integer> entry : winnerToRound.entrySet()) {
+          // code for candidate under consideration
+          String candidateCode = entry.getKey();
+          // round in which they were elected
+          Integer roundElected = entry.getValue();
+          if (roundElected == round) {
+            // one or more winners in this round
+            // here we dont subtract 1 from round because the eliminated text is displayed in the
+            // subsequent column
+            columnIndex = ((round) * COLUMNS_PER_ROUND) + 1;
+            // actionCell will contain the "winner" action
+            Cell actionCell = actionRow.createCell(columnIndex);
+            actionCell.setCellValue("Winner");
+            // cell for candidate name
+            Cell winningCandidateCell = electedRow.createCell(columnIndex);
+            winningCandidateCell.setCellValue(config.getNameForCandidateID(candidateCode));
+          }
+        }
+      }
+    }
+
+
     columnIndex = (numRounds*COLUMNS_PER_ROUND)+1;
     electedCell = electedRow.createCell(columnIndex);
     electedCell.setCellValue((String)winnerToRound.keySet().toArray()[0]); // TODO: update for multiple winners
@@ -474,7 +497,7 @@ public class ResultsWriter {
       {"Tally detail", null, OutputType.STRING},
       {"Single/multi winner", "single-winner", OutputType.STRING}, // TODO: update for multi-winners
       {"Number to be elected", 1, OutputType.INT},
-      {"Number of candidates", config.numCandidates(), OutputType.INT},
+      {"Number of declared candidates", config.numDeclaredCandidates(), OutputType.INT},
       {"Number of votes cast", totalActiveVotesFirstRound.toString(), OutputType.STRING},
       {"Undervotes", 0, OutputType.INT},
       {"Total # of rounds", totalActiveVotesPerRound.size(), OutputType.INT},

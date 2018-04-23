@@ -263,10 +263,10 @@ public class ElectionConfig {
     return mode;
   }
 
-  // function: numCandidates
+  // function: numDeclaredCandidates
   // purpose: calculate the number of declared candidates from the election configuration
   // returns: the number of declared candidates from the election configuration
-  public int numCandidates() {
+  public int numDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = candidateCodeList.size();
     if (undeclaredWriteInLabel()!= null &&
@@ -274,6 +274,13 @@ public class ElectionConfig {
       num--;
     }
     return num;
+  }
+
+  // function: numCandidates
+  // purpose: return number of candidates including UWIs as a candidate if they are in use
+  // num will contain the resulting number of candidates
+  public int numCandidates() {
+    return candidateCodeList.size();
   }
 
   // function: overvoteRule
