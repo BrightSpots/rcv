@@ -11,6 +11,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -19,6 +21,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -28,8 +33,10 @@ class RcvGui {
 
   // label showing the title of the application
   private static final JLabel labelTitle;
-  // label which communicates the status of the tabulator's operations
-  private static final JLabel labelStatus;
+  // text area which communicates the status of the tabulator's operations
+  private static final JTextArea textStatus;
+  // scroll pane for textStatus
+  private static final JScrollPane scrollerStatus;
   // FileChooser used as a dialog box for loading a config
   private static final JFileChooser fc;
   // main frame to render GUI elements
@@ -41,7 +48,8 @@ class RcvGui {
 
   static {
     labelTitle = new JLabel("Universal RCV Tabulator", SwingConstants.CENTER);
-    labelStatus = new JLabel("Welcome to the Universal RCV Tabulator!", SwingConstants.CENTER);
+    textStatus = new JTextArea(10, 20);
+    scrollerStatus = new JScrollPane(textStatus);
     fc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
     frame = new JFrame("Universal RCV Tabulator");
     filterJson = new FileNameExtensionFilter("JSON file", "json");
@@ -73,18 +81,39 @@ class RcvGui {
     buttonTabulate.setAlignmentX(Component.CENTER_ALIGNMENT);
     boxButtons.add(buttonTabulate);
 
+    scrollerStatus.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    scrollerStatus.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    textStatus.setLineWrap(true);
+    textStatus.setEditable(false);
+    printToTextStatus("Welcome to the Universal RCV Tabulator!");
+
     panelMain.add(BorderLayout.NORTH, labelTitle);
     panelMain.add(BorderLayout.CENTER, boxButtons);
-    panelMain.add(BorderLayout.SOUTH, labelStatus);
+    panelMain.add(BorderLayout.SOUTH, scrollerStatus);
     frame.getContentPane().add(panelMain);
 
     // TODO: Make below a % of window size if possible
-    frame.setSize(400, 400);
+    frame.setSize(600, 300);
     frame.setVisible(true);
 
     fc.setDialogTitle("Select a config file");
     fc.setAcceptAllFileFilterUsed(false);
     fc.addChoosableFileFilter(filterJson);
+  }
+
+  // function: printToTextStatus
+  // purpose: prints a message to the textStatus box, with timestamp and line break
+  // param: the message to print
+  // returns: N/A
+  private void printToTextStatus(String message) {
+    textStatus.append("* ");
+    textStatus
+        .append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(ZonedDateTime.now()));
+    textStatus.append(": ");
+    textStatus.append(message);
+    textStatus.append("\n");
+    // scroll to the bottom
+    textStatus.setCaretPosition(textStatus.getDocument().getLength());
   }
 
   class LoadConfigListener implements ActionListener {
@@ -102,9 +131,9 @@ class RcvGui {
         config = Main.loadElectionConfig(configPath);
         Logger.log("Tabulator is being used via the GUI.");
         if (config == null) {
-          labelStatus.setText(String.format("ERROR: Unable to load config file: %s", configPath));
+          printToTextStatus(String.format("ERROR: Unable to load config file: %s", configPath));
         } else {
-          labelStatus.setText(String.format("Successfully loaded config file: %s", configPath));
+          printToTextStatus(String.format("Successfully loaded config file: %s", configPath));
         }
       }
     }
@@ -118,8 +147,9 @@ class RcvGui {
     // returns: N/A
     public void actionPerformed(ActionEvent event) {
       // String indicating whether or not execution was successful
+      printToTextStatus("Starting tabulation...");
       String response = Main.executeTabulation(config);
-      labelStatus.setText(response);
+      printToTextStatus(response);
     }
   }
 }
