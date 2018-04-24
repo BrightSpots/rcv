@@ -132,11 +132,11 @@ class ElectionConfig {
     } else if (overvoteLabel() != null &&
         overvoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
         overvoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-        ) {
+    ) {
       valid = false;
-    } else if (maxSkippedRanksAllowed() == null || maxSkippedRanksAllowed() < 0) {
+    } else if (maxSkippedRanksAllowed() != null && maxSkippedRanksAllowed() < 0) {
       valid = false;
-    } else if (maxRankingsAllowed() == null || maxRankingsAllowed() < 1) {
+    } else if (maxRankingsAllowed() != null && maxRankingsAllowed() < 1) {
       valid = false;
     } else if (rawConfig.rules.batchElimination == null) {
       valid = false;
