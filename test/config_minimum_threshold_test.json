@@ -6,9 +6,12 @@
   "office":"Sergeant-at-Arms",
   "date":"2018-01-07",
   "rules": {
+    "batchElimination":false,
     "description":"Doyle Rules",
     "maxRankingsAllowed":3,
-    "minimumVoteThreshold":3
+    "minimumVoteThreshold":3,
+    "overvoteRule":"exhaustImmediately",
+    "tiebreakMode":"random"
   },
   "candidates": [
     {"name": "Gargamel"},
