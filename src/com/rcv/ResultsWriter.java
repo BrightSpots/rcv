@@ -259,8 +259,7 @@ public class ResultsWriter {
         //  total active votes in this round
         BigDecimal totalActiveVotes = totalActiveVotesPerRound.get(dataUseRound);
         // fractional percent
-        BigDecimal fraction =
-            config.roundDecimal(thisRoundTally.divide(totalActiveVotes, RoundingMode.HALF_EVEN));
+        BigDecimal fraction = config.divide(thisRoundTally, totalActiveVotes);
         // percentage of active votes
         BigDecimal percentage = fraction.signum() == 1 ?
             fraction.multiply(new BigDecimal(100)) :
@@ -318,9 +317,7 @@ public class ResultsWriter {
 
       // Exhausted votes as percentage of ALL votes (note: this differs from the candidate vote
       // percentages which are percentage of ACTIVE votes for the given round.
-      BigDecimal decimalPercentage = config.roundDecimal(
-          thisRoundExhausted.divide(totalActiveVotesFirstRound, RoundingMode.HALF_EVEN)
-      );
+      BigDecimal decimalPercentage = config.divide(thisRoundExhausted, totalActiveVotesFirstRound);
       BigDecimal percentage = decimalPercentage.multiply(new BigDecimal(100));
       columnIndex = ((displayRound - 1) * COLUMNS_PER_ROUND) + 1;
       // delta votes cell
@@ -479,6 +476,19 @@ public class ResultsWriter {
     DateFormat dateFormat = new SimpleDateFormat("M/d/yyyy");
     // string for formatted date
     String dateString = dateFormat.format(new Date());
+    // string indicating single- or multi-winner
+    String electionType = config.numberOfWinners() > 1 ? "multi-winner" : "single-winner";
+    // number reflecting threshold percentage to win
+    BigDecimal thresholdPercentage = config.divide(
+        new BigDecimal(100),
+        new BigDecimal(config.numberOfWinners() + 1)
+    );
+    // string for threshold percentage
+    String thresholdString = thresholdPercentage.toString() + "%";
+    // formula string
+    String formula =
+        "More than 1/" + (config.numberOfWinners() + 1) + " of total votes cast for office";
+
     // literal array to structure output cell text data
     // first cell is header text
     // second cell contains a value or null
@@ -496,16 +506,15 @@ public class ResultsWriter {
         {"Counting information", null, OutputType.STRING},
         {"Details of the tally to be used in the display screens", null, OutputType.STRING},
         {"Counting method", "Ranked-choice voting", OutputType.STRING},
-        {"Formula for winning", "Half of total votes cast for office + 1", OutputType.STRING},
+        {"Formula for winning", formula, OutputType.STRING},
         {"Formula example", "n/a", OutputType.STRING},
-        {"Threshold number", "50%", OutputType.STRING},
-        {"Graph threshold label", "50% of votes required to win", OutputType.STRING},
+        {"Threshold number", thresholdString, OutputType.STRING},
+        {"Graph threshold label", thresholdString + " of votes required to win", OutputType.STRING},
         {null, null, OutputType.STRING},
         {"Contest summary data", null, OutputType.STRING},
         {"Tally detail", null, OutputType.STRING},
-        {"Single/multi winner", "single-winner", OutputType.STRING},
-        // TODO: update for multi-winners
-        {"Number to be elected", 1, OutputType.INT},
+        {"Single-winner/multi-winner", electionType, OutputType.STRING},
+        {"Number to be elected", config.numberOfWinners(), OutputType.INT},
         {"Number of candidates", config.numCandidates(), OutputType.INT},
         {"Number of votes cast", totalActiveVotesFirstRound.toString(), OutputType.STRING},
         {"Undervotes", 0, OutputType.INT},
