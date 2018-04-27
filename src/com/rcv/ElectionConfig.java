@@ -172,6 +172,15 @@ class ElectionConfig {
         rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
+  // function: divide
+  // purpose: perform a division operation according to the config settings
+  // param: dividend is the numerator in the division operation
+  // param: divisor is the denominator in the division operation
+  // returns: the quotient
+  public BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
+    return dividend.divide(divisor, decimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
+  }
+
   // function: roundDecimal
   // purpose: round a number according to the config settings
   // returns: the rounded value

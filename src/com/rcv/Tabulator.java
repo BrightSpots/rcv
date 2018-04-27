@@ -159,11 +159,12 @@ public class Tabulator {
         for (String winner : winners) {
           // are there still more winners to select in future rounds?
           if (winnerToRound.size() < config.numberOfWinners()) {
-            // fractional transfer based on surplus votes
+            // number of votes the candidate got this round
             BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
+            // number that were surplus (beyond the required threshold)
             BigDecimal extraVotes = candidateVotes.subtract(winningThresholdThisRound);
-            BigDecimal surplusFraction =
-                config.roundDecimal(extraVotes.divide(candidateVotes, RoundingMode.HALF_EVEN));
+            // fractional transfer percentage
+            BigDecimal surplusFraction = config.divide(extraVotes, candidateVotes);
             for (CastVoteRecord cvr : castVoteRecords) {
               if (winner.equals(cvr.getCurrentRecipientOfVote())) {
                 cvr.setFractionalTransferValue(
@@ -225,8 +226,7 @@ public class Tabulator {
 
     // divisor for threshold is seats remaining to fill + 1
     BigDecimal divisor = new BigDecimal(seatsRemaining + 1);
-    // return value
-    return config.roundDecimal(currentRoundTotalVotes.divide(divisor, RoundingMode.HALF_EVEN));
+    return config.divide(currentRoundTotalVotes, divisor);
   }
 
   private CandidateStatus getCandidateStatus(String candidate) {
