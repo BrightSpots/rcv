@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class Tabulator {
+class Tabulator {
 
   // When the CVR contains an overvote we "normalize" it to use this string
   static final String explicitOvervoteLabel = "overvote";
@@ -35,6 +35,9 @@ public class Tabulator {
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes for each candidate in round 1
   // this structure is computed over the course of tabulation
   private final Map<Integer, Map<String, BigDecimal>> roundTallies = new HashMap<>();
+  // precinctRoundTallies is a map from precinct to roundTallies for that precinct
+  private final Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies =
+      new HashMap<>();
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
   // map from candidate ID to the round in which they won
@@ -55,6 +58,7 @@ public class Tabulator {
     this.castVoteRecords = castVoteRecords;
     this.candidateIDs = config.getCandidateCodeList();
     this.config = config;
+    initPrecinctRoundTallies();
   }
 
   // function: log
@@ -77,7 +81,7 @@ public class Tabulator {
   // param: shouldLog is set to log to console and log file
   // return: sorted map of tally to List of candidateIDs drawn from the input data and excluding
   //   candidates not appearing in candidatesToInclude)
-  public static SortedMap<BigDecimal, LinkedList<String>> buildTallyToCandidates(
+  static SortedMap<BigDecimal, LinkedList<String>> buildTallyToCandidates(
       Map<String, BigDecimal> roundTally,
       Set<String> candidatesToInclude,
       boolean shouldLog
@@ -104,10 +108,10 @@ public class Tabulator {
     return tallyToCandidates;
   }
 
+  // function: tabulate
   // purpose: run the main tabulation routine to determine election results
   //  this is the high-level control of the tabulation algorithm
-  public void tabulate() {
-
+  void tabulate() {
     log("Beginning tabulation for contest.");
     log("There are %d candidates for this contest:", config.numCandidates());
     // string indexes over all candidate IDs to log them
@@ -378,11 +382,13 @@ public class Tabulator {
       // there was a tie for last place
       // create new TieBreak object to pick a loser
       TieBreak tieBreak =
-          new TieBreak(lastPlaceCandidates,
+          new TieBreak(
+              lastPlaceCandidates,
               config.tiebreakMode(),
               currentRound,
               minVotes,
-              roundTallies);
+              roundTallies
+          );
 
       // results of tiebreak stored here
       eliminatedCandidate = tieBreak.loser();
@@ -397,7 +403,8 @@ public class Tabulator {
     } else {
       // last place candidate will be eliminated
       eliminatedCandidate = lastPlaceCandidates.getFirst();
-      log("%s was eliminated in round %d with %s vote(s).",
+      log(
+          "%s was eliminated in round %d with %s vote(s).",
           eliminatedCandidate,
           currentRound,
           minVotes.toString()
@@ -410,8 +417,7 @@ public class Tabulator {
   // function: generateSummarySpreadsheet
   // purpose: create a ResultsWriter object with the tabulation results data and use it
   //  to generate the results spreadsheet
-  // param: outputFile path to write the output file to
-  public void generateSummarySpreadsheet() {
+  void generateSummarySpreadsheet() {
     // writer object will create the output xls
     ResultsWriter writer = new ResultsWriter().
         setNumRounds(currentRound).
@@ -552,7 +558,7 @@ public class Tabulator {
   //   i.e. a continuing candidate
   // param: rankToCandidateIDs ordered map of rankings (most preferred to least) to candidateIDs
   // a set is used to accommodate overvotes
-  // return: true if there is a continuing candidate otherwise false
+  // return: true if there is a continuing candidate, otherwise false
   private boolean hasContinuingCandidates(SortedMap<Integer, Set<String>> rankToCandidateIDs) {
     // the result of this function
     boolean foundContinuingCandidate = false;
@@ -585,14 +591,12 @@ public class Tabulator {
   // return: map of candidateID to vote tallies for this round
   private Map<String, BigDecimal> getTallyForRound(int currentRound) {
     // map of candidateID to vote tally to store the results
-    Map<String, BigDecimal> roundTally = new HashMap<>();
+    Map<String, BigDecimal> roundTally = getNewTally();
 
-    // initialize round tallies to 0 for all continuing candidates
-    // candidateID indexes through all candidateIDs
-    for (String candidateID : candidateIDs) {
-      if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
-        roundTally.put(candidateID, BigDecimal.ZERO);
-      }
+    // map of tallies per precinct for this round
+    Map<String, Map<String, BigDecimal>> roundTallyByPrecinct = new HashMap<>();
+    for (String precinct : precinctRoundTallies.keySet()) {
+      roundTallyByPrecinct.put(precinct, getNewTally());
     }
 
     // CVR indexes over the cast vote records to count votes for continuing candidateIDs
@@ -658,12 +662,12 @@ public class Tabulator {
             // (By default the FTV is exactly one vote, but it could be less than one in a multi-
             // winner election if this CVR already helped elect a winner.)
 
-            // current tally for this candidate
-            BigDecimal currentTally = roundTally.get(selectedCandidateID);
-            // new tally after adding this vote
-            BigDecimal newTally = currentTally.add(cvr.getFractionalTransferValue());
-            roundTally.put(selectedCandidateID, newTally);
+            incrementTally(roundTally, cvr, selectedCandidateID);
             cvr.setCurrentRecipientOfVote(selectedCandidateID);
+
+            if (cvr.getPrecinct() != null) {
+              incrementTally(roundTallyByPrecinct.get(cvr.getPrecinct()), cvr, selectedCandidateID);
+            }
           }
         }
 
@@ -675,13 +679,65 @@ public class Tabulator {
       } // end looping over the rankings within one ballot
     } // end looping over all ballots
 
+    // Take the tallies for this round for each precinct and merge them into the main map tracking
+    // the tallies by precinct.
+    for (String precinct : roundTallyByPrecinct.keySet()) {
+      // the set of round tallies that we've built up so far for this precinct
+      Map<Integer, Map<String, BigDecimal>> roundTalliesForPrecinct =
+          precinctRoundTallies.get(precinct);
+      roundTalliesForPrecinct.put(currentRound, roundTallyByPrecinct.get(precinct));
+    }
+
     return roundTally;
+  }
+
+  // function: getNewTally
+  // purpose: create a new initialized tally with all continuing candidates
+  // returns: initialized tally
+  private Map<String, BigDecimal> getNewTally() {
+    Map<String, BigDecimal> tally = new HashMap<>();
+    // initialize tallies to 0 for all continuing candidates
+    for (String candidateID : candidateIDs) {
+      if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
+        tally.put(candidateID, BigDecimal.ZERO);
+      }
+    }
+    return tally;
+  }
+
+  // function: incrementTally
+  // purpose: add a vote (or fractional share of a vote) to a tally
+  // param: tally is a round tally that we're in the process of computing
+  // param: cvr is a single cast vote record
+  // param: selectedCandidateID is the candidate this CVR's vote is going to in this round
+  private void incrementTally(
+      Map<String, BigDecimal> tally,
+      CastVoteRecord cvr,
+      String selectedCandidateID
+  ) {
+    // current tally for this candidate
+    BigDecimal currentTally = tally.get(selectedCandidateID);
+    // new tally after adding this vote
+    BigDecimal newTally = currentTally.add(cvr.getFractionalTransferValue());
+    tally.put(selectedCandidateID, newTally);
+  }
+
+  // function: initPrecinctRoundTallies
+  // purpose: initialize the map tracking per-precinct round tallies
+  private void initPrecinctRoundTallies() {
+    for (CastVoteRecord cvr : castVoteRecords) {
+      // the precinct for this cast vote record
+      String precinct = cvr.getPrecinct();
+      if (precinct != null && !precinctRoundTallies.containsKey(precinct)) {
+        precinctRoundTallies.put(precinct, new HashMap<>());
+      }
+    }
   }
 
   // function: doAudit
   // purpose: log the audit info to console and audit file
   // param: castVoteRecords list of all CVRs which have been tabulated
-  public void doAudit(List<CastVoteRecord> castVoteRecords) {
+  void doAudit(List<CastVoteRecord> castVoteRecords) {
     for (CastVoteRecord cvr : castVoteRecords) {
       log(cvr.getAuditString());
     }
