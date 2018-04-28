@@ -119,6 +119,12 @@ class CastVoteRecord {
     this.currentRecipientOfVote = currentRecipientOfVote;
   }
 
+  // function: getPrecinct
+  // purpose: getter for precicnt
+  // returns: value of field
+  public String getPrecinct() {
+    return precinct;
+  }
 
   // function: sortRankings
   // purpose: create a map of ranking to candidates selected at that rank
@@ -150,8 +156,10 @@ class CastVoteRecord {
     auditStringBuilder.append(sourceName);
     auditStringBuilder.append(" [Ballot ID] ");
     auditStringBuilder.append(cvrID);
-    auditStringBuilder.append(" [Precinct] ");
-    auditStringBuilder.append(precinct);
+    if (precinct != null) {
+      auditStringBuilder.append(" [Precinct] ");
+      auditStringBuilder.append(precinct);
+    }
     auditStringBuilder.append(" [Round by Round Report] |");
     // index to to iterate over all round descriptions
     for (Integer round : descriptionsByRound.keySet()) {
