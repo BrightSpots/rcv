@@ -237,6 +237,22 @@ class ElectionConfig {
     return rawConfig.date;
   }
 
+  // function: tabulateByPrecinct
+  // purpose: getter for tabulateByPrecinct
+  // returns: true iff we should tabulate by precinct
+  public boolean tabulateByPrecinct() {
+    return rawConfig.tabulateByPrecinct != null ?
+        rawConfig.tabulateByPrecinct :
+        false;
+  }
+
+  // function: precinctOutputDirectory
+  // purpose: getter for precinctOutputDirectory
+  // returns: directory string
+  public String precinctOutputDirectory() {
+    return rawConfig.precinctOutputDirectory;
+  }
+
   // function: maxRankingsAllowed
   // purpose: getter for maxRankingsAllowed
   // returns: max rankings allowed

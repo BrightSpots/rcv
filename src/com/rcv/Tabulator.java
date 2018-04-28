@@ -12,7 +12,6 @@ package com.rcv;
 
 import com.rcv.CastVoteRecord.VoteOutcomeType;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -59,7 +58,9 @@ class Tabulator {
     this.castVoteRecords = castVoteRecords;
     this.candidateIDs = config.getCandidateCodeList();
     this.config = config;
-    initPrecinctRoundTallies();
+    if (config.tabulateByPrecinct()) {
+      initPrecinctRoundTallies();
+    }
   }
 
   // function: log
@@ -422,12 +423,15 @@ class Tabulator {
     // writer object will create the output xls
     ResultsWriter writer = new ResultsWriter().
         setNumRounds(currentRound).
-        setRoundTallies(roundTallies).
         setCandidatesToRoundEliminated(candidateToRoundEliminated).
         setWinnerToRound(winnerToRound).
         setElectionConfig(config);
 
-    writer.generateSummarySpreadsheet();
+    writer.generateOverallSummarySpreadsheet(roundTallies);
+
+    if (config.tabulateByPrecinct()) {
+      writer.generatePrecinctSummarySpreadsheets(precinctRoundTallies);
+    }
   }
 
   // Function: runBatchElimination
@@ -596,8 +600,10 @@ class Tabulator {
 
     // map of tallies per precinct for this round
     Map<String, Map<String, BigDecimal>> roundTallyByPrecinct = new HashMap<>();
-    for (String precinct : precinctRoundTallies.keySet()) {
-      roundTallyByPrecinct.put(precinct, getNewTally());
+    if (config.tabulateByPrecinct()) {
+      for (String precinct : precinctRoundTallies.keySet()) {
+        roundTallyByPrecinct.put(precinct, getNewTally());
+      }
     }
 
     // CVR indexes over the cast vote records to count votes for continuing candidateIDs
@@ -663,7 +669,7 @@ class Tabulator {
             incrementTally(roundTally, cvr, selectedCandidateID);
             cvr.setCurrentRecipientOfVote(selectedCandidateID);
 
-            if (cvr.getPrecinct() != null) {
+            if (config.tabulateByPrecinct() && cvr.getPrecinct() != null) {
               incrementTally(roundTallyByPrecinct.get(cvr.getPrecinct()), cvr, selectedCandidateID);
             }
           }
@@ -679,11 +685,13 @@ class Tabulator {
 
     // Take the tallies for this round for each precinct and merge them into the main map tracking
     // the tallies by precinct.
-    for (String precinct : roundTallyByPrecinct.keySet()) {
-      // the set of round tallies that we've built up so far for this precinct
-      Map<Integer, Map<String, BigDecimal>> roundTalliesForPrecinct =
-          precinctRoundTallies.get(precinct);
-      roundTalliesForPrecinct.put(currentRound, roundTallyByPrecinct.get(precinct));
+    if (config.tabulateByPrecinct()) {
+      for (String precinct : roundTallyByPrecinct.keySet()) {
+        // the set of round tallies that we've built up so far for this precinct
+        Map<Integer, Map<String, BigDecimal>> roundTalliesForPrecinct =
+            precinctRoundTallies.get(precinct);
+        roundTalliesForPrecinct.put(currentRound, roundTallyByPrecinct.get(precinct));
+      }
     }
 
     return roundTally;

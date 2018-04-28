@@ -9,10 +9,10 @@
 
 package com.rcv;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,14 +21,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ResultsWriter {
+class ResultsWriter {
 
   // each round has three columns of data for each candidate:
   // - change in votes for candidate compared to previous round
@@ -37,8 +39,6 @@ public class ResultsWriter {
   private static final int COLUMNS_PER_ROUND = 3;
   // number of round needed to declare a winner
   private int numRounds;
-  // map of round to map of candidateID to their tally for that round
-  private Map<Integer, Map<String, BigDecimal>> roundTallies;
   // map from round number to list of candidates eliminated in that round
   private Map<Integer, List<String>> roundToEliminatedCandidates;
   // map from round number to list of candidates winning in that round
@@ -49,23 +49,15 @@ public class ResultsWriter {
   // function: setNumRounds
   // purpose: setter for total number of rounds
   // param: numRounds total number of rounds
-  public ResultsWriter setNumRounds(int numRounds) {
+  ResultsWriter setNumRounds(int numRounds) {
     this.numRounds = numRounds;
-    return this;
-  }
-
-  // function: setRoundTallies
-  // purpose: setter for round to tally object
-  // param: roundTallies map of round to map of candidateID to their tally for that round
-  public ResultsWriter setRoundTallies(Map<Integer, Map<String, BigDecimal>> roundTallies) {
-    this.roundTallies = roundTallies;
     return this;
   }
 
   // function: setCandidatesToRoundEliminated
   // purpose: setter for candidatesToRoundEliminated object
   // param: candidatesToRoundEliminated map of candidateID to round in which they were eliminated
-  public ResultsWriter setCandidatesToRoundEliminated(
+  ResultsWriter setCandidatesToRoundEliminated(
       Map<String, Integer> candidatesToRoundEliminated
   ) {
     // roundToEliminatedCandidates is the inverse of candidatesToRoundEliminated map
@@ -87,7 +79,7 @@ public class ResultsWriter {
   // function: setWinnerToRound
   // purpose: setter for the winning candidates
   // param: map from winning candidate name to the round in which they won
-  public ResultsWriter setWinnerToRound(Map<String, Integer> winnerToRound) {
+  ResultsWriter setWinnerToRound(Map<String, Integer> winnerToRound) {
     // very similar to the logic in setCandidatesToRoundEliminated above
     roundToWinningCandidates = new HashMap<>();
     for (String candidate : winnerToRound.keySet()) {
@@ -103,15 +95,61 @@ public class ResultsWriter {
   // function: setElectionConfig
   // purpose: setter for ElectionConfig object
   // param: config the ElectionConfig object to use when writing results
-  public ResultsWriter setElectionConfig(ElectionConfig config) {
+  ResultsWriter setElectionConfig(ElectionConfig config) {
     this.config = config;
     return this;
   }
 
+  // function: generateOverallSummarySpreadsheet
+  // purpose: creates a summary spreadsheet for the full election
+  // param: roundTallies is the round-by-round count of votes per candidate
+  void generateOverallSummarySpreadsheet(
+      Map<Integer, Map<String, BigDecimal>> roundTallies
+  ) {
+    generateSummarySpreadsheet(roundTallies, null, config.visualizerOutput());
+  }
+
+  // function: generatePrecinctSummarySpreadsheet
+  // purpose: creates a summary spreadsheet for the votes in a particular precinct
+  // param: roundTallies is map from precinct to the round-by-round vote count in the precinct
+  void generatePrecinctSummarySpreadsheets(
+      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies
+  ) {
+    // location for output
+    String outputDir = config.precinctOutputDirectory();
+    if (outputDir != null) {
+      // dir is the directory to write these files
+      File dir = new File(config.precinctOutputDirectory());
+      if (!dir.mkdirs()) {
+        Logger.log("Failed to create precinct output dir: " + outputDir);
+      }
+    }
+    Set<String> filenames = new HashSet<>();
+    for (String precinct : precinctRoundTallies.keySet()) {
+      // filename is the path to write the output file
+      String filename = getPrecinctFilename(precinct, filenames);
+      if (config.precinctOutputDirectory() != null) {
+        filename = new File(outputDir, filename + ".xlsx").getPath();
+      }
+      generateSummarySpreadsheet(
+          precinctRoundTallies.get(precinct),
+          precinct,
+          filename
+      );
+    }
+  }
+
   // function: generateSummarySpreadsheet
-  // purpose: creates the summary spreadsheet xls file
+  // purpose: creates a summary spreadsheet .xlsx file
+  // param: roundTallies is the round-by-count count of votes per candidate
+  // param: precinct indicates which precinct we're reporting results for (null means all)
+  // param: outputFilename is the name of the file to save
   // file access: write / create
-  public void generateSummarySpreadsheet() {
+  private void generateSummarySpreadsheet(
+      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      String precinct,
+      String outputFilename
+  ) {
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
     Map<String, BigDecimal> firstRoundTally = roundTallies.get(1);
@@ -138,12 +176,12 @@ public class ResultsWriter {
     // create the output workbook
     XSSFWorkbook workbook = new XSSFWorkbook();
     // create the output worksheet
-    XSSFSheet worksheet =
-        workbook.createSheet(config.jurisdiction() + " " + config.office());
+    XSSFSheet worksheet = workbook.createSheet("Results");
 
-    // rowCounter contains the next empty row after all header rows have been created
-    // this is where we start adding round-by-round reports
-    int rowCounter = addHeaderRows(worksheet, totalActiveVotesPerRound);
+    // rowCounter contains the next empty row after all the general header rows have been created.
+    // This is where we start adding round-by-round reports. For precinct sheets, there are no
+    // general header rows, so we just start with the round-by-round reports.
+    int rowCounter = precinct != null ? 0 : addHeaderRows(worksheet, totalActiveVotesPerRound);
 
     // column indexes are computed for all cells as we create the output xlsx spreadsheet
     int columnIndex;
@@ -177,7 +215,9 @@ public class ResultsWriter {
       }
     }
 
-    rowCounter = addActionRows(worksheet, rowCounter);
+    if (precinct == null) { // actions don't make sense in individual precinct results
+      rowCounter = addActionRows(worksheet, rowCounter);
+    }
 
     // votesRedistributedRow is for the number of votes redistributed per round. We'll fill it
     // in after we tabulate all the candidates' data.
@@ -388,7 +428,7 @@ public class ResultsWriter {
     // write xls to disk
     try {
       // output stream is used to write data to disk
-      FileOutputStream outputStream = new FileOutputStream(config.visualizerOutput());
+      FileOutputStream outputStream = new FileOutputStream(outputFilename);
       workbook.write(outputStream);
       outputStream.close();
     } catch (IOException e) {
@@ -430,16 +470,6 @@ public class ResultsWriter {
         addActionRowCandidates(round, winnersRow, winners, actionRow, "Winner");
       }
     }
-
-    // Hack for special "winner round" for single-winner election. Disabling for now.
-    //    int columnIndex = (numRounds*COLUMNS_PER_ROUND)+1;
-    //    electedCell = electedRow.createCell(columnIndex);
-    //    electedCell.setCellValue((String)winnerToRound.keySet().toArray()[0]);
-    //
-    //    // Winner action
-    //    // actionCell is created from the actionRow (above) for the final "winner" action
-    //    Cell actionCell = actionRow.createCell(((numRounds*COLUMNS_PER_ROUND)+1));
-    //    actionCell.setCellValue("Winner");
 
     return rowCounter;
   }
@@ -583,6 +613,27 @@ public class ResultsWriter {
       sortedCandidates.add(entry.getKey());
     }
     return sortedCandidates;
+  }
+
+  // function: getPrecinctFilename
+  // purpose: return a unique, valid filename for this precinct's spreadsheet
+  // param: precinct is the name of the precinct
+  // param: filenames is the set of filenames we've already generated
+  // return: the new filename
+  private String getPrecinctFilename(String precinct, Set<String> filenames) {
+    // sanitized is the precinct name with all special characters converted to underscores
+    String sanitized = precinct.replaceAll("[^a-zA-Z0-9._\\-]+", "_");
+    // filename is the string that we'll eventually return
+    String filename = sanitized;
+    // appendNumber is used to find a unique filename (in practice this really shouldn't be
+    // necessary because different precinct names shouldn't have the same sanitized name, but we're
+    // doing it here to be safe)
+    int appendNumber = 2;
+    while (filenames.contains(filename)) {
+      filename = sanitized + "_" + appendNumber++;
+    }
+    filenames.add(filename);
+    return filename;
   }
 
   private enum OutputType {

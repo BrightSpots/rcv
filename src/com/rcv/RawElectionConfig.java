@@ -34,6 +34,10 @@ public class RawElectionConfig {
   public List<Candidate> candidates;
   // list of all cast vote record source files
   public List<CVRSource> cvrFileSources;
+  // should we report round-by-round results by precinct also?
+  public Boolean tabulateByPrecinct;
+  // directory for precinct output files
+  public String precinctOutputDirectory;
 
   // function: RawElectionConfig
   // purpose: create a new RawElectionConfig object
@@ -52,7 +56,7 @@ public class RawElectionConfig {
     public String description;
     // max rankings allowed
     public Integer maxRankingsAllowed;
-    // are we using batch elimination
+    // are we using batch elimination?
     public Boolean batchElimination;
     // which overvote rule to use
     public String overvoteRule;
@@ -68,7 +72,7 @@ public class RawElectionConfig {
     public String undervoteLabel;
     // tiebreak mode to use
     public String tiebreakMode;
-    // shall we treat blank cells as UWIs
+    // shall we treat blank cells as UWIs?
     public Boolean treatBlankAsUwi;
     // setting for number of winners
     public Integer numberOfWinners;

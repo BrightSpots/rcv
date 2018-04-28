@@ -1,7 +1,11 @@
 {
-  "auditOutput":"Minneapolis2013_audit_log.txt",
-  "visualizerOutput":"Minneapolis2013_visualizer.xlsx",
+  "auditOutput":"minneapolis_2013_audit_log.txt",
+  "visualizerOutput":"minneapolis_2013_visualizer.xlsx",
   "contestName":"2013 Minneapolis Mayor",
+  "jurisdiction":"Minneapolis",
+  "office":"Mayor",
+  "tabulateByPrecinct":true,
+  "precinctOutputDirectory":"test_output/minneapolis_2013_precincts",
   "rules": {
     "description":"Maine Rules",
     "batchElimination":true,
@@ -54,7 +58,8 @@
     {
       "provider": "ES&S",
       "filePath": "test/2013-minneapolis-mayor-cvr.xlsx",
-      "firstVoteColumnIndex": 1
+      "firstVoteColumnIndex": 1,
+      "precinctColumnIndex": 0
     }
   ]
 }
