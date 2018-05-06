@@ -63,6 +63,12 @@ public class ElectionConfig {
       valid = false;
     }
 
+    // if continueTabulationUntilTwoCandidatesRemain is selected
+    // this must be a single-winner election
+    if (this.continueUntilTwoCandidatesRemain() && this.numberOfWinners() > 1) {
+      valid = false;
+    }
+
     // if multi-seat is indicated we validate decimal count and rules style
     //
     if (this.numberOfWinners() > 1) {
@@ -145,13 +151,12 @@ public class ElectionConfig {
     return rawConfig.visualizerOutput;
   }
 
-  // function: continueTabulationTillAllCandidatesEliminated
-  // purpose: getter for setting to keep tabulating beyond selecting winner(s) till all candidates
-  // have been eliminated
-  // returns: weather to keep tabulating past selecting all winner(s)
-  public Boolean continueTabulationTillAllCandidatesEliminated() {
-    return rawConfig.rules.continueTabulationTillAllCandidatesEliminated != null ?
-        rawConfig.rules.continueTabulationTillAllCandidatesEliminated :
+  // function: continueTabulationUntilTwoCandidatesRemain
+  // purpose: getter for setting to keep tabulating beyond selecting winner till two candidates remain
+  // returns: whether to keep tabulating untill two candidates remain
+  public boolean continueUntilTwoCandidatesRemain() {
+    return rawConfig.rules.continueTabulationUntilTwoCandidatesRemain != null ?
+        rawConfig.rules.continueTabulationUntilTwoCandidatesRemain :
         false;
   }
 

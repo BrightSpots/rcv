@@ -145,7 +145,8 @@ public class Tabulator {
       this.candidateIDs.add(config.undeclaredWriteInLabel());
     }
 
-    // Loop until we've found our winner(s), or until all candidates have been eliminated
+    // Loop until we've found our winner(s) unless using
+    // continueTabulationUntilTwoCandidatesRemain in which case loop until only two candidates remain
     // At each iteration, we'll either a) identify one or more
     // winners and transfer their votes to the remaining candidates (if we still need to find more
     // winners), or b) eliminate one or more candidates and gradually transfer votes to the
@@ -255,31 +256,31 @@ public class Tabulator {
     return threshold;
   }
 
-  // purpose: determine if we should continue tabulating based on how many winners and losers
-  // have been selected and the configuration settings in use
+  // purpose: determine if we should continue tabulating based on how many winners have been
+  // selected and if continueTabulationUntilTwoCandidatesRemain flag is in use.
   // return: true if we should continue tabulating
   private boolean shouldContinueTabulating() {
     // how many candidates have already been eliminated
     int eliminatedCandidates = candidateToRoundEliminated.keySet().size();
-//    // how many winners have been selected
+    // how many winners have been selected
     int winners = winnerToRound.size();
-    if(config.continueTabulationTillAllCandidatesEliminated()) {
+    
+    if(config.continueUntilTwoCandidatesRemain()) {
       return (eliminatedCandidates + winners) < config.numCandidates();
     } else {
       return winners < config.numberOfWinners();
     }
-//    return true;
   }
   
-  // function: isContinuing
+  // function: isCandidateContinuing
   // purpose: returns true if candidate is continuing with respect to tabulation
   // this handles continued tabulation after a winner has been chosen for the
-  // continueTabulationTillAllCandidatesEliminated setting
+  // continueTabulationUntilTwoCandidatesRemain setting
   // returns: true if we should continue tabulating
-  private Boolean isContinuing(String candidate) {
+  private Boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
     return(status == CandidateStatus.CONTINUING ||
-        (status == CandidateStatus.WINNER && config.continueTabulationTillAllCandidatesEliminated()));
+        (status == CandidateStatus.WINNER && config.continueUntilTwoCandidatesRemain()));
   }
 
   // function: getCandidateStatus
@@ -584,7 +585,7 @@ public class Tabulator {
       List<String> continuingAtThisRank = new LinkedList<>();
       // candidateID indexes over all candidate IDs in this ranking set
       for (String candidateID : candidateIDSet) {
-        if (isContinuing(candidateID)) {
+        if (isCandidateContinuing(candidateID)) {
           continuingAtThisRank.add(candidateID);
         }
       }
@@ -630,7 +631,7 @@ public class Tabulator {
       // iterate through all candidateIDs in the set
       for (String candidateID : candidateIDSet) {
         // see if the candidate has been eliminated
-        if (isContinuing(candidateID)) {
+        if (isCandidateContinuing(candidateID)) {
           foundContinuingCandidate = true;
           break;
         }
@@ -659,7 +660,7 @@ public class Tabulator {
     // initialize round tallies to 0 for all continuing candidates
     // candidateID indexes through all candidateIDs
     for (String candidateID : candidateIDs) {
-      if (isContinuing(candidateID)) {
+      if (isCandidateContinuing(candidateID)) {
         roundTally.put(candidateID, BigDecimal.ZERO);
       }
     }
@@ -715,7 +716,7 @@ public class Tabulator {
         // candidateID indexes through all candidates selected at this rank
         for (String candidateID : candidateIDSet) {
           // skip non-continuing candidates
-          if (isContinuing(candidateID)) {
+          if (isCandidateContinuing(candidateID)) {
             // If this fails, it means the code failed to handle an overvote with multiple
             // continuing candidates.
             assert selectedCandidateID == null;
