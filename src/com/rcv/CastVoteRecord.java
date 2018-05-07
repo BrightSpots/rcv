@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,12 +31,11 @@ class CastVoteRecord {
   private final String precinct;
   // container for ALL CVR data parsed from the source CVR file
   private final List<String> fullCVRData;
-  // contains who this CVR counted for in each round
-  // followed by reason for exhaustion if it is ever exhausted
-  private final Map<Integer, String> descriptionsByRound = new HashMap<>();
+  // contains what happened to this CVR in each round
+  private final List<VoteOutcome> roundOutcomes = new LinkedList<>();
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
-  public SortedMap<Integer, Set<String>> rankToCandidateIDs;
+  SortedMap<Integer, Set<String>> rankToCandidateIDs;
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // For multi-winner elections that use fractional vote transfers, this represents the current
@@ -50,7 +50,7 @@ class CastVoteRecord {
   // param: ballotID unique ID of this ballot
   // param: rankings list of rank->candidateID selections parsed for this CVR
   // param: fullCVRData list of strings containing ALL data parsed for this CVR
-  public CastVoteRecord(
+  CastVoteRecord(
       String sourceName,
       String cvrID,
       String precinct,
@@ -64,65 +64,63 @@ class CastVoteRecord {
     sortRankings(rankings);
   }
 
-  // function: addRoundDescription
-  // purpose: adds the string to this CVR round by round descriptions for auditing
-  // param: description what happened (exhaustion or who the vote counted towards)
-  // param: round associated with the description
-  public void addRoundDescription(String description, int round) {
-    descriptionsByRound.put(round, description);
+  // function: addRoundOutcome
+  // purpose: adds the outcome for this CVR for this round (for auditing purposes)
+  // param: outcomeType indicates what happened
+  // param: detail reflects who (if anyone) received the vote or why it was exhausted/ignored
+  void addRoundOutcome(VoteOutcomeType outcomeType, String detail) {
+    roundOutcomes.add(new VoteOutcome(outcomeType, detail));
   }
 
   // function: exhaust
   // purpose: transition the CVR into exhausted state with the given reason
   // param: round the exhaustion occurs
   // param: reason: the reason for exhaustion
-  public void exhaust(int round, String reason) {
+  void exhaust(int round, String reason) {
     assert !isExhausted;
     isExhausted = true;
-    // formatted description string
-    String description = String.format("%d|exhausted:%s|", round, reason);
-    addRoundDescription(description, round);
+    addRoundOutcome(VoteOutcomeType.EXHAUSTED, reason);
   }
 
   // function: isExhausted
   // purpose: getter for exhausted state
   // returns: true if CVR is exhausted otherwise false
-  public boolean isExhausted() {
+  boolean isExhausted() {
     return isExhausted;
   }
 
   // function: getFractionalTransferValue
   // purpose: getter for fractionalTransferValue
   // returns: value of field
-  public BigDecimal getFractionalTransferValue() {
+  BigDecimal getFractionalTransferValue() {
     return fractionalTransferValue;
   }
 
   // function: setFractionalTransferValue
   // purpose: setter for fractionalTransferValue
   // param: new value of field
-  public void setFractionalTransferValue(BigDecimal fractionalTransferValue) {
+  void setFractionalTransferValue(BigDecimal fractionalTransferValue) {
     this.fractionalTransferValue = fractionalTransferValue;
   }
 
   // function: getCurrentRecipientOfVote
   // purpose: getter for currentRecipientOfVote
   // returns: value of field
-  public String getCurrentRecipientOfVote() {
+  String getCurrentRecipientOfVote() {
     return currentRecipientOfVote;
   }
 
   // function: setCurrentRecipientOfVote
   // purpose: setter for currentRecipientOfVote
   // param: new value of field
-  public void setCurrentRecipientOfVote(String currentRecipientOfVote) {
+  void setCurrentRecipientOfVote(String currentRecipientOfVote) {
     this.currentRecipientOfVote = currentRecipientOfVote;
   }
 
   // function: getPrecinct
   // purpose: getter for precicnt
   // returns: value of field
-  public String getPrecinct() {
+  String getPrecinct() {
     return precinct;
   }
 
@@ -161,12 +159,38 @@ class CastVoteRecord {
       auditStringBuilder.append(precinct);
     }
     auditStringBuilder.append(" [Round by Round Report] |");
-    // index to to iterate over all round descriptions
-    for (Integer round : descriptionsByRound.keySet()) {
-      auditStringBuilder.append(descriptionsByRound.get(round));
+    // round is an index to iterate over all round outcomes
+    int round = 1;
+    for (VoteOutcome roundOutcome : roundOutcomes) {
+      auditStringBuilder.append(round).append('|');
+      if (roundOutcome.outcomeType == VoteOutcomeType.IGNORED) {
+        auditStringBuilder.append("ignored:");
+      } else if (roundOutcome.outcomeType == VoteOutcomeType.EXHAUSTED) {
+        auditStringBuilder.append("exhausted:");
+      }
+      auditStringBuilder.append(roundOutcome.detail).append('|');
+      round++;
     }
     auditStringBuilder.append(" [Raw Data] ");
     auditStringBuilder.append(fullCVRData);
     return auditStringBuilder.toString();
+  }
+
+  enum VoteOutcomeType {
+    COUNTED,
+    IGNORED,
+    EXHAUSTED,
+  }
+
+  private class VoteOutcome {
+    // what type of outcome (counted, ignored, exhausted)
+    VoteOutcomeType outcomeType;
+    // more detail on the outcome (who got the vote or why it was ignored/exhausted)
+    String detail;
+
+    VoteOutcome(VoteOutcomeType outcomeType, String detail) {
+      this.outcomeType = outcomeType;
+      this.detail = detail;
+    }
   }
 }

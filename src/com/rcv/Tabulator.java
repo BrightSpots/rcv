@@ -10,6 +10,7 @@
 
 package com.rcv;
 
+import com.rcv.CastVoteRecord.VoteOutcomeType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
@@ -630,8 +631,7 @@ class Tabulator {
           break;
         } else if (overvoteDecision == OvervoteDecision.IGNORE) {
           // description of the overvote decision
-          String description = String.format("%d|ignored:%s|", currentRound, "overvote");
-          cvr.addRoundDescription(description, currentRound);
+          cvr.addRoundOutcome(VoteOutcomeType.IGNORED, "overvote");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           continue;
@@ -655,9 +655,7 @@ class Tabulator {
             assert selectedCandidateID == null;
             // we found a continuing candidate, so increase their tally by 1
             selectedCandidateID = candidateID;
-            // text description of the vote
-            String description = String.format("%d|%s|", currentRound, selectedCandidateID);
-            cvr.addRoundDescription(description, currentRound);
+            cvr.addRoundOutcome(VoteOutcomeType.COUNTED, selectedCandidateID);
             // Increment the tally for this candidate by the fractional transfer value of the CVR.
             // (By default the FTV is exactly one vote, but it could be less than one in a multi-
             // winner election if this CVR already helped elect a winner.)
