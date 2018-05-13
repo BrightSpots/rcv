@@ -61,8 +61,6 @@ class CVRReader {
       String excelFilePath,
       int firstVoteColumnIndex,
       Integer precinctColumnIndex,
-      int allowableRanks,
-      List<String> candidateIDs,
       ElectionConfig config
   ) throws Exception {
     // contestSheet contains all the CVR data we will be parsing
@@ -99,7 +97,11 @@ class CVRReader {
 
       // Iterate all expected cells in this row storing cvrData and rankings as we go
       // cellIndex ranges from 0 to the last expected rank column index
-      for (int cellIndex = 0; cellIndex < firstVoteColumnIndex + allowableRanks; cellIndex++) {
+      for (
+          int cellIndex = 0;
+          cellIndex < firstVoteColumnIndex + config.getMaxRankingsAllowed();
+          cellIndex++
+      ) {
         // cell object contains data the the current cell
         Cell cvrDataCell = castVoteRecordRow.getCell(cellIndex);
         if (cvrDataCell == null) {
@@ -132,8 +134,8 @@ class CVRReader {
         String candidate;
         if (cvrDataCell == null) {
           // empty cells are sometimes treated as undeclared write-ins (Portland / ES&S)
-          if (config.treatBlankAsUWI()) {
-            candidate = config.undeclaredWriteInLabel();
+          if (config.isTreatBlankAsUWIEnabled()) {
+            candidate = config.getUndeclaredWriteInLabel();
             Logger.log("Empty cell -- treating as UWI");
           } else {
             // just ignore this cell
@@ -146,15 +148,15 @@ class CVRReader {
           }
           candidate = cvrDataCell.getStringCellValue().trim();
 
-          if (candidate.equals(config.undervoteLabel())) {
+          if (candidate.equals(config.getUndervoteLabel())) {
             continue;
-          } else if (candidate.equals(config.overvoteLabel())) {
+          } else if (candidate.equals(config.getOvervoteLabel())) {
             candidate = Tabulator.explicitOvervoteLabel;
-          } else if (!candidateIDs.contains(candidate)) {
-            if (!candidate.equals(config.undeclaredWriteInLabel())) {
+          } else if (!config.getCandidateCodeList().contains(candidate)) {
+            if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
               Logger.log("no match for candidate: %s", candidate);
             }
-            candidate = config.undeclaredWriteInLabel();
+            candidate = config.getUndeclaredWriteInLabel();
           }
         }
         // create and add new ranking pair to the rankings list
