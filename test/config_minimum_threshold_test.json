@@ -1,6 +1,6 @@
 {
-  "auditOutput":"minimum_threshold_test_audit_log.txt",
-  "visualizerOutput":"minimum_threshold_test_visualizer.xlsx",
+  "auditOutputFilename":"minimum_threshold_test_audit_log.txt",
+  "visualizerOutputFilename":"minimum_threshold_test_visualizer.xlsx",
   "contestName":"Minimum threshold test",
   "jurisdiction":"Funkytown, USA",
   "office":"Sergeant-at-Arms",

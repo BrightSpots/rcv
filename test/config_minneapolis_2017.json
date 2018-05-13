@@ -1,10 +1,12 @@
 {
-  "auditOutput":"minneapolis_2017_audit_log.txt",
-  "visualizerOutput":"minneapolis_2017_visualizer.xlsx",
+  "outputDirectory":"test_output/minneapolis_2017",
+  "auditOutputFilename":"minneapolis_2017_audit_log.txt",
+  "visualizerOutputFilename":"minneapolis_2017_visualizer.xlsx",
   "contestName":"2017 Minneapolis mayoral race",
   "jurisdiction":"Minneapolis, MN",
   "office":"Mayor",
   "date":"2017-11-07",
+  "tabulateByPrecinct":true,
   "rules": {
     "description":"Minneapolis Rules",
     "maxRankingsAllowed":3,

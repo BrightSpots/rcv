@@ -121,22 +121,22 @@ class ElectionConfig {
   // function: validate
   // purpose: validate the correctness of the config data
   // returns false if there was a problem
-  public boolean validate() {
+  boolean validate() {
     // does this config meet our validation standards?
     boolean valid = true;
 
-    if (this.overvoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
+    if (this.getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
       valid = false;
-    } else if (this.tiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
+    } else if (this.getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
       valid = false;
-    } else if (overvoteLabel() != null &&
-        overvoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
-        overvoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
+    } else if (getOvervoteLabel() != null &&
+        getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
+        getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
     ) {
       valid = false;
-    } else if (maxSkippedRanksAllowed() != null && maxSkippedRanksAllowed() < 0) {
+    } else if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
       valid = false;
-    } else if (maxRankingsAllowed() != null && maxRankingsAllowed() < 1) {
+    } else if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
       valid = false;
     } else if (rawConfig.rules.batchElimination == null) {
       valid = false;
@@ -144,8 +144,11 @@ class ElectionConfig {
 
     // if multi-seat is indicated we validate decimal count and rules style
     //
-    if (this.numberOfWinners() > 1) {
-      if (this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 20) {
+    if (this.getNumberOfWinners() > 1) {
+      if (
+          this.getDecimalPlacesForVoteArithmetic() < 0 ||
+          this.getDecimalPlacesForVoteArithmetic() > 20
+      ) {
         valid = false;
       }
       if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
@@ -155,17 +158,17 @@ class ElectionConfig {
     return valid;
   }
 
-  // function: numberWinners
+  // function: getNumberWinners
   // purpose: how many winners for this election
   // returns from settings config or 1 of no setting is specified
-  public Integer numberOfWinners() {
+  Integer getNumberOfWinners() {
     return rawConfig.rules.numberOfWinners == null ? 1 : rawConfig.rules.numberOfWinners;
   }
 
-  // function: decimalPlacesForVoteArithmetic
+  // function: getDecimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to or 0 if no setting is specified
-  private Integer decimalPlacesForVoteArithmetic() {
+  private Integer getDecimalPlacesForVoteArithmetic() {
     // we default to using 4 places for fractional transfer vote arithmetic
     return rawConfig.rules.decimalPlacesForVoteArithmetic == null ?
         4 :
@@ -177,15 +180,15 @@ class ElectionConfig {
   // param: dividend is the numerator in the division operation
   // param: divisor is the denominator in the division operation
   // returns: the quotient
-  public BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
-    return dividend.divide(divisor, decimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
+  BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
+    return dividend.divide(divisor, getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
   }
 
   // function: roundDecimal
   // purpose: round a number according to the config settings
   // returns: the rounded value
-  public BigDecimal roundDecimal(BigDecimal bd) {
-    return bd.setScale(decimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
+  BigDecimal roundDecimal(BigDecimal bd) {
+    return bd.setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
   }
 
   // function: multiSeatTransferRule
@@ -195,112 +198,110 @@ class ElectionConfig {
     return multiSeatTransferRuleForConfigSetting(rawConfig.rules.multiSeatTransferRule);
   }
 
-  // function: auditOutput
-  // purpose: getter for auditOutput
-  // returns: path to audit output file
-  public String auditOutput() {
-    return rawConfig.auditOutput;
+  // function: getOutputDirectory
+  // purpose: getter for outputDirectory
+  // returns: directory string
+  String getOutputDirectory() {
+    return rawConfig.outputDirectory;
   }
 
-  // function: visualizerOutput
-  // purpose: getter for visualizerOutput
-  // returns: path to write visualizer output file
-  public String visualizerOutput() {
-    return rawConfig.visualizerOutput;
+  // function: getAuditOutputFilename
+  // purpose: getter for auditOutputFilename
+  // returns: filename for audit output
+  String getAuditOutputFilename() {
+    return rawConfig.auditOutputFilename;
   }
 
-  // function: contestName
+  // function: getVisualizerOutputFilename
+  // purpose: getter for visualizerOutputFilename
+  // returns: filename for visualizer output
+  String getVisualizerOutputFilename() {
+    return rawConfig.visualizerOutputFilename;
+  }
+
+  // function: getContestName
   // purpose: getter for contestName
   // returns: contest name
-  public String contestName() {
+  String getContestName() {
     return rawConfig.contestName;
   }
 
-  // function: jurisdiction
+  // function: getJurisdiction
   // purpose: getter for jurisdiction
   // returns: jurisdiction name
-  public String jurisdiction() {
+  String getJurisdiction() {
     return rawConfig.jurisdiction;
   }
 
-  // function: office
+  // function: getOffice
   // purpose: getter for office
   // returns: office name
-  public String office() {
+  String getOffice() {
     return rawConfig.office;
   }
 
   // function: electionDate
   // purpose: getter for electionDate
   // returns: election date
-  public String electionDate() {
+  String getElectionDate() {
     return rawConfig.date;
   }
 
-  // function: tabulateByPrecinct
+  // function: isTabulateByPrecinctEnabled
   // purpose: getter for tabulateByPrecinct
-  // returns: true iff we should tabulate by precinct
-  public boolean tabulateByPrecinct() {
-    return rawConfig.tabulateByPrecinct != null ?
-        rawConfig.tabulateByPrecinct :
-        false;
+  // returns: true if and only if we should tabulate by precinct
+  boolean isTabulateByPrecinctEnabled() {
+    return rawConfig.tabulateByPrecinct;
   }
 
-  // function: precinctOutputDirectory
-  // purpose: getter for precinctOutputDirectory
-  // returns: directory string
-  public String precinctOutputDirectory() {
-    return rawConfig.precinctOutputDirectory;
-  }
-
-  // function: maxRankingsAllowed
+  // function: getMaxRankingsAllowed
   // purpose: getter for maxRankingsAllowed
   // returns: max rankings allowed
-  public Integer maxRankingsAllowed() {
+  Integer getMaxRankingsAllowed() {
     return rawConfig.rules.maxRankingsAllowed;
   }
 
-  // function: description
+  // function: getDescription
   // purpose: getter for description
   // returns: description
-  public String description() {
+  String getDescription() {
     return rawConfig.rules.description;
   }
 
-  // function: batchElimination
+  // function: isBatchEliminationEnabled
   // purpose: getter for batchElimination
-  // returns: true if we should use batch elimination
-  public boolean batchElimination() {
+  // returns: true if and only if we should use batch elimination
+  boolean isBatchEliminationEnabled() {
     return rawConfig.rules.batchElimination;
   }
 
-  // function: numCandidates
+  // function: getNumCandidates
   // purpose: calculate the number of declared candidates from the election configuration
   // returns: the number of declared candidates from the election configuration
-  public int numCandidates() {
+  int getNumCandidates() {
     // num will contain the resulting number of candidates
     int num = candidateCodeList.size();
-    if (undeclaredWriteInLabel() != null &&
-        candidateCodeList.contains(undeclaredWriteInLabel())) {
+    if (getUndeclaredWriteInLabel() != null &&
+        candidateCodeList.contains(getUndeclaredWriteInLabel())) {
       num--;
     }
     return num;
   }
 
-  // function: overvoteRule
+  // function: getOvervoteRule
   // purpose: return overvote rule enum to use
   // returns: overvote rule to use for this config
-  public Tabulator.OvervoteRule overvoteRule() {
+  Tabulator.OvervoteRule getOvervoteRule() {
     // by default we exhaust immediately
     return rawConfig.rules.overvoteRule == null ?
         Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY :
         ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
   }
 
-  // function: minimumVoteThreshold
+  // function: getMinimumVoteThreshold
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use for this config
-  public BigDecimal minimumVoteThreshold() {
+  BigDecimal getMinimumVoteThreshold() {
     if (minimumVoteThreshold == null) {
       if (rawConfig.rules.minimumVoteThreshold == null) {
         minimumVoteThreshold = BigDecimal.ZERO;
@@ -311,48 +312,48 @@ class ElectionConfig {
     return minimumVoteThreshold;
   }
 
-  // function: maxSkippedRanksAllowed
+  // function: getMaxSkippedRanksAllowed
   // purpose: getter for maxSkippedRanksAllowed rule
   // returns: max skipped ranks allowed in this config
-  public Integer maxSkippedRanksAllowed() {
+  Integer getMaxSkippedRanksAllowed() {
     return rawConfig.rules.maxSkippedRanksAllowed;
   }
 
-  // function: undeclaredWriteInLabel
+  // function: getUndeclaredWriteInLabel
   // purpose: getter for UWI label
   // returns: overvote rule for this config
-  public String undeclaredWriteInLabel() {
+  String getUndeclaredWriteInLabel() {
     return rawConfig.rules.undeclaredWriteInLabel;
   }
 
-  // function: overvoteLabel
+  // function: getOvervoteLabel
   // purpose: getter for overvote label rule
   // returns: overvote label for this config
-  public String overvoteLabel() {
+  String getOvervoteLabel() {
     return rawConfig.rules.overvoteLabel;
   }
 
-  // function: undervoteLabel
+  // function: getUndervoteLabel
   // purpose: getter for undervote label
   // returns: undervote label for this config
-  public String undervoteLabel() {
+  String getUndervoteLabel() {
     return rawConfig.rules.undervoteLabel;
   }
 
-  // function: tiebreakMode
+  // function: getTiebreakMode
   // purpose: return tiebreak mode to use
   // returns: tiebreak mode to use for this config
-  public Tabulator.TieBreakMode tiebreakMode() {
+  Tabulator.TieBreakMode getTiebreakMode() {
     // by default we use random tiebreak
     return rawConfig.rules.tiebreakMode == null ?
         Tabulator.TieBreakMode.RANDOM :
         ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
   }
 
-  // function: treatBlankAsUWI
+  // function: isTreatBlankAsUWIEnabled
   // purpose: getter for treatBlankAsUWI rule
   // returns: return true if we are to treat blank cell as UWI
-  public boolean treatBlankAsUWI() {
+  boolean isTreatBlankAsUWIEnabled() {
     // by default we do not treat blank as UWI
     return rawConfig.rules.treatBlankAsUwi == null ?
         false :
@@ -362,7 +363,7 @@ class ElectionConfig {
   // function: getCandidateCodeList
   // purpose: return list of candidate codes for this config
   // returns: return list of candidate codes for this config
-  public List<String> getCandidateCodeList() {
+  List<String> getCandidateCodeList() {
     return candidateCodeList;
   }
 
@@ -370,7 +371,7 @@ class ElectionConfig {
   // purpose: lookup full candidate name given a candidate ID
   // param: candidateID the ID of the candidate whose name we want to lookup
   // returns: the full name for the given candidateID
-  public String getNameForCandidateID(String candidateID) {
+  String getNameForCandidateID(String candidateID) {
     return candidateCodeToNameMap.get(candidateID);
   }
 

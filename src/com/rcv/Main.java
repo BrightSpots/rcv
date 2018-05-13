@@ -13,6 +13,8 @@
 
 package com.rcv;
 
+import com.rcv.FileUtils.UnableToCreateDirectoryException;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,33 +49,59 @@ class Main {
   static ElectionConfig loadElectionConfig(String configPath) {
     // config: the new object
     ElectionConfig config = null;
-    try {
-      // rawConfig holds the basic election config data parsed from json
-      RawElectionConfig rawConfig;
-      // parse raw config
-      rawConfig = JsonParser.parseObjectFromFile(configPath, RawElectionConfig.class);
-      // create and validate new ElectionConfig
-      if (rawConfig != null) {
-        config = new ElectionConfig(rawConfig);
-        // set up log output
-        Logger.setup(config.auditOutput());
-        Logger.log("Parsed config file: %s", configPath);
-        Logger.log("Logging to: %s", config.auditOutput());
-        if (!config.validate()) {
-          Logger.log("There was a problem validating the election configuration.");
-          Logger.log("Please see the README.txt for details.");
-          config = null;
-        }
+
+    // encounteredError tracks whether anything went wrong during loading
+    boolean encounteredError = false;
+
+    // rawConfig holds the basic election config data parsed from json
+    RawElectionConfig rawConfig =
+        JsonParser.parseObjectFromFile(configPath, RawElectionConfig.class);
+
+    if (rawConfig == null) {
+      encounteredError = true;
+    } else {
+      config = new ElectionConfig(rawConfig);
+
+      try {
+        FileUtils.createOutputDirectory(config.getOutputDirectory());
+      } catch (UnableToCreateDirectoryException exception) {
+        encounteredError = true;
+        System.err.println(
+            String.format(
+                "Failed to create output directory: %s\n%s",
+                config.getOutputDirectory(),
+                exception.toString()
+            )
+        );
       }
-    } catch (IOException exception) {
-      System.err.print(
-          String.format(
-              "Failed to configure logging output to file: %s\n%s",
-              config.auditOutput(),
-              exception.toString()
-          )
-      );
+
+      // logPath is where we'll write the log file
+      String logPath =
+          FileUtils.buildPath(config.getOutputDirectory(), config.getAuditOutputFilename());
+
+      try {
+        Logger.setup(logPath);
+        Logger.log("Parsed config file: %s", configPath);
+        Logger.log("Logging to: %s", logPath);
+      } catch (IOException exception) {
+        encounteredError = true;
+        System.err.print(
+            String.format(
+                "Failed to configure logging output to file: %s\n%s",
+                logPath,
+                exception.toString()
+            )
+        );
+      }
     }
+
+    // TODO: confiog.validate() should log specific errors
+    if (encounteredError || !config.validate()) {
+      Logger.log("There was a problem loading or validating the election configuration.");
+      Logger.log("Please see the README.txt for details.");
+      config = null;
+    }
+
     // TODO: Should probably add either check for null config here (and throw exception?), or whenever it's called
     return config;
   }
@@ -124,8 +152,6 @@ class Main {
           source.filePath,
           source.firstVoteColumnIndex,
           source.precinctColumnIndex,
-          config.maxRankingsAllowed(),
-          config.getCandidateCodeList(),
           config
       );
       // add records to the master list
@@ -134,5 +160,4 @@ class Main {
     Logger.log("Read %d records", castVoteRecords.size());
     return castVoteRecords;
   }
-
 }

@@ -9,7 +9,6 @@
 
 package com.rcv;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -106,7 +105,7 @@ class ResultsWriter {
   void generateOverallSummarySpreadsheet(
       Map<Integer, Map<String, BigDecimal>> roundTallies
   ) {
-    generateSummarySpreadsheet(roundTallies, null, config.visualizerOutput());
+    generateSummarySpreadsheet(roundTallies, null, config.getVisualizerOutputFilename());
   }
 
   // function: generatePrecinctSummarySpreadsheet
@@ -115,22 +114,10 @@ class ResultsWriter {
   void generatePrecinctSummarySpreadsheets(
       Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies
   ) {
-    // location for output
-    String outputDir = config.precinctOutputDirectory();
-    if (outputDir != null) {
-      // dir is the directory to write these files
-      File dir = new File(config.precinctOutputDirectory());
-      if (!dir.mkdirs()) {
-        Logger.log("Failed to create precinct output dir: " + outputDir);
-      }
-    }
     Set<String> filenames = new HashSet<>();
     for (String precinct : precinctRoundTallies.keySet()) {
       // filename is the path to write the output file
-      String filename = getPrecinctFilename(precinct, filenames);
-      if (config.precinctOutputDirectory() != null) {
-        filename = new File(outputDir, filename + ".xlsx").getPath();
-      }
+      String filename = getPrecinctFilename(precinct, filenames) + ".xlsx";
       generateSummarySpreadsheet(
           precinctRoundTallies.get(precinct),
           precinct,
@@ -426,14 +413,16 @@ class ResultsWriter {
     }
 
     // write xls to disk
+    // outputPath is the full path to write to
+    String outputPath = FileUtils.buildPath(config.getOutputDirectory(), outputFilename);
     try {
       // output stream is used to write data to disk
-      FileOutputStream outputStream = new FileOutputStream(outputFilename);
+      FileOutputStream outputStream = new FileOutputStream(outputPath);
       workbook.write(outputStream);
       outputStream.close();
     } catch (IOException e) {
       e.printStackTrace();
-      Logger.log("failed to write " + config.visualizerOutput() + " to disk!");
+      Logger.log("failed to write " + outputPath + " to disk!");
     }
   }
 
@@ -507,17 +496,17 @@ class ResultsWriter {
     // string for formatted date
     String dateString = dateFormat.format(new Date());
     // string indicating single- or multi-winner
-    String electionType = config.numberOfWinners() > 1 ? "multi-winner" : "single-winner";
+    String electionType = config.getNumberOfWinners() > 1 ? "multi-winner" : "single-winner";
     // number reflecting threshold percentage to win
     BigDecimal thresholdPercentage = config.divide(
         new BigDecimal(100),
-        new BigDecimal(config.numberOfWinners() + 1)
+        new BigDecimal(config.getNumberOfWinners() + 1)
     );
     // string for threshold percentage
     String thresholdString = thresholdPercentage.toString() + "%";
     // formula string
     String formula =
-        "More than 1/" + (config.numberOfWinners() + 1) + " of total votes cast for office";
+        "More than 1/" + (config.getNumberOfWinners() + 1) + " of total votes cast for office";
 
     // literal array to structure output cell text data
     // first cell is header text
@@ -528,10 +517,10 @@ class ResultsWriter {
         {"Date/time or version", "Updated " + dateString, OutputType.STRING},
         {"Contest information", null, OutputType.STRING},
         {"Enter information about the contest as it will be displayed", null, OutputType.STRING},
-        {"Contest name", config.contestName(), OutputType.STRING},
-        {"Jurisdiction name", config.jurisdiction(), OutputType.STRING},
-        {"Office name", config.office(), OutputType.STRING},
-        {"Election date", config.electionDate(), OutputType.STRING},
+        {"Contest name", config.getContestName(), OutputType.STRING},
+        {"Jurisdiction name", config.getJurisdiction(), OutputType.STRING},
+        {"Office name", config.getOffice(), OutputType.STRING},
+        {"Election date", config.getElectionDate(), OutputType.STRING},
         {null, null, OutputType.STRING},
         {"Counting information", null, OutputType.STRING},
         {"Details of the tally to be used in the display screens", null, OutputType.STRING},
@@ -544,8 +533,8 @@ class ResultsWriter {
         {"Contest summary data", null, OutputType.STRING},
         {"Tally detail", null, OutputType.STRING},
         {"Single-winner/multi-winner", electionType, OutputType.STRING},
-        {"Number to be elected", config.numberOfWinners(), OutputType.INT},
-        {"Number of candidates", config.numCandidates(), OutputType.INT},
+        {"Number to be elected", config.getNumberOfWinners(), OutputType.INT},
+        {"Number of candidates", config.getNumCandidates(), OutputType.INT},
         {"Number of votes cast", totalActiveVotesFirstRound.toString(), OutputType.STRING},
         {"Undervotes", 0, OutputType.INT},
         {"Total # of rounds", totalActiveVotesPerRound.size(), OutputType.INT},
@@ -595,9 +584,9 @@ class ResultsWriter {
         // result of the comparison
         int ret;
 
-        if (firstObject.getKey().equals(config.undeclaredWriteInLabel())) {
+        if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
           ret = 1;
-        } else if (secondObject.getKey().equals(config.undeclaredWriteInLabel())) {
+        } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
           ret = -1;
         } else {
           ret = (secondObject.getValue()).compareTo(firstObject.getValue());

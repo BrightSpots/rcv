@@ -1,4 +1,4 @@
-This document lists the parameters that can be included in a config file. Required parameters are denoted with an asterisk.
+This document lists the parameters that can be included in a config file. Required parameters are denoted with an asterisk (*).
 - *auditOutput: the filename for the audit file that the program will create. Example: portland_2015_mayor_audit_log.txt
 - *candidates: a list of the candidates who appear in the cast vote records. Each candidate must have a name. If the cast vote records use candidate codes, each candidate must also have a code.
 - contestName: the name of the election. Example: Portland Mayoral Race
@@ -10,7 +10,7 @@ This document lists the parameters that can be included in a config file. Requir
 - date: the date of the election. Example: 2015-11-03
 - jurisdiction: the jurisdiction in which this election is being contested. Example: Portland, ME
 - office: the office being contested. Example: Mayor
-- precinctOutputDirectory: the path to where the precinct spreadsheets should be saved. Example: portland_2015_precinct_output (defaults to the current directory)
+- outputDirectory: the directory where all output files should be saved. Example: portland_2015_output (defaults to the current directory)
 - *rules: a set of options that determine exactly how the program should implement the instant runoff.
   - *batchElimination: whether batch elimination should be used. Valid options: true, false.
   - decimalPlacesForVoteArithmetic: how many places after the decimal to use in rounding for fractional vote transfer arithmetic in multi-winner elections. (defaults to 4)

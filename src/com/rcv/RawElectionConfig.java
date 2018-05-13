@@ -16,10 +16,13 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawElectionConfig {
 
-  // location to write audit output
-  public String auditOutput;
-  // location to write visualizer output
-  public String visualizerOutput;
+  // filename for audit output
+  public String auditOutputFilename;
+  // filename for visualizer output
+  public String visualizerOutputFilename;
+  // directory for output files
+  public String outputDirectory;
+
   // contest name
   public String contestName;
   // jurisdiction
@@ -35,9 +38,7 @@ public class RawElectionConfig {
   // list of all cast vote record source files
   public List<CVRSource> cvrFileSources;
   // should we report round-by-round results by precinct also?
-  public Boolean tabulateByPrecinct;
-  // directory for precinct output files
-  public String precinctOutputDirectory;
+  public boolean tabulateByPrecinct;
 
   // function: RawElectionConfig
   // purpose: create a new RawElectionConfig object
