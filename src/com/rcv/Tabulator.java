@@ -27,8 +27,8 @@ class Tabulator {
   static final String explicitOvervoteLabel = "overvote";
   // cast vote records parsed from CVR input files
   private final List<CastVoteRecord> castVoteRecords;
-  // all candidateIDs for this election parsed from the election config (does not include UWIs)
-  private final List<String> candidateIDs;
+  // all candidateIDs for this election parsed from the election config
+  private final Set<String> candidateIDs;
   // election config contains specific rules and file paths to be used during tabulation
   private final ElectionConfig config;
   // roundTallies is a map from round number to a map from candidate ID to vote total for the round
@@ -115,20 +115,15 @@ class Tabulator {
   //  this is the high-level control of the tabulation algorithm
   void tabulate() {
     log("Beginning tabulation for contest.");
-    log("There are %d declared candidates for this contest:", config.numDeclaredCandidates());
+    log("There are %d declared candidates for this contest:", config.getNumDeclaredCandidates());
     // string indexes over all candidate IDs to log them
     for (String candidateID : candidateIDs) {
       log("%s", candidateID);
     }
     log("There are %d cast vote records for this contest.", castVoteRecords.size());
 
-    // add UWI string to candidateIDs so it will be tallied similarly to other candidates
-    if (config.getUndeclaredWriteInLabel() != null) {
-      this.candidateIDs.add(config.getUndeclaredWriteInLabel());
-    }
-
-    // Loop until we've found our winner(s) unless using
-    // continueUntilTwoCandidatesRemain in which case loop until only two candidates remain
+    // Loop until we've found our winner(s) unless using continueUntilTwoCandidatesRemain, in which
+    // case we loop until only two candidates remain.
     // At each iteration, we'll either a) identify one or more
     // winners and transfer their votes to the remaining candidates (if we still need to find more
     // winners), or b) eliminate one or more candidates and gradually transfer votes to the
@@ -245,14 +240,14 @@ class Tabulator {
     int eliminatedCandidates = candidateToRoundEliminated.keySet().size();
     // how many winners have been selected
     int winners = winnerToRound.size();
-    
+
     if(config.continueUntilTwoCandidatesRemain()) {
-      return (eliminatedCandidates + winners) < config.numCandidates();
+      return (eliminatedCandidates + winners) < config.getNumCandidates();
     } else {
       return winners < config.getNumberOfWinners();
     }
   }
-  
+
   // function: isCandidateContinuing
   // purpose: returns true if candidate is continuing with respect to tabulation
   // this handles continued tabulation after a winner has been chosen for the

@@ -16,13 +16,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class ElectionConfig {
 
   // underlying rawConfig object data
   final RawElectionConfig rawConfig;
-  // list of all declared candidate codes
-  private ArrayList<String> candidateCodeList;
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
   // minimum vote threshold if one is specified
@@ -293,11 +292,11 @@ class ElectionConfig {
   // function: numDeclaredCandidates
   // purpose: calculate the number of declared candidates from the election configuration
   // returns: the number of declared candidates from the election configuration
-  public int numDeclaredCandidates() {
+  public int getNumDeclaredCandidates() {
     // num will contain the resulting number of candidates
-    int num = candidateCodeList.size();
-    if (getUndeclaredWriteInLabel()!= null &&
-        candidateCodeList.contains(getUndeclaredWriteInLabel())) {
+    int num = getCandidateCodeList().size();
+    if (getUndeclaredWriteInLabel() != null &&
+        getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
       num--;
     }
     return num;
@@ -306,8 +305,8 @@ class ElectionConfig {
   // function: numCandidates
   // purpose: return number of candidates including UWIs as a candidate if they are in use
   // num will contain the resulting number of candidates
-  public int numCandidates() {
-    return candidateCodeList.size();
+  public int getNumCandidates() {
+    return getCandidateCodeList().size();
   }
 
 
@@ -386,8 +385,8 @@ class ElectionConfig {
   // function: getCandidateCodeList
   // purpose: return list of candidate codes for this config
   // returns: return list of candidate codes for this config
-  List<String> getCandidateCodeList() {
-    return candidateCodeList;
+  Set<String> getCandidateCodeList() {
+    return candidateCodeToNameMap.keySet();
   }
 
   // function: getNameForCandidateID
@@ -401,17 +400,19 @@ class ElectionConfig {
   // function: processCandidateData
   // purpose: builds map of candidate ID to candidate name
   private void processCandidateData() {
-    candidateCodeList = new ArrayList<>();
     candidateCodeToNameMap = new HashMap<>();
     // candidate is used to index through all candidates for this election
     for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
       if (candidate.code != null) {
-        candidateCodeList.add(candidate.code);
         candidateCodeToNameMap.put(candidate.code, candidate.name);
       } else {
-        candidateCodeList.add(candidate.name);
         candidateCodeToNameMap.put(candidate.name, candidate.name);
       }
+    }
+
+    String uwiLabel = getUndeclaredWriteInLabel();
+    if (uwiLabel != null) {
+      candidateCodeToNameMap.put(uwiLabel, uwiLabel);
     }
   }
 
