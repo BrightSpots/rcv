@@ -8,4 +8,4 @@ test/~*.xlsx
 test/Portland-Tabulation-Results.xlsx
 *_audit_log.txt
 *_visualizer.xlsx
-
+test_output

@@ -1,12 +1,12 @@
 "rcv" Ranked Choice Voting Universal Tabulator
-Created by Jonathan Moldover and Louis Eisenberg
+Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
 Copyright 2018 Bright Spots
 
 Dependencies:
 
-Java 1.8
+Java 9
 
-Apache POI Java api for Microsoft Documents 3.16
+Apache POI Java API for Microsoft Documents 3.16
 Main website: https://poi.apache.org/index.html
 Binaries: https://archive.apache.org/dist/poi/release/bin/poi-bin-3.16-20170419.tar.gz
 

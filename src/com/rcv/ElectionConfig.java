@@ -1,5 +1,5 @@
-/**
- * Created by Jonathan Moldover and Louis Eisenberg
+/*
+ * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  * Copyright 2018 Bright Spots
  * Purpose: Wrapper for RawElectionConfig object
  * This class adds logic for looking up rule enum names
@@ -7,26 +7,24 @@
  * cast vote record objects.
  * Version: 1.0
  */
+
 package com.rcv;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static java.math.RoundingMode.HALF_EVEN;
+class ElectionConfig {
 
-public class ElectionConfig {
   // underlying rawConfig object data
-  RawElectionConfig rawConfig;
+  final RawElectionConfig rawConfig;
   // list of all declared candidate codes
   private ArrayList<String> candidateCodeList;
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
-  // MathContext to be shared by all vote calculations
-  private MathContext contextForVoteArithmetic;
   // minimum vote threshold if one is specified
   private BigDecimal minimumVoteThreshold;
 
@@ -38,55 +36,13 @@ public class ElectionConfig {
     this.processCandidateData();
   }
 
-  // function: validate
-  // purpose: validate the correctness of the config data
-  // returns false if there was a problem
-  public boolean validate() {
-    // does this config meet our validation standards?
-    boolean valid = true;
-
-    if (this.overvoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
-      valid = false;
-    } else if (this.tiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
-      valid = false;
-    } else if (
-      overvoteLabel() != null &&
-      overvoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
-      overvoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-    ) {
-      valid = false;
-    } else if (maxSkippedRanksAllowed() == null || maxSkippedRanksAllowed() < 0) {
-      valid = false;
-    } else if (maxRankingsAllowed() == null || maxRankingsAllowed() < 1) {
-      valid = false;
-    } else if (rawConfig.rules.batchElimination == null) {
-      valid = false;
-    }
-
-    // if continueTabulationUntilTwoCandidatesRemain is selected
-    // this must be a single-winner election
-    if (this.continueUntilTwoCandidatesRemain() && this.numberOfWinners() > 1) {
-      valid = false;
-    }
-
-    // if multi-seat is indicated we validate decimal count and rules style
-    //
-    if (this.numberOfWinners() > 1) {
-      if (this.decimalPlacesForVoteArithmetic() < 0 || this.decimalPlacesForVoteArithmetic() > 1000) {
-        valid = false;
-      }
-      if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
-        valid = false;
-      }
-    }
-    return valid;
-  }
-
   // function: overvoteRuleForConfigSetting
   // purpose: given setting String return the corresponding rules enum
   // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
-  public static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(String setting) {
+  private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(
+      String setting
+  ) {
     // rule: return value determined by input setting string
     Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
 
@@ -103,117 +59,11 @@ public class ElectionConfig {
     return rule;
   }
 
-
-  // function: numberWinners
-  // purpose: how many winners for this election
-  // returns from settings config or 1 of no setting is specified
-  public Integer numberOfWinners() {
-    return rawConfig.rules.numberOfWinners == null ? 1 : rawConfig.rules.numberOfWinners;
-  }
-
-  // function: mathContext
-  // purpose: getter for mathContext for vote tally arithmetic
-  // return: context for doing vote tally arithmetic to be used with BigDecimal
-  public MathContext mathContext() {
-    if (contextForVoteArithmetic == null) {
-      contextForVoteArithmetic = new MathContext(decimalPlacesForVoteArithmetic().intValue(), HALF_EVEN);
-    }
-    return contextForVoteArithmetic;
-  }
-
-  // function: decimalPlacesForVoteArithmetic
-  // purpose: how many places to round votes to after performing fractional vote transfers
-  // returns: number of places to round to or 0 if no setting is specified
-  public Integer decimalPlacesForVoteArithmetic() {
-    // w default to using 4 places for fractional transfer vote arithmetic
-    return rawConfig.rules.decimalPlacesForVoteArithmetic == null ? 4 :
-        rawConfig.rules.decimalPlacesForVoteArithmetic;
-  }
-
-  // function: multiSeatTransferRule
-  // purpose: which surplus transfer rule to use in multi-seat elections
-  // returns: enum indicating which transfer rule to use
-  public Tabulator.MultiSeatTransferRule multiSeatTransferRule() {
-    return multiSeatTransferRuleForConfigSetting( rawConfig.rules.multiSeatTransferRule );
-  }
-
-  // function: auditOutput
-  // purpose: getter for auditOutput
-  // returns: path to audit output file
-  public String auditOutput() {
-    return rawConfig.auditOutput;
-  }
-
-  // function: visualizerOutput
-  // purpose: getter for visualizerOutput
-  // returns: path to write visualizer output file
-  public String visualizerOutput() {
-    return rawConfig.visualizerOutput;
-  }
-
-  // function: continueTabulationUntilTwoCandidatesRemain
-  // purpose: getter for setting to keep tabulating beyond selecting winner till two candidates remain
-  // returns: whether to keep tabulating untill two candidates remain
-  public boolean continueUntilTwoCandidatesRemain() {
-    return rawConfig.rules.continueTabulationUntilTwoCandidatesRemain != null ?
-        rawConfig.rules.continueTabulationUntilTwoCandidatesRemain :
-        false;
-  }
-
-  // function: contestName
-  // purpose: getter for contestName
-  // returns: contest name
-  public String contestName() {
-    return rawConfig.contestName;
-  }
-
-  // function: jurisdiction
-  // purpose: getter for jurisdiction
-  // returns: jurisdiction name
-  public String jurisdiction() {
-    return rawConfig.jurisdiction;
-  }
-
-  // function: office
-  // purpose: getter for office
-  // returns: office name
-  public String office() {
-    return rawConfig.office;
-  }
-
-  // function: electionDate
-  // purpose: getter for electionDate
-  // returns: election date
-  public String electionDate() {
-    return rawConfig.date;
-  }
-
-  // function: maxRankingsAllowed
-  // purpose: getter for maxRankingsAllowed
-  // returns: max rankings allowed
-  public Integer maxRankingsAllowed() {
-    return rawConfig.rules.maxRankingsAllowed;
-  }
-
-  // function: description
-  // purpose: getter for description
-  // returns: description
-  public String description() {
-    return rawConfig.rules.description;
-  }
-
-  // function: batchElimination
-  // purpose: getter for batchElimination
-  // returns: true if we should use batch elimination
-  public boolean batchElimination() {
-    return rawConfig.rules.batchElimination;
-  }
-
   // function: overvoteRuleForConfigSetting
   // purpose: given setting String return the corresponding rules enum
   // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
-  static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
+  private static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
     // rule: return value determined by input setting string
     Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
 
@@ -246,7 +96,7 @@ public class ElectionConfig {
   // purpose: given setting string return corresponding rule enum
   // param: TieBreakMode setting string read from election config
   // returns: TieBreakMode enum value for the input setting string
-  static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
+  private static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
     // mode: return value determined by input setting string
     Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.MODE_UNKNOWN;
     switch (setting) {
@@ -268,14 +118,186 @@ public class ElectionConfig {
     return mode;
   }
 
+  // function: validate
+  // purpose: validate the correctness of the config data
+  // returns false if there was a problem
+  boolean validate() {
+    // does this config meet our validation standards?
+    boolean valid = true;
+
+    if (this.getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
+      valid = false;
+    } else if (this.getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
+      valid = false;
+    } else if (getOvervoteLabel() != null &&
+        getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
+        getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
+    ) {
+      valid = false;
+    } else if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
+      valid = false;
+    } else if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
+      valid = false;
+    } else if (rawConfig.rules.batchElimination == null) {
+      valid = false;
+    }
+
+    // if continueUntilTwoCandidatesRemain is selected
+    // this must be a single-winner election
+    if (this.continueUntilTwoCandidatesRemain() && this.getNumberOfWinners() > 1) {
+      valid = false;
+    }
+
+    // if multi-seat is indicated we validate decimal count and rules style
+    //
+    if (this.getNumberOfWinners() > 1) {
+      if (
+          this.getDecimalPlacesForVoteArithmetic() < 0 ||
+          this.getDecimalPlacesForVoteArithmetic() > 20
+      ) {
+        valid = false;
+      }
+      if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
+        valid = false;
+      }
+    }
+    return valid;
+  }
+
+  // function: getNumberWinners
+  // purpose: how many winners for this election
+  // returns from settings config or 1 of no setting is specified
+  Integer getNumberOfWinners() {
+    return rawConfig.rules.numberOfWinners == null ? 1 : rawConfig.rules.numberOfWinners;
+  }
+
+  // function: getDecimalPlacesForVoteArithmetic
+  // purpose: how many places to round votes to after performing fractional vote transfers
+  // returns: number of places to round to or 0 if no setting is specified
+  private Integer getDecimalPlacesForVoteArithmetic() {
+    // we default to using 4 places for fractional transfer vote arithmetic
+    return rawConfig.rules.decimalPlacesForVoteArithmetic == null ?
+        4 :
+        rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
+  // function: divide
+  // purpose: perform a division operation according to the config settings
+  // param: dividend is the numerator in the division operation
+  // param: divisor is the denominator in the division operation
+  // returns: the quotient
+  BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
+    return dividend.divide(divisor, getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
+  }
+
+  // function: roundDecimal
+  // purpose: round a number according to the config settings
+  // returns: the rounded value
+  BigDecimal roundDecimal(BigDecimal bd) {
+    return bd.setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
+  }
+
+  // function: multiSeatTransferRule
+  // purpose: which surplus transfer rule to use in multi-seat elections
+  // returns: enum indicating which transfer rule to use
+  private Tabulator.MultiSeatTransferRule multiSeatTransferRule() {
+    return multiSeatTransferRuleForConfigSetting(rawConfig.rules.multiSeatTransferRule);
+  }
+
+  // function: getOutputDirectory
+  // purpose: getter for outputDirectory
+  // returns: directory string
+  String getOutputDirectory() {
+    return rawConfig.outputDirectory;
+  }
+
+  // function: getAuditOutputFilename
+  // purpose: getter for auditOutputFilename
+  // returns: filename for audit output
+  String getAuditOutputFilename() {
+    return rawConfig.auditOutputFilename;
+  }
+
+  // function: getVisualizerOutputFilename
+  // purpose: getter for visualizerOutputFilename
+  // returns: filename for visualizer output
+  String getVisualizerOutputFilename() {
+    return rawConfig.visualizerOutputFilename;
+  }
+
+  // function: continueUntilTwoCandidatesRemain
+  // purpose: getter for setting to keep tabulating beyond selecting winner till two candidates remain
+  // returns: whether to keep tabulating untill two candidates remain
+  public boolean continueUntilTwoCandidatesRemain() {
+    return rawConfig.rules.continueUntilTwoCandidatesRemain != null ?
+        rawConfig.rules.continueUntilTwoCandidatesRemain :
+        false;
+  }
+
+  // function: contestName
+  // purpose: getter for contestName
+  // returns: contest name
+  String getContestName() {
+    return rawConfig.contestName;
+  }
+
+  // function: getJurisdiction
+  // purpose: getter for jurisdiction
+  // returns: jurisdiction name
+  String getJurisdiction() {
+    return rawConfig.jurisdiction;
+  }
+
+  // function: getOffice
+  // purpose: getter for office
+  // returns: office name
+  String getOffice() {
+    return rawConfig.office;
+  }
+
+  // function: electionDate
+  // purpose: getter for electionDate
+  // returns: election date
+  String getElectionDate() {
+    return rawConfig.date;
+  }
+
+  // function: isTabulateByPrecinctEnabled
+  // purpose: getter for tabulateByPrecinct
+  // returns: true if and only if we should tabulate by precinct
+  boolean isTabulateByPrecinctEnabled() {
+    return rawConfig.tabulateByPrecinct;
+  }
+
+  // function: getMaxRankingsAllowed
+  // purpose: getter for maxRankingsAllowed
+  // returns: max rankings allowed
+  Integer getMaxRankingsAllowed() {
+    return rawConfig.rules.maxRankingsAllowed;
+  }
+
+  // function: getDescription
+  // purpose: getter for description
+  // returns: description
+  String getDescription() {
+    return rawConfig.rules.description;
+  }
+
+  // function: isBatchEliminationEnabled
+  // purpose: getter for batchElimination
+  // returns: true if and only if we should use batch elimination
+  boolean isBatchEliminationEnabled() {
+    return rawConfig.rules.batchElimination;
+  }
+
   // function: numDeclaredCandidates
   // purpose: calculate the number of declared candidates from the election configuration
   // returns: the number of declared candidates from the election configuration
   public int numDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = candidateCodeList.size();
-    if (undeclaredWriteInLabel()!= null &&
-        candidateCodeList.contains(undeclaredWriteInLabel())) {
+    if (getUndeclaredWriteInLabel()!= null &&
+        candidateCodeList.contains(getUndeclaredWriteInLabel())) {
       num--;
     }
     return num;
@@ -288,82 +310,83 @@ public class ElectionConfig {
     return candidateCodeList.size();
   }
 
-  // function: overvoteRule
+
+  // function: getOvervoteRule
   // purpose: return overvote rule enum to use
   // returns: overvote rule to use for this config
-  public Tabulator.OvervoteRule overvoteRule() {
+  Tabulator.OvervoteRule getOvervoteRule() {
     // by default we exhaust immediately
     return rawConfig.rules.overvoteRule == null ?
-      Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY :
-      ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
+        Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY :
+        ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
   }
 
-  // function: minimumVoteThreshold
+  // function: getMinimumVoteThreshold
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use for this config
-  public BigDecimal minimumVoteThreshold() {
+  BigDecimal getMinimumVoteThreshold() {
     if (minimumVoteThreshold == null) {
       if (rawConfig.rules.minimumVoteThreshold == null) {
         minimumVoteThreshold = BigDecimal.ZERO;
       } else {
-        minimumVoteThreshold = new BigDecimal(rawConfig.rules.minimumVoteThreshold.intValue());
+        minimumVoteThreshold = new BigDecimal(rawConfig.rules.minimumVoteThreshold);
       }
     }
     return minimumVoteThreshold;
   }
 
-  // function: maxSkippedRanksAllowed
+  // function: getMaxSkippedRanksAllowed
   // purpose: getter for maxSkippedRanksAllowed rule
   // returns: max skipped ranks allowed in this config
-  public Integer maxSkippedRanksAllowed() {
+  Integer getMaxSkippedRanksAllowed() {
     return rawConfig.rules.maxSkippedRanksAllowed;
   }
 
-  // function: undeclaredWriteInLabel
+  // function: getUndeclaredWriteInLabel
   // purpose: getter for UWI label
   // returns: overvote rule for this config
-  public String undeclaredWriteInLabel() {
+  String getUndeclaredWriteInLabel() {
     return rawConfig.rules.undeclaredWriteInLabel;
   }
 
-  // function: overvoteLabel
+  // function: getOvervoteLabel
   // purpose: getter for overvote label rule
   // returns: overvote label for this config
-  public String overvoteLabel() {
+  String getOvervoteLabel() {
     return rawConfig.rules.overvoteLabel;
   }
 
-  // function: undervoteLabel
+  // function: getUndervoteLabel
   // purpose: getter for undervote label
   // returns: undervote label for this config
-  public String undervoteLabel() {
+  String getUndervoteLabel() {
     return rawConfig.rules.undervoteLabel;
   }
 
-  // function: tiebreakMode
+  // function: getTiebreakMode
   // purpose: return tiebreak mode to use
   // returns: tiebreak mode to use for this config
-  public Tabulator.TieBreakMode tiebreakMode() {
+  Tabulator.TieBreakMode getTiebreakMode() {
     // by default we use random tiebreak
     return rawConfig.rules.tiebreakMode == null ?
-      Tabulator.TieBreakMode.RANDOM :
-      ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
+        Tabulator.TieBreakMode.RANDOM :
+        ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
   }
 
-  // function: treatBlankAsUWI
+  // function: isTreatBlankAsUWIEnabled
   // purpose: getter for treatBlankAsUWI rule
   // returns: return true if we are to treat blank cell as UWI
-  public boolean treatBlankAsUWI() {
+  boolean isTreatBlankAsUWIEnabled() {
     // by default we do not treat blank as UWI
     return rawConfig.rules.treatBlankAsUwi == null ?
-      false :
-      rawConfig.rules.treatBlankAsUwi;
+        false :
+        rawConfig.rules.treatBlankAsUwi;
   }
 
   // function: getCandidateCodeList
   // purpose: return list of candidate codes for this config
   // returns: return list of candidate codes for this config
-  public List<String> getCandidateCodeList() {
+  List<String> getCandidateCodeList() {
     return candidateCodeList;
   }
 
@@ -371,7 +394,7 @@ public class ElectionConfig {
   // purpose: lookup full candidate name given a candidate ID
   // param: candidateID the ID of the candidate whose name we want to lookup
   // returns: the full name for the given candidateID
-  public String getNameForCandidateID(String candidateID) {
+  String getNameForCandidateID(String candidateID) {
     return candidateCodeToNameMap.get(candidateID);
   }
 
