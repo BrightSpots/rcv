@@ -234,7 +234,7 @@ class ElectionConfig {
         false;
   }
 
-  // function: contestName
+  // function: getContestName
   // purpose: getter for contestName
   // returns: contest name
   String getContestName() {
