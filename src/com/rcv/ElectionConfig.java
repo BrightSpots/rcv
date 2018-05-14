@@ -142,6 +142,12 @@ class ElectionConfig {
       valid = false;
     }
 
+    // if continueUntilTwoCandidatesRemain is selected
+    // this must be a single-winner election
+    if (this.continueUntilTwoCandidatesRemain() && this.getNumberOfWinners() > 1) {
+      valid = false;
+    }
+
     // if multi-seat is indicated we validate decimal count and rules style
     //
     if (this.getNumberOfWinners() > 1) {
@@ -219,6 +225,15 @@ class ElectionConfig {
     return rawConfig.visualizerOutputFilename;
   }
 
+  // function: continueUntilTwoCandidatesRemain
+  // purpose: getter for setting to keep tabulating beyond selecting winner till two candidates remain
+  // returns: whether to keep tabulating untill two candidates remain
+  public boolean continueUntilTwoCandidatesRemain() {
+    return rawConfig.rules.continueUntilTwoCandidatesRemain != null ?
+        rawConfig.rules.continueUntilTwoCandidatesRemain :
+        false;
+  }
+
   // function: getContestName
   // purpose: getter for contestName
   // returns: contest name
@@ -275,18 +290,26 @@ class ElectionConfig {
     return rawConfig.rules.batchElimination;
   }
 
-  // function: getNumCandidates
+  // function: numDeclaredCandidates
   // purpose: calculate the number of declared candidates from the election configuration
   // returns: the number of declared candidates from the election configuration
-  int getNumCandidates() {
+  public int numDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = candidateCodeList.size();
-    if (getUndeclaredWriteInLabel() != null &&
+    if (getUndeclaredWriteInLabel()!= null &&
         candidateCodeList.contains(getUndeclaredWriteInLabel())) {
       num--;
     }
     return num;
   }
+
+  // function: numCandidates
+  // purpose: return number of candidates including UWIs as a candidate if they are in use
+  // num will contain the resulting number of candidates
+  public int numCandidates() {
+    return candidateCodeList.size();
+  }
+
 
   // function: getOvervoteRule
   // purpose: return overvote rule enum to use

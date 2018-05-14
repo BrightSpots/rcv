@@ -534,7 +534,7 @@ class ResultsWriter {
         {"Tally detail", null, OutputType.STRING},
         {"Single-winner/multi-winner", electionType, OutputType.STRING},
         {"Number to be elected", config.getNumberOfWinners(), OutputType.INT},
-        {"Number of candidates", config.getNumCandidates(), OutputType.INT},
+        {"Number of declared candidates", config.numDeclaredCandidates(), OutputType.INT},
         {"Number of votes cast", totalActiveVotesFirstRound.toString(), OutputType.STRING},
         {"Undervotes", 0, OutputType.INT},
         {"Total # of rounds", totalActiveVotesPerRound.size(), OutputType.INT},

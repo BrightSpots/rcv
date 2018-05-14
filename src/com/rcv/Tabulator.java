@@ -115,7 +115,7 @@ class Tabulator {
   //  this is the high-level control of the tabulation algorithm
   void tabulate() {
     log("Beginning tabulation for contest.");
-    log("There are %d candidates for this contest:", config.getNumCandidates());
+    log("There are %d declared candidates for this contest:", config.numDeclaredCandidates());
     // string indexes over all candidate IDs to log them
     for (String candidateID : candidateIDs) {
       log("%s", candidateID);
@@ -127,11 +127,13 @@ class Tabulator {
       this.candidateIDs.add(config.getUndeclaredWriteInLabel());
     }
 
-    // Loop until we've found our winner(s). At each iteration, we'll either a) identify one or more
+    // Loop until we've found our winner(s) unless using
+    // continueUntilTwoCandidatesRemain in which case loop until only two candidates remain
+    // At each iteration, we'll either a) identify one or more
     // winners and transfer their votes to the remaining candidates (if we still need to find more
     // winners), or b) eliminate one or more candidates and gradually transfer votes to the
     // remaining candidates.
-    while (winnerToRound.size() < config.getNumberOfWinners()) {
+    while (shouldContinueTabulating()) {
       currentRound++;
       log("Round: %d", currentRound);
 
@@ -235,6 +237,36 @@ class Tabulator {
     return config.divide(currentRoundTotalVotes, divisor);
   }
 
+  // purpose: determine if we should continue tabulating based on how many winners have been
+  // selected and if continueUntilTwoCandidatesRemain flag is in use.
+  // return: true if we should continue tabulating
+  private boolean shouldContinueTabulating() {
+    // how many candidates have already been eliminated
+    int eliminatedCandidates = candidateToRoundEliminated.keySet().size();
+    // how many winners have been selected
+    int winners = winnerToRound.size();
+    
+    if(config.continueUntilTwoCandidatesRemain()) {
+      return (eliminatedCandidates + winners) < config.numCandidates();
+    } else {
+      return winners < config.getNumberOfWinners();
+    }
+  }
+  
+  // function: isCandidateContinuing
+  // purpose: returns true if candidate is continuing with respect to tabulation
+  // this handles continued tabulation after a winner has been chosen for the
+  // continueUntilTwoCandidatesRemain setting
+  // returns: true if we should continue tabulating
+  private Boolean isCandidateContinuing(String candidate) {
+    CandidateStatus status = getCandidateStatus(candidate);
+    return(status == CandidateStatus.CONTINUING ||
+        (status == CandidateStatus.WINNER && config.continueUntilTwoCandidatesRemain()));
+  }
+
+  // function: getCandidateStatus
+  // purpose: returns candidate status (continuing, eliminated or winner)
+  // returns: candidate status
   private CandidateStatus getCandidateStatus(String candidate) {
     CandidateStatus status = CandidateStatus.CONTINUING;
     if (winnerToRound.containsKey(candidate)) {
@@ -242,7 +274,6 @@ class Tabulator {
     } else if (candidateToRoundEliminated.containsKey(candidate)) {
       status = CandidateStatus.ELIMINATED;
     }
-
     return status;
   }
 
@@ -530,7 +561,7 @@ class Tabulator {
       List<String> continuingAtThisRank = new LinkedList<>();
       // candidateID indexes over all candidate IDs in this ranking set
       for (String candidateID : candidateIDSet) {
-        if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
+        if (isCandidateContinuing(candidateID)) {
           continuingAtThisRank.add(candidateID);
         }
       }
@@ -576,7 +607,7 @@ class Tabulator {
       // iterate through all candidateIDs in the set
       for (String candidateID : candidateIDSet) {
         // see if the candidate has been eliminated
-        if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
+        if (isCandidateContinuing(candidateID)) {
           foundContinuingCandidate = true;
           break;
         }
@@ -659,7 +690,7 @@ class Tabulator {
         // candidateID indexes through all candidates selected at this rank
         for (String candidateID : candidateIDSet) {
           // skip non-continuing candidates
-          if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
+          if (isCandidateContinuing(candidateID)) {
             // If this fails, it means the code failed to handle an overvote with multiple
             // continuing candidates.
             assert selectedCandidateID == null;
@@ -708,7 +739,7 @@ class Tabulator {
     Map<String, BigDecimal> tally = new HashMap<>();
     // initialize tallies to 0 for all continuing candidates
     for (String candidateID : candidateIDs) {
-      if (getCandidateStatus(candidateID) == CandidateStatus.CONTINUING) {
+      if (isCandidateContinuing(candidateID)) {
         tally.put(candidateID, BigDecimal.ZERO);
       }
     }
