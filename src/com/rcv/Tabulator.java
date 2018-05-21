@@ -146,14 +146,15 @@ class Tabulator {
       BigDecimal winningThresholdThisRound = getThreshold(currentRoundCandidateToTally);
 
       // currentRoundTallyToCandidates is a sorted map from tally to candidate(s) with that tally.
-      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates = buildTallyToCandidates(
-          currentRoundCandidateToTally,
-          currentRoundCandidateToTally.keySet(),
-          true
-      );
+      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates =
+          buildTallyToCandidates(
+              currentRoundCandidateToTally,
+              currentRoundCandidateToTally.keySet(),
+              true
+          );
       // see if a winner is determined in this iteration
-      List<String> winners = identifyWinners(currentRoundCandidateToTally,
-          currentRoundTallyToCandidates);
+      List<String> winners =
+          identifyWinners(currentRoundCandidateToTally, currentRoundTallyToCandidates);
 
       if (winners.size() > 0) {
         for (String winner : winners) {
@@ -170,9 +171,7 @@ class Tabulator {
             BigDecimal surplusFraction = config.divide(extraVotes, candidateVotes);
             for (CastVoteRecord cvr : castVoteRecords) {
               if (winner.equals(cvr.getCurrentRecipientOfVote())) {
-                cvr.setFractionalTransferValue(
-                    config.roundDecimal(cvr.getFractionalTransferValue().multiply(surplusFraction))
-                );
+                cvr.recordCurrentRecipientAsWinner(surplusFraction);
               }
             }
           }
@@ -205,6 +204,70 @@ class Tabulator {
         // store the losers
         for (String loser : eliminated) {
           candidateToRoundEliminated.put(loser, currentRound);
+        }
+      }
+
+      // TODO: avoid recomputing these every round (since they should be static for a given
+      // candidate once that candidate has won)?
+      updatePastWinnerTallies();
+    }
+  }
+
+  // function: updateWinnerTallies
+  // purpose: Update the tally for the just-completed round to reflect the tallies for candidates
+  // who won in a past round (in a multi-winner election). We do this because the regular tally
+  // logic only considers continuing candidates, so it won't assign any votes to past winners -- but
+  // in reality they continue to hold their winning margins for the rest of the rounds, so we need
+  // to fill in those values here.
+  private void updatePastWinnerTallies() {
+    // pastWinners contains winners from rounds that preceded the current round
+    Set<String> pastWinners = new HashSet<>();
+    for (String winner : winnerToRound.keySet()) {
+      // skip someone who won in the current round, because we already have that tally filled in
+      if (winnerToRound.get(winner) < currentRound) {
+        pastWinners.add(winner);
+      }
+    }
+
+    // initialize main tally
+    // roundTally is the main tally
+    Map<String, BigDecimal> roundTally = roundTallies.get(currentRound);
+    for (String pastWinner : pastWinners) {
+      roundTally.put(pastWinner, BigDecimal.ZERO);
+    }
+
+    // initialize precinct tallies
+    if (config.isTabulateByPrecinctEnabled()) {
+      for (String precinct : precinctRoundTallies.keySet()) {
+        // this is all the tallies for the given precinct
+        Map<Integer, Map<String, BigDecimal>> roundTalliesForPrecinct =
+            precinctRoundTallies.get(precinct);
+        // and this is the tally for the current round for the precinct
+        Map<String, BigDecimal> roundTallyForPrecinct = roundTalliesForPrecinct.get(currentRound);
+        for (String pastWinner : pastWinners) {
+          roundTallyForPrecinct.put(pastWinner, BigDecimal.ZERO);
+        }
+      }
+    }
+
+    // process all the CVRs
+    for (CastVoteRecord cvr : castVoteRecords) {
+      // the record of winners who got partial votes from this CVR
+      Map<String, BigDecimal> winnerToFractionalValue = cvr.getWinnerToFractionalValue();
+      for (String winner : winnerToFractionalValue.keySet()) {
+        if (!pastWinners.contains(winner)) {
+          continue; // this is someone who just won this round, so we can skip them
+        }
+        // the fractional value we should use when incrementing
+        BigDecimal fractionalTransferValue = winnerToFractionalValue.get(winner);
+        incrementTally(roundTally, fractionalTransferValue, winner);
+        for (String precinct : precinctRoundTallies.keySet()) {
+          // all the tallies for the given precinct
+          Map<Integer, Map<String, BigDecimal>> roundTalliesForPrecinct =
+              precinctRoundTallies.get(precinct);
+          // the tally for the current round for the precinct
+          Map<String, BigDecimal> roundTallyForPrecinct = roundTalliesForPrecinct.get(currentRound);
+          incrementTally(roundTallyForPrecinct, fractionalTransferValue, winner);
         }
       }
     }
@@ -241,7 +304,7 @@ class Tabulator {
     // how many winners have been selected
     int winners = winnerToRound.size();
 
-    if(config.continueUntilTwoCandidatesRemain()) {
+    if (config.continueUntilTwoCandidatesRemain()) {
       return (eliminatedCandidates + winners) < config.getNumCandidates();
     } else {
       return winners < config.getNumberOfWinners();
@@ -255,8 +318,8 @@ class Tabulator {
   // returns: true if we should continue tabulating
   private Boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
-    return(status == CandidateStatus.CONTINUING ||
-        (status == CandidateStatus.WINNER && config.continueUntilTwoCandidatesRemain()));
+    return status == CandidateStatus.CONTINUING ||
+        (status == CandidateStatus.WINNER && config.continueUntilTwoCandidatesRemain());
   }
 
   // function: getCandidateStatus
@@ -644,7 +707,7 @@ class Tabulator {
       }
       // if this CVR has no continuing candidate exhaust it
       if (!hasContinuingCandidates(cvr.rankToCandidateIDs)) {
-        cvr.exhaust(currentRound, "no continuing candidates");
+        cvr.exhaust("no continuing candidates");
         continue;
       }
 
@@ -663,11 +726,11 @@ class Tabulator {
         // overvoteDecision is the overvote decision for this ranking
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidateIDSet);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          cvr.exhaust(currentRound, "overvote");
+          cvr.exhaust("overvote");
           break;
         } else if (overvoteDecision == OvervoteDecision.IGNORE) {
           // description of the overvote decision
-          cvr.addRoundOutcome(VoteOutcomeType.IGNORED, "overvote");
+          cvr.addRoundOutcome(VoteOutcomeType.IGNORED, "overvote", null);
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           continue;
@@ -676,7 +739,7 @@ class Tabulator {
         // check for an undervote
         if ((config.getMaxSkippedRanksAllowed() != null) &&
             (rank - lastRank > config.getMaxSkippedRanksAllowed() + 1)) {
-          cvr.exhaust(currentRound, "undervote");
+          cvr.exhaust("undervote");
           break;
         }
 
@@ -691,16 +754,27 @@ class Tabulator {
             assert selectedCandidateID == null;
             // we found a continuing candidate, so increase their tally by 1
             selectedCandidateID = candidateID;
-            cvr.addRoundOutcome(VoteOutcomeType.COUNTED, selectedCandidateID);
-            // Increment the tally for this candidate by the fractional transfer value of the CVR.
-            // (By default the FTV is exactly one vote, but it could be less than one in a multi-
-            // winner election if this CVR already helped elect a winner.)
+            // the FTV for this cast vote record (by default the FTV is exactly one vote, but it
+            // could be less in a multi-winner election if this CVR already helped elect a winner.)
+            BigDecimal fractionalTransferValue = cvr.getFractionalTransferValue();
+            cvr.addRoundOutcome(
+                VoteOutcomeType.COUNTED,
+                selectedCandidateID,
+                fractionalTransferValue
+            );
 
-            incrementTally(roundTally, cvr, selectedCandidateID);
+            // Increment the tally for this candidate by the fractional transfer value of the CVR.
+            incrementTally(roundTally, fractionalTransferValue, selectedCandidateID);
+            // We set this in case we need to redistribute votes if this is a multi-winner race and
+            // this candidate wins, but there are still more winners to come.
             cvr.setCurrentRecipientOfVote(selectedCandidateID);
 
             if (config.isTabulateByPrecinctEnabled() && cvr.getPrecinct() != null) {
-              incrementTally(roundTallyByPrecinct.get(cvr.getPrecinct()), cvr, selectedCandidateID);
+              incrementTally(
+                  roundTallyByPrecinct.get(cvr.getPrecinct()),
+                  fractionalTransferValue,
+                  selectedCandidateID
+              );
             }
           }
         }
@@ -748,13 +822,13 @@ class Tabulator {
   // param: selectedCandidateID is the candidate this CVR's vote is going to in this round
   private void incrementTally(
       Map<String, BigDecimal> tally,
-      CastVoteRecord cvr,
+      BigDecimal fractionalTransferValue,
       String selectedCandidateID
   ) {
     // current tally for this candidate
     BigDecimal currentTally = tally.get(selectedCandidateID);
     // new tally after adding this vote
-    BigDecimal newTally = currentTally.add(cvr.getFractionalTransferValue());
+    BigDecimal newTally = currentTally.add(fractionalTransferValue);
     tally.put(selectedCandidateID, newTally);
   }
 
