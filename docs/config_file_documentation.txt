@@ -1,48 +1,144 @@
-This document lists the parameters that can be included in a config file. Required parameters are denoted with an asterisk (*).
-- *auditOutput: the filename for the audit file that the program will create. Example: portland_2015_mayor_audit_log.txt
-- *candidates: a list of the candidates who appear in the cast vote records. Each candidate must have a name. If the cast vote records use candidate codes, each candidate must also have a code.
-- contestName: the name of the election. Example: Portland Mayoral Race
-- *cvrFileSources: a list of the cast vote record source files. Each file must have three fields:
-  - *filePath: the location of the file. Example: test/2015-portland-mayor-cvr.xlsx
-  - *firstVoteColumnIndex: the index of the column that contains each ballot’s top-ranked candidate. Example: 3
-  - precinctColumnIndex: the index of the column that contains each ballot's precinct name. Example: 2
-  - *provider: the voting machine format of the file. Example: ES&S
-- date: the date of the election. Example: 2015-11-03
-- jurisdiction: the jurisdiction in which this election is being contested. Example: Portland, ME
-- office: the office being contested. Example: Mayor
-- outputDirectory: the directory where all output files should be saved. Example: portland_2015_output (defaults to the current directory)
-- *rules: a set of options that determine exactly how the program should implement the instant runoff.
-  - *batchElimination: whether batch elimination should be used. Valid options: true, false.
-  - decimalPlacesForVoteArithmetic: how many places after the decimal to use in rounding for fractional vote transfer arithmetic in multi-winner elections. (defaults to 4)
-  - description: the name of the set of the rules. Example: Maine Rules
-  - *maxRankingsAllowed: the maximum number of candidates that a ballot is allowed to rank. Example: 15
-  - *maxSkippedRanksAllowed: the maximum number of skipped ranks (i.e. undervotes) on a ballot before the ballot should be considered exhausted. Example: 1
-  - minimumVoteThreshold: the minimum number of votes a candidate must receive in the first round to avoid automatic elimination. Example: 150
-  - multiSeatTransferRule: how to handle vote transfers. Required if numberOfWinners is more than 1. Valid options: transferFractionalSurplus, transferWholeSurplus.
-  - numberOfWinners: the number of seats to be won in this election. (defaults to 1)
-  - overvoteLabel: the special label used in the cast vote records to denote an overvote. Example: OVERVOTE (Note: if this parameter is present, overvoteRule must be set to either alwaysSkipToNextRank or exhaustImmediately.)
-  - *overvoteRule: how the program should handle an overvote when it encounters one. Valid options: alwaysSkipToNextRank, exhaustImmediately, exhaustIfAnyContinuing, ignoreIfAnyContinuing, exhaustIfMultipleContinuing, ignoreIfMultipleContinuing.
-  - *tiebreakMode: how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round. Valid options: random, interactive, previousRoundCountsThenRandom, previousRoundCountsThenInteractive.
-  - undeclaredWriteInLabel: the special label used in the cast vote records to denote a vote for an undeclared write-in. Example: UWI
-  - undervoteLabel: the special label used in the cast vote records to denote an undervote. Example: UNDERVOTE
-  - continueUntilTwoCandidatesRemain:
-    keep tabulating beyond selecting winner until only two candidates remain.
-      used to provide additional context for the strength of support for the winner.
-    only valid for single-winner contests
-    default: FALSE
+This document lists the parameters that can be included in a config file suitable for input tabulation.
+Config file must be valid JSON format.  Examples can be found under the test folder.
 
-- *candidates: a list of the candidates who appear in the cast vote records. Each candidate must have a name. If the cast vote records use candidate codes, each candidate must also have a code.
-- *cvrFileSources: a list of the cast vote record source files. Each file must have three fields:
-  - *provider: the voting machine format of the file. Example: ES&S
-  - *filePath: the location of the file. Example: test/2015-portland-mayor-cvr.xlsx
-  - *firstVoteColumnIndex: the index of the column that contains each ballot’s top-ranked candidate. Example: 3
--- multi-seat:
-  - if numberOfWinners is specified AND it is more than 1 this will be a multi-seat tabulation
-  - numberOfWinners: Integer how many winners will be picked in this elections
-  - for multi-seat you must specify a multiSeatTransferRule
-  - multiSeatTransferRule: must be either "transferFractionalSurplus" or "transferWholeSurplus"
-    currently we only support "transferFractionalSurplus"
-  - decimalPlacesForVoteArithmetic: how many places to do rounding when computing the size of
-    fractional vote transfers.  Optional.  Defaults to 4 places.
-- tabulateByPrecinct: whether the tabulator should generate a results spreadsheet for each precinct. (defaults to false)
-- *visualizerOutput: the filename for the Excel spreadsheet with a summary of the results that the program will create. Example: portland_2015_mayor_visualizer.xlsx
+  "contestName" required
+   the name of the contest
+   used for naming output files (visualizer and audit)
+   Example: "Portland Mayoral Race 2017"
+   value: text string of length [1..1000]
+
+  "outputDirectory" required
+   directory for output files (visualizer and audit)
+   example: /Path/To/TabulatorResults
+   value: string of length [1..1000]
+
+  "candidates" required
+   List of registered candidate names and associated candidate code
+   each "candidates" list item has the following parameters:
+
+    "name" required
+    full name of the registered candidate
+    Example: "Duson, Jill C."
+    value: string of length [1..1000]
+
+    "code" optional
+    candidate code which may appear in CVRs in lieu of full candidate name
+    Example: "JCD"
+    value: string of length [1..1000]
+
+  "date:" optional
+    date of the contest
+    used for visualizer output only (not used in tabulation)
+    Example: "2015-11-03"
+    value: text string of length [1..1000]
+
+  "jurisdiction" optional
+    text description of the jurisdiction of this contest
+    used for visualizer output only (not used in tabulation)
+    Example: "Portland, ME"
+    value: text string of length [1..1000]
+
+  "office" optional
+    text description of the office being contested
+    used for visualizer output only (not used in tabulation)
+    Example: "Mayor"
+    value: text string of length [1..1000]
+
+  "cvrFileSources" required
+    list of input CVR file paths and their associated parameters
+    Each "cvrFileSources" list item contains the following parameters:
+
+      "filePath" required
+       location of the CVR file
+       Example: /Users/test/2015-portland-mayor-cvr.xlsx
+       value: string of length [1..1000]
+
+      "firstVoteColumnIndex" required
+       index of the column that contains ballot top-ranked candidate
+       example: 3
+       value: [0..1000]
+
+       "provider" optional
+       text description of the vendor / machine which generated this file -- not used by the tabulator
+       Example: "ES&S"
+
+      "precinctColumnIndex" required if "tabulateByPrecinct" is in use
+       the index of the column that contains ballot precinct name
+       example: 2
+       value: [0..1000]
+
+
+  "batchElimination" required
+    should tabulator use batch elimination should be used.
+    value: true false
+
+  "description" optional
+    text description of this rules configuration for organizing your config files -- not used by the tabulator
+    Example "Maine Rules"
+    value: string of length [1..1000]
+
+  "maxRankingsAllowed" required
+     maximum number of candidates that a ballot is allowed to rank
+     Example: 15
+     values: [1..100]
+
+  "maxSkippedRanksAllowed" required
+     maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
+     Example: 1
+     value: [1..100]
+
+  "minimumVoteThreshold" optional
+     the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
+     Example: 150
+     value: [1..10000]
+
+  "overvoteLabel" optional
+     label used in the CVR to denote an overvote
+     Example: "OVERVOTE"
+     if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately"
+    value: string of length [1..1000]
+
+  "overvoteRule" required
+    how the program should handle an overvote when it encounters one
+    value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfAnyContinuing" | "ignoreIfAnyContinuing" | "exhaustIfMultipleContinuing" | "ignoreIfMultipleContinuing"
+
+  "undervoteLabel" optional
+    the special label used in the cast vote records to denote an undervote
+    Example: "UNDERVOTE"
+    value: string of length [1..1000]
+
+  "tiebreakMode" required
+    how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round.
+    value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive"
+
+  "undeclaredWriteInLabel" optional
+    the special label used in the cast vote records to denote a vote for an undeclared write-in.
+    Example: "UWI"
+    value: string of length [1..1000]
+
+  "numberOfWinners" required
+    the number of seats to be won in this election
+    value: [1..1000]
+    default: 1
+
+  "multiSeatTransferRule" required for multi seat contests
+    how to handle vote transfers
+    value: transferFractionalSurplus | transferWholeSurplus
+    transferWholeSurplus not yet implemented
+
+  "decimalPlacesForVoteArithmetic" optional
+    rounding decimal places when computing fractional vote transfers and winning thresholds
+    valid in multi seat contests with fractional vote transfer
+    value: [0..10]
+    default: 4
+
+  "continueUntilTwoCandidatesRemain" optional
+    instruct tabulator to keep tabulating (beyond winning round) until only two candidates remain
+    valid for single winner contests
+    value: true | false
+    default: false
+
+  "tabulateByPrecinct" optional
+    instructs tabulator to generate a results spreadsheet for each precinct
+    value: true | false
+    default: false
