@@ -715,12 +715,31 @@ class Tabulator {
       // this is used to determine how many skipped rankings occurred in the case of
       // undervotes
       int lastRank = 0;
-      // loop over all rankings in this CVR from most preferred to least and see how they will
-      // be rendered
+      // candidatesSeen is the set of candidates we've encountered while processing this CVR
+      // in this round; only relevant if exhaustOnDuplicateCandidate is enabled
+      Set<String> candidatesSeen = new HashSet<>();
+      // loop over all rankings in this CVR from most preferred to least until we reach a decision
       // rank iterates through all ranks in this CVR ranking set
       for (int rank : cvr.rankToCandidateIDs.keySet()) {
         // candidateIDSet is all candidates selected at the current rank
         Set<String> candidateIDSet = cvr.rankToCandidateIDs.get(rank);
+
+        // possibly check for a duplicate candidate
+        if (config.isExhaustOnDuplicateCandidateEnabled()) {
+          // the identity of the duplicate candidate, if found
+          String duplicateCandidate = null;
+          for (String candidate : candidateIDSet) {
+            if (candidatesSeen.contains(candidate)) {
+              duplicateCandidate = candidate;
+              break; // finding one duplicate is enough
+            }
+            candidatesSeen.add(candidate);
+          }
+          if (duplicateCandidate != null) {
+            cvr.exhaust("duplicate candidate: " + duplicateCandidate);
+            break;
+          }
+        }
 
         // check for an overvote
         // overvoteDecision is the overvote decision for this ranking

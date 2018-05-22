@@ -2,39 +2,39 @@ This document lists the parameters that can be included in a config file suitabl
 Config file must be valid JSON format.  Examples can be found under the test folder.
 
   "contestName" required
-   the name of the contest
-   used for naming output files (visualizer and audit)
-   Example: "Portland Mayoral Race 2017"
-   value: text string of length [1..1000]
+    the name of the contest
+    used for naming output files (visualizer and audit)
+    Example: "Portland Mayoral Race 2017"
+    value: text string of length [1..1000]
 
   "outputDirectory" required
-   directory for output files (visualizer and audit)
-   example: /Path/To/TabulatorResults
-   value: string of length [1..1000]
+    directory for output files (visualizer and audit)
+    example: /Path/To/TabulatorResults
+    value: string of length [1..1000]
 
   "auditOutputFilename" required
-   filename for audit log
-   example: portland_audit.txt
-   value: text string
-  
+    filename for audit log
+    example: portland_audit.txt
+    value: text string
+
   "visualizerOutputFilename" required
-   filename for visualizer output spreadsheet
-   example: portland_visualizer.xlsx
-   value: text string
+    filename for visualizer output spreadsheet
+    example: portland_visualizer.xlsx
+    value: text string
 
   "candidates" required
-   List of registered candidate names and associated candidate code
-   each "candidates" list item has the following parameters:
+    List of registered candidate names and associated candidate code
+    each "candidates" list item has the following parameters:
 
     "name" required
-    full name of the registered candidate
-    Example: "Duson, Jill C."
-    value: string of length [1..1000]
+      full name of the registered candidate
+      Example: "Duson, Jill C."
+      value: string of length [1..1000]
 
     "code" optional
-    candidate code which may appear in CVRs in lieu of full candidate name
-    Example: "JCD"
-    value: string of length [1..1000]
+      candidate code which may appear in CVRs in lieu of full candidate name
+      Example: "JCD"
+      value: string of length [1..1000]
 
   "date:" optional
     date of the contest
@@ -64,41 +64,42 @@ Config file must be valid JSON format.  Examples can be found under the test fol
     Each "cvrFileSources" list item contains the following parameters:
 
       "filePath" required
-       location of the CVR file
-       Example: /Users/test/2015-portland-mayor-cvr.xlsx
-       value: string of length [1..1000]
+        location of the CVR file
+        Example: /Users/test/2015-portland-mayor-cvr.xlsx
+        value: string of length [1..1000]
 
       "firstVoteColumnIndex" required
-       index of the column that contains ballot top-ranked candidate
-       example: 3
-       value: [0..1000]
-
-       "provider" optional
-       text description of the vendor / machine which generated this file -- not used by the tabulator
-       Example: "ES&S"
+        index of the column that contains ballot top-ranked candidate
+        example: 3
+        value: [0..1000]
 
       "precinctColumnIndex" required if "tabulateByPrecinct" is in use
-       the index of the column that contains ballot precinct name
-       example: 2
-       value: [0..1000]
+        the index of the column that contains ballot precinct name
+        example: 2
+        value: [0..1000]
+
+      "provider" optional
+        text description of the vendor / machine which generated this file -- not used by the tabulator
+        Example: "ES&S"
 
   "rules" required
     set of configuration parameters that specify the tabulation rules
     The "rules" section contains the following parameters:
 
-      "batchElimination" required
-        should tabulator use batch elimination should be used.
+      "batchElimination" optional
+        should tabulator use batch elimination
         value: true false
+        default: false
 
       "continueUntilTwoCandidatesRemain" optional
-        instruct tabulator to keep tabulating (beyond winning round) until only two candidates remain
-        valid for single winner contests
+        should tabulator keep tabulating (beyond winning round) until only two candidates remain
+        valid only for single winner contests
         value: true | false
         default: false
 
       "decimalPlacesForVoteArithmetic" optional
-        rounding decimal places when computing fractional vote transfers and winning thresholds
-        valid in multi seat contests with fractional vote transfer
+        number of rounding decimal places when computing fractional vote transfers and winning thresholds
+        valid in multi-seat contests with fractional vote transfer
         value: [0..10]
         default: 4
 
@@ -107,49 +108,59 @@ Config file must be valid JSON format.  Examples can be found under the test fol
         Example "Maine Rules"
         value: string of length [1..1000]
 
+      "exhaustOnDuplicateCandidate" optional
+        should tabulator exhaust a ballot when it encounters a duplicate candidate (instead of just skipping the duplicate)
+        value: true | false
+        default: false
+
       "maxRankingsAllowed" required
-         maximum number of candidates that a ballot is allowed to rank
-         Example: 15
-         values: [1..100]
+        maximum number of candidates that a ballot is allowed to rank
+        Example: 15
+        values: [1..100]
 
       "maxSkippedRanksAllowed" required
-         maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
-         Example: 1
-         value: [1..100]
+        maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
+        Example: 1
+        value: [0..100]
 
       "minimumVoteThreshold" optional
-         the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
-         Example: 150
-         value: [1..10000]
+        the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
+        Example: 150
+        value: [1..10000]
 
       "multiSeatTransferRule" required for multi-seat contests
         how to handle vote transfers
         value: transferFractionalSurplus | transferWholeSurplus
         transferWholeSurplus not yet implemented
 
-      "numberOfWinners" required
+      "numberOfWinners" optional
         the number of seats to be won in this election
         value: [1..1000]
         default: 1
 
       "overvoteLabel" optional
-         label used in the CVR to denote an overvote
-         Example: "OVERVOTE"
-         if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately"
+        label used in the CVR to denote an overvote
+        Example: "OVERVOTE"
+        if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately"
         value: string of length [1..1000]
 
       "overvoteRule" required
         how the program should handle an overvote when it encounters one
         value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfAnyContinuing" | "ignoreIfAnyContinuing" | "exhaustIfMultipleContinuing" | "ignoreIfMultipleContinuing"
 
+      "tiebreakMode" required
+        how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round.
+        value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive"
+
+      "treatBlankAsUndeclaredWriteIn" required
+        should tabulator interpret a blank cell in a CVR as a vote for an undeclared write-in
+        value: true | false
+        default: false
+
       "undervoteLabel" optional
         the special label used in the cast vote records to denote an undervote
         Example: "UNDERVOTE"
         value: string of length [1..1000]
-
-      "tiebreakMode" required
-        how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round.
-        value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive"
 
       "undeclaredWriteInLabel" optional
         the special label used in the cast vote records to denote a vote for an undeclared write-in.
