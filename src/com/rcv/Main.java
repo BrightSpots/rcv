@@ -14,9 +14,11 @@
 package com.rcv;
 
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 class Main {
@@ -26,6 +28,17 @@ class Main {
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
+
+    // create execution logger in current working directory
+    String workingDir = System.getProperty("user.dir");
+    // rcv.log is our execution log file name
+    String logPath = Paths.get(workingDir, "rcv.log").toString();
+    try {
+      Logger.addLogger(logPath, true);
+    } catch (IOException exception) {
+      System.err.print(String.format("Failed to start system logging:%s", exception.toString()));
+    }
+
     if (args.length == 0) {
       // if no args provided, assume user wants to use the GUI
       System.out.println("No arguments provided; starting GUI...");
@@ -74,25 +87,6 @@ class Main {
             )
         );
       }
-
-      // logPath is where we'll write the log file
-      String logPath =
-          FileUtils.buildPath(config.getOutputDirectory(), config.getAuditOutputFilename());
-
-      try {
-        Logger.setup(logPath);
-        Logger.log("Parsed config file: %s", configPath);
-        Logger.log("Logging to: %s", logPath);
-      } catch (IOException exception) {
-        encounteredError = true;
-        System.err.print(
-            String.format(
-                "Failed to configure logging output to file: %s\n%s",
-                logPath,
-                exception.toString()
-            )
-        );
-      }
     }
 
     // TODO: confiog.validate() should log specific errors
@@ -111,26 +105,52 @@ class Main {
   // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
   static String executeTabulation(ElectionConfig config) {
-    // Read cast vote records from CVR files
-    // castVoteRecords will contain all cast vote records parsed by the reader
-    List<CastVoteRecord> castVoteRecords;
-    // String indicating whether or not execution was successful
+
+    // String indicating user message
     String response = "Tabulation successful!";
+    // Boolean indicating tabulation success
+    Boolean encounteredError = false;
+    // current date-time formatted as a string used for creating unique output files names
+    String timestampString = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(new Date());
+    // create audit log file name
+    String logFileName = String.format("%s_audit.log", timestampString);
+    // audit log path
+    String auditLogPath = Paths.get(config.getOutputDirectory(), logFileName).toString();
     try {
-      // parse the cast vote records
-      castVoteRecords = parseCastVoteRecords(config);
-      // tabulator for tabulation logic
-      Tabulator tabulator = new Tabulator(castVoteRecords, config);
-      // do the tabulation
-      tabulator.tabulate();
-      // generate visualizer spreadsheet data
-      tabulator.generateSummarySpreadsheet();
-      // generate audit data
-      tabulator.doAudit(castVoteRecords);
-    } catch (Exception exception) {
-      response = String.format("ERROR during tabulation: %s", exception.toString());
-      Logger.log(response);
+      // audit logger
+      Logger.addLogger(auditLogPath, false);
+    } catch (IOException exception) {
+      // error message for user and log
+      String errorMessage =
+        String.format("Failed to configure audit logger:%s", exception.toString());
+      Logger.log(errorMessage);
+      response = errorMessage;
+      encounteredError = true;
     }
+
+    if(!encounteredError) {
+      // Read cast vote records from CVR files
+      // castVoteRecords will contain all cast vote records parsed by the reader
+      List<CastVoteRecord> castVoteRecords;
+      try {
+        // parse the cast vote records
+        castVoteRecords = parseCastVoteRecords(config);
+        // tabulator for tabulation logic
+        Tabulator tabulator = new Tabulator(castVoteRecords, config);
+        // do the tabulation
+        tabulator.tabulate();
+
+        // generate visualizer spreadsheet data
+        tabulator.generateSummarySpreadsheet(timestampString);
+        // generate audit data
+        tabulator.doAudit(castVoteRecords);
+      } catch (Exception exception) {
+        response = String.format("ERROR during tabulation: %s", exception.toString());
+        Logger.log(response);
+      }
+    }
+
+    Logger.removeLogger(auditLogPath);
     // TODO: Redesign this later so as not to return a user-facing status string
     return response;
   }

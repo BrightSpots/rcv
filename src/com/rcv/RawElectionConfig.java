@@ -16,10 +16,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawElectionConfig {
 
-  // filename for audit output
-  public String auditOutputFilename;
-  // filename for visualizer output
-  public String visualizerOutputFilename;
   // directory for output files
   public String outputDirectory;
 

@@ -9,7 +9,9 @@
 package com.rcv;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -18,14 +20,16 @@ import java.util.logging.LogRecord;
 
 class Logger {
 
-  // Logger object this class wraps
-  private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger("RCV");
+  // Logger objects this class wraps
+  static private HashMap<String, java.util.logging.Logger> loggers = new HashMap<>();
 
   // function: log
   // purpose: log output to console and audit file
   // param: msg the message to be logged to console and audit file
   static void log(String msg) {
-    logger.info(msg);
+    for(java.util.logging.Logger logger : loggers.values()) {
+      logger.info(msg);
+    }
   }
 
   // function: log
@@ -33,32 +37,77 @@ class Logger {
   // format: format string into which object params will be formatted
   // param: obj object to be parsed into format string
   static void log(String format, Object... obj) {
-    logger.info(String.format(format, obj));
+    for(java.util.logging.Logger logger : loggers.values()) {
+      logger.info(String.format(format, obj));
+    }
   }
 
-  // function: setup
-  // purpose: initialize logging module
-  // param: file_output_path: File path for audit output
-  // file access: write (existing file will be overwritten)
-  // throws: IOException if unable to open file_output_path
-  static void setup(String file_output_path) throws IOException {
-    // specifies how logging output lines should appear
-    LogFormatter formatter = new LogFormatter();
-    // controls logging file output filters
-    FileHandler fileHandler = new FileHandler(file_output_path);
-    fileHandler.setFormatter(formatter);
-    // controls logging console output filters
-    ConsoleHandler consoleHandler = new ConsoleHandler();
-    consoleHandler.setFormatter(formatter);
-    // remove any existing handlers to prevent duplicate logging
-    for (Handler h : logger.getHandlers()) {
-      logger.removeHandler(h);
+  // function: removeLogger
+  // purpose: remove an existing logger object
+  // param: loggerOutputPath the logger was created with
+  static void removeLogger(String loggerOutputPath) {
+  	// get or create the logger
+    java.util.logging.Logger logger = loggers.get(loggerOutputPath);
+    if(logger != null) {
+    	// iterate through all handlers and remove them
+      for(Handler handler : logger.getHandlers()) {
+        logger.removeHandler(handler);
+        // if handler is a file handler flush and close it
+        if(handler instanceof FileHandler) {
+          FileHandler fileHandler = (FileHandler)handler;
+          fileHandler.flush();
+          fileHandler.close();
+        }
+      }
+    } else {
+      Logger.log("Couldn't remove logger:%s",loggerOutputPath);
     }
-    // add new handlers
-    logger.addHandler(consoleHandler);
-    logger.addHandler(fileHandler);
-    logger.setUseParentHandlers(false);
   }
+
+
+  // function: addLogger
+  // purpose: create and add a new logger object
+  // param: loggerOutputPath: file path for logging output
+  // param: logToConsole: weather to log to console or not
+  // file access: write (existing file will be overwritten)
+  // throws: IOException if unable to open loggerOutputPath
+  static void addLogger(String loggerOutputPath, Boolean logToConsole) throws IOException {
+    java.util.logging.Logger logger = loggers.get(loggerOutputPath);
+    if(logger != null) {
+      Logger.log("Logger has already been added:%s",loggerOutputPath);
+    } else {
+
+      // specifies how logging output lines should appear
+      LogFormatter formatter = new LogFormatter();
+
+      // get or create the logger
+      logger = java.util.logging.Logger.getLogger(loggerOutputPath);
+      // remove any existing handlers to prevent duplicate logging
+      for (Handler h : logger.getHandlers()) {
+        logger.removeHandler(h);
+      }
+
+      // add handlers
+      if(logToConsole) {
+        // create new handler for console logging and add it
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setFormatter(formatter);
+        logger.addHandler(consoleHandler);
+      }
+
+      // create new handler for file logging and add it
+      FileHandler fileHandler = new FileHandler(loggerOutputPath);
+      fileHandler.setFormatter(formatter);
+      logger.addHandler(fileHandler);
+
+      // dont log to default logger
+      logger.setUseParentHandlers(false);
+
+      // add to cache for later removal
+      loggers.put(loggerOutputPath, logger);
+    }
+  }
+
 
   // custom LogFormatter class for log output string formatting
   // extends the default logging Formatter class

@@ -448,14 +448,16 @@ class Tabulator {
 
   // function: generateSummarySpreadsheet
   // purpose: create a ResultsWriter object with the tabulation results data and use it
-  //  to generate the results spreadsheets
-  void generateSummarySpreadsheet() {
+  // to generate the results spreadsheets
+  // param: timestamp string to use when creating output filenames
+  void generateSummarySpreadsheet(String timestamp) {
     // writer object will create the output xls
     ResultsWriter writer = new ResultsWriter().
         setNumRounds(currentRound).
         setCandidatesToRoundEliminated(candidateToRoundEliminated).
         setWinnerToRound(winnerToRound).
-        setElectionConfig(config);
+        setElectionConfig(config).
+        setTimestamp(timestamp);
 
     writer.generateOverallSummarySpreadsheet(roundTallies);
 

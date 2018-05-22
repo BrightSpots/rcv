@@ -205,23 +205,12 @@ class ElectionConfig {
 
   // function: getOutputDirectory
   // purpose: getter for outputDirectory
-  // returns: directory string
+  // returns: directory string or falls back to working directory
   String getOutputDirectory() {
-    return rawConfig.outputDirectory;
-  }
-
-  // function: getAuditOutputFilename
-  // purpose: getter for auditOutputFilename
-  // returns: filename for audit output
-  String getAuditOutputFilename() {
-    return rawConfig.auditOutputFilename;
-  }
-
-  // function: getVisualizerOutputFilename
-  // purpose: getter for visualizerOutputFilename
-  // returns: filename for visualizer output
-  String getVisualizerOutputFilename() {
-    return rawConfig.visualizerOutputFilename;
+    if(rawConfig.outputDirectory != null) {
+      return rawConfig.outputDirectory;
+    }
+    return System.getProperty("user.dir");
   }
 
   // function: continueUntilTwoCandidatesRemain

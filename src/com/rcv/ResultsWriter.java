@@ -12,6 +12,7 @@ package com.rcv;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,6 +45,8 @@ class ResultsWriter {
   private Map<Integer, List<String>> roundToWinningCandidates;
   // configuration file in use for this election
   private ElectionConfig config;
+  // timestamp string to use when generating output file names
+  private String timestamp;
 
   // function: setNumRounds
   // purpose: setter for total number of rounds
@@ -99,13 +102,27 @@ class ResultsWriter {
     return this;
   }
 
+  // function: setTimestamp
+  // purpose: setter for timestamp string used for creating output file names
+  // param: timestamp string to use for creating output file names
+  ResultsWriter setTimestamp(String timestamp) {
+    this.timestamp = timestamp;
+    return this;
+  }
+
+
   // function: generateOverallSummarySpreadsheet
   // purpose: creates a summary spreadsheet for the full election
   // param: roundTallies is the round-by-round count of votes per candidate
   void generateOverallSummarySpreadsheet(
       Map<Integer, Map<String, BigDecimal>> roundTallies
   ) {
-    generateSummarySpreadsheet(roundTallies, null, config.getVisualizerOutputFilename());
+    // filename for output
+    String outputFileName = String.format("%s.xlsx", this.timestamp);
+    // full path for output
+    String outputPath = Paths.get(config.getOutputDirectory(), outputFileName ).toString();
+    // generate the spreadsheet
+    generateSummarySpreadsheet(roundTallies, null, outputPath);
   }
 
   // function: generatePrecinctSummarySpreadsheet
@@ -116,12 +133,17 @@ class ResultsWriter {
   ) {
     Set<String> filenames = new HashSet<>();
     for (String precinct : precinctRoundTallies.keySet()) {
-      // filename is the path to write the output file
-      String filename = getPrecinctFilename(precinct, filenames) + ".xlsx";
+      // precinctFileString is a unique filesystem-safe string which can be used for creating
+      // the precinct output filename
+      String precinctFileString = getPrecinctFileString(precinct, filenames);
+      // filename for output
+      String outputFileName = String.format("%s_%s.xlsx", this.timestamp, precinctFileString);
+      // full path for output
+      String outputPath = Paths.get(config.getOutputDirectory(), outputFileName).toString();
       generateSummarySpreadsheet(
           precinctRoundTallies.get(precinct),
           precinct,
-          filename
+          outputPath
       );
     }
   }
@@ -130,12 +152,12 @@ class ResultsWriter {
   // purpose: creates a summary spreadsheet .xlsx file
   // param: roundTallies is the round-by-count count of votes per candidate
   // param: precinct indicates which precinct we're reporting results for (null means all)
-  // param: outputFilename is the name of the file to save
+  // param: outputPath is the full path of the file to save
   // file access: write / create
   private void generateSummarySpreadsheet(
       Map<Integer, Map<String, BigDecimal>> roundTallies,
       String precinct,
-      String outputFilename
+      String outputPath
   ) {
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
@@ -413,8 +435,6 @@ class ResultsWriter {
     }
 
     // write xls to disk
-    // outputPath is the full path to write to
-    String outputPath = FileUtils.buildPath(config.getOutputDirectory(), outputFilename);
     try {
       // output stream is used to write data to disk
       FileOutputStream outputStream = new FileOutputStream(outputPath);
@@ -604,12 +624,12 @@ class ResultsWriter {
     return sortedCandidates;
   }
 
-  // function: getPrecinctFilename
-  // purpose: return a unique, valid filename for this precinct's spreadsheet
+  // function: getPrecinctFileString
+  // purpose: return a unique, valid string for this precinct's output spreadsheet filename
   // param: precinct is the name of the precinct
   // param: filenames is the set of filenames we've already generated
   // return: the new filename
-  private String getPrecinctFilename(String precinct, Set<String> filenames) {
+  private String getPrecinctFileString(String precinct, Set<String> filenames) {
     // sanitized is the precinct name with all special characters converted to underscores
     String sanitized = precinct.replaceAll("[^a-zA-Z0-9._\\-]+", "_");
     // filename is the string that we'll eventually return
