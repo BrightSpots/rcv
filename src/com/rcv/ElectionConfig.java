@@ -205,12 +205,14 @@ class ElectionConfig {
 
   // function: getOutputDirectory
   // purpose: getter for outputDirectory
-  // returns: directory string or falls back to working directory
+  // returns: directory string from config or falls back to working directory
   String getOutputDirectory() {
-    if(rawConfig.outputDirectory != null) {
-      return rawConfig.outputDirectory;
+    // outputDirectory is where output files should be written
+    String outputDirectory = System.getProperty("user.dir");
+    if (rawConfig.outputDirectory != null) {
+      outputDirectory = rawConfig.outputDirectory;
     }
-    return System.getProperty("user.dir");
+    return outputDirectory;
   }
 
   // function: continueUntilTwoCandidatesRemain

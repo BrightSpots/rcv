@@ -241,7 +241,7 @@ class Tabulator {
     // how many winners have been selected
     int winners = winnerToRound.size();
 
-    if(config.continueUntilTwoCandidatesRemain()) {
+    if (config.continueUntilTwoCandidatesRemain()) {
       return (eliminatedCandidates + winners) < config.getNumCandidates();
     } else {
       return winners < config.getNumberOfWinners();
@@ -253,7 +253,7 @@ class Tabulator {
   // this handles continued tabulation after a winner has been chosen for the
   // continueUntilTwoCandidatesRemain setting
   // returns: true if we should continue tabulating
-  private Boolean isCandidateContinuing(String candidate) {
+  private boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
     return(status == CandidateStatus.CONTINUING ||
         (status == CandidateStatus.WINNER && config.continueUntilTwoCandidatesRemain()));

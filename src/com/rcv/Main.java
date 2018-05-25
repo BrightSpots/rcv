@@ -28,7 +28,6 @@ class Main {
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
-
     // create execution logger in current working directory
     String workingDir = System.getProperty("user.dir");
     // rcv.log is our execution log file name
@@ -108,8 +107,8 @@ class Main {
 
     // String indicating user message
     String response = "Tabulation successful!";
-    // Boolean indicating tabulation success
-    Boolean encounteredError = false;
+    // flag indicating tabulation success
+    boolean encounteredError = false;
     // current date-time formatted as a string used for creating unique output files names
     String timestampString = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(new Date());
     // create audit log file name
@@ -128,7 +127,7 @@ class Main {
       encounteredError = true;
     }
 
-    if(!encounteredError) {
+    if (!encounteredError) {
       // Read cast vote records from CVR files
       // castVoteRecords will contain all cast vote records parsed by the reader
       List<CastVoteRecord> castVoteRecords;
@@ -145,6 +144,7 @@ class Main {
         // generate audit data
         tabulator.doAudit(castVoteRecords);
       } catch (Exception exception) {
+        encounteredError = true;
         response = String.format("ERROR during tabulation: %s", exception.toString());
         Logger.log(response);
       }

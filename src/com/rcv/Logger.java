@@ -21,7 +21,7 @@ import java.util.logging.LogRecord;
 class Logger {
 
   // Logger objects this class wraps
-  static private HashMap<String, java.util.logging.Logger> loggers = new HashMap<>();
+  private static HashMap<String, java.util.logging.Logger> loggers = new HashMap<>();
 
   // function: log
   // purpose: log output to console and audit file
@@ -48,12 +48,12 @@ class Logger {
   static void removeLogger(String loggerOutputPath) {
   	// get or create the logger
     java.util.logging.Logger logger = loggers.get(loggerOutputPath);
-    if(logger != null) {
+    if (logger != null) {
     	// iterate through all handlers and remove them
       for(Handler handler : logger.getHandlers()) {
         logger.removeHandler(handler);
         // if handler is a file handler flush and close it
-        if(handler instanceof FileHandler) {
+        if (handler instanceof FileHandler) {
           FileHandler fileHandler = (FileHandler)handler;
           fileHandler.flush();
           fileHandler.close();
@@ -71,12 +71,11 @@ class Logger {
   // param: logToConsole: weather to log to console or not
   // file access: write (existing file will be overwritten)
   // throws: IOException if unable to open loggerOutputPath
-  static void addLogger(String loggerOutputPath, Boolean logToConsole) throws IOException {
+  static void addLogger(String loggerOutputPath, boolean logToConsole) throws IOException {
     java.util.logging.Logger logger = loggers.get(loggerOutputPath);
-    if(logger != null) {
+    if (logger != null) {
       Logger.log("Logger has already been added:%s",loggerOutputPath);
     } else {
-
       // specifies how logging output lines should appear
       LogFormatter formatter = new LogFormatter();
 
@@ -88,7 +87,7 @@ class Logger {
       }
 
       // add handlers
-      if(logToConsole) {
+      if (logToConsole) {
         // create new handler for console logging and add it
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setFormatter(formatter);
@@ -100,7 +99,7 @@ class Logger {
       fileHandler.setFormatter(formatter);
       logger.addHandler(fileHandler);
 
-      // dont log to default logger
+      // don't log to default logger
       logger.setUseParentHandlers(false);
 
       // add to cache for later removal
