@@ -1,0 +1,28 @@
+{
+  "auditOutputFilename":"duplicate_test_audit_log.txt",
+  "visualizerOutputFilename":"duplicate_test_visualizer.xlsx",
+  "contestName":"Duplicate test",
+  "jurisdiction":"Funkytown, USA",
+  "office":"Director of Produce",
+  "date":"2018-05-21",
+  "rules": {
+    "description":"Doyle Rules",
+    "exhaustOnDuplicateCandidate":true,
+    "maxRankingsAllowed":3,
+    "overvoteRule":"alwaysSkipToNextRank",
+    "maxSkippedRanksAllowed":null,
+    "tiebreakMode":"random"
+  },
+  "candidates": [
+    {"name": "Banana"},
+    {"name": "Kumquat"},
+    {"name": "Durian"}
+  ],
+  "cvrFileSources": [
+    {
+      "provider": "ES&S",
+      "filePath": "test/duplicate-test-cvr.xlsx",
+      "firstVoteColumnIndex": 1
+    }
+  ]
+}

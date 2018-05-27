@@ -183,7 +183,7 @@ class Tabulator {
         // Four mutually exclusive ways to eliminate candidates.
 
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
-        eliminated = dropUWI(currentRoundCandidateToTally);
+        eliminated = dropUndeclaredWriteIns(currentRoundCandidateToTally);
         // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
         if (eliminated.isEmpty()) {
           eliminated = dropCandidatesBelowThreshold(currentRoundTallyToCandidates);
@@ -304,7 +304,7 @@ class Tabulator {
     // how many winners have been selected
     int winners = winnerToRound.size();
 
-    if (config.continueUntilTwoCandidatesRemain()) {
+    if (config.willContinueUntilTwoCandidatesRemain()) {
       return (eliminatedCandidates + winners) < config.getNumCandidates();
     } else {
       return winners < config.getNumberOfWinners();
@@ -319,7 +319,7 @@ class Tabulator {
   private Boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING ||
-        (status == CandidateStatus.WINNER && config.continueUntilTwoCandidatesRemain());
+        (status == CandidateStatus.WINNER && config.willContinueUntilTwoCandidatesRemain());
   }
 
   // function: getCandidateStatus
@@ -368,11 +368,13 @@ class Tabulator {
     return selectedWinners;
   }
 
-  // function: dropUWI
+  // function: dropUndeclaredWriteIns
   // purpose: eliminate all undeclared write in candidates
   // param: currentRoundCandidateToTally map of candidate IDs to their tally for a given round
   // returns: eliminated candidates
-  private List<String> dropUWI(Map<String, BigDecimal> currentRoundCandidateToTally) {
+  private List<String> dropUndeclaredWriteIns(
+      Map<String, BigDecimal> currentRoundCandidateToTally
+  ) {
     List<String> eliminated = new LinkedList<>();
     // undeclared label
     String label = config.getUndeclaredWriteInLabel();
@@ -715,12 +717,30 @@ class Tabulator {
       // this is used to determine how many skipped rankings occurred in the case of
       // undervotes
       int lastRank = 0;
-      // loop over all rankings in this CVR from most preferred to least and see how they will
-      // be rendered
-      // rank iterates through all ranks in this CVR ranking set
+      // candidatesSeen is the set of candidates we've encountered while processing this CVR
+      // in this round; only relevant if exhaustOnDuplicateCandidate is enabled
+      Set<String> candidatesSeen = new HashSet<>();
+      // rank iterates over all ranks in this CVR ranking set, from most preferred to least
       for (int rank : cvr.rankToCandidateIDs.keySet()) {
         // candidateIDSet is all candidates selected at the current rank
         Set<String> candidateIDSet = cvr.rankToCandidateIDs.get(rank);
+
+        // possibly check for a duplicate candidate
+        if (config.isExhaustOnDuplicateCandidateEnabled()) {
+          // the identity of the duplicate candidate, if found
+          String duplicateCandidate = null;
+          for (String candidate : candidateIDSet) {
+            if (candidatesSeen.contains(candidate)) {
+              duplicateCandidate = candidate;
+              break; // finding one duplicate is enough
+            }
+            candidatesSeen.add(candidate);
+          }
+          if (duplicateCandidate != null) {
+            cvr.exhaust("duplicate candidate: " + duplicateCandidate);
+            break;
+          }
+        }
 
         // check for an overvote
         // overvoteDecision is the overvote decision for this ranking

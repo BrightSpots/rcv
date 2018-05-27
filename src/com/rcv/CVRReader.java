@@ -24,7 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 class CVRReader {
 
   // container for all CastVoteRecords parsed from the input file
-  public final List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+  final List<CastVoteRecord> castVoteRecords = new ArrayList<>();
 
   // purpose: helper function to wrap file IO with error handling
   // param: excelFilePath path to file for parsing
@@ -57,7 +57,7 @@ class CVRReader {
   // param: allowableRanks how many ranks are allowed for each cast vote record
   // param: candidateIDs list of all declared candidate IDs
   // param: config an ElectionConfig object specifying rules for interpreting CVR file data
-  public void parseCVRFile(
+  void parseCVRFile(
       String excelFilePath,
       int firstVoteColumnIndex,
       Integer precinctColumnIndex,
@@ -134,7 +134,7 @@ class CVRReader {
         String candidate;
         if (cvrDataCell == null) {
           // empty cells are sometimes treated as undeclared write-ins (Portland / ES&S)
-          if (config.isTreatBlankAsUWIEnabled()) {
+          if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
             candidate = config.getUndeclaredWriteInLabel();
             Logger.log("Empty cell -- treating as UWI");
           } else {
@@ -171,5 +171,4 @@ class CVRReader {
     }
     // parsing complete
   }
-
 }
