@@ -304,7 +304,7 @@ class Tabulator {
     // how many winners have been selected
     int winners = winnerToRound.size();
 
-    if (config.continueUntilTwoCandidatesRemain()) {
+    if (config.willContinueUntilTwoCandidatesRemain()) {
       return (eliminatedCandidates + winners) < config.getNumCandidates();
     } else {
       return winners < config.getNumberOfWinners();
@@ -319,7 +319,7 @@ class Tabulator {
   private Boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING ||
-        (status == CandidateStatus.WINNER && config.continueUntilTwoCandidatesRemain());
+        (status == CandidateStatus.WINNER && config.willContinueUntilTwoCandidatesRemain());
   }
 
   // function: getCandidateStatus
@@ -718,8 +718,7 @@ class Tabulator {
       // candidatesSeen is the set of candidates we've encountered while processing this CVR
       // in this round; only relevant if exhaustOnDuplicateCandidate is enabled
       Set<String> candidatesSeen = new HashSet<>();
-      // loop over all rankings in this CVR from most preferred to least until we reach a decision
-      // rank iterates through all ranks in this CVR ranking set
+      // rank iterates over all ranks in this CVR ranking set, from most preferred to least
       for (int rank : cvr.rankToCandidateIDs.keySet()) {
         // candidateIDSet is all candidates selected at the current rank
         Set<String> candidateIDSet = cvr.rankToCandidateIDs.get(rank);

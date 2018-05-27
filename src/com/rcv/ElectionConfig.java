@@ -141,7 +141,7 @@ class ElectionConfig {
 
     // if continueUntilTwoCandidatesRemain is selected
     // this must be a single-winner election
-    if (this.continueUntilTwoCandidatesRemain() && this.getNumberOfWinners() > 1) {
+    if (this.willContinueUntilTwoCandidatesRemain() && this.getNumberOfWinners() > 1) {
       valid = false;
     }
 
@@ -222,10 +222,10 @@ class ElectionConfig {
     return rawConfig.visualizerOutputFilename;
   }
 
-  // function: continueUntilTwoCandidatesRemain
+  // function: willContinueUntilTwoCandidatesRemain
   // purpose: getter for setting to keep tabulating beyond selecting winner till two candidates remain
   // returns: whether to keep tabulating untill two candidates remain
-  boolean continueUntilTwoCandidatesRemain() {
+  boolean willContinueUntilTwoCandidatesRemain() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
 

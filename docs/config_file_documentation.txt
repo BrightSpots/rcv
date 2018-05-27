@@ -4,7 +4,7 @@ Config file must be valid JSON format.  Examples can be found under the test fol
   "contestName" required
     the name of the contest
     used for naming output files (visualizer and audit)
-    Example: "Portland Mayoral Race 2017"
+    example: "Portland Mayoral Race 2017"
     value: text string of length [1..1000]
 
   "outputDirectory" required
@@ -28,34 +28,38 @@ Config file must be valid JSON format.  Examples can be found under the test fol
 
     "name" required
       full name of the registered candidate
-      Example: "Duson, Jill C."
+      example: "Duson, Jill C."
       value: string of length [1..1000]
 
     "code" optional
       candidate code which may appear in CVRs in lieu of full candidate name
-      Example: "JCD"
+      example: "JCD"
       value: string of length [1..1000]
+      default: none
 
   "date:" optional
     date of the contest
     used for visualizer output only (not used in tabulation)
-    Example: "2015-11-03"
+    example: "2015-11-03"
     value: text string of length [1..1000]
+    default: none
 
   "jurisdiction" optional
     text description of the jurisdiction of this contest
     used for visualizer output only (not used in tabulation)
-    Example: "Portland, ME"
+    example: "Portland, ME"
     value: text string of length [1..1000]
+    default: none
 
   "office" optional
     text description of the office being contested
     used for visualizer output only (not used in tabulation)
-    Example: "Mayor"
+    example: "Mayor"
     value: text string of length [1..1000]
+    default: none
 
   "tabulateByPrecinct" optional
-    instructs tabulator to generate a results spreadsheet for each precinct
+    tabulator will generate a results spreadsheet for each precinct
     value: true | false
     default: false
 
@@ -65,7 +69,7 @@ Config file must be valid JSON format.  Examples can be found under the test fol
 
       "filePath" required
         location of the CVR file
-        Example: /Users/test/2015-portland-mayor-cvr.xlsx
+        example: /Users/test/2015-portland-mayor-cvr.xlsx
         value: string of length [1..1000]
 
       "firstVoteColumnIndex" required
@@ -80,20 +84,20 @@ Config file must be valid JSON format.  Examples can be found under the test fol
 
       "provider" optional
         text description of the vendor / machine which generated this file -- not used by the tabulator
-        Example: "ES&S"
+        example: "ES&S"
+        default: none
 
   "rules" required
     set of configuration parameters that specify the tabulation rules
     The "rules" section contains the following parameters:
 
       "batchElimination" optional
-        should tabulator use batch elimination
-        value: true false
+        tabulator will use batch elimination (only valid for single-winner contests)
+        value: true | false
         default: false
 
       "continueUntilTwoCandidatesRemain" optional
-        should tabulator keep tabulating (beyond winning round) until only two candidates remain
-        valid only for single winner contests
+        tabulator will keep tabulating (beyond winning round) until only two candidates remain (only valid for single-winner contests)
         value: true | false
         default: false
 
@@ -107,26 +111,28 @@ Config file must be valid JSON format.  Examples can be found under the test fol
         text description of this rules configuration for organizing your config files -- not used by the tabulator
         Example "Maine Rules"
         value: string of length [1..1000]
+        default: none
 
       "exhaustOnDuplicateCandidate" optional
-        should tabulator exhaust a ballot when it encounters a duplicate candidate (instead of just skipping the duplicate)
+        tabulator will exhaust a ballot when it encounters a duplicate candidate (instead of just skipping the duplicate)
         value: true | false
         default: false
 
       "maxRankingsAllowed" required
         maximum number of candidates that a ballot is allowed to rank
-        Example: 15
+        example: 15
         values: [1..100]
 
       "maxSkippedRanksAllowed" required
         maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
-        Example: 1
+        example: 1
         value: [0..100]
 
       "minimumVoteThreshold" optional
         the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
-        Example: 150
+        example: 150
         value: [1..10000]
+        default: 0
 
       "multiSeatTransferRule" required for multi-seat contests
         how to handle vote transfers
@@ -139,10 +145,10 @@ Config file must be valid JSON format.  Examples can be found under the test fol
         default: 1
 
       "overvoteLabel" optional
-        label used in the CVR to denote an overvote
-        Example: "OVERVOTE"
-        if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately"
+        label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately"
+        example: "OVERVOTE"
         value: string of length [1..1000]
+        default: none
 
       "overvoteRule" required
         how the program should handle an overvote when it encounters one
@@ -153,16 +159,18 @@ Config file must be valid JSON format.  Examples can be found under the test fol
         value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive"
 
       "treatBlankAsUndeclaredWriteIn" required
-        should tabulator interpret a blank cell in a CVR as a vote for an undeclared write-in
+        tabulator will interpret a blank cell in a CVR as a vote for an undeclared write-in
         value: true | false
         default: false
 
       "undervoteLabel" optional
         the special label used in the cast vote records to denote an undervote
-        Example: "UNDERVOTE"
+        example: "UNDERVOTE"
         value: string of length [1..1000]
+        default: none
 
       "undeclaredWriteInLabel" optional
         the special label used in the cast vote records to denote a vote for an undeclared write-in.
-        Example: "UWI"
+        example: "UWI"
         value: string of length [1..1000]
+        default: none
