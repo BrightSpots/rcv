@@ -183,7 +183,7 @@ class Tabulator {
         // Four mutually exclusive ways to eliminate candidates.
 
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
-        eliminated = dropUWI(currentRoundCandidateToTally);
+        eliminated = dropUndeclaredWriteIns(currentRoundCandidateToTally);
         // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
         if (eliminated.isEmpty()) {
           eliminated = dropCandidatesBelowThreshold(currentRoundTallyToCandidates);
@@ -368,11 +368,13 @@ class Tabulator {
     return selectedWinners;
   }
 
-  // function: dropUWI
+  // function: dropUndeclaredWriteIns
   // purpose: eliminate all undeclared write in candidates
   // param: currentRoundCandidateToTally map of candidate IDs to their tally for a given round
   // returns: eliminated candidates
-  private List<String> dropUWI(Map<String, BigDecimal> currentRoundCandidateToTally) {
+  private List<String> dropUndeclaredWriteIns(
+      Map<String, BigDecimal> currentRoundCandidateToTally
+  ) {
     List<String> eliminated = new LinkedList<>();
     // undeclared label
     String label = config.getUndeclaredWriteInLabel();

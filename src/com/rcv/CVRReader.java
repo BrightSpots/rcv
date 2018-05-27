@@ -134,7 +134,7 @@ class CVRReader {
         String candidate;
         if (cvrDataCell == null) {
           // empty cells are sometimes treated as undeclared write-ins (Portland / ES&S)
-          if (config.isTreatBlankAsUWIEnabled()) {
+          if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
             candidate = config.getUndeclaredWriteInLabel();
             Logger.log("Empty cell -- treating as UWI");
           } else {

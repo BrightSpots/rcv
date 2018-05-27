@@ -367,10 +367,10 @@ class ElectionConfig {
         ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
   }
 
-  // function: isTreatBlankAsUWIEnabled
-  // purpose: getter for treatBlankAsUWI rule
+  // function: isTreatBlankAsUndeclaredWriteInEnabled
+  // purpose: getter for treatBlankAsUndeclaredWriteIn rule
   // returns: return true if we are to treat blank cell as UWI
-  boolean isTreatBlankAsUWIEnabled() {
+  boolean isTreatBlankAsUndeclaredWriteInEnabled() {
     return rawConfig.treatBlankAsUndeclaredWriteIn;
   }
 
