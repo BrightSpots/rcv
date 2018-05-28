@@ -114,10 +114,11 @@ class Main {
     try {
       // audit logger
       Logger.addTabulationFileLogging(auditLogPath);
+      Logger.info("Logging tabulation to: %s", auditLogPath);
     } catch (IOException exception) {
       // error message for user and log
       String errorMessage =
-        String.format("Failed to configure audit logger:%s", exception.toString());
+        String.format("Failed to configure tabulation logger:%s", exception.toString());
       Logger.severe(errorMessage);
       response = errorMessage;
       encounteredError = true;
@@ -140,11 +141,10 @@ class Main {
         tabulator.doAudit(castVoteRecords);
       } catch (Exception exception) {
         encounteredError = true;
-        response = String.format("ERROR during tabulation: %s", exception.toString());
-        Logger.severe(response);
+        Logger.severe("ERROR during tabulation: %s", exception.toString());
       }
     }
-
+    Logger.info("Done logging tabulation to %s", auditLogPath);
     Logger.removeTabulationFileLogging();
     // TODO: Redesign this later so as not to return a user-facing status string
     return response;
