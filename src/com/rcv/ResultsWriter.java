@@ -442,7 +442,7 @@ class ResultsWriter {
       outputStream.close();
     } catch (IOException e) {
       e.printStackTrace();
-      Logger.log("failed to write " + outputPath + " to disk!");
+      Logger.severe("failed to write " + outputPath + " to disk!");
     }
   }
 

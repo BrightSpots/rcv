@@ -129,7 +129,7 @@ class RcvGui {
         // path to config file
         String configPath = fc.getSelectedFile().getAbsolutePath();
         config = Main.loadElectionConfig(configPath);
-        Logger.log("Tabulator is being used via the GUI.");
+        Logger.info("Tabulator is being used via the GUI.");
         if (config == null) {
           printToTextStatus(String.format("ERROR: Unable to load config file: %s", configPath));
         } else {

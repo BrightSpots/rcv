@@ -12,9 +12,7 @@ package com.rcv;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,7 +51,7 @@ class ElectionConfig {
         rule = Tabulator.MultiSeatTransferRule.TRANSFER_WHOLE_SURPLUS;
         break;
       default:
-        Logger.log("Unrecognized MultiSeatTransferRule setting: %s", setting);
+        Logger.warn("Unrecognized MultiSeatTransferRule setting: %s", setting);
     }
     return rule;
   }
@@ -86,7 +84,7 @@ class ElectionConfig {
         rule = Tabulator.OvervoteRule.IGNORE_IF_MULTIPLE_CONTINUING;
         break;
       default:
-        Logger.log("Unrecognized overvote rule setting: %s", setting);
+        Logger.warn("Unrecognized overvote rule setting: %s", setting);
     }
     return rule;
   }
@@ -112,7 +110,7 @@ class ElectionConfig {
         mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
         break;
       default:
-        Logger.log("Unrecognized tiebreaker mode rule setting: %s", setting);
+        Logger.warn("Unrecognized tiebreaker mode rule setting: %s", setting);
     }
     return mode;
   }

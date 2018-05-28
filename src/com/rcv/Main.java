@@ -45,7 +45,7 @@ class Main {
       String configPath = args[0];
       // config file for running the tabulator
       ElectionConfig config = loadElectionConfig(configPath);
-      Logger.log("Tabulator is being used via the CLI.");
+      Logger.info("Tabulator is being used via the CLI.");
       executeTabulation(config);
     }
   }
@@ -86,8 +86,8 @@ class Main {
 
     // TODO: confiog.validate() should log specific errors
     if (encounteredError || !config.validate()) {
-      Logger.log("There was a problem loading or validating the election configuration.");
-      Logger.log("Please see the README.txt for details.");
+      Logger.severe("There was a problem loading or validating the election configuration.");
+      Logger.severe("Please see the README.txt for details.");
       config = null;
     }
 
@@ -118,7 +118,7 @@ class Main {
       // error message for user and log
       String errorMessage =
         String.format("Failed to configure audit logger:%s", exception.toString());
-      Logger.log(errorMessage);
+      Logger.severe(errorMessage);
       response = errorMessage;
       encounteredError = true;
     }
@@ -141,7 +141,7 @@ class Main {
       } catch (Exception exception) {
         encounteredError = true;
         response = String.format("ERROR during tabulation: %s", exception.toString());
-        Logger.log(response);
+        Logger.severe(response);
       }
     }
 
@@ -160,7 +160,7 @@ class Main {
     // at each iteration of the following loop we add records from another source file
     // source: index over config sources
     for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      Logger.log("Reading CVR file: %s (provider: %s)", source.filePath, source.provider);
+      Logger.info("Reading CVR file: %s (provider: %s)", source.filePath, source.provider);
       // reader: read input file into a list of cast vote records
       CVRReader reader = new CVRReader();
       reader.parseCVRFile(
@@ -172,7 +172,7 @@ class Main {
       // add records to the master list
       castVoteRecords.addAll(reader.castVoteRecords);
     }
-    Logger.log("Read %d records", castVoteRecords.size());
+    Logger.info("Read %d records", castVoteRecords.size());
     return castVoteRecords;
   }
 }

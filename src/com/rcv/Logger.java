@@ -67,21 +67,28 @@ class Logger {
     tabulationLogger = java.util.logging.Logger.getLogger(TABULATION_LOGGER_NAME);
   }
 
-  // function: log
-  // purpose: log formatted output to console and audit file
+  // function: info
+  // purpose: log formatted output to console and audit file at INFO level
   // format: format string into which object params will be formatted
   // param: obj object to be parsed into format string
-  static void log(String format, Object... obj) {
+  static void info(String format, Object... obj) {
     tabulationLogger.info(String.format(format, obj));
   }
 
-  // function: log
-  // purpose: log formatted output to console and audit file
-  // param: level to log at
+  // function: warn
+  // purpose: log formatted output to console and audit file at WARNING level
   // param: format string into which object params will be formatted
   // param: obj object to be parsed into format string
-  static void log(java.util.logging.Level level, String format, Object... obj) {
-    tabulationLogger.log(level, String.format(format, obj));
+  static void warn(String format, Object... obj) {
+    tabulationLogger.warning(String.format(format, obj));
+  }
+
+  // function: severe
+  // purpose: log formatted output to console and audit file at SEVERE level
+  // param: format string into which object params will be formatted
+  // param: obj object to be parsed into format string
+  static void severe(String format, Object... obj) {
+    tabulationLogger.severe(String.format(format, obj));
   }
 
   // function: removeTabulationFileLogging
