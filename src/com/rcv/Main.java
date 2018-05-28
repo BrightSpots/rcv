@@ -106,7 +106,7 @@ class Main {
     // flag indicating tabulation success
     boolean encounteredError = false;
     // current date-time formatted as a string used for creating unique output files names
-    String timestampString = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(new Date());
+    String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
     // create audit log file name
     String logFileName = String.format("%s_audit.log", timestampString);
     // audit log path
