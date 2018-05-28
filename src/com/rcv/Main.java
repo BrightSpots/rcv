@@ -28,12 +28,8 @@ class Main {
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
-    // create execution logger in current working directory
-    String workingDir = System.getProperty("user.dir");
-    // rcv.log is our execution log file name
-    String logPath = Paths.get(workingDir, "rcv.log").toString();
     try {
-      Logger.addLogger(logPath, true);
+      Logger.setup();
     } catch (IOException exception) {
       System.err.print(String.format("Failed to start system logging:%s", exception.toString()));
     }
@@ -117,7 +113,7 @@ class Main {
     String auditLogPath = Paths.get(config.getOutputDirectory(), logFileName).toString();
     try {
       // audit logger
-      Logger.addLogger(auditLogPath, false);
+      Logger.addTabulationFileLogging(auditLogPath);
     } catch (IOException exception) {
       // error message for user and log
       String errorMessage =
@@ -138,7 +134,6 @@ class Main {
         Tabulator tabulator = new Tabulator(castVoteRecords, config);
         // do the tabulation
         tabulator.tabulate();
-
         // generate visualizer spreadsheet data
         tabulator.generateSummarySpreadsheet(timestampString);
         // generate audit data
@@ -150,7 +145,7 @@ class Main {
       }
     }
 
-    Logger.removeLogger(auditLogPath);
+    Logger.removeTabulationFileLogging();
     // TODO: Redesign this later so as not to return a user-facing status string
     return response;
   }
