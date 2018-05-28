@@ -118,7 +118,7 @@ class ResultsWriter {
       Map<Integer, Map<String, BigDecimal>> roundTallies
   ) {
     // filename for output
-    String outputFileName = String.format("%s.xlsx", this.timestampString);
+    String outputFileName = String.format("%s_summary.xlsx", this.timestampString);
     // full path for output
     String outputPath = Paths.get(config.getOutputDirectory(), outputFileName ).toString();
     // generate the spreadsheet
@@ -137,7 +137,7 @@ class ResultsWriter {
       // the precinct output filename
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       // filename for output
-      String outputFileName = String.format("%s_%s.xlsx", this.timestampString, precinctFileString);
+      String outputFileName = String.format("%s_%s_precinct_summary.xlsx", this.timestampString, precinctFileString);
       // full path for output
       String outputPath = Paths.get(config.getOutputDirectory(), outputFileName).toString();
       generateSummarySpreadsheet(
