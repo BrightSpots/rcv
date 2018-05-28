@@ -49,6 +49,8 @@ class Logger {
       defaultLogger.removeHandler(handler);
     }
     // logPath is where default file logging is written
+    // "user.dir" property is the current working directory, i.e. folder from whence the rcv jar
+    // was launched
     String logPath = Paths.get(System.getProperty("user.dir"), DEFAULT_FILE_NAME).toString();
     // formatter specifies how logging output lines should appear
     LogFormatter formatter = new LogFormatter();
@@ -91,23 +93,6 @@ class Logger {
     tabulationLogger.severe(String.format(format, obj));
   }
 
-  // function: removeTabulationFileLogging
-  // purpose: remove file logging once a tabulation run is complete
-  static void removeTabulationFileLogging() {
-    // iterate through all handlers and remove them
-    for (Handler handler : tabulationLogger.getHandlers()) {
-      // in practice this should only be one FileHandler here but we check the type to be sure
-      if(handler instanceof FileHandler) {
-        // cast to FileHandler and close the file to cleanup up lock file
-        FileHandler fileHandler = (FileHandler)handler;
-        fileHandler.flush();
-        fileHandler.close();
-      }
-      // remove the handler from the logger
-      tabulationLogger.removeHandler(handler);
-    }
-  }
-
   // function: addTabulationFileLogging
   // purpose: adds file logging for a tabulation run
   // param: loggerOutputPath: file path for tabulationLogger logging output
@@ -121,6 +106,17 @@ class Logger {
     fileHandler.setFormatter(formatter);
     // get the tabulationLogger logger and add file handler
     tabulationLogger.addHandler(fileHandler);
+  }
+
+  // function: removeTabulationFileLogging
+  // purpose: remove file logging once a tabulation run is complete
+  static void removeTabulationFileLogging() {
+    // in practice there should only be the one FileHandler we added here
+    for (Handler handler : tabulationLogger.getHandlers()) {
+      handler.flush();
+      handler.close();
+      tabulationLogger.removeHandler(handler);
+    }
   }
 
   // custom LogFormatter class for log output string formatting

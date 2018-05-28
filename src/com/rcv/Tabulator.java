@@ -450,7 +450,7 @@ class Tabulator {
         setCandidatesToRoundEliminated(candidateToRoundEliminated).
         setWinnerToRound(winnerToRound).
         setElectionConfig(config).
-        setTimestamp(timestamp);
+        setTimestampString(timestamp);
 
     writer.generateOverallSummarySpreadsheet(roundTallies);
 

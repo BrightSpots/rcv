@@ -45,8 +45,8 @@ class ResultsWriter {
   private Map<Integer, List<String>> roundToWinningCandidates;
   // configuration file in use for this election
   private ElectionConfig config;
-  // timestamp string to use when generating output file names
-  private String timestamp;
+  // timestampString string to use when generating output file names
+  private String timestampString;
 
   // function: setNumRounds
   // purpose: setter for total number of rounds
@@ -102,11 +102,11 @@ class ResultsWriter {
     return this;
   }
 
-  // function: setTimestamp
-  // purpose: setter for timestamp string used for creating output file names
-  // param: timestamp string to use for creating output file names
-  ResultsWriter setTimestamp(String timestamp) {
-    this.timestamp = timestamp;
+  // function: setTimestampString
+  // purpose: setter for timestampString string used for creating output file names
+  // param: timestampString string to use for creating output file names
+  ResultsWriter setTimestampString(String timestampString) {
+    this.timestampString = timestampString;
     return this;
   }
 
@@ -118,7 +118,7 @@ class ResultsWriter {
       Map<Integer, Map<String, BigDecimal>> roundTallies
   ) {
     // filename for output
-    String outputFileName = String.format("%s.xlsx", this.timestamp);
+    String outputFileName = String.format("%s.xlsx", this.timestampString);
     // full path for output
     String outputPath = Paths.get(config.getOutputDirectory(), outputFileName ).toString();
     // generate the spreadsheet
@@ -137,7 +137,7 @@ class ResultsWriter {
       // the precinct output filename
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       // filename for output
-      String outputFileName = String.format("%s_%s.xlsx", this.timestamp, precinctFileString);
+      String outputFileName = String.format("%s_%s.xlsx", this.timestampString, precinctFileString);
       // full path for output
       String outputPath = Paths.get(config.getOutputDirectory(), outputFileName).toString();
       generateSummarySpreadsheet(
