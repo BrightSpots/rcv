@@ -1,6 +1,4 @@
 {
-  "auditOutputFilename":"tiebreak_test_audit_log.txt",
-  "visualizerOutputFilename":"tiebreak_test_visualizer.xlsx",
   "contestName":"Tiebreak test",
   "jurisdiction":"Funkytown, USA",
   "office":"Sergeant-at-Arms",

@@ -14,9 +14,11 @@
 package com.rcv;
 
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 class Main {
@@ -26,6 +28,12 @@ class Main {
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
+    try {
+      Logger.setup();
+    } catch (IOException exception) {
+      System.err.print(String.format("Failed to start system logging:%s", exception.toString()));
+    }
+
     if (args.length == 0) {
       // if no args provided, assume user wants to use the GUI
       System.out.println("No arguments provided; starting GUI...");
@@ -37,7 +45,7 @@ class Main {
       String configPath = args[0];
       // config file for running the tabulator
       ElectionConfig config = loadElectionConfig(configPath);
-      Logger.log("Tabulator is being used via the CLI.");
+      Logger.info("Tabulator is being used via the CLI.");
       executeTabulation(config);
     }
   }
@@ -74,31 +82,12 @@ class Main {
             )
         );
       }
-
-      // logPath is where we'll write the log file
-      String logPath =
-          FileUtils.buildPath(config.getOutputDirectory(), config.getAuditOutputFilename());
-
-      try {
-        Logger.setup(logPath);
-        Logger.log("Parsed config file: %s", configPath);
-        Logger.log("Logging to: %s", logPath);
-      } catch (IOException exception) {
-        encounteredError = true;
-        System.err.print(
-            String.format(
-                "Failed to configure logging output to file: %s\n%s",
-                logPath,
-                exception.toString()
-            )
-        );
-      }
     }
 
     // TODO: confiog.validate() should log specific errors
     if (encounteredError || !config.validate()) {
-      Logger.log("There was a problem loading or validating the election configuration.");
-      Logger.log("Please see the README.txt for details.");
+      Logger.severe("There was a problem loading or validating the election configuration.");
+      Logger.severe("Please see the README.txt for details.");
       config = null;
     }
 
@@ -111,26 +100,52 @@ class Main {
   // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
   static String executeTabulation(ElectionConfig config) {
-    // Read cast vote records from CVR files
-    // castVoteRecords will contain all cast vote records parsed by the reader
-    List<CastVoteRecord> castVoteRecords;
-    // String indicating whether or not execution was successful
+
+    // String indicating user message
     String response = "Tabulation successful!";
+    // flag indicating tabulation success
+    boolean encounteredError = false;
+    // current date-time formatted as a string used for creating unique output files names
+    String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+    // create audit log file name
+    String logFileName = String.format("%s_audit.log", timestampString);
+    // audit log path
+    String auditLogPath = Paths.get(config.getOutputDirectory(), logFileName).toString();
     try {
-      // parse the cast vote records
-      castVoteRecords = parseCastVoteRecords(config);
-      // tabulator for tabulation logic
-      Tabulator tabulator = new Tabulator(castVoteRecords, config);
-      // do the tabulation
-      tabulator.tabulate();
-      // generate visualizer spreadsheet data
-      tabulator.generateSummarySpreadsheet();
-      // generate audit data
-      tabulator.doAudit(castVoteRecords);
-    } catch (Exception exception) {
-      response = String.format("ERROR during tabulation: %s", exception.toString());
-      Logger.log(response);
+      // audit logger
+      Logger.addTabulationFileLogging(auditLogPath);
+      Logger.info("Logging tabulation to: %s", auditLogPath);
+    } catch (IOException exception) {
+      // error message for user and log
+      String errorMessage =
+        String.format("Failed to configure tabulation logger:%s", exception.toString());
+      Logger.severe(errorMessage);
+      response = errorMessage;
+      encounteredError = true;
     }
+
+    if (!encounteredError) {
+      // Read cast vote records from CVR files
+      // castVoteRecords will contain all cast vote records parsed by the reader
+      List<CastVoteRecord> castVoteRecords;
+      try {
+        // parse the cast vote records
+        castVoteRecords = parseCastVoteRecords(config);
+        // tabulator for tabulation logic
+        Tabulator tabulator = new Tabulator(castVoteRecords, config);
+        // do the tabulation
+        tabulator.tabulate();
+        // generate visualizer spreadsheet data
+        tabulator.generateSummarySpreadsheet(timestampString);
+        // generate audit data
+        tabulator.doAudit(castVoteRecords);
+      } catch (Exception exception) {
+        encounteredError = true;
+        Logger.severe("ERROR during tabulation: %s", exception.toString());
+      }
+    }
+    Logger.info("Done logging tabulation to %s", auditLogPath);
+    Logger.removeTabulationFileLogging();
     // TODO: Redesign this later so as not to return a user-facing status string
     return response;
   }
@@ -145,7 +160,7 @@ class Main {
     // at each iteration of the following loop we add records from another source file
     // source: index over config sources
     for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      Logger.log("Reading CVR file: %s (provider: %s)", source.filePath, source.provider);
+      Logger.info("Reading CVR file: %s (provider: %s)", source.filePath, source.provider);
       // reader: read input file into a list of cast vote records
       CVRReader reader = new CVRReader();
       reader.parseCVRFile(
@@ -157,7 +172,7 @@ class Main {
       // add records to the master list
       castVoteRecords.addAll(reader.castVoteRecords);
     }
-    Logger.log("Read %d records", castVoteRecords.size());
+    Logger.info("Read %d records", castVoteRecords.size());
     return castVoteRecords;
   }
 }

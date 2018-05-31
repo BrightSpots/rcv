@@ -1,7 +1,5 @@
 {
   "outputDirectory":"test_output/minneapolis_2013_park",
-  "auditOutputFilename":"minneapolis_2013_park_audit_log.txt",
-  "visualizerOutputFilename":"minneapolis_2013_park_visualizer.xlsx",
   "contestName":"2013 Minneapolis Park Board",
   "jurisdiction":"Minneapolis",
   "office":"Park and Recreation Commissioner",

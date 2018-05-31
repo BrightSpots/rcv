@@ -1,6 +1,4 @@
 {
-  "visualizerOutputFilename":"test_continue_tabulation_visualizer.xlsx",
-  "auditOutputFilename":"minneapolis_2013_audit_log.txt",
   "outputDirectory":"test",
   "contestName":"Portland 2015 Mayoral Race",
   "jurisdiction":"Portland, ME",

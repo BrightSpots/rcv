@@ -2,13 +2,24 @@
  * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  * Copyright 2018 Bright Spots
  * Purpose: Wrapper for console and file logging functions
- * All logging and audit output should use these methods to ensure output goes into audit file
+ * All logging messages including execution, tabulation, and audit information go through this
  * Version: 1.0
+ *
+ * log message
+ *  |
+ *  v
+ * tabulation logger -> tabulation file (if installed)
+ *  |
+ *  v
+ * default logger -> rcv.log + console
+ *
+ *
  */
 
 package com.rcv;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -18,46 +29,94 @@ import java.util.logging.LogRecord;
 
 class Logger {
 
-  // Logger object this class wraps
-  private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger("RCV");
-
-  // function: log
-  // purpose: log output to console and audit file
-  // param: msg the message to be logged to console and audit file
-  static void log(String msg) {
-    logger.info(msg);
-  }
-
-  // function: log
-  // purpose: log formatted output to console and audit file
-  // format: format string into which object params will be formatted
-  // param: obj object to be parsed into format string
-  static void log(String format, Object... obj) {
-    logger.info(String.format(format, obj));
-  }
+  // cache for the default logger
+  private static java.util.logging.Logger defaultLogger;
+  // cache for the tabulation logger
+  private static java.util.logging.Logger tabulationLogger;
+  // tabulation logger name: dot "." parents it to default logger so all messages will propagate
+  private static String TABULATION_LOGGER_NAME = ".tabulation";
+  // execution log file name
+  private static String DEFAULT_FILE_NAME = "rcv.log";
 
   // function: setup
   // purpose: initialize logging module
-  // param: file_output_path: File path for audit output
-  // file access: write (existing file will be overwritten)
-  // throws: IOException if unable to open file_output_path
-  static void setup(String file_output_path) throws IOException {
-    // specifies how logging output lines should appear
+  // throws: IOException if unable to open output log file
+  static void setup() throws IOException {
+    // create and cache default logger
+    defaultLogger = java.util.logging.Logger.getLogger("");
+    // remove any loggers the system may have installed
+    for(Handler handler : defaultLogger.getHandlers()) {
+      defaultLogger.removeHandler(handler);
+    }
+    // logPath is where default file logging is written
+    // "user.dir" property is the current working directory, i.e. folder from whence the rcv jar
+    // was launched
+    String logPath = Paths.get(System.getProperty("user.dir"), DEFAULT_FILE_NAME).toString();
+    // formatter specifies how logging output lines should appear
     LogFormatter formatter = new LogFormatter();
-    // controls logging file output filters
-    FileHandler fileHandler = new FileHandler(file_output_path);
+    // fileHandler writes formatted strings to file
+    FileHandler fileHandler = new FileHandler(logPath, true);
     fileHandler.setFormatter(formatter);
-    // controls logging console output filters
+    // create a consoleHandler to writes formatted strings to console for debugging
     ConsoleHandler consoleHandler = new ConsoleHandler();
     consoleHandler.setFormatter(formatter);
-    // remove any existing handlers to prevent duplicate logging
-    for (Handler h : logger.getHandlers()) {
-      logger.removeHandler(h);
+    // add the  handlers
+    defaultLogger.addHandler(consoleHandler);
+    defaultLogger.addHandler(fileHandler);
+
+    // create and cache the tabulation logger object
+    // whenever a tabulation happens we will add tabulation-specific file handlers here
+    tabulationLogger = java.util.logging.Logger.getLogger(TABULATION_LOGGER_NAME);
+  }
+
+  // function: info
+  // purpose: log formatted output to console and audit file at INFO level
+  // format: format string into which object params will be formatted
+  // param: obj object to be parsed into format string
+  static void info(String format, Object... obj) {
+    tabulationLogger.info(String.format(format, obj));
+  }
+
+  // function: warn
+  // purpose: log formatted output to console and audit file at WARNING level
+  // param: format string into which object params will be formatted
+  // param: obj object to be parsed into format string
+  static void warn(String format, Object... obj) {
+    tabulationLogger.warning(String.format(format, obj));
+  }
+
+  // function: severe
+  // purpose: log formatted output to console and audit file at SEVERE level
+  // param: format string into which object params will be formatted
+  // param: obj object to be parsed into format string
+  static void severe(String format, Object... obj) {
+    tabulationLogger.severe(String.format(format, obj));
+  }
+
+  // function: addTabulationFileLogging
+  // purpose: adds file logging for a tabulation run
+  // param: loggerOutputPath: file path for tabulationLogger logging output
+  // file access: write - existing file will be overwritten
+  // throws: IOException if unable to open loggerOutputPath
+  static void addTabulationFileLogging(String loggerOutputPath) throws IOException {
+    // create new handler for file logging and add it
+    FileHandler fileHandler = new FileHandler(loggerOutputPath);
+    // specifies how logging output lines should appear
+    LogFormatter formatter = new LogFormatter();
+    fileHandler.setFormatter(formatter);
+    // get the tabulationLogger logger and add file handler
+    tabulationLogger.addHandler(fileHandler);
+  }
+
+  // function: removeTabulationFileLogging
+  // purpose: remove file logging once a tabulation run is complete
+  static void removeTabulationFileLogging() {
+    // in practice there should only be the one FileHandler we added here
+    for (Handler handler : tabulationLogger.getHandlers()) {
+      handler.flush();
+      handler.close();
+      tabulationLogger.removeHandler(handler);
     }
-    // add new handlers
-    logger.addHandler(consoleHandler);
-    logger.addHandler(fileHandler);
-    logger.setUseParentHandlers(false);
   }
 
   // custom LogFormatter class for log output string formatting

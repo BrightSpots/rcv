@@ -1,7 +1,5 @@
 {
   "outputDirectory":"test_output/portland_2015",
-  "auditOutputFilename":"portland_2015_mayor_audit_log.txt",
-  "visualizerOutputFilename":"portland_2015_mayor_visualizer.xlsx",
   "contestName":"Portland 2015 Mayoral Race",
   "jurisdiction":"Portland, ME",
   "office":"Mayor",

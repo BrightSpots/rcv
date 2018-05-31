@@ -30,13 +30,13 @@ class JsonParser {
       // object is the newly created object populated with json values
       return objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException jsonException) {
-      Logger.log("Error parsing json file:%s", jsonFilePath);
-      Logger.log("Check your file formatting and values to make sure they are correct.");
-      Logger.log(jsonException.getMessage());
+      Logger.severe("Error parsing json file:%s", jsonFilePath);
+      Logger.severe("Check your file formatting and values to make sure they are correct.");
+      Logger.severe(jsonException.getMessage());
     } catch (IOException fileException) {
-      Logger.log("Error opening file:%s", jsonFilePath);
-      Logger.log("Check your file path and make sure it is correct.");
-      Logger.log(fileException.toString());
+      Logger.severe("Error opening file:%s", jsonFilePath);
+      Logger.severe("Check your file path and make sure it is correct.");
+      Logger.severe(fileException.toString());
     }
     return null;
   }

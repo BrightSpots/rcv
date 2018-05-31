@@ -43,7 +43,7 @@ class CVRReader {
       inputStream.close();
       workbook.close();
     } catch (IOException exception) {
-      Logger.log("failed to open CVR file: %s, %s", excelFilePath, exception.getMessage());
+      Logger.severe("failed to open CVR file: %s, %s", excelFilePath, exception.getMessage());
       throw exception;
     }
     return firstSheet;
@@ -73,7 +73,7 @@ class CVRReader {
     org.apache.poi.ss.usermodel.Row headerRow = iterator.next();
     // require at least one row
     if (headerRow == null || contestSheet.getLastRowNum() < 2) {
-      Logger.log("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
+      Logger.severe("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
       throw new Exception();
     }
 
@@ -136,14 +136,14 @@ class CVRReader {
           // empty cells are sometimes treated as undeclared write-ins (Portland / ES&S)
           if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
             candidate = config.getUndeclaredWriteInLabel();
-            Logger.log("Empty cell -- treating as UWI");
+            Logger.warn("Empty cell -- treating as UWI");
           } else {
             // just ignore this cell
             continue;
           }
         } else {
           if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
-            Logger.log("unexpected cell type at ranking %d ballot %s", rank, castVoteRecordID);
+            Logger.warn("unexpected cell type at ranking %d ballot %s", rank, castVoteRecordID);
             continue;
           }
           candidate = cvrDataCell.getStringCellValue().trim();
@@ -154,7 +154,7 @@ class CVRReader {
             candidate = Tabulator.explicitOvervoteLabel;
           } else if (!config.getCandidateCodeList().contains(candidate)) {
             if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
-              Logger.log("no match for candidate: %s", candidate);
+              Logger.warn("no match for candidate: %s", candidate);
             }
             candidate = config.getUndeclaredWriteInLabel();
           }
