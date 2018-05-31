@@ -35,6 +35,8 @@ public class RawElectionConfig {
   public List<CVRSource> cvrFileSources;
   // should we report round-by-round results by precinct also?
   public boolean tabulateByPrecinct;
+  // shall we treat blank cells as UWIs?
+  public boolean treatBlankAsUndeclaredWriteIn;
 
   // function: RawElectionConfig
   // purpose: create a new RawElectionConfig object
@@ -54,7 +56,7 @@ public class RawElectionConfig {
     // max rankings allowed
     public Integer maxRankingsAllowed;
     // are we using batch elimination?
-    public Boolean batchElimination;
+    public boolean batchElimination;
     // which overvote rule to use
     public String overvoteRule;
     // max number of skipped rankings allowed
@@ -69,8 +71,6 @@ public class RawElectionConfig {
     public String undervoteLabel;
     // tiebreak mode to use
     public String tiebreakMode;
-    // shall we treat blank cells as UWIs?
-    public Boolean treatBlankAsUwi;
     // setting for number of winners
     public Integer numberOfWinners;
     // how far to round vote values when performing arithmetic
@@ -80,7 +80,9 @@ public class RawElectionConfig {
     // keep tabulating beyond selecting winner until only two candidates remain
     // used to provide additional context for the strength of support for the winner
     // only valid for single-winner contests
-    public Boolean continueUntilTwoCandidatesRemain;
+    public boolean continueUntilTwoCandidatesRemain;
+    // should we exhaust a ballot when we hit a duplicate candidate while traversing its rankings?
+    public boolean exhaustOnDuplicateCandidate;
   }
 
   // CVRSource: encapsulates a source cast vote record file

@@ -38,9 +38,8 @@ class CastVoteRecord {
   SortedMap<Integer, Set<String>> rankToCandidateIDs;
   // whether this CVR is exhausted or not
   private boolean isExhausted;
-  // For multi-winner elections that use fractional vote transfers, this represents the current
-  // fractional value of this CVR.
-  private BigDecimal fractionalTransferValue = new BigDecimal(BigInteger.ONE);
+  // records winners to whom some fraction of this vote has been allocated
+  private Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -68,18 +67,23 @@ class CastVoteRecord {
   // purpose: adds the outcome for this CVR for this round (for auditing purposes)
   // param: outcomeType indicates what happened
   // param: detail reflects who (if anyone) received the vote or why it was exhausted/ignored
-  void addRoundOutcome(VoteOutcomeType outcomeType, String detail) {
-    roundOutcomes.add(new VoteOutcome(outcomeType, detail));
+  // param: fractionalTransferValue if someone received the vote (not exhausted/ignored)
+  void addRoundOutcome(
+      VoteOutcomeType outcomeType,
+      String detail,
+      BigDecimal fractionalTransferValue
+  ) {
+    roundOutcomes.add(new VoteOutcome(outcomeType, detail, fractionalTransferValue));
   }
 
   // function: exhaust
   // purpose: transition the CVR into exhausted state with the given reason
   // param: round the exhaustion occurs
   // param: reason: the reason for exhaustion
-  void exhaust(int round, String reason) {
+  void exhaust(String reason) {
     assert !isExhausted;
     isExhausted = true;
-    addRoundOutcome(VoteOutcomeType.EXHAUSTED, reason);
+    addRoundOutcome(VoteOutcomeType.EXHAUSTED, reason, null);
   }
 
   // function: isExhausted
@@ -93,14 +97,22 @@ class CastVoteRecord {
   // purpose: getter for fractionalTransferValue
   // returns: value of field
   BigDecimal getFractionalTransferValue() {
-    return fractionalTransferValue;
+    // remainingValue starts at one, and we subtract all the parts that are already allocated
+    BigDecimal remainingValue = BigDecimal.ONE;
+    for (BigDecimal allocatedValue : winnerToFractionalValue.values()) {
+      remainingValue = remainingValue.subtract(allocatedValue);
+    }
+    return remainingValue;
   }
 
-  // function: setFractionalTransferValue
-  // purpose: setter for fractionalTransferValue
-  // param: new value of field
-  void setFractionalTransferValue(BigDecimal fractionalTransferValue) {
-    this.fractionalTransferValue = fractionalTransferValue;
+  // function: recordCurrentRecipientAsWinner
+  // purpose: stores the current recipient as a winner using the specified surplus fraction
+  void recordCurrentRecipientAsWinner(BigDecimal surplusFraction) {
+    // take the current FTV of this vote and allocate (1 - surplusFraction) of that amount to the
+    // new winner
+    BigDecimal newAllocatedValue =
+        getFractionalTransferValue().multiply(BigDecimal.ONE.subtract(surplusFraction));
+    winnerToFractionalValue.put(getCurrentRecipientOfVote(), newAllocatedValue);
   }
 
   // function: getCurrentRecipientOfVote
@@ -118,10 +130,17 @@ class CastVoteRecord {
   }
 
   // function: getPrecinct
-  // purpose: getter for precicnt
+  // purpose: getter for precinct
   // returns: value of field
   String getPrecinct() {
     return precinct;
+  }
+
+  // function: getWinnerToFractionalValue
+  // purpose: getter for winnerToFractionalValue
+  // returns: value of field
+  Map<String, BigDecimal> getWinnerToFractionalValue() {
+    return winnerToFractionalValue;
   }
 
   // function: sortRankings
@@ -168,7 +187,13 @@ class CastVoteRecord {
       } else if (roundOutcome.outcomeType == VoteOutcomeType.EXHAUSTED) {
         auditStringBuilder.append("exhausted:");
       }
-      auditStringBuilder.append(roundOutcome.detail).append('|');
+      auditStringBuilder.append(roundOutcome.detail);
+      // the fractional transfer value of the vote in this round
+      BigDecimal ftv = roundOutcome.fractionalTransferValue;
+      if (ftv != null && !ftv.equals(BigDecimal.ONE)) {
+        auditStringBuilder.append(" (").append(ftv).append(')');
+      }
+      auditStringBuilder.append('|');
       round++;
     }
     auditStringBuilder.append(" [Raw Data] ");
@@ -187,10 +212,13 @@ class CastVoteRecord {
     VoteOutcomeType outcomeType;
     // more detail on the outcome (who got the vote or why it was ignored/exhausted)
     String detail;
+    // if someone received the vote, what fraction of it they got
+    BigDecimal fractionalTransferValue;
 
-    VoteOutcome(VoteOutcomeType outcomeType, String detail) {
+    VoteOutcome(VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
       this.outcomeType = outcomeType;
       this.detail = detail;
+      this.fractionalTransferValue = fractionalTransferValue;
     }
   }
 }

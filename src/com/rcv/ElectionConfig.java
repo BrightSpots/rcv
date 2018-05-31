@@ -135,13 +135,11 @@ class ElectionConfig {
       valid = false;
     } else if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
       valid = false;
-    } else if (rawConfig.rules.batchElimination == null) {
-      valid = false;
     }
 
     // if continueUntilTwoCandidatesRemain is selected
     // this must be a single-winner election
-    if (this.continueUntilTwoCandidatesRemain() && this.getNumberOfWinners() > 1) {
+    if (this.willContinueUntilTwoCandidatesRemain() && this.getNumberOfWinners() > 1) {
       valid = false;
     }
 
@@ -213,13 +211,11 @@ class ElectionConfig {
     return outputDirectory;
   }
 
-  // function: continueUntilTwoCandidatesRemain
+  // function: willContinueUntilTwoCandidatesRemain
   // purpose: getter for setting to keep tabulating beyond selecting winner till two candidates remain
   // returns: whether to keep tabulating untill two candidates remain
-  public boolean continueUntilTwoCandidatesRemain() {
-    return rawConfig.rules.continueUntilTwoCandidatesRemain != null ?
-        rawConfig.rules.continueUntilTwoCandidatesRemain :
-        false;
+  boolean willContinueUntilTwoCandidatesRemain() {
+    return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
 
   // function: getContestName
@@ -281,7 +277,7 @@ class ElectionConfig {
   // function: numDeclaredCandidates
   // purpose: calculate the number of declared candidates from the election configuration
   // returns: the number of declared candidates from the election configuration
-  public int getNumDeclaredCandidates() {
+  int getNumDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = getCandidateCodeList().size();
     if (getUndeclaredWriteInLabel() != null &&
@@ -294,10 +290,9 @@ class ElectionConfig {
   // function: numCandidates
   // purpose: return number of candidates including UWIs as a candidate if they are in use
   // num will contain the resulting number of candidates
-  public int getNumCandidates() {
+  int getNumCandidates() {
     return getCandidateCodeList().size();
   }
-
 
   // function: getOvervoteRule
   // purpose: return overvote rule enum to use
@@ -361,14 +356,15 @@ class ElectionConfig {
         ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
   }
 
-  // function: isTreatBlankAsUWIEnabled
-  // purpose: getter for treatBlankAsUWI rule
+  // function: isTreatBlankAsUndeclaredWriteInEnabled
+  // purpose: getter for treatBlankAsUndeclaredWriteIn rule
   // returns: return true if we are to treat blank cell as UWI
-  boolean isTreatBlankAsUWIEnabled() {
-    // by default we do not treat blank as UWI
-    return rawConfig.rules.treatBlankAsUwi == null ?
-        false :
-        rawConfig.rules.treatBlankAsUwi;
+  boolean isTreatBlankAsUndeclaredWriteInEnabled() {
+    return rawConfig.treatBlankAsUndeclaredWriteIn;
+  }
+
+  boolean isExhaustOnDuplicateCandidateEnabled() {
+    return rawConfig.rules.exhaustOnDuplicateCandidate;
   }
 
   // function: getCandidateCodeList
