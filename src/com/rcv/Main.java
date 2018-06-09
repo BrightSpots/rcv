@@ -100,7 +100,6 @@ class Main {
   // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
   static String executeTabulation(ElectionConfig config) {
-
     // String indicating user message
     String response = "Tabulation successful!";
     // flag indicating tabulation success

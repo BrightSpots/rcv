@@ -10,9 +10,13 @@
 
 package com.rcv;
 
+import com.rcv.Tabulator.TieBreakMode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +26,8 @@ class ElectionConfig {
   final RawElectionConfig rawConfig;
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
+  // this is used if we have a permutation-based tie-break mode
+  private ArrayList<String> candidatePermutation = new ArrayList<>();
   // minimum vote threshold if one is specified
   private BigDecimal minimumVoteThreshold;
 
@@ -108,6 +114,12 @@ class ElectionConfig {
         break;
       case "previousRoundCountsThenInteractive":
         mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
+        break;
+      case "usePermutationInConfig":
+        mode = Tabulator.TieBreakMode.USE_PERMUTATION_IN_CONFIG;
+        break;
+      case "generatePermutation":
+        mode = Tabulator.TieBreakMode.GENERATE_PERMUTATION;
         break;
       default:
         Logger.warn("Unrecognized tiebreaker mode rule setting: %s", setting);
@@ -358,11 +370,14 @@ class ElectionConfig {
 
   // function: isTreatBlankAsUndeclaredWriteInEnabled
   // purpose: getter for treatBlankAsUndeclaredWriteIn rule
-  // returns: return true if we are to treat blank cell as UWI
+  // returns: true if we are to treat blank cell as UWI
   boolean isTreatBlankAsUndeclaredWriteInEnabled() {
     return rawConfig.treatBlankAsUndeclaredWriteIn;
   }
 
+  // function: isExhaustOnDuplicateCandidateEnabled
+  // purpose: getter for exhaustOnDuplicateCandidate rule
+  // returns: true if tabulation should exhaust ballot when encountering a duplicate candidate
   boolean isExhaustOnDuplicateCandidateEnabled() {
     return rawConfig.rules.exhaustOnDuplicateCandidate;
   }
@@ -382,6 +397,13 @@ class ElectionConfig {
     return candidateCodeToNameMap.get(candidateID);
   }
 
+  // function: getCandidatePermutation
+  // purpose: getter for ordered list of candidates for tie-breaking
+  // returns: ordered list of candidates
+  ArrayList<String> getCandidatePermutation() {
+    return candidatePermutation;
+  }
+
   // function: processCandidateData
   // purpose: builds map of candidate ID to candidate name
   private void processCandidateData() {
@@ -390,9 +412,15 @@ class ElectionConfig {
     for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
       if (candidate.code != null) {
         candidateCodeToNameMap.put(candidate.code, candidate.name);
+        candidatePermutation.add(candidate.code);
       } else {
         candidateCodeToNameMap.put(candidate.name, candidate.name);
+        candidatePermutation.add(candidate.name);
       }
+    }
+
+    if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
+      Collections.shuffle(candidatePermutation);
     }
 
     String uwiLabel = getUndeclaredWriteInLabel();
@@ -400,5 +428,4 @@ class ElectionConfig {
       candidateCodeToNameMap.put(uwiLabel, uwiLabel);
     }
   }
-
 }

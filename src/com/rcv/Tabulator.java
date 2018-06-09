@@ -107,13 +107,7 @@ class Tabulator {
   // purpose: run the main tabulation routine to determine election results
   //  this is the high-level control of the tabulation algorithm
   void tabulate() {
-    Logger.info("Beginning tabulation for contest.");
-    Logger.info("There are %d declared candidates for this contest:", config.getNumDeclaredCandidates());
-    // string indexes over all candidate IDs to log them
-    for (String candidateID : candidateIDs) {
-      Logger.info("%s", candidateID);
-    }
-    Logger.info("There are %d cast vote records for this contest.", castVoteRecords.size());
+    logSummaryInfo();
 
     // Loop until we've found our winner(s) unless using continueUntilTwoCandidatesRemain, in which
     // case we loop until only two candidates remain.
@@ -204,6 +198,27 @@ class Tabulator {
       // candidate once that candidate has won)?
       updatePastWinnerTallies();
     }
+  }
+
+  // function: logSummaryInfo
+  // purpose: log some basic info about the contest before starting tabulation
+  private void logSummaryInfo() {
+    Logger.info("Beginning tabulation for contest.");
+    Logger.info("There are %d declared candidates for this contest:", config.getNumDeclaredCandidates());
+    // candidateID indexes over all candidate IDs to log them
+    for (String candidateID : candidateIDs) {
+      Logger.info("%s", candidateID);
+    }
+
+    if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
+      Logger.info("Randomly generated candidate permutation for tie-breaking:");
+      // candidateID indexes over all candidates in ordered list
+      for (String candidateID : config.getCandidatePermutation()) {
+        Logger.info("%s", candidateID);
+      }
+    }
+
+    Logger.info("There are %d cast vote records for this contest.", castVoteRecords.size());
   }
 
   // function: updateWinnerTallies
@@ -477,11 +492,12 @@ class Tabulator {
               config.getTiebreakMode(),
               currentRound,
               minVotes,
-              roundTallies
+              roundTallies,
+              config.getCandidatePermutation()
           );
 
       // results of tiebreak stored here
-      eliminatedCandidate = tieBreak.loser();
+      eliminatedCandidate = tieBreak.selectLoser();
       Logger.info(
           "%s lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
           eliminatedCandidate,
@@ -872,7 +888,7 @@ class Tabulator {
   enum MultiSeatTransferRule {
     TRANSFER_FRACTIONAL_SURPLUS,
     TRANSFER_WHOLE_SURPLUS,
-    TRANSFER_RULE_UNKNOWN
+    TRANSFER_RULE_UNKNOWN,
   }
 
   // OvervoteRule determines how overvotes are handled
@@ -883,7 +899,7 @@ class Tabulator {
     IGNORE_IF_ANY_CONTINUING,
     EXHAUST_IF_MULTIPLE_CONTINUING,
     IGNORE_IF_MULTIPLE_CONTINUING,
-    RULE_UNKNOWN
+    RULE_UNKNOWN,
   }
 
   // OvervoteDecision is the result of applying an OvervoteRule to a CVR in a particular round
@@ -900,7 +916,9 @@ class Tabulator {
     INTERACTIVE,
     PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
     PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
-    MODE_UNKNOWN
+    USE_PERMUTATION_IN_CONFIG,
+    GENERATE_PERMUTATION,
+    MODE_UNKNOWN,
   }
 
   enum CandidateStatus {
