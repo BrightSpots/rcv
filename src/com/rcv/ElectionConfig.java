@@ -405,7 +405,7 @@ class ElectionConfig {
   }
 
   // function: processCandidateData
-  // purpose: builds map of candidate ID to candidate name
+  // purpose: builds map of candidate ID to candidate name and possibly generates tie-break ordering
   private void processCandidateData() {
     candidateCodeToNameMap = new HashMap<>();
     // candidate is used to index through all candidates for this election

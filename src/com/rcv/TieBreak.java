@@ -146,7 +146,7 @@ class TieBreak {
         break;
       }
     }
-    explanation = "The losing candidate appeared last in the tie-breaking permutation list.";
+    explanation = "The losing candidate appeared latest in the tie-breaking permutation list.";
     return selectedCandidate;
   }
 
