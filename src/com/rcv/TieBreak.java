@@ -9,6 +9,7 @@ package com.rcv;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,8 +19,12 @@ import java.util.SortedMap;
 
 class TieBreak {
 
+  // list of candidates who are tied
   private final List<String> tiedCandidates;
+  // mode we're using for breaking ties
   private final Tabulator.TieBreakMode tieBreakMode;
+  // ordering to use if we're doing permutation-based tie-breaking
+  private final ArrayList<String> candidatePermutation;
   // round in which this tiebreak occurred
   private final int round;
   // number of votes the tying candidates received
@@ -28,7 +33,7 @@ class TieBreak {
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
   private final Map<Integer, Map<String, BigDecimal>> roundTallies;
   // candidate ID selected to lose the tiebreak
-  private final String loser;
+  private String loser;
   // reason for the selection
   private String explanation;
 
@@ -45,19 +50,20 @@ class TieBreak {
       Tabulator.TieBreakMode tieBreakMode,
       int round,
       BigDecimal numVotes,
-      Map<Integer, Map<String, BigDecimal>> roundTallies
+      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      ArrayList<String> candidatePermutation
   ) {
     this.tiedCandidates = tiedCandidates;
     this.tieBreakMode = tieBreakMode;
     this.round = round;
     this.numVotes = numVotes;
     this.roundTallies = roundTallies;
-    this.loser = breakTie();
+    this.candidatePermutation = candidatePermutation;
   }
 
   // function: nonLosingCandidateDescription
   // purpose: generate a string listing candidate(s) not selected to lose this tiebreak
-  // return: string listing candidate(s) note selected to lose
+  // return: string listing candidate(s) not selected to lose
   String nonLosingCandidateDescription() {
     // options: container for non selected candidate IDs
     ArrayList<String> options = new ArrayList<>();
@@ -87,10 +93,6 @@ class TieBreak {
     return nonselected;
   }
 
-  String loser() {
-    return loser;
-  }
-
   String explanation() {
     return explanation;
   }
@@ -98,30 +100,54 @@ class TieBreak {
   // function: breakTie
   // purpose: execute the tiebreak logic given the tiebreak rule in use
   // returns: losing candidate
-  private String breakTie() {
-    // return value
-    String losingCandidate;
+  String selectLoser() {
     switch (tieBreakMode) {
       case INTERACTIVE:
-        losingCandidate = doInteractive();
+        loser = doInteractive();
         break;
       case RANDOM:
-        losingCandidate = doRandom();
+        loser = doRandom();
+        break;
+      case GENERATE_PERMUTATION:
+      case USE_PERMUTATION_IN_CONFIG:
+        loser = doPermutationSelection();
         break;
       default:
         // handle tiebreaks which involve previous round tallies
         // loser: will be set if there is a previous round count loser
         // it will be null if candidates were still tied at first round
-        String loser = doPreviousRounds();
-        if (loser != null) {
-          losingCandidate = loser;
+        String previousRoundsLoser = doPreviousRounds();
+        if (previousRoundsLoser != null) {
+          loser = previousRoundsLoser;
         } else if (tieBreakMode == Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
-          losingCandidate = doInteractive();
+          loser = doInteractive();
         } else {
-          losingCandidate = doRandom();
+          loser = doRandom();
         }
     }
-    return losingCandidate;
+    return loser;
+  }
+
+  // function: doPermutationSelection
+  // purpose: select the loser based on the provided permutation order
+  // returns: selected loser
+  private String doPermutationSelection() {
+    // loser to return
+    String selectedCandidate = null;
+    // create a set to simplify matching logic
+    Set<String> tiedCandidatesSet = new HashSet<>(tiedCandidates);
+
+    // start from end of list and look for a matching candidate
+    for (int i = candidatePermutation.size() - 1; i >= 0; i--) {
+      // the current candidate we're considering from the permutation
+      String candidate = candidatePermutation.get(i);
+      if (tiedCandidatesSet.contains(candidate)) {
+        selectedCandidate = candidate;
+        break;
+      }
+    }
+    explanation = "The losing candidate appeared latest in the tie-breaking permutation list.";
+    return selectedCandidate;
   }
 
   // function doInteraction

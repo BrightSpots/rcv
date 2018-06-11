@@ -156,21 +156,21 @@ Config file must be valid JSON format.  Examples can be found under the test fol
 
       "tiebreakMode" required
         how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round.
-        value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive"
+        value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive" | "usePermutationInConfig" | "generatePermutation"
 
       "treatBlankAsUndeclaredWriteIn" required
         tabulator will interpret a blank cell in a CVR as a vote for an undeclared write-in
         value: true | false
         default: false
 
-      "undervoteLabel" optional
-        the special label used in the cast vote records to denote an undervote
-        example: "UNDERVOTE"
-        value: string of length [1..1000]
-        default: none
-
       "undeclaredWriteInLabel" optional
         the special label used in the cast vote records to denote a vote for an undeclared write-in.
         example: "UWI"
+        value: string of length [1..1000]
+        default: none
+
+      "undervoteLabel" optional
+        the special label used in the cast vote records to denote an undervote
+        example: "UNDERVOTE"
         value: string of length [1..1000]
         default: none

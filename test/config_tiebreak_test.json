@@ -11,7 +11,7 @@
     "overvoteLabel":"overvote",
     "undervoteLabel":"undervote",
     "maxSkippedRanksAllowed":null,
-    "tiebreakMode":"previousRoundCountsThenInteractive"
+    "tiebreakMode":"usePermutationInConfig"
   },
   "candidates": [
     {"name": "Mookie Blaylock"},
