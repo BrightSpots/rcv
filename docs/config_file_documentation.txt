@@ -158,7 +158,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round.
         value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive" | "usePermutationInConfig" | "generatePermutation"
 
-      "treatBlankAsUndeclaredWriteIn" required
+      "treatBlankAsUndeclaredWriteIn" optional
         tabulator will interpret a blank cell in a CVR as a vote for an undeclared write-in
         value: true | false
         default: false
