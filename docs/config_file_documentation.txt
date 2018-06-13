@@ -1,5 +1,5 @@
 This document lists the parameters that can be included in a config file suitable for input tabulation.
-Config file must be valid JSON format.  Examples can be found under the test folder.
+Config file must be valid JSON format. Examples can be found under the test folder.
 
   "contestName" required
     the name of the contest
