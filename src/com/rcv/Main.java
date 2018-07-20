@@ -165,6 +165,7 @@ class Main {
       reader.parseCVRFile(
           source.filePath,
           source.firstVoteColumnIndex,
+          source.idColumnIndex,
           source.precinctColumnIndex,
           config
       );

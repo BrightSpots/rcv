@@ -73,12 +73,17 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: string of length [1..1000]
 
       "firstVoteColumnIndex" required
-        index of the column that contains ballot top-ranked candidate
+        index of the column that contains the top-ranked candidate for each CVR
         example: 3
         value: [0..1000]
 
+      "idColumnIndex" optional
+        index of the column that contains the unique ID for each CVR
+        example: 0
+        value: [0..1000]
+
       "precinctColumnIndex" required if "tabulateByPrecinct" is in use
-        the index of the column that contains ballot precinct name
+        the index of the column that contains the precinct name for each CVR
         example: 2
         value: [0..1000]
 

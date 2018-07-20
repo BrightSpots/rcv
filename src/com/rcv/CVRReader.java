@@ -60,6 +60,7 @@ class CVRReader {
   void parseCVRFile(
       String excelFilePath,
       int firstVoteColumnIndex,
+      Integer idColumnIndex,
       Integer precinctColumnIndex,
       ElectionConfig config
   ) throws Exception {
@@ -86,40 +87,39 @@ class CVRReader {
     while (iterator.hasNext()) {
       // row object is used to iterate CVR file data for this CVR
       org.apache.poi.ss.usermodel.Row castVoteRecordRow = iterator.next();
-      // unique ID for this castVoteRecord
-      String castVoteRecordID = String.format("%s(%d)", cvrFileName, cvrIndex++);
-      // create object for this row
+      // computed unique ID for this CVR
+      String computedCastVoteRecordID = String.format("%s(%d)", cvrFileName, cvrIndex++);
+      // supplied (by input file) unique ID for this CVR
+      String suppliedCastVoteRecordID = null;
+      // list of rankings read from this row
       ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
-      // create an object to store CVR data for auditing
+      // list of raw strings read from this row, for the audit log
       ArrayList<String> fullCVRData = new ArrayList<>();
       // the precinct for this ballot
       String precinct = null;
 
-      // Iterate all expected cells in this row storing cvrData and rankings as we go
+      // Iterate over all expected cells in this row storing cvrData and rankings as we go.
       // cellIndex ranges from 0 to the last expected rank column index
       for (
           int cellIndex = 0;
           cellIndex < firstVoteColumnIndex + config.getMaxRankingsAllowed();
           cellIndex++
       ) {
-        // cell object contains data the the current cell
+        // cell object contains data for the current cell
         Cell cvrDataCell = castVoteRecordRow.getCell(cellIndex);
-        if (cvrDataCell == null) {
+        String cellString = getStringFromCell(cvrDataCell);
+
+        if (cellString == null) {
           fullCVRData.add("empty cell");
-        } else if (cvrDataCell.getCellTypeEnum() == CellType.NUMERIC) {
-          // parsed numeric data
-          double doubleValue = cvrDataCell.getNumericCellValue();
-          // convert back to String (we only store String data from CVR files)
-          fullCVRData.add(Double.toString(doubleValue));
-        } else if (cvrDataCell.getCellTypeEnum() == CellType.STRING) {
-          fullCVRData.add(cvrDataCell.getStringCellValue());
         } else {
-          fullCVRData.add("unexpected data type");
+          fullCVRData.add(cellString);
         }
 
-        if (precinctColumnIndex != null && cellIndex == precinctColumnIndex) {
-          if (cvrDataCell != null) {
-            precinct = cvrDataCell.getStringCellValue();
+        if (cellString != null) {
+          if (precinctColumnIndex != null && cellIndex == precinctColumnIndex) {
+            precinct = cellString;
+          } else if (idColumnIndex != null && cellIndex == idColumnIndex) {
+            suppliedCastVoteRecordID = cellString;
           }
         }
 
@@ -143,7 +143,11 @@ class CVRReader {
           }
         } else {
           if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
-            Logger.warn("unexpected cell type at ranking %d ballot %s", rank, castVoteRecordID);
+            Logger.warn(
+                "unexpected cell type at ranking %d ballot %s",
+                rank,
+                computedCastVoteRecordID
+            );
             continue;
           }
           candidate = cvrDataCell.getStringCellValue().trim();
@@ -163,12 +167,41 @@ class CVRReader {
         Pair<Integer, String> ranking = new Pair<>(rank, candidate);
         rankings.add(ranking);
       }
+
       // we now have all required data for the new CastVoteRecord object
       // create it and add to the list of all CVRs
-      CastVoteRecord cvr =
-          new CastVoteRecord(cvrFileName, castVoteRecordID, precinct, fullCVRData, rankings);
+      CastVoteRecord cvr = new CastVoteRecord(
+          computedCastVoteRecordID,
+          suppliedCastVoteRecordID,
+          precinct,
+          fullCVRData,
+          rankings
+      );
       castVoteRecords.add(cvr);
     }
-    // parsing complete
+  }
+
+  // function: getStringFromCell
+  // purpose: parses a cell's contents into a String object
+  // param: cvrDataCell is the spreadsheet cell
+  // returns: the string
+  private String getStringFromCell(Cell cvrDataCell) {
+    // value to return
+    String cellString;
+
+    if (cvrDataCell == null) {
+      cellString = null;
+    } else if (cvrDataCell.getCellTypeEnum() == CellType.NUMERIC) {
+      // parsed numeric data (we only expect integers)
+      Integer intValue = (int) cvrDataCell.getNumericCellValue();
+      // convert back to String (we only store String data from CVR files)
+      cellString = intValue.toString();
+    } else if (cvrDataCell.getCellTypeEnum() == CellType.STRING) {
+      cellString = cvrDataCell.getStringCellValue();
+    } else {
+      cellString = null;
+    }
+
+    return cellString;
   }
 }
