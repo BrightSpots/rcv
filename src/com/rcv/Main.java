@@ -45,35 +45,38 @@ class Main {
       String configPath = args[0];
       // config file for running the tabulator
       ElectionConfig config = loadElectionConfig(configPath);
-      Logger.info("Tabulator is being used via the CLI.");
-      executeTabulation(config);
+      if (config != null) {
+        Logger.info("Tabulator is being used via the CLI.");
+        executeTabulation(config);
+      } else {
+        Logger.severe("Aborting because config is invalid.");
+      }
     }
   }
 
   // function: loadElectionConfig
   // purpose: create config object
   // param: path to config file
-  // returns: the new ElectionConfig object or null if there was a problem
+  // returns: the new ElectionConfig object, or null if there was a problem
   static ElectionConfig loadElectionConfig(String configPath) {
     // config: the new object
     ElectionConfig config = null;
 
-    // encounteredError tracks whether anything went wrong during loading
-    boolean encounteredError = false;
+    // tracks whether we encountered any critical file system errors
+    boolean encounteredFileError = false;
 
     // rawConfig holds the basic election config data parsed from json
     RawElectionConfig rawConfig =
         JsonParser.parseObjectFromFile(configPath, RawElectionConfig.class);
 
     if (rawConfig == null) {
-      encounteredError = true;
+      System.err.println(String.format("Failed to load config file: %s", configPath));
     } else {
       config = new ElectionConfig(rawConfig);
 
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
       } catch (UnableToCreateDirectoryException exception) {
-        encounteredError = true;
         System.err.println(
             String.format(
                 "Failed to create output directory: %s\n%s",
@@ -81,17 +84,22 @@ class Main {
                 exception.toString()
             )
         );
+        encounteredFileError = true;
+      }
+
+      List<String> validationErrors = config.getValidationErrors();
+      if (!validationErrors.isEmpty()) {
+        for (String error : validationErrors) {
+          Logger.severe(String.format("Invalid config: %s", error));
+        }
+        config = null;
       }
     }
 
-    // TODO: confiog.validate() should log specific errors
-    if (encounteredError || !config.validate()) {
-      Logger.severe("There was a problem loading or validating the election configuration.");
-      Logger.severe("Please see the README.txt for details.");
+    if (encounteredFileError) {
       config = null;
     }
 
-    // TODO: Should probably add either check for null config here (and throw exception?), or whenever it's called
     return config;
   }
 
@@ -117,7 +125,7 @@ class Main {
     } catch (IOException exception) {
       // error message for user and log
       String errorMessage =
-        String.format("Failed to configure tabulation logger:%s", exception.toString());
+        String.format("Failed to configure tabulation logger: %s", exception.toString());
       Logger.severe(errorMessage);
       response = errorMessage;
       encounteredError = true;
@@ -130,14 +138,18 @@ class Main {
       try {
         // parse the cast vote records
         castVoteRecords = parseCastVoteRecords(config);
-        // tabulator for tabulation logic
-        Tabulator tabulator = new Tabulator(castVoteRecords, config);
-        // do the tabulation
-        tabulator.tabulate();
-        // generate visualizer spreadsheet data
-        tabulator.generateSummarySpreadsheet(timestampString);
-        // generate audit data
-        tabulator.doAudit(castVoteRecords);
+        if (!castVoteRecords.isEmpty()) {
+          // tabulator for tabulation logic
+          Tabulator tabulator = new Tabulator(castVoteRecords, config);
+          // do the tabulation
+          tabulator.tabulate();
+          // generate visualizer spreadsheet data
+          tabulator.generateSummarySpreadsheet(timestampString);
+          // generate audit data
+          tabulator.doAudit(castVoteRecords);
+        } else {
+          Logger.severe("No cast vote records found.");
+        }
       } catch (Exception exception) {
         encounteredError = true;
         Logger.severe("ERROR during tabulation: %s", exception.toString());
@@ -154,9 +166,13 @@ class Main {
   // param: config object containing CVR file paths to parse
   // returns: list of all CastVoteRecord objects parsed from CVR files
   private static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config) throws Exception {
+    if (config.rawConfig.cvrFileSources == null || config.rawConfig.cvrFileSources.isEmpty()) {
+      Logger.severe("Config doesn't contain any CVR input files.");
+    }
+
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    // at each iteration of the following loop we add records from another source file
+    // At each iteration of the following loop, we add records from another source file.
     // source: index over config sources
     for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
       Logger.info("Reading CVR file: %s (provider: %s)", source.filePath, source.provider);

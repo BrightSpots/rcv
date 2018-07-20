@@ -1,0 +1,22 @@
+{
+  "outputDirectory":"test_output/validation_test",
+  "contestName":"Validation test",
+  "jurisdiction":"none",
+  "office":"none",
+  "date":"2018-07-19",
+  "rules": {
+    "description":"Testing our validation logic",
+    "batchElimination":true,
+    "continueUntilTwoCandidatesRemain":true,
+    "decimalPlacesForVoteArithmetic":-1,
+    "maxRankingsAllowed":-1,
+    "maxSkippedRanksAllowed":-3,
+    "multiSeatTransferRule":"flipACoin",
+    "numberOfWinners":2,
+    "overvoteLabel":"overvote",
+    "overvoteRule":"exhaustIfAnyContinuing",
+    "tiebreakMode":"whatever",
+    "undeclaredWriteInLabel":"UWI",
+    "undervoteLabel":"undervote"
+  }
+}

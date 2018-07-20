@@ -16,6 +16,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,7 +58,6 @@ class ElectionConfig {
         rule = Tabulator.MultiSeatTransferRule.TRANSFER_WHOLE_SURPLUS;
         break;
       default:
-        Logger.warn("Unrecognized MultiSeatTransferRule setting: %s", setting);
     }
     return rule;
   }
@@ -90,7 +90,6 @@ class ElectionConfig {
         rule = Tabulator.OvervoteRule.IGNORE_IF_MULTIPLE_CONTINUING;
         break;
       default:
-        Logger.warn("Unrecognized overvote rule setting: %s", setting);
     }
     return rule;
   }
@@ -122,53 +121,70 @@ class ElectionConfig {
         mode = Tabulator.TieBreakMode.GENERATE_PERMUTATION;
         break;
       default:
-        Logger.warn("Unrecognized tiebreaker mode rule setting: %s", setting);
     }
     return mode;
   }
 
-  // function: validate
+  // function: getValidationErrors
   // purpose: validate the correctness of the config data
-  // returns false if there was a problem
-  boolean validate() {
-    // does this config meet our validation standards?
-    boolean valid = true;
+  // returns any detected problems
+  List<String> getValidationErrors() {
+    // detected errors
+    List<String> errors = new LinkedList<>();
 
-    if (this.getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
-      valid = false;
-    } else if (this.getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
-      valid = false;
+    if (getNumDeclaredCandidates() == 0) {
+      errors.add("Config must contain at least one declared candidate.");
+    }
+
+    if (getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
+      errors.add("Number of winners must be between 1 and 100");
+    }
+
+    if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
+      errors.add("Invalid overvote rule.");
     } else if (getOvervoteLabel() != null &&
         getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
         getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-    ) {
-      valid = false;
-    } else if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
-      valid = false;
-    } else if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
-      valid = false;
+        ) {
+      errors.add(
+          "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately or " +
+              "alwaysSkipToNextRank."
+      );
     }
 
-    // if continueUntilTwoCandidatesRemain is selected
-    // this must be a single-winner election
-    if (this.willContinueUntilTwoCandidatesRemain() && this.getNumberOfWinners() > 1) {
-      valid = false;
+    if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
+      errors.add("Invalid tie-break mode.");
     }
 
-    // if multi-seat is indicated we validate decimal count and rules style
+    if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
+      errors.add("maxSkippedRanksAllowed can't be negative.");
+    }
+
+    if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
+      errors.add("maxRankingsAllowed must be positive.");
+    }
+
+    // If this is a multi-seat election, we validate a number of extra parameters.
     //
-    if (this.getNumberOfWinners() > 1) {
-      if (
-          this.getDecimalPlacesForVoteArithmetic() < 0 ||
-          this.getDecimalPlacesForVoteArithmetic() > 20
-      ) {
-        valid = false;
+    if (getNumberOfWinners() > 1) {
+      if (willContinueUntilTwoCandidatesRemain()) {
+        errors.add("continueUntilTwoCandidatesRemain can't be true in a multi-winner election.");
       }
+
+      if (isBatchEliminationEnabled()) {
+        errors.add("batchElimination can't be true in a multi-winner election.");
+      }
+
+      if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
+        errors.add("decimalPlacesForVoteArithmetic must be between 0 and 20.");
+      }
+
       if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
-        valid = false;
+        errors.add("Invalid multiSeatTransferRule.");
       }
     }
-    return valid;
+
+    return errors;
   }
 
   // function: getNumberWinners
@@ -408,24 +424,27 @@ class ElectionConfig {
   // purpose: builds map of candidate ID to candidate name and possibly generates tie-break ordering
   private void processCandidateData() {
     candidateCodeToNameMap = new HashMap<>();
-    // candidate is used to index through all candidates for this election
-    for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
-      if (candidate.code != null) {
-        candidateCodeToNameMap.put(candidate.code, candidate.name);
-        candidatePermutation.add(candidate.code);
-      } else {
-        candidateCodeToNameMap.put(candidate.name, candidate.name);
-        candidatePermutation.add(candidate.name);
+
+    if (rawConfig.candidates != null) {
+      // candidate is used to index through all candidates for this election
+      for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
+        if (candidate.code != null) {
+          candidateCodeToNameMap.put(candidate.code, candidate.name);
+          candidatePermutation.add(candidate.code);
+        } else {
+          candidateCodeToNameMap.put(candidate.name, candidate.name);
+          candidatePermutation.add(candidate.name);
+        }
       }
-    }
 
-    if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      Collections.shuffle(candidatePermutation);
-    }
+      if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
+        Collections.shuffle(candidatePermutation);
+      }
 
-    String uwiLabel = getUndeclaredWriteInLabel();
-    if (uwiLabel != null) {
-      candidateCodeToNameMap.put(uwiLabel, uwiLabel);
+      String uwiLabel = getUndeclaredWriteInLabel();
+      if (uwiLabel != null) {
+        candidateCodeToNameMap.put(uwiLabel, uwiLabel);
+      }
     }
   }
 }
