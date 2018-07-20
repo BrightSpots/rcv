@@ -29,6 +29,7 @@
       "provider": "ES&S",
       "filePath": "test/2018-maine-governor-primary-dem-cvr.xlsx",
       "firstVoteColumnIndex": 3,
+      "idColumnIndex": 0,
       "precinctColumnIndex": 1
     }
   ]

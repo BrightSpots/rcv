@@ -95,6 +95,8 @@ public class RawElectionConfig {
     public String filePath;
     // column where rankings data begins
     public Integer firstVoteColumnIndex;
+    // column containing CVR ID (if any)
+    public Integer idColumnIndex;
     // column containing precinct (if any)
     public Integer precinctColumnIndex;
   }
