@@ -176,7 +176,7 @@ class ElectionConfig {
       }
 
       if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
-        errors.add("decimalPlacesForVoteArithmetic must be between 0 and 20.");
+        errors.add("decimalPlacesForVoteArithmetic must be between 0 and 20 (inclusive).");
       }
 
       if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {

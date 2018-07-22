@@ -90,7 +90,7 @@ class Main {
       List<String> validationErrors = config.getValidationErrors();
       if (!validationErrors.isEmpty()) {
         for (String error : validationErrors) {
-          Logger.severe(String.format("Invalid config: %s", error));
+          Logger.severe("Invalid config: %s", error);
         }
         config = null;
       }
@@ -135,9 +135,9 @@ class Main {
       // Read cast vote records from CVR files
       // castVoteRecords will contain all cast vote records parsed by the reader
       List<CastVoteRecord> castVoteRecords;
-      try {
-        // parse the cast vote records
-        castVoteRecords = parseCastVoteRecords(config);
+      // parse the cast vote records
+      castVoteRecords = parseCastVoteRecords(config);
+      if (castVoteRecords != null) {
         if (!castVoteRecords.isEmpty()) {
           // tabulator for tabulation logic
           Tabulator tabulator = new Tabulator(castVoteRecords, config);
@@ -150,9 +150,8 @@ class Main {
         } else {
           Logger.severe("No cast vote records found.");
         }
-      } catch (Exception exception) {
-        encounteredError = true;
-        Logger.severe("ERROR during tabulation: %s", exception.toString());
+      } else {
+        Logger.severe("Skipping tabulation due to source file errors.");
       }
     }
     Logger.info("Done logging tabulation to %s", auditLogPath);
@@ -164,31 +163,84 @@ class Main {
   // function: parseCastVoteRecords
   // purpose: parse CVR files referenced in the ElectionConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
-  // returns: list of all CastVoteRecord objects parsed from CVR files
-  private static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config) throws Exception {
-    if (config.rawConfig.cvrFileSources == null || config.rawConfig.cvrFileSources.isEmpty()) {
-      Logger.severe("Config doesn't contain any CVR input files.");
-    }
-
+  // returns: list of all CastVoteRecord objects parsed from CVR files (or null if there's an error)
+  private static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config) {
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    // At each iteration of the following loop, we add records from another source file.
-    // source: index over config sources
-    for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      Logger.info("Reading CVR file: %s (provider: %s)", source.filePath, source.provider);
-      // reader: read input file into a list of cast vote records
-      CVRReader reader = new CVRReader();
-      reader.parseCVRFile(
-          source.filePath,
-          source.firstVoteColumnIndex,
-          source.idColumnIndex,
-          source.precinctColumnIndex,
-          config
-      );
-      // add records to the master list
-      castVoteRecords.addAll(reader.castVoteRecords);
+    // how many sources had fatal problems?
+    int numInvalidSources = 0;
+
+    if (config.rawConfig.cvrFileSources == null || config.rawConfig.cvrFileSources.isEmpty()) {
+      Logger.severe("Config doesn't contain any CVR input files.");
+    } else {
+      // At each iteration of the following loop, we add records from another source file.
+      // source: index over config sources
+      for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
+        Logger.info("Reading CVR file: %s (provider: %s)", source.filePath, source.provider);
+
+        // did we encounter a fatal problem for this source?
+        boolean encounteredProblemForThisSource = false;
+
+        if (source.filePath == null || source.filePath.isEmpty()) {
+          Logger.severe(
+              "Invalid source file: missing filePath"
+          );
+          encounteredProblemForThisSource = true;
+        }
+
+        if (source.firstVoteColumnIndex == null || source.firstVoteColumnIndex < 0) {
+          Logger.severe(
+              "Invalid source file: missing or invalid firstVoteColumnIndex: %s",
+              source.filePath
+          );
+          encounteredProblemForThisSource = true;
+        }
+
+        if (
+            config.isTabulateByPrecinctEnabled() &&
+            (source.precinctColumnIndex == null || source.precinctColumnIndex < 0)
+        ) {
+          Logger.severe(
+              "Invalid source file: missing or invalid precinctColumnIndex when " +
+                  "tabulateByPrecinct is enabled: %s",
+              source.filePath
+          );
+          encounteredProblemForThisSource = true;
+        }
+
+        if (!encounteredProblemForThisSource) {
+          // reader: read input file into a list of cast vote records
+          CVRReader reader = new CVRReader(
+              config,
+              source.filePath,
+              source.firstVoteColumnIndex,
+              source.idColumnIndex,
+              source.precinctColumnIndex
+          );
+          // the CVRs parsed from this source
+          List<CastVoteRecord> cvrs = reader.parseCVRFile();
+          if (cvrs.isEmpty()) {
+            Logger.severe("Source file contains no CVRs: %s", source.filePath);
+            encounteredProblemForThisSource = true;
+          }
+          // add records to the master list
+          castVoteRecords.addAll(cvrs);
+        }
+
+        if (encounteredProblemForThisSource) {
+          numInvalidSources++;
+        }
+      }
+      if (numInvalidSources == 0) {
+        Logger.info("Read %d cast vote records", castVoteRecords.size());
+      }
     }
-    Logger.info("Read %d records", castVoteRecords.size());
+
+    if (numInvalidSources > 0) {
+      Logger.severe("Encountered %d invalid source(s)", numInvalidSources);
+      castVoteRecords = null;
+    }
+
     return castVoteRecords;
   }
 }

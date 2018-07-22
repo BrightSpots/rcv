@@ -11,29 +11,198 @@ package com.rcv;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import javafx.util.Pair;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 class CVRReader {
 
-  // container for all CastVoteRecords parsed from the input file
-  final List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+  // config for the election
+  private ElectionConfig config;
+  // path of the source file
+  private String excelFilePath;
+  // column index of first ranking
+  private int firstVoteColumnIndex;
+  // column index of CVR ID (if present)
+  private Integer idColumnIndex;
+  // column index of precinct name (if present)
+  private Integer precinctColumnIndex;
 
+  // function: CVRReader
+  // param: config an ElectionConfig object specifying rules for interpreting CVR file data
+  // param: excelFilePath path to location of input cast vote record file
+  // param: firstVoteColumnIndex the 0-based index where rankings begin for this ballot style
+  // param: idColumnIndex the column containing the CVR ID (possibly null)
+  // param: precinctColumnIndex the column containing precinct names (possibly null)
+  CVRReader(
+      ElectionConfig config,
+      String excelFilePath,
+      int firstVoteColumnIndex,
+      Integer idColumnIndex,
+      Integer precinctColumnIndex
+  ) {
+    this.config = config;
+    this.excelFilePath = excelFilePath;
+    this.firstVoteColumnIndex = firstVoteColumnIndex;
+    this.idColumnIndex = idColumnIndex;
+    this.precinctColumnIndex = precinctColumnIndex;
+  }
+
+  // function: parseCVRFile
+  // purpose: parse the given file path into a List of CastVoteRecords suitable for tabulation
+  // returns: list of parsed CVRs
+  List<CastVoteRecord> parseCVRFile() {
+    // contestSheet contains all the CVR data we will be parsing
+    Sheet contestSheet = getFirstSheet(excelFilePath);
+    // container for all CastVoteRecords parsed from the input file
+    List<CastVoteRecord> castVoteRecords = new LinkedList<>();
+
+    if (contestSheet != null) {
+      // validate header
+      // Row iterator is used to iterate through a row of data from the sheet object
+      Iterator<Row> iterator = contestSheet.iterator();
+      // headerRow contains the first row
+      Row headerRow = iterator.next();
+      // require at least one non-header row
+      if (headerRow == null || contestSheet.getLastRowNum() < 2) {
+        Logger.severe(
+            "Invalid CVR source file %s: not enough rows (%d)",
+            this.excelFilePath,
+            contestSheet.getLastRowNum()
+        );
+      }
+
+      // cvrFileName for generating cvrIDs
+      String cvrFileName = new File(excelFilePath).getName();
+      // cvrIndex for generating cvrIDs
+      int cvrIndex = 1;
+
+      // Iterate through all rows and create a CastVoteRecord for each row
+      while (iterator.hasNext()) {
+        // cvr is the object parsed from the row
+        CastVoteRecord cvr = parseRow(iterator.next(), cvrFileName, cvrIndex++);
+        castVoteRecords.add(cvr);
+      }
+    }
+    return castVoteRecords;
+  }
+
+  // function: parseRow
+  // purpose: parse a single row into a CastVoteRecord
+  // returns: a CastVoteRecord object
+  private CastVoteRecord parseRow(
+      Row castVoteRecordRow,
+      String cvrFileName,
+      int cvrIndex
+  ) {
+    // row object is used to iterate CVR file data for this CVR
+    // computed unique ID for this CVR
+    String computedCastVoteRecordID = String.format("%s(%d)", cvrFileName, cvrIndex);
+    // supplied (by input file) unique ID for this CVR
+    String suppliedCastVoteRecordID = null;
+    // list of rankings read from this row
+    LinkedList<Pair<Integer, String>> rankings = new LinkedList<>();
+    // list of raw strings read from this row, for the audit log
+    LinkedList<String> fullCVRData = new LinkedList<>();
+    // the precinct for this ballot
+    String precinct = null;
+
+    // Iterate over all expected cells in this row storing cvrData and rankings as we go.
+    // cellIndex ranges from 0 to the last expected rank column index
+    for (
+        int cellIndex = 0;
+        cellIndex < firstVoteColumnIndex + config.getMaxRankingsAllowed();
+        cellIndex++
+    ) {
+      // cell object contains data for the current cell
+      Cell cvrDataCell = castVoteRecordRow.getCell(cellIndex);
+      String cellString = getStringFromCell(cvrDataCell);
+
+      if (cellString == null) {
+        fullCVRData.add("empty cell");
+      } else {
+        fullCVRData.add(cellString);
+      }
+
+      if (cellString != null) {
+        if (precinctColumnIndex != null && cellIndex == precinctColumnIndex) {
+          precinct = cellString;
+        } else if (idColumnIndex != null && cellIndex == idColumnIndex) {
+          suppliedCastVoteRecordID = cellString;
+        }
+      }
+
+      // if we haven't reached a vote cell continue to the next cell
+      if (cellIndex < firstVoteColumnIndex) {
+        continue;
+      }
+
+      // rank for this cell
+      int rank = cellIndex - firstVoteColumnIndex + 1;
+      // candidate will be the candidate selected at this rank
+      String candidate;
+      if (cvrDataCell == null) {
+        // empty cells are sometimes treated as undeclared write-ins (Portland / ES&S)
+        if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
+          candidate = config.getUndeclaredWriteInLabel();
+          Logger.warn("Empty cell -- treating as UWI");
+        } else {
+          // just ignore this cell
+          continue;
+        }
+      } else {
+        if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
+          Logger.warn(
+              "unexpected cell type at ranking %d ballot %s",
+              rank,
+              computedCastVoteRecordID
+          );
+          continue;
+        }
+        candidate = cvrDataCell.getStringCellValue().trim();
+
+        if (candidate.equals(config.getUndervoteLabel())) {
+          continue;
+        } else if (candidate.equals(config.getOvervoteLabel())) {
+          candidate = Tabulator.explicitOvervoteLabel;
+        } else if (!config.getCandidateCodeList().contains(candidate)) {
+          if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
+            Logger.warn("no match for candidate: %s", candidate);
+          }
+          candidate = config.getUndeclaredWriteInLabel();
+        }
+      }
+      // create and add new ranking pair to the rankings list
+      Pair<Integer, String> ranking = new Pair<>(rank, candidate);
+      rankings.add(ranking);
+    }
+
+    // we now have all required data for the new CastVoteRecord object
+    // create it and add to the list of all CVRs
+    return new CastVoteRecord(
+        computedCastVoteRecordID,
+        suppliedCastVoteRecordID,
+        precinct,
+        fullCVRData,
+        rankings
+    );
+  }
+
+  // function: getFirstSheet
   // purpose: helper function to wrap file IO with error handling
   // param: excelFilePath path to file for parsing
   // file access: read
-  // throws: IOException if there was a problem opening or reading the file
   // returns: the first xls sheet object in the file or null if there was a problem
-  private static Sheet getFirstSheet(String excelFilePath) throws IOException {
+  private static Sheet getFirstSheet(String excelFilePath) {
     // container for result
-    Sheet firstSheet;
+    Sheet firstSheet = null;
     try {
       // inputStream for parsing file data into memory
       FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
@@ -43,142 +212,9 @@ class CVRReader {
       inputStream.close();
       workbook.close();
     } catch (IOException exception) {
-      Logger.severe("failed to open CVR file: %s, %s", excelFilePath, exception.getMessage());
-      throw exception;
+      Logger.severe("Failed to open CVR file: %s\n%s", excelFilePath, exception.getMessage());
     }
     return firstSheet;
-  }
-
-  // purpose: parse the given file path into a CastVoteRecordList suitable for tabulation
-  // Note: this is specific for the Maine example file we were provided
-  // param: excelFilePath path to location of input cast vote record file
-  // param: firstVoteColumnIndex the 0-based index where rankings begin for this ballot style
-  // param: precinctColumnIndex the column containing precinct names (possibly null)
-  // param: allowableRanks how many ranks are allowed for each cast vote record
-  // param: candidateIDs list of all declared candidate IDs
-  // param: config an ElectionConfig object specifying rules for interpreting CVR file data
-  void parseCVRFile(
-      String excelFilePath,
-      int firstVoteColumnIndex,
-      Integer idColumnIndex,
-      Integer precinctColumnIndex,
-      ElectionConfig config
-  ) throws Exception {
-    // contestSheet contains all the CVR data we will be parsing
-    Sheet contestSheet = getFirstSheet(excelFilePath);
-
-    // validate header
-    // Row iterator is used to iterate through a row of data from the sheet object
-    Iterator<org.apache.poi.ss.usermodel.Row> iterator = contestSheet.iterator();
-    // headerRow contains the first row
-    org.apache.poi.ss.usermodel.Row headerRow = iterator.next();
-    // require at least one row
-    if (headerRow == null || contestSheet.getLastRowNum() < 2) {
-      Logger.severe("invalid RCV format: not enough rows:%d", contestSheet.getLastRowNum());
-      throw new Exception();
-    }
-
-    // cvrFileName for generating cvrIDs
-    String cvrFileName = new File(excelFilePath).getName();
-    // cvrIndex for generating cvrIDs
-    int cvrIndex = 1;
-
-    // Iterate through all rows and create a CastVoteRecord for each row
-    while (iterator.hasNext()) {
-      // row object is used to iterate CVR file data for this CVR
-      org.apache.poi.ss.usermodel.Row castVoteRecordRow = iterator.next();
-      // computed unique ID for this CVR
-      String computedCastVoteRecordID = String.format("%s(%d)", cvrFileName, cvrIndex++);
-      // supplied (by input file) unique ID for this CVR
-      String suppliedCastVoteRecordID = null;
-      // list of rankings read from this row
-      ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
-      // list of raw strings read from this row, for the audit log
-      ArrayList<String> fullCVRData = new ArrayList<>();
-      // the precinct for this ballot
-      String precinct = null;
-
-      // Iterate over all expected cells in this row storing cvrData and rankings as we go.
-      // cellIndex ranges from 0 to the last expected rank column index
-      for (
-          int cellIndex = 0;
-          cellIndex < firstVoteColumnIndex + config.getMaxRankingsAllowed();
-          cellIndex++
-      ) {
-        // cell object contains data for the current cell
-        Cell cvrDataCell = castVoteRecordRow.getCell(cellIndex);
-        String cellString = getStringFromCell(cvrDataCell);
-
-        if (cellString == null) {
-          fullCVRData.add("empty cell");
-        } else {
-          fullCVRData.add(cellString);
-        }
-
-        if (cellString != null) {
-          if (precinctColumnIndex != null && cellIndex == precinctColumnIndex) {
-            precinct = cellString;
-          } else if (idColumnIndex != null && cellIndex == idColumnIndex) {
-            suppliedCastVoteRecordID = cellString;
-          }
-        }
-
-        // if we haven't reached a vote cell continue to the next cell
-        if (cellIndex < firstVoteColumnIndex) {
-          continue;
-        }
-
-        // rank for this cell
-        int rank = cellIndex - firstVoteColumnIndex + 1;
-        // candidate will be the candidate selected at this rank
-        String candidate;
-        if (cvrDataCell == null) {
-          // empty cells are sometimes treated as undeclared write-ins (Portland / ES&S)
-          if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
-            candidate = config.getUndeclaredWriteInLabel();
-            Logger.warn("Empty cell -- treating as UWI");
-          } else {
-            // just ignore this cell
-            continue;
-          }
-        } else {
-          if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
-            Logger.warn(
-                "unexpected cell type at ranking %d ballot %s",
-                rank,
-                computedCastVoteRecordID
-            );
-            continue;
-          }
-          candidate = cvrDataCell.getStringCellValue().trim();
-
-          if (candidate.equals(config.getUndervoteLabel())) {
-            continue;
-          } else if (candidate.equals(config.getOvervoteLabel())) {
-            candidate = Tabulator.explicitOvervoteLabel;
-          } else if (!config.getCandidateCodeList().contains(candidate)) {
-            if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
-              Logger.warn("no match for candidate: %s", candidate);
-            }
-            candidate = config.getUndeclaredWriteInLabel();
-          }
-        }
-        // create and add new ranking pair to the rankings list
-        Pair<Integer, String> ranking = new Pair<>(rank, candidate);
-        rankings.add(ranking);
-      }
-
-      // we now have all required data for the new CastVoteRecord object
-      // create it and add to the list of all CVRs
-      CastVoteRecord cvr = new CastVoteRecord(
-          computedCastVoteRecordID,
-          suppliedCastVoteRecordID,
-          precinct,
-          fullCVRData,
-          rankings
-      );
-      castVoteRecords.add(cvr);
-    }
   }
 
   // function: getStringFromCell
