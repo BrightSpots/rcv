@@ -7,7 +7,6 @@
   "rules": {
     "description":"Maine + Multi-Seat Tester",
     "maxRankingsAllowed":15,
-    "batchElimination":true,
     "overvoteRule":"exhaustImmediately",
     "maxSkippedRanksAllowed":1,
     "undeclaredWriteInLabel":"UWI",

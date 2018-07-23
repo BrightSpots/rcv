@@ -1,0 +1,22 @@
+{
+  "outputDirectory":"test_output/validation_test_params",
+  "contestName":"Validation test for params",
+  "jurisdiction":"none",
+  "office":"none",
+  "date":"2018-07-19",
+  "rules": {
+    "description":"Testing our validation logic for params",
+    "batchElimination":true,
+    "continueUntilTwoCandidatesRemain":true,
+    "decimalPlacesForVoteArithmetic":-1,
+    "maxRankingsAllowed":-1,
+    "maxSkippedRanksAllowed":-3,
+    "multiSeatTransferRule":"flipACoin",
+    "numberOfWinners":2,
+    "overvoteLabel":"overvote",
+    "overvoteRule":"exhaustIfAnyContinuing",
+    "tiebreakMode":"whatever",
+    "undeclaredWriteInLabel":"UWI",
+    "undervoteLabel":"undervote"
+  }
+}
