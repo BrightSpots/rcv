@@ -45,7 +45,7 @@ class Logger {
     // create and cache default logger
     defaultLogger = java.util.logging.Logger.getLogger("");
     // remove any loggers the system may have installed
-    for(Handler handler : defaultLogger.getHandlers()) {
+    for (Handler handler : defaultLogger.getHandlers()) {
       defaultLogger.removeHandler(handler);
     }
     // logPath is where default file logging is written

@@ -120,7 +120,7 @@ class ResultsWriter {
     // filename for output
     String outputFileName = String.format("%s_summary.xlsx", this.timestampString);
     // full path for output
-    String outputPath = Paths.get(config.getOutputDirectory(), outputFileName ).toString();
+    String outputPath = Paths.get(config.getOutputDirectory(), outputFileName).toString();
     // generate the spreadsheet
     generateSummarySpreadsheet(roundTallies, null, outputPath);
   }
@@ -137,7 +137,8 @@ class ResultsWriter {
       // the precinct output filename
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       // filename for output
-      String outputFileName = String.format("%s_%s_precinct_summary.xlsx", this.timestampString, precinctFileString);
+      String outputFileName = String
+          .format("%s_%s_precinct_summary.xlsx", this.timestampString, precinctFileString);
       // full path for output
       String outputPath = Paths.get(config.getOutputDirectory(), outputFileName).toString();
       generateSummarySpreadsheet(

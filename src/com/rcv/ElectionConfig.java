@@ -145,7 +145,7 @@ class ElectionConfig {
     } else if (getOvervoteLabel() != null &&
         getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
         getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-        ) {
+    ) {
       errors.add(
           "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately or " +
               "alwaysSkipToNextRank."

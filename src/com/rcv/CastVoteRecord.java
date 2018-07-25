@@ -10,7 +10,6 @@
 package com.rcv;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -208,6 +207,7 @@ class CastVoteRecord {
   }
 
   private class VoteOutcome {
+
     // what type of outcome (counted, ignored, exhausted)
     VoteOutcomeType outcomeType;
     // more detail on the outcome (who got the vote or why it was ignored/exhausted)
