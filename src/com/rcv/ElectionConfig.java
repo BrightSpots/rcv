@@ -240,8 +240,8 @@ class ElectionConfig {
   }
 
   // function: willContinueUntilTwoCandidatesRemain
-  // purpose: getter for setting to keep tabulating beyond selecting winner till two candidates remain
-  // returns: whether to keep tabulating untill two candidates remain
+  // purpose: getter for setting to keep tabulating beyond selecting winner until two candidates remain
+  // returns: whether to keep tabulating until two candidates remain
   boolean willContinueUntilTwoCandidatesRemain() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }

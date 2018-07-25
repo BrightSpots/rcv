@@ -447,7 +447,7 @@ class Tabulator {
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates
   ) {
     List<String> eliminated = new LinkedList<>();
-    if (eliminated.isEmpty() && config.isBatchEliminationEnabled()) {
+    if (config.isBatchEliminationEnabled()) {
       // container for results
       List<BatchElimination> batchEliminations = runBatchElimination(currentRoundTallyToCandidates);
       if (batchEliminations.size() > 1) {
