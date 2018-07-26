@@ -31,7 +31,7 @@ class Main {
     try {
       Logger.setup();
     } catch (IOException exception) {
-      System.err.print(String.format("Failed to start system logging:%s", exception.toString()));
+      System.err.print(String.format("Failed to start system logging: %s", exception.toString()));
     }
 
     if (args.length == 0) {
@@ -125,7 +125,7 @@ class Main {
     } catch (IOException exception) {
       // error message for user and log
       String errorMessage =
-        String.format("Failed to configure tabulation logger: %s", exception.toString());
+          String.format("Failed to configure tabulation logger: %s", exception.toString());
       Logger.severe(errorMessage);
       response = errorMessage;
       encounteredError = true;
@@ -198,7 +198,7 @@ class Main {
 
         if (
             config.isTabulateByPrecinctEnabled() &&
-            (source.precinctColumnIndex == null || source.precinctColumnIndex < 0)
+                (source.precinctColumnIndex == null || source.precinctColumnIndex < 0)
         ) {
           Logger.severe(
               "Invalid source file: missing or invalid precinctColumnIndex when " +

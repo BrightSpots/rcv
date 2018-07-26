@@ -204,7 +204,8 @@ class Tabulator {
   // purpose: log some basic info about the contest before starting tabulation
   private void logSummaryInfo() {
     Logger.info("Beginning tabulation for contest.");
-    Logger.info("There are %d declared candidates for this contest:", config.getNumDeclaredCandidates());
+    Logger.info("There are %d declared candidates for this contest:",
+        config.getNumDeclaredCandidates());
     // candidateID indexes over all candidate IDs to log them
     for (String candidateID : candidateIDs) {
       Logger.info("%s", candidateID);
@@ -391,7 +392,7 @@ class Tabulator {
             label != null &&
             candidateIDs.contains(label) &&
             currentRoundCandidateToTally.get(label).signum() == 1
-        ) {
+    ) {
       eliminated.add(label);
       Logger.info(
           "Eliminated %s in round %d because it represents undeclared write-ins. It had %s votes.",
@@ -413,10 +414,8 @@ class Tabulator {
     List<String> eliminated = new LinkedList<>();
     // min threshold
     BigDecimal threshold = config.getMinimumVoteThreshold();
-    if (
-        threshold.signum() == 1 &&
-            currentRoundTallyToCandidates.firstKey().compareTo(threshold) < 0
-        ) {
+    if (threshold.signum() == 1
+        && currentRoundTallyToCandidates.firstKey().compareTo(threshold) < 0) {
       // tally indexes over all tallies in the current round
       for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
         if (tally.compareTo(threshold) < 0) {
@@ -448,7 +447,7 @@ class Tabulator {
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates
   ) {
     List<String> eliminated = new LinkedList<>();
-    if (eliminated.isEmpty() && config.isBatchEliminationEnabled()) {
+    if (config.isBatchEliminationEnabled()) {
       // container for results
       List<BatchElimination> batchEliminations = runBatchElimination(currentRoundTallyToCandidates);
       if (batchEliminations.size() > 1) {

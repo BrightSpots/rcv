@@ -55,6 +55,28 @@ class CVRReader {
     this.precinctColumnIndex = precinctColumnIndex;
   }
 
+  // function: getFirstSheet
+  // purpose: helper function to wrap file IO with error handling
+  // param: excelFilePath path to file for parsing
+  // file access: read
+  // returns: the first xls sheet object in the file or null if there was a problem
+  private static Sheet getFirstSheet(String excelFilePath) {
+    // container for result
+    Sheet firstSheet = null;
+    try {
+      // inputStream for parsing file data into memory
+      FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
+      // excel workbook object to access to sheet objects it contains
+      Workbook workbook = new XSSFWorkbook(inputStream);
+      firstSheet = workbook.getSheetAt(0);
+      inputStream.close();
+      workbook.close();
+    } catch (IOException exception) {
+      Logger.severe("Failed to open CVR file: %s\n%s", excelFilePath, exception.getMessage());
+    }
+    return firstSheet;
+  }
+
   // function: parseCVRFile
   // purpose: parse the given file path into a List of CastVoteRecords suitable for tabulation
   // returns: list of parsed CVRs
@@ -193,28 +215,6 @@ class CVRReader {
         fullCVRData,
         rankings
     );
-  }
-
-  // function: getFirstSheet
-  // purpose: helper function to wrap file IO with error handling
-  // param: excelFilePath path to file for parsing
-  // file access: read
-  // returns: the first xls sheet object in the file or null if there was a problem
-  private static Sheet getFirstSheet(String excelFilePath) {
-    // container for result
-    Sheet firstSheet = null;
-    try {
-      // inputStream for parsing file data into memory
-      FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
-      // excel workbook object to access to sheet objects it contains
-      Workbook workbook = new XSSFWorkbook(inputStream);
-      firstSheet = workbook.getSheetAt(0);
-      inputStream.close();
-      workbook.close();
-    } catch (IOException exception) {
-      Logger.severe("Failed to open CVR file: %s\n%s", excelFilePath, exception.getMessage());
-    }
-    return firstSheet;
   }
 
   // function: getStringFromCell

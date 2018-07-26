@@ -33,14 +33,20 @@ class RcvGui {
 
   // label showing the title of the application
   private static final JLabel labelTitle;
+  // label showing the title of the create config page
+  private static final JLabel labelTitleCreateConfig;
   // text area which communicates the status of the tabulator's operations
   private static final JTextArea textStatus;
   // scroll pane for textStatus
   private static final JScrollPane scrollerStatus;
   // FileChooser used as a dialog box for loading a config
   private static final JFileChooser fc;
-  // main frame to render GUI elements
+  // main frame to render GUI panels
   private static final JFrame frame;
+  // main panel
+  private static final JPanel panelMain = new JPanel(new BorderLayout());
+  // config creation panel
+  private static final JPanel panelCreateConfig = new JPanel(new BorderLayout());
   // filter used by FileChooser to restrict it to loading JSON files
   private static final FileNameExtensionFilter filterJson;
   // currently-loaded tabulator config
@@ -48,6 +54,7 @@ class RcvGui {
 
   static {
     labelTitle = new JLabel("Universal RCV Tabulator", SwingConstants.CENTER);
+    labelTitleCreateConfig = new JLabel("Config Creator", SwingConstants.CENTER);
     textStatus = new JTextArea(10, 20);
     scrollerStatus = new JScrollPane(textStatus);
     fc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -62,12 +69,16 @@ class RcvGui {
   void launch() {
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-    // main panel to render GUI elements
-    JPanel panelMain = new JPanel(new BorderLayout());
     panelMain.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
     // box to contain the buttons
     Box boxButtons = new Box(BoxLayout.Y_AXIS);
+
+    // button that opens the config creation page
+    JButton buttonCreateConfig = new JButton("Create config");
+    buttonCreateConfig.addActionListener(new CreateConfigListener());
+    buttonCreateConfig.setAlignmentX(Component.CENTER_ALIGNMENT);
+    boxButtons.add(buttonCreateConfig);
 
     // button that summons the dialog box to load the config
     JButton buttonLoadConfig = new JButton("Load config");
@@ -92,13 +103,30 @@ class RcvGui {
     panelMain.add(BorderLayout.SOUTH, scrollerStatus);
     frame.getContentPane().add(panelMain);
 
-    // TODO: Make below a % of window size if possible
-    frame.setSize(600, 300);
+    // TODO: Make below a % of window size if possible; also parameterize this
+    frame.setSize(600, 400);
     frame.setVisible(true);
 
     fc.setDialogTitle("Select a config file");
     fc.setAcceptAllFileFilterUsed(false);
     fc.addChoosableFileFilter(filterJson);
+
+    panelCreateConfig.setVisible(false);
+    panelCreateConfig.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+    // box to contain the buttons in the Create Config panel
+    Box boxButtonsCreateConfig = new Box(BoxLayout.Y_AXIS);
+
+    // button that closes the config creator
+    JButton buttonReturnToTabulator = new JButton("Return to tabulator");
+    buttonReturnToTabulator.addActionListener(new ReturnToTabulatorListener());
+    buttonReturnToTabulator.setAlignmentX(Component.CENTER_ALIGNMENT);
+    boxButtonsCreateConfig.add(buttonReturnToTabulator);
+
+    // TODO: set up new label
+    panelCreateConfig.add(BorderLayout.NORTH, labelTitleCreateConfig);
+    panelCreateConfig.add(BorderLayout.CENTER, boxButtonsCreateConfig);
+    frame.getContentPane().add(panelCreateConfig);
   }
 
   // function: printToTextStatus
@@ -114,6 +142,21 @@ class RcvGui {
     textStatus.append("\n");
     // scroll to the bottom
     textStatus.setCaretPosition(textStatus.getDocument().getLength());
+  }
+
+  class CreateConfigListener implements ActionListener {
+
+    // function: actionPerformed
+    // purpose: performs an action when buttonCreateConfig is clicked
+    // param: the event that is captured
+    // returns: N/A
+    public void actionPerformed(ActionEvent event) {
+      printToTextStatus("Opening config creator...");
+      panelMain.setVisible(false);
+      // TODO: Make below a % of window size if possible; also parameterize this
+      frame.setSize(600, 600);
+      panelCreateConfig.setVisible(true);
+    }
   }
 
   class LoadConfigListener implements ActionListener {
@@ -139,6 +182,20 @@ class RcvGui {
     }
   }
 
+  class ReturnToTabulatorListener implements ActionListener {
+
+    // function: actionPerformed
+    // purpose: performs an action when buttonReturnToTabulator is clicked
+    // param: the event that is captured
+    // returns: N/A
+    public void actionPerformed(ActionEvent event) {
+      panelCreateConfig.setVisible(false);
+      // TODO: Make below a % of window size if possible; also parameterize this
+      frame.setSize(600, 400);
+      panelMain.setVisible(true);
+    }
+  }
+
   class TabulateListener implements ActionListener {
 
     // function: actionPerformed
@@ -146,8 +203,8 @@ class RcvGui {
     // param: the event that is captured
     // returns: N/A
     public void actionPerformed(ActionEvent event) {
-      // String indicating whether or not execution was successful
       printToTextStatus("Starting tabulation...");
+      // String indicating whether or not execution was successful
       String response = Main.executeTabulation(config);
       printToTextStatus(response);
     }

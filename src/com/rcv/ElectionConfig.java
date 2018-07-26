@@ -145,7 +145,7 @@ class ElectionConfig {
     } else if (getOvervoteLabel() != null &&
         getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
         getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-        ) {
+    ) {
       errors.add(
           "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately or " +
               "alwaysSkipToNextRank."
@@ -240,8 +240,8 @@ class ElectionConfig {
   }
 
   // function: willContinueUntilTwoCandidatesRemain
-  // purpose: getter for setting to keep tabulating beyond selecting winner till two candidates remain
-  // returns: whether to keep tabulating untill two candidates remain
+  // purpose: getter for setting to keep tabulating beyond selecting winner until two candidates remain
+  // returns: whether to keep tabulating until two candidates remain
   boolean willContinueUntilTwoCandidatesRemain() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
