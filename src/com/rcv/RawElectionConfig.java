@@ -110,5 +110,4 @@ public class RawElectionConfig {
     // candidate ID
     public String code;
   }
-
 }

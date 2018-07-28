@@ -53,8 +53,7 @@ class CastVoteRecord {
       String suppliedID,
       String precinct,
       List<String> fullCVRData,
-      List<Pair<Integer, String>> rankings
-  ) {
+      List<Pair<Integer, String>> rankings) {
     this.computedID = computedID;
     this.suppliedID = suppliedID;
     this.precinct = precinct;
@@ -68,10 +67,7 @@ class CastVoteRecord {
   // param: detail reflects who (if anyone) received the vote or why it was exhausted/ignored
   // param: fractionalTransferValue if someone received the vote (not exhausted/ignored)
   void addRoundOutcome(
-      VoteOutcomeType outcomeType,
-      String detail,
-      BigDecimal fractionalTransferValue
-  ) {
+      VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
     roundOutcomes.add(new VoteOutcome(outcomeType, detail, fractionalTransferValue));
   }
 

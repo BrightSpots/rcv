@@ -129,12 +129,12 @@ class Logger {
     // returns: the formatted string for output
     @Override
     public String format(LogRecord record) {
-      return new Date(record.getMillis()) +
-          " " +
-          record.getLevel().getLocalizedName() +
-          ": " +
-          formatMessage(record) +
-          System.getProperty("line.separator");
+      return new Date(record.getMillis())
+          + " "
+          + record.getLevel().getLocalizedName()
+          + ": "
+          + formatMessage(record)
+          + System.getProperty("line.separator");
     }
   }
 }

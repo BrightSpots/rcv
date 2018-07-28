@@ -46,8 +46,7 @@ class CVRReader {
       String excelFilePath,
       int firstVoteColumnIndex,
       Integer idColumnIndex,
-      Integer precinctColumnIndex
-  ) {
+      Integer precinctColumnIndex) {
     this.config = config;
     this.excelFilePath = excelFilePath;
     this.firstVoteColumnIndex = firstVoteColumnIndex;
@@ -96,9 +95,7 @@ class CVRReader {
       if (headerRow == null || contestSheet.getLastRowNum() < 2) {
         Logger.severe(
             "Invalid CVR source file %s: not enough rows (%d)",
-            this.excelFilePath,
-            contestSheet.getLastRowNum()
-        );
+            this.excelFilePath, contestSheet.getLastRowNum());
       }
 
       // cvrFileName for generating cvrIDs
@@ -119,11 +116,7 @@ class CVRReader {
   // function: parseRow
   // purpose: parse a single row into a CastVoteRecord
   // returns: a CastVoteRecord object
-  private CastVoteRecord parseRow(
-      Row castVoteRecordRow,
-      String cvrFileName,
-      int cvrIndex
-  ) {
+  private CastVoteRecord parseRow(Row castVoteRecordRow, String cvrFileName, int cvrIndex) {
     // row object is used to iterate CVR file data for this CVR
     // computed unique ID for this CVR
     String computedCastVoteRecordID = String.format("%s(%d)", cvrFileName, cvrIndex);
@@ -138,11 +131,9 @@ class CVRReader {
 
     // Iterate over all expected cells in this row storing cvrData and rankings as we go.
     // cellIndex ranges from 0 to the last expected rank column index
-    for (
-        int cellIndex = 0;
+    for (int cellIndex = 0;
         cellIndex < firstVoteColumnIndex + config.getMaxRankingsAllowed();
-        cellIndex++
-    ) {
+        cellIndex++) {
       // cell object contains data for the current cell
       Cell cvrDataCell = castVoteRecordRow.getCell(cellIndex);
       String cellString = getStringFromCell(cvrDataCell);
@@ -182,10 +173,7 @@ class CVRReader {
       } else {
         if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
           Logger.warn(
-              "unexpected cell type at ranking %d ballot %s",
-              rank,
-              computedCastVoteRecordID
-          );
+              "unexpected cell type at ranking %d ballot %s", rank, computedCastVoteRecordID);
           continue;
         }
         candidate = cvrDataCell.getStringCellValue().trim();
@@ -209,12 +197,7 @@ class CVRReader {
     // we now have all required data for the new CastVoteRecord object
     // create it and add to the list of all CVRs
     return new CastVoteRecord(
-        computedCastVoteRecordID,
-        suppliedCastVoteRecordID,
-        precinct,
-        fullCVRData,
-        rankings
-    );
+        computedCastVoteRecordID, suppliedCastVoteRecordID, precinct, fullCVRData, rankings);
   }
 
   // function: getStringFromCell
