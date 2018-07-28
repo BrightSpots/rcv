@@ -85,12 +85,9 @@ class Tabulator {
         Logger.info("Candidate %s got %s votes.", candidate, votes.toString());
       }
       // all candidates in the existing output structure (if any) who received the same vote tally
-      LinkedList<String> candidates = tallyToCandidates.get(votes);
-      if (candidates == null) {
-        // new container list for candidates who received this vote tally
-        candidates = new LinkedList<>();
-        tallyToCandidates.put(votes, candidates);
-      }
+      LinkedList<String> candidates = tallyToCandidates
+          .computeIfAbsent(votes, k -> new LinkedList<>());
+      // new container list for candidates who received this vote tally
       candidates.add(candidate);
     }
     return tallyToCandidates;

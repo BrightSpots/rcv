@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import javafx.util.Pair;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -138,11 +139,7 @@ class CVRReader {
       Cell cvrDataCell = castVoteRecordRow.getCell(cellIndex);
       String cellString = getStringFromCell(cvrDataCell);
 
-      if (cellString == null) {
-        fullCVRData.add("empty cell");
-      } else {
-        fullCVRData.add(cellString);
-      }
+      fullCVRData.add(Objects.requireNonNullElse(cellString, "empty cell"));
 
       if (cellString != null) {
         if (precinctColumnIndex != null && cellIndex == precinctColumnIndex) {

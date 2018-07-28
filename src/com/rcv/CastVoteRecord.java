@@ -146,12 +146,9 @@ class CastVoteRecord {
     // index for iterating over all rankings
     for (Pair<Integer, String> ranking : rankings) {
       // set of candidates given this rank
-      Set<String> candidatesAtRank = rankToCandidateIDs.get(ranking.getKey());
-      if (candidatesAtRank == null) {
-        // create the new optionsAtRank and add to the sorted CVR
-        candidatesAtRank = new HashSet<>();
-        rankToCandidateIDs.put(ranking.getKey(), candidatesAtRank);
-      }
+      Set<String> candidatesAtRank = rankToCandidateIDs
+          .computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
+      // create the new optionsAtRank and add to the sorted CVR
       // add this option into the map
       candidatesAtRank.add(ranking.getValue());
     }

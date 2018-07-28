@@ -17,8 +17,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,9 +65,7 @@ class ResultsWriter {
     for (String candidate : candidatesToRoundEliminated.keySet()) {
       // round is the current candidate's round of elimination
       int round = candidatesToRoundEliminated.get(candidate);
-      if (roundToEliminatedCandidates.get(round) == null) {
-        roundToEliminatedCandidates.put(round, new LinkedList<>());
-      }
+      roundToEliminatedCandidates.computeIfAbsent(round, k -> new LinkedList<>());
       roundToEliminatedCandidates.get(round).add(candidate);
     }
 
@@ -84,9 +80,7 @@ class ResultsWriter {
     roundToWinningCandidates = new HashMap<>();
     for (String candidate : winnerToRound.keySet()) {
       int round = winnerToRound.get(candidate);
-      if (roundToWinningCandidates.get(round) == null) {
-        roundToWinningCandidates.put(round, new LinkedList<>());
-      }
+      roundToWinningCandidates.computeIfAbsent(round, k -> new LinkedList<>());
       roundToWinningCandidates.get(round).add(candidate);
     }
     return this;
@@ -576,26 +570,20 @@ class ResultsWriter {
     // entries will contain all the input tally entries in sorted order
     List<Map.Entry<String, BigDecimal>> entries = new ArrayList<>(tally.entrySet());
     // anonymous custom comparator will sort undeclared write in candidates to last place
-    Collections.sort(
-        entries,
-        new Comparator<Map.Entry<String, BigDecimal>>() {
-          public int compare(
-              Map.Entry<String, BigDecimal> firstObject,
-              Map.Entry<String, BigDecimal> secondObject) {
-            // result of the comparison
-            int ret;
+    entries.sort((firstObject, secondObject) -> {
+      // result of the comparison
+      int ret;
 
-            if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
-              ret = 1;
-            } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
-              ret = -1;
-            } else {
-              ret = (secondObject.getValue()).compareTo(firstObject.getValue());
-            }
+      if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+        ret = 1;
+      } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+        ret = -1;
+      } else {
+        ret = (secondObject.getValue()).compareTo(firstObject.getValue());
+      }
 
-            return ret;
-          }
-        });
+      return ret;
+    });
     // container list for the final results
     List<String> sortedCandidates = new LinkedList<>();
     // index over all entries
