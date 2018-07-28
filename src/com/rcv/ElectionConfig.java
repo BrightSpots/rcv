@@ -28,7 +28,7 @@ class ElectionConfig {
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
   // this is used if we have a permutation-based tie-break mode
-  private ArrayList<String> candidatePermutation = new ArrayList<>();
+  private final ArrayList<String> candidatePermutation = new ArrayList<>();
   // minimum vote threshold if one is specified
   private BigDecimal minimumVoteThreshold;
 

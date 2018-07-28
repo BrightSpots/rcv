@@ -25,15 +25,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 class CVRReader {
 
   // config for the election
-  private ElectionConfig config;
+  private final ElectionConfig config;
   // path of the source file
-  private String excelFilePath;
+  private final String excelFilePath;
   // column index of first ranking
-  private int firstVoteColumnIndex;
+  private final int firstVoteColumnIndex;
   // column index of CVR ID (if present)
-  private Integer idColumnIndex;
+  private final Integer idColumnIndex;
   // column index of precinct name (if present)
-  private Integer precinctColumnIndex;
+  private final Integer precinctColumnIndex;
 
   // function: CVRReader
   // param: config an ElectionConfig object specifying rules for interpreting CVR file data

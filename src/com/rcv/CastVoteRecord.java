@@ -38,7 +38,7 @@ class CastVoteRecord {
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // records winners to whom some fraction of this vote has been allocated
-  private Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
+  private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -205,11 +205,11 @@ class CastVoteRecord {
   private class VoteOutcome {
 
     // what type of outcome (counted, ignored, exhausted)
-    VoteOutcomeType outcomeType;
+    final VoteOutcomeType outcomeType;
     // more detail on the outcome (who got the vote or why it was ignored/exhausted)
-    String detail;
+    final String detail;
     // if someone received the vote, what fraction of it they got
-    BigDecimal fractionalTransferValue;
+    final BigDecimal fractionalTransferValue;
 
     VoteOutcome(VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
       this.outcomeType = outcomeType;
