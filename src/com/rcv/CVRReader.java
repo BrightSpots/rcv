@@ -11,9 +11,11 @@ package com.rcv;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javafx.util.Pair;
 import org.apache.poi.ss.usermodel.Cell;
@@ -80,7 +82,7 @@ class CVRReader {
   // function: parseCVRFile
   // purpose: parse the given file path into a List of CastVoteRecords suitable for tabulation
   // returns: list of parsed CVRs
-  List<CastVoteRecord> parseCVRFile() {
+  List<CastVoteRecord> parseCVRFile() throws SourceWithUnrecognizedCandidatesException {
     // contestSheet contains all the CVR data we will be parsing
     Sheet contestSheet = getFirstSheet(excelFilePath);
     // container for all CastVoteRecords parsed from the input file
@@ -103,21 +105,33 @@ class CVRReader {
       String cvrFileName = new File(excelFilePath).getName();
       // cvrIndex for generating cvrIDs
       int cvrIndex = 1;
+      // counts of unrecognized candidate strings
+      Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
       // Iterate through all rows and create a CastVoteRecord for each row
       while (iterator.hasNext()) {
         // cvr is the object parsed from the row
-        CastVoteRecord cvr = parseRow(iterator.next(), cvrFileName, cvrIndex++);
+        CastVoteRecord cvr =
+            parseRow(iterator.next(), cvrFileName, cvrIndex++, unrecognizedCandidateCounts);
         castVoteRecords.add(cvr);
       }
+
+      if (unrecognizedCandidateCounts.size() > 0) {
+        throw new SourceWithUnrecognizedCandidatesException(unrecognizedCandidateCounts);
+      }
     }
+
     return castVoteRecords;
   }
 
   // function: parseRow
   // purpose: parse a single row into a CastVoteRecord
   // returns: a CastVoteRecord object
-  private CastVoteRecord parseRow(Row castVoteRecordRow, String cvrFileName, int cvrIndex) {
+  private CastVoteRecord parseRow(
+      Row castVoteRecordRow,
+      String cvrFileName,
+      int cvrIndex,
+      Map<String, Integer> unrecognizedCandidateCounts) {
     // row object is used to iterate CVR file data for this CVR
     // computed unique ID for this CVR
     String computedCastVoteRecordID = String.format("%s(%d)", cvrFileName, cvrIndex);
@@ -179,11 +193,9 @@ class CVRReader {
           continue;
         } else if (candidate.equals(config.getOvervoteLabel())) {
           candidate = Tabulator.explicitOvervoteLabel;
-        } else if (!config.getCandidateCodeList().contains(candidate)) {
-          if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
-            Logger.warn("no match for candidate: %s", candidate);
-          }
-          candidate = config.getUndeclaredWriteInLabel();
+        } else if (!config.getCandidateCodeList().contains(candidate)
+            && !candidate.equals(config.getUndeclaredWriteInLabel())) {
+          unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
         }
       }
       // create and add new ranking pair to the rankings list
@@ -219,5 +231,18 @@ class CVRReader {
     }
 
     return cellString;
+  }
+
+  static class SourceWithUnrecognizedCandidatesException extends Exception {
+
+    private final Map<String, Integer> candidateCounts;
+
+    SourceWithUnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
+      this.candidateCounts = candidateCounts;
+    }
+
+    Map<String, Integer> getCandidateCounts() {
+      return this.candidateCounts;
+    }
   }
 }

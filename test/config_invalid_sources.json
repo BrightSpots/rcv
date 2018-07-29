@@ -32,6 +32,11 @@
       "provider": "ES&S",
       "firstVoteColumnIndex": 3,
       "precinctColumnIndex": 1
+    },
+    {
+      "provider": "ES&S",
+      "filePath": "test/unrecognized_candidates.xlsx",
+      "firstVoteColumnIndex": 1
     }
   ]
 }
