@@ -14,7 +14,6 @@
 package com.rcv;
 
 import com.rcv.CVRReader.SourceWithUnrecognizedCandidatesException;
-import com.rcv.CVRReader.UnrecognizedCandidateException;
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -220,7 +219,7 @@ class Main {
             // add records to the master list
             castVoteRecords.addAll(cvrs);
           } catch (SourceWithUnrecognizedCandidatesException e) {
-            Logger.severe("Source file contains unrecognized candidates: %s", source.filePath);
+            Logger.severe("Source file contains unrecognized candidate(s): %s", source.filePath);
             // map from name to number of times encountered
             Map<String, Integer> candidateCounts = e.getCandidateCounts();
             for (String candidate : candidateCounts.keySet()) {

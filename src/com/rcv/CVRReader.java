@@ -111,13 +111,9 @@ class CVRReader {
       // Iterate through all rows and create a CastVoteRecord for each row
       while (iterator.hasNext()) {
         // cvr is the object parsed from the row
-        try {
-          CastVoteRecord cvr = parseRow(iterator.next(), cvrFileName, cvrIndex++);
-          castVoteRecords.add(cvr);
-        } catch (UnrecognizedCandidateException e) {
-          // increment the count
-          unrecognizedCandidateCounts.merge(e.getName(), 1, Integer::sum);
-        }
+        CastVoteRecord cvr =
+            parseRow(iterator.next(), cvrFileName, cvrIndex++, unrecognizedCandidateCounts);
+        castVoteRecords.add(cvr);
       }
 
       if (unrecognizedCandidateCounts.size() > 0) {
@@ -134,7 +130,8 @@ class CVRReader {
   private CastVoteRecord parseRow(
       Row castVoteRecordRow,
       String cvrFileName,
-      int cvrIndex) throws UnrecognizedCandidateException {
+      int cvrIndex,
+      Map<String, Integer> unrecognizedCandidateCounts) {
     // row object is used to iterate CVR file data for this CVR
     // computed unique ID for this CVR
     String computedCastVoteRecordID = String.format("%s(%d)", cvrFileName, cvrIndex);
@@ -198,8 +195,7 @@ class CVRReader {
           candidate = Tabulator.explicitOvervoteLabel;
         } else if (!config.getCandidateCodeList().contains(candidate)
             && !candidate.equals(config.getUndeclaredWriteInLabel())) {
-          Logger.severe("No match for candidate: %s", candidate);
-          throw new UnrecognizedCandidateException(candidate);
+          unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
         }
       }
       // create and add new ranking pair to the rankings list
@@ -237,23 +233,9 @@ class CVRReader {
     return cellString;
   }
 
-  static class UnrecognizedCandidateException extends Exception {
-
-    private String name;
-
-    UnrecognizedCandidateException(String name) {
-      super();
-      this.name = name;
-    }
-
-    String getName() {
-      return name;
-    }
-  }
-
   static class SourceWithUnrecognizedCandidatesException extends Exception {
 
-    private Map<String, Integer> candidateCounts;
+    private final Map<String, Integer> candidateCounts;
 
     SourceWithUnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
       this.candidateCounts = candidateCounts;
