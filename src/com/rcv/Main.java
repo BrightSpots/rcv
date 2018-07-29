@@ -13,6 +13,7 @@
 
 package com.rcv;
 
+import com.rcv.CVRReader.UnrecognizedCandidateException;
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -208,13 +209,18 @@ class Main {
                   source.idColumnIndex,
                   source.precinctColumnIndex);
           // the CVRs parsed from this source
-          List<CastVoteRecord> cvrs = reader.parseCVRFile();
-          if (cvrs.isEmpty()) {
-            Logger.severe("Source file contains no CVRs: %s", source.filePath);
+          try {
+            List<CastVoteRecord> cvrs = reader.parseCVRFile();
+            if (cvrs.isEmpty()) {
+              Logger.severe("Source file contains no CVRs: %s", source.filePath);
+              encounteredProblemForThisSource = true;
+            }
+            // add records to the master list
+            castVoteRecords.addAll(cvrs);
+          } catch (UnrecognizedCandidateException e) {
+            Logger.severe("Source file contains unrecognized candidates: %s", source.filePath);
             encounteredProblemForThisSource = true;
           }
-          // add records to the master list
-          castVoteRecords.addAll(cvrs);
         }
 
         if (encounteredProblemForThisSource) {
