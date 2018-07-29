@@ -17,8 +17,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,9 +57,7 @@ class ResultsWriter {
   // function: setCandidatesToRoundEliminated
   // purpose: setter for candidatesToRoundEliminated object
   // param: candidatesToRoundEliminated map of candidateID to round in which they were eliminated
-  ResultsWriter setCandidatesToRoundEliminated(
-      Map<String, Integer> candidatesToRoundEliminated
-  ) {
+  ResultsWriter setCandidatesToRoundEliminated(Map<String, Integer> candidatesToRoundEliminated) {
     // roundToEliminatedCandidates is the inverse of candidatesToRoundEliminated map
     // so we can look up who got eliminated for each round
     roundToEliminatedCandidates = new HashMap<>();
@@ -69,9 +65,7 @@ class ResultsWriter {
     for (String candidate : candidatesToRoundEliminated.keySet()) {
       // round is the current candidate's round of elimination
       int round = candidatesToRoundEliminated.get(candidate);
-      if (roundToEliminatedCandidates.get(round) == null) {
-        roundToEliminatedCandidates.put(round, new LinkedList<>());
-      }
+      roundToEliminatedCandidates.computeIfAbsent(round, k -> new LinkedList<>());
       roundToEliminatedCandidates.get(round).add(candidate);
     }
 
@@ -86,9 +80,7 @@ class ResultsWriter {
     roundToWinningCandidates = new HashMap<>();
     for (String candidate : winnerToRound.keySet()) {
       int round = winnerToRound.get(candidate);
-      if (roundToWinningCandidates.get(round) == null) {
-        roundToWinningCandidates.put(round, new LinkedList<>());
-      }
+      roundToWinningCandidates.computeIfAbsent(round, k -> new LinkedList<>());
       roundToWinningCandidates.get(round).add(candidate);
     }
     return this;
@@ -110,13 +102,10 @@ class ResultsWriter {
     return this;
   }
 
-
   // function: generateOverallSummarySpreadsheet
   // purpose: creates a summary spreadsheet for the full election
   // param: roundTallies is the round-by-round count of votes per candidate
-  void generateOverallSummarySpreadsheet(
-      Map<Integer, Map<String, BigDecimal>> roundTallies
-  ) {
+  void generateOverallSummarySpreadsheet(Map<Integer, Map<String, BigDecimal>> roundTallies) {
     // filename for output
     String outputFileName = String.format("%s_summary.xlsx", this.timestampString);
     // full path for output
@@ -129,23 +118,18 @@ class ResultsWriter {
   // purpose: creates a summary spreadsheet for the votes in a particular precinct
   // param: roundTallies is map from precinct to the round-by-round vote count in the precinct
   void generatePrecinctSummarySpreadsheets(
-      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies
-  ) {
+      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies) {
     Set<String> filenames = new HashSet<>();
     for (String precinct : precinctRoundTallies.keySet()) {
       // precinctFileString is a unique filesystem-safe string which can be used for creating
       // the precinct output filename
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       // filename for output
-      String outputFileName = String
-          .format("%s_%s_precinct_summary.xlsx", this.timestampString, precinctFileString);
+      String outputFileName =
+          String.format("%s_%s_precinct_summary.xlsx", this.timestampString, precinctFileString);
       // full path for output
       String outputPath = Paths.get(config.getOutputDirectory(), outputFileName).toString();
-      generateSummarySpreadsheet(
-          precinctRoundTallies.get(precinct),
-          precinct,
-          outputPath
-      );
+      generateSummarySpreadsheet(precinctRoundTallies.get(precinct), precinct, outputPath);
     }
   }
 
@@ -156,10 +140,7 @@ class ResultsWriter {
   // param: outputPath is the full path of the file to save
   // file access: write / create
   private void generateSummarySpreadsheet(
-      Map<Integer, Map<String, BigDecimal>> roundTallies,
-      String precinct,
-      String outputPath
-  ) {
+      Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath) {
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
     Map<String, BigDecimal> firstRoundTally = roundTallies.get(1);
@@ -239,7 +220,8 @@ class ResultsWriter {
     BigDecimal[] votesRedistributedEachRound = new BigDecimal[numRounds + 1];
     Arrays.fill(votesRedistributedEachRound, BigDecimal.ZERO);
 
-    // secondHeaderRow will be the row object for vote total, change, percentage headers for each round
+    // secondHeaderRow will be the row object for vote total, change, percentage headers for each
+    // round
     org.apache.poi.ss.usermodel.Row secondHeaderRow = worksheet.createRow(rowCounter++);
     // container for candidate name
     Cell candidateNameCell = secondHeaderRow.createCell(0);
@@ -311,9 +293,8 @@ class ResultsWriter {
         // fractional percent
         BigDecimal fraction = config.divide(thisRoundTally, totalActiveVotes);
         // percentage of active votes
-        BigDecimal percentage = fraction.signum() == 1 ?
-            fraction.multiply(new BigDecimal(100)) :
-            BigDecimal.ZERO;
+        BigDecimal percentage =
+            fraction.signum() == 1 ? fraction.multiply(new BigDecimal(100)) : BigDecimal.ZERO;
         columnIndex = ((displayRound - 1) * COLUMNS_PER_ROUND) + 1;
         // delta votes cell
         Cell deltaVotesCell = candidateRow.createCell(columnIndex++);
@@ -353,12 +334,10 @@ class ResultsWriter {
         thisRoundExhausted =
             totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(dataUseRound));
         // save previous round exhausted votes to calculate exhausted vote change
-        BigDecimal prevRoundExhausted = totalActiveVotesFirstRound.subtract(
-            totalActiveVotesPerRound.get(dataUseRound - 1)
-        );
-        deltaExhausted = isFinalResults ?
-            BigDecimal.ZERO :
-            thisRoundExhausted.subtract(prevRoundExhausted);
+        BigDecimal prevRoundExhausted =
+            totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(dataUseRound - 1));
+        deltaExhausted =
+            isFinalResults ? BigDecimal.ZERO : thisRoundExhausted.subtract(prevRoundExhausted);
 
         // add exhausted votes to the votes redistributed totals
         votesRedistributedEachRound[dataUseRound] =
@@ -489,8 +468,7 @@ class ResultsWriter {
       org.apache.poi.ss.usermodel.Row candidateRow,
       List<String> candidates,
       org.apache.poi.ss.usermodel.Row actionRow,
-      String action
-  ) {
+      String action) {
     String candidateCellText = String.join("; ", candidates);
     // here we don't subtract 1 from round because the eliminated text is displayed in the
     // subsequent column
@@ -507,9 +485,7 @@ class ResultsWriter {
   // param: totalActiveVotesPerRound map of round to votes active in that round
   // returns: the next (empty) row index
   private int addHeaderRows(
-      XSSFSheet worksheet,
-      Map<Integer, BigDecimal> totalActiveVotesPerRound
-  ) {
+      XSSFSheet worksheet, Map<Integer, BigDecimal> totalActiveVotesPerRound) {
     // total active votes in this round
     BigDecimal totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
     // dateFormat helps create a formatted date string with the current date
@@ -519,10 +495,8 @@ class ResultsWriter {
     // string indicating single- or multi-winner
     String electionType = config.getNumberOfWinners() > 1 ? "multi-winner" : "single-winner";
     // number reflecting threshold percentage to win
-    BigDecimal thresholdPercentage = config.divide(
-        new BigDecimal(100),
-        new BigDecimal(config.getNumberOfWinners() + 1)
-    );
+    BigDecimal thresholdPercentage =
+        config.divide(new BigDecimal(100), new BigDecimal(config.getNumberOfWinners() + 1));
     // string for threshold percentage
     String thresholdString = thresholdPercentage.toString() + "%";
     // formula string
@@ -594,27 +568,21 @@ class ResultsWriter {
   // return: list of all input candidates sorted from highest tally to lowest
   private List<String> sortCandidatesByTally(Map<String, BigDecimal> tally) {
     // entries will contain all the input tally entries in sorted order
-    List<Map.Entry<String, BigDecimal>> entries =
-        new ArrayList<>(tally.entrySet());
+    List<Map.Entry<String, BigDecimal>> entries = new ArrayList<>(tally.entrySet());
     // anonymous custom comparator will sort undeclared write in candidates to last place
-    Collections.sort(entries, new Comparator<Map.Entry<String, BigDecimal>>() {
-      public int compare(
-          Map.Entry<String, BigDecimal> firstObject,
-          Map.Entry<String, BigDecimal> secondObject
-      ) {
-        // result of the comparison
-        int ret;
+    entries.sort((firstObject, secondObject) -> {
+      // result of the comparison
+      int ret;
 
-        if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
-          ret = 1;
-        } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
-          ret = -1;
-        } else {
-          ret = (secondObject.getValue()).compareTo(firstObject.getValue());
-        }
-
-        return ret;
+      if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+        ret = 1;
+      } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+        ret = -1;
+      } else {
+        ret = (secondObject.getValue()).compareTo(firstObject.getValue());
       }
+
+      return ret;
     });
     // container list for the final results
     List<String> sortedCandidates = new LinkedList<>();

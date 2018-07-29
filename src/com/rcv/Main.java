@@ -80,10 +80,7 @@ class Main {
         System.err.println(
             String.format(
                 "Failed to create output directory: %s\n%s",
-                config.getOutputDirectory(),
-                exception.toString()
-            )
-        );
+                config.getOutputDirectory(), exception.toString()));
         encounteredFileError = true;
       }
 
@@ -182,41 +179,34 @@ class Main {
         boolean encounteredProblemForThisSource = false;
 
         if (source.filePath == null || source.filePath.isEmpty()) {
-          Logger.severe(
-              "Invalid source file: missing filePath"
-          );
+          Logger.severe("Invalid source file: missing filePath");
           encounteredProblemForThisSource = true;
         }
 
         if (source.firstVoteColumnIndex == null || source.firstVoteColumnIndex < 0) {
           Logger.severe(
-              "Invalid source file: missing or invalid firstVoteColumnIndex: %s",
-              source.filePath
-          );
+              "Invalid source file: missing or invalid firstVoteColumnIndex: %s", source.filePath);
           encounteredProblemForThisSource = true;
         }
 
-        if (
-            config.isTabulateByPrecinctEnabled() &&
-                (source.precinctColumnIndex == null || source.precinctColumnIndex < 0)
-        ) {
+        if (config.isTabulateByPrecinctEnabled()
+            && (source.precinctColumnIndex == null || source.precinctColumnIndex < 0)) {
           Logger.severe(
-              "Invalid source file: missing or invalid precinctColumnIndex when " +
-                  "tabulateByPrecinct is enabled: %s",
-              source.filePath
-          );
+              "Invalid source file: missing or invalid precinctColumnIndex when "
+                  + "tabulateByPrecinct is enabled: %s",
+              source.filePath);
           encounteredProblemForThisSource = true;
         }
 
         if (!encounteredProblemForThisSource) {
           // reader: read input file into a list of cast vote records
-          CVRReader reader = new CVRReader(
-              config,
-              source.filePath,
-              source.firstVoteColumnIndex,
-              source.idColumnIndex,
-              source.precinctColumnIndex
-          );
+          CVRReader reader =
+              new CVRReader(
+                  config,
+                  source.filePath,
+                  source.firstVoteColumnIndex,
+                  source.idColumnIndex,
+                  source.precinctColumnIndex);
           // the CVRs parsed from this source
           List<CastVoteRecord> cvrs = reader.parseCVRFile();
           if (cvrs.isEmpty()) {

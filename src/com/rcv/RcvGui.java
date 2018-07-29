@@ -135,8 +135,8 @@ class RcvGui {
   // returns: N/A
   private void printToTextStatus(String message) {
     textStatus.append("* ");
-    textStatus
-        .append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(ZonedDateTime.now()));
+    textStatus.append(
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(ZonedDateTime.now()));
     textStatus.append(": ");
     textStatus.append(message);
     textStatus.append("\n");

@@ -38,7 +38,7 @@ class CastVoteRecord {
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // records winners to whom some fraction of this vote has been allocated
-  private Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
+  private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -53,8 +53,7 @@ class CastVoteRecord {
       String suppliedID,
       String precinct,
       List<String> fullCVRData,
-      List<Pair<Integer, String>> rankings
-  ) {
+      List<Pair<Integer, String>> rankings) {
     this.computedID = computedID;
     this.suppliedID = suppliedID;
     this.precinct = precinct;
@@ -68,10 +67,7 @@ class CastVoteRecord {
   // param: detail reflects who (if anyone) received the vote or why it was exhausted/ignored
   // param: fractionalTransferValue if someone received the vote (not exhausted/ignored)
   void addRoundOutcome(
-      VoteOutcomeType outcomeType,
-      String detail,
-      BigDecimal fractionalTransferValue
-  ) {
+      VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
     roundOutcomes.add(new VoteOutcome(outcomeType, detail, fractionalTransferValue));
   }
 
@@ -150,12 +146,9 @@ class CastVoteRecord {
     // index for iterating over all rankings
     for (Pair<Integer, String> ranking : rankings) {
       // set of candidates given this rank
-      Set<String> candidatesAtRank = rankToCandidateIDs.get(ranking.getKey());
-      if (candidatesAtRank == null) {
-        // create the new optionsAtRank and add to the sorted CVR
-        candidatesAtRank = new HashSet<>();
-        rankToCandidateIDs.put(ranking.getKey(), candidatesAtRank);
-      }
+      Set<String> candidatesAtRank = rankToCandidateIDs
+          .computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
+      // create the new optionsAtRank and add to the sorted CVR
       // add this option into the map
       candidatesAtRank.add(ranking.getValue());
     }
@@ -209,11 +202,11 @@ class CastVoteRecord {
   private class VoteOutcome {
 
     // what type of outcome (counted, ignored, exhausted)
-    VoteOutcomeType outcomeType;
+    final VoteOutcomeType outcomeType;
     // more detail on the outcome (who got the vote or why it was ignored/exhausted)
-    String detail;
+    final String detail;
     // if someone received the vote, what fraction of it they got
-    BigDecimal fractionalTransferValue;
+    final BigDecimal fractionalTransferValue;
 
     VoteOutcome(VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
       this.outcomeType = outcomeType;

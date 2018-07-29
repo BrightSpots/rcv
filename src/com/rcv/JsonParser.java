@@ -21,7 +21,7 @@ class JsonParser {
   // param: valueType class of the object to be created from parsed json
   // file access: read
   // returns: instance of the object parsed from json or null if there was a problem
-  public static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
+  static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
     try {
       // fileReader will read the json file from disk
       FileReader fileReader = new FileReader(jsonFilePath);
@@ -41,5 +41,3 @@ class JsonParser {
     return null;
   }
 }
-
-

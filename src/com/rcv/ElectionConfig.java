@@ -28,7 +28,7 @@ class ElectionConfig {
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
   // this is used if we have a permutation-based tie-break mode
-  private ArrayList<String> candidatePermutation = new ArrayList<>();
+  private final ArrayList<String> candidatePermutation = new ArrayList<>();
   // minimum vote threshold if one is specified
   private BigDecimal minimumVoteThreshold;
 
@@ -45,8 +45,7 @@ class ElectionConfig {
   // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
   private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(
-      String setting
-  ) {
+      String setting) {
     // rule: return value determined by input setting string
     Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
 
@@ -142,14 +141,12 @@ class ElectionConfig {
 
     if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
       errors.add("Invalid overvote rule.");
-    } else if (getOvervoteLabel() != null &&
-        getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
-        getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-    ) {
+    } else if (getOvervoteLabel() != null
+        && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
+        && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       errors.add(
-          "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately or " +
-              "alwaysSkipToNextRank."
-      );
+          "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately or "
+              + "alwaysSkipToNextRank.");
     }
 
     if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
@@ -199,9 +196,9 @@ class ElectionConfig {
   // returns: number of places to round to or 0 if no setting is specified
   private Integer getDecimalPlacesForVoteArithmetic() {
     // we default to using 4 places for fractional transfer vote arithmetic
-    return rawConfig.rules.decimalPlacesForVoteArithmetic == null ?
-        4 :
-        rawConfig.rules.decimalPlacesForVoteArithmetic;
+    return rawConfig.rules.decimalPlacesForVoteArithmetic == null
+        ? 4
+        : rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
   // function: divide
@@ -240,7 +237,8 @@ class ElectionConfig {
   }
 
   // function: willContinueUntilTwoCandidatesRemain
-  // purpose: getter for setting to keep tabulating beyond selecting winner until two candidates remain
+  // purpose: getter for setting to keep tabulating beyond selecting winner until two candidates
+  // remain
   // returns: whether to keep tabulating until two candidates remain
   boolean willContinueUntilTwoCandidatesRemain() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
@@ -308,8 +306,8 @@ class ElectionConfig {
   int getNumDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = getCandidateCodeList().size();
-    if (getUndeclaredWriteInLabel() != null &&
-        getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
+    if (getUndeclaredWriteInLabel() != null
+        && getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
       num--;
     }
     return num;
@@ -327,9 +325,9 @@ class ElectionConfig {
   // returns: overvote rule to use for this config
   Tabulator.OvervoteRule getOvervoteRule() {
     // by default we exhaust immediately
-    return rawConfig.rules.overvoteRule == null ?
-        Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY :
-        ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
+    return rawConfig.rules.overvoteRule == null
+        ? Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
+        : ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
   }
 
   // function: getMinimumVoteThreshold
@@ -379,9 +377,9 @@ class ElectionConfig {
   // returns: tiebreak mode to use for this config
   Tabulator.TieBreakMode getTiebreakMode() {
     // by default we use random tiebreak
-    return rawConfig.rules.tiebreakMode == null ?
-        Tabulator.TieBreakMode.RANDOM :
-        ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
+    return rawConfig.rules.tiebreakMode == null
+        ? Tabulator.TieBreakMode.RANDOM
+        : ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
   }
 
   // function: isTreatBlankAsUndeclaredWriteInEnabled

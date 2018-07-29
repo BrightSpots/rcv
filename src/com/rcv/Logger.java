@@ -34,9 +34,9 @@ class Logger {
   // cache for the tabulation logger
   private static java.util.logging.Logger tabulationLogger;
   // tabulation logger name: dot "." parents it to default logger so all messages will propagate
-  private static String TABULATION_LOGGER_NAME = ".tabulation";
+  private static final String TABULATION_LOGGER_NAME = ".tabulation";
   // execution log file name
-  private static String DEFAULT_FILE_NAME = "rcv.log";
+  private static final String DEFAULT_FILE_NAME = "rcv.log";
 
   // function: setup
   // purpose: initialize logging module
@@ -129,12 +129,12 @@ class Logger {
     // returns: the formatted string for output
     @Override
     public String format(LogRecord record) {
-      return new Date(record.getMillis()) +
-          " " +
-          record.getLevel().getLocalizedName() +
-          ": " +
-          formatMessage(record) +
-          System.getProperty("line.separator");
+      return new Date(record.getMillis())
+          + " "
+          + record.getLevel().getLocalizedName()
+          + ": "
+          + formatMessage(record)
+          + System.getProperty("line.separator");
     }
   }
 }

@@ -50,8 +50,7 @@ class TieBreak {
       int round,
       BigDecimal numVotes,
       Map<Integer, Map<String, BigDecimal>> roundTallies,
-      ArrayList<String> candidatePermutation
-  ) {
+      ArrayList<String> candidatePermutation) {
     this.tiedCandidates = tiedCandidates;
     this.tieBreakMode = tieBreakMode;
     this.round = round;
@@ -154,16 +153,17 @@ class TieBreak {
   // return: candidateID of the selected loser
   private String doInteractive() {
     System.out.println(
-        "Tie in round " + round + " for the following candidateIDs each of whom has " + numVotes
-            + " votes:"
-    );
+        "Tie in round "
+            + round
+            + " for the following candidateIDs each of whom has "
+            + numVotes
+            + " votes:");
     // i: index over tied candidates
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i + 1) + ". " + tiedCandidates.get(i));
     }
     System.out.println(
-        "Enter the number corresponding to the candidate who should lose this tiebreaker."
-    );
+        "Enter the number corresponding to the candidate who should lose this tiebreaker.");
     // the candidate selected to lose
     String selectedCandidate = null;
     while (selectedCandidate == null) {
@@ -212,11 +212,7 @@ class TieBreak {
     for (int round = this.round - 1; round > 0; round--) {
       // map of tally to candidate IDs for round under consideration
       SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates =
-          Tabulator.buildTallyToCandidates(
-              roundTallies.get(round),
-              candidatesInContention,
-              false
-          );
+          Tabulator.buildTallyToCandidates(roundTallies.get(round), candidatesInContention, false);
       // lowest tally for this round
       BigDecimal minVotes = tallyToCandidates.firstKey();
       // candidates receiving the lowest tally
@@ -224,8 +220,8 @@ class TieBreak {
       if (candidatesWithLowestTotal.size() == 1) {
         loser = candidatesWithLowestTotal.getFirst();
         explanation =
-            String.format("%s had the fewest votes (%s) in round %d.", loser, minVotes.toString(),
-                round);
+            String.format(
+                "%s had the fewest votes (%s) in round %d.", loser, minVotes.toString(), round);
         break;
       } else {
         // update candidatesInContention and check the previous round
