@@ -13,6 +13,7 @@
 
 package com.rcv;
 
+import com.rcv.CVRReader.SourceWithUnrecognizedCandidatesException;
 import com.rcv.CVRReader.UnrecognizedCandidateException;
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 class Main {
 
@@ -217,8 +219,14 @@ class Main {
             }
             // add records to the master list
             castVoteRecords.addAll(cvrs);
-          } catch (UnrecognizedCandidateException e) {
+          } catch (SourceWithUnrecognizedCandidatesException e) {
             Logger.severe("Source file contains unrecognized candidates: %s", source.filePath);
+            // map from name to number of times encountered
+            Map<String, Integer> candidateCounts = e.getCandidateCounts();
+            for (String candidate : candidateCounts.keySet()) {
+              Logger.severe("Unrecognized candidate \"%s\" appears %d time(s)", candidate,
+                  candidateCounts.get(candidate));
+            }
             encounteredProblemForThisSource = true;
           }
         }
