@@ -16,7 +16,7 @@ Jackson databind 2.4.3
 Jackson core 2.4.3
 Jackson annotations 2.4.3
 
-/docs contains licenses for the rcv module and supporting docs  
+/docs contains the license for the rcv module (AGPL v3) and supporting docs
 /libs contains third-party .jar files.
 /src contains the java code
-/test contains .json files which are used as inputs to test the tabulation software. 
+/test contains .json files which are used as inputs to test the tabulation software.
