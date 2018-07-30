@@ -12,16 +12,6 @@ Config file must be valid JSON format. Examples can be found under the test fold
     example: /Path/To/TabulatorResults
     value: string of length [1..1000]
 
-  "auditOutputFilename" required
-    filename for audit log
-    example: portland_audit.txt
-    value: text string
-
-  "visualizerOutputFilename" required
-    filename for visualizer output spreadsheet
-    example: portland_visualizer.xlsx
-    value: text string
-
   "candidates" required
     List of registered candidate names and associated candidate code
     each "candidates" list item has the following parameters:

@@ -1,6 +1,4 @@
 {
-  "auditOutputFilename":"duplicate_test_audit_log.txt",
-  "visualizerOutputFilename":"duplicate_test_visualizer.xlsx",
   "contestName":"Duplicate test",
   "jurisdiction":"Funkytown, USA",
   "office":"Director of Produce",
