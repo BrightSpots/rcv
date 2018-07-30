@@ -34,9 +34,9 @@ public class RawElectionConfig {
   // list of all cast vote record source files
   public List<CVRSource> cvrFileSources;
   // should we report round-by-round results by precinct also?
-  boolean tabulateByPrecinct;
+  public boolean tabulateByPrecinct;
   // shall we treat blank cells as UWIs?
-  boolean treatBlankAsUndeclaredWriteIn;
+  public boolean treatBlankAsUndeclaredWriteIn;
 
   // function: RawElectionConfig
   // purpose: create a new RawElectionConfig object
@@ -62,7 +62,7 @@ public class RawElectionConfig {
     // max number of skipped rankings allowed
     public Integer maxSkippedRanksAllowed;
     // minimum votes needed to continue
-    Integer minimumVoteThreshold;
+    public Integer minimumVoteThreshold;
     // UWI label
     public String undeclaredWriteInLabel;
     // overvote label
@@ -72,17 +72,17 @@ public class RawElectionConfig {
     // tiebreak mode to use
     public String tiebreakMode;
     // setting for number of winners
-    Integer numberOfWinners;
+    public Integer numberOfWinners;
     // how far to round vote values when performing arithmetic
-    Integer decimalPlacesForVoteArithmetic;
+    public Integer decimalPlacesForVoteArithmetic;
     // which transfer rule to use on surplus votes in multi-seat elections
-    String multiSeatTransferRule;
+    public String multiSeatTransferRule;
     // keep tabulating beyond selecting winner until only two candidates remain
     // used to provide additional context for the strength of support for the winner
     // only valid for single-winner contests
-    boolean continueUntilTwoCandidatesRemain;
+    public boolean continueUntilTwoCandidatesRemain;
     // should we exhaust a ballot when we hit a duplicate candidate while traversing its rankings?
-    boolean exhaustOnDuplicateCandidate;
+    public boolean exhaustOnDuplicateCandidate;
   }
 
   // CVRSource: encapsulates a source cast vote record file
@@ -96,7 +96,7 @@ public class RawElectionConfig {
     // column where rankings data begins
     public Integer firstVoteColumnIndex;
     // column containing CVR ID (if any)
-    Integer idColumnIndex;
+    public Integer idColumnIndex;
     // column containing precinct (if any)
     public Integer precinctColumnIndex;
   }
@@ -108,6 +108,6 @@ public class RawElectionConfig {
     // full candidate name
     public String name;
     // candidate ID
-    String code;
+    public String code;
   }
 }
