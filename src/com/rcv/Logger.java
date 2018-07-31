@@ -37,6 +37,8 @@ class Logger {
   private static String TABULATION_LOGGER_NAME = ".tabulation";
   // execution log file name
   private static String DEFAULT_FILE_NAME = "rcv.log";
+  // first value here is bytes per MB and the second is max MB for the log file
+  private static Integer TABULATION_LOG_FILE_MAX_SIZE_BYTES = 1000000 * 100;
 
   // function: setup
   // purpose: initialize logging module
@@ -55,7 +57,10 @@ class Logger {
     // formatter specifies how logging output lines should appear
     LogFormatter formatter = new LogFormatter();
     // fileHandler writes formatted strings to file
-    FileHandler fileHandler = new FileHandler(logPath, true);
+    FileHandler fileHandler = new FileHandler(logPath,
+        TABULATION_LOG_FILE_MAX_SIZE_BYTES,
+        1,
+        true);
     fileHandler.setFormatter(formatter);
     // create a consoleHandler to writes formatted strings to console for debugging
     ConsoleHandler consoleHandler = new ConsoleHandler();
