@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class GuiController implements Initializable {
 
@@ -51,6 +52,8 @@ public class GuiController implements Initializable {
     // FileChooser used as a dialog box for loading a config
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(workingDirectory);
+    fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
+    fc.setTitle("Load Config");
 
     File selectedFile = fc.showOpenDialog(null);
     if (selectedFile != null) {
