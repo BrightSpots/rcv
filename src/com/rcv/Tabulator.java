@@ -85,8 +85,8 @@ class Tabulator {
         Logger.info("Candidate %s got %s votes.", candidate, votes.toString());
       }
       // all candidates in the existing output structure (if any) who received the same vote tally
-      LinkedList<String> candidates = tallyToCandidates
-          .computeIfAbsent(votes, k -> new LinkedList<>());
+      LinkedList<String> candidates =
+          tallyToCandidates.computeIfAbsent(votes, k -> new LinkedList<>());
       // new container list for candidates who received this vote tally
       candidates.add(candidate);
     }
@@ -327,8 +327,8 @@ class Tabulator {
       status = CandidateStatus.WINNER;
     } else if (candidateToRoundEliminated.containsKey(candidate)) {
       status = CandidateStatus.ELIMINATED;
-    } else if (candidate.equals(config.getOvervoteLabel()) || candidate
-        .equals(config.getUndervoteLabel())) {
+    } else if (candidate.equals(config.getOvervoteLabel())
+        || candidate.equals(config.getUndervoteLabel())) {
       status = CandidateStatus.INVALID;
     }
     return status;
