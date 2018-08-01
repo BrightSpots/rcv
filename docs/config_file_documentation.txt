@@ -71,6 +71,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         index of the column that contains the unique ID for each CVR
         example: 0
         value: [0..1000]
+        default: none
 
       "precinctColumnIndex" required if "tabulateByPrecinct" is in use
         the index of the column that contains the precinct name for each CVR
@@ -80,6 +81,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
       "provider" optional
         text description of the vendor / machine which generated this file -- not used by the tabulator
         example: "ES&S"
+        value: text string of length [1..1000]
         default: none
 
   "rules" required
