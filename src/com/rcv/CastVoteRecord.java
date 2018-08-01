@@ -10,7 +10,6 @@
 package com.rcv;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,10 +22,10 @@ import javafx.util.Pair;
 
 class CastVoteRecord {
 
-  // name of the vendor, this becomes part of the audit output but is not used in tabulation
-  private final String sourceName;
-  // unique identifier for this cast vote record
-  private final String cvrID;
+  // computed unique ID for this CVR (source file + line number)
+  private final String computedID;
+  // supplied unique ID for this CVR
+  private final String suppliedID;
   // which precinct this ballot came from
   private final String precinct;
   // container for ALL CVR data parsed from the source CVR file
@@ -39,25 +38,24 @@ class CastVoteRecord {
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // records winners to whom some fraction of this vote has been allocated
-  private Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
+  private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
   // function: CastVoteRecord
   // purpose: create a new CVR object
-  // param: source what vendor created the CVR file from which this CVR was parsed
-  // param: ballotID unique ID of this ballot
+  // param: computedID is our computed unique ID for this CVR
+  // param: suppliedID is the (ostensibly unique) ID from the input data
   // param: rankings list of rank->candidateID selections parsed for this CVR
   // param: fullCVRData list of strings containing ALL data parsed for this CVR
   CastVoteRecord(
-      String sourceName,
-      String cvrID,
+      String computedID,
+      String suppliedID,
       String precinct,
       List<String> fullCVRData,
-      List<Pair<Integer, String>> rankings
-  ) {
-    this.sourceName = sourceName;
-    this.cvrID = cvrID;
+      List<Pair<Integer, String>> rankings) {
+    this.computedID = computedID;
+    this.suppliedID = suppliedID;
     this.precinct = precinct;
     this.fullCVRData = fullCVRData;
     sortRankings(rankings);
@@ -69,10 +67,7 @@ class CastVoteRecord {
   // param: detail reflects who (if anyone) received the vote or why it was exhausted/ignored
   // param: fractionalTransferValue if someone received the vote (not exhausted/ignored)
   void addRoundOutcome(
-      VoteOutcomeType outcomeType,
-      String detail,
-      BigDecimal fractionalTransferValue
-  ) {
+      VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
     roundOutcomes.add(new VoteOutcome(outcomeType, detail, fractionalTransferValue));
   }
 
@@ -151,12 +146,9 @@ class CastVoteRecord {
     // index for iterating over all rankings
     for (Pair<Integer, String> ranking : rankings) {
       // set of candidates given this rank
-      Set<String> candidatesAtRank = rankToCandidateIDs.get(ranking.getKey());
-      if (candidatesAtRank == null) {
-        // create the new optionsAtRank and add to the sorted CVR
-        candidatesAtRank = new HashSet<>();
-        rankToCandidateIDs.put(ranking.getKey(), candidatesAtRank);
-      }
+      Set<String> candidatesAtRank = rankToCandidateIDs
+          .computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
+      // create the new optionsAtRank and add to the sorted CVR
       // add this option into the map
       candidatesAtRank.add(ranking.getValue());
     }
@@ -169,10 +161,12 @@ class CastVoteRecord {
   String getAuditString() {
     // use a string builder for more efficient string creation
     StringBuilder auditStringBuilder = new StringBuilder();
-    auditStringBuilder.append("[CVR Source] ");
-    auditStringBuilder.append(sourceName);
-    auditStringBuilder.append(" [Ballot ID] ");
-    auditStringBuilder.append(cvrID);
+    auditStringBuilder.append(" [Computed ID] ");
+    auditStringBuilder.append(computedID);
+    if (suppliedID != null) {
+      auditStringBuilder.append(" [Supplied ID] ");
+      auditStringBuilder.append(suppliedID);
+    }
     if (precinct != null) {
       auditStringBuilder.append(" [Precinct] ");
       auditStringBuilder.append(precinct);
@@ -208,12 +202,13 @@ class CastVoteRecord {
   }
 
   private class VoteOutcome {
+
     // what type of outcome (counted, ignored, exhausted)
-    VoteOutcomeType outcomeType;
+    final VoteOutcomeType outcomeType;
     // more detail on the outcome (who got the vote or why it was ignored/exhausted)
-    String detail;
+    final String detail;
     // if someone received the vote, what fraction of it they got
-    BigDecimal fractionalTransferValue;
+    final BigDecimal fractionalTransferValue;
 
     VoteOutcome(VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
       this.outcomeType = outcomeType;

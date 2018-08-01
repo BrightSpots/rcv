@@ -34,11 +34,11 @@ class Logger {
   // cache for the tabulation logger
   private static java.util.logging.Logger tabulationLogger;
   // tabulation logger name: dot "." parents it to default logger so all messages will propagate
-  private static String TABULATION_LOGGER_NAME = ".tabulation";
+  private static final String TABULATION_LOGGER_NAME = ".tabulation";
   // execution log file name
-  private static String DEFAULT_FILE_NAME = "rcv.log";
+  private static final String DEFAULT_FILE_NAME = "rcv.log";
   // first value here is bytes per MB and the second is max MB for the log file
-  private static Integer TABULATION_LOG_FILE_MAX_SIZE_BYTES = 1000000 * 100;
+  private static final Integer TABULATION_LOG_FILE_MAX_SIZE_BYTES = 1000000 * 100;
 
   // function: setup
   // purpose: initialize logging module
@@ -47,7 +47,7 @@ class Logger {
     // create and cache default logger
     defaultLogger = java.util.logging.Logger.getLogger("");
     // remove any loggers the system may have installed
-    for(Handler handler : defaultLogger.getHandlers()) {
+    for (Handler handler : defaultLogger.getHandlers()) {
       defaultLogger.removeHandler(handler);
     }
     // logPath is where default file logging is written
@@ -134,12 +134,12 @@ class Logger {
     // returns: the formatted string for output
     @Override
     public String format(LogRecord record) {
-      return new Date(record.getMillis()) +
-          " " +
-          record.getLevel().getLocalizedName() +
-          ": " +
-          formatMessage(record) +
-          System.getProperty("line.separator");
+      return new Date(record.getMillis())
+          + " "
+          + record.getLevel().getLocalizedName()
+          + ": "
+          + formatMessage(record)
+          + System.getProperty("line.separator");
     }
   }
 }

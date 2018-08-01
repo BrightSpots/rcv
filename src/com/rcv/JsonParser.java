@@ -21,7 +21,7 @@ class JsonParser {
   // param: valueType class of the object to be created from parsed json
   // file access: read
   // returns: instance of the object parsed from json or null if there was a problem
-  public static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
+  static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
     try {
       // fileReader will read the json file from disk
       FileReader fileReader = new FileReader(jsonFilePath);
@@ -30,16 +30,14 @@ class JsonParser {
       // object is the newly created object populated with json values
       return objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException jsonException) {
-      Logger.severe("Error parsing json file:%s", jsonFilePath);
+      Logger.severe("Error parsing json file: %s", jsonFilePath);
       Logger.severe("Check your file formatting and values to make sure they are correct.");
       Logger.severe(jsonException.getMessage());
     } catch (IOException fileException) {
-      Logger.severe("Error opening file:%s", jsonFilePath);
+      Logger.severe("Error opening file: %s", jsonFilePath);
       Logger.severe("Check your file path and make sure it is correct.");
       Logger.severe(fileException.toString());
     }
     return null;
   }
 }
-
-

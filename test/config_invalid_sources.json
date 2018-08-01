@@ -1,0 +1,42 @@
+{
+  "outputDirectory":"test_output/validation_test_sources",
+  "contestName":"Validation test for sources",
+  "jurisdiction":"none",
+  "office":"none",
+  "date":"2018-07-20",
+  "tabulateByPrecinct":true,
+  "rules": {
+    "description":"Testing our validation logic for sources",
+    "maxRankingsAllowed":3,
+    "maxSkippedRanksAllowed":1,
+    "numberOfWinners":1,
+    "overvoteRule":"exhaustImmediately",
+    "tiebreakMode":"random"
+  },
+  "candidates":[
+    {"name":"Candidate 1"},
+    {"name":"Candidate 2"}
+  ],
+  "cvrFileSources": [
+    {
+      "provider": "ES&S",
+      "filePath": "test/nonexistent_path",
+      "firstVoteColumnIndex": 3,
+      "precinctColumnIndex": 1
+    },
+    {
+      "provider": "ES&S",
+      "filePath": "test/nonexistent_path2"
+    },
+    {
+      "provider": "ES&S",
+      "firstVoteColumnIndex": 3,
+      "precinctColumnIndex": 1
+    },
+    {
+      "provider": "ES&S",
+      "filePath": "test/unrecognized_candidates.xlsx",
+      "firstVoteColumnIndex": 1
+    }
+  ]
+}

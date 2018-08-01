@@ -24,13 +24,14 @@ class FileUtils {
     if (dir != null) {
       // dirFile is the File object for dir
       File dirFile = new File(dir);
-      if (!dirFile.exists() && !dirFile.mkdirs()){
+      if (!dirFile.exists() && !dirFile.mkdirs()) {
         throw new UnableToCreateDirectoryException("Unable to create output directory: " + dir);
       }
     }
   }
 
   static class UnableToCreateDirectoryException extends Exception {
+
     UnableToCreateDirectoryException(String message) {
       super(message);
     }

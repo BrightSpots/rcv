@@ -16,6 +16,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +28,7 @@ class ElectionConfig {
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
   // this is used if we have a permutation-based tie-break mode
-  private ArrayList<String> candidatePermutation = new ArrayList<>();
+  private final ArrayList<String> candidatePermutation = new ArrayList<>();
   // minimum vote threshold if one is specified
   private BigDecimal minimumVoteThreshold;
 
@@ -44,8 +45,7 @@ class ElectionConfig {
   // param: OvervoteRule setting string from election config
   // returns: the OvervoteRule enum value for the input setting string
   private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(
-      String setting
-  ) {
+      String setting) {
     // rule: return value determined by input setting string
     Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
 
@@ -57,7 +57,6 @@ class ElectionConfig {
         rule = Tabulator.MultiSeatTransferRule.TRANSFER_WHOLE_SURPLUS;
         break;
       default:
-        Logger.warn("Unrecognized MultiSeatTransferRule setting: %s", setting);
     }
     return rule;
   }
@@ -90,7 +89,6 @@ class ElectionConfig {
         rule = Tabulator.OvervoteRule.IGNORE_IF_MULTIPLE_CONTINUING;
         break;
       default:
-        Logger.warn("Unrecognized overvote rule setting: %s", setting);
     }
     return rule;
   }
@@ -122,53 +120,68 @@ class ElectionConfig {
         mode = Tabulator.TieBreakMode.GENERATE_PERMUTATION;
         break;
       default:
-        Logger.warn("Unrecognized tiebreaker mode rule setting: %s", setting);
     }
     return mode;
   }
 
-  // function: validate
+  // function: getValidationErrors
   // purpose: validate the correctness of the config data
-  // returns false if there was a problem
-  boolean validate() {
-    // does this config meet our validation standards?
-    boolean valid = true;
+  // returns any detected problems
+  List<String> getValidationErrors() {
+    // detected errors
+    List<String> errors = new LinkedList<>();
 
-    if (this.getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
-      valid = false;
-    } else if (this.getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
-      valid = false;
-    } else if (getOvervoteLabel() != null &&
-        getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY &&
-        getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-    ) {
-      valid = false;
-    } else if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
-      valid = false;
-    } else if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
-      valid = false;
+    if (getNumDeclaredCandidates() == 0) {
+      errors.add("Config must contain at least one declared candidate.");
     }
 
-    // if continueUntilTwoCandidatesRemain is selected
-    // this must be a single-winner election
-    if (this.willContinueUntilTwoCandidatesRemain() && this.getNumberOfWinners() > 1) {
-      valid = false;
+    if (getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
+      errors.add("Number of winners must be between 1 and 100");
     }
 
-    // if multi-seat is indicated we validate decimal count and rules style
+    if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
+      errors.add("Invalid overvote rule.");
+    } else if (getOvervoteLabel() != null
+        && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
+        && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
+      errors.add(
+          "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately or "
+              + "alwaysSkipToNextRank.");
+    }
+
+    if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
+      errors.add("Invalid tie-break mode.");
+    }
+
+    if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
+      errors.add("maxSkippedRanksAllowed can't be negative.");
+    }
+
+    if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
+      errors.add("maxRankingsAllowed must be positive.");
+    }
+
+    // If this is a multi-seat election, we validate a number of extra parameters.
     //
-    if (this.getNumberOfWinners() > 1) {
-      if (
-          this.getDecimalPlacesForVoteArithmetic() < 0 ||
-          this.getDecimalPlacesForVoteArithmetic() > 20
-      ) {
-        valid = false;
+    if (getNumberOfWinners() > 1) {
+      if (willContinueUntilTwoCandidatesRemain()) {
+        errors.add("continueUntilTwoCandidatesRemain can't be true in a multi-winner election.");
       }
+
+      if (isBatchEliminationEnabled()) {
+        errors.add("batchElimination can't be true in a multi-winner election.");
+      }
+
+      if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
+        errors.add("decimalPlacesForVoteArithmetic must be between 0 and 20 (inclusive).");
+      }
+
       if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
-        valid = false;
+        errors.add("Invalid multiSeatTransferRule.");
       }
     }
-    return valid;
+
+    return errors;
   }
 
   // function: getNumberWinners
@@ -183,9 +196,9 @@ class ElectionConfig {
   // returns: number of places to round to or 0 if no setting is specified
   private Integer getDecimalPlacesForVoteArithmetic() {
     // we default to using 4 places for fractional transfer vote arithmetic
-    return rawConfig.rules.decimalPlacesForVoteArithmetic == null ?
-        4 :
-        rawConfig.rules.decimalPlacesForVoteArithmetic;
+    return rawConfig.rules.decimalPlacesForVoteArithmetic == null
+        ? 4
+        : rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
   // function: divide
@@ -224,8 +237,9 @@ class ElectionConfig {
   }
 
   // function: willContinueUntilTwoCandidatesRemain
-  // purpose: getter for setting to keep tabulating beyond selecting winner till two candidates remain
-  // returns: whether to keep tabulating untill two candidates remain
+  // purpose: getter for setting to keep tabulating beyond selecting winner until two candidates
+  // remain
+  // returns: whether to keep tabulating until two candidates remain
   boolean willContinueUntilTwoCandidatesRemain() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
@@ -292,8 +306,8 @@ class ElectionConfig {
   int getNumDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = getCandidateCodeList().size();
-    if (getUndeclaredWriteInLabel() != null &&
-        getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
+    if (getUndeclaredWriteInLabel() != null
+        && getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
       num--;
     }
     return num;
@@ -311,9 +325,9 @@ class ElectionConfig {
   // returns: overvote rule to use for this config
   Tabulator.OvervoteRule getOvervoteRule() {
     // by default we exhaust immediately
-    return rawConfig.rules.overvoteRule == null ?
-        Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY :
-        ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
+    return rawConfig.rules.overvoteRule == null
+        ? Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
+        : ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
   }
 
   // function: getMinimumVoteThreshold
@@ -363,9 +377,9 @@ class ElectionConfig {
   // returns: tiebreak mode to use for this config
   Tabulator.TieBreakMode getTiebreakMode() {
     // by default we use random tiebreak
-    return rawConfig.rules.tiebreakMode == null ?
-        Tabulator.TieBreakMode.RANDOM :
-        ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
+    return rawConfig.rules.tiebreakMode == null
+        ? Tabulator.TieBreakMode.RANDOM
+        : ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
   }
 
   // function: isTreatBlankAsUndeclaredWriteInEnabled
@@ -408,24 +422,27 @@ class ElectionConfig {
   // purpose: builds map of candidate ID to candidate name and possibly generates tie-break ordering
   private void processCandidateData() {
     candidateCodeToNameMap = new HashMap<>();
-    // candidate is used to index through all candidates for this election
-    for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
-      if (candidate.code != null) {
-        candidateCodeToNameMap.put(candidate.code, candidate.name);
-        candidatePermutation.add(candidate.code);
-      } else {
-        candidateCodeToNameMap.put(candidate.name, candidate.name);
-        candidatePermutation.add(candidate.name);
+
+    if (rawConfig.candidates != null) {
+      // candidate is used to index through all candidates for this election
+      for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
+        if (candidate.code != null) {
+          candidateCodeToNameMap.put(candidate.code, candidate.name);
+          candidatePermutation.add(candidate.code);
+        } else {
+          candidateCodeToNameMap.put(candidate.name, candidate.name);
+          candidatePermutation.add(candidate.name);
+        }
       }
-    }
 
-    if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      Collections.shuffle(candidatePermutation);
-    }
+      if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
+        Collections.shuffle(candidatePermutation);
+      }
 
-    String uwiLabel = getUndeclaredWriteInLabel();
-    if (uwiLabel != null) {
-      candidateCodeToNameMap.put(uwiLabel, uwiLabel);
+      String uwiLabel = getUndeclaredWriteInLabel();
+      if (uwiLabel != null) {
+        candidateCodeToNameMap.put(uwiLabel, uwiLabel);
+      }
     }
   }
 }
