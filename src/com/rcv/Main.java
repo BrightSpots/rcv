@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-class Main {
+public class Main extends GuiApplication {
 
   // function: main
   // purpose: main entry point to the rcv tabulator program
@@ -37,11 +37,8 @@ class Main {
     }
 
     if (args.length == 0) {
-      // if no args provided, assume user wants to use the GUI
-      System.out.println("No arguments provided; starting GUI...");
-      // graphical user interface (GUI)
-      RcvGui gui = new RcvGui();
-      gui.launch();
+      // if no args provided, launch the GUI
+      launch(args);
     } else {
       // assume user wants to use CLI
       String configPath = args[0];
@@ -223,8 +220,9 @@ class Main {
             // map from name to number of times encountered
             Map<String, Integer> candidateCounts = e.getCandidateCounts();
             for (String candidate : candidateCounts.keySet()) {
-              Logger.severe("Unrecognized candidate \"%s\" appears %d time(s)", candidate,
-                  candidateCounts.get(candidate));
+              Logger.severe(
+                  "Unrecognized candidate \"%s\" appears %d time(s)",
+                  candidate, candidateCounts.get(candidate));
             }
             encounteredProblemForThisSource = true;
           }
