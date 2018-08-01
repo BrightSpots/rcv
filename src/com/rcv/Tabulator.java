@@ -85,8 +85,8 @@ class Tabulator {
         Logger.info("Candidate %s got %s votes.", candidate, votes.toString());
       }
       // all candidates in the existing output structure (if any) who received the same vote tally
-      LinkedList<String> candidates = tallyToCandidates
-          .computeIfAbsent(votes, k -> new LinkedList<>());
+      LinkedList<String> candidates =
+          tallyToCandidates.computeIfAbsent(votes, k -> new LinkedList<>());
       // new container list for candidates who received this vote tally
       candidates.add(candidate);
     }
@@ -296,14 +296,14 @@ class Tabulator {
   // return: true if we should continue tabulating
   private boolean shouldContinueTabulating() {
     // how many candidates have already been eliminated
-    int eliminatedCandidates = candidateToRoundEliminated.keySet().size();
+    int numEliminatedCandidates = candidateToRoundEliminated.keySet().size();
     // how many winners have been selected
-    int winners = winnerToRound.size();
+    int numWinners = winnerToRound.size();
     // apply config setting if specified
     if (config.willContinueUntilTwoCandidatesRemain()) {
-      return (eliminatedCandidates + winners) < config.getNumCandidates();
+      return numEliminatedCandidates + numWinners + 1 < config.getNumCandidates();
     } else {
-      return winners < config.getNumberOfWinners();
+      return numWinners < config.getNumberOfWinners();
     }
   }
 
@@ -327,6 +327,9 @@ class Tabulator {
       status = CandidateStatus.WINNER;
     } else if (candidateToRoundEliminated.containsKey(candidate)) {
       status = CandidateStatus.ELIMINATED;
+    } else if (candidate.equals(config.getOvervoteLabel())
+        || candidate.equals(config.getUndervoteLabel())) {
+      status = CandidateStatus.INVALID;
     }
     return status;
   }
@@ -681,6 +684,7 @@ class Tabulator {
       if (cvr.isExhausted()) {
         continue;
       }
+
       // if this CVR has no continuing candidate exhaust it
       if (!hasContinuingCandidates(cvr.rankToCandidateIDs)) {
         cvr.exhaust("no continuing candidates");
@@ -696,6 +700,14 @@ class Tabulator {
       Set<String> candidatesSeen = new HashSet<>();
       // rank iterates over all ranks in this CVR ranking set, from most preferred to least
       for (int rank : cvr.rankToCandidateIDs.keySet()) {
+        // check for undervote exhaustion (too many consecutive skipped ranks)
+        if (config.getMaxSkippedRanksAllowed() != null
+            && (rank - lastRank > config.getMaxSkippedRanksAllowed() + 1)) {
+          cvr.exhaust("undervote");
+          break;
+        }
+        lastRank = rank;
+
         // candidateIDSet is all candidates selected at the current rank
         Set<String> candidateIDSet = cvr.rankToCandidateIDs.get(rank);
 
@@ -716,7 +728,6 @@ class Tabulator {
           }
         }
 
-        // check for an overvote
         // overvoteDecision is the overvote decision for this ranking
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidateIDSet);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
@@ -728,13 +739,6 @@ class Tabulator {
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           continue;
-        }
-
-        // check for an undervote
-        if ((config.getMaxSkippedRanksAllowed() != null)
-            && (rank - lastRank > config.getMaxSkippedRanksAllowed() + 1)) {
-          cvr.exhaust("undervote");
-          break;
         }
 
         // selectedCandidateID for this rank
@@ -773,7 +777,6 @@ class Tabulator {
           // we've found our candidate
           break;
         }
-        lastRank = rank;
       } // end looping over the rankings within one ballot
     } // end looping over all ballots
 
@@ -883,6 +886,7 @@ class Tabulator {
     CONTINUING,
     WINNER,
     ELIMINATED,
+    INVALID,
   }
 
   // simple container class used during batch elimination process to store the results
