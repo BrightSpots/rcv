@@ -8,7 +8,7 @@ test/~*.xlsx
 test/Portland-Tabulation-Results.xlsx
 *_audit_log.txt
 *_audit.log
-rcv.log
+rcv.log*
 *_visualizer.xlsx
 *_summary.xlsx
 test_output
