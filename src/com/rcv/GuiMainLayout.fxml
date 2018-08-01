@@ -12,7 +12,7 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
   minHeight="400.0"
   minWidth="400.0" prefHeight="400.0" prefWidth="600.0"
-  xmlns="http://javafx.com/javafx/8.0.121" fx:controller="com.rcv.GuiController">
+  xmlns="http://javafx.com/javafx/8.0.121" fx:controller="com.rcv.GuiMainController">
   <top>
     <Label BorderPane.alignment="CENTER" alignment="CENTER" text="Universal RCV Tabulator"
       textAlignment="CENTER">
@@ -41,16 +41,14 @@
         </HBox.margin>
         <Button alignment="CENTER" contentDisplay="CENTER" id="buttonCreateConfig"
           maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-          onAction="#buttonCreateConfigClicked"
-          text="Create Config"/>
+          onAction="#buttonCreateConfigClicked" text="Create Config"/>
         <Button alignment="CENTER" contentDisplay="CENTER" id="buttonLoadConfig"
           maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-          onAction="#buttonLoadConfigClicked"
-          text="Load Config"/>
+          onAction="#buttonLoadConfigClicked" text="Load Config"/>
         <Button alignment="CENTER" contentDisplay="CENTER" id="buttonTabulate"
           maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-          onAction="#buttonTabulateClicked"
-          text="Tabulate"/>
+          onAction="#buttonTabulateClicked" text="Tabulate"/>
+        <Region VBox.vgrow="ALWAYS" prefHeight="200.0" prefWidth="200.0"/>
       </VBox>
       <Region HBox.hgrow="ALWAYS" prefHeight="200.0" prefWidth="200.0"/>
     </HBox>

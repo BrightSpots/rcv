@@ -1,17 +1,24 @@
 package com.rcv;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
-public class GuiController implements Initializable {
+public class GuiMainController implements Initializable {
 
   // currently-loaded tabulator config
   private static ElectionConfig config;
@@ -20,10 +27,6 @@ public class GuiController implements Initializable {
   @FXML
   private TextArea textStatus;
 
-  // function: printToTextStatus
-  // purpose: prints a message to the textStatus box, with timestamp and line break
-  // param: the message to print
-  // returns: N/A
   private void printToTextStatus(String message) {
     textStatus.appendText("* ");
     textStatus.appendText(
@@ -33,23 +36,14 @@ public class GuiController implements Initializable {
     textStatus.appendText("\n");
   }
 
-  // function: buttonCreateConfigClicked
-  // purpose: performs an action when buttonCreateConfig is clicked
-  // param: N/A
-  // returns: N/A
-  public void buttonCreateConfigClicked() {
-    printToTextStatus("Opening config creator...");
-    // TODO: add code to actually swap the scene
+  public void buttonCreateConfigClicked(ActionEvent event) throws IOException {
+    Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+    Parent configParent = FXMLLoader.load(getClass().getResource("GuiConfigLayout.fxml"));
+    window.setScene(new Scene(configParent));
   }
 
-  // function: buttonLoadConfigClicked
-  // purpose: performs an action when buttonLoadConfig is clicked
-  // param: N/A
-  // returns: N/A
   public void buttonLoadConfigClicked() {
-    // Current working directory
     File workingDirectory = new File(System.getProperty("user.dir"));
-    // FileChooser used as a dialog box for loading a config
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(workingDirectory);
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
@@ -67,19 +61,14 @@ public class GuiController implements Initializable {
     }
   }
 
-  // function: buttonTabulateClicked
-  // purpose: performs an action when buttonTabulate is clicked
-  // param: N/A
-  // returns: N/A
   public void buttonTabulateClicked() {
     printToTextStatus("Starting tabulation...");
-    // String indicating whether or not execution was successful
     String response = Main.executeTabulation(config);
     printToTextStatus(response);
   }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.info("No arguments provided; starting GUI...");
+    Logger.info("Opening main menu GUI...");
   }
 }
