@@ -62,9 +62,14 @@ public class GuiMainController implements Initializable {
   }
 
   public void buttonTabulateClicked() {
-    printToTextStatus("Starting tabulation...");
-    String response = Main.executeTabulation(config);
-    printToTextStatus(response);
+    if (config != null) {
+      printToTextStatus("Starting tabulation...");
+      String response = Main.executeTabulation(config);
+      printToTextStatus(response);
+      printToTextStatus(String.format("Output available here: %s", config.getOutputDirectory()));
+    } else {
+      printToTextStatus("Please load a config before attempting to tabulate!");
+    }
   }
 
   @Override

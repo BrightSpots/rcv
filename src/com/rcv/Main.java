@@ -106,6 +106,8 @@ public class Main extends GuiApplication {
   static String executeTabulation(ElectionConfig config) {
     // String indicating user message
     String response = "Tabulation successful!";
+    // Error message for user and log
+    String errorMessage;
     // flag indicating tabulation success
     boolean encounteredError = false;
     // current date-time formatted as a string used for creating unique output files names
@@ -119,8 +121,7 @@ public class Main extends GuiApplication {
       Logger.addTabulationFileLogging(auditLogPath);
       Logger.info("Logging tabulation to: %s", auditLogPath);
     } catch (IOException exception) {
-      // error message for user and log
-      String errorMessage =
+      errorMessage =
           String.format("Failed to configure tabulation logger: %s", exception.toString());
       Logger.severe(errorMessage);
       response = errorMessage;
@@ -144,10 +145,14 @@ public class Main extends GuiApplication {
           // generate audit data
           tabulator.doAudit(castVoteRecords);
         } else {
-          Logger.severe("No cast vote records found.");
+          errorMessage = "No cast vote records found.";
+          Logger.severe(errorMessage);
+          response = errorMessage;
         }
       } else {
-        Logger.severe("Skipping tabulation due to source file errors.");
+        errorMessage = "Skipping tabulation due to source file errors.";
+        Logger.severe(errorMessage);
+        response = errorMessage;
       }
     }
     Logger.info("Done logging tabulation to %s", auditLogPath);
