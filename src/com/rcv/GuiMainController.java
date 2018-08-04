@@ -43,9 +43,8 @@ public class GuiMainController implements Initializable {
   }
 
   public void buttonLoadConfigClicked() {
-    File workingDirectory = new File(System.getProperty("user.dir"));
     FileChooser fc = new FileChooser();
-    fc.setInitialDirectory(workingDirectory);
+    fc.setInitialDirectory(new File(System.getProperty("user.dir")));
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Load Config");
 

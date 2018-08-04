@@ -3,8 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
@@ -15,7 +17,11 @@
     <TabPane BorderPane.alignment="CENTER" prefHeight="200.0" prefWidth="200.0"
       tabClosingPolicy="UNAVAILABLE">
       <Tab text="Untitled Tab 1">
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+          <Label layoutX="22.0" layoutY="14.0" text="Contest Name"/>
+          <TextField id="textContestName" layoutX="22.0" layoutY="30.0" promptText="Contest Name"
+            fx:id="textContestName"/>
+        </AnchorPane>
       </Tab>
       <Tab text="Untitled Tab 2">
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
@@ -32,7 +38,7 @@
     <ButtonBar BorderPane.alignment="CENTER" prefHeight="40.0" prefWidth="200.0">
       <buttons>
         <Button mnemonicParsing="false" onAction="#buttonMenuClicked" text="Back to Menu"/>
-        <Button mnemonicParsing="false" text="Save Config"/>
+        <Button mnemonicParsing="false" onAction="#buttonSaveClicked" text="Save Config"/>
       </buttons>
       <BorderPane.margin>
         <Insets/>
