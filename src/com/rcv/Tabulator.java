@@ -12,6 +12,7 @@ package com.rcv;
 
 import com.rcv.CastVoteRecord.VoteOutcomeType;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -847,20 +848,56 @@ class Tabulator {
 
   // vote transfer rule to use in multi-seat elections
   enum MultiSeatTransferRule {
-    TRANSFER_FRACTIONAL_SURPLUS,
-    TRANSFER_WHOLE_SURPLUS,
-    TRANSFER_RULE_UNKNOWN,
+    TRANSFER_FRACTIONAL_SURPLUS("transferFractionalSurplus"),
+    TRANSFER_WHOLE_SURPLUS("transferWholeSurplus"),
+    TRANSFER_RULE_UNKNOWN("transferRuleUnknown");
+
+    private final String label;
+
+    MultiSeatTransferRule(String label) {
+      this.label = label;
+    }
+
+    static MultiSeatTransferRule getByLabel(String labelLookup) {
+      return Arrays.stream(MultiSeatTransferRule.values())
+          .filter(v -> v.label.equals(labelLookup))
+          .findAny()
+          .orElse(null);
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
   }
 
   // OvervoteRule determines how overvotes are handled
   enum OvervoteRule {
-    EXHAUST_IMMEDIATELY,
-    ALWAYS_SKIP_TO_NEXT_RANK,
-    EXHAUST_IF_ANY_CONTINUING,
-    IGNORE_IF_ANY_CONTINUING,
-    EXHAUST_IF_MULTIPLE_CONTINUING,
-    IGNORE_IF_MULTIPLE_CONTINUING,
-    RULE_UNKNOWN,
+    EXHAUST_IMMEDIATELY("exhaustImmediately"),
+    ALWAYS_SKIP_TO_NEXT_RANK("alwaysSkipToNextRank"),
+    EXHAUST_IF_ANY_CONTINUING("exhaustIfAnyContinuing"),
+    IGNORE_IF_ANY_CONTINUING("ignoreIfAnyContinuing"),
+    EXHAUST_IF_MULTIPLE_CONTINUING("exhaustIfMultipleContinuing"),
+    IGNORE_IF_MULTIPLE_CONTINUING("ignoreIfMultipleContinuing"),
+    RULE_UNKNOWN("ruleUnknown");
+
+    private final String label;
+
+    OvervoteRule(String label) {
+      this.label = label;
+    }
+
+    static OvervoteRule getByLabel(String labelLookup) {
+      return Arrays.stream(OvervoteRule.values())
+          .filter(v -> v.label.equals(labelLookup))
+          .findAny()
+          .orElse(null);
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
   }
 
   // OvervoteDecision is the result of applying an OvervoteRule to a CVR in a particular round
@@ -873,13 +910,31 @@ class Tabulator {
 
   // TieBreakMode determines how ties will be handled
   enum TieBreakMode {
-    RANDOM,
-    INTERACTIVE,
-    PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
-    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
-    USE_PERMUTATION_IN_CONFIG,
-    GENERATE_PERMUTATION,
-    MODE_UNKNOWN,
+    RANDOM("random"),
+    INTERACTIVE("interactive"),
+    PREVIOUS_ROUND_COUNTS_THEN_RANDOM("previousRoundCountsThenRandom"),
+    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("previousRoundCountsThenInteractive"),
+    USE_PERMUTATION_IN_CONFIG("usePermutationInConfig"),
+    GENERATE_PERMUTATION("generatePermutation"),
+    MODE_UNKNOWN("modeUnknown");
+
+    private final String label;
+
+    TieBreakMode(String label) {
+      this.label = label;
+    }
+
+    static TieBreakMode getByLabel(String labelLookup) {
+      return Arrays.stream(TieBreakMode.values())
+          .filter(v -> v.label.equals(labelLookup))
+          .findAny()
+          .orElse(null);
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
   }
 
   enum CandidateStatus {

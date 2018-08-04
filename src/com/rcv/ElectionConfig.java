@@ -25,10 +25,10 @@ class ElectionConfig {
 
   // underlying rawConfig object data
   final RawElectionConfig rawConfig;
-  // mapping from candidate code to full name
-  private Map<String, String> candidateCodeToNameMap;
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
+  // mapping from candidate code to full name
+  private Map<String, String> candidateCodeToNameMap;
   // minimum vote threshold if one is specified
   private BigDecimal minimumVoteThreshold;
 
@@ -40,23 +40,16 @@ class ElectionConfig {
     this.processCandidateData();
   }
 
-  // function: overvoteRuleForConfigSetting
+  // function: multiSeatTransferRuleForConfigSetting
   // purpose: given setting String return the corresponding rules enum
-  // param: OvervoteRule setting string from election config
-  // returns: the OvervoteRule enum value for the input setting string
+  // param: MultiSeatTransferRule setting string from election config
+  // returns: the MultiSeatTransferRule enum value for the input setting string
   private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(
       String setting) {
     // rule: return value determined by input setting string
-    Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
-
-    switch (setting) {
-      case "transferFractionalSurplus":
-        rule = Tabulator.MultiSeatTransferRule.TRANSFER_FRACTIONAL_SURPLUS;
-        break;
-      case "transferWholeSurplus":
-        rule = Tabulator.MultiSeatTransferRule.TRANSFER_WHOLE_SURPLUS;
-        break;
-      default:
+    Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.getByLabel(setting);
+    if (rule == null) {
+      rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
     }
     return rule;
   }
@@ -67,28 +60,9 @@ class ElectionConfig {
   // returns: the OvervoteRule enum value for the input setting string
   private static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
     // rule: return value determined by input setting string
-    Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
-
-    switch (setting) {
-      case "alwaysSkipToNextRank":
-        rule = Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
-        break;
-      case "exhaustImmediately":
-        rule = Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY;
-        break;
-      case "exhaustIfAnyContinuing":
-        rule = Tabulator.OvervoteRule.EXHAUST_IF_ANY_CONTINUING;
-        break;
-      case "ignoreIfAnyContinuing":
-        rule = Tabulator.OvervoteRule.IGNORE_IF_ANY_CONTINUING;
-        break;
-      case "exhaustIfMultipleContinuing":
-        rule = Tabulator.OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING;
-        break;
-      case "ignoreIfMultipleContinuing":
-        rule = Tabulator.OvervoteRule.IGNORE_IF_MULTIPLE_CONTINUING;
-        break;
-      default:
+    Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.getByLabel(setting);
+    if (rule == null) {
+      rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
     }
     return rule;
   }
@@ -99,27 +73,9 @@ class ElectionConfig {
   // returns: TieBreakMode enum value for the input setting string
   private static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
     // mode: return value determined by input setting string
-    Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.MODE_UNKNOWN;
-    switch (setting) {
-      case "random":
-        mode = Tabulator.TieBreakMode.RANDOM;
-        break;
-      case "interactive":
-        mode = Tabulator.TieBreakMode.INTERACTIVE;
-        break;
-      case "previousRoundCountsThenRandom":
-        mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM;
-        break;
-      case "previousRoundCountsThenInteractive":
-        mode = Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE;
-        break;
-      case "usePermutationInConfig":
-        mode = Tabulator.TieBreakMode.USE_PERMUTATION_IN_CONFIG;
-        break;
-      case "generatePermutation":
-        mode = Tabulator.TieBreakMode.GENERATE_PERMUTATION;
-        break;
-      default:
+    Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.getByLabel(setting);
+    if (mode == null) {
+      mode = Tabulator.TieBreakMode.MODE_UNKNOWN;
     }
     return mode;
   }
@@ -140,6 +96,7 @@ class ElectionConfig {
     }
 
     if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
+      // TODO: report what the invalid value was?
       errors.add("Invalid overvote rule.");
     } else if (getOvervoteLabel() != null
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
