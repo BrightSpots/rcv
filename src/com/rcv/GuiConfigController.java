@@ -3,6 +3,8 @@ package com.rcv;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -19,6 +22,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 public class GuiConfigController implements Initializable {
 
@@ -30,6 +34,13 @@ public class GuiConfigController implements Initializable {
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
   @FXML
   private ToggleGroup toggleTabulateByPrecinct;
+  @FXML
+  private DatePicker datePickerContestDate;
+
+  public void buttonClearDatePickerContestDateClicked() {
+    datePickerContestDate.getEditor().clear();
+    datePickerContestDate.setValue(null);
+  }
 
   public void buttonOutputDirectoryClicked() {
     DirectoryChooser dc = new DirectoryChooser();
@@ -66,6 +77,23 @@ public class GuiConfigController implements Initializable {
 
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
+
+    datePickerContestDate.setConverter(
+        new StringConverter<>() {
+          final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+          @Override
+          public String toString(LocalDate date) {
+            return (date != null) ? dateFormatter.format(date) : "";
+          }
+
+          @Override
+          public LocalDate fromString(String string) {
+            return (string != null && !string.isEmpty())
+                ? LocalDate.parse(string, dateFormatter)
+                : null;
+          }
+        });
   }
 
   private void saveElectionConfig(File saveFile) {
@@ -76,6 +104,10 @@ public class GuiConfigController implements Initializable {
     config.outputDirectory = textOutputDirectory.getText();
     config.tabulateByPrecinct =
         ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
+    config.date =
+        (datePickerContestDate.getValue() != null)
+            ? datePickerContestDate.getValue().toString()
+            : "";
     rules.overvoteRule =
         (choiceOvervoteRule.getValue() != null)
             ? choiceOvervoteRule.getValue().toString()
