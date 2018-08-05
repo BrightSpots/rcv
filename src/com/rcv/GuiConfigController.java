@@ -15,6 +15,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -24,9 +25,22 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textContestName;
   @FXML
+  private TextField textOutputDirectory;
+  @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
   @FXML
   private ToggleGroup toggleTabulateByPrecinct;
+
+  public void buttonOutputDirectoryClicked() {
+    DirectoryChooser dc = new DirectoryChooser();
+    dc.setInitialDirectory(new File(System.getProperty("user.dir")));
+    dc.setTitle("Output Directory");
+
+    File outputDirectory = dc.showDialog(null);
+    if (outputDirectory != null) {
+      textOutputDirectory.setText(outputDirectory.getAbsolutePath());
+    }
+  }
 
   public void buttonMenuClicked(ActionEvent event) throws IOException {
     Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -59,6 +73,7 @@ public class GuiConfigController implements Initializable {
     RawElectionConfig.ElectionRules rules = new RawElectionConfig.ElectionRules();
 
     config.contestName = textContestName.getText();
+    config.outputDirectory = textOutputDirectory.getText();
     config.tabulateByPrecinct =
         ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
     rules.overvoteRule =
