@@ -18,7 +18,6 @@ public class RawElectionConfig {
 
   // directory for output files
   public String outputDirectory;
-
   // contest name
   public String contestName;
   // jurisdiction

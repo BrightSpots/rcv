@@ -10,6 +10,7 @@ package com.rcv;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -22,6 +23,7 @@ class JsonParser {
   // file access: read
   // returns: instance of the object parsed from json or null if there was a problem
   static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
+    // TODO: consolidate two return statements in this method into one?
     try {
       // fileReader will read the json file from disk
       FileReader fileReader = new FileReader(jsonFilePath);
@@ -39,5 +41,18 @@ class JsonParser {
       Logger.severe(fileException.toString());
     }
     return null;
+  }
+
+  static String createFileFromRawElectionConfig(File jsonFile, RawElectionConfig config) {
+    ObjectMapper mapper = new ObjectMapper();
+    String response = "SUCCESS";
+    try {
+      mapper.writer().withDefaultPrettyPrinter().writeValue(jsonFile, config);
+    } catch (IOException fileException) {
+      Logger.severe("Error saving file: %s", jsonFile.getAbsolutePath());
+      Logger.severe(fileException.toString());
+      response = "FAILURE";
+    }
+    return response;
   }
 }
