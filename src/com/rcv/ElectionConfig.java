@@ -87,6 +87,8 @@ class ElectionConfig {
     // detected errors
     List<String> errors = new LinkedList<>();
 
+    // TODO: need to add checks that all required String fields !.equals("")
+
     if (getNumDeclaredCandidates() == 0) {
       errors.add("Config must contain at least one declared candidate.");
     }

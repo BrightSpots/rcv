@@ -5,11 +5,14 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
   minHeight="-Infinity"
   minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
@@ -19,9 +22,22 @@
       tabClosingPolicy="UNAVAILABLE">
       <Tab text="Contest">
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-          <Label layoutX="22.0" layoutY="14.0" text="Contest Name"/>
-          <TextField id="textContestName" layoutX="22.0" layoutY="30.0" promptText="Contest Name"
+          <Label layoutX="22.0" layoutY="14.0" text="Contest Name *"/>
+          <TextField id="textContestName" layoutX="22.0" layoutY="32.0" promptText="Contest Name"
             fx:id="textContestName"/>
+          <Label layoutX="22.0" layoutY="70.0" text="Tabulate by Precinct"/>
+          <HBox alignment="CENTER_LEFT" layoutX="22.0" layoutY="87.0" spacing="12.0">
+            <padding>
+              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+            </padding>
+            <RadioButton mnemonicParsing="false" text="True">
+              <toggleGroup>
+                <ToggleGroup fx:id="toggleTabulateByPrecinct"/>
+              </toggleGroup>
+            </RadioButton>
+            <RadioButton layoutX="10.0" layoutY="10.0" mnemonicParsing="false" selected="true"
+              text="False" toggleGroup="$toggleTabulateByPrecinct"/>
+          </HBox>
         </AnchorPane>
       </Tab>
       <Tab text="CVR Files">
@@ -32,8 +48,8 @@
       </Tab>
       <Tab text="Rules">
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-          <Label layoutX="14.0" layoutY="14.0" text="Overvote Rule"/>
-          <ChoiceBox id="choiceOvervoteRule" layoutX="14.0" layoutY="31.0"
+          <Label layoutX="22.0" layoutY="14.0" text="Overvote Rule *"/>
+          <ChoiceBox id="choiceOvervoteRule" layoutX="22.0" layoutY="32.0"
             prefWidth="150.0" fx:id="choiceOvervoteRule"/>
         </AnchorPane>
       </Tab>

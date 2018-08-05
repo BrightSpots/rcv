@@ -12,7 +12,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -23,6 +25,8 @@ public class GuiConfigController implements Initializable {
   private TextField textContestName;
   @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
+  @FXML
+  private ToggleGroup toggleTabulateByPrecinct;
 
   public void buttonMenuClicked(ActionEvent event) throws IOException {
     Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -48,7 +52,6 @@ public class GuiConfigController implements Initializable {
 
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
-    choiceOvervoteRule.getSelectionModel().select(0);
   }
 
   private void saveElectionConfig(File saveFile) {
@@ -56,8 +59,12 @@ public class GuiConfigController implements Initializable {
     RawElectionConfig.ElectionRules rules = new RawElectionConfig.ElectionRules();
 
     config.contestName = textContestName.getText();
-
-    rules.overvoteRule = choiceOvervoteRule.getValue().toString();
+    config.tabulateByPrecinct =
+        ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
+    rules.overvoteRule =
+        (choiceOvervoteRule.getValue() != null)
+            ? choiceOvervoteRule.getValue().toString()
+            : Tabulator.OvervoteRule.RULE_UNKNOWN.toString();
     config.rules = rules;
 
     String response = JsonParser.createFileFromRawElectionConfig(saveFile, config);
