@@ -3,7 +3,7 @@
   "contestName":"Validation test for sources",
   "jurisdiction":"none",
   "office":"none",
-  "date":"2018-07-20",
+  "contestDate": "2018-07-20",
   "tabulateByPrecinct":true,
   "rules": {
     "description":"Testing our validation logic for sources",

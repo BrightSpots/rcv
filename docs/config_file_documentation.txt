@@ -27,7 +27,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
       value: string of length [1..1000]
       default: none
 
-  "date:" optional
+  "contestDate:" optional
     date of the contest
     used for visualizer output only (not used in tabulation)
     example: "2015-11-03"

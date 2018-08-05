@@ -3,7 +3,7 @@
   "contestName":"2017 Minneapolis mayoral race",
   "jurisdiction":"Minneapolis, MN",
   "office":"Mayor",
-  "date":"2017-11-07",
+  "contestDate": "2017-11-07",
   "tabulateByPrecinct":true,
   "rules": {
     "description":"Minneapolis Rules",

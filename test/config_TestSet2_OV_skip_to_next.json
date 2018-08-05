@@ -3,7 +3,7 @@
   "contestName": "Overvote2",
   "jurisdiction": "Funkytown, USA",
   "office": "Exhausted",
-  "date": "2018-07-28",
+  "contestDate": "2018-07-28",
   "rules": {
     "description": "Doyle Rules",
     "exhaustOnDuplicateCandidate": false,

@@ -228,7 +228,7 @@ class ElectionConfig {
   // purpose: getter for electionDate
   // returns: election date
   String getElectionDate() {
-    return rawConfig.date;
+    return rawConfig.contestDate;
   }
 
   // function: isTabulateByPrecinctEnabled

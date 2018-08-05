@@ -3,7 +3,7 @@
   "contestName":"Maine 2018 Democratic Governor Primary race",
   "jurisdiction":"Maine",
   "office":"Governor",
-  "date":"2018-06-12",
+  "contestDate": "2018-06-12",
   "rules": {
     "description":"Maine Rules",
     "maxRankingsAllowed":8,

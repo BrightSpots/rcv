@@ -104,7 +104,7 @@ public class GuiConfigController implements Initializable {
     config.outputDirectory = textOutputDirectory.getText();
     config.tabulateByPrecinct =
         ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
-    config.date =
+    config.contestDate =
         (datePickerContestDate.getValue() != null)
             ? datePickerContestDate.getValue().toString()
             : "";

@@ -3,7 +3,7 @@
   "contestName":"Portland 2015 Mayoral Race",
   "jurisdiction":"Portland, ME",
   "office":"Mayor",
-  "date":"2015-11-03",
+  "contestDate": "2015-11-03",
   "rules": {
     "description":"Maine Rules",
     "maxRankingsAllowed":15,
