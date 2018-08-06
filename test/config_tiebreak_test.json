@@ -2,7 +2,7 @@
   "contestName":"Tiebreak test",
   "jurisdiction":"Funkytown, USA",
   "office":"Sergeant-at-Arms",
-  "date":"2017-12-03",
+  "contestDate": "2017-12-03",
   "rules": {
     "description":"Doyle Rules",
     "maxRankingsAllowed":3,

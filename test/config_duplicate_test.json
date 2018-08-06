@@ -2,7 +2,7 @@
   "contestName":"Duplicate test",
   "jurisdiction":"Funkytown, USA",
   "office":"Director of Produce",
-  "date":"2018-05-21",
+  "contestDate": "2018-05-21",
   "rules": {
     "description":"Doyle Rules",
     "exhaustOnDuplicateCandidate":true,

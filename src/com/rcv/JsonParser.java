@@ -23,24 +23,26 @@ class JsonParser {
   // file access: read
   // returns: instance of the object parsed from json or null if there was a problem
   static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
-    // TODO: consolidate two return statements in this method into one?
+    T createdObject;
     try {
       // fileReader will read the json file from disk
       FileReader fileReader = new FileReader(jsonFilePath);
       // objectMapper will map json values into the new java object
       ObjectMapper objectMapper = new ObjectMapper();
       // object is the newly created object populated with json values
-      return objectMapper.readValue(fileReader, valueType);
+      createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException jsonException) {
       Logger.severe("Error parsing json file: %s", jsonFilePath);
       Logger.severe("Check your file formatting and values to make sure they are correct.");
       Logger.severe(jsonException.getMessage());
+      createdObject = null;
     } catch (IOException fileException) {
       Logger.severe("Error opening file: %s", jsonFilePath);
       Logger.severe("Check your file path and make sure it is correct.");
       Logger.severe(fileException.toString());
+      createdObject = null;
     }
-    return null;
+    return createdObject;
   }
 
   static String createFileFromRawElectionConfig(File jsonFile, RawElectionConfig config) {

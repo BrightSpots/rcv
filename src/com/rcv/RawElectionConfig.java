@@ -24,8 +24,8 @@ public class RawElectionConfig {
   public String jurisdiction;
   // office
   public String office;
-  // election date
-  public String date;
+  // contest date
+  public String contestDate;
   // rules object
   public ElectionRules rules;
   // list of all Candidates
