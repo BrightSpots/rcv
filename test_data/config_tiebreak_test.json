@@ -22,7 +22,7 @@
   "cvrFileSources": [
     {
       "provider": "ES&S",
-      "filePath": "test/tiebreak-test-cvr.xlsx",
+      "filePath": "test_data/tiebreak-test-cvr.xlsx",
       "firstVoteColumnIndex": 1
     }
   ]

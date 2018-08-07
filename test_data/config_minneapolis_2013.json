@@ -55,7 +55,7 @@
   "cvrFileSources": [
     {
       "provider": "ES&S",
-      "filePath": "test/2013-minneapolis-mayor-cvr.xlsx",
+      "filePath": "test_data/2013-minneapolis-mayor-cvr.xlsx",
       "firstVoteColumnIndex": 1,
       "precinctColumnIndex": 0
     }

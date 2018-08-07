@@ -31,7 +31,7 @@
   "cvrFileSources": [
     {
       "provider": "ES&S",
-      "filePath": "test/TestSet2_OV_skip_to_next-cvr.xlsx",
+      "filePath": "test_data/TestSet2_OV_skip_to_next-cvr.xlsx",
       "firstVoteColumnIndex": 1,
       "idColumnIndex": 0
     }

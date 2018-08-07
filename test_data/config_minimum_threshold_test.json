@@ -21,7 +21,7 @@
   "cvrFileSources": [
     {
       "provider": "ES&S",
-      "filePath": "test/minimum-threshold-test-cvr.xlsx",
+      "filePath": "test_data/minimum-threshold-test-cvr.xlsx",
       "firstVoteColumnIndex": 1
     }
   ]

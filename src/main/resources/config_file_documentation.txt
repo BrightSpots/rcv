@@ -44,7 +44,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
 
       "filePath" required
         location of the CVR file
-        example: /Users/test/2015-portland-mayor-cvr.xlsx
+        example: /Users/test_data/2015-portland-mayor-cvr.xlsx
         value: string of length [1..1000]
 
       "firstVoteColumnIndex" required

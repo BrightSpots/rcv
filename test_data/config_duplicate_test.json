@@ -19,7 +19,7 @@
   "cvrFileSources": [
     {
       "provider": "ES&S",
-      "filePath": "test/duplicate-test-cvr.xlsx",
+      "filePath": "test_data/duplicate-test-cvr.xlsx",
       "firstVoteColumnIndex": 1
     }
   ]

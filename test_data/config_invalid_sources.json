@@ -20,13 +20,13 @@
   "cvrFileSources": [
     {
       "provider": "ES&S",
-      "filePath": "test/nonexistent_path",
+      "filePath": "test_data/nonexistent_path",
       "firstVoteColumnIndex": 3,
       "precinctColumnIndex": 1
     },
     {
       "provider": "ES&S",
-      "filePath": "test/nonexistent_path2"
+      "filePath": "test_data/nonexistent_path2"
     },
     {
       "provider": "ES&S",
@@ -35,7 +35,7 @@
     },
     {
       "provider": "ES&S",
-      "filePath": "test/unrecognized_candidates.xlsx",
+      "filePath": "test_data/unrecognized_candidates.xlsx",
       "firstVoteColumnIndex": 1
     }
   ]

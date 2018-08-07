@@ -33,7 +33,7 @@
   "cvrFileSources": [
     {
       "provider": "ES&S",
-      "filePath": "test/2013-minneapolis-park-at-large-cvr.xlsx",
+      "filePath": "test_data/2013-minneapolis-park-at-large-cvr.xlsx",
       "firstVoteColumnIndex": 1,
       "precinctColumnIndex": 0
     }
