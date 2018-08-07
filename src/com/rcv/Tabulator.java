@@ -1,11 +1,22 @@
 /*
- * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
- * Copyright 2018 Bright Spots
- * Purpose: perform ranked choice tabulation calculations
- * round-by-round tabulation of votes to each candidate
- * handles overvote / undervote decisions batch elimination and tiebreaks
- * results are logged to console and audit file
- * Version: 1.0
+ * Ranked Choice Voting Universal Tabulator
+ * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ * the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Purpose:
+ * Perform ranked choice tabulation calculations. Round-by-round tabulation of votes to
+ * each candidate. Handles overvote / undervote decisions batch elimination and tiebreaks. Results
+ * are logged to console and audit file.
  */
 
 package com.rcv;

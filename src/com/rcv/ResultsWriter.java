@@ -1,10 +1,22 @@
 /*
- * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
- * Copyright 2018 Bright Spots
+ * Ranked Choice Voting Universal Tabulator
+ * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ * the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Purpose:
  * Helper class takes tabulation results data as input and generates results xls file which
- * contains results summary information.
- * Currently we support an xlsx spreadsheet which can be visualized in a web browser
- * Version: 1.0
+ * contains results summary information. Currently we support an xlsx spreadsheet which can be
+ * visualized in a web browser.
  */
 
 package com.rcv;

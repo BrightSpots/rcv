@@ -1,6 +1,6 @@
 "rcv" Ranked Choice Voting Universal Tabulator
 Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
-Copyright 2018 Bright Spots
+Copyright (C) 2018 Bright Spots
 
 Dependencies:
 

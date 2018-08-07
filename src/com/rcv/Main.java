@@ -1,14 +1,25 @@
 /*
- * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
- * Copyright 2018 Bright Spots
- * Purpose: Main entry point for the rcv module
- * Controls high-level flow for program execution:
+ * Ranked Choice Voting Universal Tabulator
+ * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ * the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Purpose:
+ * Main entry point for the RCV module. Controls high-level flow for program execution:
  * parse command line
  * parse config file
  * read cast vote records
  * tabulate election
  * output results
- * Version: 1.0
  */
 
 package com.rcv;

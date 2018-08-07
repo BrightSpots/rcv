@@ -1,11 +1,21 @@
 /*
- * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
- * Copyright 2018 Bright Spots
- * Purpose: Wrapper for RawElectionConfig object
- * This class adds logic for looking up rule enum names
- * candidate names and various configuration utilities
- * cast vote record objects.
- * Version: 1.0
+ * Ranked Choice Voting Universal Tabulator
+ * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ * the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Purpose:
+ * Wrapper for RawElectionConfig object. This class adds logic for looking up rule enum
+ * names, candidate names, various configuration utilities, and cast vote record objects.
  */
 
 package com.rcv;

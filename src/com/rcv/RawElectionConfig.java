@@ -1,10 +1,22 @@
 /*
- * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
- * Copyright 2018 Bright Spots
- * Purpose: RawElectionConfig defines the data model used for an election configuration.
- * It is used by JsonParser to map json configuration files into Java objects.
- * We use jackson json parser with annotations below to facilitate parsing (see JsonParser.java)
- * Version: 1.0
+ * Ranked Choice Voting Universal Tabulator
+ * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ * the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Purpose:
+ * RawElectionConfig defines the data model used for an election configuration. It is used
+ * by JsonParser to map JSON configuration files into Java objects. We use Jackson JSON parser with \
+ * annotations below to facilitate parsing (see JsonParser.java).
  */
 
 package com.rcv;

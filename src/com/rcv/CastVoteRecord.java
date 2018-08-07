@@ -1,10 +1,21 @@
 /*
- * Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
- * Copyright 2018 Bright Spots
+ * Ranked Choice Voting Universal Tabulator
+ * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ * the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  * Purpose:
- * internal representation of a single cast vote record including rankings ID and
- * state (exhausted or not).  Conceptually this is a ballot.
- * Version: 1.0
+ * Internal representation of a single cast vote record including rankings ID and state (exhausted
+ * or not). Conceptually this is a ballot.
  */
 
 package com.rcv;
@@ -32,13 +43,13 @@ class CastVoteRecord {
   private final List<String> fullCVRData;
   // contains what happened to this CVR in each round
   private final List<VoteOutcome> roundOutcomes = new LinkedList<>();
+  // records winners to whom some fraction of this vote has been allocated
+  private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
   SortedMap<Integer, Set<String>> rankToCandidateIDs;
   // whether this CVR is exhausted or not
   private boolean isExhausted;
-  // records winners to whom some fraction of this vote has been allocated
-  private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -146,8 +157,8 @@ class CastVoteRecord {
     // index for iterating over all rankings
     for (Pair<Integer, String> ranking : rankings) {
       // set of candidates given this rank
-      Set<String> candidatesAtRank = rankToCandidateIDs
-          .computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
+      Set<String> candidatesAtRank =
+          rankToCandidateIDs.computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
       // create the new optionsAtRank and add to the sorted CVR
       // add this option into the map
       candidatesAtRank.add(ranking.getValue());
