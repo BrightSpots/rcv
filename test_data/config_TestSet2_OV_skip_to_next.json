@@ -1,0 +1,39 @@
+{
+  "outputDirectory": "test_output/TestSet2",
+  "contestName": "Overvote2",
+  "jurisdiction": "Funkytown, USA",
+  "office": "Exhausted",
+  "contestDate": "2018-07-28",
+  "rules": {
+    "description": "Doyle Rules",
+    "exhaustOnDuplicateCandidate": false,
+    "maxRankingsAllowed": 4,
+    "overvoteRule": "alwaysSkipToNextRank",
+    "maxSkippedRanksAllowed": 1,
+    "tiebreakMode": "random",
+    "undervoteLabel": "undervote",
+    "overvoteLabel": "overvote"
+  },
+  "candidates": [
+    {
+      "name": "A"
+    },
+    {
+      "name": "B"
+    },
+    {
+      "name": "C"
+    },
+    {
+      "name": "D"
+    }
+  ],
+  "cvrFileSources": [
+    {
+      "provider": "ES&S",
+      "filePath": "test_data/TestSet2_OV_skip_to_next-cvr.xlsx",
+      "firstVoteColumnIndex": 1,
+      "idColumnIndex": 0
+    }
+  ]
+}

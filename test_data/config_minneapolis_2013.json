@@ -1,0 +1,63 @@
+{
+  "outputDirectory":"test_output/minneapolis_2013",
+  "contestName":"2013 Minneapolis Mayor",
+  "jurisdiction":"Minneapolis",
+  "office":"Mayor",
+  "tabulateByPrecinct":true,
+  "rules": {
+    "description":"Maine Rules",
+    "batchElimination":true,
+    "overvoteRule":"exhaustImmediately",
+    "maxRankingsAllowed":3,
+    "maxSkippedRanksAllowed":1,
+    "overvoteLabel":"overvote",
+    "tiebreakMode":"random",
+    "undeclaredWriteInLabel":"UWI",
+    "undervoteLabel":"undervote"
+  },
+  "candidates":[
+    {"name": "TROY BENJEGERDES"},
+    {"name": "TONY LANE"},
+    {"name": "STEPHANIE WOODRUFF"},
+    {"name": "RAHN V. WORKCUFF"},
+    {"name": "OLE SAVIOR"},
+    {"name": "NEAL BAXTER"},
+    {"name": "MIKE GOULD"},
+    {"name": "MERRILL ANDERSON"},
+    {"name": "MARK V ANDERSON"},
+    {"name": "MARK ANDREW"},
+    {"name": "KURTIS W. HANNA"},
+    {"name": "JOSHUA REA"},
+    {"name": "JOHN LESLIE HARTWIG"},
+    {"name": "JOHN CHARLES WILSON"},
+    {"name": "JEFFREY ALAN WAGNER"},
+    {"name": "JAYMIE KELLY"},
+    {"name": "JAMES EVERETT"},
+    {"name": "JAMES JIMMY L. STROUD, JR."},
+    {"name": "JACKIE CHERRYHOMES"},
+    {"name": "GREGG A. IVERSON"},
+    {"name": "EDMUND BERNARD BRUYERE"},
+    {"name": "DOUG MANN"},
+    {"name": "DON SAMUELS"},
+    {"name": "DAN COHEN"},
+    {"name": "CYD GORMAN"},
+    {"name": "CHRISTOPHER ROBIN ZIMMERMAN"},
+    {"name": "CHRISTOPHER CLARK"},
+    {"name": "CAPTAIN JACK SPARROW"},
+    {"name": "CAM WINTON"},
+    {"name": "BOB FINE"},
+    {"name": "BOB AGAIN CARNEY JR"},
+    {"name": "BILL KAHN"},
+    {"name": "BETSY HODGES"},
+    {"name": "ALICIA K. BENNETT"},
+    {"name": "ABDUL M RAHAMAN THE ROCK"}
+  ],
+  "cvrFileSources": [
+    {
+      "provider": "ES&S",
+      "filePath": "test_data/2013-minneapolis-mayor-cvr.xlsx",
+      "firstVoteColumnIndex": 1,
+      "precinctColumnIndex": 0
+    }
+  ]
+}

@@ -1,14 +1,15 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log*
+
+# Lock files
+test_data/~*
+
+# Project-specific exclusions
 .idea
 .DS_Store
 out
-tmp
-test/election_summary_report.txt
-test/2013-minneapolis-mayor-tabulation-results.xlsx
-test/~*.xlsx
-test/Portland-Tabulation-Results.xlsx
-*_audit_log.txt
-*_audit.log
-rcv.log*
-*_visualizer.xlsx
-*_summary.xlsx
 test_output
+tmp
