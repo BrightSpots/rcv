@@ -8,6 +8,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
@@ -31,15 +33,15 @@
         <Tab text="Contest">
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
             <Label layoutX="22.0" layoutY="14.0" text="Contest Name *"/>
-            <TextField id="textContestName" layoutX="22.0" layoutY="32.0" promptText="Contest Name"
-              fx:id="textContestName"/>
+            <TextField id="textContestName" layoutX="22.0" layoutY="32.0"
+              promptText="Contest Name *" fx:id="textFieldContestName"/>
             <Label layoutX="22.0" layoutY="57.0" text="Output Directory *"/>
             <HBox alignment="CENTER_LEFT" layoutX="18.0" layoutY="74.0" spacing="4.0">
               <padding>
                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
               </padding>
-              <TextField id="textOutputDirectory" promptText="Output Directory"
-                fx:id="textOutputDirectory"/>
+              <TextField id="textOutputDirectory" promptText="Output Directory *"
+                fx:id="textFieldOutputDirectory"/>
               <Button mnemonicParsing="false" onAction="#buttonOutputDirectoryClicked"
                 text="Select"/>
             </HBox>
@@ -71,7 +73,27 @@
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
         </Tab>
         <Tab text="Candidates">
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+          <VBox>
+            <HBox alignment="CENTER" spacing="4.0">
+              <padding>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+              </padding>
+              <TextField promptText="Name *" fx:id="textFieldCandidateName"/>
+              <TextField promptText="Code" fx:id="textFieldCandidateCode"/>
+              <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>
+              <Region prefHeight="25.0" prefWidth="39.0"/>
+              <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
+                text="Delete Selected"/>
+            </HBox>
+            <TableView fx:id="tableViewCandidates">
+              <columns>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="180.0"
+                  text="Name" fx:id="tableColumnCandidateName"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="180.0"
+                  text="Code" fx:id="tableColumnCandidateCode"/>
+              </columns>
+            </TableView>
+          </VBox>
         </Tab>
         <Tab text="Rules">
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">

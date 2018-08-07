@@ -395,12 +395,12 @@ class ElectionConfig {
     if (rawConfig.candidates != null) {
       // candidate is used to index through all candidates for this election
       for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
-        if (candidate.code != null) {
-          candidateCodeToNameMap.put(candidate.code, candidate.name);
-          candidatePermutation.add(candidate.code);
+        if (candidate.getCode() != null) {
+          candidateCodeToNameMap.put(candidate.getCode(), candidate.getName());
+          candidatePermutation.add(candidate.getCode());
         } else {
-          candidateCodeToNameMap.put(candidate.name, candidate.name);
-          candidatePermutation.add(candidate.name);
+          candidateCodeToNameMap.put(candidate.getName(), candidate.getName());
+          candidatePermutation.add(candidate.getName());
         }
       }
 

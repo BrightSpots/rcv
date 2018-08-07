@@ -16,6 +16,7 @@
 
 package com.rcv;
 
+import com.rcv.RawElectionConfig.Candidate;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.event.ActionEvent;
@@ -35,9 +37,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -49,15 +55,25 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextArea textAreaHelp;
   @FXML
-  private TextField textContestName;
+  private TextField textFieldContestName;
   @FXML
-  private TextField textOutputDirectory;
+  private TextField textFieldOutputDirectory;
   @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
   @FXML
   private ToggleGroup toggleTabulateByPrecinct;
   @FXML
   private DatePicker datePickerContestDate;
+  @FXML
+  private TableView<Candidate> tableViewCandidates;
+  @FXML
+  private TableColumn<Candidate, String> tableColumnCandidateName;
+  @FXML
+  private TableColumn<Candidate, String> tableColumnCandidateCode;
+  @FXML
+  private TextField textFieldCandidateName;
+  @FXML
+  private TextField textFieldCandidateCode;
 
   public void buttonClearDatePickerContestDateClicked() {
     datePickerContestDate.getEditor().clear();
@@ -71,7 +87,7 @@ public class GuiConfigController implements Initializable {
 
     File outputDirectory = dc.showDialog(null);
     if (outputDirectory != null) {
-      textOutputDirectory.setText(outputDirectory.getAbsolutePath());
+      textFieldOutputDirectory.setText(outputDirectory.getAbsolutePath());
     }
   }
 
@@ -93,6 +109,27 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  public void buttonAddCandidateClicked() {
+    Candidate candidate = new Candidate();
+    // TODO: check if candidate is already in list?
+    if (!textFieldCandidateName.getText().isEmpty()) {
+      candidate.setName(textFieldCandidateName.getText());
+      candidate.setCode(textFieldCandidateCode.getText());
+      tableViewCandidates.getItems().add(candidate);
+      textFieldCandidateName.clear();
+      textFieldCandidateCode.clear();
+    } else {
+      // TODO: Need to convey this in the UI; also consider moving validation to setter
+      Logger.warn("Candidate name field is required!");
+    }
+  }
+
+  public void buttonDeleteCandidateClicked() {
+    tableViewCandidates
+        .getItems()
+        .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
+  }
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.info("Opening config creator GUI...");
@@ -111,9 +148,6 @@ public class GuiConfigController implements Initializable {
     }
     textAreaHelp.setText(helpText);
 
-    choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
-    choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
-
     datePickerContestDate.setConverter(
         new StringConverter<>() {
           final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -130,18 +164,28 @@ public class GuiConfigController implements Initializable {
                 : null;
           }
         });
+
+    tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
+    tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+    tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+    choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
+    choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
   }
 
   private void saveElectionConfig(File saveFile) {
     RawElectionConfig config = new RawElectionConfig();
     RawElectionConfig.ElectionRules rules = new RawElectionConfig.ElectionRules();
 
-    config.contestName = textContestName.getText();
-    config.outputDirectory = textOutputDirectory.getText();
+    config.contestName = textFieldContestName.getText();
+    config.outputDirectory = textFieldOutputDirectory.getText();
     config.tabulateByPrecinct =
         ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
     config.contestDate =
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
+
+    config.candidates = new ArrayList<>(tableViewCandidates.getItems());
+
     rules.overvoteRule =
         choiceOvervoteRule.getValue() != null
             ? choiceOvervoteRule.getValue().toString()
