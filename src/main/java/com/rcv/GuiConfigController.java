@@ -16,12 +16,15 @@
 
 package com.rcv;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -32,6 +35,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.DirectoryChooser;
@@ -42,6 +46,8 @@ import javafx.util.StringConverter;
 
 public class GuiConfigController implements Initializable {
 
+  @FXML
+  private TextArea textAreaHelp;
   @FXML
   private TextField textContestName;
   @FXML
@@ -91,6 +97,20 @@ public class GuiConfigController implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     Logger.info("Opening config creator GUI...");
 
+    String helpText;
+    try {
+      helpText =
+          new BufferedReader(
+              new InputStreamReader(
+                  ClassLoader.getSystemResourceAsStream("config_file_documentation.txt")))
+              .lines()
+              .collect(Collectors.joining("\n"));
+    } catch (Exception e) {
+      Logger.severe("Error loading config_file_documentation.txt: %s", e.toString());
+      helpText = "<Error loading config_file_documentation.txt>";
+    }
+    textAreaHelp.setText(helpText);
+
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
 
@@ -100,12 +120,12 @@ public class GuiConfigController implements Initializable {
 
           @Override
           public String toString(LocalDate date) {
-            return (date != null) ? dateFormatter.format(date) : "";
+            return date != null ? dateFormatter.format(date) : "";
           }
 
           @Override
           public LocalDate fromString(String string) {
-            return (string != null && !string.isEmpty())
+            return string != null && !string.isEmpty()
                 ? LocalDate.parse(string, dateFormatter)
                 : null;
           }
@@ -121,11 +141,9 @@ public class GuiConfigController implements Initializable {
     config.tabulateByPrecinct =
         ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
     config.contestDate =
-        (datePickerContestDate.getValue() != null)
-            ? datePickerContestDate.getValue().toString()
-            : "";
+        datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
     rules.overvoteRule =
-        (choiceOvervoteRule.getValue() != null)
+        choiceOvervoteRule.getValue() != null
             ? choiceOvervoteRule.getValue().toString()
             : Tabulator.OvervoteRule.RULE_UNKNOWN.toString();
     config.rules = rules;
