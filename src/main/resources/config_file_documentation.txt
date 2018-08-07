@@ -12,21 +12,6 @@ Config file must be valid JSON format. Examples can be found under the test fold
     example: /Path/To/TabulatorResults
     value: string of length [1..1000]
 
-  "candidates" required
-    List of registered candidate names and associated candidate code
-    each "candidates" list item has the following parameters:
-
-    "name" required
-      full name of the registered candidate
-      example: "Duson, Jill C."
-      value: string of length [1..1000]
-
-    "code" optional
-      candidate code which may appear in CVRs in lieu of full candidate name
-      example: "JCD"
-      value: string of length [1..1000]
-      default: none
-
   "contestDate:" optional
     date of the contest
     used for visualizer output only (not used in tabulation)
@@ -83,6 +68,21 @@ Config file must be valid JSON format. Examples can be found under the test fold
         example: "ES&S"
         value: text string of length [1..1000]
         default: none
+
+  "candidates" required
+    List of registered candidate names and associated candidate code
+    each "candidates" list item has the following parameters:
+
+    "name" required
+      full name of the registered candidate
+      example: "Duson, Jill C."
+      value: string of length [1..1000]
+
+    "code" optional
+      candidate code which may appear in CVRs in lieu of full candidate name
+      example: "JCD"
+      value: string of length [1..1000]
+      default: none
 
   "rules" required
     set of configuration parameters that specify the tabulation rules
@@ -161,7 +161,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         default: false
 
       "undeclaredWriteInLabel" optional
-        the special label used in the cast vote records to denote a vote for an undeclared write-in.
+        the special label used in the cast vote records to denote a vote for an undeclared write-in
         example: "UWI"
         value: string of length [1..1000]
         default: none
