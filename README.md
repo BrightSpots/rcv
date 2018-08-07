@@ -20,3 +20,6 @@ Jackson databind 2.4.3
 Jackson core 2.4.3
 
 Jackson annotations 2.4.3
+
+## Configuration
+Config file documentation is available [here](src/main/resources/config_file_documentation.txt).

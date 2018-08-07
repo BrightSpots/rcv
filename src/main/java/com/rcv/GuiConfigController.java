@@ -77,7 +77,7 @@ public class GuiConfigController implements Initializable {
 
   public void buttonMenuClicked(ActionEvent event) throws IOException {
     Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-    Parent menuParent = FXMLLoader.load(getClass().getResource("GuiMainLayout.fxml"));
+    Parent menuParent = FXMLLoader.load(getClass().getResource("/GuiMainLayout.fxml"));
     window.setScene(new Scene(menuParent));
   }
 
