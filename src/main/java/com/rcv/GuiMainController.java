@@ -41,20 +41,20 @@ public class GuiMainController implements Initializable {
 
   // text area which communicates the status of the tabulator's operations
   @FXML
-  private TextArea textStatus;
+  private TextArea textAreaStatus;
 
   private void printToTextStatus(String message) {
-    textStatus.appendText("* ");
-    textStatus.appendText(
+    textAreaStatus.appendText("* ");
+    textAreaStatus.appendText(
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(ZonedDateTime.now()));
-    textStatus.appendText(": ");
-    textStatus.appendText(message);
-    textStatus.appendText("\n");
+    textAreaStatus.appendText(": ");
+    textAreaStatus.appendText(message);
+    textAreaStatus.appendText("\n");
   }
 
   public void buttonCreateConfigClicked(ActionEvent event) throws IOException {
     Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-    Parent configParent = FXMLLoader.load(getClass().getResource("GuiConfigLayout.fxml"));
+    Parent configParent = FXMLLoader.load(getClass().getResource("/GuiConfigLayout.fxml"));
     window.setScene(new Scene(configParent));
   }
 

@@ -26,7 +26,7 @@
   </top>
   <bottom>
     <TextArea BorderPane.alignment="TOP_LEFT" editable="false" id="textStatus" prefHeight="200.0"
-      prefWidth="200.0" wrapText="true" fx:id="textStatus">
+      prefWidth="200.0" wrapText="true" fx:id="textAreaStatus">
       <BorderPane.margin>
         <Insets/>
       </BorderPane.margin>
