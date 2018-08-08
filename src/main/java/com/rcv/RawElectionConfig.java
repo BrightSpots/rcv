@@ -34,10 +34,10 @@ public class RawElectionConfig {
   public String outputDirectory;
   // contest name
   public String contestName;
-  // jurisdiction
-  public String jurisdiction;
-  // office
-  public String office;
+  // contest jurisdiction
+  public String contestJurisdiction;
+  // contest office
+  public String contestOffice;
   // contest date
   public String contestDate;
   // rules object

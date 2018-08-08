@@ -220,18 +220,18 @@ class ElectionConfig {
     return rawConfig.contestName;
   }
 
-  // function: getJurisdiction
-  // purpose: getter for jurisdiction
-  // returns: jurisdiction name
-  String getJurisdiction() {
-    return rawConfig.jurisdiction;
+  // function: getContestJurisdiction
+  // purpose: getter for contestJurisdiction
+  // returns: contest jurisdiction name
+  String getContestJurisdiction() {
+    return rawConfig.contestJurisdiction;
   }
 
-  // function: getOffice
-  // purpose: getter for office
-  // returns: office name
-  String getOffice() {
-    return rawConfig.office;
+  // function: getContestOffice
+  // purpose: getter for contestOffice
+  // returns: contest office name
+  String getContestOffice() {
+    return rawConfig.contestOffice;
   }
 
   // function: electionDate

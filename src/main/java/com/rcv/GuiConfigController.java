@@ -59,11 +59,13 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldOutputDirectory;
   @FXML
-  private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
+  private DatePicker datePickerContestDate;
+  @FXML
+  private TextField textFieldContestJurisdiction;
+  @FXML
+  private TextField textFieldContestOffice;
   @FXML
   private ToggleGroup toggleTabulateByPrecinct;
-  @FXML
-  private DatePicker datePickerContestDate;
   @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
@@ -74,6 +76,8 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldCandidateName;
   @FXML
   private TextField textFieldCandidateCode;
+  @FXML
+  private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
 
   public void buttonClearDatePickerContestDateClicked() {
     datePickerContestDate.getEditor().clear();
@@ -179,10 +183,12 @@ public class GuiConfigController implements Initializable {
 
     config.contestName = textFieldContestName.getText();
     config.outputDirectory = textFieldOutputDirectory.getText();
-    config.tabulateByPrecinct =
-        ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
     config.contestDate =
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
+    config.contestJurisdiction = textFieldContestJurisdiction.getText();
+    config.contestOffice = textFieldContestOffice.getText();
+    config.tabulateByPrecinct =
+        ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
 
     config.candidates = new ArrayList<>(tableViewCandidates.getItems());
 

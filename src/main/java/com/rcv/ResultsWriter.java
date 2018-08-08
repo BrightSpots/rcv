@@ -525,8 +525,8 @@ class ResultsWriter {
         {"Contest information", null, OutputType.STRING},
         {"Enter information about the contest as it will be displayed", null, OutputType.STRING},
         {"Contest name", config.getContestName(), OutputType.STRING},
-        {"Jurisdiction name", config.getJurisdiction(), OutputType.STRING},
-        {"Office name", config.getOffice(), OutputType.STRING},
+        {"Jurisdiction name", config.getContestJurisdiction(), OutputType.STRING},
+        {"Office name", config.getContestOffice(), OutputType.STRING},
         {"Election date", config.getElectionDate(), OutputType.STRING},
         {null, null, OutputType.STRING},
         {"Counting information", null, OutputType.STRING},
@@ -582,20 +582,21 @@ class ResultsWriter {
     // entries will contain all the input tally entries in sorted order
     List<Map.Entry<String, BigDecimal>> entries = new ArrayList<>(tally.entrySet());
     // anonymous custom comparator will sort undeclared write in candidates to last place
-    entries.sort((firstObject, secondObject) -> {
-      // result of the comparison
-      int ret;
+    entries.sort(
+        (firstObject, secondObject) -> {
+          // result of the comparison
+          int ret;
 
-      if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
-        ret = 1;
-      } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
-        ret = -1;
-      } else {
-        ret = (secondObject.getValue()).compareTo(firstObject.getValue());
-      }
+          if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+            ret = 1;
+          } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+            ret = -1;
+          } else {
+            ret = (secondObject.getValue()).compareTo(firstObject.getValue());
+          }
 
-      return ret;
-    });
+          return ret;
+        });
     // container list for the final results
     List<String> sortedCandidates = new LinkedList<>();
     // index over all entries

@@ -12,7 +12,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
     example: /Path/To/TabulatorResults
     value: string of length [1..1000]
 
-  "contestDate:" optional
+  "contestDate" optional
     date of the contest
     used for visualizer output only (not used in tabulation)
     example: "2015-11-03"
