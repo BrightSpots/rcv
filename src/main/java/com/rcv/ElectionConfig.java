@@ -220,18 +220,18 @@ class ElectionConfig {
     return rawConfig.contestName;
   }
 
-  // function: getJurisdiction
-  // purpose: getter for jurisdiction
-  // returns: jurisdiction name
-  String getJurisdiction() {
-    return rawConfig.jurisdiction;
+  // function: getContestJurisdiction
+  // purpose: getter for contestJurisdiction
+  // returns: contest jurisdiction name
+  String getContestJurisdiction() {
+    return rawConfig.contestJurisdiction;
   }
 
-  // function: getOffice
-  // purpose: getter for office
-  // returns: office name
-  String getOffice() {
-    return rawConfig.office;
+  // function: getContestOffice
+  // purpose: getter for contestOffice
+  // returns: contest office name
+  String getContestOffice() {
+    return rawConfig.contestOffice;
   }
 
   // function: electionDate
@@ -395,12 +395,12 @@ class ElectionConfig {
     if (rawConfig.candidates != null) {
       // candidate is used to index through all candidates for this election
       for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
-        if (candidate.code != null) {
-          candidateCodeToNameMap.put(candidate.code, candidate.name);
-          candidatePermutation.add(candidate.code);
+        if (candidate.getCode() != null) {
+          candidateCodeToNameMap.put(candidate.getCode(), candidate.getName());
+          candidatePermutation.add(candidate.getCode());
         } else {
-          candidateCodeToNameMap.put(candidate.name, candidate.name);
-          candidatePermutation.add(candidate.name);
+          candidateCodeToNameMap.put(candidate.getName(), candidate.getName());
+          candidatePermutation.add(candidate.getName());
         }
       }
 

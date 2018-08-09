@@ -8,6 +8,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
@@ -29,56 +31,79 @@
     <VBox BorderPane.alignment="CENTER">
       <TabPane minHeight="450.0" tabClosingPolicy="UNAVAILABLE">
         <Tab text="Contest">
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-            <Label layoutX="22.0" layoutY="14.0" text="Contest Name *"/>
-            <TextField id="textContestName" layoutX="22.0" layoutY="32.0" promptText="Contest Name"
-              fx:id="textContestName"/>
-            <Label layoutX="22.0" layoutY="57.0" text="Output Directory *"/>
-            <HBox alignment="CENTER_LEFT" layoutX="18.0" layoutY="74.0" spacing="4.0">
-              <padding>
-                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-              </padding>
-              <TextField id="textOutputDirectory" promptText="Output Directory"
-                fx:id="textOutputDirectory"/>
+          <VBox spacing="8.0">
+            <Label text="Contest Name *"/>
+            <TextField maxWidth="200.0" promptText="Contest Name *" fx:id="textFieldContestName"/>
+            <Label text="Output Directory *"/>
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+              <TextField prefWidth="400.0" promptText="Output Directory *"
+                fx:id="textFieldOutputDirectory"/>
               <Button mnemonicParsing="false" onAction="#buttonOutputDirectoryClicked"
                 text="Select"/>
             </HBox>
-            <Label layoutX="22.0" layoutY="107.0" text="Tabulate by Precinct"/>
-            <HBox alignment="CENTER_LEFT" layoutX="22.0" layoutY="124.0" spacing="12.0">
-              <padding>
-                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-              </padding>
+            <Label text="Contest Date"/>
+            <HBox spacing="8.0">
+              <DatePicker editable="false" prefWidth="150.0" fx:id="datePickerContestDate"/>
+              <Button mnemonicParsing="false" onAction="#buttonClearDatePickerContestDateClicked"
+                text="Clear"/>
+            </HBox>
+            <Label text="Contest Jurisdiction"/>
+            <TextField maxWidth="200.0" promptText="Contest Jurisdiction"
+              fx:id="textFieldContestJurisdiction"/>
+            <Label text="Contest Office"/>
+            <TextField maxWidth="200.0" promptText="Contest Office" fx:id="textFieldContestOffice"/>
+            <Label text="Tabulate by Precinct"/>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
               <RadioButton mnemonicParsing="false" text="True">
                 <toggleGroup>
                   <ToggleGroup fx:id="toggleTabulateByPrecinct"/>
                 </toggleGroup>
               </RadioButton>
-              <RadioButton layoutX="10.0" layoutY="10.0" mnemonicParsing="false" selected="true"
-                text="False" toggleGroup="$toggleTabulateByPrecinct"/>
+              <RadioButton mnemonicParsing="false" selected="true" text="False"
+                toggleGroup="$toggleTabulateByPrecinct"/>
             </HBox>
-            <Label layoutX="22.0" layoutY="149.0" text="Contest Date"/>
-            <HBox layoutX="18.0" layoutY="166.0" spacing="4.0">
-              <padding>
-                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-              </padding>
-              <DatePicker editable="false" fx:id="datePickerContestDate"/>
-              <Button mnemonicParsing="false" onAction="#buttonClearDatePickerContestDateClicked"
-                text="Clear"/>
-            </HBox>
-          </AnchorPane>
+            <padding>
+              <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+            </padding>
+          </VBox>
         </Tab>
         <Tab text="CVR Files">
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
         </Tab>
         <Tab text="Candidates">
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+          <VBox>
+            <HBox alignment="CENTER" spacing="4.0">
+              <TextField promptText="Name *" fx:id="textFieldCandidateName"/>
+              <TextField promptText="Code" fx:id="textFieldCandidateCode"/>
+              <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>
+              <Region prefHeight="25.0" prefWidth="39.0"/>
+              <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
+                text="Delete Selected"/>
+              <padding>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+              </padding>
+            </HBox>
+            <TableView fx:id="tableViewCandidates">
+              <columns>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="180.0"
+                  text="Name" fx:id="tableColumnCandidateName"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="180.0"
+                  text="Code" fx:id="tableColumnCandidateCode"/>
+              </columns>
+            </TableView>
+            <padding>
+              <Insets top="12.0"/>
+            </padding>
+          </VBox>
         </Tab>
         <Tab text="Rules">
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-            <Label layoutX="22.0" layoutY="14.0" text="Overvote Rule *"/>
-            <ChoiceBox id="choiceOvervoteRule" layoutX="22.0" layoutY="32.0"
-              prefWidth="150.0" fx:id="choiceOvervoteRule"/>
-          </AnchorPane>
+          <VBox spacing="8.0">
+            <Label text="Overvote Rule *"/>
+            <ChoiceBox prefWidth="150.0" fx:id="choiceOvervoteRule"/>
+            <padding>
+              <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+            </padding>
+          </VBox>
         </Tab>
       </TabPane>
       <Region/>

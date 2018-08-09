@@ -25,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
+// TODO: add getters and setters for everything to address issue #73
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawElectionConfig {
 
@@ -32,10 +34,10 @@ public class RawElectionConfig {
   public String outputDirectory;
   // contest name
   public String contestName;
-  // jurisdiction
-  public String jurisdiction;
-  // office
-  public String office;
+  // contest jurisdiction
+  public String contestJurisdiction;
+  // contest office
+  public String contestOffice;
   // contest date
   public String contestDate;
   // rules object
@@ -117,8 +119,24 @@ public class RawElectionConfig {
   public static class Candidate {
 
     // full candidate name
-    public String name;
+    private String name;
     // candidate ID
-    public String code;
+    private String code;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public String getCode() {
+      return code;
+    }
+
+    public void setCode(String code) {
+      this.code = code;
+    }
   }
 }
