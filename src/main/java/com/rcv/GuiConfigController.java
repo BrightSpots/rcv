@@ -92,6 +92,14 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldDecimalPlacesForVoteArithmetic;
   @FXML
   private TextField textFieldMinimumVoteThreshold;
+  @FXML
+  private ToggleGroup toggleBatchElimination;
+  @FXML
+  private ToggleGroup toggleContinueUntilTwoCandidatesRemain;
+  @FXML
+  private ToggleGroup toggleExhaustOnDuplicateCandidate;
+  @FXML
+  private ToggleGroup toggleTreatBlankAsUndeclaredWriteIn;
 
   public void buttonClearDatePickerContestDateClicked() {
     datePickerContestDate.getEditor().clear();
@@ -192,36 +200,56 @@ public class GuiConfigController implements Initializable {
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
     choiceMultiSeatTransferRule.getItems().addAll(Tabulator.MultiSeatTransferRule.values());
-    choiceMultiSeatTransferRule.getItems()
+    choiceMultiSeatTransferRule
+        .getItems()
         .remove(Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
 
-    // Restricts text fields to non-negative integers
-    textFieldMaxRankingsAllowed.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (!newValue.matches("\\d*")) {
-        textFieldMaxRankingsAllowed.setText(oldValue);
-      }
-    });
-    textFieldMaxSkippedRanksAllowed.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (!newValue.matches("\\d*")) {
-        textFieldMaxSkippedRanksAllowed.setText(oldValue);
-      }
-    });
-    textFieldNumberOfWinners.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (!newValue.matches("\\d*")) {
-        textFieldNumberOfWinners.setText(oldValue);
-      }
-    });
-    textFieldDecimalPlacesForVoteArithmetic.textProperty()
-        .addListener((observable, oldValue, newValue) -> {
-          if (!newValue.matches("\\d*")) {
-            textFieldDecimalPlacesForVoteArithmetic.setText(oldValue);
-          }
-        });
-    textFieldMinimumVoteThreshold.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (!newValue.matches("\\d*")) {
-        textFieldMinimumVoteThreshold.setText(oldValue);
-      }
-    });
+    // Restrict text fields to non-negative integers and set default values where applicable
+    textFieldMaxRankingsAllowed
+        .textProperty()
+        .addListener(
+            (observable, oldValue, newValue) -> {
+              if (!newValue.matches("\\d*")) {
+                textFieldMaxRankingsAllowed.setText(oldValue);
+              }
+            });
+    textFieldMaxSkippedRanksAllowed
+        .textProperty()
+        .addListener(
+            (observable, oldValue, newValue) -> {
+              if (!newValue.matches("\\d*")) {
+                textFieldMaxSkippedRanksAllowed.setText(oldValue);
+              }
+            });
+    textFieldNumberOfWinners
+        .textProperty()
+        .addListener(
+            (observable, oldValue, newValue) -> {
+              if (!newValue.matches("\\d*")) {
+                textFieldNumberOfWinners.setText(oldValue);
+              }
+            });
+    textFieldNumberOfWinners.setText(String.valueOf(ElectionConfig.DEFAULT_NUMBER_OF_WINNERS));
+    textFieldDecimalPlacesForVoteArithmetic
+        .textProperty()
+        .addListener(
+            (observable, oldValue, newValue) -> {
+              if (!newValue.matches("\\d*")) {
+                textFieldDecimalPlacesForVoteArithmetic.setText(oldValue);
+              }
+            });
+    textFieldDecimalPlacesForVoteArithmetic.setText(
+        String.valueOf(ElectionConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+    textFieldMinimumVoteThreshold
+        .textProperty()
+        .addListener(
+            (observable, oldValue, newValue) -> {
+              if (!newValue.matches("\\d*")) {
+                textFieldMinimumVoteThreshold.setText(oldValue);
+              }
+            });
+    textFieldMinimumVoteThreshold.setText(
+        String.valueOf(ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
   }
 
   private void saveElectionConfig(File saveFile) {
@@ -251,12 +279,40 @@ public class GuiConfigController implements Initializable {
         choiceMultiSeatTransferRule.getValue() != null
             ? choiceMultiSeatTransferRule.getValue().toString()
             : Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN.toString();
-    rules.maxRankingsAllowed = Integer.parseInt(textFieldMaxRankingsAllowed.getText());
-    rules.maxSkippedRanksAllowed = Integer.parseInt(textFieldMaxSkippedRanksAllowed.getText());
-    rules.numberOfWinners = Integer.parseInt(textFieldNumberOfWinners.getText());
-    rules.decimalPlacesForVoteArithmetic = Integer
-        .parseInt(textFieldDecimalPlacesForVoteArithmetic.getText());
-    rules.minimumVoteThreshold = Integer.parseInt(textFieldMinimumVoteThreshold.getText());
+    rules.maxRankingsAllowed =
+        !textFieldMaxRankingsAllowed.getText().isEmpty()
+            ? Integer.parseInt(textFieldMaxRankingsAllowed.getText())
+            : null;
+    rules.maxSkippedRanksAllowed =
+        !textFieldMaxSkippedRanksAllowed.getText().isEmpty()
+            ? Integer.parseInt(textFieldMaxSkippedRanksAllowed.getText())
+            : null;
+    rules.numberOfWinners =
+        !textFieldNumberOfWinners.getText().isEmpty()
+            ? Integer.parseInt(textFieldNumberOfWinners.getText())
+            : ElectionConfig.DEFAULT_NUMBER_OF_WINNERS;
+    rules.decimalPlacesForVoteArithmetic =
+        !textFieldDecimalPlacesForVoteArithmetic.getText().isEmpty()
+            ? Integer.parseInt(textFieldDecimalPlacesForVoteArithmetic.getText())
+            : ElectionConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC;
+    rules.minimumVoteThreshold =
+        !textFieldMinimumVoteThreshold.getText().isEmpty()
+            ? Integer.parseInt(textFieldMinimumVoteThreshold.getText())
+            : ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue();
+    rules.batchElimination =
+        ((RadioButton) toggleBatchElimination.getSelectedToggle()).getText().equals("True");
+    rules.continueUntilTwoCandidatesRemain =
+        ((RadioButton) toggleContinueUntilTwoCandidatesRemain.getSelectedToggle())
+            .getText()
+            .equals("True");
+    rules.exhaustOnDuplicateCandidate =
+        ((RadioButton) toggleExhaustOnDuplicateCandidate.getSelectedToggle())
+            .getText()
+            .equals("True");
+    rules.treatBlankAsUndeclaredWriteIn =
+        ((RadioButton) toggleTreatBlankAsUndeclaredWriteIn.getSelectedToggle())
+            .getText()
+            .equals("True");
     config.rules = rules;
 
     String response = JsonParser.createFileFromRawElectionConfig(saveFile, config);

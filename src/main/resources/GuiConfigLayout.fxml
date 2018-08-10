@@ -110,6 +110,26 @@
               <Label text="Decimal Places for Vote Arithmetic"/>
               <TextField maxWidth="220.0" promptText="Decimal Places for Vote Arithmetic"
                 fx:id="textFieldDecimalPlacesForVoteArithmetic"/>
+              <Label text="Batch Elimination"/>
+              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <RadioButton mnemonicParsing="false" text="True">
+                  <toggleGroup>
+                    <ToggleGroup fx:id="toggleBatchElimination"/>
+                  </toggleGroup>
+                </RadioButton>
+                <RadioButton mnemonicParsing="false" selected="true" text="False"
+                  toggleGroup="$toggleBatchElimination"/>
+              </HBox>
+              <Label text="Exhaust on Duplicate Candidate"/>
+              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <RadioButton mnemonicParsing="false" text="True">
+                  <toggleGroup>
+                    <ToggleGroup fx:id="toggleExhaustOnDuplicateCandidate"/>
+                  </toggleGroup>
+                </RadioButton>
+                <RadioButton mnemonicParsing="false" selected="true" text="False"
+                  toggleGroup="$toggleExhaustOnDuplicateCandidate"/>
+              </HBox>
               <padding>
                 <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
               </padding>
@@ -125,6 +145,26 @@
               <Label text="Minimum Vote Threshold"/>
               <TextField maxWidth="220.0" promptText="Minimum Vote Threshold"
                 fx:id="textFieldMinimumVoteThreshold"/>
+              <Label text="Continue until Two Candidates Remain"/>
+              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <RadioButton mnemonicParsing="false" text="True">
+                  <toggleGroup>
+                    <ToggleGroup fx:id="toggleContinueUntilTwoCandidatesRemain"/>
+                  </toggleGroup>
+                </RadioButton>
+                <RadioButton mnemonicParsing="false" selected="true" text="False"
+                  toggleGroup="$toggleContinueUntilTwoCandidatesRemain"/>
+              </HBox>
+              <Label text="Treat Blank as Undeclared Write-in"/>
+              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <RadioButton mnemonicParsing="false" text="True">
+                  <toggleGroup>
+                    <ToggleGroup fx:id="toggleTreatBlankAsUndeclaredWriteIn"/>
+                  </toggleGroup>
+                </RadioButton>
+                <RadioButton mnemonicParsing="false" selected="true" text="False"
+                  toggleGroup="$toggleTreatBlankAsUndeclaredWriteIn"/>
+              </HBox>
               <padding>
                 <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
               </padding>

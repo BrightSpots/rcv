@@ -48,8 +48,6 @@ public class RawElectionConfig {
   public List<CVRSource> cvrFileSources;
   // should we report round-by-round results by precinct also?
   public boolean tabulateByPrecinct;
-  // shall we treat blank cells as UWIs?
-  public boolean treatBlankAsUndeclaredWriteIn;
 
   // function: RawElectionConfig
   // purpose: create a new RawElectionConfig object
@@ -96,6 +94,8 @@ public class RawElectionConfig {
     public boolean continueUntilTwoCandidatesRemain;
     // should we exhaust a ballot when we hit a duplicate candidate while traversing its rankings?
     public boolean exhaustOnDuplicateCandidate;
+    // shall we treat blank cells as UWIs?
+    public boolean treatBlankAsUndeclaredWriteIn;
   }
 
   // CVRSource: encapsulates a source cast vote record file
