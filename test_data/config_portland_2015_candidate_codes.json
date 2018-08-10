@@ -5,7 +5,7 @@
   "office":"Mayor",
   "contestDate": "2015-11-03",
   "rules": {
-    "description":"Maine Rules",
+    "rulesDescription": "Maine Rules",
     "maxRankingsAllowed":15,
     "batchElimination":true,
     "overvoteRule":"exhaustImmediately",

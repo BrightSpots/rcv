@@ -166,7 +166,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: string of length [1..1000]
         default: none
 
-      "description" optional
+      "rulesDescription" optional
         text description of this rules configuration for organizing your config files -- not used by the tabulator
         Example "Maine Rules"
         value: string of length [1..1000]

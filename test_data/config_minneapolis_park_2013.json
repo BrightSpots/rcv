@@ -5,7 +5,7 @@
   "office":"Park and Recreation Commissioner",
   "tabulateByPrecinct":false,
   "rules": {
-    "description":"Minneapolis Rules",
+    "rulesDescription": "Minneapolis Rules",
     "batchElimination":false,
     "overvoteRule":"alwaysSkipToNextRank",
     "maxRankingsAllowed":3,

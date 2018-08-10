@@ -6,7 +6,7 @@
   "contestDate": "2017-11-07",
   "tabulateByPrecinct":true,
   "rules": {
-    "description":"Minneapolis Rules",
+    "rulesDescription": "Minneapolis Rules",
     "maxRankingsAllowed":3,
     "batchElimination":true,
     "overvoteRule":"alwaysSkipToNextRank",

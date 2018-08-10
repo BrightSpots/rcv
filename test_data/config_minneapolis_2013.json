@@ -5,7 +5,7 @@
   "office":"Mayor",
   "tabulateByPrecinct":true,
   "rules": {
-    "description":"Maine Rules",
+    "rulesDescription": "Maine Rules",
     "batchElimination":true,
     "overvoteRule":"exhaustImmediately",
     "maxRankingsAllowed":3,

@@ -5,7 +5,7 @@
   "office":"none",
   "contestDate": "2018-07-19",
   "rules": {
-    "description":"Testing our validation logic for params",
+    "rulesDescription": "Testing our validation logic for params",
     "batchElimination":true,
     "continueUntilTwoCandidatesRemain":true,
     "decimalPlacesForVoteArithmetic":-1,

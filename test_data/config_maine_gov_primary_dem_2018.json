@@ -5,7 +5,7 @@
   "office":"Governor",
   "contestDate": "2018-06-12",
   "rules": {
-    "description":"Maine Rules",
+    "rulesDescription": "Maine Rules",
     "maxRankingsAllowed":8,
     "batchElimination":true,
     "overvoteRule":"exhaustImmediately",

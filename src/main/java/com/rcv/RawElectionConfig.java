@@ -63,7 +63,7 @@ public class RawElectionConfig {
   public static class ElectionRules {
 
     // human description of this rules set
-    public String description;
+    public String rulesDescription;
     // max rankings allowed
     public Integer maxRankingsAllowed;
     // are we using batch elimination?

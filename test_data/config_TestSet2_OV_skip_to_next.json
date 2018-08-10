@@ -5,7 +5,7 @@
   "office": "Exhausted",
   "contestDate": "2018-07-28",
   "rules": {
-    "description": "Doyle Rules",
+    "rulesDescription": "Doyle Rules",
     "exhaustOnDuplicateCandidate": false,
     "maxRankingsAllowed": 4,
     "overvoteRule": "alwaysSkipToNextRank",

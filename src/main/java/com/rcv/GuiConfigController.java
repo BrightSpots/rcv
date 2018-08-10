@@ -93,6 +93,14 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldMinimumVoteThreshold;
   @FXML
+  private TextField textFieldOvervoteLabel;
+  @FXML
+  private TextField textFieldUndervoteLabel;
+  @FXML
+  private TextField textFieldUndeclaredWriteInLabel;
+  @FXML
+  private TextField textFieldRulesDescription;
+  @FXML
   private ToggleGroup toggleBatchElimination;
   @FXML
   private ToggleGroup toggleContinueUntilTwoCandidatesRemain;
@@ -313,6 +321,10 @@ public class GuiConfigController implements Initializable {
         ((RadioButton) toggleTreatBlankAsUndeclaredWriteIn.getSelectedToggle())
             .getText()
             .equals("True");
+    rules.overvoteLabel = textFieldOvervoteLabel.getText();
+    rules.undervoteLabel = textFieldUndervoteLabel.getText();
+    rules.undeclaredWriteInLabel = textFieldUndeclaredWriteInLabel.getText();
+    rules.rulesDescription = textFieldRulesDescription.getText();
     config.rules = rules;
 
     String response = JsonParser.createFileFromRawElectionConfig(saveFile, config);

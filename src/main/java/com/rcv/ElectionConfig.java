@@ -258,11 +258,11 @@ class ElectionConfig {
     return rawConfig.rules.maxRankingsAllowed;
   }
 
-  // function: getDescription
-  // purpose: getter for description
-  // returns: description
-  String getDescription() {
-    return rawConfig.rules.description;
+  // function: getRulesDescription
+  // purpose: getter for rules description
+  // returns: rules description
+  String getRulesDescription() {
+    return rawConfig.rules.rulesDescription;
   }
 
   // function: isBatchEliminationEnabled

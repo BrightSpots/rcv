@@ -4,7 +4,7 @@
   "office":"Sergeant-at-Arms",
   "contestDate": "2017-12-03",
   "rules": {
-    "description":"Doyle Rules",
+    "rulesDescription": "Doyle Rules",
     "maxRankingsAllowed":3,
     "batchElimination":true,
     "overvoteRule":"alwaysSkipToNextRank",
