@@ -77,7 +77,21 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCandidateCode;
   @FXML
+  private ChoiceBox<Tabulator.TieBreakMode> choiceTiebreakMode;
+  @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
+  @FXML
+  private ChoiceBox<Tabulator.MultiSeatTransferRule> choiceMultiSeatTransferRule;
+  @FXML
+  private TextField textFieldMaxRankingsAllowed;
+  @FXML
+  private TextField textFieldMaxSkippedRanksAllowed;
+  @FXML
+  private TextField textFieldNumberOfWinners;
+  @FXML
+  private TextField textFieldDecimalPlacesForVoteArithmetic;
+  @FXML
+  private TextField textFieldMinimumVoteThreshold;
 
   public void buttonClearDatePickerContestDateClicked() {
     datePickerContestDate.getEditor().clear();
@@ -173,8 +187,41 @@ public class GuiConfigController implements Initializable {
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+    choiceTiebreakMode.getItems().addAll(Tabulator.TieBreakMode.values());
+    choiceTiebreakMode.getItems().remove(Tabulator.TieBreakMode.MODE_UNKNOWN);
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
+    choiceMultiSeatTransferRule.getItems().addAll(Tabulator.MultiSeatTransferRule.values());
+    choiceMultiSeatTransferRule.getItems()
+        .remove(Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
+
+    // Restricts text fields to non-negative integers
+    textFieldMaxRankingsAllowed.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (!newValue.matches("\\d*")) {
+        textFieldMaxRankingsAllowed.setText(oldValue);
+      }
+    });
+    textFieldMaxSkippedRanksAllowed.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (!newValue.matches("\\d*")) {
+        textFieldMaxSkippedRanksAllowed.setText(oldValue);
+      }
+    });
+    textFieldNumberOfWinners.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (!newValue.matches("\\d*")) {
+        textFieldNumberOfWinners.setText(oldValue);
+      }
+    });
+    textFieldDecimalPlacesForVoteArithmetic.textProperty()
+        .addListener((observable, oldValue, newValue) -> {
+          if (!newValue.matches("\\d*")) {
+            textFieldDecimalPlacesForVoteArithmetic.setText(oldValue);
+          }
+        });
+    textFieldMinimumVoteThreshold.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (!newValue.matches("\\d*")) {
+        textFieldMinimumVoteThreshold.setText(oldValue);
+      }
+    });
   }
 
   private void saveElectionConfig(File saveFile) {
@@ -192,10 +239,24 @@ public class GuiConfigController implements Initializable {
 
     config.candidates = new ArrayList<>(tableViewCandidates.getItems());
 
+    rules.tiebreakMode =
+        choiceTiebreakMode.getValue() != null
+            ? choiceTiebreakMode.getValue().toString()
+            : Tabulator.TieBreakMode.MODE_UNKNOWN.toString();
     rules.overvoteRule =
         choiceOvervoteRule.getValue() != null
             ? choiceOvervoteRule.getValue().toString()
             : Tabulator.OvervoteRule.RULE_UNKNOWN.toString();
+    rules.multiSeatTransferRule =
+        choiceMultiSeatTransferRule.getValue() != null
+            ? choiceMultiSeatTransferRule.getValue().toString()
+            : Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN.toString();
+    rules.maxRankingsAllowed = Integer.parseInt(textFieldMaxRankingsAllowed.getText());
+    rules.maxSkippedRanksAllowed = Integer.parseInt(textFieldMaxSkippedRanksAllowed.getText());
+    rules.numberOfWinners = Integer.parseInt(textFieldNumberOfWinners.getText());
+    rules.decimalPlacesForVoteArithmetic = Integer
+        .parseInt(textFieldDecimalPlacesForVoteArithmetic.getText());
+    rules.minimumVoteThreshold = Integer.parseInt(textFieldMinimumVoteThreshold.getText());
     config.rules = rules;
 
     String response = JsonParser.createFileFromRawElectionConfig(saveFile, config);

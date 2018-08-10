@@ -88,6 +88,46 @@ Config file must be valid JSON format. Examples can be found under the test fold
     set of configuration parameters that specify the tabulation rules
     The "rules" section contains the following parameters:
 
+      "tiebreakMode" required
+        how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round.
+        value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive" | "usePermutationInConfig" | "generatePermutation"
+
+      "overvoteRule" required
+        how the program should handle an overvote when it encounters one
+        value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfAnyContinuing" | "ignoreIfAnyContinuing" | "exhaustIfMultipleContinuing" | "ignoreIfMultipleContinuing"
+
+      "maxRankingsAllowed" required
+        maximum number of candidates that a ballot is allowed to rank
+        example: 15
+        values: [1..100]
+
+      "multiSeatTransferRule" required for multi-seat contests
+        how to handle vote transfers
+        value: transferFractionalSurplus | transferWholeSurplus
+        transferWholeSurplus not yet implemented
+
+      "maxSkippedRanksAllowed" required
+        maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
+        example: 1
+        value: [0..100]
+
+      "numberOfWinners" optional
+        the number of seats to be won in this election
+        value: [1..1000]
+        default: 1
+
+      "decimalPlacesForVoteArithmetic" optional
+        number of rounding decimal places when computing fractional vote transfers and winning thresholds
+        valid in multi-seat contests with fractional vote transfer
+        value: [0..10]
+        default: 4
+
+      "minimumVoteThreshold" optional
+        the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
+        example: 150
+        value: [0..10000]
+        default: 0
+
       "batchElimination" optional
         tabulator will use batch elimination (only valid for single-winner contests)
         value: true | false
@@ -98,48 +138,15 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: true | false
         default: false
 
-      "decimalPlacesForVoteArithmetic" optional
-        number of rounding decimal places when computing fractional vote transfers and winning thresholds
-        valid in multi-seat contests with fractional vote transfer
-        value: [0..10]
-        default: 4
-
-      "description" optional
-        text description of this rules configuration for organizing your config files -- not used by the tabulator
-        Example "Maine Rules"
-        value: string of length [1..1000]
-        default: none
-
       "exhaustOnDuplicateCandidate" optional
         tabulator will exhaust a ballot when it encounters a duplicate candidate (instead of just skipping the duplicate)
         value: true | false
         default: false
 
-      "maxRankingsAllowed" required
-        maximum number of candidates that a ballot is allowed to rank
-        example: 15
-        values: [1..100]
-
-      "maxSkippedRanksAllowed" required
-        maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
-        example: 1
-        value: [0..100]
-
-      "minimumVoteThreshold" optional
-        the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
-        example: 150
-        value: [1..10000]
-        default: 0
-
-      "multiSeatTransferRule" required for multi-seat contests
-        how to handle vote transfers
-        value: transferFractionalSurplus | transferWholeSurplus
-        transferWholeSurplus not yet implemented
-
-      "numberOfWinners" optional
-        the number of seats to be won in this election
-        value: [1..1000]
-        default: 1
+      "treatBlankAsUndeclaredWriteIn" optional
+        tabulator will interpret a blank cell in a CVR as a vote for an undeclared write-in
+        value: true | false
+        default: false
 
       "overvoteLabel" optional
         label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately" (because the other options rely on knowing which specific candidates were involved in each overvote)
@@ -147,18 +154,11 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: string of length [1..1000]
         default: none
 
-      "overvoteRule" required
-        how the program should handle an overvote when it encounters one
-        value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfAnyContinuing" | "ignoreIfAnyContinuing" | "exhaustIfMultipleContinuing" | "ignoreIfMultipleContinuing"
-
-      "tiebreakMode" required
-        how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round.
-        value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive" | "usePermutationInConfig" | "generatePermutation"
-
-      "treatBlankAsUndeclaredWriteIn" optional
-        tabulator will interpret a blank cell in a CVR as a vote for an undeclared write-in
-        value: true | false
-        default: false
+      "undervoteLabel" optional
+        the special label used in the cast vote records to denote an undervote
+        example: "UNDERVOTE"
+        value: string of length [1..1000]
+        default: none
 
       "undeclaredWriteInLabel" optional
         the special label used in the cast vote records to denote a vote for an undeclared write-in
@@ -166,8 +166,8 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: string of length [1..1000]
         default: none
 
-      "undervoteLabel" optional
-        the special label used in the cast vote records to denote an undervote
-        example: "UNDERVOTE"
+      "description" optional
+        text description of this rules configuration for organizing your config files -- not used by the tabulator
+        Example "Maine Rules"
         value: string of length [1..1000]
         default: none
