@@ -27,6 +27,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -77,7 +79,37 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCandidateCode;
   @FXML
+  private ChoiceBox<Tabulator.TieBreakMode> choiceTiebreakMode;
+  @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
+  @FXML
+  private ChoiceBox<Tabulator.MultiSeatTransferRule> choiceMultiSeatTransferRule;
+  @FXML
+  private TextField textFieldMaxRankingsAllowed;
+  @FXML
+  private TextField textFieldMaxSkippedRanksAllowed;
+  @FXML
+  private TextField textFieldNumberOfWinners;
+  @FXML
+  private TextField textFieldDecimalPlacesForVoteArithmetic;
+  @FXML
+  private TextField textFieldMinimumVoteThreshold;
+  @FXML
+  private TextField textFieldOvervoteLabel;
+  @FXML
+  private TextField textFieldUndervoteLabel;
+  @FXML
+  private TextField textFieldUndeclaredWriteInLabel;
+  @FXML
+  private TextField textFieldRulesDescription;
+  @FXML
+  private ToggleGroup toggleBatchElimination;
+  @FXML
+  private ToggleGroup toggleContinueUntilTwoCandidatesRemain;
+  @FXML
+  private ToggleGroup toggleExhaustOnDuplicateCandidate;
+  @FXML
+  private ToggleGroup toggleTreatBlankAsUndeclaredWriteIn;
 
   public void buttonClearDatePickerContestDateClicked() {
     datePickerContestDate.getEditor().clear();
@@ -173,8 +205,48 @@ public class GuiConfigController implements Initializable {
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+    choiceTiebreakMode.getItems().addAll(Tabulator.TieBreakMode.values());
+    choiceTiebreakMode.getItems().remove(Tabulator.TieBreakMode.MODE_UNKNOWN);
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
+    choiceMultiSeatTransferRule.getItems().addAll(Tabulator.MultiSeatTransferRule.values());
+    choiceMultiSeatTransferRule
+        .getItems()
+        .remove(Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
+
+    // Restrict these text fields to non-negative integers and set default values where applicable
+    textFieldMaxRankingsAllowed
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldMaxRankingsAllowed));
+    textFieldMaxSkippedRanksAllowed
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldMaxSkippedRanksAllowed));
+    textFieldNumberOfWinners
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
+    textFieldNumberOfWinners.setText(String.valueOf(ElectionConfig.DEFAULT_NUMBER_OF_WINNERS));
+    textFieldDecimalPlacesForVoteArithmetic
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldDecimalPlacesForVoteArithmetic));
+    textFieldDecimalPlacesForVoteArithmetic.setText(
+        String.valueOf(ElectionConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+    textFieldMinimumVoteThreshold
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
+    textFieldMinimumVoteThreshold.setText(
+        String.valueOf(ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
+  }
+
+  private boolean getToggleBoolean(ToggleGroup toggleGroup) {
+    return ((RadioButton) toggleGroup.getSelectedToggle()).getText().equals("True");
+  }
+
+  private int getIntValueElse(TextField textField, int defaultValue) {
+    return !textField.getText().isEmpty() ? Integer.parseInt(textField.getText()) : defaultValue;
+  }
+
+  private String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
+    return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
   }
 
   private void saveElectionConfig(File saveFile) {
@@ -187,20 +259,65 @@ public class GuiConfigController implements Initializable {
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
     config.contestJurisdiction = textFieldContestJurisdiction.getText();
     config.contestOffice = textFieldContestOffice.getText();
-    config.tabulateByPrecinct =
-        ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
+    config.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
 
     config.candidates = new ArrayList<>(tableViewCandidates.getItems());
 
-    rules.overvoteRule =
-        choiceOvervoteRule.getValue() != null
-            ? choiceOvervoteRule.getValue().toString()
-            : Tabulator.OvervoteRule.RULE_UNKNOWN.toString();
+    rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
+    rules.overvoteRule = getChoiceElse(choiceOvervoteRule, Tabulator.OvervoteRule.RULE_UNKNOWN);
+    rules.multiSeatTransferRule =
+        getChoiceElse(
+            choiceMultiSeatTransferRule, Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
+    rules.maxRankingsAllowed =
+        !textFieldMaxRankingsAllowed.getText().isEmpty()
+            ? Integer.parseInt(textFieldMaxRankingsAllowed.getText())
+            : null;
+    rules.maxSkippedRanksAllowed =
+        !textFieldMaxSkippedRanksAllowed.getText().isEmpty()
+            ? Integer.parseInt(textFieldMaxSkippedRanksAllowed.getText())
+            : null;
+    rules.numberOfWinners =
+        getIntValueElse(textFieldNumberOfWinners, ElectionConfig.DEFAULT_NUMBER_OF_WINNERS);
+    rules.decimalPlacesForVoteArithmetic =
+        getIntValueElse(
+            textFieldDecimalPlacesForVoteArithmetic,
+            ElectionConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
+    rules.minimumVoteThreshold =
+        getIntValueElse(
+            textFieldMinimumVoteThreshold,
+            ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
+    rules.batchElimination = getToggleBoolean(toggleBatchElimination);
+    rules.continueUntilTwoCandidatesRemain =
+        getToggleBoolean(toggleContinueUntilTwoCandidatesRemain);
+    rules.exhaustOnDuplicateCandidate = getToggleBoolean(toggleExhaustOnDuplicateCandidate);
+    rules.treatBlankAsUndeclaredWriteIn = getToggleBoolean(toggleTreatBlankAsUndeclaredWriteIn);
+    rules.overvoteLabel = textFieldOvervoteLabel.getText();
+    rules.undervoteLabel = textFieldUndervoteLabel.getText();
+    rules.undeclaredWriteInLabel = textFieldUndeclaredWriteInLabel.getText();
+    rules.rulesDescription = textFieldRulesDescription.getText();
     config.rules = rules;
 
     String response = JsonParser.createFileFromRawElectionConfig(saveFile, config);
     if (response.equals("SUCCESS")) {
       Logger.info("Saved config via the GUI to: %s", saveFile.getAbsolutePath());
+    }
+  }
+
+  private class TextFieldListenerNonNegInt implements ChangeListener<String> {
+    // Restricts text fields to non-negative integers
+
+    private final TextField textField;
+
+    TextFieldListenerNonNegInt(TextField textField) {
+      this.textField = textField;
+    }
+
+    @Override
+    public void changed(
+        ObservableValue<? extends String> observable, String oldValue, String newValue) {
+      if (!newValue.matches("\\d*")) {
+        textField.setText(oldValue);
+      }
     }
   }
 }

@@ -203,7 +203,7 @@ class CVRReader {
         if (candidate.equals(config.getUndervoteLabel())) {
           continue;
         } else if (candidate.equals(config.getOvervoteLabel())) {
-          candidate = Tabulator.explicitOvervoteLabel;
+          candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
         } else if (!config.getCandidateCodeList().contains(candidate)
             && !candidate.equals(config.getUndeclaredWriteInLabel())) {
           unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
@@ -232,9 +232,9 @@ class CVRReader {
       cellString = null;
     } else if (cvrDataCell.getCellTypeEnum() == CellType.NUMERIC) {
       // parsed numeric data (we only expect integers)
-      Integer intValue = (int) cvrDataCell.getNumericCellValue();
+      int intValue = (int) cvrDataCell.getNumericCellValue();
       // convert back to String (we only store String data from CVR files)
-      cellString = intValue.toString();
+      cellString = Integer.toString(intValue);
     } else if (cvrDataCell.getCellTypeEnum() == CellType.STRING) {
       cellString = cvrDataCell.getStringCellValue();
     } else {

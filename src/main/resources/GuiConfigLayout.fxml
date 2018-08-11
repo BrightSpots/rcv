@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
   minHeight="-Infinity"
-  minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0"
+  minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0"
   xmlns="http://javafx.com/javafx/8.0.121" fx:controller="com.rcv.GuiConfigController">
   <right>
     <TextArea BorderPane.alignment="TOP_LEFT" editable="false" minWidth="300.0" prefWidth="300.0"
@@ -33,7 +33,7 @@
         <Tab text="Contest">
           <VBox spacing="8.0">
             <Label text="Contest Name *"/>
-            <TextField maxWidth="200.0" promptText="Contest Name *" fx:id="textFieldContestName"/>
+            <TextField maxWidth="220.0" promptText="Contest Name *" fx:id="textFieldContestName"/>
             <Label text="Output Directory *"/>
             <HBox alignment="CENTER_LEFT" spacing="8.0">
               <TextField prefWidth="400.0" promptText="Output Directory *"
@@ -48,10 +48,10 @@
                 text="Clear"/>
             </HBox>
             <Label text="Contest Jurisdiction"/>
-            <TextField maxWidth="200.0" promptText="Contest Jurisdiction"
+            <TextField maxWidth="220.0" promptText="Contest Jurisdiction"
               fx:id="textFieldContestJurisdiction"/>
             <Label text="Contest Office"/>
-            <TextField maxWidth="200.0" promptText="Contest Office" fx:id="textFieldContestOffice"/>
+            <TextField maxWidth="220.0" promptText="Contest Office" fx:id="textFieldContestOffice"/>
             <Label text="Tabulate by Precinct"/>
             <HBox alignment="CENTER_LEFT" spacing="12.0">
               <RadioButton mnemonicParsing="false" text="True">
@@ -97,13 +97,91 @@
           </VBox>
         </Tab>
         <Tab text="Rules">
-          <VBox spacing="8.0">
-            <Label text="Overvote Rule *"/>
-            <ChoiceBox prefWidth="150.0" fx:id="choiceOvervoteRule"/>
-            <padding>
-              <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
-            </padding>
-          </VBox>
+          <HBox>
+            <VBox spacing="8.0">
+              <Label text="Tiebreak Mode *"/>
+              <ChoiceBox prefWidth="220.0" fx:id="choiceTiebreakMode"/>
+              <Label text="Max Rankings Allowed *"/>
+              <TextField maxWidth="220.0" promptText="Max Rankings Allowed *"
+                fx:id="textFieldMaxRankingsAllowed"/>
+              <Label text="Max Skipped Ranks Allowed *"/>
+              <TextField maxWidth="220.0" promptText="Max Skipped Ranks Allowed *"
+                fx:id="textFieldMaxSkippedRanksAllowed"/>
+              <Label text="Decimal Places for Vote Arithmetic"/>
+              <TextField maxWidth="220.0" promptText="Decimal Places for Vote Arithmetic"
+                fx:id="textFieldDecimalPlacesForVoteArithmetic"/>
+              <Label text="Batch Elimination"/>
+              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <RadioButton mnemonicParsing="false" text="True">
+                  <toggleGroup>
+                    <ToggleGroup fx:id="toggleBatchElimination"/>
+                  </toggleGroup>
+                </RadioButton>
+                <RadioButton mnemonicParsing="false" selected="true" text="False"
+                  toggleGroup="$toggleBatchElimination"/>
+              </HBox>
+              <Label text="Exhaust on Duplicate Candidate"/>
+              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <RadioButton mnemonicParsing="false" text="True">
+                  <toggleGroup>
+                    <ToggleGroup fx:id="toggleExhaustOnDuplicateCandidate"/>
+                  </toggleGroup>
+                </RadioButton>
+                <RadioButton mnemonicParsing="false" selected="true" text="False"
+                  toggleGroup="$toggleExhaustOnDuplicateCandidate"/>
+              </HBox>
+              <Label text="Overvote Label"/>
+              <TextField maxWidth="220.0" promptText="Overvote Label"
+                fx:id="textFieldOvervoteLabel"/>
+              <Label text="Undeclared Write-in Label"/>
+              <TextField maxWidth="220.0" promptText="Undeclared Write-in Label"
+                fx:id="textFieldUndeclaredWriteInLabel"/>
+              <padding>
+                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+              </padding>
+            </VBox>
+            <VBox spacing="8.0">
+              <Label text="Overvote Rule *"/>
+              <ChoiceBox prefWidth="220.0" fx:id="choiceOvervoteRule"/>
+              <Label text="Multi-Seat Transfer Rule"/>
+              <ChoiceBox prefWidth="220.0" fx:id="choiceMultiSeatTransferRule"/>
+              <Label text="Number of Winners"/>
+              <TextField maxWidth="220.0" promptText="Number of Winners"
+                fx:id="textFieldNumberOfWinners"/>
+              <Label text="Minimum Vote Threshold"/>
+              <TextField maxWidth="220.0" promptText="Minimum Vote Threshold"
+                fx:id="textFieldMinimumVoteThreshold"/>
+              <Label text="Continue until Two Candidates Remain"/>
+              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <RadioButton mnemonicParsing="false" text="True">
+                  <toggleGroup>
+                    <ToggleGroup fx:id="toggleContinueUntilTwoCandidatesRemain"/>
+                  </toggleGroup>
+                </RadioButton>
+                <RadioButton mnemonicParsing="false" selected="true" text="False"
+                  toggleGroup="$toggleContinueUntilTwoCandidatesRemain"/>
+              </HBox>
+              <Label text="Treat Blank as Undeclared Write-in"/>
+              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <RadioButton mnemonicParsing="false" text="True">
+                  <toggleGroup>
+                    <ToggleGroup fx:id="toggleTreatBlankAsUndeclaredWriteIn"/>
+                  </toggleGroup>
+                </RadioButton>
+                <RadioButton mnemonicParsing="false" selected="true" text="False"
+                  toggleGroup="$toggleTreatBlankAsUndeclaredWriteIn"/>
+              </HBox>
+              <Label text="Undervote Label"/>
+              <TextField maxWidth="220.0" promptText="Undervote Label"
+                fx:id="textFieldUndervoteLabel"/>
+              <Label text="Rules Description"/>
+              <TextField maxWidth="220.0" promptText="Rules Description"
+                fx:id="textFieldRulesDescription"/>
+              <padding>
+                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+              </padding>
+            </VBox>
+          </HBox>
         </Tab>
       </TabPane>
       <Region/>

@@ -2,7 +2,7 @@
   "outputDirectory":"test_output/minneapolis_2013_scale",
   "contestName":"2013 Minneapolis Mayor",
   "rules": {
-    "description":"Maine Rules",
+    "rulesDescription": "Maine Rules",
     "batchElimination":true,
     "overvoteRule":"exhaustImmediately",
     "maxRankingsAllowed":3,

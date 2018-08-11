@@ -36,7 +36,7 @@ import java.util.TreeMap;
 class Tabulator {
 
   // When the CVR contains an overvote we "normalize" it to use this string
-  static final String explicitOvervoteLabel = "overvote";
+  static final String EXPLICIT_OVERVOTE_LABEL = "overvote";
   // cast vote records parsed from CVR input files
   private final List<CastVoteRecord> castVoteRecords;
   // all candidateIDs for this election parsed from the election config
@@ -580,7 +580,7 @@ class Tabulator {
     OvervoteRule rule = config.getOvervoteRule();
 
     // does this set include the explicit overvote label?
-    boolean explicitOvervote = candidateIDSet.contains(explicitOvervoteLabel);
+    boolean explicitOvervote = candidateIDSet.contains(EXPLICIT_OVERVOTE_LABEL);
     if (explicitOvervote) {
       // we should never have the explicit overvote flag AND other candidates for a given ranking
       assert candidateIDSet.size() == 1;

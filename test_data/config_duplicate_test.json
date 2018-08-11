@@ -4,7 +4,7 @@
   "office":"Director of Produce",
   "contestDate": "2018-05-21",
   "rules": {
-    "description":"Doyle Rules",
+    "rulesDescription": "Doyle Rules",
     "exhaustOnDuplicateCandidate":true,
     "maxRankingsAllowed":3,
     "overvoteRule":"alwaysSkipToNextRank",

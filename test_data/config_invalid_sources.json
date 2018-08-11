@@ -6,7 +6,7 @@
   "contestDate": "2018-07-20",
   "tabulateByPrecinct":true,
   "rules": {
-    "description":"Testing our validation logic for sources",
+    "rulesDescription": "Testing our validation logic for sources",
     "maxRankingsAllowed":3,
     "maxSkippedRanksAllowed":1,
     "numberOfWinners":1,

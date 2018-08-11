@@ -33,14 +33,16 @@ import java.util.Set;
 
 class ElectionConfig {
 
+  static final int DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
+  static final int DEFAULT_NUMBER_OF_WINNERS = 1;
+  static final BigDecimal DEFAULT_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
+
   // underlying rawConfig object data
   final RawElectionConfig rawConfig;
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
-  // minimum vote threshold if one is specified
-  private BigDecimal minimumVoteThreshold;
 
   // function: ElectionConfig
   // purpose: create a new ElectionConfig object
@@ -157,16 +159,17 @@ class ElectionConfig {
   // purpose: how many winners for this election
   // returns from settings config or 1 of no setting is specified
   Integer getNumberOfWinners() {
-    return rawConfig.rules.numberOfWinners == null ? 1 : rawConfig.rules.numberOfWinners;
+    return rawConfig.rules.numberOfWinners == null
+        ? DEFAULT_NUMBER_OF_WINNERS
+        : rawConfig.rules.numberOfWinners;
   }
 
   // function: getDecimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to or 0 if no setting is specified
   private Integer getDecimalPlacesForVoteArithmetic() {
-    // we default to using 4 places for fractional transfer vote arithmetic
     return rawConfig.rules.decimalPlacesForVoteArithmetic == null
-        ? 4
+        ? DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC
         : rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
@@ -255,11 +258,11 @@ class ElectionConfig {
     return rawConfig.rules.maxRankingsAllowed;
   }
 
-  // function: getDescription
-  // purpose: getter for description
-  // returns: description
-  String getDescription() {
-    return rawConfig.rules.description;
+  // function: getRulesDescription
+  // purpose: getter for rules description
+  // returns: rules description
+  String getRulesDescription() {
+    return rawConfig.rules.rulesDescription;
   }
 
   // function: isBatchEliminationEnabled
@@ -303,14 +306,9 @@ class ElectionConfig {
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use for this config
   BigDecimal getMinimumVoteThreshold() {
-    if (minimumVoteThreshold == null) {
-      if (rawConfig.rules.minimumVoteThreshold == null) {
-        minimumVoteThreshold = BigDecimal.ZERO;
-      } else {
-        minimumVoteThreshold = new BigDecimal(rawConfig.rules.minimumVoteThreshold);
-      }
-    }
-    return minimumVoteThreshold;
+    return rawConfig.rules.minimumVoteThreshold == null
+        ? DEFAULT_MINIMUM_VOTE_THRESHOLD
+        : new BigDecimal(rawConfig.rules.minimumVoteThreshold);
   }
 
   // function: getMaxSkippedRanksAllowed
@@ -355,7 +353,7 @@ class ElectionConfig {
   // purpose: getter for treatBlankAsUndeclaredWriteIn rule
   // returns: true if we are to treat blank cell as UWI
   boolean isTreatBlankAsUndeclaredWriteInEnabled() {
-    return rawConfig.treatBlankAsUndeclaredWriteIn;
+    return rawConfig.rules.treatBlankAsUndeclaredWriteIn;
   }
 
   // function: isExhaustOnDuplicateCandidateEnabled
