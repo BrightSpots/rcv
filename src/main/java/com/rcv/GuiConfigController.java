@@ -16,6 +16,7 @@
 
 package com.rcv;
 
+import com.rcv.RawElectionConfig.CVRSource;
 import com.rcv.RawElectionConfig.Candidate;
 import java.io.BufferedReader;
 import java.io.File;
@@ -69,6 +70,28 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ToggleGroup toggleTabulateByPrecinct;
   @FXML
+  private TableView<CVRSource> tableViewCvrFiles;
+  @FXML
+  private TableColumn<CVRSource, String> tableColumnCvrFilePath;
+  @FXML
+  private TableColumn<CVRSource, Integer> tableColumnCvrFirstVoteCol;
+  @FXML
+  private TableColumn<CVRSource, Integer> tableColumnCvrIdCol;
+  @FXML
+  private TableColumn<CVRSource, Integer> tableColumnCvrPrecinctCol;
+  @FXML
+  private TableColumn<CVRSource, String> tableColumnCvrProvider;
+  @FXML
+  private TextField textFieldCvrFilePath;
+  @FXML
+  private TextField textFieldCvrFirstVoteCol;
+  @FXML
+  private TextField textFieldCvrIdCol;
+  @FXML
+  private TextField textFieldCvrPrecinctCol;
+  @FXML
+  private TextField textFieldCvrProvider;
+  @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
   private TableColumn<Candidate, String> tableColumnCandidateName;
@@ -111,22 +134,6 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ToggleGroup toggleTreatBlankAsUndeclaredWriteIn;
 
-  public void buttonClearDatePickerContestDateClicked() {
-    datePickerContestDate.getEditor().clear();
-    datePickerContestDate.setValue(null);
-  }
-
-  public void buttonOutputDirectoryClicked() {
-    DirectoryChooser dc = new DirectoryChooser();
-    dc.setInitialDirectory(new File(System.getProperty("user.dir")));
-    dc.setTitle("Output Directory");
-
-    File outputDirectory = dc.showDialog(null);
-    if (outputDirectory != null) {
-      textFieldOutputDirectory.setText(outputDirectory.getAbsolutePath());
-    }
-  }
-
   public void buttonMenuClicked(ActionEvent event) throws IOException {
     Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
     Parent menuParent = FXMLLoader.load(getClass().getResource("/GuiMainLayout.fxml"));
@@ -145,18 +152,75 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  public void buttonOutputDirectoryClicked() {
+    DirectoryChooser dc = new DirectoryChooser();
+    dc.setInitialDirectory(new File(System.getProperty("user.dir")));
+    dc.setTitle("Output Directory");
+
+    File outputDirectory = dc.showDialog(null);
+    if (outputDirectory != null) {
+      textFieldOutputDirectory.setText(outputDirectory.getAbsolutePath());
+    }
+  }
+
+  public void buttonClearDatePickerContestDateClicked() {
+    datePickerContestDate.getEditor().clear();
+    datePickerContestDate.setValue(null);
+  }
+
+  public void buttonCvrFilePathClicked() {
+    FileChooser fc = new FileChooser();
+    fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+    fc.getExtensionFilters().add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
+    fc.setTitle("Select CVR File");
+
+    File openFile = fc.showOpenDialog(null);
+    if (openFile != null) {
+      textFieldCvrFilePath.setText(openFile.getAbsolutePath());
+    }
+  }
+
+  public void buttonAddCvrFileClicked() {
+    CVRSource cvrSource = new CVRSource();
+    // TODO: check if CVR source is already in list?
+    // TODO: Need to convey below warnings in the UI; also consider moving validation to setter
+    if (textFieldCvrFilePath.getText().isEmpty()) {
+      Logger.warn("CVR file path is required!");
+    } else if (textFieldCvrFirstVoteCol.getText().isEmpty()) {
+      Logger.warn("CVR first vote column is required!");
+    } else {
+      cvrSource.setFilePath(textFieldCvrFilePath.getText());
+      cvrSource.setFirstVoteColumnIndex(getIntValueElse(textFieldCvrFirstVoteCol, null));
+      cvrSource.setIdColumnIndex(getIntValueElse(textFieldCvrIdCol, null));
+      cvrSource.setPrecinctColumnIndex(getIntValueElse(textFieldCvrPrecinctCol, null));
+      cvrSource.setProvider(textFieldCvrProvider.getText());
+      tableViewCvrFiles.getItems().add(cvrSource);
+      textFieldCvrFilePath.clear();
+      textFieldCvrFirstVoteCol.clear();
+      textFieldCvrIdCol.clear();
+      textFieldCvrPrecinctCol.clear();
+      textFieldCvrProvider.clear();
+    }
+  }
+
+  public void buttonDeleteCvrFileClicked() {
+    tableViewCvrFiles
+        .getItems()
+        .removeAll(tableViewCvrFiles.getSelectionModel().getSelectedItems());
+  }
+
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
     // TODO: check if candidate is already in list?
-    if (!textFieldCandidateName.getText().isEmpty()) {
+    // TODO: Need to convey this in the UI; also consider moving validation to setter
+    if (textFieldCandidateName.getText().isEmpty()) {
+      Logger.warn("Candidate name field is required!");
+    } else {
       candidate.setName(textFieldCandidateName.getText());
       candidate.setCode(textFieldCandidateCode.getText());
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
       textFieldCandidateCode.clear();
-    } else {
-      // TODO: Need to convey this in the UI; also consider moving validation to setter
-      Logger.warn("Candidate name field is required!");
     }
   }
 
@@ -201,6 +265,22 @@ public class GuiConfigController implements Initializable {
           }
         });
 
+    textFieldCvrFirstVoteCol
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteCol));
+    textFieldCvrIdCol.textProperty().addListener(new TextFieldListenerNonNegInt(textFieldCvrIdCol));
+    textFieldCvrPrecinctCol
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldCvrPrecinctCol));
+    tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
+    tableColumnCvrFirstVoteCol.setCellValueFactory(
+        new PropertyValueFactory<>("firstVoteColumnIndex"));
+    tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
+    tableColumnCvrPrecinctCol.setCellValueFactory(
+        new PropertyValueFactory<>("precinctColumnIndex"));
+    tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
+    tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -214,7 +294,6 @@ public class GuiConfigController implements Initializable {
         .getItems()
         .remove(Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
 
-    // Restrict these text fields to non-negative integers and set default values where applicable
     textFieldMaxRankingsAllowed
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldMaxRankingsAllowed));
@@ -241,8 +320,8 @@ public class GuiConfigController implements Initializable {
     return ((RadioButton) toggleGroup.getSelectedToggle()).getText().equals("True");
   }
 
-  private int getIntValueElse(TextField textField, int defaultValue) {
-    return !textField.getText().isEmpty() ? Integer.parseInt(textField.getText()) : defaultValue;
+  private Integer getIntValueElse(TextField textField, Integer defaultValue) {
+    return !textField.getText().isEmpty() ? Integer.valueOf(textField.getText()) : defaultValue;
   }
 
   private String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
@@ -261,6 +340,8 @@ public class GuiConfigController implements Initializable {
     config.contestOffice = textFieldContestOffice.getText();
     config.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
 
+    config.cvrFileSources = new ArrayList<>(tableViewCvrFiles.getItems());
+
     config.candidates = new ArrayList<>(tableViewCandidates.getItems());
 
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
@@ -268,14 +349,8 @@ public class GuiConfigController implements Initializable {
     rules.multiSeatTransferRule =
         getChoiceElse(
             choiceMultiSeatTransferRule, Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
-    rules.maxRankingsAllowed =
-        !textFieldMaxRankingsAllowed.getText().isEmpty()
-            ? Integer.parseInt(textFieldMaxRankingsAllowed.getText())
-            : null;
-    rules.maxSkippedRanksAllowed =
-        !textFieldMaxSkippedRanksAllowed.getText().isEmpty()
-            ? Integer.parseInt(textFieldMaxSkippedRanksAllowed.getText())
-            : null;
+    rules.maxRankingsAllowed = getIntValueElse(textFieldMaxRankingsAllowed, null);
+    rules.maxSkippedRanksAllowed = getIntValueElse(textFieldMaxSkippedRanksAllowed, null);
     rules.numberOfWinners =
         getIntValueElse(textFieldNumberOfWinners, ElectionConfig.DEFAULT_NUMBER_OF_WINNERS);
     rules.decimalPlacesForVoteArithmetic =

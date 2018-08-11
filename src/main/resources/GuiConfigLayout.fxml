@@ -14,14 +14,13 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
   minHeight="-Infinity"
-  minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0"
+  minWidth="-Infinity" prefHeight="550.0" prefWidth="900.0"
   xmlns="http://javafx.com/javafx/8.0.121" fx:controller="com.rcv.GuiConfigController">
   <right>
     <TextArea BorderPane.alignment="TOP_LEFT" editable="false" minWidth="300.0" prefWidth="300.0"
@@ -68,11 +67,61 @@
           </VBox>
         </Tab>
         <Tab text="CVR Files">
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+          <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="4.0">
+              <VBox spacing="4.0">
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <TextField prefHeight="25.0" prefWidth="366.0" promptText="File Path *"
+                    fx:id="textFieldCvrFilePath"/>
+                  <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
+                    text="Select"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <TextField prefHeight="25.0" prefWidth="160.0"
+                    promptText="First Vote Column Index *"
+                    fx:id="textFieldCvrFirstVoteCol"/>
+                  <TextField prefHeight="25.0" prefWidth="110.0" promptText="ID Column Index"
+                    fx:id="textFieldCvrIdCol"/>
+                  <TextField prefHeight="25.0" prefWidth="140.0" promptText="Precinct Column Index"
+                    fx:id="textFieldCvrPrecinctCol"/>
+                </HBox>
+                <TextField maxWidth="418.0" prefHeight="25.0" prefWidth="300.0"
+                  promptText="Provider" fx:id="textFieldCvrProvider"/>
+              </VBox>
+              <VBox alignment="BOTTOM_LEFT" spacing="4.0">
+                <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                </padding>
+                <Button mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add"/>
+                <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
+                  text="Delete Selected"/>
+              </VBox>
+              <padding>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+              </padding>
+            </HBox>
+            <TableView fx:id="tableViewCvrFiles">
+              <columns>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="250.0"
+                  text="File Path" fx:id="tableColumnCvrFilePath"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="60.0"
+                  text="First Vote&#10;Column&#10;Index" fx:id="tableColumnCvrFirstVoteCol"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="60.0"
+                  text="ID&#10;Column&#10;Index" fx:id="tableColumnCvrIdCol"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="60.0"
+                  text="Precinct&#10;Column&#10;Index" fx:id="tableColumnCvrPrecinctCol"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="160.0"
+                  text="Provider" fx:id="tableColumnCvrProvider"/>
+              </columns>
+            </TableView>
+            <padding>
+              <Insets top="12.0"/>
+            </padding>
+          </VBox>
         </Tab>
         <Tab text="Candidates">
           <VBox>
-            <HBox alignment="CENTER" spacing="4.0">
+            <HBox alignment="CENTER_LEFT" spacing="4.0">
               <TextField promptText="Name *" fx:id="textFieldCandidateName"/>
               <TextField promptText="Code" fx:id="textFieldCandidateCode"/>
               <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>

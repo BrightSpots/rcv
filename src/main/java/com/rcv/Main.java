@@ -188,28 +188,30 @@ public class Main extends GuiApplication {
       // At each iteration of the following loop, we add records from another source file.
       // source: index over config sources
       for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-        Logger.info("Reading CVR file: %s (provider: %s)", source.filePath, source.provider);
+        Logger.info(
+            "Reading CVR file: %s (provider: %s)", source.getFilePath(), source.getProvider());
 
         // did we encounter a fatal problem for this source?
         boolean encounteredProblemForThisSource = false;
 
-        if (source.filePath == null || source.filePath.isEmpty()) {
+        if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
           Logger.severe("Invalid source file: missing filePath");
           encounteredProblemForThisSource = true;
         }
 
-        if (source.firstVoteColumnIndex == null || source.firstVoteColumnIndex < 0) {
+        if (source.getFirstVoteColumnIndex() == null || source.getFirstVoteColumnIndex() < 0) {
           Logger.severe(
-              "Invalid source file: missing or invalid firstVoteColumnIndex: %s", source.filePath);
+              "Invalid source file: missing or invalid firstVoteColumnIndex: %s",
+              source.getFilePath());
           encounteredProblemForThisSource = true;
         }
 
         if (config.isTabulateByPrecinctEnabled()
-            && (source.precinctColumnIndex == null || source.precinctColumnIndex < 0)) {
+            && (source.getPrecinctColumnIndex() == null || source.getPrecinctColumnIndex() < 0)) {
           Logger.severe(
               "Invalid source file: missing or invalid precinctColumnIndex when "
                   + "tabulateByPrecinct is enabled: %s",
-              source.filePath);
+              source.getFilePath());
           encounteredProblemForThisSource = true;
         }
 
@@ -218,21 +220,22 @@ public class Main extends GuiApplication {
           CVRReader reader =
               new CVRReader(
                   config,
-                  source.filePath,
-                  source.firstVoteColumnIndex,
-                  source.idColumnIndex,
-                  source.precinctColumnIndex);
+                  source.getFilePath(),
+                  source.getFirstVoteColumnIndex(),
+                  source.getIdColumnIndex(),
+                  source.getPrecinctColumnIndex());
           // the CVRs parsed from this source
           try {
             List<CastVoteRecord> cvrs = reader.parseCVRFile();
             if (cvrs.isEmpty()) {
-              Logger.severe("Source file contains no CVRs: %s", source.filePath);
+              Logger.severe("Source file contains no CVRs: %s", source.getFilePath());
               encounteredProblemForThisSource = true;
             }
             // add records to the master list
             castVoteRecords.addAll(cvrs);
           } catch (SourceWithUnrecognizedCandidatesException e) {
-            Logger.severe("Source file contains unrecognized candidate(s): %s", source.filePath);
+            Logger.severe(
+                "Source file contains unrecognized candidate(s): %s", source.getFilePath());
             // map from name to number of times encountered
             Map<String, Integer> candidateCounts = e.getCandidateCounts();
             for (String candidate : candidateCounts.keySet()) {
