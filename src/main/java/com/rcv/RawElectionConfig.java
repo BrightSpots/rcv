@@ -40,14 +40,14 @@ public class RawElectionConfig {
   public String contestOffice;
   // contest date
   public String contestDate;
+  // should we report round-by-round results by precinct also?
+  public boolean tabulateByPrecinct;
   // rules object
   public ElectionRules rules;
   // list of all Candidates
   public List<Candidate> candidates;
   // list of all cast vote record source files
   public List<CVRSource> cvrFileSources;
-  // should we report round-by-round results by precinct also?
-  public boolean tabulateByPrecinct;
 
   // function: RawElectionConfig
   // purpose: create a new RawElectionConfig object
@@ -102,16 +102,56 @@ public class RawElectionConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class CVRSource {
 
-    // provider for this source e.g. "ES&S"
-    public String provider;
     // path to the file on disk
-    public String filePath;
+    private String filePath;
     // column where rankings data begins
-    public Integer firstVoteColumnIndex;
+    private Integer firstVoteColumnIndex;
     // column containing CVR ID (if any)
-    public Integer idColumnIndex;
+    private Integer idColumnIndex;
     // column containing precinct (if any)
-    public Integer precinctColumnIndex;
+    private Integer precinctColumnIndex;
+    // provider for this source e.g. "ES&S"
+    private String provider;
+
+    public String getFilePath() {
+      return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+      this.filePath = filePath;
+    }
+
+    public Integer getFirstVoteColumnIndex() {
+      return firstVoteColumnIndex;
+    }
+
+    public void setFirstVoteColumnIndex(Integer firstVoteColumnIndex) {
+      this.firstVoteColumnIndex = firstVoteColumnIndex;
+    }
+
+    public Integer getIdColumnIndex() {
+      return idColumnIndex;
+    }
+
+    public void setIdColumnIndex(Integer idColumnIndex) {
+      this.idColumnIndex = idColumnIndex;
+    }
+
+    public Integer getPrecinctColumnIndex() {
+      return precinctColumnIndex;
+    }
+
+    public void setPrecinctColumnIndex(Integer precinctColumnIndex) {
+      this.precinctColumnIndex = precinctColumnIndex;
+    }
+
+    public String getProvider() {
+      return provider;
+    }
+
+    public void setProvider(String provider) {
+      this.provider = provider;
+    }
   }
 
   // Candidate: contains a full candidate name and optionally a candidate ID
