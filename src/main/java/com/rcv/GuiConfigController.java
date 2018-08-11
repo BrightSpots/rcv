@@ -27,6 +27,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -212,52 +214,39 @@ public class GuiConfigController implements Initializable {
         .getItems()
         .remove(Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
 
-    // Restrict text fields to non-negative integers and set default values where applicable
+    // Restrict these text fields to non-negative integers and set default values where applicable
     textFieldMaxRankingsAllowed
         .textProperty()
-        .addListener(
-            (observable, oldValue, newValue) -> {
-              if (!newValue.matches("\\d*")) {
-                textFieldMaxRankingsAllowed.setText(oldValue);
-              }
-            });
+        .addListener(new TextFieldListenerNonNegInt(textFieldMaxRankingsAllowed));
     textFieldMaxSkippedRanksAllowed
         .textProperty()
-        .addListener(
-            (observable, oldValue, newValue) -> {
-              if (!newValue.matches("\\d*")) {
-                textFieldMaxSkippedRanksAllowed.setText(oldValue);
-              }
-            });
+        .addListener(new TextFieldListenerNonNegInt(textFieldMaxSkippedRanksAllowed));
     textFieldNumberOfWinners
         .textProperty()
-        .addListener(
-            (observable, oldValue, newValue) -> {
-              if (!newValue.matches("\\d*")) {
-                textFieldNumberOfWinners.setText(oldValue);
-              }
-            });
+        .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
     textFieldNumberOfWinners.setText(String.valueOf(ElectionConfig.DEFAULT_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic
         .textProperty()
-        .addListener(
-            (observable, oldValue, newValue) -> {
-              if (!newValue.matches("\\d*")) {
-                textFieldDecimalPlacesForVoteArithmetic.setText(oldValue);
-              }
-            });
+        .addListener(new TextFieldListenerNonNegInt(textFieldDecimalPlacesForVoteArithmetic));
     textFieldDecimalPlacesForVoteArithmetic.setText(
         String.valueOf(ElectionConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
     textFieldMinimumVoteThreshold
         .textProperty()
-        .addListener(
-            (observable, oldValue, newValue) -> {
-              if (!newValue.matches("\\d*")) {
-                textFieldMinimumVoteThreshold.setText(oldValue);
-              }
-            });
+        .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
     textFieldMinimumVoteThreshold.setText(
         String.valueOf(ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
+  }
+
+  private boolean getToggleBoolean(ToggleGroup toggleGroup) {
+    return ((RadioButton) toggleGroup.getSelectedToggle()).getText().equals("True");
+  }
+
+  private int getIntValueElse(TextField textField, int defaultValue) {
+    return !textField.getText().isEmpty() ? Integer.parseInt(textField.getText()) : defaultValue;
+  }
+
+  private String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
+    return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
   }
 
   private void saveElectionConfig(File saveFile) {
@@ -270,23 +259,15 @@ public class GuiConfigController implements Initializable {
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
     config.contestJurisdiction = textFieldContestJurisdiction.getText();
     config.contestOffice = textFieldContestOffice.getText();
-    config.tabulateByPrecinct =
-        ((RadioButton) toggleTabulateByPrecinct.getSelectedToggle()).getText().equals("True");
+    config.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
 
     config.candidates = new ArrayList<>(tableViewCandidates.getItems());
 
-    rules.tiebreakMode =
-        choiceTiebreakMode.getValue() != null
-            ? choiceTiebreakMode.getValue().toString()
-            : Tabulator.TieBreakMode.MODE_UNKNOWN.toString();
-    rules.overvoteRule =
-        choiceOvervoteRule.getValue() != null
-            ? choiceOvervoteRule.getValue().toString()
-            : Tabulator.OvervoteRule.RULE_UNKNOWN.toString();
+    rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
+    rules.overvoteRule = getChoiceElse(choiceOvervoteRule, Tabulator.OvervoteRule.RULE_UNKNOWN);
     rules.multiSeatTransferRule =
-        choiceMultiSeatTransferRule.getValue() != null
-            ? choiceMultiSeatTransferRule.getValue().toString()
-            : Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN.toString();
+        getChoiceElse(
+            choiceMultiSeatTransferRule, Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
     rules.maxRankingsAllowed =
         !textFieldMaxRankingsAllowed.getText().isEmpty()
             ? Integer.parseInt(textFieldMaxRankingsAllowed.getText())
@@ -296,31 +277,20 @@ public class GuiConfigController implements Initializable {
             ? Integer.parseInt(textFieldMaxSkippedRanksAllowed.getText())
             : null;
     rules.numberOfWinners =
-        !textFieldNumberOfWinners.getText().isEmpty()
-            ? Integer.parseInt(textFieldNumberOfWinners.getText())
-            : ElectionConfig.DEFAULT_NUMBER_OF_WINNERS;
+        getIntValueElse(textFieldNumberOfWinners, ElectionConfig.DEFAULT_NUMBER_OF_WINNERS);
     rules.decimalPlacesForVoteArithmetic =
-        !textFieldDecimalPlacesForVoteArithmetic.getText().isEmpty()
-            ? Integer.parseInt(textFieldDecimalPlacesForVoteArithmetic.getText())
-            : ElectionConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC;
+        getIntValueElse(
+            textFieldDecimalPlacesForVoteArithmetic,
+            ElectionConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
     rules.minimumVoteThreshold =
-        !textFieldMinimumVoteThreshold.getText().isEmpty()
-            ? Integer.parseInt(textFieldMinimumVoteThreshold.getText())
-            : ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue();
-    rules.batchElimination =
-        ((RadioButton) toggleBatchElimination.getSelectedToggle()).getText().equals("True");
+        getIntValueElse(
+            textFieldMinimumVoteThreshold,
+            ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
+    rules.batchElimination = getToggleBoolean(toggleBatchElimination);
     rules.continueUntilTwoCandidatesRemain =
-        ((RadioButton) toggleContinueUntilTwoCandidatesRemain.getSelectedToggle())
-            .getText()
-            .equals("True");
-    rules.exhaustOnDuplicateCandidate =
-        ((RadioButton) toggleExhaustOnDuplicateCandidate.getSelectedToggle())
-            .getText()
-            .equals("True");
-    rules.treatBlankAsUndeclaredWriteIn =
-        ((RadioButton) toggleTreatBlankAsUndeclaredWriteIn.getSelectedToggle())
-            .getText()
-            .equals("True");
+        getToggleBoolean(toggleContinueUntilTwoCandidatesRemain);
+    rules.exhaustOnDuplicateCandidate = getToggleBoolean(toggleExhaustOnDuplicateCandidate);
+    rules.treatBlankAsUndeclaredWriteIn = getToggleBoolean(toggleTreatBlankAsUndeclaredWriteIn);
     rules.overvoteLabel = textFieldOvervoteLabel.getText();
     rules.undervoteLabel = textFieldUndervoteLabel.getText();
     rules.undeclaredWriteInLabel = textFieldUndeclaredWriteInLabel.getText();
@@ -330,6 +300,24 @@ public class GuiConfigController implements Initializable {
     String response = JsonParser.createFileFromRawElectionConfig(saveFile, config);
     if (response.equals("SUCCESS")) {
       Logger.info("Saved config via the GUI to: %s", saveFile.getAbsolutePath());
+    }
+  }
+
+  private class TextFieldListenerNonNegInt implements ChangeListener<String> {
+    // Restricts text fields to non-negative integers
+
+    private final TextField textField;
+
+    TextFieldListenerNonNegInt(TextField textField) {
+      this.textField = textField;
+    }
+
+    @Override
+    public void changed(
+        ObservableValue<? extends String> observable, String oldValue, String newValue) {
+      if (!newValue.matches("\\d*")) {
+        textField.setText(oldValue);
+      }
     }
   }
 }
