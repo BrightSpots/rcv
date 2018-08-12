@@ -1,0 +1,29 @@
+{
+  "contestName":"Tiebreak test",
+  "jurisdiction":"Funkytown, USA",
+  "office":"Sergeant-at-Arms",
+  "contestDate": "2017-12-03",
+  "rules": {
+    "rulesDescription": "Doyle Rules",
+    "maxRankingsAllowed":3,
+    "batchElimination":true,
+    "overvoteRule":"alwaysSkipToNextRank",
+    "overvoteLabel":"overvote",
+    "undervoteLabel":"undervote",
+    "maxSkippedRanksAllowed":null,
+    "tiebreakMode":"usePermutationInConfig"
+  },
+  "candidates": [
+    {"name": "Mookie Blaylock"},
+    {"name": "Yinka Dare"},
+    {"name": "George Gervin"},
+    {"name": "Sedale Threatt"}
+  ],
+  "cvrFileSources": [
+    {
+      "provider": "ES&S",
+      "filePath": "test_data/tiebreak-test-cvr.xlsx",
+      "firstVoteColumnIndex": 1
+    }
+  ]
+}

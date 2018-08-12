@@ -1,0 +1,28 @@
+{
+  "contestName":"Minimum threshold test",
+  "jurisdiction":"Funkytown, USA",
+  "office":"Sergeant-at-Arms",
+  "contestDate": "2018-01-07",
+  "rules": {
+    "batchElimination":false,
+    "rulesDescription": "Doyle Rules",
+    "maxRankingsAllowed":3,
+    "minimumVoteThreshold":3,
+    "overvoteRule":"exhaustImmediately",
+    "tiebreakMode":"random"
+  },
+  "candidates": [
+    {"name": "Gargamel"},
+    {"name": "Skeletor"},
+    {"name": "Megatron"},
+    {"name": "Garfield"},
+    {"name": "Odie"}
+  ],
+  "cvrFileSources": [
+    {
+      "provider": "ES&S",
+      "filePath": "test_data/minimum-threshold-test-cvr.xlsx",
+      "firstVoteColumnIndex": 1
+    }
+  ]
+}

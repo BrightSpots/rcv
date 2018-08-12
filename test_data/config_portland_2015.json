@@ -1,0 +1,43 @@
+{
+  "outputDirectory":"test_output/portland_2015",
+  "contestName":"Portland 2015 Mayoral Race",
+  "jurisdiction":"Portland, ME",
+  "office":"Mayor",
+  "contestDate": "2015-11-03",
+  "rules": {
+    "rulesDescription": "Maine Rules",
+    "maxRankingsAllowed":15,
+    "batchElimination":true,
+    "overvoteRule":"exhaustImmediately",
+    "maxSkippedRanksAllowed":1,
+    "undeclaredWriteInLabel":"UWI",
+    "overvoteLabel":"overvote",
+    "undervoteLabel":"undervote",
+    "tiebreakMode":"random"
+  },
+  "candidates":[
+    {"name":"Brennan, Michael F."},
+    {"name":"Bragdon, Charles E."},
+    {"name":"Bryant, Peter G."},
+    {"name":"Carmona, Ralph C."},
+    {"name":"Dodge, Richard A."},
+    {"name":"Duson, Jill C."},
+    {"name":"Eder, John M."},
+    {"name":"Haadoow, Hamza A."},
+    {"name":"Lapchick, Jodie L."},
+    {"name":"Marshall, David A."},
+    {"name":"Mavodones, Nicholas M. Jr."},
+    {"name":"Miller, Markos S."},
+    {"name":"Rathband, Jed"},
+    {"name":"Strimling, Ethan K."},
+    {"name":"Vail, Christopher L."}
+  ],
+  "cvrFileSources": [
+    {
+      "provider": "ES&S",
+      "filePath": "test_data/2015-portland-mayor-cvr.xlsx",
+      "firstVoteColumnIndex": 3,
+      "precinctColumnIndex": 1
+    }
+  ]
+}
