@@ -33,6 +33,7 @@ import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import java.util.logging.Level;
 
 public class GuiMainController implements Initializable {
 
@@ -89,6 +90,7 @@ public class GuiMainController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.info("Opening main menu GUI...");
+    Logger.addGUILogging(this.textAreaStatus);
+    Logger.executionLog(Level.INFO, "Opening main menu GUI...");
   }
 }

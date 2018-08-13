@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -185,9 +186,9 @@ public class GuiConfigController implements Initializable {
     // TODO: check if CVR source is already in list?
     // TODO: Need to convey below warnings in the UI; also consider moving validation to setter
     if (textFieldCvrFilePath.getText().isEmpty()) {
-      Logger.warn("CVR file path is required!");
+      Logger.executionLog(Level.WARNING, "CVR file path is required!");
     } else if (textFieldCvrFirstVoteCol.getText().isEmpty()) {
-      Logger.warn("CVR first vote column is required!");
+      Logger.executionLog(Level.WARNING, "CVR first vote column is required!");
     } else {
       cvrSource.setFilePath(textFieldCvrFilePath.getText());
       cvrSource.setFirstVoteColumnIndex(getIntValueElse(textFieldCvrFirstVoteCol, null));
@@ -214,7 +215,7 @@ public class GuiConfigController implements Initializable {
     // TODO: check if candidate is already in list?
     // TODO: Need to convey this in the UI; also consider moving validation to setter
     if (textFieldCandidateName.getText().isEmpty()) {
-      Logger.warn("Candidate name field is required!");
+      Logger.executionLog(Level.WARNING, "Candidate name field is required!");
     } else {
       candidate.setName(textFieldCandidateName.getText());
       candidate.setCode(textFieldCandidateCode.getText());
@@ -232,7 +233,7 @@ public class GuiConfigController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.info("Opening config creator GUI...");
+    Logger.executionLog(Level.INFO, "Opening config creator GUI...");
 
     String helpText;
     try {
@@ -243,7 +244,7 @@ public class GuiConfigController implements Initializable {
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception e) {
-      Logger.severe("Error loading config_file_documentation.txt: %s", e.toString());
+      Logger.executionLog(Level.SEVERE, "Error loading config_file_documentation.txt: %s", e.toString());
       helpText = "<Error loading config_file_documentation.txt>";
     }
     textAreaHelp.setText(helpText);
@@ -374,7 +375,7 @@ public class GuiConfigController implements Initializable {
 
     String response = JsonParser.createFileFromRawElectionConfig(saveFile, config);
     if (response.equals("SUCCESS")) {
-      Logger.info("Saved config via the GUI to: %s", saveFile.getAbsolutePath());
+      Logger.executionLog(Level.INFO, "Saved config via the GUI to: %s", saveFile.getAbsolutePath());
     }
   }
 

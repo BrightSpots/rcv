@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class Main extends GuiApplication {
 
@@ -56,10 +57,10 @@ public class Main extends GuiApplication {
       // config file for running the tabulator
       ElectionConfig config = loadElectionConfig(configPath);
       if (config != null) {
-        Logger.info("Tabulator is being used via the CLI.");
+        Logger.executionLog(Level.INFO, "Tabulator is being used via the CLI.");
         executeTabulation(config);
       } else {
-        Logger.severe("Aborting because config is invalid.");
+        Logger.executionLog(Level.SEVERE, "Aborting because config is invalid.");
       }
     }
   }
@@ -97,7 +98,7 @@ public class Main extends GuiApplication {
       List<String> validationErrors = config.getValidationErrors();
       if (!validationErrors.isEmpty()) {
         for (String error : validationErrors) {
-          Logger.severe("Invalid config: %s", error);
+          Logger.executionLog(Level.SEVERE, "Invalid config: %s", error);
         }
         config = null;
       }
@@ -126,15 +127,15 @@ public class Main extends GuiApplication {
     // create audit log file name
     String logFileName = String.format("%s_audit.log", timestampString);
     // audit log path
-    String auditLogPath = Paths.get(config.getOutputDirectory(), logFileName).toString();
+    String tabulationLogPath = Paths.get(config.getOutputDirectory(), logFileName).toString();
     try {
-      // audit logger
-      Logger.addTabulationFileLogging(auditLogPath);
-      Logger.info("Logging tabulation to: %s", auditLogPath);
+      // tabulation logger
+      Logger.addTabulationFileLogging(tabulationLogPath);
+      Logger.allLogs(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
     } catch (IOException exception) {
       errorMessage =
           String.format("Failed to configure tabulation logger: %s", exception.toString());
-      Logger.severe(errorMessage);
+      Logger.executionLog(Level.SEVERE, errorMessage);
       response = errorMessage;
       encounteredError = true;
     }
@@ -157,16 +158,16 @@ public class Main extends GuiApplication {
           tabulator.doAudit(castVoteRecords);
         } else {
           errorMessage = "No cast vote records found.";
-          Logger.severe(errorMessage);
+          Logger.tabulationLog(Level.SEVERE, errorMessage);
           response = errorMessage;
         }
       } else {
         errorMessage = "Skipping tabulation due to source file errors.";
-        Logger.severe(errorMessage);
+        Logger.tabulationLog(Level.SEVERE, errorMessage);
         response = errorMessage;
       }
     }
-    Logger.info("Done logging tabulation to %s", auditLogPath);
+    Logger.tabulationLog(Level.INFO, "Done logging tabulation to %s", tabulationLogPath);
     Logger.removeTabulationFileLogging();
     // TODO: Redesign this later so as not to return a user-facing status string
     return response;
@@ -183,24 +184,24 @@ public class Main extends GuiApplication {
     int numInvalidSources = 0;
 
     if (config.rawConfig.cvrFileSources == null || config.rawConfig.cvrFileSources.isEmpty()) {
-      Logger.severe("Config doesn't contain any CVR input files.");
+      Logger.tabulationLog(Level.SEVERE, "Config doesn't contain any CVR input files.");
     } else {
       // At each iteration of the following loop, we add records from another source file.
       // source: index over config sources
       for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-        Logger.info(
+        Logger.tabulationLog(Level.INFO, 
             "Reading CVR file: %s (provider: %s)", source.getFilePath(), source.getProvider());
 
         // did we encounter a fatal problem for this source?
         boolean encounteredProblemForThisSource = false;
 
         if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
-          Logger.severe("Invalid source file: missing filePath");
+          Logger.tabulationLog(Level.SEVERE, "Invalid source file: missing filePath");
           encounteredProblemForThisSource = true;
         }
 
         if (source.getFirstVoteColumnIndex() == null || source.getFirstVoteColumnIndex() < 0) {
-          Logger.severe(
+          Logger.tabulationLog(Level.SEVERE, 
               "Invalid source file: missing or invalid firstVoteColumnIndex: %s",
               source.getFilePath());
           encounteredProblemForThisSource = true;
@@ -208,7 +209,7 @@ public class Main extends GuiApplication {
 
         if (config.isTabulateByPrecinctEnabled()
             && (source.getPrecinctColumnIndex() == null || source.getPrecinctColumnIndex() < 0)) {
-          Logger.severe(
+          Logger.tabulationLog(Level.SEVERE, 
               "Invalid source file: missing or invalid precinctColumnIndex when "
                   + "tabulateByPrecinct is enabled: %s",
               source.getFilePath());
@@ -228,18 +229,18 @@ public class Main extends GuiApplication {
           try {
             List<CastVoteRecord> cvrs = reader.parseCVRFile();
             if (cvrs.isEmpty()) {
-              Logger.severe("Source file contains no CVRs: %s", source.getFilePath());
+              Logger.tabulationLog(Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
               encounteredProblemForThisSource = true;
             }
             // add records to the master list
             castVoteRecords.addAll(cvrs);
           } catch (SourceWithUnrecognizedCandidatesException e) {
-            Logger.severe(
+            Logger.tabulationLog(Level.SEVERE, 
                 "Source file contains unrecognized candidate(s): %s", source.getFilePath());
             // map from name to number of times encountered
             Map<String, Integer> candidateCounts = e.getCandidateCounts();
             for (String candidate : candidateCounts.keySet()) {
-              Logger.severe(
+              Logger.tabulationLog(Level.SEVERE, 
                   "Unrecognized candidate \"%s\" appears %d time(s)",
                   candidate, candidateCounts.get(candidate));
             }
@@ -252,12 +253,12 @@ public class Main extends GuiApplication {
         }
       }
       if (numInvalidSources == 0) {
-        Logger.info("Read %d cast vote records", castVoteRecords.size());
+        Logger.tabulationLog(Level.INFO, "Read %d cast vote records", castVoteRecords.size());
       }
     }
 
     if (numInvalidSources > 0) {
-      Logger.severe("Encountered %d invalid source(s)", numInvalidSources);
+      Logger.tabulationLog(Level.SEVERE, "Encountered %d invalid source(s)", numInvalidSources);
       castVoteRecords = null;
     }
 

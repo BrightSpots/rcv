@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -434,7 +435,7 @@ class ResultsWriter {
       outputStream.close();
     } catch (IOException e) {
       e.printStackTrace();
-      Logger.severe("failed to write " + outputPath + " to disk!");
+      Logger.tabulationLog(Level.SEVERE, "failed to write " + outputPath + " to disk!");
     }
   }
 
