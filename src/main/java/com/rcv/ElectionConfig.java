@@ -20,6 +20,7 @@
 
 package com.rcv;
 
+import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import com.rcv.Tabulator.TieBreakMode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 class ElectionConfig {
 
@@ -92,67 +94,86 @@ class ElectionConfig {
     return mode;
   }
 
-  // function: getValidationErrors
+  // function: validate
   // purpose: validate the correctness of the config data
   // returns any detected problems
-  List<String> getValidationErrors() {
+  Boolean validate() {
     // detected errors
-    List<String> errors = new LinkedList<>();
+    Boolean success = true;
+
+    try {
+      FileUtils.createOutputDirectory(this.getOutputDirectory());
+    } catch (UnableToCreateDirectoryException exception) {
+      success = false;
+      Logger.executionLog(Level.SEVERE, String.format(
+          "Failed to create output directory: %s\n%s",
+          this.getOutputDirectory(), exception.toString()));
+    }
 
     // TODO: need to add checks that all required String fields !.equals("")
 
     if (getNumDeclaredCandidates() == 0) {
-      errors.add("Config must contain at least one declared candidate.");
+      success = false;
+      Logger.executionLog(Level.SEVERE, "Config must contain at least one declared candidate.");
     }
 
     if (getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
-      errors.add("Number of winners must be between 1 and 100");
+      success = false;
+      Logger.executionLog(Level.SEVERE, "Number of winners must be between 1 and 100");
     }
 
     if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
       // TODO: report what the invalid value was?
-      errors.add("Invalid overvote rule.");
+      Logger.executionLog(Level.SEVERE, "Invalid overvote rule.");
     } else if (getOvervoteLabel() != null
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
-      errors.add(
+      success = false;
+      Logger.executionLog(Level.SEVERE,
           "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately or "
               + "alwaysSkipToNextRank.");
     }
 
     if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
-      errors.add("Invalid tie-break mode.");
+      success = false;
+      Logger.executionLog(Level.SEVERE, "Invalid tie-break mode.");
     }
 
     if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
-      errors.add("maxSkippedRanksAllowed can't be negative.");
+      success = false;
+      Logger.executionLog(Level.SEVERE, "maxSkippedRanksAllowed can't be negative.");
     }
 
     if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
-      errors.add("maxRankingsAllowed must be positive.");
+      success = false;
+      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed must be positive.");
     }
 
     // If this is a multi-seat election, we validate a number of extra parameters.
     //
     if (getNumberOfWinners() > 1) {
       if (willContinueUntilTwoCandidatesRemain()) {
-        errors.add("continueUntilTwoCandidatesRemain can't be true in a multi-winner election.");
+        success = false;
+        Logger.executionLog(Level.SEVERE, "continueUntilTwoCandidatesRemain can't be true in a multi-winner election.");
       }
 
       if (isBatchEliminationEnabled()) {
-        errors.add("batchElimination can't be true in a multi-winner election.");
+        success = false;
+        Logger.executionLog(Level.SEVERE, "batchElimination can't be true in a multi-winner election.");
       }
 
       if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
-        errors.add("decimalPlacesForVoteArithmetic must be between 0 and 20 (inclusive).");
+        success = false;
+        Logger.executionLog(Level.SEVERE, "decimalPlacesForVoteArithmetic must be between 0 and 20 (inclusive).");
       }
 
       if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
-        errors.add("Invalid multiSeatTransferRule.");
+        success = false;
+        Logger.executionLog(Level.SEVERE, "Invalid multiSeatTransferRule.");
       }
     }
 
-    return errors;
+    return success;
   }
 
   // function: getNumberWinners

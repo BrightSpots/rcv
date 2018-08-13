@@ -25,7 +25,6 @@
 package com.rcv;
 
 import com.rcv.CVRReader.SourceWithUnrecognizedCandidatesException;
-import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -71,41 +70,18 @@ public class Main extends GuiApplication {
   // returns: the new ElectionConfig object, or null if there was a problem
   static ElectionConfig loadElectionConfig(String configPath) {
     // config: the new object
-    ElectionConfig config = null;
-
-    // tracks whether we encountered any critical file system errors
-    boolean encounteredFileError = false;
+    ElectionConfig config;
 
     // rawConfig holds the basic election config data parsed from json
     RawElectionConfig rawConfig =
         JsonParser.parseObjectFromFile(configPath, RawElectionConfig.class);
 
     if (rawConfig == null) {
-      System.err.println(String.format("Failed to load config file: %s", configPath));
+      Logger.executionLog(Level.SEVERE, String.format("Failed to load config file: %s", configPath));
+      return null;
     } else {
       config = new ElectionConfig(rawConfig);
-
-      try {
-        FileUtils.createOutputDirectory(config.getOutputDirectory());
-      } catch (UnableToCreateDirectoryException exception) {
-        System.err.println(
-            String.format(
-                "Failed to create output directory: %s\n%s",
-                config.getOutputDirectory(), exception.toString()));
-        encounteredFileError = true;
-      }
-
-      List<String> validationErrors = config.getValidationErrors();
-      if (!validationErrors.isEmpty()) {
-        for (String error : validationErrors) {
-          Logger.executionLog(Level.SEVERE, "Invalid config: %s", error);
-        }
-        config = null;
-      }
-    }
-
-    if (encounteredFileError) {
-      config = null;
+      config.validate();
     }
 
     return config;
