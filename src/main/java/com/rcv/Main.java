@@ -65,23 +65,25 @@ public class Main extends GuiApplication {
   }
 
   // function: loadElectionConfig
-  // purpose: create config object
+  // purpose: attempts to create config object
   // param: path to config file
   // returns: the new ElectionConfig object, or null if there was a problem
   static ElectionConfig loadElectionConfig(String configPath) {
     // config: the new object
-    ElectionConfig config;
+    ElectionConfig config = null;
 
     // rawConfig holds the basic election config data parsed from json
+    // this will be null if there is a problem loading it
     RawElectionConfig rawConfig =
         JsonParser.parseObjectFromFile(configPath, RawElectionConfig.class);
 
+    // if raw config failed alert user
     if (rawConfig == null) {
       Logger.executionLog(Level.SEVERE, String.format("Failed to load config file: %s", configPath));
-      return null;
     } else {
+      // proceed to create the ElectionConfig wrapper
       config = new ElectionConfig(rawConfig);
-      config.validate();
+      Logger.executionLog(Level.INFO, String.format("Loaded: %s", configPath));
     }
 
     return config;
@@ -91,28 +93,23 @@ public class Main extends GuiApplication {
   // purpose: execute tabulation for given ElectionConfig
   // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
-  static String executeTabulation(ElectionConfig config) {
-    // String indicating user message
-    String response = "Tabulation successful!";
-    // Error message for user and log
-    String errorMessage;
+  static void executeTabulation(ElectionConfig config) {
+    Logger.allLogs(Level.INFO, "Starting tabulation");
+
     // flag indicating tabulation success
     boolean encounteredError = false;
     // current date-time formatted as a string used for creating unique output files names
     String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-    // create audit log file name
+    // create tabulation log file name and path
     String logFileName = String.format("%s_audit.log", timestampString);
-    // audit log path
     String tabulationLogPath = Paths.get(config.getOutputDirectory(), logFileName).toString();
     try {
-      // tabulation logger
+      // add tabulation logger
       Logger.addTabulationFileLogging(tabulationLogPath);
       Logger.allLogs(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
     } catch (IOException exception) {
-      errorMessage =
-          String.format("Failed to configure tabulation logger: %s", exception.toString());
-      Logger.executionLog(Level.SEVERE, errorMessage);
-      response = errorMessage;
+      Logger.executionLog(Level.SEVERE, String.format("Failed to configure tabulation logger: %s",
+          exception.toString()));
       encounteredError = true;
     }
 
@@ -133,20 +130,14 @@ public class Main extends GuiApplication {
           // generate audit data
           tabulator.doAudit(castVoteRecords);
         } else {
-          errorMessage = "No cast vote records found.";
-          Logger.tabulationLog(Level.SEVERE, errorMessage);
-          response = errorMessage;
+          Logger.tabulationLog(Level.SEVERE, "No cast vote records found.");
         }
       } else {
-        errorMessage = "Skipping tabulation due to source file errors.";
-        Logger.tabulationLog(Level.SEVERE, errorMessage);
-        response = errorMessage;
+        Logger.tabulationLog(Level.SEVERE, "Skipping tabulation due to source file errors.");
       }
     }
-    Logger.tabulationLog(Level.INFO, "Done logging tabulation to %s", tabulationLogPath);
+    Logger.allLogs(Level.INFO, "Done logging tabulation to %s", tabulationLogPath);
     Logger.removeTabulationFileLogging();
-    // TODO: Redesign this later so as not to return a user-facing status string
-    return response;
   }
 
   // function: parseCastVoteRecords

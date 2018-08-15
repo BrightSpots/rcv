@@ -27,8 +27,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -97,14 +95,14 @@ class ElectionConfig {
   // function: validate
   // purpose: validate the correctness of the config data
   // returns any detected problems
-  Boolean validate() {
-    // detected errors
-    Boolean success = true;
+  boolean validate() {
+    // return value will be false if there are any validation errors
+    boolean isValid = true;
 
     try {
       FileUtils.createOutputDirectory(this.getOutputDirectory());
     } catch (UnableToCreateDirectoryException exception) {
-      success = false;
+      isValid = false;
       Logger.executionLog(Level.SEVERE, String.format(
           "Failed to create output directory: %s\n%s",
           this.getOutputDirectory(), exception.toString()));
@@ -113,12 +111,12 @@ class ElectionConfig {
     // TODO: need to add checks that all required String fields !.equals("")
 
     if (getNumDeclaredCandidates() == 0) {
-      success = false;
+      isValid = false;
       Logger.executionLog(Level.SEVERE, "Config must contain at least one declared candidate.");
     }
 
     if (getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
-      success = false;
+      isValid = false;
       Logger.executionLog(Level.SEVERE, "Number of winners must be between 1 and 100");
     }
 
@@ -128,24 +126,24 @@ class ElectionConfig {
     } else if (getOvervoteLabel() != null
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
-      success = false;
+      isValid = false;
       Logger.executionLog(Level.SEVERE,
           "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately or "
               + "alwaysSkipToNextRank.");
     }
 
     if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
-      success = false;
+      isValid = false;
       Logger.executionLog(Level.SEVERE, "Invalid tie-break mode.");
     }
 
     if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
-      success = false;
+      isValid = false;
       Logger.executionLog(Level.SEVERE, "maxSkippedRanksAllowed can't be negative.");
     }
 
     if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
-      success = false;
+      isValid = false;
       Logger.executionLog(Level.SEVERE, "maxRankingsAllowed must be positive.");
     }
 
@@ -153,27 +151,27 @@ class ElectionConfig {
     //
     if (getNumberOfWinners() > 1) {
       if (willContinueUntilTwoCandidatesRemain()) {
-        success = false;
+        isValid = false;
         Logger.executionLog(Level.SEVERE, "continueUntilTwoCandidatesRemain can't be true in a multi-winner election.");
       }
 
       if (isBatchEliminationEnabled()) {
-        success = false;
+        isValid = false;
         Logger.executionLog(Level.SEVERE, "batchElimination can't be true in a multi-winner election.");
       }
 
       if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
-        success = false;
+        isValid = false;
         Logger.executionLog(Level.SEVERE, "decimalPlacesForVoteArithmetic must be between 0 and 20 (inclusive).");
       }
 
       if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
-        success = false;
+        isValid = false;
         Logger.executionLog(Level.SEVERE, "Invalid multiSeatTransferRule.");
       }
     }
 
-    return success;
+    return isValid;
   }
 
   // function: getNumberWinners
