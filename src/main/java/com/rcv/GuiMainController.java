@@ -19,9 +19,8 @@ package com.rcv;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,15 +42,6 @@ public class GuiMainController implements Initializable {
   @FXML
   private TextArea textAreaStatus;
 
-  private void printToTextStatus(String message) {
-    textAreaStatus.appendText("* ");
-    textAreaStatus.appendText(
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(ZonedDateTime.now()));
-    textAreaStatus.appendText(": ");
-    textAreaStatus.appendText(message);
-    textAreaStatus.appendText("\n");
-  }
-
   public void buttonCreateConfigClicked(ActionEvent event) throws IOException {
     Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
     Parent configParent = FXMLLoader.load(getClass().getResource("/GuiConfigLayout.fxml"));
@@ -68,27 +58,20 @@ public class GuiMainController implements Initializable {
     if (selectedFile != null) {
       String configPath = selectedFile.getAbsolutePath();
       config = Main.loadElectionConfig(configPath);
-      if (config == null) {
-        printToTextStatus(String.format("ERROR: Unable to load config file: %s", configPath));
-      } else {
-        printToTextStatus(String.format("Successfully loaded config file: %s", configPath));
-      }
     }
   }
 
   public void buttonTabulateClicked() {
     if (config != null) {
-      printToTextStatus("Starting tabulation...");
-      String response = Main.executeTabulation(config);
-      printToTextStatus(response);
-      printToTextStatus(String.format("Output available here: %s", config.getOutputDirectory()));
+      Main.executeTabulation(config);
     } else {
-      printToTextStatus("Please load a config before attempting to tabulate!");
+      Logger.executionLog(Level.WARNING, "Please load a config before attempting to tabulate!");
     }
   }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.info("Opening main menu GUI...");
+    Logger.addGUILogging(this.textAreaStatus);
+    Logger.executionLog(Level.INFO, "Opening main menu GUI...");
   }
 }

@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 import javafx.util.Pair;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -85,7 +86,8 @@ class CVRReader {
       inputStream.close();
       workbook.close();
     } catch (IOException exception) {
-      Logger.severe("Failed to open CVR file: %s\n%s", excelFilePath, exception.getMessage());
+      Logger.tabulationLog(
+          Level.SEVERE, "Failed to open CVR file: %s\n%s", excelFilePath, exception.getMessage());
     }
     return firstSheet;
   }
@@ -107,9 +109,11 @@ class CVRReader {
       Row headerRow = iterator.next();
       // require at least one non-header row
       if (headerRow == null || contestSheet.getLastRowNum() < 2) {
-        Logger.severe(
+        Logger.tabulationLog(
+            Level.SEVERE,
             "Invalid CVR source file %s: not enough rows (%d)",
-            this.excelFilePath, contestSheet.getLastRowNum());
+            this.excelFilePath,
+            contestSheet.getLastRowNum());
       }
 
       // cvrFileName for generating cvrIDs
@@ -187,15 +191,18 @@ class CVRReader {
         // empty cells are sometimes treated as undeclared write-ins (Portland / ES&S)
         if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
           candidate = config.getUndeclaredWriteInLabel();
-          Logger.warn("Empty cell -- treating as UWI");
+          Logger.tabulationLog(Level.WARNING, "Empty cell -- treating as UWI");
         } else {
           // just ignore this cell
           continue;
         }
       } else {
         if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
-          Logger.warn(
-              "unexpected cell type at ranking %d ballot %s", rank, computedCastVoteRecordID);
+          Logger.tabulationLog(
+              Level.WARNING,
+              "unexpected cell type at ranking %d ballot %s",
+              rank,
+              computedCastVoteRecordID);
           continue;
         }
         candidate = cvrDataCell.getStringCellValue().trim();

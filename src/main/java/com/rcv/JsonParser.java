@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.logging.Level;
 
 class JsonParser {
 
@@ -44,14 +45,16 @@ class JsonParser {
       // object is the newly created object populated with json values
       createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException jsonException) {
-      Logger.severe("Error parsing json file: %s", jsonFilePath);
-      Logger.severe("Check your file formatting and values to make sure they are correct.");
-      Logger.severe(jsonException.getMessage());
+      Logger.executionLog(Level.SEVERE, "Error parsing JSON file: %s", jsonFilePath);
+      Logger.executionLog(
+          Level.SEVERE, "Check your file formatting and values to make sure they are correct.");
+      Logger.executionLog(Level.SEVERE, jsonException.getMessage());
       createdObject = null;
     } catch (IOException fileException) {
-      Logger.severe("Error opening file: %s", jsonFilePath);
-      Logger.severe("Check your file path and make sure it is correct.");
-      Logger.severe(fileException.toString());
+      Logger.executionLog(Level.SEVERE, "Error opening file: %s", jsonFilePath);
+      Logger.executionLog(
+          Level.SEVERE, "Check your file path and permissions and make sure they are correct.");
+      Logger.executionLog(Level.SEVERE, fileException.toString());
       createdObject = null;
     }
     return createdObject;
@@ -63,8 +66,8 @@ class JsonParser {
     try {
       mapper.writer().withDefaultPrettyPrinter().writeValue(jsonFile, config);
     } catch (IOException fileException) {
-      Logger.severe("Error saving file: %s", jsonFile.getAbsolutePath());
-      Logger.severe(fileException.toString());
+      Logger.executionLog(Level.SEVERE, "Error saving file: %s", jsonFile.getAbsolutePath());
+      Logger.executionLog(Level.SEVERE, fileException.toString());
       response = "FAILURE";
     }
     return response;

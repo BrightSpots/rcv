@@ -35,72 +35,114 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import javafx.application.Platform;
+import javafx.scene.control.TextArea;
 
 class Logger {
 
-  // cache for the default logger
-  private static java.util.logging.Logger defaultLogger;
+  // execution logger name
+  private static final String EXECUTION_LOGGER_NAME = "execution";
+  // tabulation logger name
+  private static final String TABULATION_LOGGER_NAME = "tabulation";
+  // GUI logger name
+  private static final String GUI_LOGGER_NAME = "GUI";
+  // execution log file name (%g tracks count of log file if additional versions are created)
+  private static final String EXECUTION_LOG_FILE_NAME = "rcv_%g.log";
+  // first value here is bytes per MB and the second is max MB for the log file
+  private static final Integer EXECUTION_LOG_FILE_MAX_SIZE_BYTES = 1000000 * 50;
+  // how many execution files to keep
+  private static final Integer EXECUTION_LOG_FILE_COUNT = 2;
+  // cache for the execution logger
+  private static java.util.logging.Logger executionLogger;
   // cache for the tabulation logger
   private static java.util.logging.Logger tabulationLogger;
-  // tabulation logger name: dot "." parents it to default logger so all messages will propagate
-  private static final String TABULATION_LOGGER_NAME = ".tabulation";
-  // execution log file name
-  private static final String DEFAULT_FILE_NAME = "rcv.log";
+  // cache for the tabulation logger
+  private static java.util.logging.Logger guiLogger;
 
   // function: setup
   // purpose: initialize logging module
   // throws: IOException if unable to open output log file
   static void setup() throws IOException {
     // create and cache default logger
-    defaultLogger = java.util.logging.Logger.getLogger("");
+    executionLogger = java.util.logging.Logger.getLogger(EXECUTION_LOGGER_NAME);
     // remove any loggers the system may have installed
-    for (Handler handler : defaultLogger.getHandlers()) {
-      defaultLogger.removeHandler(handler);
+    for (Handler handler : executionLogger.getHandlers()) {
+      executionLogger.removeHandler(handler);
     }
     // logPath is where default file logging is written
     // "user.dir" property is the current working directory, i.e. folder from whence the rcv jar
     // was launched
-    String logPath = Paths.get(System.getProperty("user.dir"), DEFAULT_FILE_NAME).toString();
+    String logPath = Paths.get(System.getProperty("user.dir"), EXECUTION_LOG_FILE_NAME).toString();
     // formatter specifies how logging output lines should appear
     LogFormatter formatter = new LogFormatter();
     // fileHandler writes formatted strings to file
-    FileHandler fileHandler = new FileHandler(logPath, true);
+    FileHandler fileHandler =
+        new FileHandler(logPath, EXECUTION_LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
     fileHandler.setFormatter(formatter);
     // create a consoleHandler to writes formatted strings to console for debugging
     ConsoleHandler consoleHandler = new ConsoleHandler();
     consoleHandler.setFormatter(formatter);
     // add the  handlers
-    defaultLogger.addHandler(consoleHandler);
-    defaultLogger.addHandler(fileHandler);
+    executionLogger.addHandler(consoleHandler);
+    executionLogger.addHandler(fileHandler);
 
     // create and cache the tabulation logger object
-    // whenever a tabulation happens we will add tabulation-specific file handlers here
+    // whenever a tabulation happens we will add tabulation-specific file handlers to it
     tabulationLogger = java.util.logging.Logger.getLogger(TABULATION_LOGGER_NAME);
   }
 
-  // function: info
-  // purpose: log formatted output to console and audit file at INFO level
-  // format: format string into which object params will be formatted
-  // param: obj object to be parsed into format string
-  static void info(String format, Object... obj) {
-    tabulationLogger.info(String.format(format, obj));
+  // logs text to all output loggers
+  static void allLogs(Level level, String format, Object... obj) {
+    executionLogger.log(level, String.format(format, obj));
+    tabulationLogger.log(level, String.format(format, obj));
+    if (guiLogger != null) {
+      guiLogger.log(level, String.format(format, obj));
+    }
   }
 
-  // function: warn
-  // purpose: log formatted output to console and audit file at WARNING level
-  // param: format string into which object params will be formatted
-  // param: obj object to be parsed into format string
-  static void warn(String format, Object... obj) {
-    tabulationLogger.warning(String.format(format, obj));
+  // logs to execution log and GUI if there is one
+  static void executionLog(Level level, String format, Object... obj) {
+    executionLogger.log(level, String.format(format, obj));
+    if (guiLogger != null) {
+      guiLogger.log(level, String.format(format, obj));
+    }
   }
 
-  // function: severe
-  // purpose: log formatted output to console and audit file at SEVERE level
-  // param: format string into which object params will be formatted
-  // param: obj object to be parsed into format string
-  static void severe(String format, Object... obj) {
-    tabulationLogger.severe(String.format(format, obj));
+  // logs to tabulation log and GUI if there is one
+  static void tabulationLog(Level level, String format, Object... obj) {
+    tabulationLogger.log(level, String.format(format, obj));
+    if (guiLogger != null) {
+      guiLogger.log(level, String.format(format, obj));
+    }
+  }
+
+  // audit logging goes to the tabulation file ONLY
+  static void auditLog(Level level, String format, Object... obj) {
+    tabulationLogger.log(level, String.format(format, obj));
+  }
+
+  // setup logging to the provided text area
+  static void addGUILogging(TextArea textArea) {
+    guiLogger = java.util.logging.Logger.getLogger(GUI_LOGGER_NAME);
+    LogFormatter formatter = new LogFormatter();
+    guiLogger.addHandler(
+        new Handler() {
+
+          @Override
+          public void publish(LogRecord record) {
+            Platform.runLater(() -> textArea.appendText(formatter.format(record)));
+          }
+
+          @Override
+          public void flush() {
+          }
+
+          @Override
+          public void close() {
+          }
+        });
   }
 
   // function: addTabulationFileLogging

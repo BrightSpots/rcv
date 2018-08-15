@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
 
 class Tabulator {
 
@@ -94,7 +95,7 @@ class Tabulator {
       // vote count for this candidate
       BigDecimal votes = roundTally.get(candidate);
       if (shouldLog) {
-        Logger.info("Candidate %s got %s votes.", candidate, votes.toString());
+        Logger.tabulationLog(Level.INFO, "Candidate %s got %s votes.", candidate, votes.toString());
       }
       // all candidates in the existing output structure (if any) who received the same vote tally
       LinkedList<String> candidates =
@@ -119,7 +120,7 @@ class Tabulator {
     // remaining candidates.
     while (shouldContinueTabulating()) {
       currentRound++;
-      Logger.info("Round: %d", currentRound);
+      Logger.tabulationLog(Level.INFO, "Round: %d", currentRound);
 
       // currentRoundCandidateToTally is a map from candidateID to vote tally for the current round.
       // At each iteration of this loop that involves eliminating candidates, the eliminatedRound
@@ -202,23 +203,26 @@ class Tabulator {
   // function: logSummaryInfo
   // purpose: log some basic info about the contest before starting tabulation
   private void logSummaryInfo() {
-    Logger.info("Beginning tabulation for contest.");
-    Logger.info(
-        "There are %d declared candidates for this contest:", config.getNumDeclaredCandidates());
+    Logger.executionLog(Level.INFO, "Beginning tabulation for contest.");
+    Logger.executionLog(
+        Level.INFO,
+        "There are %d declared candidates for this contest:",
+        config.getNumDeclaredCandidates());
     // candidateID indexes over all candidate IDs to log them
     for (String candidateID : candidateIDs) {
-      Logger.info("%s", candidateID);
+      Logger.executionLog(Level.INFO, "%s", candidateID);
     }
 
     if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      Logger.info("Randomly generated candidate permutation for tie-breaking:");
+      Logger.executionLog(Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
       // candidateID indexes over all candidates in ordered list
       for (String candidateID : config.getCandidatePermutation()) {
-        Logger.info("%s", candidateID);
+        Logger.executionLog(Level.INFO, "%s", candidateID);
       }
     }
 
-    Logger.info("There are %d cast vote records for this contest.", castVoteRecords.size());
+    Logger.executionLog(
+        Level.INFO, "There are %d cast vote records for this contest.", castVoteRecords.size());
   }
 
   // function: updateWinnerTallies
@@ -366,9 +370,12 @@ class Tabulator {
         List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
         for (String winningCandidate : winningCandidates) {
           selectedWinners.add(winningCandidate);
-          Logger.info(
+          Logger.executionLog(
+              Level.INFO,
               "%s won in round %d with %s votes.",
-              winningCandidate, currentRound, tally.toString());
+              winningCandidate,
+              currentRound,
+              tally.toString());
         }
       }
     }
@@ -389,9 +396,13 @@ class Tabulator {
         && candidateIDs.contains(label)
         && currentRoundCandidateToTally.get(label).signum() == 1) {
       eliminated.add(label);
-      Logger.info(
-          "Eliminated %s in round %d because it represents undeclared write-ins. It had %s votes.",
-          label, currentRound, currentRoundCandidateToTally.get(label).toString());
+      Logger.executionLog(
+          Level.INFO,
+          "Eliminated %s in round %d because it represents undeclared write-ins. It had "
+              + "%s votes.",
+          label,
+          currentRound,
+          currentRoundCandidateToTally.get(label).toString());
     }
     return eliminated;
   }
@@ -413,10 +424,14 @@ class Tabulator {
           // candidate indexes over all candidates who received this tally
           for (String candidate : currentRoundTallyToCandidates.get(tally)) {
             eliminated.add(candidate);
-            Logger.info(
-                "Eliminated %s in round %d because they only had %s vote(s), below the minimum "
-                    + "threshold of %s.",
-                candidate, currentRound, tally.toString(), threshold.toString());
+            Logger.executionLog(
+                Level.INFO,
+                "Eliminated %s in round %d because they only had %s vote(s), below the "
+                    + "minimum threshold of %s.",
+                candidate,
+                currentRound,
+                tally.toString(),
+                threshold.toString());
           }
         } else {
           break;
@@ -440,7 +455,8 @@ class Tabulator {
         // elimination iterates over all BatchElimination objects describing the eliminations
         for (BatchElimination elimination : batchEliminations) {
           eliminated.add(elimination.candidateID);
-          Logger.info(
+          Logger.executionLog(
+              Level.INFO,
               "Batch-eliminated %s in round %d. The running total was %s vote(s) and the "
                   + "next-highest count was %s vote(s).",
               elimination.candidateID,
@@ -480,7 +496,8 @@ class Tabulator {
 
       // results of tiebreak stored here
       eliminatedCandidate = tieBreak.selectLoser();
-      Logger.info(
+      Logger.executionLog(
+          Level.INFO,
           "%s lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
           eliminatedCandidate,
           currentRound,
@@ -490,9 +507,12 @@ class Tabulator {
     } else {
       // last place candidate will be eliminated
       eliminatedCandidate = lastPlaceCandidates.getFirst();
-      Logger.info(
+      Logger.executionLog(
+          Level.INFO,
           "%s was eliminated in round %d with %s vote(s).",
-          eliminatedCandidate, currentRound, minVotes.toString());
+          eliminatedCandidate,
+          currentRound,
+          minVotes.toString());
     }
     eliminated.add(eliminatedCandidate);
     return eliminated;
@@ -853,7 +873,7 @@ class Tabulator {
   // param: castVoteRecords list of all CVRs which have been tabulated
   void doAudit(List<CastVoteRecord> castVoteRecords) {
     for (CastVoteRecord cvr : castVoteRecords) {
-      Logger.info(cvr.getAuditString());
+      Logger.auditLog(Level.INFO, cvr.getAuditString());
     }
   }
 
