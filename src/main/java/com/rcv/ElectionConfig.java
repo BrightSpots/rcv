@@ -99,13 +99,17 @@ class ElectionConfig {
     // return value will be false if there are any validation errors
     boolean isValid = true;
 
+    Logger.executionLog(Level.INFO, "Validating config file...");
+
     try {
       FileUtils.createOutputDirectory(this.getOutputDirectory());
     } catch (UnableToCreateDirectoryException exception) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, String.format(
-          "Failed to create output directory: %s\n%s",
-          this.getOutputDirectory(), exception.toString()));
+      Logger.executionLog(
+          Level.SEVERE,
+          String.format(
+              "Failed to create output directory: %s\n%s",
+              this.getOutputDirectory(), exception.toString()));
     }
 
     // TODO: need to add checks that all required String fields !.equals("")
@@ -127,9 +131,10 @@ class ElectionConfig {
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE,
-          "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately or "
-              + "alwaysSkipToNextRank.");
+      Logger.executionLog(
+          Level.SEVERE,
+          "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately "
+              + "or alwaysSkipToNextRank.");
     }
 
     if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
@@ -152,23 +157,33 @@ class ElectionConfig {
     if (getNumberOfWinners() > 1) {
       if (willContinueUntilTwoCandidatesRemain()) {
         isValid = false;
-        Logger.executionLog(Level.SEVERE, "continueUntilTwoCandidatesRemain can't be true in a multi-winner election.");
+        Logger.executionLog(
+            Level.SEVERE,
+            "continueUntilTwoCandidatesRemain can't be true in a multi-winner election.");
       }
 
       if (isBatchEliminationEnabled()) {
         isValid = false;
-        Logger.executionLog(Level.SEVERE, "batchElimination can't be true in a multi-winner election.");
+        Logger.executionLog(
+            Level.SEVERE, "batchElimination can't be true in a multi-winner election.");
       }
 
       if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
         isValid = false;
-        Logger.executionLog(Level.SEVERE, "decimalPlacesForVoteArithmetic must be between 0 and 20 (inclusive).");
+        Logger.executionLog(
+            Level.SEVERE, "decimalPlacesForVoteArithmetic must be between 0 and 20 (inclusive).");
       }
 
       if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
         isValid = false;
         Logger.executionLog(Level.SEVERE, "Invalid multiSeatTransferRule.");
       }
+    }
+
+    if (isValid) {
+      Logger.executionLog(Level.INFO, "Validation successful.");
+    } else {
+      Logger.executionLog(Level.SEVERE, "Validation failed!");
     }
 
     return isValid;

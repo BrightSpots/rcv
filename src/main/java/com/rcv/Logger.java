@@ -42,25 +42,24 @@ import javafx.scene.control.TextArea;
 
 class Logger {
 
-  // cache for the execution logger
-  private static java.util.logging.Logger executionLogger;
-  // cache for the tabulation logger
-  private static java.util.logging.Logger tabulationLogger;
-  // cache for the tabulation logger
-  private static java.util.logging.Logger guiLogger;
   // execution logger name
   private static final String EXECUTION_LOGGER_NAME = "execution";
   // tabulation logger name
   private static final String TABULATION_LOGGER_NAME = "tabulation";
   // GUI logger name
   private static final String GUI_LOGGER_NAME = "GUI";
-  // execution log file name
-  private static final String EXECUTION_LOG_FILE_NAME = "rcv.log";
+  // execution log file name (%g tracks count of log file if additional versions are created)
+  private static final String EXECUTION_LOG_FILE_NAME = "rcv_%g.log";
   // first value here is bytes per MB and the second is max MB for the log file
-  private static final Integer EXECUTION_LOG_FILE_MAX_SIZE_BYTES = 1000000 * 100;
+  private static final Integer EXECUTION_LOG_FILE_MAX_SIZE_BYTES = 1000000 * 50;
   // how many execution files to keep
   private static final Integer EXECUTION_LOG_FILE_COUNT = 2;
-
+  // cache for the execution logger
+  private static java.util.logging.Logger executionLogger;
+  // cache for the tabulation logger
+  private static java.util.logging.Logger tabulationLogger;
+  // cache for the tabulation logger
+  private static java.util.logging.Logger guiLogger;
 
   // function: setup
   // purpose: initialize logging module
@@ -79,10 +78,8 @@ class Logger {
     // formatter specifies how logging output lines should appear
     LogFormatter formatter = new LogFormatter();
     // fileHandler writes formatted strings to file
-    FileHandler fileHandler = new FileHandler(logPath,
-        EXECUTION_LOG_FILE_MAX_SIZE_BYTES,
-        EXECUTION_LOG_FILE_COUNT,
-        true);
+    FileHandler fileHandler =
+        new FileHandler(logPath, EXECUTION_LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
     fileHandler.setFormatter(formatter);
     // create a consoleHandler to writes formatted strings to console for debugging
     ConsoleHandler consoleHandler = new ConsoleHandler();
@@ -100,16 +97,15 @@ class Logger {
   static void allLogs(Level level, String format, Object... obj) {
     executionLogger.log(level, String.format(format, obj));
     tabulationLogger.log(level, String.format(format, obj));
-    if(guiLogger != null) {
+    if (guiLogger != null) {
       guiLogger.log(level, String.format(format, obj));
     }
   }
 
-
   // logs to execution log and GUI if there is one
   static void executionLog(Level level, String format, Object... obj) {
     executionLogger.log(level, String.format(format, obj));
-    if(guiLogger != null) {
+    if (guiLogger != null) {
       guiLogger.log(level, String.format(format, obj));
     }
   }
@@ -117,7 +113,7 @@ class Logger {
   // logs to tabulation log and GUI if there is one
   static void tabulationLog(Level level, String format, Object... obj) {
     tabulationLogger.log(level, String.format(format, obj));
-    if(guiLogger != null) {
+    if (guiLogger != null) {
       guiLogger.log(level, String.format(format, obj));
     }
   }
@@ -127,25 +123,26 @@ class Logger {
     tabulationLogger.log(level, String.format(format, obj));
   }
 
-
   // setup logging to the provided text area
   static void addGUILogging(TextArea textArea) {
     guiLogger = java.util.logging.Logger.getLogger(GUI_LOGGER_NAME);
     LogFormatter formatter = new LogFormatter();
-    guiLogger.addHandler(new Handler() {
+    guiLogger.addHandler(
+        new Handler() {
 
-      @Override
-      public void publish(LogRecord record) {
-        Platform.runLater(() -> textArea.appendText(formatter.format(record)));
-      }
+          @Override
+          public void publish(LogRecord record) {
+            Platform.runLater(() -> textArea.appendText(formatter.format(record)));
+          }
 
-      @Override
-      public void flush() {}
+          @Override
+          public void flush() {
+          }
 
-      @Override
-      public void close() {}
-
-    });
+          @Override
+          public void close() {
+          }
+        });
   }
 
   // function: addTabulationFileLogging

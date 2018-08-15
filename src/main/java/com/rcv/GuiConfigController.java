@@ -244,7 +244,8 @@ public class GuiConfigController implements Initializable {
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception e) {
-      Logger.executionLog(Level.SEVERE, "Error loading config_file_documentation.txt: %s", e.toString());
+      Logger.executionLog(
+          Level.SEVERE, "Error loading config_file_documentation.txt: %s", e.toString());
       helpText = "<Error loading config_file_documentation.txt>";
     }
     textAreaHelp.setText(helpText);
@@ -375,7 +376,8 @@ public class GuiConfigController implements Initializable {
 
     String response = JsonParser.createFileFromRawElectionConfig(saveFile, config);
     if (response.equals("SUCCESS")) {
-      Logger.executionLog(Level.INFO, "Saved config via the GUI to: %s", saveFile.getAbsolutePath());
+      Logger.executionLog(
+          Level.INFO, "Saved config via the GUI to: %s", saveFile.getAbsolutePath());
     }
   }
 

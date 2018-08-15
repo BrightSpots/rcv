@@ -435,7 +435,7 @@ class ResultsWriter {
       outputStream.close();
     } catch (IOException e) {
       e.printStackTrace();
-      Logger.tabulationLog(Level.SEVERE, "failed to write " + outputPath + " to disk!");
+      Logger.tabulationLog(Level.SEVERE, "Failed to save: %s", outputPath);
     }
   }
 

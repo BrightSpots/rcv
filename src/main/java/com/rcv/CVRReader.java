@@ -86,7 +86,8 @@ class CVRReader {
       inputStream.close();
       workbook.close();
     } catch (IOException exception) {
-      Logger.tabulationLog(Level.SEVERE, "Failed to open CVR file: %s\n%s", excelFilePath, exception.getMessage());
+      Logger.tabulationLog(
+          Level.SEVERE, "Failed to open CVR file: %s\n%s", excelFilePath, exception.getMessage());
     }
     return firstSheet;
   }
@@ -108,9 +109,11 @@ class CVRReader {
       Row headerRow = iterator.next();
       // require at least one non-header row
       if (headerRow == null || contestSheet.getLastRowNum() < 2) {
-        Logger.tabulationLog(Level.SEVERE, 
+        Logger.tabulationLog(
+            Level.SEVERE,
             "Invalid CVR source file %s: not enough rows (%d)",
-            this.excelFilePath, contestSheet.getLastRowNum());
+            this.excelFilePath,
+            contestSheet.getLastRowNum());
       }
 
       // cvrFileName for generating cvrIDs
@@ -195,8 +198,11 @@ class CVRReader {
         }
       } else {
         if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
-          Logger.tabulationLog(Level.WARNING, 
-              "unexpected cell type at ranking %d ballot %s", rank, computedCastVoteRecordID);
+          Logger.tabulationLog(
+              Level.WARNING,
+              "unexpected cell type at ranking %d ballot %s",
+              rank,
+              computedCastVoteRecordID);
           continue;
         }
         candidate = cvrDataCell.getStringCellValue().trim();

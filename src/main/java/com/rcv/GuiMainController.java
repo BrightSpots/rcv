@@ -19,9 +19,8 @@ package com.rcv;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +32,6 @@ import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import java.util.logging.Level;
 
 public class GuiMainController implements Initializable {
 
@@ -60,11 +58,6 @@ public class GuiMainController implements Initializable {
     if (selectedFile != null) {
       String configPath = selectedFile.getAbsolutePath();
       config = Main.loadElectionConfig(configPath);
-      if (config == null) {
-        Logger.executionLog(Level.INFO,String.format("ERROR: Unable to load config file: %s", configPath));
-      } else {
-        Logger.executionLog(Level.INFO,String.format("Successfully loaded config file: %s", configPath));
-      }
     }
   }
 
@@ -72,7 +65,7 @@ public class GuiMainController implements Initializable {
     if (config != null) {
       Main.executeTabulation(config);
     } else {
-      Logger.executionLog(Level.WARNING,"Please load a config before attempting to tabulate!");
+      Logger.executionLog(Level.WARNING, "Please load a config before attempting to tabulate!");
     }
   }
 
