@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -56,6 +57,7 @@ import javafx.util.StringConverter;
 
 public class GuiConfigController implements Initializable {
 
+  private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   @FXML
   private TextArea textAreaHelp;
   @FXML
@@ -70,6 +72,8 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldContestOffice;
   @FXML
   private ToggleGroup toggleTabulateByPrecinct;
+  @FXML
+  private RadioButton radioTabulateByPrecinctTrue;
   @FXML
   private TableView<CVRSource> tableViewCvrFiles;
   @FXML
@@ -129,21 +133,36 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ToggleGroup toggleBatchElimination;
   @FXML
+  private RadioButton radioBatchEliminationTrue;
+  @FXML
   private ToggleGroup toggleContinueUntilTwoCandidatesRemain;
+  @FXML
+  private RadioButton radioContinueUntilTwoCandidatesRemainTrue;
   @FXML
   private ToggleGroup toggleExhaustOnDuplicateCandidate;
   @FXML
+  private RadioButton radioExhaustOnDuplicateCandidateTrue;
+  @FXML
   private ToggleGroup toggleTreatBlankAsUndeclaredWriteIn;
+  @FXML
+  private RadioButton radioTreatBlankAsUndeclaredWriteInTrue;
 
   public void buttonMenuClicked(ActionEvent event) throws IOException {
     Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
     Parent menuParent = FXMLLoader.load(getClass().getResource("/GuiMainLayout.fxml"));
     window.setScene(new Scene(menuParent));
+    GuiMainController.config = null;
+    GuiMainController.selectedFile = null;
   }
 
   public void buttonSaveClicked() {
     FileChooser fc = new FileChooser();
-    fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+    if (GuiMainController.selectedFile == null) {
+      fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+    } else {
+      fc.setInitialDirectory(new File(GuiMainController.selectedFile.getParent()));
+      fc.setInitialFileName(GuiMainController.selectedFile.getName());
+    }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
 
@@ -159,9 +178,8 @@ public class GuiConfigController implements Initializable {
     dc.setTitle("Output Directory");
 
     File outputDirectory = dc.showDialog(null);
-    if (outputDirectory != null) {
+    if (outputDirectory != null)
       textFieldOutputDirectory.setText(outputDirectory.getAbsolutePath());
-    }
   }
 
   public void buttonClearDatePickerContestDateClicked() {
@@ -252,8 +270,6 @@ public class GuiConfigController implements Initializable {
 
     datePickerContestDate.setConverter(
         new StringConverter<>() {
-          final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
           @Override
           public String toString(LocalDate date) {
             return date != null ? dateFormatter.format(date) : "";
@@ -316,6 +332,57 @@ public class GuiConfigController implements Initializable {
         .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
     textFieldMinimumVoteThreshold.setText(
         String.valueOf(ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
+
+    if (GuiMainController.config != null) {
+      loadConfig(GuiMainController.config);
+    }
+  }
+
+  private void setTextFieldToInteger(TextField textField, Integer value) {
+    if (value != null) {
+      textField.setText(Integer.toString(value));
+    }
+  }
+
+  private void loadConfig(ElectionConfig config) {
+    textFieldContestName.setText(config.getContestName());
+    textFieldOutputDirectory.setText(config.getOutputDirectory());
+    if (config.getContestDate() != null && !config.getContestDate().isEmpty()) {
+      datePickerContestDate.setValue(LocalDate.parse(config.getContestDate(), dateFormatter));
+    }
+    textFieldContestJurisdiction.setText(config.getContestJurisdiction());
+    textFieldContestOffice.setText(config.getContestOffice());
+    radioTabulateByPrecinctTrue.setSelected(config.isTabulateByPrecinctEnabled());
+
+    if (config.rawConfig.cvrFileSources != null) {
+      tableViewCvrFiles.setItems(
+          FXCollections.observableArrayList(config.rawConfig.cvrFileSources));
+    }
+
+    if (config.rawConfig.candidates != null) {
+      tableViewCandidates.setItems(FXCollections.observableArrayList(config.rawConfig.candidates));
+    }
+
+    choiceTiebreakMode.setValue(config.getTiebreakMode());
+    choiceOvervoteRule.setValue(config.getOvervoteRule());
+    choiceMultiSeatTransferRule.setValue(config.getMultiSeatTransferRule());
+    setTextFieldToInteger(textFieldMaxRankingsAllowed, config.getMaxRankingsAllowed());
+    setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, config.getMaxSkippedRanksAllowed());
+    setTextFieldToInteger(textFieldNumberOfWinners, config.getNumberOfWinners());
+    setTextFieldToInteger(
+        textFieldDecimalPlacesForVoteArithmetic, config.getDecimalPlacesForVoteArithmetic());
+    setTextFieldToInteger(
+        textFieldMinimumVoteThreshold, config.getMinimumVoteThreshold().intValue());
+    textFieldOvervoteLabel.setText(config.getOvervoteLabel());
+    textFieldUndervoteLabel.setText(config.getUndervoteLabel());
+    textFieldUndeclaredWriteInLabel.setText(config.getUndeclaredWriteInLabel());
+    textFieldRulesDescription.setText(config.getRulesDescription());
+    radioBatchEliminationTrue.setSelected(config.isBatchEliminationEnabled());
+    radioContinueUntilTwoCandidatesRemainTrue.setSelected(
+        config.willContinueUntilTwoCandidatesRemain());
+    radioExhaustOnDuplicateCandidateTrue.setSelected(config.isExhaustOnDuplicateCandidateEnabled());
+    radioTreatBlankAsUndeclaredWriteInTrue.setSelected(
+        config.isTreatBlankAsUndeclaredWriteInEnabled());
   }
 
   private boolean getToggleBoolean(ToggleGroup toggleGroup) {

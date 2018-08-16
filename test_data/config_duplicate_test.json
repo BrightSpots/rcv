@@ -1,7 +1,7 @@
 {
   "contestName":"Duplicate test",
-  "jurisdiction":"Funkytown, USA",
-  "office":"Director of Produce",
+  "contestJurisdiction": "Funkytown, USA",
+  "contestOffice": "Director of Produce",
   "contestDate": "2018-05-21",
   "rules": {
     "rulesDescription": "Doyle Rules",

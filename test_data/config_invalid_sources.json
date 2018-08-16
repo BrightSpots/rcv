@@ -1,8 +1,8 @@
 {
   "outputDirectory":"test_output/validation_test_sources",
   "contestName":"Validation test for sources",
-  "jurisdiction":"none",
-  "office":"none",
+  "contestJurisdiction": "none",
+  "contestOffice": "none",
   "contestDate": "2018-07-20",
   "tabulateByPrecinct":true,
   "rules": {

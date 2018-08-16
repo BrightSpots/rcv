@@ -1,8 +1,8 @@
 {
   "outputDirectory": "test_output/TestSet2",
   "contestName": "Overvote2",
-  "jurisdiction": "Funkytown, USA",
-  "office": "Exhausted",
+  "contestJurisdiction": "Funkytown, USA",
+  "contestOffice": "Exhausted",
   "contestDate": "2018-07-28",
   "rules": {
     "rulesDescription": "Doyle Rules",

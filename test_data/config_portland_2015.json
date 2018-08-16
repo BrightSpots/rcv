@@ -1,8 +1,8 @@
 {
   "outputDirectory":"test_output/portland_2015",
   "contestName":"Portland 2015 Mayoral Race",
-  "jurisdiction":"Portland, ME",
-  "office":"Mayor",
+  "contestJurisdiction": "Portland, ME",
+  "contestOffice": "Mayor",
   "contestDate": "2015-11-03",
   "rules": {
     "rulesDescription": "Maine Rules",

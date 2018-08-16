@@ -52,46 +52,6 @@ class ElectionConfig {
     this.processCandidateData();
   }
 
-  // function: multiSeatTransferRuleForConfigSetting
-  // purpose: given setting String return the corresponding rules enum
-  // param: MultiSeatTransferRule setting string from election config
-  // returns: the MultiSeatTransferRule enum value for the input setting string
-  private static Tabulator.MultiSeatTransferRule multiSeatTransferRuleForConfigSetting(
-      String setting) {
-    // rule: return value determined by input setting string
-    Tabulator.MultiSeatTransferRule rule = Tabulator.MultiSeatTransferRule.getByLabel(setting);
-    if (rule == null) {
-      rule = Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN;
-    }
-    return rule;
-  }
-
-  // function: overvoteRuleForConfigSetting
-  // purpose: given setting String return the corresponding rules enum
-  // param: OvervoteRule setting string from election config
-  // returns: the OvervoteRule enum value for the input setting string
-  private static Tabulator.OvervoteRule overvoteRuleForConfigSetting(String setting) {
-    // rule: return value determined by input setting string
-    Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.getByLabel(setting);
-    if (rule == null) {
-      rule = Tabulator.OvervoteRule.RULE_UNKNOWN;
-    }
-    return rule;
-  }
-
-  // function: tieBreakModeForConfigSetting
-  // purpose: given setting string return corresponding rule enum
-  // param: TieBreakMode setting string read from election config
-  // returns: TieBreakMode enum value for the input setting string
-  private static Tabulator.TieBreakMode tieBreakModeForConfigSetting(String setting) {
-    // mode: return value determined by input setting string
-    Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.getByLabel(setting);
-    if (mode == null) {
-      mode = Tabulator.TieBreakMode.MODE_UNKNOWN;
-    }
-    return mode;
-  }
-
   // function: validate
   // purpose: validate the correctness of the config data
   // returns any detected problems
@@ -142,14 +102,20 @@ class ElectionConfig {
       Logger.executionLog(Level.SEVERE, "Invalid tie-break mode.");
     }
 
-    if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
+    if (getMaxSkippedRanksAllowed() == null) {
+      isValid = false;
+      Logger.executionLog(Level.SEVERE, "maxSkippedRanksAllowed is required.");
+    } else if (getMaxSkippedRanksAllowed() < 0) {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "maxSkippedRanksAllowed can't be negative.");
     }
 
-    if (getMaxRankingsAllowed() != null && getMaxRankingsAllowed() < 1) {
+    if (getMaxRankingsAllowed() == null) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed must be positive.");
+      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed is required.");
+    } else if (getMaxRankingsAllowed() < 1) {
+      isValid = false;
+      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed must be greater than zero.");
     }
 
     // If this is a multi-seat election, we validate a number of extra parameters.
@@ -174,7 +140,7 @@ class ElectionConfig {
             Level.SEVERE, "decimalPlacesForVoteArithmetic must be between 0 and 20 (inclusive).");
       }
 
-      if (multiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
+      if (getMultiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
         isValid = false;
         Logger.executionLog(Level.SEVERE, "Invalid multiSeatTransferRule.");
       }
@@ -201,7 +167,7 @@ class ElectionConfig {
   // function: getDecimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to or 0 if no setting is specified
-  private Integer getDecimalPlacesForVoteArithmetic() {
+  Integer getDecimalPlacesForVoteArithmetic() {
     return rawConfig.rules.decimalPlacesForVoteArithmetic == null
         ? DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC
         : rawConfig.rules.decimalPlacesForVoteArithmetic;
@@ -223,11 +189,13 @@ class ElectionConfig {
     return bd.setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
   }
 
-  // function: multiSeatTransferRule
+  // function: getMultiSeatTransferRule
   // purpose: which surplus transfer rule to use in multi-seat elections
   // returns: enum indicating which transfer rule to use
-  private Tabulator.MultiSeatTransferRule multiSeatTransferRule() {
-    return multiSeatTransferRuleForConfigSetting(rawConfig.rules.multiSeatTransferRule);
+  Tabulator.MultiSeatTransferRule getMultiSeatTransferRule() {
+    Tabulator.MultiSeatTransferRule rule =
+        Tabulator.MultiSeatTransferRule.getByLabel(rawConfig.rules.multiSeatTransferRule);
+    return rule == null ? Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN : rule;
   }
 
   // function: getOutputDirectory
@@ -271,10 +239,10 @@ class ElectionConfig {
     return rawConfig.contestOffice;
   }
 
-  // function: electionDate
-  // purpose: getter for electionDate
+  // function: getContestDate
+  // purpose: getter for contestDate
   // returns: election date
-  String getElectionDate() {
+  String getContestDate() {
     return rawConfig.contestDate;
   }
 
@@ -330,10 +298,8 @@ class ElectionConfig {
   // purpose: return overvote rule enum to use
   // returns: overvote rule to use for this config
   Tabulator.OvervoteRule getOvervoteRule() {
-    // by default we exhaust immediately
-    return rawConfig.rules.overvoteRule == null
-        ? Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
-        : ElectionConfig.overvoteRuleForConfigSetting(rawConfig.rules.overvoteRule);
+    Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.getByLabel(rawConfig.rules.overvoteRule);
+    return rule == null ? Tabulator.OvervoteRule.RULE_UNKNOWN : rule;
   }
 
   // function: getMinimumVoteThreshold
@@ -377,10 +343,8 @@ class ElectionConfig {
   // purpose: return tiebreak mode to use
   // returns: tiebreak mode to use for this config
   Tabulator.TieBreakMode getTiebreakMode() {
-    // by default we use random tiebreak
-    return rawConfig.rules.tiebreakMode == null
-        ? Tabulator.TieBreakMode.RANDOM
-        : ElectionConfig.tieBreakModeForConfigSetting(rawConfig.rules.tiebreakMode);
+    Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.getByLabel(rawConfig.rules.tiebreakMode);
+    return mode == null ? Tabulator.TieBreakMode.MODE_UNKNOWN : mode;
   }
 
   // function: isTreatBlankAsUndeclaredWriteInEnabled

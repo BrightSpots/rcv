@@ -1,8 +1,8 @@
 {
   "outputDirectory":"test_output/minneapolis_2013_park",
   "contestName":"2013 Minneapolis Park Board",
-  "jurisdiction":"Minneapolis",
-  "office":"Park and Recreation Commissioner",
+  "contestJurisdiction": "Minneapolis",
+  "contestOffice": "Park and Recreation Commissioner",
   "tabulateByPrecinct":false,
   "rules": {
     "rulesDescription": "Minneapolis Rules",

@@ -36,16 +36,36 @@ import javafx.stage.Stage;
 public class GuiMainController implements Initializable {
 
   // currently-loaded tabulator config
-  private static ElectionConfig config;
+  static ElectionConfig config;
+  // file selected for loading
+  static File selectedFile;
 
   // text area which communicates the status of the tabulator's operations
   @FXML
   private TextArea textAreaStatus;
 
-  public void buttonCreateConfigClicked(ActionEvent event) throws IOException {
+  private void openConfigCreator(ActionEvent event) {
     Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-    Parent configParent = FXMLLoader.load(getClass().getResource("/GuiConfigLayout.fxml"));
-    window.setScene(new Scene(configParent));
+    try {
+      Parent configParent = FXMLLoader.load(getClass().getResource("/GuiConfigLayout.fxml"));
+      window.setScene(new Scene(configParent));
+    } catch (IOException exception) {
+      Logger.executionLog(
+          Level.SEVERE, "Failed to open config creator: %s", exception.getCause().toString());
+    }
+  }
+
+  public void buttonCreateConfigClicked(ActionEvent event) {
+    config = null;
+    selectedFile = null;
+    openConfigCreator(event);
+  }
+
+  public void buttonModifyConfigClicked(ActionEvent event) {
+    buttonLoadConfigClicked();
+    if (config != null) {
+      openConfigCreator(event);
+    }
   }
 
   public void buttonLoadConfigClicked() {
@@ -54,10 +74,9 @@ public class GuiMainController implements Initializable {
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Load Config");
 
-    File selectedFile = fc.showOpenDialog(null);
+    selectedFile = fc.showOpenDialog(null);
     if (selectedFile != null) {
-      String configPath = selectedFile.getAbsolutePath();
-      config = Main.loadElectionConfig(configPath);
+      config = Main.loadElectionConfig(selectedFile.getAbsolutePath());
     }
   }
 

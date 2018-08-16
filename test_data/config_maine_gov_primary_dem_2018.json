@@ -1,8 +1,8 @@
 {
   "outputDirectory":"test_output/maine_2018",
   "contestName":"Maine 2018 Democratic Governor Primary race",
-  "jurisdiction":"Maine",
-  "office":"Governor",
+  "contestJurisdiction": "Maine",
+  "contestOffice": "Governor",
   "contestDate": "2018-06-12",
   "rules": {
     "rulesDescription": "Maine Rules",
