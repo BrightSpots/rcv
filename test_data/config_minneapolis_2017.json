@@ -1,8 +1,8 @@
 {
   "outputDirectory":"test_output/minneapolis_2017",
   "contestName":"2017 Minneapolis mayoral race",
-  "jurisdiction":"Minneapolis, MN",
-  "office":"Mayor",
+  "contestJurisdiction": "Minneapolis, MN",
+  "contestOffice": "Mayor",
   "contestDate": "2017-11-07",
   "tabulateByPrecinct":true,
   "rules": {

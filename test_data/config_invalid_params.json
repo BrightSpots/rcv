@@ -1,13 +1,13 @@
 {
   "outputDirectory":"test_output/validation_test_params",
   "contestName":"Validation test for params",
-  "jurisdiction":"none",
-  "office":"none",
+  "contestJurisdiction": "none",
+  "contestOffice": "nonie",
   "contestDate": "2018-07-19",
   "rules": {
     "rulesDescription": "Testing our validation logic for params",
-    "batchElimination":true,
-    "continueUntilTwoCandidatesRemain":true,
+    "batchElimination": "True",
+    "continueUntilTwoCandidatesRemain": "false",
     "decimalPlacesForVoteArithmetic":-1,
     "maxRankingsAllowed":-1,
     "maxSkippedRanksAllowed":-3,

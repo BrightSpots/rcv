@@ -42,6 +42,9 @@
         <Button alignment="CENTER" contentDisplay="CENTER" id="buttonCreateConfig"
           maxWidth="1.7976931348623157E308" mnemonicParsing="false"
           onAction="#buttonCreateConfigClicked" text="Create Config"/>
+        <Button alignment="CENTER" contentDisplay="CENTER" id="buttonModifyConfig"
+          maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+          onAction="#buttonModifyConfigClicked" text="Modify Existing Config"/>
         <Button alignment="CENTER" contentDisplay="CENTER" id="buttonLoadConfig"
           maxWidth="1.7976931348623157E308" mnemonicParsing="false"
           onAction="#buttonLoadConfigClicked" text="Load Config"/>

@@ -528,7 +528,7 @@ class ResultsWriter {
         {"Contest name", config.getContestName(), OutputType.STRING},
         {"Jurisdiction name", config.getContestJurisdiction(), OutputType.STRING},
         {"Office name", config.getContestOffice(), OutputType.STRING},
-        {"Election date", config.getElectionDate(), OutputType.STRING},
+        {"Election date", config.getContestDate(), OutputType.STRING},
         {null, null, OutputType.STRING},
         {"Counting information", null, OutputType.STRING},
         {"Details of the tally to be used in the display screens", null, OutputType.STRING},

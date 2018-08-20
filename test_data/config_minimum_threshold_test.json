@@ -1,7 +1,7 @@
 {
   "contestName":"Minimum threshold test",
-  "jurisdiction":"Funkytown, USA",
-  "office":"Sergeant-at-Arms",
+  "contestJurisdiction": "Funkytown, USA",
+  "contestOffice": "Sergeant-at-Arms",
   "contestDate": "2018-01-07",
   "rules": {
     "batchElimination":false,

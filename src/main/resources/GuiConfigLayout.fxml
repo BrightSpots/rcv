@@ -53,7 +53,7 @@
             <TextField maxWidth="220.0" promptText="Contest Office" fx:id="textFieldContestOffice"/>
             <Label text="Tabulate by Precinct"/>
             <HBox alignment="CENTER_LEFT" spacing="12.0">
-              <RadioButton mnemonicParsing="false" text="True">
+              <RadioButton mnemonicParsing="false" text="True" fx:id="radioTabulateByPrecinctTrue">
                 <toggleGroup>
                   <ToggleGroup fx:id="toggleTabulateByPrecinct"/>
                 </toggleGroup>
@@ -161,7 +161,7 @@
                 fx:id="textFieldDecimalPlacesForVoteArithmetic"/>
               <Label text="Batch Elimination"/>
               <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <RadioButton mnemonicParsing="false" text="True">
+                <RadioButton mnemonicParsing="false" text="True" fx:id="radioBatchEliminationTrue">
                   <toggleGroup>
                     <ToggleGroup fx:id="toggleBatchElimination"/>
                   </toggleGroup>
@@ -171,7 +171,8 @@
               </HBox>
               <Label text="Exhaust on Duplicate Candidate"/>
               <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <RadioButton mnemonicParsing="false" text="True">
+                <RadioButton mnemonicParsing="false" text="True"
+                  fx:id="radioExhaustOnDuplicateCandidateTrue">
                   <toggleGroup>
                     <ToggleGroup fx:id="toggleExhaustOnDuplicateCandidate"/>
                   </toggleGroup>
@@ -202,7 +203,8 @@
                 fx:id="textFieldMinimumVoteThreshold"/>
               <Label text="Continue until Two Candidates Remain"/>
               <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <RadioButton mnemonicParsing="false" text="True">
+                <RadioButton mnemonicParsing="false" text="True"
+                  fx:id="radioContinueUntilTwoCandidatesRemainTrue">
                   <toggleGroup>
                     <ToggleGroup fx:id="toggleContinueUntilTwoCandidatesRemain"/>
                   </toggleGroup>
@@ -212,7 +214,8 @@
               </HBox>
               <Label text="Treat Blank as Undeclared Write-in"/>
               <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <RadioButton mnemonicParsing="false" text="True">
+                <RadioButton mnemonicParsing="false" text="True"
+                  fx:id="radioTreatBlankAsUndeclaredWriteInTrue">
                   <toggleGroup>
                     <ToggleGroup fx:id="toggleTreatBlankAsUndeclaredWriteIn"/>
                   </toggleGroup>

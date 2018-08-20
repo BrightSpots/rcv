@@ -1,8 +1,8 @@
 {
   "outputDirectory":"test_output/minneapolis_2013",
   "contestName":"2013 Minneapolis Mayor",
-  "jurisdiction":"Minneapolis",
-  "office":"Mayor",
+  "contestJurisdiction": "Minneapolis",
+  "contestOffice": "Mayor",
   "tabulateByPrecinct":true,
   "rules": {
     "rulesDescription": "Maine Rules",
