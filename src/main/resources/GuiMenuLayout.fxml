@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<HBox xmlns:fx="http://javafx.com/fxml/1" BorderPane.alignment="CENTER" prefHeight="100.0"
+  prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.121"
+  fx:controller="com.rcv.GuiMenuController">
+  <Region HBox.hgrow="ALWAYS" prefHeight="200.0" prefWidth="200.0"/>
+  <VBox alignment="CENTER" spacing="12.0">
+    <Label text="Universal RCV Tabulator">
+      <font>
+        <Font size="20.0"/>
+      </font>
+    </Label>
+    <Button alignment="CENTER" contentDisplay="CENTER" id="buttonCreateConfig"
+      maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+      onAction="#buttonCreateConfigClicked" text="Create Config"/>
+    <Button alignment="CENTER" contentDisplay="CENTER" id="buttonModifyConfig"
+      maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+      onAction="#buttonModifyConfigClicked" text="Modify Existing Config"/>
+    <Button alignment="CENTER" contentDisplay="CENTER" id="buttonLoadConfig"
+      maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonLoadConfigClicked"
+      text="Load Config"/>
+    <Button alignment="CENTER" contentDisplay="CENTER" id="buttonTabulate"
+      maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#buttonTabulateClicked"
+      text="Tabulate"/>
+    <Region VBox.vgrow="ALWAYS"/>
+    <HBox.margin>
+      <Insets/>
+    </HBox.margin>
+  </VBox>
+  <Region HBox.hgrow="ALWAYS" prefHeight="200.0" prefWidth="200.0"/>
+</HBox>

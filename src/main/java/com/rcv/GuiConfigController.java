@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -20,7 +20,6 @@ import com.rcv.RawElectionConfig.CVRSource;
 import com.rcv.RawElectionConfig.Candidate;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.time.LocalDate;
@@ -32,13 +31,8 @@ import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
@@ -52,7 +46,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 public class GuiConfigController implements Initializable {
@@ -147,21 +140,19 @@ public class GuiConfigController implements Initializable {
   @FXML
   private RadioButton radioTreatBlankAsUndeclaredWriteInTrue;
 
-  public void buttonMenuClicked(ActionEvent event) throws IOException {
-    Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-    Parent menuParent = FXMLLoader.load(getClass().getResource("/GuiMainLayout.fxml"));
-    window.setScene(new Scene(menuParent));
-    GuiMainController.config = null;
-    GuiMainController.selectedFile = null;
+  public void buttonMenuClicked() {
+    GuiContext.getInstance().showContent("/GuiMenuLayout.fxml");
+    GuiContext.setConfig(null);
+    GuiContext.setSelectedFile(null);
   }
 
   public void buttonSaveClicked() {
     FileChooser fc = new FileChooser();
-    if (GuiMainController.selectedFile == null) {
+    if (GuiContext.getSelectedFile() == null) {
       fc.setInitialDirectory(new File(System.getProperty("user.dir")));
     } else {
-      fc.setInitialDirectory(new File(GuiMainController.selectedFile.getParent()));
-      fc.setInitialFileName(GuiMainController.selectedFile.getName());
+      fc.setInitialDirectory(new File(GuiContext.getSelectedFile().getParent()));
+      fc.setInitialFileName(GuiContext.getSelectedFile().getName());
     }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
@@ -178,8 +169,9 @@ public class GuiConfigController implements Initializable {
     dc.setTitle("Output Directory");
 
     File outputDirectory = dc.showDialog(null);
-    if (outputDirectory != null)
+    if (outputDirectory != null) {
       textFieldOutputDirectory.setText(outputDirectory.getAbsolutePath());
+    }
   }
 
   public void buttonClearDatePickerContestDateClicked() {
@@ -333,8 +325,8 @@ public class GuiConfigController implements Initializable {
     textFieldMinimumVoteThreshold.setText(
         String.valueOf(ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
 
-    if (GuiMainController.config != null) {
-      loadConfig(GuiMainController.config);
+    if (GuiContext.getConfig() != null) {
+      loadConfig(GuiContext.getConfig());
     }
   }
 

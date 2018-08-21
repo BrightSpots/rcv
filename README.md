@@ -1,7 +1,7 @@
 # Ranked Choice Voting Universal Tabulator
 Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
 
-Copyright (C) 2018 Bright Spots
+Copyright (c) 2018 Bright Spots
 
 ## Dependencies
 
