@@ -58,7 +58,7 @@ class ElectionConfig {
     // return value will be false if there are any validation errors
     boolean isValid = true;
 
-    Logger.executionLog(Level.INFO, "Validating config file...");
+    Logger.executionLog(Level.INFO, "Validating config...");
     // TODO: reorder all checks so they go in same order as fields in config GUI
     // TODO: need to add checks that all required String fields !.equals("")
 
@@ -134,9 +134,9 @@ class ElectionConfig {
     }
 
     if (isValid) {
-      Logger.executionLog(Level.INFO, "Validation successful.");
+      Logger.executionLog(Level.INFO, "Config validation successful.");
     } else {
-      Logger.executionLog(Level.SEVERE, "Validation failed!");
+      Logger.executionLog(Level.SEVERE, "Config validation failed!");
     }
 
     return isValid;

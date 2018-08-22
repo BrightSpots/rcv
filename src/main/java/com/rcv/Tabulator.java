@@ -111,6 +111,7 @@ class Tabulator {
   //  this is the high-level control of the tabulation algorithm
   void tabulate() {
     logSummaryInfo();
+    Logger.tabulationLog(Level.INFO, "Starting tabulation...");
 
     // Loop until we've found our winner(s) unless using continueUntilTwoCandidatesRemain, in which
     // case we loop until only two candidates remain.
@@ -198,31 +199,30 @@ class Tabulator {
       // candidate once that candidate has won)?
       updatePastWinnerTallies();
     }
+
+    Logger.tabulationLog(Level.INFO, "Tabulation completed.");
   }
 
   // function: logSummaryInfo
   // purpose: log some basic info about the contest before starting tabulation
   private void logSummaryInfo() {
-    Logger.executionLog(Level.INFO, "Beginning tabulation for contest.");
-    Logger.executionLog(
+    Logger.tabulationLog(
         Level.INFO,
         "There are %d declared candidates for this contest:",
         config.getNumDeclaredCandidates());
     // candidateID indexes over all candidate IDs to log them
     for (String candidateID : candidateIDs) {
-      Logger.executionLog(Level.INFO, "%s", candidateID);
+      Logger.tabulationLog(Level.INFO, "%s", candidateID);
     }
 
     if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      Logger.executionLog(Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
+      Logger
+          .tabulationLog(Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
       // candidateID indexes over all candidates in ordered list
       for (String candidateID : config.getCandidatePermutation()) {
-        Logger.executionLog(Level.INFO, "%s", candidateID);
+        Logger.tabulationLog(Level.INFO, "%s", candidateID);
       }
     }
-
-    Logger.executionLog(
-        Level.INFO, "There are %d cast vote records for this contest.", castVoteRecords.size());
   }
 
   // function: updateWinnerTallies
@@ -370,7 +370,7 @@ class Tabulator {
         List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
         for (String winningCandidate : winningCandidates) {
           selectedWinners.add(winningCandidate);
-          Logger.executionLog(
+          Logger.tabulationLog(
               Level.INFO,
               "%s won in round %d with %s votes.",
               winningCandidate,
@@ -396,7 +396,7 @@ class Tabulator {
         && candidateIDs.contains(label)
         && currentRoundCandidateToTally.get(label).signum() == 1) {
       eliminated.add(label);
-      Logger.executionLog(
+      Logger.tabulationLog(
           Level.INFO,
           "Eliminated %s in round %d because it represents undeclared write-ins. It had "
               + "%s votes.",
@@ -424,7 +424,7 @@ class Tabulator {
           // candidate indexes over all candidates who received this tally
           for (String candidate : currentRoundTallyToCandidates.get(tally)) {
             eliminated.add(candidate);
-            Logger.executionLog(
+            Logger.tabulationLog(
                 Level.INFO,
                 "Eliminated %s in round %d because they only had %s vote(s), below the "
                     + "minimum threshold of %s.",
@@ -455,7 +455,7 @@ class Tabulator {
         // elimination iterates over all BatchElimination objects describing the eliminations
         for (BatchElimination elimination : batchEliminations) {
           eliminated.add(elimination.candidateID);
-          Logger.executionLog(
+          Logger.tabulationLog(
               Level.INFO,
               "Batch-eliminated %s in round %d. The running total was %s vote(s) and the "
                   + "next-highest count was %s vote(s).",
@@ -496,7 +496,7 @@ class Tabulator {
 
       // results of tiebreak stored here
       eliminatedCandidate = tieBreak.selectLoser();
-      Logger.executionLog(
+      Logger.tabulationLog(
           Level.INFO,
           "%s lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
           eliminatedCandidate,
@@ -507,7 +507,7 @@ class Tabulator {
     } else {
       // last place candidate will be eliminated
       eliminatedCandidate = lastPlaceCandidates.getFirst();
-      Logger.executionLog(
+      Logger.tabulationLog(
           Level.INFO,
           "%s was eliminated in round %d with %s vote(s).",
           eliminatedCandidate,
@@ -872,9 +872,11 @@ class Tabulator {
   // purpose: log the audit info to console and audit file
   // param: castVoteRecords list of all CVRs which have been tabulated
   void doAudit(List<CastVoteRecord> castVoteRecords) {
+    Logger.tabulationLog(Level.INFO, "Writing audit info to logs...");
     for (CastVoteRecord cvr : castVoteRecords) {
-      Logger.auditLog(Level.INFO, cvr.getAuditString());
+      Logger.auditLog(Level.FINER, cvr.getAuditString());
     }
+    Logger.tabulationLog(Level.INFO, "Audit info written.");
   }
 
   // vote transfer rule to use in multi-seat elections

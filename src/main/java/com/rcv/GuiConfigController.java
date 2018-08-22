@@ -50,7 +50,9 @@ import javafx.util.StringConverter;
 
 public class GuiConfigController implements Initializable {
 
-  private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private static final DateTimeFormatter DATE_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private static final String CONFIG_FILE_NAME = "config_file_documentation.txt";
   @FXML
   private TextArea textAreaHelp;
   @FXML
@@ -205,9 +207,9 @@ public class GuiConfigController implements Initializable {
     // TODO: check if CVR source is already in list?
     // TODO: Need to convey below warnings in the UI; also consider moving validation to setter
     if (textFieldCvrFilePath.getText().isEmpty()) {
-      Logger.executionLog(Level.WARNING, "CVR file path is required!");
+      Logger.guiLog(Level.WARNING, "CVR file path is required!");
     } else if (textFieldCvrFirstVoteCol.getText().isEmpty()) {
-      Logger.executionLog(Level.WARNING, "CVR first vote column is required!");
+      Logger.guiLog(Level.WARNING, "CVR first vote column is required!");
     } else {
       cvrSource.setFilePath(textFieldCvrFilePath.getText());
       cvrSource.setFirstVoteColumnIndex(getIntValueElse(textFieldCvrFirstVoteCol, null));
@@ -234,7 +236,7 @@ public class GuiConfigController implements Initializable {
     // TODO: check if candidate is already in list?
     // TODO: Need to convey this in the UI; also consider moving validation to setter
     if (textFieldCandidateName.getText().isEmpty()) {
-      Logger.executionLog(Level.WARNING, "Candidate name field is required!");
+      Logger.guiLog(Level.WARNING, "Candidate name field is required!");
     } else {
       candidate.setName(textFieldCandidateName.getText());
       candidate.setCode(textFieldCandidateCode.getText());
@@ -258,14 +260,13 @@ public class GuiConfigController implements Initializable {
     try {
       helpText =
           new BufferedReader(
-              new InputStreamReader(
-                  ClassLoader.getSystemResourceAsStream("config_file_documentation.txt")))
+              new InputStreamReader(ClassLoader.getSystemResourceAsStream(CONFIG_FILE_NAME)))
               .lines()
               .collect(Collectors.joining("\n"));
-    } catch (Exception e) {
+    } catch (Exception exception) {
       Logger.executionLog(
-          Level.SEVERE, "Error loading config_file_documentation.txt: %s", e.toString());
-      helpText = "<Error loading config_file_documentation.txt>";
+          Level.SEVERE, "Error loading: %s\n%s", CONFIG_FILE_NAME, exception.toString());
+      helpText = String.format("<Error loading %s>", CONFIG_FILE_NAME);
     }
     textAreaHelp.setText(helpText);
 
@@ -273,13 +274,13 @@ public class GuiConfigController implements Initializable {
         new StringConverter<>() {
           @Override
           public String toString(LocalDate date) {
-            return date != null ? dateFormatter.format(date) : "";
+            return date != null ? DATE_TIME_FORMATTER.format(date) : "";
           }
 
           @Override
           public LocalDate fromString(String string) {
             return string != null && !string.isEmpty()
-                ? LocalDate.parse(string, dateFormatter)
+                ? LocalDate.parse(string, DATE_TIME_FORMATTER)
                 : null;
           }
         });
@@ -349,7 +350,7 @@ public class GuiConfigController implements Initializable {
     textFieldContestName.setText(config.getContestName());
     textFieldOutputDirectory.setText(config.getOutputDirectory());
     if (config.getContestDate() != null && !config.getContestDate().isEmpty()) {
-      datePickerContestDate.setValue(LocalDate.parse(config.getContestDate(), dateFormatter));
+      datePickerContestDate.setValue(LocalDate.parse(config.getContestDate(), DATE_TIME_FORMATTER));
     }
     textFieldContestJurisdiction.setText(config.getContestJurisdiction());
     textFieldContestOffice.setText(config.getContestOffice());

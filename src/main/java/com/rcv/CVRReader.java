@@ -87,7 +87,7 @@ class CVRReader {
       workbook.close();
     } catch (IOException exception) {
       Logger.tabulationLog(
-          Level.SEVERE, "Failed to open CVR file: %s\n%s", excelFilePath, exception.getMessage());
+          Level.SEVERE, "Failed to open CVR file: %s\n%s", excelFilePath, exception.toString());
     }
     return firstSheet;
   }

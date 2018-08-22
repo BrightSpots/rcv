@@ -68,9 +68,9 @@ class GuiContext {
     getContentVBox().getChildren().clear();
     try {
       getContentVBox().getChildren().add(FXMLLoader.load(getClass().getResource(resourcePath)));
-    } catch (IOException e) {
+    } catch (IOException exception) {
       Logger.executionLog(
-          Level.SEVERE, "Failed to open '%s': %s", resourcePath, e.getCause().toString());
+          Level.SEVERE, "Failed to open: %s:\n%s", resourcePath, exception.getCause().toString());
     }
   }
 }

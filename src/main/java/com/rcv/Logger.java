@@ -126,6 +126,11 @@ class Logger {
     tabulationLogger.log(level, String.format(format, obj));
   }
 
+  // logs to GUI console only
+  static void guiLog(Level level, String format, Object... obj) {
+    guiLogger.log(level, String.format(format, obj));
+  }
+
   // setup logging to the provided text area
   static void addGuiLogging(TextArea textArea) {
     guiLogger = java.util.logging.Logger.getLogger(GUI_LOGGER_NAME);
@@ -136,7 +141,11 @@ class Logger {
 
           @Override
           public void publish(LogRecord record) {
-            Platform.runLater(() -> textArea.appendText(formatter.format(record)));
+            if (Platform.isFxApplicationThread()) {
+              textArea.appendText(formatter.format(record));
+            } else {
+              Platform.runLater(() -> textArea.appendText(formatter.format(record)));
+            }
           }
 
           @Override
@@ -155,13 +164,15 @@ class Logger {
   // file access: write - existing file will be overwritten
   // throws: IOException if unable to open loggerOutputPath
   static void addTabulationFileLogging(String loggerOutputPath) throws IOException {
-    // create new handler for file logging and add it
-    FileHandler fileHandler = new FileHandler(loggerOutputPath);
     // specifies how logging output lines should appear
     LogFormatter formatter = new LogFormatter();
+    // create new handler for file logging and add it
+    FileHandler fileHandler = new FileHandler(loggerOutputPath);
     fileHandler.setFormatter(formatter);
+    fileHandler.setLevel(Level.FINER);
     // get the tabulationLogger logger and add file handler
     tabulationLogger.addHandler(fileHandler);
+    tabulationLogger.setLevel(Level.FINER);
   }
 
   // function: removeTabulationFileLogging

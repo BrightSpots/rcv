@@ -45,16 +45,16 @@ class JsonParser {
       // object is the newly created object populated with json values
       createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException jsonException) {
-      Logger.executionLog(Level.SEVERE, "Error parsing JSON file: %s", jsonFilePath);
+      Logger.executionLog(
+          Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, jsonException.toString());
       Logger.executionLog(
           Level.SEVERE, "Check your file formatting and values to make sure they are correct.");
-      Logger.executionLog(Level.SEVERE, jsonException.getMessage());
       createdObject = null;
     } catch (IOException fileException) {
-      Logger.executionLog(Level.SEVERE, "Error opening file: %s", jsonFilePath);
+      Logger.executionLog(
+          Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, fileException.toString());
       Logger.executionLog(
           Level.SEVERE, "Check your file path and permissions and make sure they are correct.");
-      Logger.executionLog(Level.SEVERE, fileException.toString());
       createdObject = null;
     }
     return createdObject;
@@ -66,8 +66,11 @@ class JsonParser {
     try {
       mapper.writer().withDefaultPrettyPrinter().writeValue(jsonFile, config);
     } catch (IOException fileException) {
-      Logger.executionLog(Level.SEVERE, "Error saving file: %s", jsonFile.getAbsolutePath());
-      Logger.executionLog(Level.SEVERE, fileException.toString());
+      Logger.executionLog(
+          Level.SEVERE,
+          "Error saving file: %s\n%s",
+          jsonFile.getAbsolutePath(),
+          fileException.toString());
       response = "FAILURE";
     }
     return response;

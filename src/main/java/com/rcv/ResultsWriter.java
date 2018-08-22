@@ -154,6 +154,8 @@ class ResultsWriter {
   // file access: write / create
   private void generateSummarySpreadsheet(
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath) {
+    Logger.tabulationLog(Level.INFO, "Generating summary spreadsheet: %s", outputPath);
+
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
     Map<String, BigDecimal> firstRoundTally = roundTallies.get(1);

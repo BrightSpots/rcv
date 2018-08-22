@@ -60,9 +60,9 @@ public class GuiMenuController implements Initializable {
 
   public void buttonTabulateClicked() {
     if (GuiContext.getInstance().getConfig() != null) {
-      Main.executeTabulation(GuiContext.getInstance().getConfig());
+      new Thread(() -> Main.executeTabulation(GuiContext.getInstance().getConfig())).start();
     } else {
-      Logger.executionLog(Level.WARNING, "Please load a config before attempting to tabulate!");
+      Logger.guiLog(Level.WARNING, "Please load a config file before attempting to tabulate!");
     }
   }
 

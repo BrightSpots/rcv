@@ -45,7 +45,7 @@ public class Main extends GuiApplication {
     try {
       Logger.setup();
     } catch (IOException exception) {
-      System.err.print(String.format("Failed to start system logging: %s", exception.toString()));
+      System.err.print(String.format("Failed to start system logging!\n%s", exception.toString()));
     }
 
     if (args.length == 0) {
@@ -53,16 +53,18 @@ public class Main extends GuiApplication {
       launch(args);
     } else {
       // assume user wants to use CLI
+      Logger.executionLog(Level.INFO, "Tabulator is being used via the CLI.");
       String configPath = args[0];
       // config file for running the tabulator
       ElectionConfig config = loadElectionConfig(configPath);
       if (config != null) {
-        Logger.executionLog(Level.INFO, "Tabulator is being used via the CLI.");
         executeTabulation(config);
       } else {
         Logger.executionLog(Level.SEVERE, "Aborting because config is invalid.");
       }
     }
+
+    System.exit(0);
   }
 
   // function: loadElectionConfig
@@ -95,36 +97,36 @@ public class Main extends GuiApplication {
   // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
   static void executeTabulation(ElectionConfig config) {
+    Logger.executionLog(Level.INFO, "Starting tabulation process...");
+
+    boolean isTabulationCompleted = false;
     boolean isConfigValid = config.validate();
 
     if (isConfigValid) {
-      Logger.allLogs(Level.INFO, "Starting tabulation...");
-
-      // flag indicating tabulation success
-      boolean encounteredError = false;
+      boolean isTabulationLogSetUp = false;
       // current date-time formatted as a string used for creating unique output files names
-      String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-      // create tabulation log file name and path
-      String logFileName = String.format("%s_audit.log", timestampString);
-      String tabulationLogPath = Paths.get(config.getOutputDirectory(), logFileName).toString();
+      final String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+      String tabulationLogPath =
+          Paths.get(config.getOutputDirectory(), String.format("%s_audit.log", timestampString))
+              .toString();
+
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         Logger.addTabulationFileLogging(tabulationLogPath);
-        Logger.allLogs(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
+        isTabulationLogSetUp = true;
       } catch (UnableToCreateDirectoryException exception) {
         Logger.executionLog(
             Level.SEVERE,
             "Failed to create output directory: %s\n%s",
             config.getOutputDirectory(),
             exception.toString());
-        encounteredError = true;
       } catch (IOException exception) {
         Logger.executionLog(
-            Level.SEVERE, "Failed to configure tabulation logger: %s", exception.toString());
-        encounteredError = true;
+            Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
       }
 
-      if (!encounteredError) {
+      if (isTabulationLogSetUp) {
+        Logger.allLogs(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
         // Read cast vote records from CVR files
         // castVoteRecords will contain all cast vote records parsed by the reader
         List<CastVoteRecord> castVoteRecords;
@@ -140,17 +142,22 @@ public class Main extends GuiApplication {
             tabulator.generateSummarySpreadsheet(timestampString);
             // generate audit data
             tabulator.doAudit(castVoteRecords);
+            isTabulationCompleted = true;
           } else {
             Logger.tabulationLog(Level.SEVERE, "No cast vote records found.");
           }
         } else {
           Logger.tabulationLog(Level.SEVERE, "Skipping tabulation due to source file errors.");
         }
-      } else {
-        Logger.executionLog(Level.SEVERE, "Unable to complete tabulation.");
+        Logger.allLogs(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
+        Logger.removeTabulationFileLogging();
       }
-      Logger.allLogs(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
-      Logger.removeTabulationFileLogging();
+    }
+
+    if (isTabulationCompleted) {
+      Logger.executionLog(Level.INFO, "Tabulation process completed.");
+    } else {
+      Logger.executionLog(Level.SEVERE, "Unable to complete tabulation process!");
     }
   }
 
@@ -159,6 +166,8 @@ public class Main extends GuiApplication {
   // param: config object containing CVR file paths to parse
   // returns: list of all CastVoteRecord objects parsed from CVR files (or null if there's an error)
   private static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config) {
+    Logger.tabulationLog(Level.INFO, "Parsing cast vote records...");
+
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     // how many sources had fatal problems?
@@ -251,6 +260,12 @@ public class Main extends GuiApplication {
     if (numInvalidSources > 0) {
       Logger.tabulationLog(Level.SEVERE, "Encountered %d invalid source(s)", numInvalidSources);
       castVoteRecords = null;
+    }
+
+    if (castVoteRecords != null) {
+      Logger.tabulationLog(Level.INFO, "Parsing cast vote records completed.");
+    } else {
+      Logger.tabulationLog(Level.SEVERE, "Parsing cast vote records failed!");
     }
 
     return castVoteRecords;
