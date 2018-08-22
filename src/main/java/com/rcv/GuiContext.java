@@ -25,32 +25,35 @@ import javafx.scene.layout.VBox;
 class GuiContext {
 
   // context instance
-  private static final GuiContext instance = new GuiContext();
+  private static final GuiContext INSTANCE = new GuiContext();
   // currently-loaded tabulator config
-  private static ElectionConfig config;
+  private ElectionConfig config;
   // file selected for loading
-  private static File selectedFile;
+  private File selectedFile;
   // VBox for displaying main content
   private VBox contentVBox;
 
-  static GuiContext getInstance() {
-    return instance;
+  private GuiContext() {
   }
 
-  static ElectionConfig getConfig() {
+  static GuiContext getInstance() {
+    return INSTANCE;
+  }
+
+  ElectionConfig getConfig() {
     return config;
   }
 
-  static void setConfig(ElectionConfig config) {
-    GuiContext.config = config;
+  void setConfig(ElectionConfig config) {
+    this.config = config;
   }
 
-  static File getSelectedFile() {
+  File getSelectedFile() {
     return selectedFile;
   }
 
-  static void setSelectedFile(File selectedFile) {
-    GuiContext.selectedFile = selectedFile;
+  void setSelectedFile(File selectedFile) {
+    this.selectedFile = selectedFile;
   }
 
   private VBox getContentVBox() {

@@ -81,12 +81,15 @@ class Logger {
     FileHandler fileHandler =
         new FileHandler(logPath, EXECUTION_LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
     fileHandler.setFormatter(formatter);
+    fileHandler.setLevel(Level.FINE);
     // create a consoleHandler to writes formatted strings to console for debugging
     ConsoleHandler consoleHandler = new ConsoleHandler();
     consoleHandler.setFormatter(formatter);
-    // add the  handlers
+    consoleHandler.setLevel(Level.FINE);
+    // add the handlers
     executionLogger.addHandler(consoleHandler);
     executionLogger.addHandler(fileHandler);
+    executionLogger.setLevel(Level.FINE);
 
     // create and cache the tabulation logger object
     // whenever a tabulation happens we will add tabulation-specific file handlers to it
@@ -124,9 +127,10 @@ class Logger {
   }
 
   // setup logging to the provided text area
-  static void addGUILogging(TextArea textArea) {
+  static void addGuiLogging(TextArea textArea) {
     guiLogger = java.util.logging.Logger.getLogger(GUI_LOGGER_NAME);
     LogFormatter formatter = new LogFormatter();
+    // TODO: Prevent double-logging to console (i.e. why guiLogger is appearing in console at all?)
     guiLogger.addHandler(
         new Handler() {
 

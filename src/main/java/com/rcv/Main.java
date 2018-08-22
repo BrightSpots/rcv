@@ -25,6 +25,7 @@
 package com.rcv;
 
 import com.rcv.CVRReader.SourceWithUnrecognizedCandidatesException;
+import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -107,9 +108,16 @@ public class Main extends GuiApplication {
       String logFileName = String.format("%s_audit.log", timestampString);
       String tabulationLogPath = Paths.get(config.getOutputDirectory(), logFileName).toString();
       try {
-        // add tabulation logger
+        FileUtils.createOutputDirectory(config.getOutputDirectory());
         Logger.addTabulationFileLogging(tabulationLogPath);
         Logger.allLogs(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
+      } catch (UnableToCreateDirectoryException exception) {
+        Logger.executionLog(
+            Level.SEVERE,
+            "Failed to create output directory: %s\n%s",
+            config.getOutputDirectory(),
+            exception.toString());
+        encounteredError = true;
       } catch (IOException exception) {
         Logger.executionLog(
             Level.SEVERE, "Failed to configure tabulation logger: %s", exception.toString());

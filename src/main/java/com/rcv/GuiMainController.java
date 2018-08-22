@@ -34,8 +34,8 @@ public class GuiMainController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.addGUILogging(this.textAreaStatus);
-    Logger.executionLog(Level.INFO, "Opening GUI...");
+    Logger.addGuiLogging(this.textAreaStatus);
+    Logger.executionLog(Level.FINE, "Opening GUI...");
     GuiContext.getInstance().setContentVBox(vBoxContent);
     GuiContext.getInstance().showContent("/GuiMenuLayout.fxml");
   }

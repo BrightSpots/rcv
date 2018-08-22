@@ -31,14 +31,14 @@ public class GuiMenuController implements Initializable {
   }
 
   public void buttonCreateConfigClicked() {
-    GuiContext.setConfig(null);
-    GuiContext.setSelectedFile(null);
+    GuiContext.getInstance().setConfig(null);
+    GuiContext.getInstance().setSelectedFile(null);
     openConfigCreator();
   }
 
   public void buttonModifyConfigClicked() {
     buttonLoadConfigClicked();
-    if (GuiContext.getConfig() != null) {
+    if (GuiContext.getInstance().getConfig() != null) {
       openConfigCreator();
     }
   }
@@ -49,15 +49,18 @@ public class GuiMenuController implements Initializable {
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Load Config");
 
-    GuiContext.setSelectedFile(fc.showOpenDialog(null));
-    if (GuiContext.getSelectedFile() != null) {
-      GuiContext.setConfig(Main.loadElectionConfig(GuiContext.getSelectedFile().getAbsolutePath()));
+    GuiContext.getInstance().setSelectedFile(fc.showOpenDialog(null));
+    if (GuiContext.getInstance().getSelectedFile() != null) {
+      GuiContext.getInstance()
+          .setConfig(
+              Main.loadElectionConfig(
+                  GuiContext.getInstance().getSelectedFile().getAbsolutePath()));
     }
   }
 
   public void buttonTabulateClicked() {
-    if (GuiContext.getConfig() != null) {
-      Main.executeTabulation(GuiContext.getConfig());
+    if (GuiContext.getInstance().getConfig() != null) {
+      Main.executeTabulation(GuiContext.getInstance().getConfig());
     } else {
       Logger.executionLog(Level.WARNING, "Please load a config before attempting to tabulate!");
     }
@@ -65,6 +68,6 @@ public class GuiMenuController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.executionLog(Level.INFO, "Opening main menu GUI...");
+    Logger.executionLog(Level.FINE, "Opening main menu GUI...");
   }
 }

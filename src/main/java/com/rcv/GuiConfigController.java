@@ -142,24 +142,33 @@ public class GuiConfigController implements Initializable {
 
   public void buttonMenuClicked() {
     GuiContext.getInstance().showContent("/GuiMenuLayout.fxml");
-    GuiContext.setConfig(null);
-    GuiContext.setSelectedFile(null);
+    GuiContext.getInstance().setConfig(null);
+    GuiContext.getInstance().setSelectedFile(null);
+  }
+
+  public void buttonValidateClicked() {
+    new ElectionConfig(createRawElectionConfig()).validate();
   }
 
   public void buttonSaveClicked() {
     FileChooser fc = new FileChooser();
-    if (GuiContext.getSelectedFile() == null) {
+    if (GuiContext.getInstance().getSelectedFile() == null) {
       fc.setInitialDirectory(new File(System.getProperty("user.dir")));
     } else {
-      fc.setInitialDirectory(new File(GuiContext.getSelectedFile().getParent()));
-      fc.setInitialFileName(GuiContext.getSelectedFile().getName());
+      fc.setInitialDirectory(new File(GuiContext.getInstance().getSelectedFile().getParent()));
+      fc.setInitialFileName(GuiContext.getInstance().getSelectedFile().getName());
     }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
 
     File saveFile = fc.showSaveDialog(null);
     if (saveFile != null) {
-      saveElectionConfig(saveFile);
+      String response =
+          JsonParser.createFileFromRawElectionConfig(saveFile, createRawElectionConfig());
+      if (response.equals("SUCCESS")) {
+        Logger.executionLog(
+            Level.INFO, "Saved config via the GUI to: %s", saveFile.getAbsolutePath());
+      }
     }
   }
 
@@ -243,7 +252,7 @@ public class GuiConfigController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.executionLog(Level.INFO, "Opening config creator GUI...");
+    Logger.executionLog(Level.FINE, "Opening config creator GUI...");
 
     String helpText;
     try {
@@ -325,8 +334,8 @@ public class GuiConfigController implements Initializable {
     textFieldMinimumVoteThreshold.setText(
         String.valueOf(ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
 
-    if (GuiContext.getConfig() != null) {
-      loadConfig(GuiContext.getConfig());
+    if (GuiContext.getInstance().getConfig() != null) {
+      loadConfig(GuiContext.getInstance().getConfig());
     }
   }
 
@@ -389,7 +398,7 @@ public class GuiConfigController implements Initializable {
     return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
   }
 
-  private void saveElectionConfig(File saveFile) {
+  private RawElectionConfig createRawElectionConfig() {
     RawElectionConfig config = new RawElectionConfig();
     RawElectionConfig.ElectionRules rules = new RawElectionConfig.ElectionRules();
 
@@ -433,11 +442,7 @@ public class GuiConfigController implements Initializable {
     rules.rulesDescription = textFieldRulesDescription.getText();
     config.rules = rules;
 
-    String response = JsonParser.createFileFromRawElectionConfig(saveFile, config);
-    if (response.equals("SUCCESS")) {
-      Logger.executionLog(
-          Level.INFO, "Saved config via the GUI to: %s", saveFile.getAbsolutePath());
-    }
+    return config;
   }
 
   private class TextFieldListenerNonNegInt implements ChangeListener<String> {

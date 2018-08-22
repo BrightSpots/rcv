@@ -20,7 +20,6 @@
 
 package com.rcv;
 
-import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import com.rcv.Tabulator.TieBreakMode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -60,18 +59,7 @@ class ElectionConfig {
     boolean isValid = true;
 
     Logger.executionLog(Level.INFO, "Validating config file...");
-
-    try {
-      FileUtils.createOutputDirectory(this.getOutputDirectory());
-    } catch (UnableToCreateDirectoryException exception) {
-      isValid = false;
-      Logger.executionLog(
-          Level.SEVERE,
-          String.format(
-              "Failed to create output directory: %s\n%s",
-              this.getOutputDirectory(), exception.toString()));
-    }
-
+    // TODO: reorder all checks so they go in same order as fields in config GUI
     // TODO: need to add checks that all required String fields !.equals("")
 
     if (getNumDeclaredCandidates() == 0) {
@@ -85,7 +73,7 @@ class ElectionConfig {
     }
 
     if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
-      // TODO: report what the invalid value was?
+      isValid = false;
       Logger.executionLog(Level.SEVERE, "Invalid overvote rule.");
     } else if (getOvervoteLabel() != null
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
@@ -119,7 +107,6 @@ class ElectionConfig {
     }
 
     // If this is a multi-seat election, we validate a number of extra parameters.
-    //
     if (getNumberOfWinners() > 1) {
       if (willContinueUntilTwoCandidatesRemain()) {
         isValid = false;
@@ -196,11 +183,9 @@ class ElectionConfig {
   // returns: directory string from config or falls back to working directory
   String getOutputDirectory() {
     // outputDirectory is where output files should be written
-    String outputDirectory = System.getProperty("user.dir");
-    if (rawConfig.outputDirectory != null) {
-      outputDirectory = rawConfig.outputDirectory;
-    }
-    return outputDirectory;
+    return rawConfig.outputDirectory != null
+        ? rawConfig.outputDirectory
+        : System.getProperty("user.dir");
   }
 
   // function: willContinueUntilTwoCandidatesRemain
@@ -384,7 +369,8 @@ class ElectionConfig {
     if (rawConfig.candidates != null) {
       // candidate is used to index through all candidates for this election
       for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
-        if (candidate.getCode() != null) {
+        // TODO: go through and add checks for isEmpty in all other String != null situations?
+        if (candidate.getCode() != null && !candidate.getCode().isEmpty()) {
           candidateCodeToNameMap.put(candidate.getCode(), candidate.getName());
           candidatePermutation.add(candidate.getCode());
         } else {
@@ -398,7 +384,7 @@ class ElectionConfig {
       }
 
       String uwiLabel = getUndeclaredWriteInLabel();
-      if (uwiLabel != null) {
+      if (uwiLabel != null && !uwiLabel.isEmpty()) {
         candidateCodeToNameMap.put(uwiLabel, uwiLabel);
       }
     }
