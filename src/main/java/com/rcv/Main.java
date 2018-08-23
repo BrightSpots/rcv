@@ -170,102 +170,52 @@ public class Main extends GuiApplication {
 
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    // how many sources had fatal problems?
-    int numInvalidSources = 0;
+    // did we encounter a fatal problem for this source?
+    boolean encounteredSourceProblem = false;
 
-    if (config.rawConfig.cvrFileSources == null || config.rawConfig.cvrFileSources.isEmpty()) {
-      Logger.tabulationLog(Level.SEVERE, "Config doesn't contain any CVR input files.");
-    } else {
-      // At each iteration of the following loop, we add records from another source file.
-      // source: index over config sources
-      for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
+    // At each iteration of the following loop, we add records from another source file.
+    // source: index over config sources
+    for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
+      String logMessage = String.format("Reading CVR file: %s", source.getFilePath());
+      if (source.getProvider() != null && !source.getProvider().isEmpty()) {
+        logMessage += String.format(" (provider: %s)", source.getProvider());
+      }
+      Logger.tabulationLog(Level.INFO, logMessage);
+
+      // the CVRs parsed from this source
+      try {
+        List<CastVoteRecord> cvrs = new CVRReader(config, source).parseCVRFile();
+        if (cvrs.isEmpty()) {
+          Logger.tabulationLog(
+              Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
+          encounteredSourceProblem = true;
+        }
+        // add records to the master list
+        castVoteRecords.addAll(cvrs);
+      } catch (SourceWithUnrecognizedCandidatesException exception) {
         Logger.tabulationLog(
-            Level.INFO,
-            "Reading CVR file: %s (provider: %s)",
-            source.getFilePath(),
-            source.getProvider());
-
-        // did we encounter a fatal problem for this source?
-        boolean encounteredProblemForThisSource = false;
-
-        if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
-          Logger.tabulationLog(Level.SEVERE, "Invalid source file: missing filePath");
-          encounteredProblemForThisSource = true;
-        }
-
-        if (source.getFirstVoteColumnIndex() == null || source.getFirstVoteColumnIndex() < 0) {
+            Level.SEVERE,
+            "Source file contains unrecognized candidate(s): %s",
+            source.getFilePath());
+        // map from name to number of times encountered
+        Map<String, Integer> candidateCounts = exception.getCandidateCounts();
+        for (String candidate : candidateCounts.keySet()) {
           Logger.tabulationLog(
               Level.SEVERE,
-              "Invalid source file: missing or invalid firstVoteColumnIndex: %s",
-              source.getFilePath());
-          encounteredProblemForThisSource = true;
+              "Unrecognized candidate \"%s\" appears %d time(s).",
+              candidate,
+              candidateCounts.get(candidate));
         }
-
-        if (config.isTabulateByPrecinctEnabled()
-            && (source.getPrecinctColumnIndex() == null || source.getPrecinctColumnIndex() < 0)) {
-          Logger.tabulationLog(
-              Level.SEVERE,
-              "Invalid source file: missing or invalid precinctColumnIndex when "
-                  + "tabulateByPrecinct is enabled: %s",
-              source.getFilePath());
-          encounteredProblemForThisSource = true;
-        }
-
-        if (!encounteredProblemForThisSource) {
-          // reader: read input file into a list of cast vote records
-          CVRReader reader =
-              new CVRReader(
-                  config,
-                  source.getFilePath(),
-                  source.getFirstVoteColumnIndex(),
-                  source.getIdColumnIndex(),
-                  source.getPrecinctColumnIndex());
-          // the CVRs parsed from this source
-          try {
-            List<CastVoteRecord> cvrs = reader.parseCVRFile();
-            if (cvrs.isEmpty()) {
-              Logger.tabulationLog(
-                  Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
-              encounteredProblemForThisSource = true;
-            }
-            // add records to the master list
-            castVoteRecords.addAll(cvrs);
-          } catch (SourceWithUnrecognizedCandidatesException e) {
-            Logger.tabulationLog(
-                Level.SEVERE,
-                "Source file contains unrecognized candidate(s): %s",
-                source.getFilePath());
-            // map from name to number of times encountered
-            Map<String, Integer> candidateCounts = e.getCandidateCounts();
-            for (String candidate : candidateCounts.keySet()) {
-              Logger.tabulationLog(
-                  Level.SEVERE,
-                  "Unrecognized candidate \"%s\" appears %d time(s)",
-                  candidate,
-                  candidateCounts.get(candidate));
-            }
-            encounteredProblemForThisSource = true;
-          }
-        }
-
-        if (encounteredProblemForThisSource) {
-          numInvalidSources++;
-        }
-      }
-      if (numInvalidSources == 0) {
-        Logger.tabulationLog(Level.INFO, "Read %d cast vote records", castVoteRecords.size());
+        encounteredSourceProblem = true;
       }
     }
 
-    if (numInvalidSources > 0) {
-      Logger.tabulationLog(Level.SEVERE, "Encountered %d invalid source(s)", numInvalidSources);
-      castVoteRecords = null;
-    }
-
-    if (castVoteRecords != null) {
-      Logger.tabulationLog(Level.INFO, "Parsing cast vote records completed.");
+    if (!encounteredSourceProblem) {
+      Logger.tabulationLog(
+          Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
     } else {
       Logger.tabulationLog(Level.SEVERE, "Parsing cast vote records failed!");
+      castVoteRecords = null;
     }
 
     return castVoteRecords;

@@ -216,8 +216,8 @@ class Tabulator {
     }
 
     if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      Logger
-          .tabulationLog(Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
+      Logger.tabulationLog(
+          Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
       // candidateID indexes over all candidates in ordered list
       for (String candidateID : config.getCandidatePermutation()) {
         Logger.tabulationLog(Level.INFO, "%s", candidateID);
@@ -393,6 +393,7 @@ class Tabulator {
     String label = config.getUndeclaredWriteInLabel();
     if (currentRound == 1
         && label != null
+        && !label.isEmpty()
         && candidateIDs.contains(label)
         && currentRoundCandidateToTally.get(label).signum() == 1) {
       eliminated.add(label);
@@ -754,7 +755,7 @@ class Tabulator {
             }
             candidatesSeen.add(candidate);
           }
-          if (duplicateCandidate != null) {
+          if (duplicateCandidate != null && !duplicateCandidate.isEmpty()) {
             cvr.exhaust("duplicate candidate: " + duplicateCandidate);
             break;
           }
@@ -796,7 +797,9 @@ class Tabulator {
             // this candidate wins, but there are still more winners to come.
             cvr.setCurrentRecipientOfVote(selectedCandidateID);
 
-            if (config.isTabulateByPrecinctEnabled() && cvr.getPrecinct() != null) {
+            if (config.isTabulateByPrecinctEnabled()
+                && cvr.getPrecinct() != null
+                && !cvr.getPrecinct().isEmpty()) {
               incrementTally(
                   roundTallyByPrecinct.get(cvr.getPrecinct()),
                   fractionalTransferValue,
@@ -805,7 +808,7 @@ class Tabulator {
           }
         }
 
-        if (selectedCandidateID != null) {
+        if (selectedCandidateID != null && !selectedCandidateID.isEmpty()) {
           // we've found our candidate
           break;
         }
@@ -862,7 +865,7 @@ class Tabulator {
     for (CastVoteRecord cvr : castVoteRecords) {
       // the precinct for this cast vote record
       String precinct = cvr.getPrecinct();
-      if (precinct != null && !precinctRoundTallies.containsKey(precinct)) {
+      if (precinct != null && !precinct.isEmpty() && !precinctRoundTallies.containsKey(precinct)) {
         precinctRoundTallies.put(precinct, new HashMap<>());
       }
     }

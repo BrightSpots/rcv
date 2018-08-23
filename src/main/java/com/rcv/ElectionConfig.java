@@ -20,12 +20,15 @@
 
 package com.rcv;
 
+import com.rcv.RawElectionConfig.CVRSource;
+import com.rcv.RawElectionConfig.Candidate;
 import com.rcv.Tabulator.TieBreakMode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -59,23 +62,119 @@ class ElectionConfig {
     boolean isValid = true;
 
     Logger.executionLog(Level.INFO, "Validating config...");
-    // TODO: reorder all checks so they go in same order as fields in config GUI
-    // TODO: need to add checks that all required String fields !.equals("")
 
-    if (getNumDeclaredCandidates() == 0) {
+    if (getContestName() == null || getContestName().isEmpty()) {
+      isValid = false;
+      Logger.executionLog(Level.SEVERE, "Contest name is required.");
+    }
+
+    if (getOutputDirectory() == null || getOutputDirectory().isEmpty()) {
+      isValid = false;
+      Logger.executionLog(Level.SEVERE, "Output directory is required.");
+    }
+
+    if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
+      isValid = false;
+      Logger.executionLog(Level.SEVERE, "Config doesn't contain any CVR files.");
+    } else {
+      HashSet<String> cvrFilePathSet = new HashSet<>();
+      for (CVRSource source : rawConfig.cvrFileSources) {
+        if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
+          isValid = false;
+          Logger.executionLog(Level.SEVERE, "filePath is required for each CVR file.");
+        } else if (cvrFilePathSet.contains(source.getFilePath())) {
+          isValid = false;
+          Logger.executionLog(
+              Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s", source.getFilePath());
+        } else {
+          cvrFilePathSet.add(source.getFilePath());
+        }
+
+        if (source.getFirstVoteColumnIndex() == null) {
+          isValid = false;
+          Logger.executionLog(
+              Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFilePath());
+        } else if (source.getFirstVoteColumnIndex() < 0
+            || source.getFirstVoteColumnIndex() > 1000) {
+          isValid = false;
+          Logger.executionLog(
+              Level.SEVERE,
+              "firstVoteColumnIndex must be from 0 to 1000: %s",
+              source.getFilePath());
+        }
+
+        if (source.getIdColumnIndex() != null
+            && (source.getIdColumnIndex() < 0 || source.getIdColumnIndex() > 1000)) {
+          isValid = false;
+          Logger.executionLog(
+              Level.SEVERE, "idColumnIndex must be from 0 to 1000: %s", source.getFilePath());
+        }
+
+        if (isTabulateByPrecinctEnabled()) {
+          if (source.getPrecinctColumnIndex() == null) {
+            isValid = false;
+            Logger.executionLog(
+                Level.SEVERE,
+                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
+                source.getFilePath());
+          } else if (source.getPrecinctColumnIndex() < 0
+              || source.getPrecinctColumnIndex() > 1000) {
+            isValid = false;
+            Logger.executionLog(
+                Level.SEVERE,
+                "precinctColumnIndex must be from 0 to 1000: %s",
+                source.getFilePath());
+          }
+        }
+      }
+    }
+
+    HashSet<String> candidateNameSet = new HashSet<>();
+    HashSet<String> candidateCodeSet = new HashSet<>();
+    for (Candidate candidate : rawConfig.candidates) {
+      if (candidate.getName() == null || candidate.getName().isEmpty()) {
+        isValid = false;
+        Logger.executionLog(Level.SEVERE, "Name is required for each candidate.");
+      } else if (candidateNameSet.contains(candidate.getName())) {
+        isValid = false;
+        Logger.executionLog(
+            Level.SEVERE, "Duplicate candidate names are not allowed: %s", candidate.getName());
+      } else {
+        candidateNameSet.add(candidate.getName());
+      }
+
+      if (candidate.getCode() != null && !candidate.getCode().isEmpty()) {
+        if (candidateCodeSet.contains(candidate.getCode())) {
+          isValid = false;
+          Logger.executionLog(
+              Level.SEVERE, "Duplicate candidate codes are not allowed: %s", candidate.getCode());
+        } else {
+          candidateCodeSet.add(candidate.getCode());
+        }
+      }
+    }
+
+    if (candidateCodeSet.size() > 0 && candidateCodeSet.size() != candidateNameSet.size()) {
+      isValid = false;
+      Logger.executionLog(
+          Level.SEVERE,
+          "If candidate codes are used, a unique code is required for each candidate.");
+    }
+
+    if (getNumDeclaredCandidates() < 1) {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "Config must contain at least one declared candidate.");
     }
 
-    if (getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
+    if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "Number of winners must be between 1 and 100");
+      Logger.executionLog(Level.SEVERE, "Invalid tie-break mode.");
     }
 
     if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "Invalid overvote rule.");
-    } else if (getOvervoteLabel() != null
+    } else if ((getOvervoteLabel() != null && !getOvervoteLabel().isEmpty())
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       isValid = false;
@@ -85,25 +184,30 @@ class ElectionConfig {
               + "or alwaysSkipToNextRank.");
     }
 
-    if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
+    if (getMaxRankingsAllowed() == null) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "Invalid tie-break mode.");
+      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed is required.");
+    } else if (getMaxRankingsAllowed() < 1 || getMaxRankingsAllowed() > 100) {
+      isValid = false;
+      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed must be from 1 to 100.");
     }
 
     if (getMaxSkippedRanksAllowed() == null) {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "maxSkippedRanksAllowed is required.");
-    } else if (getMaxSkippedRanksAllowed() < 0) {
+    } else if (getMaxSkippedRanksAllowed() < 0 || getMaxSkippedRanksAllowed() > 100) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "maxSkippedRanksAllowed can't be negative.");
+      Logger.executionLog(Level.SEVERE, "maxSkippedRanksAllowed must be from 0 to 100.");
     }
 
-    if (getMaxRankingsAllowed() == null) {
+    if (getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed is required.");
-    } else if (getMaxRankingsAllowed() < 1) {
+      Logger.executionLog(Level.SEVERE, "numberOfWinners must be from 1 to 100.");
+    }
+
+    if (getMinimumVoteThreshold().intValue() < 0 || getMinimumVoteThreshold().intValue() > 10000) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed must be greater than zero.");
+      Logger.executionLog(Level.SEVERE, "minimumVoteThreshold must be from 0 to 10000.");
     }
 
     // If this is a multi-seat election, we validate a number of extra parameters.
@@ -123,8 +227,7 @@ class ElectionConfig {
 
       if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
         isValid = false;
-        Logger.executionLog(
-            Level.SEVERE, "decimalPlacesForVoteArithmetic must be between 0 and 20 (inclusive).");
+        Logger.executionLog(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 0 to 20.");
       }
 
       if (getMultiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
@@ -183,7 +286,7 @@ class ElectionConfig {
   // returns: directory string from config or falls back to working directory
   String getOutputDirectory() {
     // outputDirectory is where output files should be written
-    return rawConfig.outputDirectory != null
+    return (rawConfig.outputDirectory != null && !rawConfig.outputDirectory.isEmpty())
         ? rawConfig.outputDirectory
         : System.getProperty("user.dir");
   }
@@ -258,7 +361,7 @@ class ElectionConfig {
   int getNumDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = getCandidateCodeList().size();
-    if (getUndeclaredWriteInLabel() != null
+    if ((getUndeclaredWriteInLabel() != null && !getUndeclaredWriteInLabel().isEmpty())
         && getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
       num--;
     }
@@ -369,13 +472,16 @@ class ElectionConfig {
     if (rawConfig.candidates != null) {
       // candidate is used to index through all candidates for this election
       for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
-        // TODO: go through and add checks for isEmpty in all other String != null situations?
-        if (candidate.getCode() != null && !candidate.getCode().isEmpty()) {
-          candidateCodeToNameMap.put(candidate.getCode(), candidate.getName());
-          candidatePermutation.add(candidate.getCode());
-        } else {
-          candidateCodeToNameMap.put(candidate.getName(), candidate.getName());
-          candidatePermutation.add(candidate.getName());
+        String code = candidate.getCode();
+        String name = candidate.getName();
+        if (code != null && !code.isEmpty()) {
+          if (!candidateCodeToNameMap.keySet().contains(code)) {
+            candidateCodeToNameMap.put(code, name);
+            candidatePermutation.add(code);
+          }
+        } else if (!candidateCodeToNameMap.keySet().contains(name)) {
+          candidateCodeToNameMap.put(name, name);
+          candidatePermutation.add(name);
         }
       }
 

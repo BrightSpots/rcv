@@ -187,7 +187,10 @@ class ResultsWriter {
     // rowCounter contains the next empty row after all the general header rows have been created.
     // This is where we start adding round-by-round reports. For precinct sheets, there are no
     // general header rows, so we just start with the round-by-round reports.
-    int rowCounter = precinct != null ? 0 : addHeaderRows(worksheet, totalActiveVotesPerRound);
+    int rowCounter =
+        precinct != null && !precinct.isEmpty()
+            ? 0
+            : addHeaderRows(worksheet, totalActiveVotesPerRound);
 
     // column indexes are computed for all cells as we create the output xlsx spreadsheet
     int columnIndex;
@@ -221,7 +224,8 @@ class ResultsWriter {
       }
     }
 
-    if (precinct == null) { // actions don't make sense in individual precinct results
+    // actions don't make sense in individual precinct results
+    if (precinct == null || precinct.isEmpty()) {
       rowCounter = addActionRows(worksheet, rowCounter);
     }
 
@@ -435,9 +439,9 @@ class ResultsWriter {
       FileOutputStream outputStream = new FileOutputStream(outputPath);
       workbook.write(outputStream);
       outputStream.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-      Logger.tabulationLog(Level.SEVERE, "Failed to save: %s", outputPath);
+    } catch (IOException exception) {
+      Logger.tabulationLog(
+          Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
     }
   }
 

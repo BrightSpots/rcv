@@ -24,7 +24,7 @@ import java.io.File;
 class FileUtils {
 
   static void createOutputDirectory(String dir) throws UnableToCreateDirectoryException {
-    if (dir != null) {
+    if (dir != null && !dir.isEmpty()) {
       // dirFile is the File object for dir
       File dirFile = new File(dir);
       if (!dirFile.exists() && !dirFile.mkdirs()) {

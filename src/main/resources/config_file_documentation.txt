@@ -113,13 +113,13 @@ Config file must be valid JSON format. Examples can be found under the test fold
 
       "numberOfWinners" optional
         the number of seats to be won in this election
-        value: [1..1000]
+        value: [1..100]
         default: 1
 
       "decimalPlacesForVoteArithmetic" optional
         number of rounding decimal places when computing fractional vote transfers and winning thresholds
         valid in multi-seat contests with fractional vote transfer
-        value: [0..10]
+        value: [0..20]
         default: 4
 
       "minimumVoteThreshold" optional

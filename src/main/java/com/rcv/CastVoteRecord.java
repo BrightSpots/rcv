@@ -174,11 +174,11 @@ class CastVoteRecord {
     StringBuilder auditStringBuilder = new StringBuilder();
     auditStringBuilder.append(" [Computed ID] ");
     auditStringBuilder.append(computedID);
-    if (suppliedID != null) {
+    if (suppliedID != null && !suppliedID.isEmpty()) {
       auditStringBuilder.append(" [Supplied ID] ");
       auditStringBuilder.append(suppliedID);
     }
-    if (precinct != null) {
+    if (precinct != null && !precinct.isEmpty()) {
       auditStringBuilder.append(" [Precinct] ");
       auditStringBuilder.append(precinct);
     }

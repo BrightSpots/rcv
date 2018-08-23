@@ -204,8 +204,6 @@ public class GuiConfigController implements Initializable {
 
   public void buttonAddCvrFileClicked() {
     CVRSource cvrSource = new CVRSource();
-    // TODO: check if CVR source is already in list?
-    // TODO: Need to convey below warnings in the UI; also consider moving validation to setter
     if (textFieldCvrFilePath.getText().isEmpty()) {
       Logger.guiLog(Level.WARNING, "CVR file path is required!");
     } else if (textFieldCvrFirstVoteCol.getText().isEmpty()) {
@@ -233,8 +231,6 @@ public class GuiConfigController implements Initializable {
 
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
-    // TODO: check if candidate is already in list?
-    // TODO: Need to convey this in the UI; also consider moving validation to setter
     if (textFieldCandidateName.getText().isEmpty()) {
       Logger.guiLog(Level.WARNING, "Candidate name field is required!");
     } else {
