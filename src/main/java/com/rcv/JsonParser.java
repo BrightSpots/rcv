@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -44,17 +44,17 @@ class JsonParser {
       ObjectMapper objectMapper = new ObjectMapper();
       // object is the newly created object populated with json values
       createdObject = objectMapper.readValue(fileReader, valueType);
-    } catch (JsonParseException | JsonMappingException jsonException) {
-      Logger.executionLog(Level.SEVERE, "Error parsing JSON file: %s", jsonFilePath);
+    } catch (JsonParseException | JsonMappingException exception) {
+      Logger.executionLog(
+          Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
       Logger.executionLog(
           Level.SEVERE, "Check your file formatting and values to make sure they are correct.");
-      Logger.executionLog(Level.SEVERE, jsonException.getMessage());
       createdObject = null;
-    } catch (IOException fileException) {
-      Logger.executionLog(Level.SEVERE, "Error opening file: %s", jsonFilePath);
+    } catch (IOException exception) {
+      Logger.executionLog(
+          Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
       Logger.executionLog(
           Level.SEVERE, "Check your file path and permissions and make sure they are correct.");
-      Logger.executionLog(Level.SEVERE, fileException.toString());
       createdObject = null;
     }
     return createdObject;
@@ -65,9 +65,12 @@ class JsonParser {
     String response = "SUCCESS";
     try {
       mapper.writer().withDefaultPrettyPrinter().writeValue(jsonFile, config);
-    } catch (IOException fileException) {
-      Logger.executionLog(Level.SEVERE, "Error saving file: %s", jsonFile.getAbsolutePath());
-      Logger.executionLog(Level.SEVERE, fileException.toString());
+    } catch (IOException exception) {
+      Logger.executionLog(
+          Level.SEVERE,
+          "Error saving file: %s\n%s",
+          jsonFile.getAbsolutePath(),
+          exception.toString());
       response = "FAILURE";
     }
     return response;

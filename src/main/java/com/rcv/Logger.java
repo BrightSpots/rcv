@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -81,12 +81,15 @@ class Logger {
     FileHandler fileHandler =
         new FileHandler(logPath, EXECUTION_LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
     fileHandler.setFormatter(formatter);
+    fileHandler.setLevel(Level.FINE);
     // create a consoleHandler to writes formatted strings to console for debugging
     ConsoleHandler consoleHandler = new ConsoleHandler();
     consoleHandler.setFormatter(formatter);
-    // add the  handlers
+    consoleHandler.setLevel(Level.FINE);
+    // add the handlers
     executionLogger.addHandler(consoleHandler);
     executionLogger.addHandler(fileHandler);
+    executionLogger.setLevel(Level.FINE);
 
     // create and cache the tabulation logger object
     // whenever a tabulation happens we will add tabulation-specific file handlers to it
@@ -123,16 +126,26 @@ class Logger {
     tabulationLogger.log(level, String.format(format, obj));
   }
 
+  // logs to GUI console only
+  static void guiLog(Level level, String format, Object... obj) {
+    guiLogger.log(level, String.format(format, obj));
+  }
+
   // setup logging to the provided text area
-  static void addGUILogging(TextArea textArea) {
+  static void addGuiLogging(TextArea textArea) {
     guiLogger = java.util.logging.Logger.getLogger(GUI_LOGGER_NAME);
     LogFormatter formatter = new LogFormatter();
+    // TODO: Prevent double-logging to console (i.e. why guiLogger is appearing in console at all?)
     guiLogger.addHandler(
         new Handler() {
 
           @Override
           public void publish(LogRecord record) {
-            Platform.runLater(() -> textArea.appendText(formatter.format(record)));
+            if (Platform.isFxApplicationThread()) {
+              textArea.appendText(formatter.format(record));
+            } else {
+              Platform.runLater(() -> textArea.appendText(formatter.format(record)));
+            }
           }
 
           @Override
@@ -151,13 +164,15 @@ class Logger {
   // file access: write - existing file will be overwritten
   // throws: IOException if unable to open loggerOutputPath
   static void addTabulationFileLogging(String loggerOutputPath) throws IOException {
-    // create new handler for file logging and add it
-    FileHandler fileHandler = new FileHandler(loggerOutputPath);
     // specifies how logging output lines should appear
     LogFormatter formatter = new LogFormatter();
+    // create new handler for file logging and add it
+    FileHandler fileHandler = new FileHandler(loggerOutputPath);
     fileHandler.setFormatter(formatter);
+    fileHandler.setLevel(Level.FINER);
     // get the tabulationLogger logger and add file handler
     tabulationLogger.addHandler(fileHandler);
+    tabulationLogger.setLevel(Level.FINER);
   }
 
   // function: removeTabulationFileLogging

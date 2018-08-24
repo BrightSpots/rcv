@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -19,6 +19,7 @@
 
 package com.rcv;
 
+import com.rcv.RawElectionConfig.CVRSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,21 +53,13 @@ class CVRReader {
 
   // function: CVRReader
   // param: config an ElectionConfig object specifying rules for interpreting CVR file data
-  // param: excelFilePath path to location of input cast vote record file
-  // param: firstVoteColumnIndex the 0-based index where rankings begin for this ballot style
-  // param: idColumnIndex the column containing the CVR ID (possibly null)
-  // param: precinctColumnIndex the column containing precinct names (possibly null)
-  CVRReader(
-      ElectionConfig config,
-      String excelFilePath,
-      int firstVoteColumnIndex,
-      Integer idColumnIndex,
-      Integer precinctColumnIndex) {
+  // param: source file to read
+  CVRReader(ElectionConfig config, CVRSource source) {
     this.config = config;
-    this.excelFilePath = excelFilePath;
-    this.firstVoteColumnIndex = firstVoteColumnIndex;
-    this.idColumnIndex = idColumnIndex;
-    this.precinctColumnIndex = precinctColumnIndex;
+    this.excelFilePath = source.getFilePath();
+    this.firstVoteColumnIndex = source.getFirstVoteColumnIndex();
+    this.idColumnIndex = source.getIdColumnIndex();
+    this.precinctColumnIndex = source.getPrecinctColumnIndex();
   }
 
   // function: getFirstSheet
@@ -87,7 +80,7 @@ class CVRReader {
       workbook.close();
     } catch (IOException exception) {
       Logger.tabulationLog(
-          Level.SEVERE, "Failed to open CVR file: %s\n%s", excelFilePath, exception.getMessage());
+          Level.SEVERE, "Failed to open CVR file: %s\n%s", excelFilePath, exception.toString());
     }
     return firstSheet;
   }
@@ -170,7 +163,7 @@ class CVRReader {
 
       fullCVRData.add(Objects.requireNonNullElse(cellString, "empty cell"));
 
-      if (cellString != null) {
+      if (cellString != null && !cellString.isEmpty()) {
         if (precinctColumnIndex != null && cellIndex == precinctColumnIndex) {
           precinct = cellString;
         } else if (idColumnIndex != null && cellIndex == idColumnIndex) {

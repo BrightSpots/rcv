@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -174,11 +174,11 @@ class CastVoteRecord {
     StringBuilder auditStringBuilder = new StringBuilder();
     auditStringBuilder.append(" [Computed ID] ");
     auditStringBuilder.append(computedID);
-    if (suppliedID != null) {
+    if (suppliedID != null && !suppliedID.isEmpty()) {
       auditStringBuilder.append(" [Supplied ID] ");
       auditStringBuilder.append(suppliedID);
     }
-    if (precinct != null) {
+    if (precinct != null && !precinct.isEmpty()) {
       auditStringBuilder.append(" [Precinct] ");
       auditStringBuilder.append(precinct);
     }

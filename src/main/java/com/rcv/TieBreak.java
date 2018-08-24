@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -127,7 +127,7 @@ class TieBreak {
         // loser: will be set if there is a previous round count loser
         // it will be null if candidates were still tied at first round
         String previousRoundsLoser = doPreviousRounds();
-        if (previousRoundsLoser != null) {
+        if (previousRoundsLoser != null && !previousRoundsLoser.isEmpty()) {
           loser = previousRoundsLoser;
         } else if (tieBreakMode == Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
           loser = doInteractive();
@@ -178,7 +178,7 @@ class TieBreak {
         "Enter the number corresponding to the candidate who should lose this tiebreaker.");
     // the candidate selected to lose
     String selectedCandidate = null;
-    while (selectedCandidate == null) {
+    while (selectedCandidate == null || selectedCandidate.isEmpty()) {
       // container for user console input
       String userInput = System.console().readLine();
       try {
@@ -189,10 +189,10 @@ class TieBreak {
           // Convert from 1-indexed list back to 0-indexed list.
           selectedCandidate = tiedCandidates.get(choice - 1);
         }
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException exception) {
         // if parseInt failed selectedCandidate will be null and we will retry
       }
-      if (selectedCandidate == null) {
+      if (selectedCandidate == null || selectedCandidate.isEmpty()) {
         System.out.println("Invalid selection. Please try again.");
       }
     }

@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (C) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -23,17 +23,8 @@ import java.io.File;
 
 class FileUtils {
 
-  static String buildPath(String dir, String file) {
-    // path is the value we're returning
-    String path = file;
-    if (dir != null) {
-      path = new File(dir, file).toString();
-    }
-    return path;
-  }
-
   static void createOutputDirectory(String dir) throws UnableToCreateDirectoryException {
-    if (dir != null) {
+    if (dir != null && !dir.isEmpty()) {
       // dirFile is the File object for dir
       File dirFile = new File(dir);
       if (!dirFile.exists() && !dirFile.mkdirs()) {

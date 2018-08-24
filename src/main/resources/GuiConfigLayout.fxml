@@ -240,6 +240,7 @@
       <ButtonBar maxHeight="50.0" prefHeight="50.0">
         <buttons>
           <Button mnemonicParsing="false" onAction="#buttonMenuClicked" text="Back to Menu"/>
+          <Button mnemonicParsing="false" onAction="#buttonValidateClicked" text="Validate Config"/>
           <Button mnemonicParsing="false" onAction="#buttonSaveClicked" text="Save Config"/>
         </buttons>
         <padding>
