@@ -37,7 +37,6 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 class Logger {
@@ -141,11 +140,13 @@ class Logger {
 
           @Override
           public void publish(LogRecord record) {
-            if (Platform.isFxApplicationThread()) {
-              textArea.appendText(formatter.format(record));
-            } else {
-              Platform.runLater(() -> textArea.appendText(formatter.format(record)));
-            }
+            textArea.appendText(formatter.format(record));
+            // TODO: Below may not be necessary once tasks / threads work properly during tabulation
+//            if (Platform.isFxApplicationThread()) {
+//              textArea.appendText(formatter.format(record));
+//            } else {
+//              Platform.runLater(() -> textArea.appendText(formatter.format(record)));
+//            }
           }
 
           @Override

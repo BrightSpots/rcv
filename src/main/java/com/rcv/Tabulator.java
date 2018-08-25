@@ -497,6 +497,7 @@ class Tabulator {
 
       // results of tiebreak stored here
       eliminatedCandidate = tieBreak.selectLoser();
+      // TODO: If returned eliminatedCandidate is null, infinite loop!
       Logger.tabulationLog(
           Level.INFO,
           "%s lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
@@ -504,7 +505,7 @@ class Tabulator {
           currentRound,
           tieBreak.nonLosingCandidateDescription(),
           minVotes.toString(),
-          tieBreak.explanation());
+          tieBreak.getExplanation());
     } else {
       // last place candidate will be eliminated
       eliminatedCandidate = lastPlaceCandidates.getFirst();

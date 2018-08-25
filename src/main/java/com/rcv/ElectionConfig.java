@@ -239,7 +239,8 @@ class ElectionConfig {
     if (isValid) {
       Logger.executionLog(Level.INFO, "Config validation successful.");
     } else {
-      Logger.executionLog(Level.SEVERE, "Config validation failed!");
+      Logger.executionLog(Level.SEVERE,
+          "Config validation failed! Please modify the config file and try again.");
     }
 
     return isValid;

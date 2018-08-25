@@ -25,10 +25,10 @@ import javafx.stage.Stage;
 public class GuiApplication extends Application {
 
   @Override
-  public void start(Stage primaryStage) throws Exception {
+  public void start(Stage window) throws Exception {
     Parent root = FXMLLoader.load(getClass().getResource("/GuiMainLayout.fxml"));
-    primaryStage.setTitle("Universal RCV Tabulator");
-    primaryStage.setScene(new Scene(root));
-    primaryStage.show();
+    window.setTitle("Universal RCV Tabulator");
+    window.setScene(new Scene(root));
+    window.show();
   }
 }

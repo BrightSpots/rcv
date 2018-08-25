@@ -19,6 +19,7 @@
 
 package com.rcv;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,6 +28,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 class TieBreak {
 
@@ -103,7 +114,7 @@ class TieBreak {
     return nonselected;
   }
 
-  String explanation() {
+  String getExplanation() {
     return explanation;
   }
 
@@ -160,22 +171,20 @@ class TieBreak {
     return selectedCandidate;
   }
 
-  // function doInteraction
-  // purpose: interactively select the loser of this tiebreak
+  // function doInteractiveCli
+  // purpose: interactively select the loser of this tiebreak via the command-line interface
   // return: candidateID of the selected loser
-  private String doInteractive() {
+  private String doInteractiveCli() {
     System.out.println(
-        "Tie in round "
-            + round
-            + " for the following candidateIDs each of whom has "
-            + numVotes
-            + " votes:");
+        String.format(
+            "Tie in round %d for the following candidateIDs, each of whom has %d votes: ",
+            round, numVotes.intValue()));
     // i: index over tied candidates
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i + 1) + ". " + tiedCandidates.get(i));
     }
     System.out.println(
-        "Enter the number corresponding to the candidate who should lose this tiebreaker.");
+        "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
     // the candidate selected to lose
     String selectedCandidate = null;
     while (selectedCandidate == null || selectedCandidate.isEmpty()) {
@@ -197,6 +206,92 @@ class TieBreak {
       }
     }
     return selectedCandidate;
+  }
+
+  // function doInteractiveGui
+  // purpose: interactively select the loser of this tiebreak via the graphical user interface
+  // return: candidateID of the selected loser
+  private String doInteractiveGui() {
+    Logger.guiLog(
+        Level.INFO,
+        "Tie in round %d for the following candidateIDs, each of whom has %d votes: %s",
+        round,
+        numVotes.intValue(),
+        String.join(", ", tiedCandidates));
+    Logger.guiLog(
+        Level.INFO,
+        "Please use the pop-up window to select the candidate who should lose this tiebreaker.");
+
+    explanation = "The losing candidate was supplied by the operator.";
+
+    // TODO: below works when not multi-threadeding
+//    Stage window = new Stage();
+//    window.initModality(Modality.APPLICATION_MODAL);
+//    window.setTitle("RCV Tiebreaker");
+//    Parent root = null;
+//    FXMLLoader loader = new FXMLLoader(getClass().getResource("/GuiTiebreakerLayout.fxml"));
+//    try {
+//      root = loader.load();
+//    } catch (IOException e) {
+//      // TODO: fix
+//      e.printStackTrace();
+//    }
+//    window.setScene(new Scene(root));
+//    GuiTiebreakerController controller = loader.getController();
+//    controller.populateTiedCandidates(tiedCandidates);
+//    window.showAndWait();
+//
+//    return controller.getCandidateToEliminate();
+
+    // TODO: below is supposed to work with multi-threading
+    FutureTask<String> futureTask = new FutureTask(new TiebreakerPrompt());
+    Platform.runLater(futureTask);
+    String selectedCandidate = null;
+    try {
+      selectedCandidate = futureTask.get();
+    } catch (InterruptedException e) {
+      // TODO: fix all exceptions
+      e.printStackTrace();
+    } catch (ExecutionException e) {
+      e.printStackTrace();
+    }
+    return selectedCandidate;
+  }
+
+  // function doInteractive
+  // purpose: interactively select the loser of this tiebreak
+  // return: candidateID of the selected loser
+  private String doInteractive() {
+    return GuiContext.getInstance().getConfig() != null ? doInteractiveGui() : doInteractiveCli();
+  }
+
+  // TODO: move this to a better spot
+  class TiebreakerPrompt implements Callable<String> {
+
+    // TODO: fix throws general exception?
+    @Override
+    public String call() {
+
+      final Stage window = new Stage();
+      window.initModality(Modality.APPLICATION_MODAL);
+      window.setTitle("RCV Tiebreaker");
+      Parent root = null;
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("/GuiTiebreakerLayout.fxml"));
+      try {
+        root = loader.load();
+      } catch (IOException e) {
+        // TODO: fix
+        e.printStackTrace();
+      }
+
+      GuiTiebreakerController controller = loader.getController();
+      controller.populateTiedCandidates(tiedCandidates);
+
+      window.setScene(new Scene(root));
+      window.showAndWait();
+
+      return controller.getCandidateToEliminate();
+    }
   }
 
   // function doRandom
