@@ -237,7 +237,7 @@
         </Tab>
       </TabPane>
       <Region/>
-      <ButtonBar maxHeight="50.0" prefHeight="50.0">
+      <ButtonBar maxHeight="50.0" prefHeight="50.0" fx:id="buttonBar">
         <buttons>
           <Button mnemonicParsing="false" onAction="#buttonMenuClicked" text="Back to Menu"/>
           <Button mnemonicParsing="false" onAction="#buttonValidateClicked" text="Validate Config"/>
