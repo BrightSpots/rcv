@@ -37,6 +37,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 class Logger {
@@ -137,16 +138,13 @@ class Logger {
     // TODO: Prevent double-logging to console (i.e. why guiLogger is appearing in console at all?)
     guiLogger.addHandler(
         new Handler() {
-
           @Override
           public void publish(LogRecord record) {
-            textArea.appendText(formatter.format(record));
-            // TODO: Below may not be necessary once tasks / threads work properly during tabulation
-//            if (Platform.isFxApplicationThread()) {
-//              textArea.appendText(formatter.format(record));
-//            } else {
-//              Platform.runLater(() -> textArea.appendText(formatter.format(record)));
-//            }
+            if (Platform.isFxApplicationThread()) {
+              textArea.appendText(formatter.format(record));
+            } else {
+              Platform.runLater(() -> textArea.appendText(formatter.format(record)));
+            }
           }
 
           @Override
