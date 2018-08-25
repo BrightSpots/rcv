@@ -175,12 +175,14 @@ public class Main extends GuiApplication {
 
     // At each iteration of the following loop, we add records from another source file.
     // source: index over config sources
+    StringBuilder logMessage = new StringBuilder();
     for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      String logMessage = String.format("Reading CVR file: %s", source.getFilePath());
+      logMessage.append("Reading CVR file: ").append(source.getFilePath());
       if (source.getProvider() != null && !source.getProvider().isEmpty()) {
-        logMessage += String.format(" (provider: %s)", source.getProvider());
+        logMessage.append(" (provider: ").append(source.getProvider()).append(")");
       }
-      Logger.tabulationLog(Level.INFO, logMessage);
+      Logger.tabulationLog(Level.INFO, logMessage.toString());
+      logMessage.setLength(0);
 
       // the CVRs parsed from this source
       try {
