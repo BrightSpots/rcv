@@ -175,6 +175,7 @@ class TieBreak {
   // purpose: interactively select the loser of this tiebreak via the command-line interface
   // return: candidateID of the selected loser
   private String doInteractiveCli() {
+    explanation = "The losing candidate was supplied by the operator.";
     System.out.println(
         String.format(
             "Tie in round %d for the following candidateIDs, each of whom has %d votes: ",
@@ -185,16 +186,17 @@ class TieBreak {
     }
     System.out.println(
         "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
+
     // the candidate selected to lose
     String selectedCandidate = null;
     while (selectedCandidate == null || selectedCandidate.isEmpty()) {
+      // TODO: Create and enable cancel option for interactive tiebreaker CLI
       // container for user console input
       String userInput = System.console().readLine();
       try {
         // user selected loser parsed to int
         int choice = Integer.parseInt(userInput);
         if (choice >= 1 && choice <= tiedCandidates.size()) {
-          explanation = "The losing candidate was supplied by the operator.";
           // Convert from 1-indexed list back to 0-indexed list.
           selectedCandidate = tiedCandidates.get(choice - 1);
         }
@@ -205,6 +207,7 @@ class TieBreak {
         System.out.println("Invalid selection. Please try again.");
       }
     }
+
     return selectedCandidate;
   }
 
@@ -212,6 +215,7 @@ class TieBreak {
   // purpose: interactively select the loser of this tiebreak via the graphical user interface
   // return: candidateID of the selected loser
   private String doInteractiveGui() {
+    explanation = "The losing candidate was supplied by the operator.";
     Logger.guiLog(
         Level.INFO,
         "Tie in round %d for the following candidateIDs, each of whom has %d votes: %s",
@@ -222,39 +226,21 @@ class TieBreak {
         Level.INFO,
         "Please use the pop-up window to select the candidate who should lose this tiebreaker.");
 
-    explanation = "The losing candidate was supplied by the operator.";
-
-    // TODO: below works when not multi-threadeding
-//    Stage window = new Stage();
-//    window.initModality(Modality.APPLICATION_MODAL);
-//    window.setTitle("RCV Tiebreaker");
-//    Parent root = null;
-//    FXMLLoader loader = new FXMLLoader(getClass().getResource("/GuiTiebreakerLayout.fxml"));
-//    try {
-//      root = loader.load();
-//    } catch (IOException e) {
-//      // TODO: fix
-//      e.printStackTrace();
-//    }
-//    window.setScene(new Scene(root));
-//    GuiTiebreakerController controller = loader.getController();
-//    controller.populateTiedCandidates(tiedCandidates);
-//    window.showAndWait();
-//
-//    return controller.getCandidateToEliminate();
-
-    // TODO: below is supposed to work with multi-threading
-    FutureTask<String> futureTask = new FutureTask(new TiebreakerPrompt());
-    Platform.runLater(futureTask);
     String selectedCandidate = null;
-    try {
-      selectedCandidate = futureTask.get();
-    } catch (InterruptedException e) {
-      // TODO: fix all exceptions
-      e.printStackTrace();
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+    while (selectedCandidate == null || selectedCandidate.isEmpty()) {
+      // TODO: actually enable cancel button for interactive tiebreaker GUI
+      try {
+        FutureTask<String> futureTask = new FutureTask<>(new GuiTiebreakerPrompt());
+        Platform.runLater(futureTask);
+        selectedCandidate = futureTask.get();
+      } catch (InterruptedException | ExecutionException exception) {
+        Logger.tabulationLog(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
+      }
+      if (selectedCandidate == null || selectedCandidate.isEmpty()) {
+        Logger.guiLog(Level.WARNING, "Invalid selection. Please try again.");
+      }
     }
+
     return selectedCandidate;
   }
 
@@ -263,35 +249,6 @@ class TieBreak {
   // return: candidateID of the selected loser
   private String doInteractive() {
     return GuiContext.getInstance().getConfig() != null ? doInteractiveGui() : doInteractiveCli();
-  }
-
-  // TODO: move this to a better spot
-  class TiebreakerPrompt implements Callable<String> {
-
-    // TODO: fix throws general exception?
-    @Override
-    public String call() {
-
-      final Stage window = new Stage();
-      window.initModality(Modality.APPLICATION_MODAL);
-      window.setTitle("RCV Tiebreaker");
-      Parent root = null;
-      FXMLLoader loader = new FXMLLoader(getClass().getResource("/GuiTiebreakerLayout.fxml"));
-      try {
-        root = loader.load();
-      } catch (IOException e) {
-        // TODO: fix
-        e.printStackTrace();
-      }
-
-      GuiTiebreakerController controller = loader.getController();
-      controller.populateTiedCandidates(tiedCandidates);
-
-      window.setScene(new Scene(root));
-      window.showAndWait();
-
-      return controller.getCandidateToEliminate();
-    }
   }
 
   // function doRandom
@@ -336,5 +293,32 @@ class TieBreak {
       }
     }
     return loser;
+  }
+
+  class GuiTiebreakerPrompt implements Callable<String> {
+
+    @Override
+    public String call() {
+      String candidateToEliminate = null;
+      final Stage window = new Stage();
+      window.initModality(Modality.APPLICATION_MODAL);
+      window.setTitle("RCV Tiebreaker");
+      String resourcePath = "/GuiTiebreakerLayout.fxml";
+      FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
+
+      try {
+        Parent root = loader.load();
+        GuiTiebreakerController controller = loader.getController();
+        controller.populateTiedCandidates(tiedCandidates);
+        window.setScene(new Scene(root));
+        window.showAndWait();
+        candidateToEliminate = controller.getCandidateToEliminate();
+      } catch (IOException exception) {
+        Logger.tabulationLog(
+            Level.SEVERE, "Failed to open: %s:\n%s", resourcePath, exception.getCause().toString());
+      }
+
+      return candidateToEliminate;
+    }
   }
 }

@@ -22,11 +22,18 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class GuiMenuController implements Initializable {
+
+  @FXML
+  private VBox vboxMenu;
 
   private void openConfigCreator() {
     GuiContext.getInstance().showContent("/GuiConfigLayout.fxml");
@@ -60,37 +67,30 @@ public class GuiMenuController implements Initializable {
     }
   }
 
+  private void setButtonsDisable(boolean disable) {
+    for (Node node : vboxMenu.getChildren()) {
+      if (node instanceof Button) {
+        node.setDisable(disable);
+      }
+    }
+  }
+
   public void buttonTabulateClicked() {
     if (GuiContext.getInstance().getConfig() != null) {
-      // TODO: clean up -- below are 4 different ways of executing tabulation
-//      Main.executeTabulation(GuiContext.getInstance().getConfig());
-
-//      new Thread(() -> Main.executeTabulation(GuiContext.getInstance().getConfig())).start();
-
-//      TabulatorService service = new TabulatorService();
-////      service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-////
-////        @Override
-////        public void handle(WorkerStateEvent t) {
-////          System.out.println("done:" + t.getSource().getValue());
-////        }
-////      });
-//      service.start();
-
-//      TabulatorService service = new TabulatorService();
-//      service.start();
-
-      TabulateTask task = new TabulateTask();
-      final Thread taskThread = new Thread(task, "tabulate");
-      taskThread.setDaemon(true);
-      taskThread.start();
-
-
-
-
+      setButtonsDisable(true);
+      TabulatorService service = new TabulatorService();
+      service.setOnSucceeded(event -> setButtonsDisable(false));
+      service.setOnCancelled(event -> setButtonsDisable(false));
+      service.setOnFailed(event -> setButtonsDisable(false));
+      service.start();
     } else {
       Logger.guiLog(Level.WARNING, "Please load a config file before attempting to tabulate!");
     }
+  }
+
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
+    Logger.executionLog(Level.FINE, "Opening main menu GUI...");
   }
 
   private static class TabulatorService extends Service<Void> {
@@ -105,19 +105,5 @@ public class GuiMenuController implements Initializable {
         }
       };
     }
-  }
-
-  class TabulateTask extends Task<Void> {
-
-    @Override
-    protected Void call() {
-      Main.executeTabulation(GuiContext.getInstance().getConfig());
-      return null;
-    }
-  }
-
-  @Override
-  public void initialize(URL location, ResourceBundle resources) {
-    Logger.executionLog(Level.FINE, "Opening main menu GUI...");
   }
 }

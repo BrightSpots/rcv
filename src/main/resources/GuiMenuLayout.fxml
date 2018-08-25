@@ -12,7 +12,7 @@
   prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.121"
   fx:controller="com.rcv.GuiMenuController">
   <Region HBox.hgrow="ALWAYS" prefHeight="200.0" prefWidth="200.0"/>
-  <VBox alignment="CENTER" spacing="12.0">
+  <VBox alignment="CENTER" spacing="12.0" fx:id="vboxMenu">
     <Label text="Universal RCV Tabulator">
       <font>
         <Font size="20.0"/>
