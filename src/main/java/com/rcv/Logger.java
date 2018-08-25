@@ -138,7 +138,6 @@ class Logger {
     // TODO: Prevent double-logging to console (i.e. why guiLogger is appearing in console at all?)
     guiLogger.addHandler(
         new Handler() {
-
           @Override
           public void publish(LogRecord record) {
             if (Platform.isFxApplicationThread()) {
