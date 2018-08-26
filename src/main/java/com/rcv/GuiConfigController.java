@@ -31,8 +31,11 @@ import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
@@ -141,6 +144,8 @@ public class GuiConfigController implements Initializable {
   private ToggleGroup toggleTreatBlankAsUndeclaredWriteIn;
   @FXML
   private RadioButton radioTreatBlankAsUndeclaredWriteInTrue;
+  @FXML
+  private ButtonBar buttonBar;
 
   public void buttonMenuClicked() {
     GuiContext.getInstance().showContent("/GuiMenuLayout.fxml");
@@ -149,7 +154,12 @@ public class GuiConfigController implements Initializable {
   }
 
   public void buttonValidateClicked() {
-    new ElectionConfig(createRawElectionConfig()).validate();
+    buttonBar.setDisable(true);
+    ValidatorService service = new ValidatorService(createRawElectionConfig());
+    service.setOnSucceeded(event -> buttonBar.setDisable(false));
+    service.setOnCancelled(event -> buttonBar.setDisable(false));
+    service.setOnFailed(event -> buttonBar.setDisable(false));
+    service.start();
   }
 
   public void buttonSaveClicked() {
@@ -440,6 +450,26 @@ public class GuiConfigController implements Initializable {
     config.rules = rules;
 
     return config;
+  }
+
+  private static class ValidatorService extends Service<Void> {
+
+    private RawElectionConfig rawElectionConfig;
+
+    ValidatorService(RawElectionConfig rawElectionConfig) {
+      this.rawElectionConfig = rawElectionConfig;
+    }
+
+    @Override
+    protected Task<Void> createTask() {
+      return new Task<>() {
+        @Override
+        protected Void call() {
+          new ElectionConfig(rawElectionConfig).validate();
+          return null;
+        }
+      };
+    }
   }
 
   private class TextFieldListenerNonNegInt implements ChangeListener<String> {

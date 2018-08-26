@@ -5,7 +5,9 @@ Copyright (c) 2018 Bright Spots
 
 ## Dependencies
 
-#### Java 9+
+#### Java Runtime Environment (JRE) 10+
+
+[Main website](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 #### Apache POI Java API for Microsoft Documents 3.16
 [Main website](https://poi.apache.org/index.html)
@@ -15,11 +17,12 @@ Copyright (c) 2018 Bright Spots
 #### Jackson databind General data-binding package:
 [Binaries](http://central.maven.org/maven2/com/fasterxml/jackson/core/)
 
-Jackson databind 2.4.3
+Jackson Annotations 2.9.6
 
-Jackson core 2.4.3
+Jackson Core 2.9.6
 
-Jackson annotations 2.4.3
+Jackson Databind 2.9.6
+
 
 ## Configuration
 Config file documentation is available [here](src/main/resources/config_file_documentation.txt).

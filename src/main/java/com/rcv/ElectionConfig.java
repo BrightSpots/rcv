@@ -45,6 +45,8 @@ class ElectionConfig {
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
+  // whether or not there are any validation errors
+  private boolean isValid;
 
   // function: ElectionConfig
   // purpose: create a new ElectionConfig object
@@ -58,11 +60,25 @@ class ElectionConfig {
   // purpose: validate the correctness of the config data
   // returns any detected problems
   boolean validate() {
-    // return value will be false if there are any validation errors
-    boolean isValid = true;
-
     Logger.executionLog(Level.INFO, "Validating config...");
+    isValid = true;
 
+    validateContestSettings();
+    validateCvrFileSources();
+    validateCandidates();
+    validateRules();
+
+    if (isValid) {
+      Logger.executionLog(Level.INFO, "Config validation successful.");
+    } else {
+      Logger.executionLog(
+          Level.SEVERE, "Config validation failed! Please modify the config file and try again.");
+    }
+
+    return isValid;
+  }
+
+  private void validateContestSettings() {
     if (getContestName() == null || getContestName().isEmpty()) {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "Contest name is required.");
@@ -72,7 +88,9 @@ class ElectionConfig {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "Output directory is required.");
     }
+  }
 
+  private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "Config doesn't contain any CVR files.");
@@ -128,7 +146,9 @@ class ElectionConfig {
         }
       }
     }
+  }
 
+  private void validateCandidates() {
     HashSet<String> candidateNameSet = new HashSet<>();
     HashSet<String> candidateCodeSet = new HashSet<>();
     for (Candidate candidate : rawConfig.candidates) {
@@ -165,7 +185,9 @@ class ElectionConfig {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "Config must contain at least one declared candidate.");
     }
+  }
 
+  private void validateRules() {
     if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "Invalid tie-break mode.");
@@ -235,14 +257,6 @@ class ElectionConfig {
         Logger.executionLog(Level.SEVERE, "Invalid multiSeatTransferRule.");
       }
     }
-
-    if (isValid) {
-      Logger.executionLog(Level.INFO, "Config validation successful.");
-    } else {
-      Logger.executionLog(Level.SEVERE, "Config validation failed!");
-    }
-
-    return isValid;
   }
 
   // function: getNumberWinners

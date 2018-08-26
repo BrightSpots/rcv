@@ -19,6 +19,7 @@
 
 package com.rcv;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,6 +28,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 class TieBreak {
 
@@ -103,7 +114,7 @@ class TieBreak {
     return nonselected;
   }
 
-  String explanation() {
+  String getExplanation() {
     return explanation;
   }
 
@@ -160,32 +171,31 @@ class TieBreak {
     return selectedCandidate;
   }
 
-  // function doInteraction
-  // purpose: interactively select the loser of this tiebreak
+  // function doInteractiveCli
+  // purpose: interactively select the loser of this tiebreak via the command-line interface
   // return: candidateID of the selected loser
-  private String doInteractive() {
+  private String doInteractiveCli() {
     System.out.println(
-        "Tie in round "
-            + round
-            + " for the following candidateIDs each of whom has "
-            + numVotes
-            + " votes:");
+        String.format(
+            "Tie in round %d for the following candidates, each of whom has %d votes: ",
+            round, numVotes.intValue()));
     // i: index over tied candidates
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i + 1) + ". " + tiedCandidates.get(i));
     }
     System.out.println(
-        "Enter the number corresponding to the candidate who should lose this tiebreaker.");
+        "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
+
     // the candidate selected to lose
     String selectedCandidate = null;
     while (selectedCandidate == null || selectedCandidate.isEmpty()) {
+      // TODO: Create and enable cancel option for interactive tiebreaker CLI
       // container for user console input
       String userInput = System.console().readLine();
       try {
         // user selected loser parsed to int
         int choice = Integer.parseInt(userInput);
         if (choice >= 1 && choice <= tiedCandidates.size()) {
-          explanation = "The losing candidate was supplied by the operator.";
           // Convert from 1-indexed list back to 0-indexed list.
           selectedCandidate = tiedCandidates.get(choice - 1);
         }
@@ -196,7 +206,48 @@ class TieBreak {
         System.out.println("Invalid selection. Please try again.");
       }
     }
+
     return selectedCandidate;
+  }
+
+  // function doInteractiveGui
+  // purpose: interactively select the loser of this tiebreak via the graphical user interface
+  // return: candidateID of the selected loser
+  private String doInteractiveGui() {
+    Logger.guiLog(
+        Level.INFO,
+        "Tie in round %d for the following candidates, each of whom has %d votes: %s",
+        round,
+        numVotes.intValue(),
+        String.join(", ", tiedCandidates));
+    Logger.guiLog(
+        Level.INFO,
+        "Please use the pop-up window to select the candidate who should lose this tiebreaker.");
+
+    String selectedCandidate = null;
+    while (selectedCandidate == null || selectedCandidate.isEmpty()) {
+      // TODO: actually enable cancel button for interactive tiebreaker GUI
+      try {
+        FutureTask<String> futureTask = new FutureTask<>(new GuiTiebreakerPrompt());
+        Platform.runLater(futureTask);
+        selectedCandidate = futureTask.get();
+      } catch (InterruptedException | ExecutionException exception) {
+        Logger.tabulationLog(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
+      }
+      if (selectedCandidate == null || selectedCandidate.isEmpty()) {
+        Logger.guiLog(Level.WARNING, "Invalid selection. Please try again.");
+      }
+    }
+
+    return selectedCandidate;
+  }
+
+  // function doInteractive
+  // purpose: interactively select the loser of this tiebreak
+  // return: candidateID of the selected loser
+  private String doInteractive() {
+    explanation = "The losing candidate was supplied by the operator.";
+    return GuiContext.getInstance().getConfig() != null ? doInteractiveGui() : doInteractiveCli();
   }
 
   // function doRandom
@@ -241,5 +292,32 @@ class TieBreak {
       }
     }
     return loser;
+  }
+
+  class GuiTiebreakerPrompt implements Callable<String> {
+
+    @Override
+    public String call() {
+      String candidateToEliminate = null;
+      final Stage window = new Stage();
+      window.initModality(Modality.APPLICATION_MODAL);
+      window.setTitle("RCV Tiebreaker");
+      String resourcePath = "/GuiTiebreakerLayout.fxml";
+      FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
+
+      try {
+        Parent root = loader.load();
+        GuiTiebreakerController controller = loader.getController();
+        controller.populateTiedCandidates(tiedCandidates);
+        window.setScene(new Scene(root));
+        window.showAndWait();
+        candidateToEliminate = controller.getCandidateToEliminate();
+      } catch (IOException exception) {
+        Logger.tabulationLog(
+            Level.SEVERE, "Failed to open: %s:\n%s", resourcePath, exception.getCause().toString());
+      }
+
+      return candidateToEliminate;
+    }
   }
 }

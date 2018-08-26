@@ -20,11 +20,20 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class GuiMenuController implements Initializable {
+
+  @FXML
+  private VBox vboxMenu;
 
   private void openConfigCreator() {
     GuiContext.getInstance().showContent("/GuiConfigLayout.fxml");
@@ -58,9 +67,22 @@ public class GuiMenuController implements Initializable {
     }
   }
 
+  private void setButtonsDisable(boolean disable) {
+    for (Node node : vboxMenu.getChildren()) {
+      if (node instanceof Button) {
+        node.setDisable(disable);
+      }
+    }
+  }
+
   public void buttonTabulateClicked() {
     if (GuiContext.getInstance().getConfig() != null) {
-      new Thread(() -> Main.executeTabulation(GuiContext.getInstance().getConfig())).start();
+      setButtonsDisable(true);
+      TabulatorService service = new TabulatorService();
+      service.setOnSucceeded(event -> setButtonsDisable(false));
+      service.setOnCancelled(event -> setButtonsDisable(false));
+      service.setOnFailed(event -> setButtonsDisable(false));
+      service.start();
     } else {
       Logger.guiLog(Level.WARNING, "Please load a config file before attempting to tabulate!");
     }
@@ -69,5 +91,19 @@ public class GuiMenuController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.executionLog(Level.FINE, "Opening main menu GUI...");
+  }
+
+  private static class TabulatorService extends Service<Void> {
+
+    @Override
+    protected Task<Void> createTask() {
+      return new Task<>() {
+        @Override
+        protected Void call() {
+          Main.executeTabulation(GuiContext.getInstance().getConfig());
+          return null;
+        }
+      };
+    }
   }
 }
