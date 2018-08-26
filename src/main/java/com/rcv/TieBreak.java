@@ -175,10 +175,9 @@ class TieBreak {
   // purpose: interactively select the loser of this tiebreak via the command-line interface
   // return: candidateID of the selected loser
   private String doInteractiveCli() {
-    explanation = "The losing candidate was supplied by the operator.";
     System.out.println(
         String.format(
-            "Tie in round %d for the following candidateIDs, each of whom has %d votes: ",
+            "Tie in round %d for the following candidates, each of whom has %d votes: ",
             round, numVotes.intValue()));
     // i: index over tied candidates
     for (int i = 0; i < tiedCandidates.size(); i++) {
@@ -215,10 +214,9 @@ class TieBreak {
   // purpose: interactively select the loser of this tiebreak via the graphical user interface
   // return: candidateID of the selected loser
   private String doInteractiveGui() {
-    explanation = "The losing candidate was supplied by the operator.";
     Logger.guiLog(
         Level.INFO,
-        "Tie in round %d for the following candidateIDs, each of whom has %d votes: %s",
+        "Tie in round %d for the following candidates, each of whom has %d votes: %s",
         round,
         numVotes.intValue(),
         String.join(", ", tiedCandidates));
@@ -248,6 +246,7 @@ class TieBreak {
   // purpose: interactively select the loser of this tiebreak
   // return: candidateID of the selected loser
   private String doInteractive() {
+    explanation = "The losing candidate was supplied by the operator.";
     return GuiContext.getInstance().getConfig() != null ? doInteractiveGui() : doInteractiveCli();
   }
 
