@@ -40,10 +40,10 @@ class Tabulator {
   static final String EXPLICIT_OVERVOTE_LABEL = "overvote";
   // cast vote records parsed from CVR input files
   private final List<CastVoteRecord> castVoteRecords;
-  // all candidateIDs for this election parsed from the election config
+  // all candidateIDs for this contest parsed from the contest config
   private final Set<String> candidateIDs;
-  // election config contains specific rules and file paths to be used during tabulation
-  private final ElectionConfig config;
+  // contest config contains specific rules and file paths to be used during tabulation
+  private final ContestConfig config;
   // roundTallies is a map from round number to a map from candidate ID to vote total for the round
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes for each candidate in round 1
   // this structure is computed over the course of tabulation
@@ -64,7 +64,7 @@ class Tabulator {
   // param: castVoteRecords list of all cast vote records to be tabulated for this contest
   // param: config describes various tabulation rules to be used for tabulation
   // returns: the new object
-  Tabulator(List<CastVoteRecord> castVoteRecords, ElectionConfig config) {
+  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config) {
     this.castVoteRecords = castVoteRecords;
     this.candidateIDs = config.getCandidateCodeList();
     this.config = config;
@@ -107,7 +107,7 @@ class Tabulator {
   }
 
   // function: tabulate
-  // purpose: run the main tabulation routine to determine election results
+  // purpose: run the main tabulation routine to determine contest results
   //  this is the high-level control of the tabulation algorithm
   void tabulate() {
     logSummaryInfo();
@@ -227,7 +227,7 @@ class Tabulator {
 
   // function: updateWinnerTallies
   // purpose: Update the tally for the just-completed round to reflect the tallies for candidates
-  // who won in a past round (in a multi-winner election). We do this because the regular tally
+  // who won in a past round (in a multi-winner contest). We do this because the regular tally
   // logic only considers continuing candidates, so it won't assign any votes to past winners -- but
   // in reality they continue to hold their winning margins for the rest of the rounds, so we need
   // to fill in those values here.
@@ -531,7 +531,7 @@ class Tabulator {
             .setNumRounds(currentRound)
             .setCandidatesToRoundEliminated(candidateToRoundEliminated)
             .setWinnerToRound(winnerToRound)
-            .setElectionConfig(config)
+            .setContestConfig(config)
             .setTimestampString(timestamp);
 
     writer.generateOverallSummarySpreadsheet(roundTallies);
@@ -787,7 +787,7 @@ class Tabulator {
             // we found a continuing candidate, so increase their tally by 1
             selectedCandidateID = candidateID;
             // the FTV for this cast vote record (by default the FTV is exactly one vote, but it
-            // could be less in a multi-winner election if this CVR already helped elect a winner.)
+            // could be less in a multi-winner contest if this CVR already helped elect a winner.)
             BigDecimal fractionalTransferValue = cvr.getFractionalTransferValue();
             cvr.addRoundOutcome(
                 VoteOutcomeType.COUNTED, selectedCandidateID, fractionalTransferValue);
@@ -883,7 +883,7 @@ class Tabulator {
     Logger.tabulationLog(Level.INFO, "Audit info written.");
   }
 
-  // vote transfer rule to use in multi-seat elections
+  // vote transfer rule to use in multi-seat contests
   enum MultiSeatTransferRule {
     TRANSFER_FRACTIONAL_SURPLUS("transferFractionalSurplus"),
     TRANSFER_WHOLE_SURPLUS("transferWholeSurplus"),

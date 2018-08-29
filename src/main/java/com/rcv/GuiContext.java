@@ -27,7 +27,7 @@ class GuiContext {
   // context instance
   private static final GuiContext INSTANCE = new GuiContext();
   // currently-loaded tabulator config
-  private ElectionConfig config;
+  private ContestConfig config;
   // file selected for loading
   private File selectedFile;
   // VBox for displaying main content
@@ -40,11 +40,11 @@ class GuiContext {
     return INSTANCE;
   }
 
-  ElectionConfig getConfig() {
+  ContestConfig getConfig() {
     return config;
   }
 
-  void setConfig(ElectionConfig config) {
+  void setConfig(ContestConfig config) {
     this.config = config;
   }
 

@@ -112,7 +112,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: [0..100]
 
       "numberOfWinners" optional
-        the number of seats to be won in this election
+        the number of seats to be won in this contest
         value: [1..100]
         default: 1
 

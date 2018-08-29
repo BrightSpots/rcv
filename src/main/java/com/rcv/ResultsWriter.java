@@ -54,8 +54,8 @@ class ResultsWriter {
   private Map<Integer, List<String>> roundToEliminatedCandidates;
   // map from round number to list of candidates winning in that round
   private Map<Integer, List<String>> roundToWinningCandidates;
-  // configuration file in use for this election
-  private ElectionConfig config;
+  // configuration file in use for this contest
+  private ContestConfig config;
   // timestampString string to use when generating output file names
   private String timestampString;
 
@@ -99,10 +99,10 @@ class ResultsWriter {
     return this;
   }
 
-  // function: setElectionConfig
-  // purpose: setter for ElectionConfig object
-  // param: config the ElectionConfig object to use when writing results
-  ResultsWriter setElectionConfig(ElectionConfig config) {
+  // function: setContestConfig
+  // purpose: setter for ContestConfig object
+  // param: config the ContestConfig object to use when writing results
+  ResultsWriter setContestConfig(ContestConfig config) {
     this.config = config;
     return this;
   }
@@ -116,7 +116,7 @@ class ResultsWriter {
   }
 
   // function: generateOverallSummarySpreadsheet
-  // purpose: creates a summary spreadsheet for the full election
+  // purpose: creates a summary spreadsheet for the full contest
   // param: roundTallies is the round-by-round count of votes per candidate
   void generateOverallSummarySpreadsheet(Map<Integer, Map<String, BigDecimal>> roundTallies) {
     // filename for output
@@ -512,7 +512,7 @@ class ResultsWriter {
     // string for formatted date
     String dateString = dateFormat.format(new Date());
     // string indicating single- or multi-winner
-    String electionType = config.getNumberOfWinners() > 1 ? "multi-winner" : "single-winner";
+    String contestType = config.getNumberOfWinners() > 1 ? "multi-winner" : "single-winner";
     // number reflecting threshold percentage to win
     BigDecimal thresholdPercentage =
         config.divide(new BigDecimal(100), new BigDecimal(config.getNumberOfWinners() + 1));
@@ -534,7 +534,7 @@ class ResultsWriter {
         {"Contest name", config.getContestName(), OutputType.STRING},
         {"Jurisdiction name", config.getContestJurisdiction(), OutputType.STRING},
         {"Office name", config.getContestOffice(), OutputType.STRING},
-        {"Election date", config.getContestDate(), OutputType.STRING},
+        {"Contest date", config.getContestDate(), OutputType.STRING},
         {null, null, OutputType.STRING},
         {"Counting information", null, OutputType.STRING},
         {"Details of the tally to be used in the display screens", null, OutputType.STRING},
@@ -546,7 +546,7 @@ class ResultsWriter {
         {null, null, OutputType.STRING},
         {"Contest summary data", null, OutputType.STRING},
         {"Tally detail", null, OutputType.STRING},
-        {"Single-winner/multi-winner", electionType, OutputType.STRING},
+        {"Single-winner/multi-winner", contestType, OutputType.STRING},
         {"Number to be elected", config.getNumberOfWinners(), OutputType.INT},
         {"Number of declared candidates", config.getNumDeclaredCandidates(), OutputType.INT},
         {"Number of votes cast", totalActiveVotesFirstRound.toString(), OutputType.STRING},

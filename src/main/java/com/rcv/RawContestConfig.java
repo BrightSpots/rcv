@@ -14,7 +14,7 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Purpose:
- * RawElectionConfig defines the data model used for an election configuration. It is used
+ * RawContestConfig defines the data model used for a contest configuration. It is used
  * by JsonParser to map JSON configuration files into Java objects. We use Jackson JSON parser with \
  * annotations below to facilitate parsing (see JsonParser.java).
  */
@@ -28,7 +28,7 @@ import java.util.List;
 // TODO: add getters and setters for everything to address issue #73
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RawElectionConfig {
+public class RawContestConfig {
 
   // directory for output files
   public String outputDirectory;
@@ -43,24 +43,24 @@ public class RawElectionConfig {
   // should we report round-by-round results by precinct also?
   public boolean tabulateByPrecinct;
   // rules object
-  public ElectionRules rules;
+  public ContestRules rules;
   // list of all Candidates
   public List<Candidate> candidates;
   // list of all cast vote record source files
   public List<CVRSource> cvrFileSources;
 
-  // function: RawElectionConfig
-  // purpose: create a new RawElectionConfig object
-  // returns: the newly created RawElectionConfig object
-  RawElectionConfig() {
+  // function: RawContestConfig
+  // purpose: create a new RawContestConfig object
+  // returns: the newly created RawContestConfig object
+  RawContestConfig() {
   }
 
-  // ElectionRules: encapsulates the set of rules required to perform election tabulation
+  // ContestRules: encapsulates the set of rules required to perform contest tabulation
   // See Tabulator.java for more info on rules enums
   // Note: all jackson parsed variables names must match name exactly
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public static class ElectionRules {
+  public static class ContestRules {
 
     // human description of this rules set
     public String rulesDescription;
@@ -86,7 +86,7 @@ public class RawElectionConfig {
     public Integer numberOfWinners;
     // how far to round vote values when performing arithmetic
     public Integer decimalPlacesForVoteArithmetic;
-    // which transfer rule to use on surplus votes in multi-seat elections
+    // which transfer rule to use on surplus votes in multi-seat contests
     public String multiSeatTransferRule;
     // keep tabulating beyond selecting winner until only two candidates remain
     // used to provide additional context for the strength of support for the winner

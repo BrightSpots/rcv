@@ -62,7 +62,7 @@ public class GuiMenuController implements Initializable {
     if (GuiContext.getInstance().getSelectedFile() != null) {
       GuiContext.getInstance()
           .setConfig(
-              Main.loadElectionConfig(
+              Main.loadContestConfig(
                   GuiContext.getInstance().getSelectedFile().getAbsolutePath()));
     }
   }

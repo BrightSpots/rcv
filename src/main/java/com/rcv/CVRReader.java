@@ -19,7 +19,7 @@
 
 package com.rcv;
 
-import com.rcv.RawElectionConfig.CVRSource;
+import com.rcv.RawContestConfig.CVRSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,8 +40,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 class CVRReader {
 
-  // config for the election
-  private final ElectionConfig config;
+  // config for the contest
+  private final ContestConfig config;
   // path of the source file
   private final String excelFilePath;
   // column index of first ranking
@@ -52,9 +52,9 @@ class CVRReader {
   private final Integer precinctColumnIndex;
 
   // function: CVRReader
-  // param: config an ElectionConfig object specifying rules for interpreting CVR file data
+  // param: config an ContestConfig object specifying rules for interpreting CVR file data
   // param: source file to read
-  CVRReader(ElectionConfig config, CVRSource source) {
+  CVRReader(ContestConfig config, CVRSource source) {
     this.config = config;
     this.excelFilePath = source.getFilePath();
     this.firstVoteColumnIndex = source.getFirstVoteColumnIndex();

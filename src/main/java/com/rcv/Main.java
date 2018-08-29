@@ -18,7 +18,7 @@
  * parse command line
  * parse config file
  * read cast vote records
- * tabulate election
+ * tabulate contest
  * output results
  */
 
@@ -56,7 +56,7 @@ public class Main extends GuiApplication {
       Logger.executionLog(Level.INFO, "Tabulator is being used via the CLI.");
       String configPath = args[0];
       // config file for running the tabulator
-      ElectionConfig config = loadElectionConfig(configPath);
+      ContestConfig config = loadContestConfig(configPath);
       if (config != null) {
         executeTabulation(config);
       } else {
@@ -67,25 +67,25 @@ public class Main extends GuiApplication {
     System.exit(0);
   }
 
-  // function: loadElectionConfig
+  // function: loadContestConfig
   // purpose: attempts to create config object
   // param: path to config file
-  // returns: the new ElectionConfig object, or null if there was a problem
-  static ElectionConfig loadElectionConfig(String configPath) {
+  // returns: the new ContestConfig object, or null if there was a problem
+  static ContestConfig loadContestConfig(String configPath) {
     // config: the new object
-    ElectionConfig config = null;
+    ContestConfig config = null;
 
-    // rawConfig holds the basic election config data parsed from json
+    // rawConfig holds the basic contest config data parsed from json
     // this will be null if there is a problem loading it
-    RawElectionConfig rawConfig =
-        JsonParser.parseObjectFromFile(configPath, RawElectionConfig.class);
+    RawContestConfig rawConfig =
+        JsonParser.parseObjectFromFile(configPath, RawContestConfig.class);
 
     // if raw config failed alert user
     if (rawConfig == null) {
       Logger.executionLog(Level.SEVERE, "Failed to load config file: %s", configPath);
     } else {
-      // proceed to create the ElectionConfig wrapper
-      config = new ElectionConfig(rawConfig);
+      // proceed to create the ContestConfig wrapper
+      config = new ContestConfig(rawConfig);
       Logger.executionLog(Level.INFO, "Successfully loaded config file: %s", configPath);
     }
 
@@ -93,10 +93,10 @@ public class Main extends GuiApplication {
   }
 
   // function: executeTabulation
-  // purpose: execute tabulation for given ElectionConfig
+  // purpose: execute tabulation for given ContestConfig
   // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
-  static void executeTabulation(ElectionConfig config) {
+  static void executeTabulation(ContestConfig config) {
     Logger.executionLog(Level.INFO, "Starting tabulation process...");
 
     boolean isTabulationCompleted = false;
@@ -162,10 +162,10 @@ public class Main extends GuiApplication {
   }
 
   // function: parseCastVoteRecords
-  // purpose: parse CVR files referenced in the ElectionConfig object into a list of CastVoteRecords
+  // purpose: parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
   // returns: list of all CastVoteRecord objects parsed from CVR files (or null if there's an error)
-  private static List<CastVoteRecord> parseCastVoteRecords(ElectionConfig config) {
+  private static List<CastVoteRecord> parseCastVoteRecords(ContestConfig config) {
     Logger.tabulationLog(Level.INFO, "Parsing cast vote records...");
 
     // castVoteRecords will contain all cast vote records parsed by the reader
@@ -176,7 +176,7 @@ public class Main extends GuiApplication {
     // At each iteration of the following loop, we add records from another source file.
     // source: index over config sources
     StringBuilder logMessage = new StringBuilder();
-    for (RawElectionConfig.CVRSource source : config.rawConfig.cvrFileSources) {
+    for (RawContestConfig.CVRSource source : config.rawConfig.cvrFileSources) {
       logMessage.append("Reading CVR file: ").append(source.getFilePath());
       if (source.getProvider() != null && !source.getProvider().isEmpty()) {
         logMessage.append(" (provider: ").append(source.getProvider()).append(")");

@@ -14,14 +14,14 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Purpose:
- * Wrapper for RawElectionConfig object. This class adds logic for looking up rule enum
+ * Wrapper for RawContestConfig object. This class adds logic for looking up rule enum
  * names, candidate names, various configuration utilities, and cast vote record objects.
  */
 
 package com.rcv;
 
-import com.rcv.RawElectionConfig.CVRSource;
-import com.rcv.RawElectionConfig.Candidate;
+import com.rcv.RawContestConfig.CVRSource;
+import com.rcv.RawContestConfig.Candidate;
 import com.rcv.Tabulator.TieBreakMode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -33,14 +33,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-class ElectionConfig {
+class ContestConfig {
 
   static final int DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final int DEFAULT_NUMBER_OF_WINNERS = 1;
   static final BigDecimal DEFAULT_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
 
   // underlying rawConfig object data
-  final RawElectionConfig rawConfig;
+  final RawContestConfig rawConfig;
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   // mapping from candidate code to full name
@@ -48,10 +48,10 @@ class ElectionConfig {
   // whether or not there are any validation errors
   private boolean isValid;
 
-  // function: ElectionConfig
-  // purpose: create a new ElectionConfig object
+  // function: ContestConfig
+  // purpose: create a new ContestConfig object
   // param: rawConfig underlying rawConfig object this object wraps
-  ElectionConfig(RawElectionConfig rawConfig) {
+  ContestConfig(RawContestConfig rawConfig) {
     this.rawConfig = rawConfig;
     this.processCandidateData();
   }
@@ -232,19 +232,19 @@ class ElectionConfig {
       Logger.executionLog(Level.SEVERE, "minimumVoteThreshold must be from 0 to 10000.");
     }
 
-    // If this is a multi-seat election, we validate a number of extra parameters.
+    // If this is a multi-seat contest, we validate a number of extra parameters.
     if (getNumberOfWinners() > 1) {
       if (willContinueUntilTwoCandidatesRemain()) {
         isValid = false;
         Logger.executionLog(
             Level.SEVERE,
-            "continueUntilTwoCandidatesRemain can't be true in a multi-winner election.");
+            "continueUntilTwoCandidatesRemain can't be true in a multi-winner contest.");
       }
 
       if (isBatchEliminationEnabled()) {
         isValid = false;
         Logger.executionLog(
-            Level.SEVERE, "batchElimination can't be true in a multi-winner election.");
+            Level.SEVERE, "batchElimination can't be true in a multi-winner contest.");
       }
 
       if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
@@ -260,7 +260,7 @@ class ElectionConfig {
   }
 
   // function: getNumberWinners
-  // purpose: how many winners for this election
+  // purpose: how many winners for this contest
   // returns from settings config or 1 of no setting is specified
   Integer getNumberOfWinners() {
     return rawConfig.rules.numberOfWinners == null
@@ -287,7 +287,7 @@ class ElectionConfig {
   }
 
   // function: getMultiSeatTransferRule
-  // purpose: which surplus transfer rule to use in multi-seat elections
+  // purpose: which surplus transfer rule to use in multi-seat contests
   // returns: enum indicating which transfer rule to use
   Tabulator.MultiSeatTransferRule getMultiSeatTransferRule() {
     Tabulator.MultiSeatTransferRule rule =
@@ -336,7 +336,7 @@ class ElectionConfig {
 
   // function: getContestDate
   // purpose: getter for contestDate
-  // returns: election date
+  // returns: contest date
   String getContestDate() {
     return rawConfig.contestDate;
   }
@@ -370,8 +370,8 @@ class ElectionConfig {
   }
 
   // function: numDeclaredCandidates
-  // purpose: calculate the number of declared candidates from the election configuration
-  // returns: the number of declared candidates from the election configuration
+  // purpose: calculate the number of declared candidates from the contest configuration
+  // returns: the number of declared candidates from the contest configuration
   int getNumDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = getCandidateCodeList().size();
@@ -484,8 +484,8 @@ class ElectionConfig {
     candidateCodeToNameMap = new HashMap<>();
 
     if (rawConfig.candidates != null) {
-      // candidate is used to index through all candidates for this election
-      for (RawElectionConfig.Candidate candidate : rawConfig.candidates) {
+      // candidate is used to index through all candidates for this contest
+      for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
         String code = candidate.getCode();
         String name = candidate.getName();
         if (code != null && !code.isEmpty()) {
