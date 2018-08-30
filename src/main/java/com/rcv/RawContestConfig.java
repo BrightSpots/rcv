@@ -25,8 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
-// TODO: add getters and setters for everything to address issue #73
-
+@SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
 
@@ -49,7 +48,6 @@ public class RawContestConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class OutputSettings {
-
     // contest name
     public String contestName;
     // directory for output files
@@ -150,7 +148,6 @@ public class RawContestConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class ContestRules {
-
     // tiebreak mode to use
     public String tiebreakMode;
     // which overvote rule to use

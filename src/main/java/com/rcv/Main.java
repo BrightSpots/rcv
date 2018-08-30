@@ -77,8 +77,7 @@ public class Main extends GuiApplication {
 
     // rawConfig holds the basic contest config data parsed from json
     // this will be null if there is a problem loading it
-    RawContestConfig rawConfig =
-        JsonParser.parseObjectFromFile(configPath, RawContestConfig.class);
+    RawContestConfig rawConfig = JsonParser.createRawContestConfigFromFile(configPath);
 
     // if raw config failed alert user
     if (rawConfig == null) {

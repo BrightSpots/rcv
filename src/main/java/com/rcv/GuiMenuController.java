@@ -52,6 +52,7 @@ public class GuiMenuController implements Initializable {
     }
   }
 
+  @SuppressWarnings("WeakerAccess")
   public void buttonLoadConfigClicked() {
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(new File(System.getProperty("user.dir")));

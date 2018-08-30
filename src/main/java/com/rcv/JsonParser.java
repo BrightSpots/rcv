@@ -29,50 +29,43 @@ import java.util.logging.Level;
 
 class JsonParser {
 
-  // function: parseObjectFromFile
-  // purpose: parse input json file into an object of the specified type
+  // function: createRawContestConfigFromFile
+  // purpose: parse input json file into a RawContestConfig
   // param: jsonFilePath path to json file to be parsed into java
-  // param: valueType class of the object to be created from parsed json
   // file access: read
-  // returns: instance of the object parsed from json or null if there was a problem
-  static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
-    T createdObject;
+  // returns: instance of the RawContestConfig parsed from json, or null if there was a problem
+  static RawContestConfig createRawContestConfigFromFile(String jsonFilePath) {
+    RawContestConfig rawConfig;
     try {
-      // fileReader will read the json file from disk
-      FileReader fileReader = new FileReader(jsonFilePath);
-      // objectMapper will map json values into the new java object
-      ObjectMapper objectMapper = new ObjectMapper();
-      // object is the newly created object populated with json values
-      createdObject = objectMapper.readValue(fileReader, valueType);
+      rawConfig =
+          new ObjectMapper().readValue(new FileReader(jsonFilePath), RawContestConfig.class);
     } catch (JsonParseException | JsonMappingException exception) {
       Logger.executionLog(
           Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
       Logger.executionLog(
           Level.SEVERE, "Check your file formatting and values to make sure they are correct.");
-      createdObject = null;
+      rawConfig = null;
     } catch (IOException exception) {
       Logger.executionLog(
           Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
       Logger.executionLog(
           Level.SEVERE, "Check your file path and permissions and make sure they are correct.");
-      createdObject = null;
+      rawConfig = null;
     }
-    return createdObject;
+    return rawConfig;
   }
 
-  static String createFileFromRawContestConfig(File jsonFile, RawContestConfig config) {
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "SUCCESS";
+  static void createFileFromRawContestConfig(File jsonFile, RawContestConfig config) {
     try {
-      mapper.writer().withDefaultPrettyPrinter().writeValue(jsonFile, config);
+      new ObjectMapper().writer().withDefaultPrettyPrinter().writeValue(jsonFile, config);
+      Logger.executionLog(
+          Level.INFO, "Saved config via the GUI to: %s", jsonFile.getAbsolutePath());
     } catch (IOException exception) {
       Logger.executionLog(
           Level.SEVERE,
           "Error saving file: %s\n%s",
           jsonFile.getAbsolutePath(),
           exception.toString());
-      response = "FAILURE";
     }
-    return response;
   }
 }

@@ -177,12 +177,7 @@ public class GuiConfigController implements Initializable {
 
     File saveFile = fc.showSaveDialog(null);
     if (saveFile != null) {
-      String response =
-          JsonParser.createFileFromRawContestConfig(saveFile, createRawContestConfig());
-      if (response.equals("SUCCESS")) {
-        Logger.executionLog(
-            Level.INFO, "Saved config via the GUI to: %s", saveFile.getAbsolutePath());
-      }
+      JsonParser.createFileFromRawContestConfig(saveFile, createRawContestConfig());
     }
   }
 
@@ -458,7 +453,7 @@ public class GuiConfigController implements Initializable {
 
   private static class ValidatorService extends Service<Void> {
 
-    private RawContestConfig rawContestConfig;
+    private final RawContestConfig rawContestConfig;
 
     ValidatorService(RawContestConfig rawContestConfig) {
       this.rawContestConfig = rawContestConfig;
