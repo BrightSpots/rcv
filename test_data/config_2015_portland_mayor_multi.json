@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "Portland 2015 Mayoral Race",
     "outputDirectory": "test_output/2015_portland_mayor_multi",
     "contestDate": "2015-11-03",
@@ -11,71 +11,55 @@
     {
       "filePath": "test_data/cvr_2015_portland_mayor.xlsx",
       "firstVoteColumnIndex": 3,
-      "idColumnIndex": null,
       "precinctColumnIndex": 1,
       "provider": "ES&S"
     }
   ],
   "candidates": [
     {
-      "name": "Brennan, Michael F.",
-      "code": null
+      "name": "Brennan, Michael F."
     },
     {
-      "name": "Bragdon, Charles E.",
-      "code": null
+      "name": "Bragdon, Charles E."
     },
     {
-      "name": "Bryant, Peter G.",
-      "code": null
+      "name": "Bryant, Peter G."
     },
     {
-      "name": "Carmona, Ralph C.",
-      "code": null
+      "name": "Carmona, Ralph C."
     },
     {
-      "name": "Dodge, Richard A.",
-      "code": null
+      "name": "Dodge, Richard A."
     },
     {
-      "name": "Duson, Jill C.",
-      "code": null
+      "name": "Duson, Jill C."
     },
     {
-      "name": "Eder, John M.",
-      "code": null
+      "name": "Eder, John M."
     },
     {
-      "name": "Haadoow, Hamza A.",
-      "code": null
+      "name": "Haadoow, Hamza A."
     },
     {
-      "name": "Lapchick, Jodie L.",
-      "code": null
+      "name": "Lapchick, Jodie L."
     },
     {
-      "name": "Marshall, David A.",
-      "code": null
+      "name": "Marshall, David A."
     },
     {
-      "name": "Mavodones, Nicholas M. Jr.",
-      "code": null
+      "name": "Mavodones, Nicholas M. Jr."
     },
     {
-      "name": "Miller, Markos S.",
-      "code": null
+      "name": "Miller, Markos S."
     },
     {
-      "name": "Rathband, Jed",
-      "code": null
+      "name": "Rathband, Jed"
     },
     {
-      "name": "Strimling, Ethan K.",
-      "code": null
+      "name": "Strimling, Ethan K."
     },
     {
-      "name": "Vail, Christopher L.",
-      "code": null
+      "name": "Vail, Christopher L."
     }
   ],
   "rules": {

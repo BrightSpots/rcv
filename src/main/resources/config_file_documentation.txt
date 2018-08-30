@@ -1,9 +1,9 @@
 This document lists the parameters that can be included in a config file suitable for input tabulation.
 Config file must be valid JSON format. Examples can be found under the test folder.
 
-  "settings" required
-    list of contest settings and their associated parameters
-    each "settings" list item contains the following parameters:
+  "outputSettings" required
+    list of output settings and their associated parameters
+    the "outputSettings" section contains the following parameters:
 
       "contestName" required
         the name of the contest

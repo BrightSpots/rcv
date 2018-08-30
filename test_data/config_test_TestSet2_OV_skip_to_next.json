@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "Overvote2",
     "outputDirectory": "test_output/test_TestSet2_OV_skip_to_next",
     "contestDate": "2018-07-28",
@@ -12,26 +12,21 @@
       "filePath": "test_data/cvr_test_TestSet2_OV_skip_to_next.xlsx",
       "firstVoteColumnIndex": 1,
       "idColumnIndex": 0,
-      "precinctColumnIndex": null,
       "provider": "ES&S"
     }
   ],
   "candidates": [
     {
-      "name": "A",
-      "code": null
+      "name": "A"
     },
     {
-      "name": "B",
-      "code": null
+      "name": "B"
     },
     {
-      "name": "C",
-      "code": null
+      "name": "C"
     },
     {
-      "name": "D",
-      "code": null
+      "name": "D"
     }
   ],
   "rules": {

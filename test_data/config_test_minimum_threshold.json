@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "Minimum threshold test",
     "outputDirectory": "test_output/test_minimum_threshold",
     "contestDate": "2018-01-07",
@@ -11,31 +11,24 @@
     {
       "filePath": "test_data/cvr_test_minimum_threshold.xlsx",
       "firstVoteColumnIndex": 1,
-      "idColumnIndex": null,
-      "precinctColumnIndex": null,
       "provider": "ES&S"
     }
   ],
   "candidates": [
     {
-      "name": "Gargamel",
-      "code": null
+      "name": "Gargamel"
     },
     {
-      "name": "Skeletor",
-      "code": null
+      "name": "Skeletor"
     },
     {
-      "name": "Megatron",
-      "code": null
+      "name": "Megatron"
     },
     {
-      "name": "Garfield",
-      "code": null
+      "name": "Garfield"
     },
     {
-      "name": "Odie",
-      "code": null
+      "name": "Odie"
     }
   ],
   "rules": {

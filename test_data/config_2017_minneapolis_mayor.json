@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "2017 Minneapolis mayoral race",
     "outputDirectory": "test_output/2017_minneapolis_mayor",
     "contestDate": "2017-11-07",
@@ -11,83 +11,64 @@
     {
       "filePath": "test_data/cvr_2017_minneapolis_mayor.xlsx",
       "firstVoteColumnIndex": 1,
-      "idColumnIndex": null,
       "precinctColumnIndex": 0,
       "provider": "ES&S"
     }
   ],
   "candidates": [
     {
-      "name": "Jacob Frey",
-      "code": null
+      "name": "Jacob Frey"
     },
     {
-      "name": "Tom Hoch",
-      "code": null
+      "name": "Tom Hoch"
     },
     {
-      "name": "Betsy Hodges",
-      "code": null
+      "name": "Betsy Hodges"
     },
     {
-      "name": "Raymond Dehn",
-      "code": null
+      "name": "Raymond Dehn"
     },
     {
-      "name": "Nekima Levy-Pounds",
-      "code": null
+      "name": "Nekima Levy-Pounds"
     },
     {
-      "name": "Charlie Gers",
-      "code": null
+      "name": "Charlie Gers"
     },
     {
-      "name": "Aswar Rahman",
-      "code": null
+      "name": "Aswar Rahman"
     },
     {
-      "name": "Al Flowers",
-      "code": null
+      "name": "Al Flowers"
     },
     {
-      "name": "L.A. Nik",
-      "code": null
+      "name": "L.A. Nik"
     },
     {
-      "name": "David Rosenfeld",
-      "code": null
+      "name": "David Rosenfeld"
     },
     {
-      "name": "Captain Jack Sparrow",
-      "code": null
+      "name": "Captain Jack Sparrow"
     },
     {
-      "name": "Gregg A. Iverson",
-      "code": null
+      "name": "Gregg A. Iverson"
     },
     {
-      "name": "Ronald Lischeid",
-      "code": null
+      "name": "Ronald Lischeid"
     },
     {
-      "name": "David John Wilson",
-      "code": null
+      "name": "David John Wilson"
     },
     {
-      "name": "Troy Benjegerdes",
-      "code": null
+      "name": "Troy Benjegerdes"
     },
     {
-      "name": "Ian Simpson",
-      "code": null
+      "name": "Ian Simpson"
     },
     {
-      "name": "Christopher Zimmerman",
-      "code": null
+      "name": "Christopher Zimmerman"
     },
     {
-      "name": "Theron Preston Washington",
-      "code": null
+      "name": "Theron Preston Washington"
     }
   ],
   "rules": {

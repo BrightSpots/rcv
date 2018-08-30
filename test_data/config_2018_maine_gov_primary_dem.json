@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "Maine 2018 Democratic Governor Primary race",
     "outputDirectory": "test_output/2018_maine_gov_primary_dem",
     "contestDate": "2018-06-12",
@@ -18,36 +18,28 @@
   ],
   "candidates": [
     {
-      "name": "Mills, Janet T.",
-      "code": null
+      "name": "Mills, Janet T."
     },
     {
-      "name": "Cote, Adam Roland",
-      "code": null
+      "name": "Cote, Adam Roland"
     },
     {
-      "name": "Sweet, Elizabeth A.",
-      "code": null
+      "name": "Sweet, Elizabeth A."
     },
     {
-      "name": "Eves, Mark W.",
-      "code": null
+      "name": "Eves, Mark W."
     },
     {
-      "name": "Dion, Mark N.",
-      "code": null
+      "name": "Dion, Mark N."
     },
     {
-      "name": "Russell, Diane Marie",
-      "code": null
+      "name": "Russell, Diane Marie"
     },
     {
-      "name": "Dion, Donna J.",
-      "code": null
+      "name": "Dion, Donna J."
     },
     {
-      "name": "Write-in",
-      "code": null
+      "name": "Write-in"
     }
   ],
   "rules": {

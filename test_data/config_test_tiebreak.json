@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "Tiebreak test",
     "outputDirectory": "test_output/test_tiebreak",
     "contestDate": "2017-12-03",
@@ -11,27 +11,21 @@
     {
       "filePath": "test_data/cvr_test_tiebreak.xlsx",
       "firstVoteColumnIndex": 1,
-      "idColumnIndex": null,
-      "precinctColumnIndex": null,
       "provider": "ES&S"
     }
   ],
   "candidates": [
     {
-      "name": "Mookie Blaylock",
-      "code": null
+      "name": "Mookie Blaylock"
     },
     {
-      "name": "Yinka Dare",
-      "code": null
+      "name": "Yinka Dare"
     },
     {
-      "name": "George Gervin",
-      "code": null
+      "name": "George Gervin"
     },
     {
-      "name": "Sedale Threatt",
-      "code": null
+      "name": "Sedale Threatt"
     }
   ],
   "rules": {

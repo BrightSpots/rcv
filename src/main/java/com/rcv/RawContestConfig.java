@@ -30,8 +30,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
 
-  // contest settings object
-  public ContestSettings settings;
+  // output settings object
+  public OutputSettings outputSettings;
   // list of all cast vote record source files
   public List<CVRSource> cvrFileSources;
   // list of all Candidates
@@ -45,10 +45,10 @@ public class RawContestConfig {
   RawContestConfig() {
   }
 
-  // ContestSettings: encapsulates the contest settings
+  // OutputSettings: encapsulates the output settings
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public static class ContestSettings {
+  public static class OutputSettings {
 
     // contest name
     public String contestName;
@@ -66,6 +66,7 @@ public class RawContestConfig {
 
   // CVRSource: encapsulates a source cast vote record file
   @JsonIgnoreProperties(ignoreUnknown = true)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CVRSource {
     // path to the file on disk
     private String filePath;
@@ -121,6 +122,7 @@ public class RawContestConfig {
 
   // Candidate: contains a full candidate name and optionally a candidate ID
   @JsonIgnoreProperties(ignoreUnknown = true)
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
     // full candidate name
     private String name;

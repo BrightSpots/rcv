@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "Validation test for sources",
     "outputDirectory": "test_output/test_invalid_sources",
     "contestDate": "2018-07-20",
@@ -11,40 +11,30 @@
     {
       "filePath": "test_data/nonexistent_path",
       "firstVoteColumnIndex": 3,
-      "idColumnIndex": null,
       "precinctColumnIndex": 1,
       "provider": "ES&S"
     },
     {
       "filePath": "test_data/nonexistent_path2",
-      "firstVoteColumnIndex": null,
-      "idColumnIndex": null,
-      "precinctColumnIndex": null,
       "provider": "ES&S"
     },
     {
-      "filePath": null,
       "firstVoteColumnIndex": 3,
-      "idColumnIndex": null,
       "precinctColumnIndex": 1,
       "provider": "ES&S"
     },
     {
       "filePath": "test_data/cvr_test_invalid_sources_unrecognized_candidates.xlsx",
       "firstVoteColumnIndex": 1,
-      "idColumnIndex": null,
-      "precinctColumnIndex": null,
       "provider": "ES&S"
     }
   ],
   "candidates": [
     {
-      "name": "Candidate 1",
-      "code": null
+      "name": "Candidate 1"
     },
     {
-      "name": "Candidate 2",
-      "code": null
+      "name": "Candidate 2"
     }
   ],
   "rules": {

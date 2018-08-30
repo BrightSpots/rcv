@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "2013 Minneapolis Park Board",
     "outputDirectory": "test_output/2013_minneapolis_park",
     "contestDate": "",
@@ -11,51 +11,40 @@
     {
       "filePath": "test_data/cvr_2013_minneapolis_park.xlsx",
       "firstVoteColumnIndex": 1,
-      "idColumnIndex": null,
       "precinctColumnIndex": 0,
       "provider": "ES&S"
     }
   ],
   "candidates": [
     {
-      "name": "ANNIE YOUNG",
-      "code": null
+      "name": "ANNIE YOUNG"
     },
     {
-      "name": "CASPER HILL",
-      "code": null
+      "name": "CASPER HILL"
     },
     {
-      "name": "HASHIM YONIS",
-      "code": null
+      "name": "HASHIM YONIS"
     },
     {
-      "name": "ISHMAEL ISRAEL",
-      "code": null
+      "name": "ISHMAEL ISRAEL"
     },
     {
-      "name": "JASON STONE",
-      "code": null
+      "name": "JASON STONE"
     },
     {
-      "name": "JOHN ERWIN",
-      "code": null
+      "name": "JOHN ERWIN"
     },
     {
-      "name": "MARY LYNN MCPHERSON",
-      "code": null
+      "name": "MARY LYNN MCPHERSON"
     },
     {
-      "name": "MEG FORNEY",
-      "code": null
+      "name": "MEG FORNEY"
     },
     {
-      "name": "STEVE BARLAND",
-      "code": null
+      "name": "STEVE BARLAND"
     },
     {
-      "name": "TOM NORDYKE",
-      "code": null
+      "name": "TOM NORDYKE"
     }
   ],
   "rules": {

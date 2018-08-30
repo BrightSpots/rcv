@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "Portland 2015 Mayoral Race",
     "outputDirectory": "test",
     "contestDate": "2015-11-03",
@@ -11,23 +11,18 @@
     {
       "filePath": "test_data/cvr_test_continue_tabulation.xlsx",
       "firstVoteColumnIndex": 3,
-      "idColumnIndex": null,
-      "precinctColumnIndex": null,
       "provider": "ES&S"
     }
   ],
   "candidates": [
     {
-      "name": "Carmona, Ralph C.",
-      "code": null
+      "name": "Carmona, Ralph C."
     },
     {
-      "name": "Haadoow, Hamza A.",
-      "code": null
+      "name": "Haadoow, Hamza A."
     },
     {
-      "name": "Vail, Christopher L.",
-      "code": null
+      "name": "Vail, Christopher L."
     }
   ],
   "rules": {

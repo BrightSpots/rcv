@@ -261,7 +261,7 @@ class ContestConfig {
 
   // function: getNumberWinners
   // purpose: how many winners for this contest
-  // returns from settings config or 1 of no setting is specified
+  // returns: number of winners or default value if it's not specified
   Integer getNumberOfWinners() {
     return rawConfig.rules.numberOfWinners == null
         ? DEFAULT_NUMBER_OF_WINNERS
@@ -270,7 +270,7 @@ class ContestConfig {
 
   // function: getDecimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
-  // returns: number of places to round to or 0 if no setting is specified
+  // returns: number of places to round to or default value if it's not specified
   Integer getDecimalPlacesForVoteArithmetic() {
     return rawConfig.rules.decimalPlacesForVoteArithmetic == null
         ? DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC
@@ -300,9 +300,10 @@ class ContestConfig {
   // returns: directory string from config or falls back to working directory
   String getOutputDirectory() {
     // outputDirectory is where output files should be written
-    return (rawConfig.settings.outputDirectory != null && !rawConfig.settings.outputDirectory
+    return (rawConfig.outputSettings.outputDirectory != null
+        && !rawConfig.outputSettings.outputDirectory
         .isEmpty())
-        ? rawConfig.settings.outputDirectory
+        ? rawConfig.outputSettings.outputDirectory
         : System.getProperty("user.dir");
   }
 
@@ -318,35 +319,35 @@ class ContestConfig {
   // purpose: getter for contestName
   // returns: contest name
   String getContestName() {
-    return rawConfig.settings.contestName;
+    return rawConfig.outputSettings.contestName;
   }
 
   // function: getContestJurisdiction
   // purpose: getter for contestJurisdiction
   // returns: contest jurisdiction name
   String getContestJurisdiction() {
-    return rawConfig.settings.contestJurisdiction;
+    return rawConfig.outputSettings.contestJurisdiction;
   }
 
   // function: getContestOffice
   // purpose: getter for contestOffice
   // returns: contest office name
   String getContestOffice() {
-    return rawConfig.settings.contestOffice;
+    return rawConfig.outputSettings.contestOffice;
   }
 
   // function: getContestDate
   // purpose: getter for contestDate
   // returns: contest date
   String getContestDate() {
-    return rawConfig.settings.contestDate;
+    return rawConfig.outputSettings.contestDate;
   }
 
   // function: isTabulateByPrecinctEnabled
   // purpose: getter for tabulateByPrecinct
   // returns: true if and only if we should tabulate by precinct
   boolean isTabulateByPrecinctEnabled() {
-    return rawConfig.settings.tabulateByPrecinct;
+    return rawConfig.outputSettings.tabulateByPrecinct;
   }
 
   // function: getMaxRankingsAllowed
@@ -400,7 +401,7 @@ class ContestConfig {
 
   // function: getMinimumVoteThreshold
   // purpose: getter for minimumVoteThreshold rule
-  // returns: minimum vote threshold to use for this config
+  // returns: minimum vote threshold to use or default value if it's not specified
   BigDecimal getMinimumVoteThreshold() {
     return rawConfig.rules.minimumVoteThreshold == null
         ? DEFAULT_MINIMUM_VOTE_THRESHOLD

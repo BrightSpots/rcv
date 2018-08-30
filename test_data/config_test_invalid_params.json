@@ -1,5 +1,5 @@
 {
-  "settings": {
+  "outputSettings": {
     "contestName": "Validation test for params",
     "outputDirectory": "test_output/test_invalid_params",
     "contestDate": "2018-07-19",
@@ -10,18 +10,21 @@
   "cvrFileSources": [],
   "candidates": [],
   "rules": {
-    "rulesDescription": "Testing our validation logic for params",
-    "batchElimination": "True",
-    "continueUntilTwoCandidatesRemain": "false",
+    "tiebreakMode": "whatever",
+    "overvoteRule": "exhaustIfAnyContinuing",
+    "multiSeatTransferRule": "flipACoin",
+    "numberOfWinners": 2,
     "decimalPlacesForVoteArithmetic": -1,
     "maxRankingsAllowed": -1,
     "maxSkippedRanksAllowed": -3,
-    "multiSeatTransferRule": "flipACoin",
-    "numberOfWinners": 2,
+    "minimumVoteThreshold": 0,
+    "batchElimination": "True",
+    "continueUntilTwoCandidatesRemain": "false",
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "overvote",
-    "overvoteRule": "exhaustIfAnyContinuing",
-    "tiebreakMode": "whatever",
+    "undervoteLabel": "undervote",
     "undeclaredWriteInLabel": "UWI",
-    "undervoteLabel": "undervote"
+    "rulesDescription": "Testing our validation logic for params"
   }
 }

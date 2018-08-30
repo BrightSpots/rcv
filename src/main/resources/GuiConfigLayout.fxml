@@ -29,7 +29,7 @@
   <center>
     <VBox BorderPane.alignment="CENTER">
       <TabPane minHeight="450.0" tabClosingPolicy="UNAVAILABLE">
-        <Tab text="Contest">
+        <Tab text="Output">
           <VBox spacing="8.0">
             <Label text="Contest Name *"/>
             <TextField maxWidth="220.0" promptText="Contest Name *" fx:id="textFieldContestName"/>

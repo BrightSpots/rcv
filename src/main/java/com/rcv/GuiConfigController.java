@@ -19,7 +19,7 @@ package com.rcv;
 import com.rcv.RawContestConfig.CVRSource;
 import com.rcv.RawContestConfig.Candidate;
 import com.rcv.RawContestConfig.ContestRules;
-import com.rcv.RawContestConfig.ContestSettings;
+import com.rcv.RawContestConfig.OutputSettings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -410,15 +410,15 @@ public class GuiConfigController implements Initializable {
   private RawContestConfig createRawContestConfig() {
     RawContestConfig config = new RawContestConfig();
 
-    ContestSettings settings = new ContestSettings();
-    settings.contestName = textFieldContestName.getText();
-    settings.outputDirectory = textFieldOutputDirectory.getText();
-    settings.contestDate =
+    OutputSettings outputSettings = new OutputSettings();
+    outputSettings.contestName = textFieldContestName.getText();
+    outputSettings.outputDirectory = textFieldOutputDirectory.getText();
+    outputSettings.contestDate =
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
-    settings.contestJurisdiction = textFieldContestJurisdiction.getText();
-    settings.contestOffice = textFieldContestOffice.getText();
-    settings.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
-    config.settings = settings;
+    outputSettings.contestJurisdiction = textFieldContestJurisdiction.getText();
+    outputSettings.contestOffice = textFieldContestOffice.getText();
+    outputSettings.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
+    config.outputSettings = outputSettings;
 
     config.cvrFileSources = new ArrayList<>(tableViewCvrFiles.getItems());
 
