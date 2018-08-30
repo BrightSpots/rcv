@@ -1,0 +1,99 @@
+{
+  "settings": {
+    "contestName": "Portland 2015 Mayoral Race",
+    "outputDirectory": "test_output/2015_portland_mayor",
+    "contestDate": "2015-11-03",
+    "contestJurisdiction": "Portland, ME",
+    "contestOffice": "Mayor",
+    "tabulateByPrecinct": false
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "test_data/cvr_2015_portland_mayor.xlsx",
+      "firstVoteColumnIndex": 3,
+      "idColumnIndex": null,
+      "precinctColumnIndex": 1,
+      "provider": "ES&S"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Brennan, Michael F.",
+      "code": null
+    },
+    {
+      "name": "Bragdon, Charles E.",
+      "code": null
+    },
+    {
+      "name": "Bryant, Peter G.",
+      "code": null
+    },
+    {
+      "name": "Carmona, Ralph C.",
+      "code": null
+    },
+    {
+      "name": "Dodge, Richard A.",
+      "code": null
+    },
+    {
+      "name": "Duson, Jill C.",
+      "code": null
+    },
+    {
+      "name": "Eder, John M.",
+      "code": null
+    },
+    {
+      "name": "Haadoow, Hamza A.",
+      "code": null
+    },
+    {
+      "name": "Lapchick, Jodie L.",
+      "code": null
+    },
+    {
+      "name": "Marshall, David A.",
+      "code": null
+    },
+    {
+      "name": "Mavodones, Nicholas M. Jr.",
+      "code": null
+    },
+    {
+      "name": "Miller, Markos S.",
+      "code": null
+    },
+    {
+      "name": "Rathband, Jed",
+      "code": null
+    },
+    {
+      "name": "Strimling, Ethan K.",
+      "code": null
+    },
+    {
+      "name": "Vail, Christopher L.",
+      "code": null
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "maxRankingsAllowed": 15,
+    "multiSeatTransferRule": "transferRuleUnknown",
+    "maxSkippedRanksAllowed": 1,
+    "numberOfWinners": 1,
+    "decimalPlacesForVoteArithmetic": 4,
+    "minimumVoteThreshold": 0,
+    "batchElimination": true,
+    "continueUntilTwoCandidatesRemain": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI",
+    "rulesDescription": "Maine Rules"
+  }
+}

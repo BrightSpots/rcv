@@ -1,0 +1,47 @@
+{
+  "settings": {
+    "contestName": "Duplicate test",
+    "outputDirectory": "test_output/test_duplicate",
+    "contestDate": "2018-05-21",
+    "contestJurisdiction": "Funkytown, USA",
+    "contestOffice": "Director of Produce",
+    "tabulateByPrecinct": false
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "test_data/cvr_test_duplicate.xlsx",
+      "firstVoteColumnIndex": 1,
+      "idColumnIndex": null,
+      "precinctColumnIndex": null,
+      "provider": "ES&S"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Banana",
+      "code": null
+    },
+    {
+      "name": "Kumquat",
+      "code": null
+    },
+    {
+      "name": "Durian",
+      "code": null
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "maxRankingsAllowed": 3,
+    "multiSeatTransferRule": "transferRuleUnknown",
+    "numberOfWinners": 1,
+    "decimalPlacesForVoteArithmetic": 4,
+    "minimumVoteThreshold": 0,
+    "batchElimination": false,
+    "continueUntilTwoCandidatesRemain": false,
+    "exhaustOnDuplicateCandidate": true,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "rulesDescription": "Doyle Rules"
+  }
+}

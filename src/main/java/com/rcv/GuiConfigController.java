@@ -19,6 +19,7 @@ package com.rcv;
 import com.rcv.RawContestConfig.CVRSource;
 import com.rcv.RawContestConfig.Candidate;
 import com.rcv.RawContestConfig.ContestRules;
+import com.rcv.RawContestConfig.ContestSettings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -408,20 +409,22 @@ public class GuiConfigController implements Initializable {
 
   private RawContestConfig createRawContestConfig() {
     RawContestConfig config = new RawContestConfig();
-    ContestRules rules = new ContestRules();
 
-    config.contestName = textFieldContestName.getText();
-    config.outputDirectory = textFieldOutputDirectory.getText();
-    config.contestDate =
+    ContestSettings settings = new ContestSettings();
+    settings.contestName = textFieldContestName.getText();
+    settings.outputDirectory = textFieldOutputDirectory.getText();
+    settings.contestDate =
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
-    config.contestJurisdiction = textFieldContestJurisdiction.getText();
-    config.contestOffice = textFieldContestOffice.getText();
-    config.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
+    settings.contestJurisdiction = textFieldContestJurisdiction.getText();
+    settings.contestOffice = textFieldContestOffice.getText();
+    settings.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
+    config.settings = settings;
 
     config.cvrFileSources = new ArrayList<>(tableViewCvrFiles.getItems());
 
     config.candidates = new ArrayList<>(tableViewCandidates.getItems());
 
+    ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, Tabulator.OvervoteRule.RULE_UNKNOWN);
     rules.multiSeatTransferRule =

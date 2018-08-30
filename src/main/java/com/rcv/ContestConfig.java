@@ -300,8 +300,9 @@ class ContestConfig {
   // returns: directory string from config or falls back to working directory
   String getOutputDirectory() {
     // outputDirectory is where output files should be written
-    return (rawConfig.outputDirectory != null && !rawConfig.outputDirectory.isEmpty())
-        ? rawConfig.outputDirectory
+    return (rawConfig.settings.outputDirectory != null && !rawConfig.settings.outputDirectory
+        .isEmpty())
+        ? rawConfig.settings.outputDirectory
         : System.getProperty("user.dir");
   }
 
@@ -317,35 +318,35 @@ class ContestConfig {
   // purpose: getter for contestName
   // returns: contest name
   String getContestName() {
-    return rawConfig.contestName;
+    return rawConfig.settings.contestName;
   }
 
   // function: getContestJurisdiction
   // purpose: getter for contestJurisdiction
   // returns: contest jurisdiction name
   String getContestJurisdiction() {
-    return rawConfig.contestJurisdiction;
+    return rawConfig.settings.contestJurisdiction;
   }
 
   // function: getContestOffice
   // purpose: getter for contestOffice
   // returns: contest office name
   String getContestOffice() {
-    return rawConfig.contestOffice;
+    return rawConfig.settings.contestOffice;
   }
 
   // function: getContestDate
   // purpose: getter for contestDate
   // returns: contest date
   String getContestDate() {
-    return rawConfig.contestDate;
+    return rawConfig.settings.contestDate;
   }
 
   // function: isTabulateByPrecinctEnabled
   // purpose: getter for tabulateByPrecinct
   // returns: true if and only if we should tabulate by precinct
   boolean isTabulateByPrecinctEnabled() {
-    return rawConfig.tabulateByPrecinct;
+    return rawConfig.settings.tabulateByPrecinct;
   }
 
   // function: getMaxRankingsAllowed

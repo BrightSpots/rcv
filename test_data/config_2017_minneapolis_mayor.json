@@ -1,0 +1,110 @@
+{
+  "settings": {
+    "contestName": "2017 Minneapolis mayoral race",
+    "outputDirectory": "test_output/2017_minneapolis_mayor",
+    "contestDate": "2017-11-07",
+    "contestJurisdiction": "Minneapolis, MN",
+    "contestOffice": "Mayor",
+    "tabulateByPrecinct": true
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "test_data/cvr_2017_minneapolis_mayor.xlsx",
+      "firstVoteColumnIndex": 1,
+      "idColumnIndex": null,
+      "precinctColumnIndex": 0,
+      "provider": "ES&S"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Jacob Frey",
+      "code": null
+    },
+    {
+      "name": "Tom Hoch",
+      "code": null
+    },
+    {
+      "name": "Betsy Hodges",
+      "code": null
+    },
+    {
+      "name": "Raymond Dehn",
+      "code": null
+    },
+    {
+      "name": "Nekima Levy-Pounds",
+      "code": null
+    },
+    {
+      "name": "Charlie Gers",
+      "code": null
+    },
+    {
+      "name": "Aswar Rahman",
+      "code": null
+    },
+    {
+      "name": "Al Flowers",
+      "code": null
+    },
+    {
+      "name": "L.A. Nik",
+      "code": null
+    },
+    {
+      "name": "David Rosenfeld",
+      "code": null
+    },
+    {
+      "name": "Captain Jack Sparrow",
+      "code": null
+    },
+    {
+      "name": "Gregg A. Iverson",
+      "code": null
+    },
+    {
+      "name": "Ronald Lischeid",
+      "code": null
+    },
+    {
+      "name": "David John Wilson",
+      "code": null
+    },
+    {
+      "name": "Troy Benjegerdes",
+      "code": null
+    },
+    {
+      "name": "Ian Simpson",
+      "code": null
+    },
+    {
+      "name": "Christopher Zimmerman",
+      "code": null
+    },
+    {
+      "name": "Theron Preston Washington",
+      "code": null
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "maxRankingsAllowed": 3,
+    "multiSeatTransferRule": "transferRuleUnknown",
+    "numberOfWinners": 1,
+    "decimalPlacesForVoteArithmetic": 4,
+    "minimumVoteThreshold": 0,
+    "batchElimination": true,
+    "continueUntilTwoCandidatesRemain": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI",
+    "rulesDescription": "Minneapolis Rules"
+  }
+}
