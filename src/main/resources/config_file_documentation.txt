@@ -1,46 +1,50 @@
 This document lists the parameters that can be included in a config file suitable for input tabulation.
 Config file must be valid JSON format. Examples can be found under the test folder.
 
-  "contestName" required
-    the name of the contest
-    used for naming output files (visualizer and audit)
-    example: "Portland Mayoral Race 2017"
-    value: text string of length [1..1000]
+  "outputSettings" required
+    list of output settings and their associated parameters
+    the "outputSettings" section contains the following parameters:
 
-  "outputDirectory" required
-    directory for output files (visualizer and audit)
-    example: /Path/To/TabulatorResults
-    value: string of length [1..1000]
+      "contestName" required
+        the name of the contest
+        used for naming output files (visualizer and audit)
+        example: "Portland Mayoral Race 2017"
+        value: text string of length [1..1000]
 
-  "contestDate" optional
-    date of the contest
-    used for visualizer output only (not used in tabulation)
-    example: "2015-11-03"
-    value: text string of length [1..1000]
-    default: none
+      "outputDirectory" required
+        directory for output files (visualizer and audit)
+        example: /Path/To/TabulatorResults
+        value: string of length [1..1000]
 
-  "jurisdiction" optional
-    text description of the jurisdiction of this contest
-    used for visualizer output only (not used in tabulation)
-    example: "Portland, ME"
-    value: text string of length [1..1000]
-    default: none
+      "contestDate" optional
+        date of the contest
+        used for visualizer output only (not used in tabulation)
+        example: "2015-11-03"
+        value: text string of length [1..1000]
+        default: none
 
-  "office" optional
-    text description of the office being contested
-    used for visualizer output only (not used in tabulation)
-    example: "Mayor"
-    value: text string of length [1..1000]
-    default: none
+      "contestJurisdiction" optional
+        text description of the jurisdiction of this contest
+        used for visualizer output only (not used in tabulation)
+        example: "Portland, ME"
+        value: text string of length [1..1000]
+        default: none
 
-  "tabulateByPrecinct" optional
-    tabulator will generate a results spreadsheet for each precinct
-    value: true | false
-    default: false
+      "contestOffice" optional
+        text description of the office being contested
+        used for visualizer output only (not used in tabulation)
+        example: "Mayor"
+        value: text string of length [1..1000]
+        default: none
+
+      "tabulateByPrecinct" optional
+        tabulator will generate a results spreadsheet for each precinct
+        value: true | false
+        default: false
 
   "cvrFileSources" required
     list of input CVR file paths and their associated parameters
-    Each "cvrFileSources" list item contains the following parameters:
+    each "cvrFileSources" list item contains the following parameters:
 
       "filePath" required
         location of the CVR file
@@ -70,7 +74,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         default: none
 
   "candidates" required
-    List of registered candidate names and associated candidate code
+    list of registered candidate names and associated candidate code
     each "candidates" list item has the following parameters:
 
     "name" required
@@ -86,7 +90,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
 
   "rules" required
     set of configuration parameters that specify the tabulation rules
-    The "rules" section contains the following parameters:
+    the "rules" section contains the following parameters:
 
       "tiebreakMode" required
         how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round.
@@ -112,7 +116,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: [0..100]
 
       "numberOfWinners" optional
-        the number of seats to be won in this election
+        the number of seats to be won in this contest
         value: [1..100]
         default: 1
 

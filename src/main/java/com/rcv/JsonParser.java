@@ -60,7 +60,7 @@ class JsonParser {
     return createdObject;
   }
 
-  static String createFileFromRawElectionConfig(File jsonFile, RawElectionConfig config) {
+  static String createFileFromRawContestConfig(File jsonFile, RawContestConfig config) {
     ObjectMapper mapper = new ObjectMapper();
     String response = "SUCCESS";
     try {

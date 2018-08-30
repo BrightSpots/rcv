@@ -1,0 +1,49 @@
+{
+  "outputSettings": {
+    "contestName": "Overvote2",
+    "outputDirectory": "test_output/test_TestSet2_OV_skip_to_next",
+    "contestDate": "2018-07-28",
+    "contestJurisdiction": "Funkytown, USA",
+    "contestOffice": "Exhausted",
+    "tabulateByPrecinct": false
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "test_data/cvr_test_TestSet2_OV_skip_to_next.xlsx",
+      "firstVoteColumnIndex": 1,
+      "idColumnIndex": 0,
+      "provider": "ES&S"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "A"
+    },
+    {
+      "name": "B"
+    },
+    {
+      "name": "C"
+    },
+    {
+      "name": "D"
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "maxRankingsAllowed": 4,
+    "multiSeatTransferRule": "transferRuleUnknown",
+    "maxSkippedRanksAllowed": 1,
+    "numberOfWinners": 1,
+    "decimalPlacesForVoteArithmetic": 4,
+    "minimumVoteThreshold": 0,
+    "batchElimination": false,
+    "continueUntilTwoCandidatesRemain": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "rulesDescription": "Doyle Rules"
+  }
+}

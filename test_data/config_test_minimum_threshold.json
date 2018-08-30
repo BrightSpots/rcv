@@ -1,0 +1,48 @@
+{
+  "outputSettings": {
+    "contestName": "Minimum threshold test",
+    "outputDirectory": "test_output/test_minimum_threshold",
+    "contestDate": "2018-01-07",
+    "contestJurisdiction": "Funkytown, USA",
+    "contestOffice": "Sergeant-at-Arms",
+    "tabulateByPrecinct": false
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "test_data/cvr_test_minimum_threshold.xlsx",
+      "firstVoteColumnIndex": 1,
+      "provider": "ES&S"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Gargamel"
+    },
+    {
+      "name": "Skeletor"
+    },
+    {
+      "name": "Megatron"
+    },
+    {
+      "name": "Garfield"
+    },
+    {
+      "name": "Odie"
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "maxRankingsAllowed": 3,
+    "multiSeatTransferRule": "transferRuleUnknown",
+    "numberOfWinners": 1,
+    "decimalPlacesForVoteArithmetic": 4,
+    "minimumVoteThreshold": 3,
+    "batchElimination": false,
+    "continueUntilTwoCandidatesRemain": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "rulesDescription": "Doyle Rules"
+  }
+}

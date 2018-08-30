@@ -1,0 +1,83 @@
+{
+  "outputSettings": {
+    "contestName": "Portland 2015 Mayoral Race",
+    "outputDirectory": "test_output/2015_portland_mayor_multi",
+    "contestDate": "2015-11-03",
+    "contestJurisdiction": "Portland, ME",
+    "contestOffice": "Mayor",
+    "tabulateByPrecinct": false
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "test_data/cvr_2015_portland_mayor.xlsx",
+      "firstVoteColumnIndex": 3,
+      "precinctColumnIndex": 1,
+      "provider": "ES&S"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Brennan, Michael F."
+    },
+    {
+      "name": "Bragdon, Charles E."
+    },
+    {
+      "name": "Bryant, Peter G."
+    },
+    {
+      "name": "Carmona, Ralph C."
+    },
+    {
+      "name": "Dodge, Richard A."
+    },
+    {
+      "name": "Duson, Jill C."
+    },
+    {
+      "name": "Eder, John M."
+    },
+    {
+      "name": "Haadoow, Hamza A."
+    },
+    {
+      "name": "Lapchick, Jodie L."
+    },
+    {
+      "name": "Marshall, David A."
+    },
+    {
+      "name": "Mavodones, Nicholas M. Jr."
+    },
+    {
+      "name": "Miller, Markos S."
+    },
+    {
+      "name": "Rathband, Jed"
+    },
+    {
+      "name": "Strimling, Ethan K."
+    },
+    {
+      "name": "Vail, Christopher L."
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "maxRankingsAllowed": 15,
+    "multiSeatTransferRule": "transferFractionalSurplus",
+    "maxSkippedRanksAllowed": 1,
+    "numberOfWinners": 5,
+    "decimalPlacesForVoteArithmetic": 5,
+    "minimumVoteThreshold": 0,
+    "batchElimination": false,
+    "continueUntilTwoCandidatesRemain": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI",
+    "rulesDescription": "Maine + Multi-Seat Tester"
+  }
+}

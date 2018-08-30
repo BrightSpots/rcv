@@ -1,0 +1,91 @@
+{
+  "outputSettings": {
+    "contestName": "2017 Minneapolis mayoral race",
+    "outputDirectory": "test_output/2017_minneapolis_mayor",
+    "contestDate": "2017-11-07",
+    "contestJurisdiction": "Minneapolis, MN",
+    "contestOffice": "Mayor",
+    "tabulateByPrecinct": true
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "test_data/cvr_2017_minneapolis_mayor.xlsx",
+      "firstVoteColumnIndex": 1,
+      "precinctColumnIndex": 0,
+      "provider": "ES&S"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Jacob Frey"
+    },
+    {
+      "name": "Tom Hoch"
+    },
+    {
+      "name": "Betsy Hodges"
+    },
+    {
+      "name": "Raymond Dehn"
+    },
+    {
+      "name": "Nekima Levy-Pounds"
+    },
+    {
+      "name": "Charlie Gers"
+    },
+    {
+      "name": "Aswar Rahman"
+    },
+    {
+      "name": "Al Flowers"
+    },
+    {
+      "name": "L.A. Nik"
+    },
+    {
+      "name": "David Rosenfeld"
+    },
+    {
+      "name": "Captain Jack Sparrow"
+    },
+    {
+      "name": "Gregg A. Iverson"
+    },
+    {
+      "name": "Ronald Lischeid"
+    },
+    {
+      "name": "David John Wilson"
+    },
+    {
+      "name": "Troy Benjegerdes"
+    },
+    {
+      "name": "Ian Simpson"
+    },
+    {
+      "name": "Christopher Zimmerman"
+    },
+    {
+      "name": "Theron Preston Washington"
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "maxRankingsAllowed": 3,
+    "multiSeatTransferRule": "transferRuleUnknown",
+    "numberOfWinners": 1,
+    "decimalPlacesForVoteArithmetic": 4,
+    "minimumVoteThreshold": 0,
+    "batchElimination": true,
+    "continueUntilTwoCandidatesRemain": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI",
+    "rulesDescription": "Minneapolis Rules"
+  }
+}

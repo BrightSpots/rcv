@@ -16,8 +16,10 @@
 
 package com.rcv;
 
-import com.rcv.RawElectionConfig.CVRSource;
-import com.rcv.RawElectionConfig.Candidate;
+import com.rcv.RawContestConfig.CVRSource;
+import com.rcv.RawContestConfig.Candidate;
+import com.rcv.RawContestConfig.ContestRules;
+import com.rcv.RawContestConfig.OutputSettings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -155,7 +157,7 @@ public class GuiConfigController implements Initializable {
 
   public void buttonValidateClicked() {
     buttonBar.setDisable(true);
-    ValidatorService service = new ValidatorService(createRawElectionConfig());
+    ValidatorService service = new ValidatorService(createRawContestConfig());
     service.setOnSucceeded(event -> buttonBar.setDisable(false));
     service.setOnCancelled(event -> buttonBar.setDisable(false));
     service.setOnFailed(event -> buttonBar.setDisable(false));
@@ -176,7 +178,7 @@ public class GuiConfigController implements Initializable {
     File saveFile = fc.showSaveDialog(null);
     if (saveFile != null) {
       String response =
-          JsonParser.createFileFromRawElectionConfig(saveFile, createRawElectionConfig());
+          JsonParser.createFileFromRawContestConfig(saveFile, createRawContestConfig());
       if (response.equals("SUCCESS")) {
         Logger.executionLog(
             Level.INFO, "Saved config via the GUI to: %s", saveFile.getAbsolutePath());
@@ -329,17 +331,17 @@ public class GuiConfigController implements Initializable {
     textFieldNumberOfWinners
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
-    textFieldNumberOfWinners.setText(String.valueOf(ElectionConfig.DEFAULT_NUMBER_OF_WINNERS));
+    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.DEFAULT_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldDecimalPlacesForVoteArithmetic));
     textFieldDecimalPlacesForVoteArithmetic.setText(
-        String.valueOf(ElectionConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+        String.valueOf(ContestConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
     textFieldMinimumVoteThreshold
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
     textFieldMinimumVoteThreshold.setText(
-        String.valueOf(ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
+        String.valueOf(ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
 
     if (GuiContext.getInstance().getConfig() != null) {
       loadConfig(GuiContext.getInstance().getConfig());
@@ -352,7 +354,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private void loadConfig(ElectionConfig config) {
+  private void loadConfig(ContestConfig config) {
     textFieldContestName.setText(config.getContestName());
     textFieldOutputDirectory.setText(config.getOutputDirectory());
     if (config.getContestDate() != null && !config.getContestDate().isEmpty()) {
@@ -405,22 +407,24 @@ public class GuiConfigController implements Initializable {
     return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
   }
 
-  private RawElectionConfig createRawElectionConfig() {
-    RawElectionConfig config = new RawElectionConfig();
-    RawElectionConfig.ElectionRules rules = new RawElectionConfig.ElectionRules();
+  private RawContestConfig createRawContestConfig() {
+    RawContestConfig config = new RawContestConfig();
 
-    config.contestName = textFieldContestName.getText();
-    config.outputDirectory = textFieldOutputDirectory.getText();
-    config.contestDate =
+    OutputSettings outputSettings = new OutputSettings();
+    outputSettings.contestName = textFieldContestName.getText();
+    outputSettings.outputDirectory = textFieldOutputDirectory.getText();
+    outputSettings.contestDate =
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
-    config.contestJurisdiction = textFieldContestJurisdiction.getText();
-    config.contestOffice = textFieldContestOffice.getText();
-    config.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
+    outputSettings.contestJurisdiction = textFieldContestJurisdiction.getText();
+    outputSettings.contestOffice = textFieldContestOffice.getText();
+    outputSettings.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
+    config.outputSettings = outputSettings;
 
     config.cvrFileSources = new ArrayList<>(tableViewCvrFiles.getItems());
 
     config.candidates = new ArrayList<>(tableViewCandidates.getItems());
 
+    ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, Tabulator.OvervoteRule.RULE_UNKNOWN);
     rules.multiSeatTransferRule =
@@ -429,15 +433,15 @@ public class GuiConfigController implements Initializable {
     rules.maxRankingsAllowed = getIntValueElse(textFieldMaxRankingsAllowed, null);
     rules.maxSkippedRanksAllowed = getIntValueElse(textFieldMaxSkippedRanksAllowed, null);
     rules.numberOfWinners =
-        getIntValueElse(textFieldNumberOfWinners, ElectionConfig.DEFAULT_NUMBER_OF_WINNERS);
+        getIntValueElse(textFieldNumberOfWinners, ContestConfig.DEFAULT_NUMBER_OF_WINNERS);
     rules.decimalPlacesForVoteArithmetic =
         getIntValueElse(
             textFieldDecimalPlacesForVoteArithmetic,
-            ElectionConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
+            ContestConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
     rules.minimumVoteThreshold =
         getIntValueElse(
             textFieldMinimumVoteThreshold,
-            ElectionConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
+            ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
     rules.batchElimination = getToggleBoolean(toggleBatchElimination);
     rules.continueUntilTwoCandidatesRemain =
         getToggleBoolean(toggleContinueUntilTwoCandidatesRemain);
@@ -454,10 +458,10 @@ public class GuiConfigController implements Initializable {
 
   private static class ValidatorService extends Service<Void> {
 
-    private RawElectionConfig rawElectionConfig;
+    private RawContestConfig rawContestConfig;
 
-    ValidatorService(RawElectionConfig rawElectionConfig) {
-      this.rawElectionConfig = rawElectionConfig;
+    ValidatorService(RawContestConfig rawContestConfig) {
+      this.rawContestConfig = rawContestConfig;
     }
 
     @Override
@@ -465,7 +469,7 @@ public class GuiConfigController implements Initializable {
       return new Task<>() {
         @Override
         protected Void call() {
-          new ElectionConfig(rawElectionConfig).validate();
+          new ContestConfig(rawContestConfig).validate();
           return null;
         }
       };
