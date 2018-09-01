@@ -24,6 +24,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
+@SuppressWarnings("WeakerAccess")
 public class GuiTiebreakerController {
 
   private String candidateToEliminate = null;
