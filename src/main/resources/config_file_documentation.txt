@@ -112,6 +112,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
 
       "numberOfWinners" optional
         the number of seats to be won in this contest
+        note: we use fractional vote transfer to redistribute votes in multi-seat contests
         value: [1..100]
         default: 1
 

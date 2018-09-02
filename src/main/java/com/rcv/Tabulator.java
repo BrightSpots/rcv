@@ -195,8 +195,6 @@ class Tabulator {
         }
       }
 
-      // TODO: avoid recomputing these every round (since they should be static for a given
-      // candidate once that candidate has won)?
       updatePastWinnerTallies();
     }
 
@@ -231,6 +229,9 @@ class Tabulator {
   // logic only considers continuing candidates, so it won't assign any votes to past winners -- but
   // in reality they continue to hold their winning margins for the rest of the rounds, so we need
   // to fill in those values here.
+  // TODO: instead of recomputing these winning tallies each round, we could just read the values
+  // from the previous round. Once someone wins and we redistribute their extra votes, their tally
+  // should be frozen for the rest of the rounds.
   private void updatePastWinnerTallies() {
     // pastWinners contains winners from rounds that preceded the current round
     Set<String> pastWinners = new HashSet<>();
@@ -780,8 +781,15 @@ class Tabulator {
         }
       } // end looping over the rankings within one ballot
 
+      // Once we get here (having iterated through some or all of this CVR's rankings), either:
+      // a) the ballot is exhausted,
+      // b) we've counted it toward a candidate, or
+      // c) neither.
+
+      // If (c) is the case, we definitely want to exhaust the ballot, and the only thing to resolve
+      // is the official reason for exhaustion: did it skip too many rankings at the end of the
+      // ballot, or did it just no longer have any continuing candidates?
       if (!cvr.isExhausted() && cvr.getCurrentRecipientOfVote() == null) {
-        // Either it's an undervote or their candidates got eliminated.
         if (config.getMaxSkippedRanksAllowed() != null
             && config.getMaxRankingsAllowed() - lastRankSeen > config.getMaxSkippedRanksAllowed()) {
           cvr.exhaust("undervote");
