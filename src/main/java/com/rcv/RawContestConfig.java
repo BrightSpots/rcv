@@ -154,8 +154,6 @@ public class RawContestConfig {
     public String overvoteRule;
     // max rankings allowed
     public Integer maxRankingsAllowed;
-    // which transfer rule to use on surplus votes in multi-seat contests
-    public String multiSeatTransferRule;
     // max number of skipped rankings allowed
     public Integer maxSkippedRanksAllowed;
     // setting for number of winners

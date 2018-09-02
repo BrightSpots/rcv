@@ -111,8 +111,6 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
   @FXML
-  private ChoiceBox<Tabulator.MultiSeatTransferRule> choiceMultiSeatTransferRule;
-  @FXML
   private TextField textFieldMaxRankingsAllowed;
   @FXML
   private TextField textFieldMaxSkippedRanksAllowed;
@@ -312,10 +310,6 @@ public class GuiConfigController implements Initializable {
     choiceTiebreakMode.getItems().remove(Tabulator.TieBreakMode.MODE_UNKNOWN);
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
-    choiceMultiSeatTransferRule.getItems().addAll(Tabulator.MultiSeatTransferRule.values());
-    choiceMultiSeatTransferRule
-        .getItems()
-        .remove(Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
 
     textFieldMaxRankingsAllowed
         .textProperty()
@@ -370,7 +364,6 @@ public class GuiConfigController implements Initializable {
 
     choiceTiebreakMode.setValue(config.getTiebreakMode());
     choiceOvervoteRule.setValue(config.getOvervoteRule());
-    choiceMultiSeatTransferRule.setValue(config.getMultiSeatTransferRule());
     setTextFieldToInteger(textFieldMaxRankingsAllowed, config.getMaxRankingsAllowed());
     setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, config.getMaxSkippedRanksAllowed());
     setTextFieldToInteger(textFieldNumberOfWinners, config.getNumberOfWinners());
@@ -422,9 +415,6 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, Tabulator.OvervoteRule.RULE_UNKNOWN);
-    rules.multiSeatTransferRule =
-        getChoiceElse(
-            choiceMultiSeatTransferRule, Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN);
     rules.maxRankingsAllowed = getIntValueElse(textFieldMaxRankingsAllowed, null);
     rules.maxSkippedRanksAllowed = getIntValueElse(textFieldMaxSkippedRanksAllowed, null);
     rules.numberOfWinners =
