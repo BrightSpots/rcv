@@ -251,11 +251,6 @@ class ContestConfig {
         isValid = false;
         Logger.executionLog(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 0 to 20.");
       }
-
-      if (getMultiSeatTransferRule() == Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN) {
-        isValid = false;
-        Logger.executionLog(Level.SEVERE, "Invalid multiSeatTransferRule.");
-      }
     }
   }
 
@@ -284,15 +279,6 @@ class ContestConfig {
   // returns: the quotient
   BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
     return dividend.divide(divisor, getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
-  }
-
-  // function: getMultiSeatTransferRule
-  // purpose: which surplus transfer rule to use in multi-seat contests
-  // returns: enum indicating which transfer rule to use
-  Tabulator.MultiSeatTransferRule getMultiSeatTransferRule() {
-    Tabulator.MultiSeatTransferRule rule =
-        Tabulator.MultiSeatTransferRule.getByLabel(rawConfig.rules.multiSeatTransferRule);
-    return rule == null ? Tabulator.MultiSeatTransferRule.TRANSFER_RULE_UNKNOWN : rule;
   }
 
   // function: getOutputDirectory

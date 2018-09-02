@@ -12,7 +12,6 @@
   "rules": {
     "tiebreakMode": "whatever",
     "overvoteRule": "exhaustIfAnyContinuing",
-    "multiSeatTransferRule": "flipACoin",
     "numberOfWinners": 2,
     "decimalPlacesForVoteArithmetic": -1,
     "maxRankingsAllowed": -1,

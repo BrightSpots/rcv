@@ -883,31 +883,6 @@ class Tabulator {
     Logger.tabulationLog(Level.INFO, "Audit info written.");
   }
 
-  // vote transfer rule to use in multi-seat contests
-  enum MultiSeatTransferRule {
-    TRANSFER_FRACTIONAL_SURPLUS("transferFractionalSurplus"),
-    TRANSFER_WHOLE_SURPLUS("transferWholeSurplus"),
-    TRANSFER_RULE_UNKNOWN("transferRuleUnknown");
-
-    private final String label;
-
-    MultiSeatTransferRule(String label) {
-      this.label = label;
-    }
-
-    static MultiSeatTransferRule getByLabel(String labelLookup) {
-      return Arrays.stream(MultiSeatTransferRule.values())
-          .filter(v -> v.label.equals(labelLookup))
-          .findAny()
-          .orElse(null);
-    }
-
-    @Override
-    public String toString() {
-      return label;
-    }
-  }
-
   // OvervoteRule determines how overvotes are handled
   enum OvervoteRule {
     EXHAUST_IMMEDIATELY("exhaustImmediately"),

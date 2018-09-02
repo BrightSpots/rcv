@@ -51,7 +51,6 @@
     "tiebreakMode": "random",
     "overvoteRule": "alwaysSkipToNextRank",
     "maxRankingsAllowed": 3,
-    "multiSeatTransferRule": "transferFractionalSurplus",
     "maxSkippedRanksAllowed": 2,
     "numberOfWinners": 3,
     "decimalPlacesForVoteArithmetic": 5,

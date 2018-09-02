@@ -193,8 +193,6 @@
             <VBox spacing="8.0">
               <Label text="Overvote Rule *"/>
               <ChoiceBox prefWidth="220.0" fx:id="choiceOvervoteRule"/>
-              <Label text="Multi-Seat Transfer Rule"/>
-              <ChoiceBox prefWidth="220.0" fx:id="choiceMultiSeatTransferRule"/>
               <Label text="Number of Winners"/>
               <TextField maxWidth="220.0" promptText="Number of Winners"
                 fx:id="textFieldNumberOfWinners"/>
