@@ -106,9 +106,8 @@ public class Main extends GuiApplication {
       // current date-time formatted as a string used for creating unique output files names
       final String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
       String tabulationLogPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_audit.log", timestampString))
-              .toString();
-
+          Paths.get(config.getOutputDirectory(), String.format("%s_audit.log",
+              timestampString)).toAbsolutePath().toString();
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         Logger.addTabulationFileLogging(tabulationLogPath);

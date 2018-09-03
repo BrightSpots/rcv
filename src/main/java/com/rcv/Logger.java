@@ -29,6 +29,7 @@
 package com.rcv;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.logging.ConsoleHandler;
@@ -53,7 +54,7 @@ class Logger {
   // first value here is bytes per MB and the second is max MB for the log file
   private static final Integer EXECUTION_LOG_FILE_MAX_SIZE_BYTES = 1000000 * 50;
   // how many execution files to keep
-  private static final Integer EXECUTION_LOG_FILE_COUNT = 2;
+  private static final Integer EXECUTION_LOG_FILE_COUNT = 100;
   // cache for the execution logger
   private static java.util.logging.Logger executionLogger;
   // cache for the tabulation logger
@@ -67,19 +68,19 @@ class Logger {
   static void setup() throws IOException {
     // create and cache default logger
     executionLogger = java.util.logging.Logger.getLogger(EXECUTION_LOGGER_NAME);
-    // remove any loggers the system may have installed
-    for (Handler handler : executionLogger.getHandlers()) {
-      executionLogger.removeHandler(handler);
-    }
+    // remove system logger
+    executionLogger.setUseParentHandlers(false);
     // logPath is where default file logging is written
     // "user.dir" property is the current working directory, i.e. folder from whence the rcv jar
     // was launched
-    String logPath = Paths.get(System.getProperty("user.dir"), EXECUTION_LOG_FILE_NAME).toString();
+    Path logPath = Paths.get(System.getProperty("user.dir"),
+        EXECUTION_LOG_FILE_NAME).toAbsolutePath();
+
     // formatter specifies how logging output lines should appear
     LogFormatter formatter = new LogFormatter();
     // fileHandler writes formatted strings to file
     FileHandler fileHandler =
-        new FileHandler(logPath, EXECUTION_LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
+        new FileHandler(logPath.toString(), EXECUTION_LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
     fileHandler.setFormatter(formatter);
     fileHandler.setLevel(Level.FINE);
     // create a consoleHandler to writes formatted strings to console for debugging
@@ -90,10 +91,46 @@ class Logger {
     executionLogger.addHandler(consoleHandler);
     executionLogger.addHandler(fileHandler);
     executionLogger.setLevel(Level.FINE);
+    // log results
+    executionLog(Level.INFO,"RCV Tabulator Logging execution to %s", logPath.toString());
+  }
 
-    // create and cache the tabulation logger object
-    // whenever a tabulation happens we will add tabulation-specific file handlers to it
+  // function: addTabulationFileLogging
+  // purpose: adds file and console logging for a tabulation run
+  // param: loggerOutputPath: file path for tabulationLogger logging output
+  // file access: write - existing file will be overwritten
+  // throws: IOException if unable to open loggerOutputPath
+  static void addTabulationFileLogging(String loggerOutputPath) throws IOException {
+    // create tabulation logger object
     tabulationLogger = java.util.logging.Logger.getLogger(TABULATION_LOGGER_NAME);
+    // remove system logger
+    tabulationLogger.setUseParentHandlers(false);
+
+    // specifies how logging output lines should appear
+    LogFormatter formatter = new LogFormatter();
+    // create new handler for file logging and add it
+    FileHandler fileHandler = new FileHandler(loggerOutputPath);
+    fileHandler.setFormatter(formatter);
+    fileHandler.setLevel(Level.FINER);
+    tabulationLogger.addHandler(fileHandler);
+    // create a consoleHandler to writes formatted strings to console for debugging
+    ConsoleHandler consoleHandler = new ConsoleHandler();
+    consoleHandler.setFormatter(formatter);
+    consoleHandler.setLevel(Level.FINER);
+    tabulationLogger.addHandler(consoleHandler);
+    // get the tabulationLogger logger and add file handler
+    tabulationLogger.setLevel(Level.FINER);
+  }
+
+  // function: removeTabulationFileLogging
+  // purpose: remove file logging once a tabulation run is complete
+  static void removeTabulationFileLogging() {
+    // in practice there should only be the one FileHandler we added here
+    for (Handler handler : tabulationLogger.getHandlers()) {
+      handler.flush();
+      handler.close();
+      tabulationLogger.removeHandler(handler);
+    }
   }
 
   // logs text to all output loggers
@@ -155,34 +192,6 @@ class Logger {
           public void close() {
           }
         });
-  }
-
-  // function: addTabulationFileLogging
-  // purpose: adds file logging for a tabulation run
-  // param: loggerOutputPath: file path for tabulationLogger logging output
-  // file access: write - existing file will be overwritten
-  // throws: IOException if unable to open loggerOutputPath
-  static void addTabulationFileLogging(String loggerOutputPath) throws IOException {
-    // specifies how logging output lines should appear
-    LogFormatter formatter = new LogFormatter();
-    // create new handler for file logging and add it
-    FileHandler fileHandler = new FileHandler(loggerOutputPath);
-    fileHandler.setFormatter(formatter);
-    fileHandler.setLevel(Level.FINER);
-    // get the tabulationLogger logger and add file handler
-    tabulationLogger.addHandler(fileHandler);
-    tabulationLogger.setLevel(Level.FINER);
-  }
-
-  // function: removeTabulationFileLogging
-  // purpose: remove file logging once a tabulation run is complete
-  static void removeTabulationFileLogging() {
-    // in practice there should only be the one FileHandler we added here
-    for (Handler handler : tabulationLogger.getHandlers()) {
-      handler.flush();
-      handler.close();
-      tabulationLogger.removeHandler(handler);
-    }
   }
 
   // custom LogFormatter class for log output string formatting
