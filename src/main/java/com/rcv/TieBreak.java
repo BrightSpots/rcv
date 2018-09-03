@@ -232,7 +232,7 @@ class TieBreak {
         Platform.runLater(futureTask);
         selectedCandidate = futureTask.get();
       } catch (InterruptedException | ExecutionException exception) {
-        Logger.tabulationLog(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
+        Logger.executionLog(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
       }
       if (selectedCandidate == null || selectedCandidate.isEmpty()) {
         Logger.executionLog(Level.WARNING, "Invalid selection. Please try again.");
@@ -313,7 +313,7 @@ class TieBreak {
         window.showAndWait();
         candidateToEliminate = controller.getCandidateToEliminate();
       } catch (IOException exception) {
-        Logger.tabulationLog(
+        Logger.executionLog(
             Level.SEVERE, "Failed to open: %s:\n%s", resourcePath, exception.getCause().toString());
       }
 
