@@ -53,14 +53,14 @@ public class Main extends GuiApplication {
       launch(args);
     } else {
       // assume user wants to use CLI
-      Logger.executionLog(Level.INFO, "Tabulator is being used via the CLI.");
+      Logger.Log(Level.INFO, "Tabulator is being used via the CLI.");
       String configPath = args[0];
       // config file for running the tabulator
       ContestConfig config = loadContestConfig(configPath);
       if (config != null) {
         executeTabulation(config);
       } else {
-        Logger.executionLog(Level.SEVERE, "Aborting because config is invalid.");
+        Logger.Log(Level.SEVERE, "Aborting because config is invalid.");
       }
     }
 
@@ -81,11 +81,11 @@ public class Main extends GuiApplication {
 
     // if raw config failed alert user
     if (rawConfig == null) {
-      Logger.executionLog(Level.SEVERE, "Failed to load config file: %s", configPath);
+      Logger.Log(Level.SEVERE, "Failed to load config file: %s", configPath);
     } else {
       // proceed to create the ContestConfig wrapper
       config = new ContestConfig(rawConfig);
-      Logger.executionLog(Level.INFO, "Successfully loaded config file: %s", configPath);
+      Logger.Log(Level.INFO, "Successfully loaded config file: %s", configPath);
     }
 
     return config;
@@ -96,7 +96,7 @@ public class Main extends GuiApplication {
   // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
   static void executeTabulation(ContestConfig config) {
-    Logger.executionLog(Level.INFO, "Starting tabulation process...");
+    Logger.Log(Level.INFO, "Starting tabulation process...");
 
     boolean isTabulationCompleted = false;
     boolean isConfigValid = config.validate();
@@ -113,18 +113,18 @@ public class Main extends GuiApplication {
         Logger.addTabulationFileLogging(executionLogPath);
         isexecutionLogSetUp = true;
       } catch (UnableToCreateDirectoryException exception) {
-        Logger.executionLog(
+        Logger.Log(
             Level.SEVERE,
             "Failed to create output directory: %s\n%s",
             config.getOutputDirectory(),
             exception.toString());
       } catch (IOException exception) {
-        Logger.executionLog(
+        Logger.Log(
             Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
       }
 
       if (isexecutionLogSetUp) {
-        Logger.executionLog(Level.INFO, "Logging tabulation to: %s", executionLogPath);
+        Logger.Log(Level.INFO, "Logging tabulation to: %s", executionLogPath);
         // Read cast vote records from CVR files
         // castVoteRecords will contain all cast vote records parsed by the reader
         List<CastVoteRecord> castVoteRecords;
@@ -142,20 +142,20 @@ public class Main extends GuiApplication {
             tabulator.doAudit(castVoteRecords);
             isTabulationCompleted = true;
           } else {
-            Logger.executionLog(Level.SEVERE, "No cast vote records found.");
+            Logger.Log(Level.SEVERE, "No cast vote records found.");
           }
         } else {
-          Logger.executionLog(Level.SEVERE, "Skipping tabulation due to source file errors.");
+          Logger.Log(Level.SEVERE, "Skipping tabulation due to source file errors.");
         }
-        Logger.executionLog(Level.INFO, "Done logging tabulation to: %s", executionLogPath);
+        Logger.Log(Level.INFO, "Done logging tabulation to: %s", executionLogPath);
         Logger.removeTabulationFileLogging();
       }
     }
 
     if (isTabulationCompleted) {
-      Logger.executionLog(Level.INFO, "Tabulation process completed.");
+      Logger.Log(Level.INFO, "Tabulation process completed.");
     } else {
-      Logger.executionLog(Level.SEVERE, "Unable to complete tabulation process!");
+      Logger.Log(Level.SEVERE, "Unable to complete tabulation process!");
     }
   }
 
@@ -164,7 +164,7 @@ public class Main extends GuiApplication {
   // param: config object containing CVR file paths to parse
   // returns: list of all CastVoteRecord objects parsed from CVR files (or null if there's an error)
   private static List<CastVoteRecord> parseCastVoteRecords(ContestConfig config) {
-    Logger.executionLog(Level.INFO, "Parsing cast vote records...");
+    Logger.Log(Level.INFO, "Parsing cast vote records...");
 
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
@@ -179,28 +179,28 @@ public class Main extends GuiApplication {
       if (source.getProvider() != null && !source.getProvider().isEmpty()) {
         logMessage.append(" (provider: ").append(source.getProvider()).append(")");
       }
-      Logger.executionLog(Level.INFO, logMessage.toString());
+      Logger.Log(Level.INFO, logMessage.toString());
       logMessage.setLength(0);
 
       // the CVRs parsed from this source
       try {
         List<CastVoteRecord> cvrs = new CVRReader(config, source).parseCVRFile();
         if (cvrs.isEmpty()) {
-          Logger.executionLog(
+          Logger.Log(
               Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
           encounteredSourceProblem = true;
         }
         // add records to the master list
         castVoteRecords.addAll(cvrs);
       } catch (SourceWithUnrecognizedCandidatesException exception) {
-        Logger.executionLog(
+        Logger.Log(
             Level.SEVERE,
             "Source file contains unrecognized candidate(s): %s",
             source.getFilePath());
         // map from name to number of times encountered
         Map<String, Integer> candidateCounts = exception.getCandidateCounts();
         for (String candidate : candidateCounts.keySet()) {
-          Logger.executionLog(
+          Logger.Log(
               Level.SEVERE,
               "Unrecognized candidate \"%s\" appears %d time(s).",
               candidate,
@@ -211,10 +211,10 @@ public class Main extends GuiApplication {
     }
 
     if (!encounteredSourceProblem) {
-      Logger.executionLog(
+      Logger.Log(
           Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
     } else {
-      Logger.executionLog(Level.SEVERE, "Parsing cast vote records failed!");
+      Logger.Log(Level.SEVERE, "Parsing cast vote records failed!");
       castVoteRecords = null;
     }
 

@@ -60,7 +60,7 @@ class ContestConfig {
   // purpose: validate the correctness of the config data
   // returns any detected problems
   boolean validate() {
-    Logger.executionLog(Level.INFO, "Validating config...");
+    Logger.Log(Level.INFO, "Validating config...");
     isValid = true;
 
     validateContestSettings();
@@ -69,9 +69,9 @@ class ContestConfig {
     validateRules();
 
     if (isValid) {
-      Logger.executionLog(Level.INFO, "Config validation successful.");
+      Logger.Log(Level.INFO, "Config validation successful.");
     } else {
-      Logger.executionLog(
+      Logger.Log(
           Level.SEVERE, "Config validation failed! Please modify the config file and try again.");
     }
 
@@ -81,28 +81,28 @@ class ContestConfig {
   private void validateContestSettings() {
     if (getContestName() == null || getContestName().isEmpty()) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "Contest name is required.");
+      Logger.Log(Level.SEVERE, "Contest name is required.");
     }
 
     if (getOutputDirectory() == null || getOutputDirectory().isEmpty()) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "Output directory is required.");
+      Logger.Log(Level.SEVERE, "Output directory is required.");
     }
   }
 
   private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "Config doesn't contain any CVR files.");
+      Logger.Log(Level.SEVERE, "Config doesn't contain any CVR files.");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
         if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
           isValid = false;
-          Logger.executionLog(Level.SEVERE, "filePath is required for each CVR file.");
+          Logger.Log(Level.SEVERE, "filePath is required for each CVR file.");
         } else if (cvrFilePathSet.contains(source.getFilePath())) {
           isValid = false;
-          Logger.executionLog(
+          Logger.Log(
               Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s", source.getFilePath());
         } else {
           cvrFilePathSet.add(source.getFilePath());
@@ -110,12 +110,12 @@ class ContestConfig {
 
         if (source.getFirstVoteColumnIndex() == null) {
           isValid = false;
-          Logger.executionLog(
+          Logger.Log(
               Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFilePath());
         } else if (source.getFirstVoteColumnIndex() < 0
             || source.getFirstVoteColumnIndex() > 1000) {
           isValid = false;
-          Logger.executionLog(
+          Logger.Log(
               Level.SEVERE,
               "firstVoteColumnIndex must be from 0 to 1000: %s",
               source.getFilePath());
@@ -124,21 +124,21 @@ class ContestConfig {
         if (source.getIdColumnIndex() != null
             && (source.getIdColumnIndex() < 0 || source.getIdColumnIndex() > 1000)) {
           isValid = false;
-          Logger.executionLog(
+          Logger.Log(
               Level.SEVERE, "idColumnIndex must be from 0 to 1000: %s", source.getFilePath());
         }
 
         if (isTabulateByPrecinctEnabled()) {
           if (source.getPrecinctColumnIndex() == null) {
             isValid = false;
-            Logger.executionLog(
+            Logger.Log(
                 Level.SEVERE,
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
                 source.getFilePath());
           } else if (source.getPrecinctColumnIndex() < 0
               || source.getPrecinctColumnIndex() > 1000) {
             isValid = false;
-            Logger.executionLog(
+            Logger.Log(
                 Level.SEVERE,
                 "precinctColumnIndex must be from 0 to 1000: %s",
                 source.getFilePath());
@@ -154,10 +154,10 @@ class ContestConfig {
     for (Candidate candidate : rawConfig.candidates) {
       if (candidate.getName() == null || candidate.getName().isEmpty()) {
         isValid = false;
-        Logger.executionLog(Level.SEVERE, "Name is required for each candidate.");
+        Logger.Log(Level.SEVERE, "Name is required for each candidate.");
       } else if (candidateNameSet.contains(candidate.getName())) {
         isValid = false;
-        Logger.executionLog(
+        Logger.Log(
             Level.SEVERE, "Duplicate candidate names are not allowed: %s", candidate.getName());
       } else {
         candidateNameSet.add(candidate.getName());
@@ -166,7 +166,7 @@ class ContestConfig {
       if (candidate.getCode() != null && !candidate.getCode().isEmpty()) {
         if (candidateCodeSet.contains(candidate.getCode())) {
           isValid = false;
-          Logger.executionLog(
+          Logger.Log(
               Level.SEVERE, "Duplicate candidate codes are not allowed: %s", candidate.getCode());
         } else {
           candidateCodeSet.add(candidate.getCode());
@@ -176,31 +176,31 @@ class ContestConfig {
 
     if (candidateCodeSet.size() > 0 && candidateCodeSet.size() != candidateNameSet.size()) {
       isValid = false;
-      Logger.executionLog(
+      Logger.Log(
           Level.SEVERE,
           "If candidate codes are used, a unique code is required for each candidate.");
     }
 
     if (getNumDeclaredCandidates() < 1) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "Config must contain at least one declared candidate.");
+      Logger.Log(Level.SEVERE, "Config must contain at least one declared candidate.");
     }
   }
 
   private void validateRules() {
     if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "Invalid tie-break mode.");
+      Logger.Log(Level.SEVERE, "Invalid tie-break mode.");
     }
 
     if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "Invalid overvote rule.");
+      Logger.Log(Level.SEVERE, "Invalid overvote rule.");
     } else if ((getOvervoteLabel() != null && !getOvervoteLabel().isEmpty())
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       isValid = false;
-      Logger.executionLog(
+      Logger.Log(
           Level.SEVERE,
           "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately "
               + "or alwaysSkipToNextRank.");
@@ -208,48 +208,48 @@ class ContestConfig {
 
     if (getMaxRankingsAllowed() == null) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed is required.");
+      Logger.Log(Level.SEVERE, "maxRankingsAllowed is required.");
     } else if (getMaxRankingsAllowed() < 1 || getMaxRankingsAllowed() > 100) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "maxRankingsAllowed must be from 1 to 100.");
+      Logger.Log(Level.SEVERE, "maxRankingsAllowed must be from 1 to 100.");
     }
 
     if (getMaxSkippedRanksAllowed() == null) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "maxSkippedRanksAllowed is required.");
+      Logger.Log(Level.SEVERE, "maxSkippedRanksAllowed is required.");
     } else if (getMaxSkippedRanksAllowed() < 0 || getMaxSkippedRanksAllowed() > 100) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "maxSkippedRanksAllowed must be from 0 to 100.");
+      Logger.Log(Level.SEVERE, "maxSkippedRanksAllowed must be from 0 to 100.");
     }
 
     if (getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "numberOfWinners must be from 1 to 100.");
+      Logger.Log(Level.SEVERE, "numberOfWinners must be from 1 to 100.");
     }
 
     if (getMinimumVoteThreshold().intValue() < 0 || getMinimumVoteThreshold().intValue() > 10000) {
       isValid = false;
-      Logger.executionLog(Level.SEVERE, "minimumVoteThreshold must be from 0 to 10000.");
+      Logger.Log(Level.SEVERE, "minimumVoteThreshold must be from 0 to 10000.");
     }
 
     // If this is a multi-seat contest, we validate a number of extra parameters.
     if (getNumberOfWinners() > 1) {
       if (willContinueUntilTwoCandidatesRemain()) {
         isValid = false;
-        Logger.executionLog(
+        Logger.Log(
             Level.SEVERE,
             "continueUntilTwoCandidatesRemain can't be true in a multi-winner contest.");
       }
 
       if (isBatchEliminationEnabled()) {
         isValid = false;
-        Logger.executionLog(
+        Logger.Log(
             Level.SEVERE, "batchElimination can't be true in a multi-winner contest.");
       }
 
       if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
         isValid = false;
-        Logger.executionLog(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 0 to 20.");
+        Logger.Log(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 0 to 20.");
       }
     }
   }

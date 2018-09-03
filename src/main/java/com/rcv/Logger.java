@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
-import java.util.logging.ErrorManager;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -98,7 +97,7 @@ class Logger {
     fileHandler.setLevel(Level.INFO);
     executionLogger.addHandler(fileHandler);
     // log results
-    executionLog(Level.INFO,"RCV Tabulator Logging execution to %s", logPath.toString());
+    Log(Level.INFO,"RCV Tabulator Logging execution to %s", logPath.toString());
   }
 
   // function: addTabulationFileLogging
@@ -122,7 +121,7 @@ class Logger {
   }
 
   // logs to execution log and GUI if there is one
-  static void executionLog(Level level, String format, Object... obj) {
+  static void Log(Level level, String format, Object... obj) {
     executionLogger.log(level, String.format(format, obj));
   }
 
