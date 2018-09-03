@@ -82,15 +82,15 @@ class Logger {
     FileHandler fileHandler =
         new FileHandler(logPath.toString(), EXECUTION_LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
     fileHandler.setFormatter(formatter);
-    fileHandler.setLevel(Level.FINE);
+    fileHandler.setLevel(Level.INFO);
     // create a consoleHandler to writes formatted strings to console for debugging
     ConsoleHandler consoleHandler = new ConsoleHandler();
     consoleHandler.setFormatter(formatter);
-    consoleHandler.setLevel(Level.FINE);
+    consoleHandler.setLevel(Level.INFO);
     // add the handlers
     executionLogger.addHandler(consoleHandler);
     executionLogger.addHandler(fileHandler);
-    executionLogger.setLevel(Level.FINE);
+    executionLogger.setLevel(Level.INFO);
     // log results
     executionLog(Level.INFO,"RCV Tabulator Logging execution to %s", logPath.toString());
   }
@@ -105,21 +105,19 @@ class Logger {
     tabulationLogger = java.util.logging.Logger.getLogger(TABULATION_LOGGER_NAME);
     // remove system logger
     tabulationLogger.setUseParentHandlers(false);
-
+    tabulationLogger.setLevel(Level.FINE);
     // specifies how logging output lines should appear
     LogFormatter formatter = new LogFormatter();
-    // create new handler for file logging and add it
+    // create file handler at FINE level for audit logging
     FileHandler fileHandler = new FileHandler(loggerOutputPath);
     fileHandler.setFormatter(formatter);
-    fileHandler.setLevel(Level.FINER);
+    fileHandler.setLevel(Level.FINE);
     tabulationLogger.addHandler(fileHandler);
-    // create a consoleHandler to writes formatted strings to console for debugging
+    // create a consoleHandler at INFO level for debugging
     ConsoleHandler consoleHandler = new ConsoleHandler();
     consoleHandler.setFormatter(formatter);
-    consoleHandler.setLevel(Level.FINER);
+    consoleHandler.setLevel(Level.INFO);
     tabulationLogger.addHandler(consoleHandler);
-    // get the tabulationLogger logger and add file handler
-    tabulationLogger.setLevel(Level.FINER);
   }
 
   // function: removeTabulationFileLogging
@@ -158,28 +156,24 @@ class Logger {
     }
   }
 
-  // audit logging goes to the tabulation file ONLY
-  static void auditLog(Level level, String format, Object... obj) {
-    tabulationLogger.log(level, String.format(format, obj));
-  }
-
-  // logs to GUI console only
-  static void guiLog(Level level, String format, Object... obj) {
-    guiLogger.log(level, String.format(format, obj));
-  }
-
-  // setup logging to the provided text area
+  // setup logging to the provided text area for display to user in the GUI
   static void addGuiLogging(TextArea textArea) {
     guiLogger = java.util.logging.Logger.getLogger(GUI_LOGGER_NAME);
+    // remove default handler
+    guiLogger.setUseParentHandlers(false);
     LogFormatter formatter = new LogFormatter();
-    // TODO: Prevent double-logging to console (i.e. why guiLogger is appearing in console at all?)
+    // gui handler will add text to the TextArea
     guiLogger.addHandler(
         new Handler() {
           @Override
           public void publish(LogRecord record) {
+            // if we are executing on the GUI thread we can post immediately
+            // e.g. responses to button clicks
             if (Platform.isFxApplicationThread()) {
               textArea.appendText(formatter.format(record));
             } else {
+              // if not currently on GUI thread schedule the text update to run on the GUI thread
+              // e.g. tabulation thread updates
               Platform.runLater(() -> textArea.appendText(formatter.format(record)));
             }
           }

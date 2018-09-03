@@ -861,7 +861,8 @@ class Tabulator {
   void doAudit(List<CastVoteRecord> castVoteRecords) {
     Logger.tabulationLog(Level.INFO, "Writing audit info to logs...");
     for (CastVoteRecord cvr : castVoteRecords) {
-      Logger.auditLog(Level.FINER, cvr.getAuditString());
+      // use level FINE to keep audit logging out of the console
+      Logger.tabulationLog(Level.FINE, cvr.getAuditString());
     }
     Logger.tabulationLog(Level.INFO, "Audit info written.");
   }

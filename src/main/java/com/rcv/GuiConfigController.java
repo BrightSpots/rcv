@@ -210,9 +210,9 @@ public class GuiConfigController implements Initializable {
   public void buttonAddCvrFileClicked() {
     CVRSource cvrSource = new CVRSource();
     if (textFieldCvrFilePath.getText().isEmpty()) {
-      Logger.guiLog(Level.WARNING, "CVR file path is required!");
+      Logger.executionLog(Level.WARNING, "CVR file path is required!");
     } else if (textFieldCvrFirstVoteCol.getText().isEmpty()) {
-      Logger.guiLog(Level.WARNING, "CVR first vote column is required!");
+      Logger.executionLog(Level.WARNING, "CVR first vote column is required!");
     } else {
       cvrSource.setFilePath(textFieldCvrFilePath.getText());
       cvrSource.setFirstVoteColumnIndex(getIntValueElse(textFieldCvrFirstVoteCol, null));
@@ -237,7 +237,7 @@ public class GuiConfigController implements Initializable {
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
     if (textFieldCandidateName.getText().isEmpty()) {
-      Logger.guiLog(Level.WARNING, "Candidate name field is required!");
+      Logger.executionLog(Level.WARNING, "Candidate name field is required!");
     } else {
       candidate.setName(textFieldCandidateName.getText());
       candidate.setCode(textFieldCandidateCode.getText());
@@ -255,7 +255,7 @@ public class GuiConfigController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.executionLog(Level.FINE, "Opening config creator GUI...");
+    Logger.executionLog(Level.INFO, "Opening config creator GUI...");
 
     String helpText;
     try {
