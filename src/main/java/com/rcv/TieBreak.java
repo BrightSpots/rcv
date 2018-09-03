@@ -214,13 +214,13 @@ class TieBreak {
   // purpose: interactively select the loser of this tiebreak via the graphical user interface
   // return: candidateID of the selected loser
   private String doInteractiveGui() {
-    Logger.Log(
+    Logger.log(
         Level.INFO,
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
         round,
         numVotes.intValue(),
         String.join(", ", tiedCandidates));
-    Logger.Log(
+    Logger.log(
         Level.INFO,
         "Please use the pop-up window to select the candidate who should lose this tiebreaker.");
 
@@ -232,10 +232,10 @@ class TieBreak {
         Platform.runLater(futureTask);
         selectedCandidate = futureTask.get();
       } catch (InterruptedException | ExecutionException exception) {
-        Logger.Log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
+        Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
       }
       if (selectedCandidate == null || selectedCandidate.isEmpty()) {
-        Logger.Log(Level.WARNING, "Invalid selection. Please try again.");
+        Logger.log(Level.WARNING, "Invalid selection. Please try again.");
       }
     }
 
@@ -313,7 +313,7 @@ class TieBreak {
         window.showAndWait();
         candidateToEliminate = controller.getCandidateToEliminate();
       } catch (IOException exception) {
-        Logger.Log(
+        Logger.log(
             Level.SEVERE, "Failed to open: %s:\n%s", resourcePath, exception.getCause().toString());
       }
 

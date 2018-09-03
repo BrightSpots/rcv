@@ -97,7 +97,7 @@ class Logger {
     fileHandler.setLevel(Level.INFO);
     executionLogger.addHandler(fileHandler);
     // log results
-    Log(Level.INFO,"RCV Tabulator Logging execution to %s", logPath.toString());
+    log(Level.INFO,"RCV Tabulator Logging execution to %s", logPath.toString());
   }
 
   // function: addTabulationFileLogging
@@ -121,7 +121,7 @@ class Logger {
   }
 
   // logs to execution log and GUI if there is one
-  static void Log(Level level, String format, Object... obj) {
+  static void log(Level level, String format, Object... obj) {
     executionLogger.log(level, String.format(format, obj));
   }
 

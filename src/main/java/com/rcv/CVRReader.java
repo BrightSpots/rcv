@@ -79,7 +79,7 @@ class CVRReader {
       inputStream.close();
       workbook.close();
     } catch (IOException exception) {
-      Logger.Log(
+      Logger.log(
           Level.SEVERE, "Failed to open CVR file: %s\n%s", excelFilePath, exception.toString());
     }
     return firstSheet;
@@ -102,7 +102,7 @@ class CVRReader {
       Row headerRow = iterator.next();
       // require at least one non-header row
       if (headerRow == null || contestSheet.getLastRowNum() < 2) {
-        Logger.Log(
+        Logger.log(
             Level.SEVERE,
             "Invalid CVR source file %s: not enough rows (%d)",
             this.excelFilePath,
@@ -184,14 +184,14 @@ class CVRReader {
         // empty cells are sometimes treated as undeclared write-ins (Portland / ES&S)
         if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
           candidate = config.getUndeclaredWriteInLabel();
-          Logger.Log(Level.WARNING, "Empty cell -- treating as UWI");
+          Logger.log(Level.WARNING, "Empty cell -- treating as UWI");
         } else {
           // just ignore this cell
           continue;
         }
       } else {
         if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
-          Logger.Log(
+          Logger.log(
               Level.WARNING,
               "unexpected cell type at ranking %d ballot %s",
               rank,

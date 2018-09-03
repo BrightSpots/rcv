@@ -40,15 +40,15 @@ class JsonParser {
       rawConfig =
           new ObjectMapper().readValue(new FileReader(jsonFilePath), RawContestConfig.class);
     } catch (JsonParseException | JsonMappingException exception) {
-      Logger.Log(
+      Logger.log(
           Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
-      Logger.Log(
+      Logger.log(
           Level.SEVERE, "Check your file formatting and values to make sure they are correct.");
       rawConfig = null;
     } catch (IOException exception) {
-      Logger.Log(
+      Logger.log(
           Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
-      Logger.Log(
+      Logger.log(
           Level.SEVERE, "Check your file path and permissions and make sure they are correct.");
       rawConfig = null;
     }
@@ -58,10 +58,10 @@ class JsonParser {
   static void createFileFromRawContestConfig(File jsonFile, RawContestConfig config) {
     try {
       new ObjectMapper().writer().withDefaultPrettyPrinter().writeValue(jsonFile, config);
-      Logger.Log(
+      Logger.log(
           Level.INFO, "Saved config via the GUI to: %s", jsonFile.getAbsolutePath());
     } catch (IOException exception) {
-      Logger.Log(
+      Logger.log(
           Level.SEVERE,
           "Error saving file: %s\n%s",
           jsonFile.getAbsolutePath(),

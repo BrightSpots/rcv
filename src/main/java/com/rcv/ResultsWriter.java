@@ -154,7 +154,7 @@ class ResultsWriter {
   // file access: write / create
   private void generateSummarySpreadsheet(
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath) {
-    Logger.Log(Level.INFO, "Generating summary spreadsheet: %s", outputPath);
+    Logger.log(Level.INFO, "Generating summary spreadsheet: %s", outputPath);
 
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
@@ -440,7 +440,7 @@ class ResultsWriter {
       workbook.write(outputStream);
       outputStream.close();
     } catch (IOException exception) {
-      Logger.Log(
+      Logger.log(
           Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
     }
   }

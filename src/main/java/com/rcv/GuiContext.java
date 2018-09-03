@@ -69,7 +69,7 @@ class GuiContext {
     try {
       getContentVBox().getChildren().add(FXMLLoader.load(getClass().getResource(resourcePath)));
     } catch (IOException exception) {
-      Logger.Log(
+      Logger.log(
           Level.SEVERE, "Failed to open: %s:\n%s", resourcePath, exception.getCause().toString());
     }
   }
