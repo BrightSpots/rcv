@@ -41,6 +41,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -67,6 +68,8 @@ public class GuiConfigController implements Initializable {
   private TextArea textAreaStatus;
   @FXML
   private TextArea textAreaHelp;
+  @FXML
+  private Label labelCurrentlyLoaded;
   @FXML
   private TextField textFieldContestName;
   @FXML
@@ -166,6 +169,8 @@ public class GuiConfigController implements Initializable {
 
   public void buttonNewConfigClicked() {
     Logger.guiLog(Level.INFO, "Creating new config.");
+    GuiContext.getInstance().setConfig(null);
+    selectedFile = null;
     clearConfig();
   }
 
@@ -184,6 +189,7 @@ public class GuiConfigController implements Initializable {
       GuiContext.getInstance().setConfig(Main.loadContestConfig(selectedFile.getAbsolutePath()));
       if (GuiContext.getInstance().getConfig() != null) {
         loadConfig(GuiContext.getInstance().getConfig());
+        labelCurrentlyLoaded.setText("Currently loaded: " + selectedFile.getAbsolutePath());
       }
     }
   }
@@ -390,6 +396,8 @@ public class GuiConfigController implements Initializable {
   }
 
   private void setDefaultValues() {
+    labelCurrentlyLoaded.setText("Currently loaded: <new config>");
+
     setToggleBoolean(
         ContestConfig.DEFAULT_TABULATE_BY_PRECINCT,
         radioTabulateByPrecinctTrue,
@@ -419,9 +427,6 @@ public class GuiConfigController implements Initializable {
   }
 
   private void clearConfig() {
-    GuiContext.getInstance().setConfig(null);
-    selectedFile = null;
-
     textFieldContestName.clear();
     textFieldOutputDirectory.clear();
     datePickerContestDate.setValue(null);
