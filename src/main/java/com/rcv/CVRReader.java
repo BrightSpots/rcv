@@ -79,7 +79,7 @@ class CVRReader {
       inputStream.close();
       workbook.close();
     } catch (IOException exception) {
-      Logger.tabulationLog(
+      Logger.log(
           Level.SEVERE, "Failed to open CVR file: %s\n%s", excelFilePath, exception.toString());
     }
     return firstSheet;
@@ -87,13 +87,11 @@ class CVRReader {
 
   // function: parseCVRFile
   // purpose: parse the given file path into a List of CastVoteRecords suitable for tabulation
+  // param: castVoteRecords existing list to append new CastVoteRecords to
   // returns: list of parsed CVRs
-  List<CastVoteRecord> parseCVRFile() throws SourceWithUnrecognizedCandidatesException {
+  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords) throws SourceWithUnrecognizedCandidatesException {
     // contestSheet contains all the CVR data we will be parsing
     Sheet contestSheet = getFirstSheet(excelFilePath);
-    // container for all CastVoteRecords parsed from the input file
-    List<CastVoteRecord> castVoteRecords = new LinkedList<>();
-
     if (contestSheet != null) {
       // validate header
       // Row iterator is used to iterate through a row of data from the sheet object
@@ -102,7 +100,7 @@ class CVRReader {
       Row headerRow = iterator.next();
       // require at least one non-header row
       if (headerRow == null || contestSheet.getLastRowNum() < 2) {
-        Logger.tabulationLog(
+        Logger.log(
             Level.SEVERE,
             "Invalid CVR source file %s: not enough rows (%d)",
             this.excelFilePath,
@@ -122,6 +120,10 @@ class CVRReader {
         CastVoteRecord cvr =
             parseRow(iterator.next(), cvrFileName, cvrIndex++, unrecognizedCandidateCounts);
         castVoteRecords.add(cvr);
+        // log update every 10,000 records
+        if(castVoteRecords.size() % 10000 == 0) {
+          Logger.log(Level.INFO, "Parsed %d cast vote records", castVoteRecords.size());
+        }
       }
 
       if (unrecognizedCandidateCounts.size() > 0) {
@@ -184,14 +186,14 @@ class CVRReader {
         // empty cells are sometimes treated as undeclared write-ins (Portland / ES&S)
         if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
           candidate = config.getUndeclaredWriteInLabel();
-          Logger.tabulationLog(Level.WARNING, "Empty cell -- treating as UWI");
+          Logger.log(Level.WARNING, "Empty cell -- treating as UWI");
         } else {
           // just ignore this cell
           continue;
         }
       } else {
         if (cvrDataCell.getCellTypeEnum() != CellType.STRING) {
-          Logger.tabulationLog(
+          Logger.log(
               Level.WARNING,
               "unexpected cell type at ranking %d ballot %s",
               rank,

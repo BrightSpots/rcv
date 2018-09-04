@@ -85,13 +85,13 @@ public class GuiMenuController implements Initializable {
       service.setOnFailed(event -> setButtonsDisable(false));
       service.start();
     } else {
-      Logger.guiLog(Level.WARNING, "Please load a config file before attempting to tabulate!");
+      Logger.log(Level.WARNING, "Please load a config file before attempting to tabulate!");
     }
   }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.executionLog(Level.FINE, "Opening main menu GUI...");
+    Logger.log(Level.INFO, "Opening main menu GUI...");
   }
 
   private static class TabulatorService extends Service<Void> {
