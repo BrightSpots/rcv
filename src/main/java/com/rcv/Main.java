@@ -27,6 +27,7 @@ package com.rcv;
 import com.rcv.CVRReader.SourceWithUnrecognizedCandidatesException;
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,14 +54,14 @@ public class Main extends GuiApplication {
       launch(args);
     } else {
       // assume user wants to use CLI
-      Logger.executionLog(Level.INFO, "Tabulator is being used via the CLI.");
+      Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       String configPath = args[0];
       // config file for running the tabulator
       ContestConfig config = loadContestConfig(configPath);
       if (config != null) {
         executeTabulation(config);
       } else {
-        Logger.executionLog(Level.SEVERE, "Aborting because config is invalid.");
+        Logger.log(Level.SEVERE, "Aborting because config is invalid.");
       }
     }
 
@@ -81,11 +82,11 @@ public class Main extends GuiApplication {
 
     // if raw config failed alert user
     if (rawConfig == null) {
-      Logger.executionLog(Level.SEVERE, "Failed to load config file: %s", configPath);
+      Logger.log(Level.SEVERE, "Failed to load config file: %s", configPath);
     } else {
       // proceed to create the ContestConfig wrapper
       config = new ContestConfig(rawConfig);
-      Logger.executionLog(Level.INFO, "Successfully loaded config file: %s", configPath);
+      Logger.log(Level.INFO, "Successfully loaded config file: %s", configPath);
     }
 
     return config;
@@ -96,7 +97,7 @@ public class Main extends GuiApplication {
   // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
   static void executeTabulation(ContestConfig config) {
-    Logger.executionLog(Level.INFO, "Starting tabulation process...");
+    Logger.log(Level.INFO, "Starting tabulation process...");
 
     boolean isTabulationCompleted = false;
     boolean isConfigValid = config.validate();
@@ -106,26 +107,25 @@ public class Main extends GuiApplication {
       // current date-time formatted as a string used for creating unique output files names
       final String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
       String tabulationLogPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_audit.log", timestampString))
-              .toString();
-
+          Paths.get(config.getOutputDirectory(), String.format("%s_audit.log",
+              timestampString)).toAbsolutePath().toString();
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         Logger.addTabulationFileLogging(tabulationLogPath);
         isTabulationLogSetUp = true;
       } catch (UnableToCreateDirectoryException exception) {
-        Logger.executionLog(
+        Logger.log(
             Level.SEVERE,
             "Failed to create output directory: %s\n%s",
             config.getOutputDirectory(),
             exception.toString());
       } catch (IOException exception) {
-        Logger.executionLog(
+        Logger.log(
             Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
       }
 
       if (isTabulationLogSetUp) {
-        Logger.allLogs(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
+        Logger.log(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
         // Read cast vote records from CVR files
         // castVoteRecords will contain all cast vote records parsed by the reader
         List<CastVoteRecord> castVoteRecords;
@@ -143,20 +143,20 @@ public class Main extends GuiApplication {
             tabulator.doAudit(castVoteRecords);
             isTabulationCompleted = true;
           } else {
-            Logger.tabulationLog(Level.SEVERE, "No cast vote records found.");
+            Logger.log(Level.SEVERE, "No cast vote records found.");
           }
         } else {
-          Logger.tabulationLog(Level.SEVERE, "Skipping tabulation due to source file errors.");
+          Logger.log(Level.SEVERE, "Skipping tabulation due to source file errors.");
         }
-        Logger.allLogs(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
+        Logger.log(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
         Logger.removeTabulationFileLogging();
       }
     }
 
     if (isTabulationCompleted) {
-      Logger.executionLog(Level.INFO, "Tabulation process completed.");
+      Logger.log(Level.INFO, "Tabulation process completed.");
     } else {
-      Logger.executionLog(Level.SEVERE, "Unable to complete tabulation process!");
+      Logger.log(Level.SEVERE, "Unable to complete tabulation process!");
     }
   }
 
@@ -165,7 +165,7 @@ public class Main extends GuiApplication {
   // param: config object containing CVR file paths to parse
   // returns: list of all CastVoteRecord objects parsed from CVR files (or null if there's an error)
   private static List<CastVoteRecord> parseCastVoteRecords(ContestConfig config) {
-    Logger.tabulationLog(Level.INFO, "Parsing cast vote records...");
+    Logger.log(Level.INFO, "Parsing cast vote records");
 
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
@@ -174,34 +174,26 @@ public class Main extends GuiApplication {
 
     // At each iteration of the following loop, we add records from another source file.
     // source: index over config sources
-    StringBuilder logMessage = new StringBuilder();
     for (RawContestConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      logMessage.append("Reading CVR file: ").append(source.getFilePath());
-      if (source.getProvider() != null && !source.getProvider().isEmpty()) {
-        logMessage.append(" (provider: ").append(source.getProvider()).append(")");
-      }
-      Logger.tabulationLog(Level.INFO, logMessage.toString());
-      logMessage.setLength(0);
-
+      Path cvrPath = Paths.get(source.getFilePath()).toAbsolutePath();
+      Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       // the CVRs parsed from this source
       try {
-        List<CastVoteRecord> cvrs = new CVRReader(config, source).parseCVRFile();
+        List<CastVoteRecord> cvrs = new CVRReader(config, source).parseCVRFile(castVoteRecords);
         if (cvrs.isEmpty()) {
-          Logger.tabulationLog(
+          Logger.log(
               Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
           encounteredSourceProblem = true;
         }
-        // add records to the master list
-        castVoteRecords.addAll(cvrs);
       } catch (SourceWithUnrecognizedCandidatesException exception) {
-        Logger.tabulationLog(
+        Logger.log(
             Level.SEVERE,
             "Source file contains unrecognized candidate(s): %s",
             source.getFilePath());
         // map from name to number of times encountered
         Map<String, Integer> candidateCounts = exception.getCandidateCounts();
         for (String candidate : candidateCounts.keySet()) {
-          Logger.tabulationLog(
+          Logger.log(
               Level.SEVERE,
               "Unrecognized candidate \"%s\" appears %d time(s).",
               candidate,
@@ -212,10 +204,10 @@ public class Main extends GuiApplication {
     }
 
     if (!encounteredSourceProblem) {
-      Logger.tabulationLog(
+      Logger.log(
           Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
     } else {
-      Logger.tabulationLog(Level.SEVERE, "Parsing cast vote records failed!");
+      Logger.log(Level.SEVERE, "Parsing cast vote records failed!");
       castVoteRecords = null;
     }
 
