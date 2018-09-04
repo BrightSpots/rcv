@@ -35,6 +35,12 @@ import java.util.logging.Level;
 
 class ContestConfig {
 
+  // TODO: if any booleans are unspecified in config file, they default to false no matter what
+  static final boolean DEFAULT_TABULATE_BY_PRECINCT = false;
+  static final boolean DEFAULT_BATCH_ELIMINATION = false;
+  static final boolean DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
+  static final boolean DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
+  static final boolean DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final int DEFAULT_NUMBER_OF_WINNERS = 1;
   static final BigDecimal DEFAULT_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
@@ -63,7 +69,7 @@ class ContestConfig {
     Logger.executionLog(Level.INFO, "Validating config...");
     isValid = true;
 
-    validateContestSettings();
+    validateOutputSettings();
     validateCvrFileSources();
     validateCandidates();
     validateRules();
@@ -78,7 +84,7 @@ class ContestConfig {
     return isValid;
   }
 
-  private void validateContestSettings() {
+  private void validateOutputSettings() {
     if (getContestName() == null || getContestName().isEmpty()) {
       isValid = false;
       Logger.executionLog(Level.SEVERE, "Contest name is required.");
@@ -287,8 +293,7 @@ class ContestConfig {
   String getOutputDirectory() {
     // outputDirectory is where output files should be written
     return (rawConfig.outputSettings.outputDirectory != null
-        && !rawConfig.outputSettings.outputDirectory
-        .isEmpty())
+        && !rawConfig.outputSettings.outputDirectory.isEmpty())
         ? rawConfig.outputSettings.outputDirectory
         : System.getProperty("user.dir");
   }

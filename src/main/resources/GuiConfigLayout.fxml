@@ -18,14 +18,36 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
-  minHeight="-Infinity"
-  minWidth="-Infinity" prefHeight="550.0" prefWidth="900.0"
+  minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="900.0"
   xmlns="http://javafx.com/javafx/8.0.121" fx:controller="com.rcv.GuiConfigController">
-  <right>
-    <TextArea BorderPane.alignment="TOP_LEFT" editable="false" minWidth="300.0" prefWidth="300.0"
-      wrapText="true" fx:id="textAreaHelp"/>
-  </right>
+  <top>
+    <VBox BorderPane.alignment="TOP_LEFT">
+      <ButtonBar maxHeight="50.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0"
+        fx:id="buttonBar">
+        <buttons>
+          <Button ButtonBar.buttonData="LEFT" mnemonicParsing="false"
+            onAction="#buttonNewConfigClicked" text="New"/>
+          <Button ButtonBar.buttonData="LEFT" mnemonicParsing="false"
+            onAction="#buttonLoadConfigClicked" text="Load..."/>
+          <Button ButtonBar.buttonData="LEFT" mnemonicParsing="false" onAction="#buttonSaveClicked"
+            text="Save..."/>
+          <Button mnemonicParsing="false" onAction="#buttonValidateClicked" text="Validate"/>
+          <Button mnemonicParsing="false" onAction="#buttonTabulateClicked" text="Tabulate"/>
+          <Button mnemonicParsing="false" onAction="#buttonExitClicked" text="Exit"/>
+        </buttons>
+        <padding>
+          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
+        </padding>
+      </ButtonBar>
+      <Label text="Universal RCV Tabulator">
+        <font>
+          <Font size="20.0"/>
+        </font>
+      </Label>
+    </VBox>
+  </top>
   <center>
     <VBox BorderPane.alignment="CENTER">
       <TabPane minHeight="450.0" tabClosingPolicy="UNAVAILABLE">
@@ -58,8 +80,8 @@
                   <ToggleGroup fx:id="toggleTabulateByPrecinct"/>
                 </toggleGroup>
               </RadioButton>
-              <RadioButton mnemonicParsing="false" selected="true" text="False"
-                toggleGroup="$toggleTabulateByPrecinct"/>
+              <RadioButton mnemonicParsing="false" text="False"
+                toggleGroup="$toggleTabulateByPrecinct" fx:id="radioTabulateByPrecinctFalse"/>
             </HBox>
             <padding>
               <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
@@ -78,8 +100,7 @@
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <TextField prefHeight="25.0" prefWidth="160.0"
-                    promptText="First Vote Column Index *"
-                    fx:id="textFieldCvrFirstVoteCol"/>
+                    promptText="First Vote Column Index *" fx:id="textFieldCvrFirstVoteCol"/>
                   <TextField prefHeight="25.0" prefWidth="110.0" promptText="ID Column Index"
                     fx:id="textFieldCvrIdCol"/>
                   <TextField prefHeight="25.0" prefWidth="140.0" promptText="Precinct Column Index"
@@ -102,16 +123,16 @@
             </HBox>
             <TableView fx:id="tableViewCvrFiles">
               <columns>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="250.0"
-                  text="File Path" fx:id="tableColumnCvrFilePath"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="250.0" text="File Path"
+                  fx:id="tableColumnCvrFilePath"/>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="60.0"
                   text="First Vote&#10;Column&#10;Index" fx:id="tableColumnCvrFirstVoteCol"/>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="60.0"
                   text="ID&#10;Column&#10;Index" fx:id="tableColumnCvrIdCol"/>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="60.0"
                   text="Precinct&#10;Column&#10;Index" fx:id="tableColumnCvrPrecinctCol"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="160.0"
-                  text="Provider" fx:id="tableColumnCvrProvider"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="160.0" text="Provider"
+                  fx:id="tableColumnCvrProvider"/>
               </columns>
             </TableView>
             <padding>
@@ -134,10 +155,10 @@
             </HBox>
             <TableView fx:id="tableViewCandidates">
               <columns>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="180.0"
-                  text="Name" fx:id="tableColumnCandidateName"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="180.0"
-                  text="Code" fx:id="tableColumnCandidateCode"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="180.0" text="Name"
+                  fx:id="tableColumnCandidateName"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="180.0" text="Code"
+                  fx:id="tableColumnCandidateCode"/>
               </columns>
             </TableView>
             <padding>
@@ -166,8 +187,8 @@
                     <ToggleGroup fx:id="toggleBatchElimination"/>
                   </toggleGroup>
                 </RadioButton>
-                <RadioButton mnemonicParsing="false" selected="true" text="False"
-                  toggleGroup="$toggleBatchElimination"/>
+                <RadioButton mnemonicParsing="false" text="False"
+                  toggleGroup="$toggleBatchElimination" fx:id="radioBatchEliminationFalse"/>
               </HBox>
               <Label text="Exhaust on Duplicate Candidate"/>
               <HBox alignment="CENTER_LEFT" spacing="12.0">
@@ -177,8 +198,9 @@
                     <ToggleGroup fx:id="toggleExhaustOnDuplicateCandidate"/>
                   </toggleGroup>
                 </RadioButton>
-                <RadioButton mnemonicParsing="false" selected="true" text="False"
-                  toggleGroup="$toggleExhaustOnDuplicateCandidate"/>
+                <RadioButton mnemonicParsing="false" text="False"
+                  toggleGroup="$toggleExhaustOnDuplicateCandidate"
+                  fx:id="radioExhaustOnDuplicateCandidateFalse"/>
               </HBox>
               <Label text="Overvote Label"/>
               <TextField maxWidth="220.0" promptText="Overvote Label"
@@ -207,8 +229,9 @@
                     <ToggleGroup fx:id="toggleContinueUntilTwoCandidatesRemain"/>
                   </toggleGroup>
                 </RadioButton>
-                <RadioButton mnemonicParsing="false" selected="true" text="False"
-                  toggleGroup="$toggleContinueUntilTwoCandidatesRemain"/>
+                <RadioButton mnemonicParsing="false" text="False"
+                  toggleGroup="$toggleContinueUntilTwoCandidatesRemain"
+                  fx:id="radioContinueUntilTwoCandidatesRemainFalse"/>
               </HBox>
               <Label text="Treat Blank as Undeclared Write-in"/>
               <HBox alignment="CENTER_LEFT" spacing="12.0">
@@ -218,8 +241,9 @@
                     <ToggleGroup fx:id="toggleTreatBlankAsUndeclaredWriteIn"/>
                   </toggleGroup>
                 </RadioButton>
-                <RadioButton mnemonicParsing="false" selected="true" text="False"
-                  toggleGroup="$toggleTreatBlankAsUndeclaredWriteIn"/>
+                <RadioButton mnemonicParsing="false" text="False"
+                  toggleGroup="$toggleTreatBlankAsUndeclaredWriteIn"
+                  fx:id="radioTreatBlankAsUndeclaredWriteInFalse"/>
               </HBox>
               <Label text="Undervote Label"/>
               <TextField maxWidth="220.0" promptText="Undervote Label"
@@ -235,16 +259,18 @@
         </Tab>
       </TabPane>
       <Region/>
-      <ButtonBar maxHeight="50.0" prefHeight="50.0" fx:id="buttonBar">
-        <buttons>
-          <Button mnemonicParsing="false" onAction="#buttonMenuClicked" text="Back to Menu"/>
-          <Button mnemonicParsing="false" onAction="#buttonValidateClicked" text="Validate Config"/>
-          <Button mnemonicParsing="false" onAction="#buttonSaveClicked" text="Save Config"/>
-        </buttons>
-        <padding>
-          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
-        </padding>
-      </ButtonBar>
     </VBox>
   </center>
+  <right>
+    <TextArea BorderPane.alignment="TOP_LEFT" editable="false" minWidth="300.0" prefWidth="300.0"
+      wrapText="true" fx:id="textAreaHelp"/>
+  </right>
+  <bottom>
+    <TextArea BorderPane.alignment="TOP_LEFT" editable="false" id="textStatus" prefHeight="200.0"
+      prefWidth="200.0" wrapText="true" fx:id="textAreaStatus">
+      <BorderPane.margin>
+        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+      </BorderPane.margin>
+    </TextArea>
+  </bottom>
 </BorderPane>

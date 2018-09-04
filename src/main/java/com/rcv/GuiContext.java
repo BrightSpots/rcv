@@ -16,22 +16,12 @@
 
 package com.rcv;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.VBox;
-
 class GuiContext {
 
   // context instance
   private static final GuiContext INSTANCE = new GuiContext();
   // currently-loaded tabulator config
   private ContestConfig config;
-  // file selected for loading
-  private File selectedFile;
-  // VBox for displaying main content
-  private VBox contentVBox;
 
   private GuiContext() {
   }
@@ -46,31 +36,5 @@ class GuiContext {
 
   void setConfig(ContestConfig config) {
     this.config = config;
-  }
-
-  File getSelectedFile() {
-    return selectedFile;
-  }
-
-  void setSelectedFile(File selectedFile) {
-    this.selectedFile = selectedFile;
-  }
-
-  private VBox getContentVBox() {
-    return contentVBox;
-  }
-
-  void setContentVBox(VBox contentVBox) {
-    this.contentVBox = contentVBox;
-  }
-
-  void showContent(String resourcePath) {
-    getContentVBox().getChildren().clear();
-    try {
-      getContentVBox().getChildren().add(FXMLLoader.load(getClass().getResource(resourcePath)));
-    } catch (IOException exception) {
-      Logger.executionLog(
-          Level.SEVERE, "Failed to open: %s:\n%s", resourcePath, exception.getCause().toString());
-    }
   }
 }
