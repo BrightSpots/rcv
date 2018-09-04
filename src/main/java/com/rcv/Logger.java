@@ -40,6 +40,7 @@ package com.rcv;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -51,34 +52,28 @@ import javafx.scene.control.TextArea;
 
 class Logger {
 
-  // execution logger name
-  private static final String EXECUTION_LOGGER_NAME = "execution";
   // execution log file name (%g tracks count of log file if additional versions are created)
   private static final String EXECUTION_LOG_FILE_NAME = "rcv_%g.log";
-  // first value here is bytes per MB and the second is max MB for the log file
-  private static final Integer EXECUTION_LOG_MAX_SIZE_BYTES = 1000000 * 50;
+  // first value here is bytes per MB and the second is max MB for each execution log file
+  private static final Integer EXECUTION_LOG_FILE_MAX_SIZE_BYTES = 1000000 * 50;
   // how many execution files to keep
   private static final Integer EXECUTION_LOG_FILE_COUNT = 2;
-  // cache for the execution logger
-  private static java.util.logging.Logger executionLogger;
-  // cache for the tabulation logger
+  // cache for logger
+  private static java.util.logging.Logger logger;
+  // cache for tabulation handler
   private static java.util.logging.FileHandler tabulationHandler;
-  // cache for the tabulation logger
+  // cache for gui handler
   private static java.util.logging.Handler guiHandler;
+  // cache for custom formatter
+  private static java.util.logging.Formatter formatter;
 
   // function: setup
   // purpose: initialize logging module
   // throws: IOException if unable to open output log file
   static void setup() throws IOException {
-    // create and cache default logger
-    executionLogger = java.util.logging.Logger.getLogger(EXECUTION_LOGGER_NAME);
-    executionLogger.setLevel(Level.FINE);
-
-    // set root console handler to use our formatter (just to keep things tidy and consistent)
-    java.util.logging.Logger rootLogger = executionLogger.getParent();
-    for(Handler handler : rootLogger.getHandlers()) {
-      handler.setFormatter(new LogFormatter());
-    }
+    // cache default logger
+    logger = java.util.logging.Logger.getLogger("");
+    logger.setLevel(Level.FINE);
 
     // logPath is where default file logging is written
     // "user.dir" property is the current working directory, i.e. folder from whence the rcv jar
@@ -86,46 +81,51 @@ class Logger {
     Path logPath = Paths.get(System.getProperty("user.dir"),
         EXECUTION_LOG_FILE_NAME).toAbsolutePath();
 
-    // fileHandler writes formatted strings to file
-    FileHandler fileHandler =
+    // executionHandler writes to the execution log file
+    FileHandler executionHandler =
         new FileHandler(logPath.toString(),
-            EXECUTION_LOG_MAX_SIZE_BYTES,
+            EXECUTION_LOG_FILE_MAX_SIZE_BYTES,
             EXECUTION_LOG_FILE_COUNT,
             true);
-    // use our custom formatter
-    fileHandler.setFormatter(new LogFormatter());
-    fileHandler.setLevel(Level.INFO);
-    executionLogger.addHandler(fileHandler);
+    executionHandler.setLevel(Level.INFO);
+    logger.addHandler(executionHandler);
+
+    // use our custom formatter for all installed handlers
+    formatter = new LogFormatter();
+    for(Handler handler : logger.getHandlers()) {
+      handler.setFormatter(formatter);
+    }
+
     // log results
     log(Level.INFO,"RCV Tabulator Logging execution to %s", logPath.toString());
   }
 
   // function: addTabulationFileLogging
-  // purpose: adds file and console logging for a tabulation run
-  // param: loggerOutputPath: file path for executionLogger logging output
+  // purpose: adds file logging for a tabulation run
+  // param: loggerOutputPath: file path for logger logging output
   // file access: write - existing file will be overwritten
   // throws: IOException if unable to open loggerOutputPath
-  static void addTabulationFileLogging(String loggerOutputPath) throws IOException {
-    // create file handler at FINE level for audit logging
-    tabulationHandler = new FileHandler(loggerOutputPath);
-    // use our custom formatter
-    tabulationHandler.setFormatter(new LogFormatter());
+  static void addTabulationFileLogging(String outputPath) throws IOException {
+    // create file handler at FINE level (we have detailed audit logging we want to capture)
+    // and use our custom formatter
+    tabulationHandler = new FileHandler(outputPath);
+    tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
-    executionLogger.addHandler(tabulationHandler);
+    logger.addHandler(tabulationHandler);
   }
 
   // function: removeTabulationFileLogging
   // purpose: remove file logging once a tabulation run is complete
   static void removeTabulationFileLogging() {
-    executionLogger.removeHandler(tabulationHandler);
+    logger.removeHandler(tabulationHandler);
   }
 
-  // logs to execution log and GUI if there is one
+  // logs to default logger
   static void log(Level level, String format, Object... obj) {
-    executionLogger.log(level, String.format(format, obj));
+    logger.log(level, String.format(format, obj));
   }
 
-  // setup logging to the provided text area for display to user in the GUI
+  // add logging to the provided text area for display to user in the GUI
   static void addGuiLogging(TextArea textArea) {
     // custom handler overrides publish to post text to the GUI
     guiHandler = new Handler() {
@@ -155,8 +155,8 @@ class Logger {
       }
     };
     guiHandler.setLevel(Level.INFO);
-    guiHandler.setFormatter(new LogFormatter());
-    executionLogger.addHandler(guiHandler);
+    guiHandler.setFormatter(formatter);
+    logger.addHandler(guiHandler);
   }
 
   // custom LogFormatter class for log output string formatting
@@ -169,7 +169,7 @@ class Logger {
     // returns: the formatted string for output
     @Override
     public String format(LogRecord record) {
-      return new Date(record.getMillis())
+      return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new Date())
           + " "
           + record.getLevel().getLocalizedName()
           + ": "
