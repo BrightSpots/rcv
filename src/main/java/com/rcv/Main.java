@@ -184,14 +184,12 @@ public class Main extends GuiApplication {
 
       // the CVRs parsed from this source
       try {
-        List<CastVoteRecord> cvrs = new CVRReader(config, source).parseCVRFile();
+        List<CastVoteRecord> cvrs = new CVRReader(config, source).parseCVRFile(castVoteRecords);
         if (cvrs.isEmpty()) {
           Logger.log(
               Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
           encounteredSourceProblem = true;
         }
-        // add records to the master list
-        castVoteRecords.addAll(cvrs);
       } catch (SourceWithUnrecognizedCandidatesException exception) {
         Logger.log(
             Level.SEVERE,
