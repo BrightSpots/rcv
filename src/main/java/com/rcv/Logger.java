@@ -96,7 +96,7 @@ class Logger {
     }
 
     // log results
-    log(Level.INFO,"RCV Tabulator logging execution to %s", logPath.toString());
+    log(Level.INFO, "RCV Tabulator logging execution to: %s", logPath.toString());
   }
 
   // function: addTabulationFileLogging

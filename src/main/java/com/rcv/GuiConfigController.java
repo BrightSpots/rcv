@@ -168,7 +168,7 @@ public class GuiConfigController implements Initializable {
   private ButtonBar buttonBar;
 
   public void buttonNewConfigClicked() {
-    Logger.guiLog(Level.INFO, "Creating new config.");
+    Logger.log(Level.INFO, "Creating new config.");
     GuiContext.getInstance().setConfig(null);
     selectedFile = null;
     clearConfig();
@@ -229,12 +229,12 @@ public class GuiConfigController implements Initializable {
       service.setOnFailed(event -> buttonBar.setDisable(false));
       service.start();
     } else {
-      Logger.guiLog(Level.WARNING, "Please load a config file before attempting to tabulate!");
+      Logger.log(Level.WARNING, "Please load a config file before attempting to tabulate!");
     }
   }
 
   public void buttonExitClicked() {
-    Logger.guiLog(Level.INFO, "Exiting tabulator.");
+    Logger.log(Level.INFO, "Exiting tabulator GUI.");
     Platform.exit();
   }
 
@@ -268,9 +268,9 @@ public class GuiConfigController implements Initializable {
   public void buttonAddCvrFileClicked() {
     CVRSource cvrSource = new CVRSource();
     if (textFieldCvrFilePath.getText().isEmpty()) {
-      Logger.guiLog(Level.WARNING, "CVR file path is required!");
+      Logger.log(Level.WARNING, "CVR file path is required!");
     } else if (textFieldCvrFirstVoteCol.getText().isEmpty()) {
-      Logger.guiLog(Level.WARNING, "CVR first vote column is required!");
+      Logger.log(Level.WARNING, "CVR first vote column is required!");
     } else {
       cvrSource.setFilePath(textFieldCvrFilePath.getText());
       cvrSource.setFirstVoteColumnIndex(getIntValueElse(textFieldCvrFirstVoteCol, null));
@@ -295,7 +295,7 @@ public class GuiConfigController implements Initializable {
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
     if (textFieldCandidateName.getText().isEmpty()) {
-      Logger.guiLog(Level.WARNING, "Candidate name field is required!");
+      Logger.log(Level.WARNING, "Candidate name field is required!");
     } else {
       candidate.setName(textFieldCandidateName.getText());
       candidate.setCode(textFieldCandidateCode.getText());
@@ -314,7 +314,7 @@ public class GuiConfigController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
-    Logger.executionLog(Level.FINE, "Opening GUI...");
+    Logger.log(Level.INFO, "Opening tabulator GUI.");
 
     String helpText;
     try {
@@ -324,8 +324,7 @@ public class GuiConfigController implements Initializable {
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception exception) {
-      Logger.executionLog(
-          Level.SEVERE, "Error loading: %s\n%s", CONFIG_FILE_NAME, exception.toString());
+      Logger.log(Level.SEVERE, "Error loading: %s\n%s", CONFIG_FILE_NAME, exception.toString());
       helpText = String.format("<Error loading %s>", CONFIG_FILE_NAME);
     }
     textAreaHelp.setText(helpText);
@@ -538,7 +537,7 @@ public class GuiConfigController implements Initializable {
       }
       returnValue = Integer.valueOf(textField.getText());
     } catch (Exception exception) {
-      Logger.executionLog(
+      Logger.log(
           Level.WARNING,
           "Integer required! Illegal value '%s' was replaced by '%s'",
           textField.getText(),

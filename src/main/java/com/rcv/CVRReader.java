@@ -120,9 +120,8 @@ class CVRReader {
         CastVoteRecord cvr =
             parseRow(iterator.next(), cvrFileName, cvrIndex++, unrecognizedCandidateCounts);
         castVoteRecords.add(cvr);
-        // log update every 10,000 records
-        if(castVoteRecords.size() % 10000 == 0) {
-          Logger.log(Level.INFO, "Parsed %d cast vote records", castVoteRecords.size());
+        if (castVoteRecords.size() % 50000 == 0) {
+          Logger.log(Level.INFO, "Parsed %d cast vote records...", castVoteRecords.size());
         }
       }
 

@@ -165,7 +165,7 @@ public class Main extends GuiApplication {
   // param: config object containing CVR file paths to parse
   // returns: list of all CastVoteRecord objects parsed from CVR files (or null if there's an error)
   private static List<CastVoteRecord> parseCastVoteRecords(ContestConfig config) {
-    Logger.log(Level.INFO, "Parsing cast vote records");
+    Logger.log(Level.INFO, "Parsing cast vote records...");
 
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
