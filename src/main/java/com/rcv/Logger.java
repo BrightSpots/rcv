@@ -65,7 +65,7 @@ class Logger {
   // cache for gui handler
   private static java.util.logging.Handler guiHandler;
   // cache for custom formatter
-  private static java.util.logging.Formatter formatter;
+  private static final java.util.logging.Formatter formatter = new LogFormatter();
 
   // function: setup
   // purpose: initialize logging module
@@ -75,7 +75,7 @@ class Logger {
     logger = java.util.logging.Logger.getLogger("");
     logger.setLevel(Level.FINE);
 
-    // logPath is where default file logging is written
+    // logPath is where execution file logging is written
     // "user.dir" property is the current working directory, i.e. folder from whence the rcv jar
     // was launched
     Path logPath = Paths.get(System.getProperty("user.dir"),
@@ -91,7 +91,6 @@ class Logger {
     logger.addHandler(executionHandler);
 
     // use our custom formatter for all installed handlers
-    formatter = new LogFormatter();
     for(Handler handler : logger.getHandlers()) {
       handler.setFormatter(formatter);
     }

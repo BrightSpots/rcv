@@ -27,6 +27,7 @@ package com.rcv;
 import com.rcv.CVRReader.SourceWithUnrecognizedCandidatesException;
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -164,7 +165,7 @@ public class Main extends GuiApplication {
   // param: config object containing CVR file paths to parse
   // returns: list of all CastVoteRecord objects parsed from CVR files (or null if there's an error)
   private static List<CastVoteRecord> parseCastVoteRecords(ContestConfig config) {
-    Logger.log(Level.INFO, "Parsing cast vote records...");
+    Logger.log(Level.INFO, "Parsing cast vote records");
 
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
@@ -173,15 +174,9 @@ public class Main extends GuiApplication {
 
     // At each iteration of the following loop, we add records from another source file.
     // source: index over config sources
-    StringBuilder logMessage = new StringBuilder();
     for (RawContestConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      logMessage.append("Reading CVR file: ").append(source.getFilePath());
-      if (source.getProvider() != null && !source.getProvider().isEmpty()) {
-        logMessage.append(" (provider: ").append(source.getProvider()).append(")");
-      }
-      Logger.log(Level.INFO, logMessage.toString());
-      logMessage.setLength(0);
-
+      Path cvrPath = Paths.get(source.getFilePath()).toAbsolutePath();
+      Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       // the CVRs parsed from this source
       try {
         List<CastVoteRecord> cvrs = new CVRReader(config, source).parseCVRFile(castVoteRecords);
