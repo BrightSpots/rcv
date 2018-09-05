@@ -23,6 +23,7 @@ package com.rcv;
 
 import com.rcv.CastVoteRecord.VoteOutcomeType;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,6 +58,8 @@ class Tabulator {
   private final Map<String, Integer> winnerToRound = new HashMap<>();
   // tracks the current round (and when tabulation is complete, the total number of rounds)
   private int currentRound = 0;
+  // tracks required winning threshold
+  private BigDecimal winningThreshold;
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
@@ -132,9 +135,12 @@ class Tabulator {
       Map<String, BigDecimal> currentRoundCandidateToTally = getTallyForRound(currentRound);
       roundTallies.put(currentRound, currentRoundCandidateToTally);
 
-      // cache this as it will change after adding winners to winnerToRound
-      // TODO: better encapsulation
-      BigDecimal winningThresholdThisRound = getThreshold(currentRoundCandidateToTally);
+      // The winning threshold in a multi-seat contest is based on the number of active votes in the
+      // first round.
+      // In a single-seat contest, it's based on the number of active votes in the current round.
+      if (currentRound == 1 || config.getNumberOfWinners() == 1) {
+        setWinningThreshold(currentRoundCandidateToTally);
+      }
 
       // currentRoundTallyToCandidates is a sorted map from tally to candidate(s) with that tally.
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates =
@@ -154,7 +160,7 @@ class Tabulator {
             // number of votes the candidate got this round
             BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
             // number that were surplus (beyond the required threshold)
-            BigDecimal extraVotes = candidateVotes.subtract(winningThresholdThisRound);
+            BigDecimal extraVotes = candidateVotes.subtract(winningThreshold);
             // fractional transfer percentage
             BigDecimal surplusFraction = config.divide(extraVotes, candidateVotes);
             for (CastVoteRecord cvr : castVoteRecords) {
@@ -214,8 +220,7 @@ class Tabulator {
     }
 
     if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      Logger.log(
-          Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
+      Logger.log(Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
       // candidateID indexes over all candidates in ordered list
       for (String candidateID : config.getCandidatePermutation()) {
         Logger.log(Level.INFO, "%s", candidateID);
@@ -286,26 +291,22 @@ class Tabulator {
     }
   }
 
-  // function: getThreshold
-  // purpose: determine the threshold to win for the given round
+  // function: setWinningThreshold
+  // purpose: determine and store the threshold to win
   // param: currentRoundCandidateToTally map of candidateID to their tally for a particular round
-  // param: winnerToRound map of candidateID to round in which they won
-  // return: threshold to determine a winner
-  private BigDecimal getThreshold(Map<String, BigDecimal> currentRoundCandidateToTally) {
+  private void setWinningThreshold(Map<String, BigDecimal> currentRoundCandidateToTally) {
     // currentRoundTotalVotes holds total active votes in this round
     BigDecimal currentRoundTotalVotes = BigDecimal.ZERO;
     // numVotes indexes over all vote tallies in this round
     for (BigDecimal numVotes : currentRoundCandidateToTally.values()) {
       currentRoundTotalVotes = currentRoundTotalVotes.add(numVotes);
     }
-    // how many seats have been filled
-    int numPreviousWinners = winnerToRound.size();
-    // how many seats remain to be filled
-    int seatsRemaining = config.getNumberOfWinners() - numPreviousWinners;
 
-    // divisor for threshold is seats remaining to fill + 1
-    BigDecimal divisor = new BigDecimal(seatsRemaining + 1);
-    return config.divide(currentRoundTotalVotes, divisor);
+    // divisor for threshold is num winners + 1
+    BigDecimal divisor = new BigDecimal(config.getNumberOfWinners() + 1);
+    // threshold = floor(votes / (num_winners + 1)) + 1
+    winningThreshold =
+        currentRoundTotalVotes.divide(divisor, RoundingMode.DOWN).add(BigDecimal.ONE);
   }
 
   // purpose: determine if we should continue tabulating based on how many winners have been
@@ -360,25 +361,30 @@ class Tabulator {
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates) {
     // store result here
     List<String> selectedWinners = new LinkedList<>();
-    // winning threshold this round
-    BigDecimal thresholdToWin = getThreshold(currentRoundCandidateToTally);
-    // tally indexes over all tallies to find any winners
-    for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
-      // TODO: some rules require >= instead of just > here
-      if (tally.compareTo(thresholdToWin) > 0) {
-        // we have winner(s)
-        List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
-        for (String winningCandidate : winningCandidates) {
-          selectedWinners.add(winningCandidate);
-          Logger.log(
-              Level.INFO,
-              "%s won in round %d with %s votes.",
-              winningCandidate,
-              currentRound,
-              tally.toString());
+
+    // If the number of continuing candidates equals the number of seats to fill, everyone wins.
+    if (currentRoundCandidateToTally.size() == config.getNumberOfWinners() - winnerToRound.size()) {
+      selectedWinners.addAll(currentRoundCandidateToTally.keySet());
+    } else { // see if anyone has exceeded the threshold
+      // tally indexes over all tallies to find any winners
+      for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
+        if (tally.compareTo(winningThreshold) > 0) {
+          // we have winner(s)
+          List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
+          selectedWinners.addAll(winningCandidates);
         }
       }
     }
+
+    for (String winner : selectedWinners) {
+      Logger.log(
+          Level.INFO,
+          "%s won in round %d with %s votes.",
+          winner,
+          currentRound,
+          currentRoundCandidateToTally.get(winner).toString());
+    }
+
     return selectedWinners;
   }
 
