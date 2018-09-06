@@ -26,7 +26,7 @@ public class GuiApplication extends Application {
 
   @Override
   public void start(Stage window) throws Exception {
-    Parent root = FXMLLoader.load(getClass().getResource("/GuiMainLayout.fxml"));
+    Parent root = FXMLLoader.load(getClass().getResource("/GuiConfigLayout.fxml"));
     window.setTitle("Universal RCV Tabulator");
     window.setScene(new Scene(root));
     window.show();

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -40,6 +41,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -58,8 +60,16 @@ public class GuiConfigController implements Initializable {
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String CONFIG_FILE_NAME = "config_file_documentation.txt";
+
+  // file selected for loading
+  private File selectedFile;
+
+  @FXML
+  private TextArea textAreaStatus;
   @FXML
   private TextArea textAreaHelp;
+  @FXML
+  private Label labelCurrentlyLoaded;
   @FXML
   private TextField textFieldContestName;
   @FXML
@@ -74,6 +84,8 @@ public class GuiConfigController implements Initializable {
   private ToggleGroup toggleTabulateByPrecinct;
   @FXML
   private RadioButton radioTabulateByPrecinctTrue;
+  @FXML
+  private RadioButton radioTabulateByPrecinctFalse;
   @FXML
   private TableView<CVRSource> tableViewCvrFiles;
   @FXML
@@ -133,24 +145,70 @@ public class GuiConfigController implements Initializable {
   @FXML
   private RadioButton radioBatchEliminationTrue;
   @FXML
+  private RadioButton radioBatchEliminationFalse;
+  @FXML
   private ToggleGroup toggleContinueUntilTwoCandidatesRemain;
   @FXML
   private RadioButton radioContinueUntilTwoCandidatesRemainTrue;
+  @FXML
+  private RadioButton radioContinueUntilTwoCandidatesRemainFalse;
   @FXML
   private ToggleGroup toggleExhaustOnDuplicateCandidate;
   @FXML
   private RadioButton radioExhaustOnDuplicateCandidateTrue;
   @FXML
+  private RadioButton radioExhaustOnDuplicateCandidateFalse;
+  @FXML
   private ToggleGroup toggleTreatBlankAsUndeclaredWriteIn;
   @FXML
   private RadioButton radioTreatBlankAsUndeclaredWriteInTrue;
   @FXML
+  private RadioButton radioTreatBlankAsUndeclaredWriteInFalse;
+  @FXML
   private ButtonBar buttonBar;
 
-  public void buttonMenuClicked() {
-    GuiContext.getInstance().showContent("/GuiMenuLayout.fxml");
+  public void buttonNewConfigClicked() {
+    Logger.log(Level.INFO, "Creating new config.");
     GuiContext.getInstance().setConfig(null);
-    GuiContext.getInstance().setSelectedFile(null);
+    selectedFile = null;
+    clearConfig();
+  }
+
+  public void buttonLoadConfigClicked() {
+    FileChooser fc = new FileChooser();
+    if (selectedFile == null) {
+      fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+    } else {
+      fc.setInitialDirectory(new File(selectedFile.getParent()));
+    }
+    fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
+    fc.setTitle("Load Config");
+
+    selectedFile = fc.showOpenDialog(null);
+    if (selectedFile != null) {
+      GuiContext.getInstance().setConfig(Main.loadContestConfig(selectedFile.getAbsolutePath()));
+      if (GuiContext.getInstance().getConfig() != null) {
+        loadConfig(GuiContext.getInstance().getConfig());
+        labelCurrentlyLoaded.setText("Currently loaded: " + selectedFile.getAbsolutePath());
+      }
+    }
+  }
+
+  public void buttonSaveClicked() {
+    FileChooser fc = new FileChooser();
+    if (selectedFile == null) {
+      fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+    } else {
+      fc.setInitialDirectory(new File(selectedFile.getParent()));
+      fc.setInitialFileName(selectedFile.getName());
+    }
+    fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
+    fc.setTitle("Save Config");
+
+    File saveFile = fc.showSaveDialog(null);
+    if (saveFile != null) {
+      JsonParser.createFileFromRawContestConfig(saveFile, createRawContestConfig());
+    }
   }
 
   public void buttonValidateClicked() {
@@ -162,21 +220,22 @@ public class GuiConfigController implements Initializable {
     service.start();
   }
 
-  public void buttonSaveClicked() {
-    FileChooser fc = new FileChooser();
-    if (GuiContext.getInstance().getSelectedFile() == null) {
-      fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+  public void buttonTabulateClicked() {
+    if (GuiContext.getInstance().getConfig() != null) {
+      buttonBar.setDisable(true);
+      TabulatorService service = new TabulatorService();
+      service.setOnSucceeded(event -> buttonBar.setDisable(false));
+      service.setOnCancelled(event -> buttonBar.setDisable(false));
+      service.setOnFailed(event -> buttonBar.setDisable(false));
+      service.start();
     } else {
-      fc.setInitialDirectory(new File(GuiContext.getInstance().getSelectedFile().getParent()));
-      fc.setInitialFileName(GuiContext.getInstance().getSelectedFile().getName());
+      Logger.log(Level.WARNING, "Please load a config file before attempting to tabulate!");
     }
-    fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
-    fc.setTitle("Save Config");
+  }
 
-    File saveFile = fc.showSaveDialog(null);
-    if (saveFile != null) {
-      JsonParser.createFileFromRawContestConfig(saveFile, createRawContestConfig());
-    }
+  public void buttonExitClicked() {
+    Logger.log(Level.INFO, "Exiting tabulator GUI.");
+    Platform.exit();
   }
 
   public void buttonOutputDirectoryClicked() {
@@ -191,7 +250,6 @@ public class GuiConfigController implements Initializable {
   }
 
   public void buttonClearDatePickerContestDateClicked() {
-    datePickerContestDate.getEditor().clear();
     datePickerContestDate.setValue(null);
   }
 
@@ -255,7 +313,8 @@ public class GuiConfigController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Logger.log(Level.INFO, "Opening config creator GUI...");
+    Logger.addGuiLogging(this.textAreaStatus);
+    Logger.log(Level.INFO, "Opening tabulator GUI.");
 
     String helpText;
     try {
@@ -265,8 +324,7 @@ public class GuiConfigController implements Initializable {
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception exception) {
-      Logger.log(
-          Level.SEVERE, "Error loading: %s\n%s", CONFIG_FILE_NAME, exception.toString());
+      Logger.log(Level.SEVERE, "Error loading: %s\n%s", CONFIG_FILE_NAME, exception.toString());
       helpText = String.format("<Error loading %s>", CONFIG_FILE_NAME);
     }
     textAreaHelp.setText(helpText);
@@ -320,21 +378,14 @@ public class GuiConfigController implements Initializable {
     textFieldNumberOfWinners
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
-    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.DEFAULT_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldDecimalPlacesForVoteArithmetic));
-    textFieldDecimalPlacesForVoteArithmetic.setText(
-        String.valueOf(ContestConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
     textFieldMinimumVoteThreshold
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
-    textFieldMinimumVoteThreshold.setText(
-        String.valueOf(ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
 
-    if (GuiContext.getInstance().getConfig() != null) {
-      loadConfig(GuiContext.getInstance().getConfig());
-    }
+    setDefaultValues();
   }
 
   private void setTextFieldToInteger(TextField textField, Integer value) {
@@ -343,7 +394,78 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  private void setDefaultValues() {
+    labelCurrentlyLoaded.setText("Currently loaded: <new config>");
+
+    setToggleBoolean(
+        ContestConfig.DEFAULT_TABULATE_BY_PRECINCT,
+        radioTabulateByPrecinctTrue,
+        radioTabulateByPrecinctFalse);
+    setToggleBoolean(
+        ContestConfig.DEFAULT_BATCH_ELIMINATION,
+        radioBatchEliminationTrue,
+        radioBatchEliminationFalse);
+    setToggleBoolean(
+        ContestConfig.DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES,
+        radioExhaustOnDuplicateCandidateTrue,
+        radioExhaustOnDuplicateCandidateFalse);
+    setToggleBoolean(
+        ContestConfig.DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN,
+        radioContinueUntilTwoCandidatesRemainTrue,
+        radioContinueUntilTwoCandidatesRemainFalse);
+    setToggleBoolean(
+        ContestConfig.DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN,
+        radioTreatBlankAsUndeclaredWriteInTrue,
+        radioTreatBlankAsUndeclaredWriteInFalse);
+
+    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.DEFAULT_NUMBER_OF_WINNERS));
+    textFieldDecimalPlacesForVoteArithmetic.setText(
+        String.valueOf(ContestConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+    textFieldMinimumVoteThreshold.setText(
+        String.valueOf(ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
+  }
+
+  private void clearConfig() {
+    textFieldContestName.clear();
+    textFieldOutputDirectory.clear();
+    datePickerContestDate.setValue(null);
+    textFieldContestJurisdiction.clear();
+    textFieldContestOffice.clear();
+    toggleTabulateByPrecinct.selectToggle(null);
+
+    textFieldCvrFilePath.clear();
+    textFieldCvrFirstVoteCol.clear();
+    textFieldCvrIdCol.clear();
+    textFieldCvrPrecinctCol.clear();
+    textFieldCvrProvider.clear();
+    tableViewCvrFiles.getItems().clear();
+
+    textFieldCandidateName.clear();
+    textFieldCandidateCode.clear();
+    tableViewCandidates.getItems().clear();
+
+    choiceTiebreakMode.setValue(null);
+    choiceOvervoteRule.setValue(null);
+    textFieldMaxRankingsAllowed.clear();
+    textFieldMaxSkippedRanksAllowed.clear();
+    textFieldNumberOfWinners.clear();
+    textFieldDecimalPlacesForVoteArithmetic.clear();
+    textFieldMinimumVoteThreshold.clear();
+    textFieldOvervoteLabel.clear();
+    textFieldUndervoteLabel.clear();
+    textFieldUndeclaredWriteInLabel.clear();
+    textFieldRulesDescription.clear();
+    toggleBatchElimination.selectToggle(null);
+    toggleContinueUntilTwoCandidatesRemain.selectToggle(null);
+    toggleExhaustOnDuplicateCandidate.selectToggle(null);
+    toggleTreatBlankAsUndeclaredWriteIn.selectToggle(null);
+
+    setDefaultValues();
+  }
+
   private void loadConfig(ContestConfig config) {
+    clearConfig();
+
     textFieldContestName.setText(config.getContestName());
     textFieldOutputDirectory.setText(config.getOutputDirectory());
     if (config.getContestDate() != null && !config.getContestDate().isEmpty()) {
@@ -351,7 +473,10 @@ public class GuiConfigController implements Initializable {
     }
     textFieldContestJurisdiction.setText(config.getContestJurisdiction());
     textFieldContestOffice.setText(config.getContestOffice());
-    radioTabulateByPrecinctTrue.setSelected(config.isTabulateByPrecinctEnabled());
+    setToggleBoolean(
+        config.isTabulateByPrecinctEnabled(),
+        radioTabulateByPrecinctTrue,
+        radioTabulateByPrecinctFalse);
 
     if (config.rawConfig.cvrFileSources != null) {
       tableViewCvrFiles.setItems(
@@ -375,12 +500,29 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.setText(config.getUndervoteLabel());
     textFieldUndeclaredWriteInLabel.setText(config.getUndeclaredWriteInLabel());
     textFieldRulesDescription.setText(config.getRulesDescription());
-    radioBatchEliminationTrue.setSelected(config.isBatchEliminationEnabled());
-    radioContinueUntilTwoCandidatesRemainTrue.setSelected(
-        config.willContinueUntilTwoCandidatesRemain());
-    radioExhaustOnDuplicateCandidateTrue.setSelected(config.isExhaustOnDuplicateCandidateEnabled());
-    radioTreatBlankAsUndeclaredWriteInTrue.setSelected(
-        config.isTreatBlankAsUndeclaredWriteInEnabled());
+    setToggleBoolean(
+        config.isBatchEliminationEnabled(), radioBatchEliminationTrue, radioBatchEliminationFalse);
+    setToggleBoolean(
+        config.willContinueUntilTwoCandidatesRemain(),
+        radioContinueUntilTwoCandidatesRemainTrue,
+        radioContinueUntilTwoCandidatesRemainFalse);
+    setToggleBoolean(
+        config.isExhaustOnDuplicateCandidateEnabled(),
+        radioExhaustOnDuplicateCandidateTrue,
+        radioExhaustOnDuplicateCandidateFalse);
+    setToggleBoolean(
+        config.isTreatBlankAsUndeclaredWriteInEnabled(),
+        radioTreatBlankAsUndeclaredWriteInTrue,
+        radioTreatBlankAsUndeclaredWriteInFalse);
+  }
+
+  // TODO: this function assumes that if a field isn't provided in the config, it'll be false
+  private void setToggleBoolean(boolean condition, RadioButton radioTrue, RadioButton radioFalse) {
+    if (condition) {
+      radioTrue.setSelected(true);
+    } else {
+      radioFalse.setSelected(true);
+    }
   }
 
   private boolean getToggleBoolean(ToggleGroup toggleGroup) {
@@ -388,7 +530,21 @@ public class GuiConfigController implements Initializable {
   }
 
   private Integer getIntValueElse(TextField textField, Integer defaultValue) {
-    return !textField.getText().isEmpty() ? Integer.valueOf(textField.getText()) : defaultValue;
+    Integer returnValue;
+    try {
+      if (textField.getText().isEmpty()) {
+        throw new IllegalArgumentException();
+      }
+      returnValue = Integer.valueOf(textField.getText());
+    } catch (Exception exception) {
+      Logger.log(
+          Level.WARNING,
+          "Integer required! Illegal value '%s' was replaced by '%s'",
+          textField.getText(),
+          defaultValue);
+      returnValue = defaultValue;
+    }
+    return returnValue;
   }
 
   private String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
@@ -425,8 +581,7 @@ public class GuiConfigController implements Initializable {
             ContestConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
     rules.minimumVoteThreshold =
         getIntValueElse(
-            textFieldMinimumVoteThreshold,
-            ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
+            textFieldMinimumVoteThreshold, ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
     rules.batchElimination = getToggleBoolean(toggleBatchElimination);
     rules.continueUntilTwoCandidatesRemain =
         getToggleBoolean(toggleContinueUntilTwoCandidatesRemain);
@@ -455,6 +610,20 @@ public class GuiConfigController implements Initializable {
         @Override
         protected Void call() {
           new ContestConfig(rawContestConfig).validate();
+          return null;
+        }
+      };
+    }
+  }
+
+  private static class TabulatorService extends Service<Void> {
+
+    @Override
+    protected Task<Void> createTask() {
+      return new Task<>() {
+        @Override
+        protected Void call() {
+          Main.executeTabulation(GuiContext.getInstance().getConfig());
           return null;
         }
       };
