@@ -1,0 +1,45 @@
+Universal Tabulator User Guide
+
+Overview:
+
+The Universal Tabulator is a free open source application designed to quickly and accurately tabulate ranked choice voting elections using a variety of rules commonly in use in North America.
+
+The Tabulator requires as input a "contest configuration" file which specifies:
+- Tabulation rule variations to use
+- List of registered candidates 
+- One or more cast vote record files
+- Output formatting options (contest name, where to write output files, etc.)
+
+The Tabulator produces as output:
+- A results spreadsheet including round-by-round vote totals for each candidate and the eventual winner(s)
+- An audit report describing how every ballot was counted in each round over the course of the tabulation
+
+The Tabulator provides an interface for:
+- Creating contest configuration files
+- Validating contest configuration files to ensure they are well-formed, and all values are within expected ranges
+- Tabulating a contest with a contest configuration file 
+
+Launching the Tabulator:
+
+Unzip the Tabulator .zip file and double-click rcv.jar file to launch the Tabulator.
+You may need to install Java SE Runtime Environment 10 first: http://www.oracle.com/technetwork/java/javase/downloads/jre10-downloads-4417026.html
+
+Loading and Tabulating a Contest:
+
+The Tabulator includes several example contest configuration files and associated cast vote record files.
+Click "Load..." at the top of the window and browse into the "test_data" folder.
+Select config_2015_portland_mayor.json and load it.
+Click on the configuration tabs (Output, CVR Files, Candidates, Rules) to see how this contest is configured.
+Click "Validate" to check if this configuration is valid.  You will see the results in the black console area at the bottom of the main window.
+Click "Tabulate" to tabulate the election.  You will see the results in the console, including the location and names of output files.
+
+Viewing Tabulator outputs:
+
+Tabulator output file names automatically include the current date and time, e.g. 2018-09-09_15-34-00_summary.xlsx.  This keeps them separate if you tabulate the same contest multiple times.
+Look in the console window to see where the output spreadsheet was written, e.g.
+2018-09-09 18:55:53 PDT INFO: Generating summary spreadsheet: /Users/Me/Documents/rcv/test_output/2018_maine_gov_primary_dem/2018-09-09_18-55-33_summary.xlsx
+Double-click on the summary spreadsheet to open it.  You may have to install OpenOffice (or some other Excel file reader) first:
+	https://www.openoffice.org/download/ 
+Find the audit log file and double-click on it to open it.  It is a standard text file and can be displayed with any kind of text editor.
+
+
