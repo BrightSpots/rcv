@@ -214,8 +214,7 @@ class Tabulator {
     }
 
     if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      Logger.log(
-          Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
+      Logger.log(Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
       // candidateID indexes over all candidates in ordered list
       for (String candidateID : config.getCandidatePermutation()) {
         Logger.log(Level.INFO, "%s", candidateID);
@@ -595,17 +594,17 @@ class Tabulator {
   // and if so return how to handle it based on the rules configuration in use
   // param: candidateIDSet all candidates this CVR contains at a particular rank
   // return: an OvervoteDecision enum to be applied to the CVR under consideration
-  private OvervoteDecision getOvervoteDecision(Set<String> candidateIDSet) {
+  private OvervoteDecision getOvervoteDecision(Set<String> candidateSet) {
     // the resulting decision
     OvervoteDecision decision;
     // the rule we're using
     OvervoteRule rule = config.getOvervoteRule();
 
     // does this set include the explicit overvote label?
-    boolean explicitOvervote = candidateIDSet.contains(EXPLICIT_OVERVOTE_LABEL);
+    boolean explicitOvervote = candidateSet.contains(EXPLICIT_OVERVOTE_LABEL);
     if (explicitOvervote) {
       // we should never have the explicit overvote flag AND other candidates for a given ranking
-      assert candidateIDSet.size() == 1;
+      assert candidateSet.size() == 1;
 
       // if we have an explicit overvote, the only valid rules are exhaust immediately or
       // always skip. (this is enforced when we load the config also)
@@ -617,7 +616,7 @@ class Tabulator {
       } else {
         decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
       }
-    } else if (candidateIDSet.size() <= 1) {
+    } else if (candidateSet.size() <= 1) {
       // if undervote or one vote which is not the overvote label, then there is no overvote
       decision = OvervoteDecision.NONE;
     } else if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
@@ -625,39 +624,22 @@ class Tabulator {
     } else if (rule == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
     } else {
-      // if we got here, there are multiple candidates, and the decision depends on how the rule
-      // handles continuing candidates
+      // if we got here, there are multiple candidates and our rule must be
+      // EXHAUST_IF_MULTIPLE_CONTINUING, so the decision depends on how many are continuing
 
-      // build a list of all continuing candidates from the input set
-      List<String> continuingAtThisRank = new LinkedList<>();
-      // candidateID indexes over all candidate IDs in this ranking set
-      for (String candidateID : candidateIDSet) {
-        if (isCandidateContinuing(candidateID)) {
-          continuingAtThisRank.add(candidateID);
-        }
-      }
-
-      if (continuingAtThisRank.size() > 0) {
-        // at least 1 continuing candidate
-        if (rule == OvervoteRule.EXHAUST_IF_ANY_CONTINUING) {
-          decision = OvervoteDecision.EXHAUST;
-        } else if (rule == OvervoteRule.IGNORE_IF_ANY_CONTINUING) {
-          decision = OvervoteDecision.IGNORE;
-        } else if (continuingAtThisRank.size() > 1) {
-          // multiple continuing candidates at this rank
-          if (rule == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
+      // default is no overvote unless we encounter multiple continuing
+      decision = OvervoteDecision.NONE;
+      // keep track if we encounter a continuing candidate
+      String continuingCandidate = null;
+      for (String candidate : candidateSet) {
+        if (isCandidateContinuing(candidate)) {
+          if (continuingCandidate != null) { // at least two continuing
             decision = OvervoteDecision.EXHAUST;
-          } else {
-            // if there's > 1 continuing, OvervoteDecision.NONE is not a valid option
-            decision = OvervoteDecision.IGNORE;
+            break;
           }
         } else {
-          // exactly 1 continuing candidate at this rank
-          decision = OvervoteDecision.NONE;
+          continuingCandidate = candidate;
         }
-      } else {
-        // no continuing candidates at this rank
-        decision = OvervoteDecision.NONE;
       }
     }
 
@@ -733,10 +715,6 @@ class Tabulator {
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidateSet);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
           cvr.exhaust("overvote");
-          break;
-        } else if (overvoteDecision == OvervoteDecision.IGNORE) {
-          // description of the overvote decision
-          cvr.addRoundOutcome(VoteOutcomeType.IGNORED, "overvote", null);
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           continue;
@@ -871,10 +849,7 @@ class Tabulator {
   enum OvervoteRule {
     EXHAUST_IMMEDIATELY("exhaustImmediately"),
     ALWAYS_SKIP_TO_NEXT_RANK("alwaysSkipToNextRank"),
-    EXHAUST_IF_ANY_CONTINUING("exhaustIfAnyContinuing"),
-    IGNORE_IF_ANY_CONTINUING("ignoreIfAnyContinuing"),
     EXHAUST_IF_MULTIPLE_CONTINUING("exhaustIfMultipleContinuing"),
-    IGNORE_IF_MULTIPLE_CONTINUING("ignoreIfMultipleContinuing"),
     RULE_UNKNOWN("ruleUnknown");
 
     private final String label;
@@ -900,7 +875,6 @@ class Tabulator {
   enum OvervoteDecision {
     NONE,
     EXHAUST,
-    IGNORE,
     SKIP_TO_NEXT_RANK,
   }
 

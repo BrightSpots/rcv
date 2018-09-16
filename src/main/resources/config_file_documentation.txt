@@ -98,7 +98,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
 
       "overvoteRule" required
         how the program should handle an overvote when it encounters one
-        value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfAnyContinuing" | "ignoreIfAnyContinuing" | "exhaustIfMultipleContinuing" | "ignoreIfMultipleContinuing"
+        value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
 
       "maxRankingsAllowed" required
         maximum number of candidates that a ballot is allowed to rank
@@ -149,7 +149,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         default: false
 
       "overvoteLabel" optional
-        label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately" (because the other options rely on knowing which specific candidates were involved in each overvote)
+        label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately" (because the other option, exhaustIfMultipleContinuing, relies on knowing which specific candidates were involved in each overvote)
         example: "OVERVOTE"
         value: string of length [1..1000]
         default: none
