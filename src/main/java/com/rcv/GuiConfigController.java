@@ -243,8 +243,7 @@ public class GuiConfigController implements Initializable {
   }
 
   public void buttonTabulateClicked() {
-    // TODO: customize message box so there's no "no"
-    if (checkForSaveAndContinue()) {
+    if (checkForSaveAndTabulate()) {
       if (GuiContext.getInstance().getConfig() != null) {
         buttonBar.setDisable(true);
         TabulatorService service = new TabulatorService();
@@ -503,8 +502,7 @@ public class GuiConfigController implements Initializable {
     setDefaultValues();
   }
 
-  private boolean checkForSaveAndContinue() {
-    boolean willContinue = false;
+  private boolean checkIfNeedsSaving() {
     boolean needsSaving = true;
     try {
       String currentConfigString =
@@ -529,17 +527,20 @@ public class GuiConfigController implements Initializable {
           "Unable tell if saving is necessary, but everything should work fine anyway! Prompting for save just in case...\n%s",
           exception.toString());
     }
-    if (!needsSaving) {
-      willContinue = true;
-    } else {
+    return needsSaving;
+  }
+
+  private boolean checkForSaveAndContinue() {
+    boolean willContinue = false;
+    if (checkIfNeedsSaving()) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
-      ButtonType dontSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
+      ButtonType doNotSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
       Alert alert =
           new Alert(
               AlertType.CONFIRMATION,
               "Do you want to save your changes before continuing?",
               saveButton,
-              dontSaveButton,
+              doNotSaveButton,
               ButtonType.CANCEL);
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
@@ -549,9 +550,36 @@ public class GuiConfigController implements Initializable {
           saveFile(saveFile);
           willContinue = true;
         }
-      } else if (result.isPresent() && result.get() == dontSaveButton) {
+      } else if (result.isPresent() && result.get() == doNotSaveButton) {
         willContinue = true;
       }
+    } else {
+      willContinue = true;
+    }
+    return willContinue;
+  }
+
+  private boolean checkForSaveAndTabulate() {
+    boolean willContinue = false;
+    if (checkIfNeedsSaving()) {
+      ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
+      Alert alert =
+          new Alert(
+              AlertType.WARNING,
+              "You must save your changes before continuing, or else load a new config!",
+              saveButton,
+              ButtonType.CANCEL);
+      alert.setHeaderText(null);
+      Optional<ButtonType> result = alert.showAndWait();
+      if (result.isPresent() && result.get() == saveButton) {
+        File saveFile = getSaveFile();
+        if (saveFile != null) {
+          saveFile(saveFile);
+          willContinue = true;
+        }
+      }
+    } else {
+      willContinue = true;
     }
     return willContinue;
   }
