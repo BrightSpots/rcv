@@ -10,7 +10,7 @@
   "cvrFileSources": [
     {
       "filePath": "test_data/cvr_test_continue_tabulation.xlsx",
-      "firstVoteColumnIndex": 3,
+      "firstVoteColumnIndex": 4,
       "provider": "ES&S"
     }
   ],

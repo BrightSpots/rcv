@@ -10,8 +10,8 @@
   "cvrFileSources": [
     {
       "filePath": "test_data/cvr_test_TestSet2_OV_skip_to_next.xlsx",
-      "firstVoteColumnIndex": 1,
-      "idColumnIndex": 0,
+      "firstVoteColumnIndex": 2,
+      "idColumnIndex": 1,
       "provider": "ES&S"
     }
   ],
