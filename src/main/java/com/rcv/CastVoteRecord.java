@@ -111,7 +111,7 @@ class CastVoteRecord {
     // add complete data for round 1 only
     if (round == 1) {
       logStringBuilder.append(" [Raw Data] ");
-      logStringBuilder.append(fullCVRData).append(" ");
+      logStringBuilder.append(fullCVRData);
     }
 
     // output with level FINE routes to audit log

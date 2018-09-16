@@ -688,13 +688,15 @@ class Tabulator {
 
     // CVR indexes over the cast vote records to count votes for continuing candidateIDs
     for (CastVoteRecord cvr : castVoteRecords) {
-      // see if this cvr recipient is a continuing candidate
-      // in this case we can skip logic to determine who the cvr will count for
+      // If this CVR was assigned to a candidate last round and that candidate is still continuing,
+      // we can safely assume that the CVR should still be assigned to that candidate in this round.
       if (!cvr.isExhausted() &&
-          !(cvr.getCurrentRecipientOfVote() == null) &&
+          (cvr.getCurrentRecipientOfVote() != null) &&
           isCandidateContinuing(cvr.getCurrentRecipientOfVote())) {
 
-        // this vote stays with it's current recipient
+        // this vote stays with its current recipient
+        // we don't log this as we only want to capture when cvr recipient changes, is exhausted
+        // or skipped
         incrementTallies(roundTally,
             cvr.getFractionalTransferValue(),
             cvr.getCurrentRecipientOfVote(),
@@ -857,40 +859,40 @@ class Tabulator {
 
   // function: incrementTally
   // purpose: add a vote (or fractional share of a vote) to a tally
-  // param: tally is a round tally that we're in the process of computing
+  // param: tally is the round tally we are computing
   // param: cvr is a single cast vote record
-  // param: selectedCandidateID is the candidate this CVR's vote is going to in this round
+  // param: selectedCandidate is the candidate this CVR's vote is going to in this round
   private void incrementTally(
       Map<String, BigDecimal> tally,
       BigDecimal fractionalTransferValue,
-      String selectedCandidateID) {
+      String selectedCandidate) {
     // current tally for this candidate
-    BigDecimal currentTally = tally.get(selectedCandidateID);
+    BigDecimal currentTally = tally.get(selectedCandidate);
     // new tally after adding this vote
     BigDecimal newTally = currentTally.add(fractionalTransferValue);
-    tally.put(selectedCandidateID, newTally);
+    tally.put(selectedCandidate, newTally);
   }
 
   // function: incrementTallies
   // purpose: transfer vote to round tally and (if valid) the precinct round tally
-  // param: tally is a round tally that we're in the process of computing
+  // param: roundTally is round tally we are computing
   // param: cvr is a single cast vote record
-  // param: selectedCandidateID is the candidate this CVR's vote is going to in this round
+  // param: selectedCandidate is the candidate this CVR's vote is going to in this round
   // param: roundTallyByPrecinct map of precinct IDs to roundTallies
   // param: precinct ID of precinct for current CVR
   private void incrementTallies(
-      Map<String, BigDecimal> tally,
+      Map<String, BigDecimal> roundTally,
       BigDecimal fractionalTransferValue,
-      String selectedCandidateID,
+      String selectedCandidate,
       Map<String, Map<String, BigDecimal>> roundTallyByPrecinct,
       String precinct) {
     // transfer vote value to round tally
-    incrementTally(tally, fractionalTransferValue, selectedCandidateID);
-    // if enabled and there is a valid precinct string transfer vote valute to precinct tally
+    incrementTally(roundTally, fractionalTransferValue, selectedCandidate);
+    // if enabled and there is a valid precinct string transfer vote value to precinct tally
     if (config.isTabulateByPrecinctEnabled() && precinct != null && !precinct.isEmpty()) {
       incrementTally(roundTallyByPrecinct.get(precinct),
           fractionalTransferValue,
-          selectedCandidateID);
+          selectedCandidate);
     }
   }
 
