@@ -415,11 +415,16 @@ public class GuiConfigController implements Initializable {
     setDefaultValues();
 
     try {
-      emptyConfigString = new ObjectMapper().writer().withDefaultPrettyPrinter()
-          .writeValueAsString(createRawContestConfig());
-    } catch (JsonProcessingException e) {
-      // TODO determine error handling
-      e.printStackTrace();
+      emptyConfigString =
+          new ObjectMapper()
+              .writer()
+              .withDefaultPrettyPrinter()
+              .writeValueAsString(createRawContestConfig());
+    } catch (JsonProcessingException exception) {
+      Logger.log(
+          Level.WARNING,
+          "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
+          exception.toString());
     }
   }
 
@@ -502,37 +507,49 @@ public class GuiConfigController implements Initializable {
     boolean willContinue = false;
     boolean needsSaving = true;
     try {
-      String currentConfigString = new ObjectMapper().writer().withDefaultPrettyPrinter()
-          .writeValueAsString(createRawContestConfig());
+      String currentConfigString =
+          new ObjectMapper()
+              .writer()
+              .withDefaultPrettyPrinter()
+              .writeValueAsString(createRawContestConfig());
       if (currentConfigString.equals(emptyConfigString)) {
         // All fields are currently empty / default values so no point in asking to save
         needsSaving = false;
       } else if (GuiContext.getInstance().getConfig() != null) {
-        String savedConfigString = new ObjectMapper().writer().withDefaultPrettyPrinter()
-            .writeValueAsString(GuiContext.getInstance().getConfig().rawConfig);
+        String savedConfigString =
+            new ObjectMapper()
+                .writer()
+                .withDefaultPrettyPrinter()
+                .writeValueAsString(GuiContext.getInstance().getConfig().rawConfig);
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
-    } catch (JsonProcessingException e) {
-      // TODO determine error handling
-      e.printStackTrace();
+    } catch (JsonProcessingException exception) {
+      Logger.log(
+          Level.WARNING,
+          "Unable tell if saving is necessary, but everything should work fine anyway! Prompting for save just in case...\n%s",
+          exception.toString());
     }
     if (!needsSaving) {
       willContinue = true;
     } else {
-      Alert alert = new Alert(AlertType.CONFIRMATION,
-          "Do you want to save your changes before continuing?", ButtonType.YES, ButtonType.NO,
-          ButtonType.CANCEL);
+      ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
+      ButtonType dontSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
+      Alert alert =
+          new Alert(
+              AlertType.CONFIRMATION,
+              "Do you want to save your changes before continuing?",
+              saveButton,
+              dontSaveButton,
+              ButtonType.CANCEL);
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
-      // TODO: change to Save, Don't Save, and Cancel
-      // Guarantees willContinue is false if user cancels the process at any time
-      if (result.isPresent() && result.get() == ButtonType.YES) {
+      if (result.isPresent() && result.get() == saveButton) {
         File saveFile = getSaveFile();
         if (saveFile != null) {
           saveFile(saveFile);
           willContinue = true;
         }
-      } else if (result.isPresent() && result.get() == ButtonType.NO) {
+      } else if (result.isPresent() && result.get() == dontSaveButton) {
         willContinue = true;
       }
     }
