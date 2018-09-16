@@ -98,7 +98,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
 
       "overvoteRule" required
         how the program should handle an overvote when it encounters one
-        value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfAnyContinuing" | "ignoreIfAnyContinuing" | "exhaustIfMultipleContinuing" | "ignoreIfMultipleContinuing"
+        value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
 
       "maxRankingsAllowed" required
         maximum number of candidates that a ballot is allowed to rank
