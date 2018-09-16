@@ -57,9 +57,12 @@ class CVRReader {
   CVRReader(ContestConfig config, CVRSource source) {
     this.config = config;
     this.excelFilePath = source.getFilePath();
-    this.firstVoteColumnIndex = source.getFirstVoteColumnIndex();
-    this.idColumnIndex = source.getIdColumnIndex();
-    this.precinctColumnIndex = source.getPrecinctColumnIndex();
+
+    // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
+    this.firstVoteColumnIndex = source.getFirstVoteColumnIndex() - 1;
+    this.idColumnIndex = source.getIdColumnIndex() != null ? source.getIdColumnIndex() - 1 : null;
+    this.precinctColumnIndex =
+        source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex() - 1 : null;
   }
 
   // function: getFirstSheet
@@ -89,7 +92,8 @@ class CVRReader {
   // purpose: parse the given file path into a List of CastVoteRecords suitable for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // returns: list of parsed CVRs
-  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords) throws SourceWithUnrecognizedCandidatesException {
+  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords)
+      throws SourceWithUnrecognizedCandidatesException {
     // contestSheet contains all the CVR data we will be parsing
     Sheet contestSheet = getFirstSheet(excelFilePath);
     if (contestSheet != null) {

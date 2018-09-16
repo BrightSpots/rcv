@@ -10,8 +10,8 @@
   "cvrFileSources": [
     {
       "filePath": "test_data/cvr_2015_portland_mayor.xlsx",
-      "firstVoteColumnIndex": 3,
-      "precinctColumnIndex": 1,
+      "firstVoteColumnIndex": 4,
+      "precinctColumnIndex": 2,
       "provider": "ES&S"
     }
   ],

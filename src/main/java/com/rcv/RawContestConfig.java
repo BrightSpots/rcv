@@ -68,11 +68,11 @@ public class RawContestConfig {
   public static class CVRSource {
     // path to the file on disk
     private String filePath;
-    // column where rankings data begins
+    // 1-indexed column where rankings data begins
     private Integer firstVoteColumnIndex;
-    // column containing CVR ID (if any)
+    // 1-indexed column containing CVR ID (if any)
     private Integer idColumnIndex;
-    // column containing precinct (if any)
+    // 1-indexed column containing precinct (if any)
     private Integer precinctColumnIndex;
     // provider for this source e.g. "ES&S"
     private String provider;

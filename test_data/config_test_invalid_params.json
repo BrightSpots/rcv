@@ -11,7 +11,7 @@
   "candidates": [],
   "rules": {
     "tiebreakMode": "whatever",
-    "overvoteRule": "exhaustIfAnyContinuing",
+    "overvoteRule": "invalidOption",
     "numberOfWinners": 2,
     "decimalPlacesForVoteArithmetic": -1,
     "maxRankingsAllowed": -1,
