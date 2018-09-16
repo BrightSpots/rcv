@@ -71,7 +71,7 @@ class CastVoteRecord {
   }
 
   // function: logRoundOutcome
-  // purpose: adds the outcome for this CVR for this round (for auditing purposes)
+  // purpose: logs the outcome for this CVR for this round for auditing purposes
   // param: outcomeType indicates what happened
   // param: detail reflects who (if anyone) received the vote or why it was exhausted/ignored
   // param: fractionalTransferValue if someone received the vote (not exhausted/ignored)
@@ -81,14 +81,14 @@ class CastVoteRecord {
       BigDecimal fractionalTransferValue) {
 
     StringBuilder logStringBuilder = new StringBuilder();
-    // add info on the outcome
+    // add round and ID
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
     if (suppliedID != null && !suppliedID.isEmpty()) {
       logStringBuilder.append(suppliedID);
     } else {
       logStringBuilder.append(computedID);
     }
-
+    // add outcome type
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
@@ -100,7 +100,7 @@ class CastVoteRecord {
         logStringBuilder.append(" [transferred to] ");
       }
     }
-    // detail string is candidate ID or more explanation for other outcomes
+    // add detail: either candidate ID or more explanation for other outcomes
     logStringBuilder.append(detail);
 
     // add fractional transfer value of the vote if it is fractional
@@ -121,7 +121,6 @@ class CastVoteRecord {
   // function: exhaust
   // purpose: transition the CVR into exhausted state with the given reason
   // param: round the exhaustion occurs
-  // param: reason: the reason for exhaustion
   void exhaust() {
     assert !isExhausted;
     isExhausted = true;

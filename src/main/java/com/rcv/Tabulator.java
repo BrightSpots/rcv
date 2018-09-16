@@ -688,8 +688,7 @@ class Tabulator {
 
     // CVR indexes over the cast vote records to count votes for continuing candidateIDs
     for (CastVoteRecord cvr : castVoteRecords) {
-
-      // see if this cvr has a current recipient which is continuing
+      // see if this cvr recipient is a continuing candidate
       // in this case we can skip logic to determine who the cvr will count for
       if (!cvr.isExhausted() &&
           !(cvr.getCurrentRecipientOfVote() == null) &&
@@ -744,8 +743,10 @@ class Tabulator {
           }
           if (duplicateCandidate != null && !duplicateCandidate.isEmpty()) {
             cvr.exhaust();
-            cvr.logRoundOutcome(currentRound, VoteOutcomeType.EXHAUSTED,
-                "duplicate candidate: " + duplicateCandidate, null);
+            cvr.logRoundOutcome(currentRound,
+                VoteOutcomeType.EXHAUSTED,
+                "duplicate candidate: " + duplicateCandidate,
+                null);
             break;
           }
         }
@@ -793,7 +794,9 @@ class Tabulator {
               cvr.getPrecinct());
 
           // log the vote transfer to new recipient
-          cvr.logRoundOutcome(currentRound, VoteOutcomeType.COUNTED, selectedCandidate,
+          cvr.logRoundOutcome(currentRound,
+              VoteOutcomeType.COUNTED,
+              selectedCandidate,
               fractionalTransferValue);
         }
 
@@ -870,6 +873,11 @@ class Tabulator {
 
   // function: incrementTallies
   // purpose: transfer vote to round tally and (if valid) the precinct round tally
+  // param: tally is a round tally that we're in the process of computing
+  // param: cvr is a single cast vote record
+  // param: selectedCandidateID is the candidate this CVR's vote is going to in this round
+  // param: roundTallyByPrecinct map of precinct IDs to roundTallies
+  // param: precinct ID of precinct for current CVR
   private void incrementTallies(
       Map<String, BigDecimal> tally,
       BigDecimal fractionalTransferValue,
