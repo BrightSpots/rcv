@@ -118,20 +118,20 @@ class ContestConfig {
           isValid = false;
           Logger.log(
               Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFilePath());
-        } else if (source.getFirstVoteColumnIndex() < 0
+        } else if (source.getFirstVoteColumnIndex() < 1
             || source.getFirstVoteColumnIndex() > 1000) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
-              "firstVoteColumnIndex must be from 0 to 1000: %s",
+              "firstVoteColumnIndex must be from 1 to 1000: %s",
               source.getFilePath());
         }
 
         if (source.getIdColumnIndex() != null
-            && (source.getIdColumnIndex() < 0 || source.getIdColumnIndex() > 1000)) {
+            && (source.getIdColumnIndex() < 1 || source.getIdColumnIndex() > 1000)) {
           isValid = false;
           Logger.log(
-              Level.SEVERE, "idColumnIndex must be from 0 to 1000: %s", source.getFilePath());
+              Level.SEVERE, "idColumnIndex must be from 1 to 1000: %s", source.getFilePath());
         }
 
         if (isTabulateByPrecinctEnabled()) {
@@ -141,12 +141,12 @@ class ContestConfig {
                 Level.SEVERE,
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
                 source.getFilePath());
-          } else if (source.getPrecinctColumnIndex() < 0
+          } else if (source.getPrecinctColumnIndex() < 1
               || source.getPrecinctColumnIndex() > 1000) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
-                "precinctColumnIndex must be from 0 to 1000: %s",
+                "precinctColumnIndex must be from 1 to 1000: %s",
                 source.getFilePath());
           }
         }
