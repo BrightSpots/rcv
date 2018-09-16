@@ -16,6 +16,8 @@
 
 package com.rcv;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rcv.RawContestConfig.CVRSource;
 import com.rcv.RawContestConfig.Candidate;
 import com.rcv.RawContestConfig.ContestRules;
@@ -27,6 +29,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -38,7 +41,10 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -60,6 +66,8 @@ public class GuiConfigController implements Initializable {
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String CONFIG_FILE_NAME = "config_file_documentation.txt";
+
+  private String emptyConfigString;
 
   // file selected for loading
   private File selectedFile;
@@ -168,33 +176,37 @@ public class GuiConfigController implements Initializable {
   private ButtonBar buttonBar;
 
   public void buttonNewConfigClicked() {
-    Logger.log(Level.INFO, "Creating new config.");
-    GuiContext.getInstance().setConfig(null);
-    selectedFile = null;
-    clearConfig();
+    if (checkForSaveAndContinue()) {
+      Logger.log(Level.INFO, "Creating new config.");
+      GuiContext.getInstance().setConfig(null);
+      selectedFile = null;
+      clearConfig();
+    }
   }
 
   public void buttonLoadConfigClicked() {
-    FileChooser fc = new FileChooser();
-    if (selectedFile == null) {
-      fc.setInitialDirectory(new File(System.getProperty("user.dir")));
-    } else {
-      fc.setInitialDirectory(new File(selectedFile.getParent()));
-    }
-    fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
-    fc.setTitle("Load Config");
+    if (checkForSaveAndContinue()) {
+      FileChooser fc = new FileChooser();
+      if (selectedFile == null) {
+        fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+      } else {
+        fc.setInitialDirectory(new File(selectedFile.getParent()));
+      }
+      fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
+      fc.setTitle("Load Config");
 
-    selectedFile = fc.showOpenDialog(null);
-    if (selectedFile != null) {
-      GuiContext.getInstance().setConfig(Main.loadContestConfig(selectedFile.getAbsolutePath()));
-      if (GuiContext.getInstance().getConfig() != null) {
-        loadConfig(GuiContext.getInstance().getConfig());
-        labelCurrentlyLoaded.setText("Currently loaded: " + selectedFile.getAbsolutePath());
+      selectedFile = fc.showOpenDialog(null);
+      if (selectedFile != null) {
+        GuiContext.getInstance().setConfig(Main.loadContestConfig(selectedFile.getAbsolutePath()));
+        if (GuiContext.getInstance().getConfig() != null) {
+          loadConfig(GuiContext.getInstance().getConfig());
+          labelCurrentlyLoaded.setText("Currently loaded: " + selectedFile.getAbsolutePath());
+        }
       }
     }
   }
 
-  public void buttonSaveClicked() {
+  private File getSaveFile() {
     FileChooser fc = new FileChooser();
     if (selectedFile == null) {
       fc.setInitialDirectory(new File(System.getProperty("user.dir")));
@@ -204,10 +216,20 @@ public class GuiConfigController implements Initializable {
     }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
+    return fc.showSaveDialog(null);
+  }
 
-    File saveFile = fc.showSaveDialog(null);
+  private void saveFile(File saveFile) {
+    RawContestConfig rawConfig = createRawContestConfig();
+    JsonParser.createFileFromRawContestConfig(saveFile, rawConfig);
+    GuiContext.getInstance().setConfig(new ContestConfig(rawConfig));
+    labelCurrentlyLoaded.setText("Currently loaded: " + saveFile.getAbsolutePath());
+  }
+
+  public void buttonSaveClicked() {
+    File saveFile = getSaveFile();
     if (saveFile != null) {
-      JsonParser.createFileFromRawContestConfig(saveFile, createRawContestConfig());
+      saveFile(saveFile);
     }
   }
 
@@ -221,21 +243,26 @@ public class GuiConfigController implements Initializable {
   }
 
   public void buttonTabulateClicked() {
-    if (GuiContext.getInstance().getConfig() != null) {
-      buttonBar.setDisable(true);
-      TabulatorService service = new TabulatorService();
-      service.setOnSucceeded(event -> buttonBar.setDisable(false));
-      service.setOnCancelled(event -> buttonBar.setDisable(false));
-      service.setOnFailed(event -> buttonBar.setDisable(false));
-      service.start();
-    } else {
-      Logger.log(Level.WARNING, "Please load a config file before attempting to tabulate!");
+    // TODO: customize message box so there's no "no"
+    if (checkForSaveAndContinue()) {
+      if (GuiContext.getInstance().getConfig() != null) {
+        buttonBar.setDisable(true);
+        TabulatorService service = new TabulatorService();
+        service.setOnSucceeded(event -> buttonBar.setDisable(false));
+        service.setOnCancelled(event -> buttonBar.setDisable(false));
+        service.setOnFailed(event -> buttonBar.setDisable(false));
+        service.start();
+      } else {
+        Logger.log(Level.WARNING, "Please load a config file before attempting to tabulate!");
+      }
     }
   }
 
   public void buttonExitClicked() {
-    Logger.log(Level.INFO, "Exiting tabulator GUI.");
-    Platform.exit();
+    if (checkForSaveAndContinue()) {
+      Logger.log(Level.INFO, "Exiting tabulator GUI.");
+      Platform.exit();
+    }
   }
 
   public void buttonOutputDirectoryClicked() {
@@ -386,6 +413,14 @@ public class GuiConfigController implements Initializable {
         .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
 
     setDefaultValues();
+
+    try {
+      emptyConfigString = new ObjectMapper().writer().withDefaultPrettyPrinter()
+          .writeValueAsString(createRawContestConfig());
+    } catch (JsonProcessingException e) {
+      // TODO determine error handling
+      e.printStackTrace();
+    }
   }
 
   private void setTextFieldToInteger(TextField textField, Integer value) {
@@ -461,6 +496,47 @@ public class GuiConfigController implements Initializable {
     toggleTreatBlankAsUndeclaredWriteIn.selectToggle(null);
 
     setDefaultValues();
+  }
+
+  private boolean checkForSaveAndContinue() {
+    boolean willContinue = false;
+    boolean needsSaving = true;
+    try {
+      String currentConfigString = new ObjectMapper().writer().withDefaultPrettyPrinter()
+          .writeValueAsString(createRawContestConfig());
+      if (currentConfigString.equals(emptyConfigString)) {
+        // All fields are currently empty / default values so no point in asking to save
+        needsSaving = false;
+      } else if (GuiContext.getInstance().getConfig() != null) {
+        String savedConfigString = new ObjectMapper().writer().withDefaultPrettyPrinter()
+            .writeValueAsString(GuiContext.getInstance().getConfig().rawConfig);
+        needsSaving = !currentConfigString.equals(savedConfigString);
+      }
+    } catch (JsonProcessingException e) {
+      // TODO determine error handling
+      e.printStackTrace();
+    }
+    if (!needsSaving) {
+      willContinue = true;
+    } else {
+      Alert alert = new Alert(AlertType.CONFIRMATION,
+          "Do you want to save your changes before continuing?", ButtonType.YES, ButtonType.NO,
+          ButtonType.CANCEL);
+      alert.setHeaderText(null);
+      Optional<ButtonType> result = alert.showAndWait();
+      // TODO: change to Save, Don't Save, and Cancel
+      // Guarantees willContinue is false if user cancels the process at any time
+      if (result.isPresent() && result.get() == ButtonType.YES) {
+        File saveFile = getSaveFile();
+        if (saveFile != null) {
+          saveFile(saveFile);
+          willContinue = true;
+        }
+      } else if (result.isPresent() && result.get() == ButtonType.NO) {
+        willContinue = true;
+      }
+    }
+    return willContinue;
   }
 
   private void loadConfig(ContestConfig config) {
