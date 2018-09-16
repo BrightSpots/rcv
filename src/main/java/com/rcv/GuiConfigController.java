@@ -184,11 +184,11 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private void loadFile(File loadFile) {
-    GuiContext.getInstance().setConfig(Main.loadContestConfig(loadFile.getAbsolutePath()));
+  private void loadFile(File fileToLoad) {
+    GuiContext.getInstance().setConfig(Main.loadContestConfig(fileToLoad.getAbsolutePath()));
     if (GuiContext.getInstance().getConfig() != null) {
       loadConfig(GuiContext.getInstance().getConfig());
-      labelCurrentlyLoaded.setText("Currently loaded: " + loadFile.getAbsolutePath());
+      labelCurrentlyLoaded.setText("Currently loaded: " + fileToLoad.getAbsolutePath());
     }
   }
 
@@ -203,10 +203,10 @@ public class GuiConfigController implements Initializable {
       fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
       fc.setTitle("Load Config");
 
-      File loadFile = fc.showOpenDialog(null);
-      if (loadFile != null) {
-        selectedFile = loadFile;
-        loadFile(loadFile);
+      File fileToLoad = fc.showOpenDialog(null);
+      if (fileToLoad != null) {
+        selectedFile = fileToLoad;
+        loadFile(fileToLoad);
       }
     }
   }
@@ -224,17 +224,17 @@ public class GuiConfigController implements Initializable {
     return fc.showSaveDialog(null);
   }
 
-  private void saveFile(File saveFile) {
-    JsonParser.createFileFromRawContestConfig(saveFile, createRawContestConfig());
-    // Necessary to keep GUI aligned when default values subbed in if invalid during save process
-    loadFile(saveFile);
+  private void saveFile(File fileToSave) {
+    JsonParser.createFileFromRawContestConfig(fileToSave, createRawContestConfig());
+    // Reload the file to keep the GUI fields updated in case invalid values are replaced during the save process
+    loadFile(fileToSave);
   }
 
   public void buttonSaveClicked() {
-    File saveFile = getSaveFile();
-    if (saveFile != null) {
-      selectedFile = saveFile;
-      saveFile(saveFile);
+    File fileToSave = getSaveFile();
+    if (fileToSave != null) {
+      selectedFile = fileToSave;
+      saveFile(fileToSave);
     }
   }
 
@@ -550,9 +550,9 @@ public class GuiConfigController implements Initializable {
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
       if (result.isPresent() && result.get() == saveButton) {
-        File saveFile = getSaveFile();
-        if (saveFile != null) {
-          saveFile(saveFile);
+        File fileToSave = getSaveFile();
+        if (fileToSave != null) {
+          saveFile(fileToSave);
           willContinue = true;
         }
       } else if (result.isPresent() && result.get() == doNotSaveButton) {
@@ -577,9 +577,9 @@ public class GuiConfigController implements Initializable {
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
       if (result.isPresent() && result.get() == saveButton) {
-        File saveFile = getSaveFile();
-        if (saveFile != null) {
-          saveFile(saveFile);
+        File fileToSave = getSaveFile();
+        if (fileToSave != null) {
+          saveFile(fileToSave);
           willContinue = true;
         }
       }
