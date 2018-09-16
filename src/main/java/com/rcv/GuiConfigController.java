@@ -67,9 +67,9 @@ public class GuiConfigController implements Initializable {
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String CONFIG_FILE_NAME = "config_file_documentation.txt";
 
+  // Used to check if changes have been made to a new config
   private String emptyConfigString;
-
-  // file selected for loading
+  // File previously loaded or saved
   private File selectedFile;
 
   @FXML
@@ -203,9 +203,10 @@ public class GuiConfigController implements Initializable {
       fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
       fc.setTitle("Load Config");
 
-      selectedFile = fc.showOpenDialog(null);
-      if (selectedFile != null) {
-        loadFile(selectedFile);
+      File loadFile = fc.showOpenDialog(null);
+      if (loadFile != null) {
+        selectedFile = loadFile;
+        loadFile(loadFile);
       }
     }
   }
@@ -514,7 +515,7 @@ public class GuiConfigController implements Initializable {
               .writer()
               .withDefaultPrettyPrinter()
               .writeValueAsString(createRawContestConfig());
-      if (currentConfigString.equals(emptyConfigString)) {
+      if (selectedFile == null && currentConfigString.equals(emptyConfigString)) {
         // All fields are currently empty / default values so no point in asking to save
         needsSaving = false;
       } else if (GuiContext.getInstance().getConfig() != null) {
@@ -570,7 +571,7 @@ public class GuiConfigController implements Initializable {
       Alert alert =
           new Alert(
               AlertType.WARNING,
-              "You must save your changes before continuing, or else load a new config!",
+              "You must either save your changes before continuing or load a new config!",
               saveButton,
               ButtonType.CANCEL);
       alert.setHeaderText(null);

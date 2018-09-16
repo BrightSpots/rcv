@@ -82,7 +82,25 @@ public class Main extends GuiApplication {
 
     // if raw config failed alert user
     if (rawConfig == null) {
-      Logger.log(Level.SEVERE, "Failed to load config file: %s", configPath);
+      Logger.log(Level.SEVERE, "Failed to load config file:\n%s", configPath);
+    } else if (rawConfig.outputSettings == null) {
+      Logger.log(
+          Level.SEVERE,
+          "No 'outputSettings' field specified! Failed to load config file:\n%s",
+          configPath);
+    } else if (rawConfig.cvrFileSources == null) {
+      Logger.log(
+          Level.SEVERE,
+          "No 'cvrFileSources' field specified! Failed to load config file:\n%s",
+          configPath);
+    } else if (rawConfig.candidates == null) {
+      Logger.log(
+          Level.SEVERE,
+          "No 'candidates' field specified! Failed to load config file:\n%s",
+          configPath);
+    } else if (rawConfig.rules == null) {
+      Logger.log(
+          Level.SEVERE, "No 'rules' field specified! Failed to load config file:\n%s", configPath);
     } else {
       // proceed to create the ContestConfig wrapper
       config = new ContestConfig(rawConfig);
@@ -107,8 +125,9 @@ public class Main extends GuiApplication {
       // current date-time formatted as a string used for creating unique output files names
       final String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
       String tabulationLogPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_audit.log",
-              timestampString)).toAbsolutePath().toString();
+          Paths.get(config.getOutputDirectory(), String.format("%s_audit.log", timestampString))
+              .toAbsolutePath()
+              .toString();
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         Logger.addTabulationFileLogging(tabulationLogPath);
@@ -181,8 +200,7 @@ public class Main extends GuiApplication {
       try {
         List<CastVoteRecord> cvrs = new CVRReader(config, source).parseCVRFile(castVoteRecords);
         if (cvrs.isEmpty()) {
-          Logger.log(
-              Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
+          Logger.log(Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
           encounteredSourceProblem = true;
         }
       } catch (SourceWithUnrecognizedCandidatesException exception) {
@@ -204,8 +222,7 @@ public class Main extends GuiApplication {
     }
 
     if (!encounteredSourceProblem) {
-      Logger.log(
-          Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
+      Logger.log(Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
     } else {
       Logger.log(Level.SEVERE, "Parsing cast vote records failed!");
       castVoteRecords = null;
