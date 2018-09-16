@@ -23,12 +23,12 @@ package com.rcv;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import javafx.util.Pair;
 
 class CastVoteRecord {
@@ -41,8 +41,6 @@ class CastVoteRecord {
   private final String precinct;
   // container for ALL CVR data parsed from the source CVR file
   private final List<String> fullCVRData;
-  // contains what happened to this CVR in each round
-  private final List<VoteOutcome> roundOutcomes = new LinkedList<>();
   // records winners to whom some fraction of this vote has been allocated
   private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // map of round to all candidates selected for that round
@@ -72,24 +70,61 @@ class CastVoteRecord {
     sortRankings(rankings);
   }
 
-  // function: addRoundOutcome
+  // function: logRoundOutcome
   // purpose: adds the outcome for this CVR for this round (for auditing purposes)
   // param: outcomeType indicates what happened
   // param: detail reflects who (if anyone) received the vote or why it was exhausted/ignored
   // param: fractionalTransferValue if someone received the vote (not exhausted/ignored)
-  void addRoundOutcome(
-      VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
-    roundOutcomes.add(new VoteOutcome(outcomeType, detail, fractionalTransferValue));
+  void logRoundOutcome(int round,
+      VoteOutcomeType outcomeType,
+      String detail,
+      BigDecimal fractionalTransferValue) {
+
+    StringBuilder logStringBuilder = new StringBuilder();
+    // add info on the outcome
+    logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
+    if (suppliedID != null && !suppliedID.isEmpty()) {
+      logStringBuilder.append(suppliedID);
+    } else {
+      logStringBuilder.append(computedID);
+    }
+
+    if (outcomeType == VoteOutcomeType.IGNORED) {
+      logStringBuilder.append(" [was ignored] ");
+    } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
+      logStringBuilder.append(" [was exhausted] ");
+    } else {
+      if (round == 1) {
+        logStringBuilder.append(" [counted for] ");
+      } else {
+        logStringBuilder.append(" [transferred to] ");
+      }
+    }
+    // detail string is candidate ID or more explanation for other outcomes
+    logStringBuilder.append(detail);
+
+    // add fractional transfer value of the vote if it is fractional
+    if (fractionalTransferValue != null && !fractionalTransferValue.equals(BigDecimal.ONE)) {
+      logStringBuilder.append(" [value] ").append(fractionalTransferValue.toString());
+    }
+
+    // add complete data for round 1 only
+    if (round == 1) {
+      logStringBuilder.append(" [Raw Data] ");
+      logStringBuilder.append(fullCVRData).append(" ");
+    }
+
+    // output with level FINE routes to audit log
+    Logger.log(Level.FINE, logStringBuilder.toString());
   }
 
   // function: exhaust
   // purpose: transition the CVR into exhausted state with the given reason
   // param: round the exhaustion occurs
   // param: reason: the reason for exhaustion
-  void exhaust(String reason) {
+  void exhaust() {
     assert !isExhausted;
     isExhausted = true;
-    addRoundOutcome(VoteOutcomeType.EXHAUSTED, reason, null);
   }
 
   // function: isExhausted
@@ -165,66 +200,10 @@ class CastVoteRecord {
     }
   }
 
-  // function: getAuditString
-  // purpose: return a formatted string describing this CVR and how state changes over
-  //  the course of the tabulation.  Used for audit output.
-  // returns: the formatted string for audit output
-  String getAuditString() {
-    // use a string builder for more efficient string creation
-    StringBuilder auditStringBuilder = new StringBuilder();
-    auditStringBuilder.append(" [Computed ID] ");
-    auditStringBuilder.append(computedID);
-    if (suppliedID != null && !suppliedID.isEmpty()) {
-      auditStringBuilder.append(" [Supplied ID] ");
-      auditStringBuilder.append(suppliedID);
-    }
-    if (precinct != null && !precinct.isEmpty()) {
-      auditStringBuilder.append(" [Precinct] ");
-      auditStringBuilder.append(precinct);
-    }
-    auditStringBuilder.append(" [Round by Round Report] |");
-    // round is an index to iterate over all round outcomes
-    int round = 1;
-    for (VoteOutcome roundOutcome : roundOutcomes) {
-      auditStringBuilder.append(round).append('|');
-      if (roundOutcome.outcomeType == VoteOutcomeType.IGNORED) {
-        auditStringBuilder.append("ignored:");
-      } else if (roundOutcome.outcomeType == VoteOutcomeType.EXHAUSTED) {
-        auditStringBuilder.append("exhausted:");
-      }
-      auditStringBuilder.append(roundOutcome.detail);
-      // the fractional transfer value of the vote in this round
-      BigDecimal ftv = roundOutcome.fractionalTransferValue;
-      if (ftv != null && !ftv.equals(BigDecimal.ONE)) {
-        auditStringBuilder.append(" (").append(ftv).append(')');
-      }
-      auditStringBuilder.append('|');
-      round++;
-    }
-    auditStringBuilder.append(" [Raw Data] ");
-    auditStringBuilder.append(fullCVRData);
-    return auditStringBuilder.toString();
-  }
-
   enum VoteOutcomeType {
     COUNTED,
     IGNORED,
     EXHAUSTED,
   }
 
-  private class VoteOutcome {
-
-    // what type of outcome (counted, ignored, exhausted)
-    final VoteOutcomeType outcomeType;
-    // more detail on the outcome (who got the vote or why it was ignored/exhausted)
-    final String detail;
-    // if someone received the vote, what fraction of it they got
-    final BigDecimal fractionalTransferValue;
-
-    VoteOutcome(VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
-      this.outcomeType = outcomeType;
-      this.detail = detail;
-      this.fractionalTransferValue = fractionalTransferValue;
-    }
-  }
 }

@@ -139,8 +139,6 @@ public class Main extends GuiApplication {
             tabulator.tabulate();
             // generate visualizer spreadsheet data
             tabulator.generateSummarySpreadsheet(timestampString);
-            // generate audit data
-            tabulator.doAudit(castVoteRecords);
             isTabulationCompleted = true;
           } else {
             Logger.log(Level.SEVERE, "No cast vote records found.");
