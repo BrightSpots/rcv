@@ -16,6 +16,8 @@
 
 package com.rcv;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rcv.RawContestConfig.CVRSource;
 import com.rcv.RawContestConfig.Candidate;
 import com.rcv.RawContestConfig.ContestRules;
@@ -27,6 +29,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -38,7 +41,10 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -61,7 +67,9 @@ public class GuiConfigController implements Initializable {
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String CONFIG_FILE_NAME = "config_file_documentation.txt";
 
-  // file selected for loading
+  // Used to check if changes have been made to a new config
+  private String emptyConfigString;
+  // File previously loaded or saved
   private File selectedFile;
 
   @FXML
@@ -168,33 +176,42 @@ public class GuiConfigController implements Initializable {
   private ButtonBar buttonBar;
 
   public void buttonNewConfigClicked() {
-    Logger.log(Level.INFO, "Creating new config.");
-    GuiContext.getInstance().setConfig(null);
-    selectedFile = null;
-    clearConfig();
+    if (checkForSaveAndContinue()) {
+      Logger.log(Level.INFO, "Creating new config.");
+      GuiContext.getInstance().setConfig(null);
+      selectedFile = null;
+      clearConfig();
+    }
+  }
+
+  private void loadFile(File fileToLoad) {
+    GuiContext.getInstance().setConfig(Main.loadContestConfig(fileToLoad.getAbsolutePath()));
+    if (GuiContext.getInstance().getConfig() != null) {
+      loadConfig(GuiContext.getInstance().getConfig());
+      labelCurrentlyLoaded.setText("Currently loaded: " + fileToLoad.getAbsolutePath());
+    }
   }
 
   public void buttonLoadConfigClicked() {
-    FileChooser fc = new FileChooser();
-    if (selectedFile == null) {
-      fc.setInitialDirectory(new File(System.getProperty("user.dir")));
-    } else {
-      fc.setInitialDirectory(new File(selectedFile.getParent()));
-    }
-    fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
-    fc.setTitle("Load Config");
+    if (checkForSaveAndContinue()) {
+      FileChooser fc = new FileChooser();
+      if (selectedFile == null) {
+        fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+      } else {
+        fc.setInitialDirectory(new File(selectedFile.getParent()));
+      }
+      fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
+      fc.setTitle("Load Config");
 
-    selectedFile = fc.showOpenDialog(null);
-    if (selectedFile != null) {
-      GuiContext.getInstance().setConfig(Main.loadContestConfig(selectedFile.getAbsolutePath()));
-      if (GuiContext.getInstance().getConfig() != null) {
-        loadConfig(GuiContext.getInstance().getConfig());
-        labelCurrentlyLoaded.setText("Currently loaded: " + selectedFile.getAbsolutePath());
+      File fileToLoad = fc.showOpenDialog(null);
+      if (fileToLoad != null) {
+        selectedFile = fileToLoad;
+        loadFile(fileToLoad);
       }
     }
   }
 
-  public void buttonSaveClicked() {
+  private File getSaveFile() {
     FileChooser fc = new FileChooser();
     if (selectedFile == null) {
       fc.setInitialDirectory(new File(System.getProperty("user.dir")));
@@ -204,10 +221,20 @@ public class GuiConfigController implements Initializable {
     }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
+    return fc.showSaveDialog(null);
+  }
 
-    File saveFile = fc.showSaveDialog(null);
-    if (saveFile != null) {
-      JsonParser.createFileFromRawContestConfig(saveFile, createRawContestConfig());
+  private void saveFile(File fileToSave) {
+    JsonParser.createFileFromRawContestConfig(fileToSave, createRawContestConfig());
+    // Reload the file to keep the GUI fields updated in case invalid values are replaced during the save process
+    loadFile(fileToSave);
+  }
+
+  public void buttonSaveClicked() {
+    File fileToSave = getSaveFile();
+    if (fileToSave != null) {
+      selectedFile = fileToSave;
+      saveFile(fileToSave);
     }
   }
 
@@ -221,21 +248,25 @@ public class GuiConfigController implements Initializable {
   }
 
   public void buttonTabulateClicked() {
-    if (GuiContext.getInstance().getConfig() != null) {
-      buttonBar.setDisable(true);
-      TabulatorService service = new TabulatorService();
-      service.setOnSucceeded(event -> buttonBar.setDisable(false));
-      service.setOnCancelled(event -> buttonBar.setDisable(false));
-      service.setOnFailed(event -> buttonBar.setDisable(false));
-      service.start();
-    } else {
-      Logger.log(Level.WARNING, "Please load a config file before attempting to tabulate!");
+    if (checkForSaveAndTabulate()) {
+      if (GuiContext.getInstance().getConfig() != null) {
+        buttonBar.setDisable(true);
+        TabulatorService service = new TabulatorService();
+        service.setOnSucceeded(event -> buttonBar.setDisable(false));
+        service.setOnCancelled(event -> buttonBar.setDisable(false));
+        service.setOnFailed(event -> buttonBar.setDisable(false));
+        service.start();
+      } else {
+        Logger.log(Level.WARNING, "Please load a config file before attempting to tabulate!");
+      }
     }
   }
 
   public void buttonExitClicked() {
-    Logger.log(Level.INFO, "Exiting tabulator GUI.");
-    Platform.exit();
+    if (checkForSaveAndContinue()) {
+      Logger.log(Level.INFO, "Exiting tabulator GUI.");
+      Platform.exit();
+    }
   }
 
   public void buttonOutputDirectoryClicked() {
@@ -386,6 +417,19 @@ public class GuiConfigController implements Initializable {
         .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
 
     setDefaultValues();
+
+    try {
+      emptyConfigString =
+          new ObjectMapper()
+              .writer()
+              .withDefaultPrettyPrinter()
+              .writeValueAsString(createRawContestConfig());
+    } catch (JsonProcessingException exception) {
+      Logger.log(
+          Level.WARNING,
+          "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
+          exception.toString());
+    }
   }
 
   private void setTextFieldToInteger(TextField textField, Integer value) {
@@ -463,6 +507,88 @@ public class GuiConfigController implements Initializable {
     setDefaultValues();
   }
 
+  private boolean checkIfNeedsSaving() {
+    boolean needsSaving = true;
+    try {
+      String currentConfigString =
+          new ObjectMapper()
+              .writer()
+              .withDefaultPrettyPrinter()
+              .writeValueAsString(createRawContestConfig());
+      if (selectedFile == null && currentConfigString.equals(emptyConfigString)) {
+        // All fields are currently empty / default values so no point in asking to save
+        needsSaving = false;
+      } else if (GuiContext.getInstance().getConfig() != null) {
+        String savedConfigString =
+            new ObjectMapper()
+                .writer()
+                .withDefaultPrettyPrinter()
+                .writeValueAsString(GuiContext.getInstance().getConfig().rawConfig);
+        needsSaving = !currentConfigString.equals(savedConfigString);
+      }
+    } catch (JsonProcessingException exception) {
+      Logger.log(
+          Level.WARNING,
+          "Unable tell if saving is necessary, but everything should work fine anyway! Prompting for save just in case...\n%s",
+          exception.toString());
+    }
+    return needsSaving;
+  }
+
+  private boolean checkForSaveAndContinue() {
+    boolean willContinue = false;
+    if (checkIfNeedsSaving()) {
+      ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
+      ButtonType doNotSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
+      Alert alert =
+          new Alert(
+              AlertType.CONFIRMATION,
+              "Do you want to save your changes before continuing?",
+              saveButton,
+              doNotSaveButton,
+              ButtonType.CANCEL);
+      alert.setHeaderText(null);
+      Optional<ButtonType> result = alert.showAndWait();
+      if (result.isPresent() && result.get() == saveButton) {
+        File fileToSave = getSaveFile();
+        if (fileToSave != null) {
+          saveFile(fileToSave);
+          willContinue = true;
+        }
+      } else if (result.isPresent() && result.get() == doNotSaveButton) {
+        willContinue = true;
+      }
+    } else {
+      willContinue = true;
+    }
+    return willContinue;
+  }
+
+  private boolean checkForSaveAndTabulate() {
+    boolean willContinue = false;
+    if (checkIfNeedsSaving()) {
+      ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
+      Alert alert =
+          new Alert(
+              AlertType.WARNING,
+              "You must either save your changes before continuing or load a new config!",
+              saveButton,
+              ButtonType.CANCEL);
+      alert.setHeaderText(null);
+      Optional<ButtonType> result = alert.showAndWait();
+      if (result.isPresent() && result.get() == saveButton) {
+        File fileToSave = getSaveFile();
+        if (fileToSave != null) {
+          saveFile(fileToSave);
+          willContinue = true;
+        }
+      }
+    } else {
+      willContinue = true;
+    }
+    return willContinue;
+  }
+
   private void loadConfig(ContestConfig config) {
     clearConfig();
 
@@ -537,11 +663,13 @@ public class GuiConfigController implements Initializable {
       }
       returnValue = Integer.valueOf(textField.getText());
     } catch (Exception exception) {
-      Logger.log(
-          Level.WARNING,
-          "Integer required! Illegal value '%s' was replaced by '%s'",
-          textField.getText(),
-          defaultValue);
+      if (!(textField.getText().isEmpty() && defaultValue == null)) {
+        Logger.log(
+            Level.WARNING,
+            "Integer required! Illegal value '%s' was replaced by '%s'",
+            textField.getText(),
+            defaultValue);
+      }
       returnValue = defaultValue;
     }
     return returnValue;

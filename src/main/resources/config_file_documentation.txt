@@ -58,7 +58,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
 
       "idColumnIndex" optional
         index of the column (starting from 1) that contains the unique ID for each CVR
-        example: 0
+        example: 1
         value: [1..1000]
         default: none
 
