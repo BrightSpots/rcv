@@ -184,6 +184,14 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  private void loadFile(File loadFile) {
+    GuiContext.getInstance().setConfig(Main.loadContestConfig(loadFile.getAbsolutePath()));
+    if (GuiContext.getInstance().getConfig() != null) {
+      loadConfig(GuiContext.getInstance().getConfig());
+      labelCurrentlyLoaded.setText("Currently loaded: " + loadFile.getAbsolutePath());
+    }
+  }
+
   public void buttonLoadConfigClicked() {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
@@ -197,11 +205,7 @@ public class GuiConfigController implements Initializable {
 
       selectedFile = fc.showOpenDialog(null);
       if (selectedFile != null) {
-        GuiContext.getInstance().setConfig(Main.loadContestConfig(selectedFile.getAbsolutePath()));
-        if (GuiContext.getInstance().getConfig() != null) {
-          loadConfig(GuiContext.getInstance().getConfig());
-          labelCurrentlyLoaded.setText("Currently loaded: " + selectedFile.getAbsolutePath());
-        }
+        loadFile(selectedFile);
       }
     }
   }
@@ -220,15 +224,15 @@ public class GuiConfigController implements Initializable {
   }
 
   private void saveFile(File saveFile) {
-    RawContestConfig rawConfig = createRawContestConfig();
-    JsonParser.createFileFromRawContestConfig(saveFile, rawConfig);
-    GuiContext.getInstance().setConfig(new ContestConfig(rawConfig));
-    labelCurrentlyLoaded.setText("Currently loaded: " + saveFile.getAbsolutePath());
+    JsonParser.createFileFromRawContestConfig(saveFile, createRawContestConfig());
+    // Necessary to keep GUI aligned when default values subbed in if invalid during save process
+    loadFile(saveFile);
   }
 
   public void buttonSaveClicked() {
     File saveFile = getSaveFile();
     if (saveFile != null) {
+      selectedFile = saveFile;
       saveFile(saveFile);
     }
   }
@@ -658,11 +662,13 @@ public class GuiConfigController implements Initializable {
       }
       returnValue = Integer.valueOf(textField.getText());
     } catch (Exception exception) {
-      Logger.log(
-          Level.WARNING,
-          "Integer required! Illegal value '%s' was replaced by '%s'",
-          textField.getText(),
-          defaultValue);
+      if (!(textField.getText().isEmpty() && defaultValue == null)) {
+        Logger.log(
+            Level.WARNING,
+            "Integer required! Illegal value '%s' was replaced by '%s'",
+            textField.getText(),
+            defaultValue);
+      }
       returnValue = defaultValue;
     }
     return returnValue;
