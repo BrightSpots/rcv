@@ -45,16 +45,15 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -89,11 +88,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldContestOffice;
   @FXML
-  private ToggleGroup toggleTabulateByPrecinct;
-  @FXML
-  private RadioButton radioTabulateByPrecinctTrue;
-  @FXML
-  private RadioButton radioTabulateByPrecinctFalse;
+  private CheckBox checkBoxTabulateByPrecinct;
   @FXML
   private TableView<CVRSource> tableViewCvrFiles;
   @FXML
@@ -149,29 +144,13 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldRulesDescription;
   @FXML
-  private ToggleGroup toggleBatchElimination;
+  private CheckBox checkBoxBatchElimination;
   @FXML
-  private RadioButton radioBatchEliminationTrue;
+  private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
   @FXML
-  private RadioButton radioBatchEliminationFalse;
+  private CheckBox checkBoxExhaustOnDuplicateCandidate;
   @FXML
-  private ToggleGroup toggleContinueUntilTwoCandidatesRemain;
-  @FXML
-  private RadioButton radioContinueUntilTwoCandidatesRemainTrue;
-  @FXML
-  private RadioButton radioContinueUntilTwoCandidatesRemainFalse;
-  @FXML
-  private ToggleGroup toggleExhaustOnDuplicateCandidate;
-  @FXML
-  private RadioButton radioExhaustOnDuplicateCandidateTrue;
-  @FXML
-  private RadioButton radioExhaustOnDuplicateCandidateFalse;
-  @FXML
-  private ToggleGroup toggleTreatBlankAsUndeclaredWriteIn;
-  @FXML
-  private RadioButton radioTreatBlankAsUndeclaredWriteInTrue;
-  @FXML
-  private RadioButton radioTreatBlankAsUndeclaredWriteInFalse;
+  private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
   @FXML
   private ButtonBar buttonBar;
 
@@ -226,7 +205,7 @@ public class GuiConfigController implements Initializable {
 
   private void saveFile(File fileToSave) {
     JsonParser.createFileFromRawContestConfig(fileToSave, createRawContestConfig());
-    // Reload the file to keep the GUI fields updated in case invalid values are replaced during the save process
+    // Reload to keep GUI fields updated in case invalid values are replaced during save process
     loadFile(fileToSave);
   }
 
@@ -441,26 +420,14 @@ public class GuiConfigController implements Initializable {
   private void setDefaultValues() {
     labelCurrentlyLoaded.setText("Currently loaded: <new config>");
 
-    setToggleBoolean(
-        ContestConfig.DEFAULT_TABULATE_BY_PRECINCT,
-        radioTabulateByPrecinctTrue,
-        radioTabulateByPrecinctFalse);
-    setToggleBoolean(
-        ContestConfig.DEFAULT_BATCH_ELIMINATION,
-        radioBatchEliminationTrue,
-        radioBatchEliminationFalse);
-    setToggleBoolean(
-        ContestConfig.DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES,
-        radioExhaustOnDuplicateCandidateTrue,
-        radioExhaustOnDuplicateCandidateFalse);
-    setToggleBoolean(
-        ContestConfig.DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN,
-        radioContinueUntilTwoCandidatesRemainTrue,
-        radioContinueUntilTwoCandidatesRemainFalse);
-    setToggleBoolean(
-        ContestConfig.DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN,
-        radioTreatBlankAsUndeclaredWriteInTrue,
-        radioTreatBlankAsUndeclaredWriteInFalse);
+    checkBoxTabulateByPrecinct.setSelected(ContestConfig.DEFAULT_TABULATE_BY_PRECINCT);
+    checkBoxBatchElimination.setSelected(ContestConfig.DEFAULT_BATCH_ELIMINATION);
+    checkBoxContinueUntilTwoCandidatesRemain.setSelected(
+        ContestConfig.DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
+    checkBoxExhaustOnDuplicateCandidate.setSelected(
+        ContestConfig.DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES);
+    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
+        ContestConfig.DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
 
     textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.DEFAULT_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic.setText(
@@ -475,7 +442,7 @@ public class GuiConfigController implements Initializable {
     datePickerContestDate.setValue(null);
     textFieldContestJurisdiction.clear();
     textFieldContestOffice.clear();
-    toggleTabulateByPrecinct.selectToggle(null);
+    checkBoxTabulateByPrecinct.setSelected(false);
 
     textFieldCvrFilePath.clear();
     textFieldCvrFirstVoteCol.clear();
@@ -499,10 +466,10 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.clear();
     textFieldUndeclaredWriteInLabel.clear();
     textFieldRulesDescription.clear();
-    toggleBatchElimination.selectToggle(null);
-    toggleContinueUntilTwoCandidatesRemain.selectToggle(null);
-    toggleExhaustOnDuplicateCandidate.selectToggle(null);
-    toggleTreatBlankAsUndeclaredWriteIn.selectToggle(null);
+    checkBoxBatchElimination.setSelected(false);
+    checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
+    checkBoxExhaustOnDuplicateCandidate.setSelected(false);
+    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(false);
 
     setDefaultValues();
   }
@@ -599,10 +566,7 @@ public class GuiConfigController implements Initializable {
     }
     textFieldContestJurisdiction.setText(config.getContestJurisdiction());
     textFieldContestOffice.setText(config.getContestOffice());
-    setToggleBoolean(
-        config.isTabulateByPrecinctEnabled(),
-        radioTabulateByPrecinctTrue,
-        radioTabulateByPrecinctFalse);
+    checkBoxTabulateByPrecinct.setSelected(config.isTabulateByPrecinctEnabled());
 
     if (config.rawConfig.cvrFileSources != null) {
       tableViewCvrFiles.setItems(
@@ -626,33 +590,12 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.setText(config.getUndervoteLabel());
     textFieldUndeclaredWriteInLabel.setText(config.getUndeclaredWriteInLabel());
     textFieldRulesDescription.setText(config.getRulesDescription());
-    setToggleBoolean(
-        config.isBatchEliminationEnabled(), radioBatchEliminationTrue, radioBatchEliminationFalse);
-    setToggleBoolean(
-        config.willContinueUntilTwoCandidatesRemain(),
-        radioContinueUntilTwoCandidatesRemainTrue,
-        radioContinueUntilTwoCandidatesRemainFalse);
-    setToggleBoolean(
-        config.isExhaustOnDuplicateCandidateEnabled(),
-        radioExhaustOnDuplicateCandidateTrue,
-        radioExhaustOnDuplicateCandidateFalse);
-    setToggleBoolean(
-        config.isTreatBlankAsUndeclaredWriteInEnabled(),
-        radioTreatBlankAsUndeclaredWriteInTrue,
-        radioTreatBlankAsUndeclaredWriteInFalse);
-  }
-
-  // TODO: this function assumes that if a field isn't provided in the config, it'll be false
-  private void setToggleBoolean(boolean condition, RadioButton radioTrue, RadioButton radioFalse) {
-    if (condition) {
-      radioTrue.setSelected(true);
-    } else {
-      radioFalse.setSelected(true);
-    }
-  }
-
-  private boolean getToggleBoolean(ToggleGroup toggleGroup) {
-    return ((RadioButton) toggleGroup.getSelectedToggle()).getText().equals("True");
+    checkBoxBatchElimination.setSelected(config.isBatchEliminationEnabled());
+    checkBoxContinueUntilTwoCandidatesRemain.setSelected(
+        config.willContinueUntilTwoCandidatesRemain());
+    checkBoxExhaustOnDuplicateCandidate.setSelected(config.isExhaustOnDuplicateCandidateEnabled());
+    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
+        config.isTreatBlankAsUndeclaredWriteInEnabled());
   }
 
   private Integer getIntValueElse(TextField textField, Integer defaultValue) {
@@ -689,7 +632,7 @@ public class GuiConfigController implements Initializable {
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
     outputSettings.contestJurisdiction = textFieldContestJurisdiction.getText();
     outputSettings.contestOffice = textFieldContestOffice.getText();
-    outputSettings.tabulateByPrecinct = getToggleBoolean(toggleTabulateByPrecinct);
+    outputSettings.tabulateByPrecinct = checkBoxTabulateByPrecinct.isSelected();
     config.outputSettings = outputSettings;
 
     config.cvrFileSources = new ArrayList<>(tableViewCvrFiles.getItems());
@@ -710,11 +653,10 @@ public class GuiConfigController implements Initializable {
     rules.minimumVoteThreshold =
         getIntValueElse(
             textFieldMinimumVoteThreshold, ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
-    rules.batchElimination = getToggleBoolean(toggleBatchElimination);
-    rules.continueUntilTwoCandidatesRemain =
-        getToggleBoolean(toggleContinueUntilTwoCandidatesRemain);
-    rules.exhaustOnDuplicateCandidate = getToggleBoolean(toggleExhaustOnDuplicateCandidate);
-    rules.treatBlankAsUndeclaredWriteIn = getToggleBoolean(toggleTreatBlankAsUndeclaredWriteIn);
+    rules.batchElimination = checkBoxBatchElimination.isSelected();
+    rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
+    rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
+    rules.treatBlankAsUndeclaredWriteIn = checkBoxTreatBlankAsUndeclaredWriteIn.isSelected();
     rules.overvoteLabel = textFieldOvervoteLabel.getText();
     rules.undervoteLabel = textFieldUndervoteLabel.getText();
     rules.undeclaredWriteInLabel = textFieldUndeclaredWriteInLabel.getText();

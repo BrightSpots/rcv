@@ -28,4 +28,4 @@ Jackson Databind 2.9.6
 Config file documentation is available [here](src/main/resources/config_file_documentation.txt).
 
 ## User Guide
-User Guide is available [here](UserGuide.txt)
+User Guide is available [here](UserGuide.txt).
