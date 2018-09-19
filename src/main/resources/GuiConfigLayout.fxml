@@ -3,23 +3,23 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
-  minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="900.0"
+  minHeight="-Infinity"
+  minWidth="-Infinity" prefHeight="800.0" prefWidth="900.0"
   stylesheets="GuiStyles.css" xmlns="http://javafx.com/javafx/8.0.121"
   fx:controller="com.rcv.GuiConfigController">
   <top>
@@ -28,9 +28,11 @@
         fx:id="buttonBar">
         <buttons>
           <Button ButtonBar.buttonData="LEFT" mnemonicParsing="false"
-            onAction="#buttonNewConfigClicked" text="New"/>
+            onAction="#buttonNewConfigClicked"
+            text="New"/>
           <Button ButtonBar.buttonData="LEFT" mnemonicParsing="false"
-            onAction="#buttonLoadConfigClicked" text="Load..."/>
+            onAction="#buttonLoadConfigClicked"
+            text="Load..."/>
           <Button ButtonBar.buttonData="LEFT" mnemonicParsing="false" onAction="#buttonSaveClicked"
             text="Save..."/>
           <Button mnemonicParsing="false" onAction="#buttonValidateClicked" text="Validate"/>
@@ -73,16 +75,12 @@
               fx:id="textFieldContestJurisdiction"/>
             <Label text="Contest Office"/>
             <TextField maxWidth="220.0" promptText="Contest Office" fx:id="textFieldContestOffice"/>
-            <Label text="Tabulate by Precinct"/>
-            <HBox alignment="CENTER_LEFT" spacing="12.0">
-              <RadioButton mnemonicParsing="false" text="True" fx:id="radioTabulateByPrecinctTrue">
-                <toggleGroup>
-                  <ToggleGroup fx:id="toggleTabulateByPrecinct"/>
-                </toggleGroup>
-              </RadioButton>
-              <RadioButton mnemonicParsing="false" text="False"
-                toggleGroup="$toggleTabulateByPrecinct" fx:id="radioTabulateByPrecinctFalse"/>
-            </HBox>
+            <CheckBox mnemonicParsing="false" text="Tabulate by Precinct"
+              fx:id="checkBoxTabulateByPrecinct">
+              <VBox.margin>
+                <Insets top="10.0"/>
+              </VBox.margin>
+            </CheckBox>
             <padding>
               <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
             </padding>
@@ -100,7 +98,8 @@
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <TextField prefHeight="25.0" prefWidth="170.0"
-                    promptText="First Vote Column Index *" fx:id="textFieldCvrFirstVoteCol"/>
+                    promptText="First Vote Column Index *"
+                    fx:id="textFieldCvrFirstVoteCol"/>
                   <TextField prefHeight="25.0" prefWidth="120.0" promptText="ID Column Index"
                     fx:id="textFieldCvrIdCol"/>
                   <TextField prefHeight="25.0" prefWidth="150.0" promptText="Precinct Column Index"
@@ -123,16 +122,16 @@
             </HBox>
             <TableView fx:id="tableViewCvrFiles">
               <columns>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="240.0" text="File Path"
-                  fx:id="tableColumnCvrFilePath"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="240.0"
+                  text="File Path" fx:id="tableColumnCvrFilePath"/>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
                   text="First Vote&#10;Column&#10;Index" fx:id="tableColumnCvrFirstVoteCol"/>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
                   text="ID&#10;Column&#10;Index" fx:id="tableColumnCvrIdCol"/>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
                   text="Precinct&#10;Column&#10;Index" fx:id="tableColumnCvrPrecinctCol"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="140.0" text="Provider"
-                  fx:id="tableColumnCvrProvider"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="140.0"
+                  text="Provider" fx:id="tableColumnCvrProvider"/>
               </columns>
             </TableView>
             <padding>
@@ -155,10 +154,10 @@
             </HBox>
             <TableView fx:id="tableViewCandidates">
               <columns>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="230.0" text="Name"
-                  fx:id="tableColumnCandidateName"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="230.0" text="Code"
-                  fx:id="tableColumnCandidateCode"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="230.0"
+                  text="Name" fx:id="tableColumnCandidateName"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="230.0"
+                  text="Code" fx:id="tableColumnCandidateCode"/>
               </columns>
             </TableView>
             <padding>
@@ -193,52 +192,30 @@
               </padding>
             </VBox>
             <VBox spacing="8.0">
-              <Label text="Batch Elimination"/>
-              <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <RadioButton mnemonicParsing="false" text="True" fx:id="radioBatchEliminationTrue">
-                  <toggleGroup>
-                    <ToggleGroup fx:id="toggleBatchElimination"/>
-                  </toggleGroup>
-                </RadioButton>
-                <RadioButton mnemonicParsing="false" text="False"
-                  toggleGroup="$toggleBatchElimination" fx:id="radioBatchEliminationFalse"/>
-              </HBox>
-              <Label text="Continue until Two Candidates Remain"/>
-              <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <RadioButton mnemonicParsing="false" text="True"
-                  fx:id="radioContinueUntilTwoCandidatesRemainTrue">
-                  <toggleGroup>
-                    <ToggleGroup fx:id="toggleContinueUntilTwoCandidatesRemain"/>
-                  </toggleGroup>
-                </RadioButton>
-                <RadioButton mnemonicParsing="false" text="False"
-                  toggleGroup="$toggleContinueUntilTwoCandidatesRemain"
-                  fx:id="radioContinueUntilTwoCandidatesRemainFalse"/>
-              </HBox>
-              <Label text="Exhaust on Duplicate Candidate"/>
-              <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <RadioButton mnemonicParsing="false" text="True"
-                  fx:id="radioExhaustOnDuplicateCandidateTrue">
-                  <toggleGroup>
-                    <ToggleGroup fx:id="toggleExhaustOnDuplicateCandidate"/>
-                  </toggleGroup>
-                </RadioButton>
-                <RadioButton mnemonicParsing="false" text="False"
-                  toggleGroup="$toggleExhaustOnDuplicateCandidate"
-                  fx:id="radioExhaustOnDuplicateCandidateFalse"/>
-              </HBox>
-              <Label text="Treat Blank as Undeclared Write-in"/>
-              <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <RadioButton mnemonicParsing="false" text="True"
-                  fx:id="radioTreatBlankAsUndeclaredWriteInTrue">
-                  <toggleGroup>
-                    <ToggleGroup fx:id="toggleTreatBlankAsUndeclaredWriteIn"/>
-                  </toggleGroup>
-                </RadioButton>
-                <RadioButton mnemonicParsing="false" text="False"
-                  toggleGroup="$toggleTreatBlankAsUndeclaredWriteIn"
-                  fx:id="radioTreatBlankAsUndeclaredWriteInFalse"/>
-              </HBox>
+              <CheckBox mnemonicParsing="false" text="Batch Elimination"
+                fx:id="checkBoxBatchElimination">
+                <VBox.margin>
+                  <Insets top="4.0"/>
+                </VBox.margin>
+              </CheckBox>
+              <CheckBox mnemonicParsing="false" text="Continue until Two Candidates Remain"
+                fx:id="checkBoxContinueUntilTwoCandidatesRemain">
+                <VBox.margin>
+                  <Insets top="4.0"/>
+                </VBox.margin>
+              </CheckBox>
+              <CheckBox mnemonicParsing="false" text="Exhaust on Duplicate Candidate"
+                fx:id="checkBoxExhaustOnDuplicateCandidate">
+                <VBox.margin>
+                  <Insets top="4.0"/>
+                </VBox.margin>
+              </CheckBox>
+              <CheckBox mnemonicParsing="false" text="Treat Blank as Undeclared Write-in"
+                fx:id="checkBoxTreatBlankAsUndeclaredWriteIn">
+                <VBox.margin>
+                  <Insets top="4.0"/>
+                </VBox.margin>
+              </CheckBox>
               <Label text="Overvote Label"/>
               <TextField maxWidth="220.0" promptText="Overvote Label"
                 fx:id="textFieldOvervoteLabel"/>
