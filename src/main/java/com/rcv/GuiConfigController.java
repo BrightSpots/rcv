@@ -174,6 +174,9 @@ public class GuiConfigController implements Initializable {
   public void buttonLoadConfigClicked() {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
+
+      GuiContext.getInstance().fileChooser = fc;
+
       if (selectedFile == null) {
         fc.setInitialDirectory(new File(System.getProperty("user.dir")));
       } else {
@@ -181,8 +184,10 @@ public class GuiConfigController implements Initializable {
       }
       fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
       fc.setTitle("Load Config");
+      File fileToLoad = fc.showOpenDialog(GuiContext.getInstance().mainWindow);
 
-      File fileToLoad = fc.showOpenDialog(null);
+      GuiContext.getInstance().fileChooser = null;
+
       if (fileToLoad != null) {
         selectedFile = fileToLoad;
         loadFile(fileToLoad);

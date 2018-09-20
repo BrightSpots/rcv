@@ -16,12 +16,18 @@
 
 package com.rcv;
 
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
 class GuiContext {
 
   // context instance
   private static final GuiContext INSTANCE = new GuiContext();
   // currently-loaded tabulator config
   private ContestConfig config;
+
+  public Stage mainWindow;
+  public FileChooser fileChooser;
 
   private GuiContext() {
   }
