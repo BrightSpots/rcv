@@ -16,7 +16,6 @@
 
 package com.rcv;
 
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 class GuiContext {
@@ -25,9 +24,8 @@ class GuiContext {
   private static final GuiContext INSTANCE = new GuiContext();
   // currently-loaded tabulator config
   private ContestConfig config;
-
-  public Stage mainWindow;
-  public FileChooser fileChooser;
+  // cache for main window so we can parent file choosers to it
+  private Stage mainWindow;
 
   private GuiContext() {
   }
@@ -42,5 +40,13 @@ class GuiContext {
 
   void setConfig(ContestConfig config) {
     this.config = config;
+  }
+
+  Stage getMainWindow() {
+    return this.mainWindow;
+  }
+
+  void setMainWindow(Stage mainWindow) {
+    this.mainWindow = mainWindow;
   }
 }

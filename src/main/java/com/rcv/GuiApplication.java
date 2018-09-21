@@ -16,14 +16,12 @@
 
 package com.rcv;
 
-import java.util.logging.Level;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -34,22 +32,12 @@ public class GuiApplication extends Application {
     Parent root = FXMLLoader.load(getClass().getResource("/GuiConfigLayout.fxml"));
     window.setTitle("Universal RCV Tabulator");
     window.setScene(new Scene(root));
+    // cache main window so we can parent file choosers to it
     GuiContext context = GuiContext.getInstance();
-    // cache this so we can parent file chooser to it
-    context.mainWindow = window;
-    EventHandler<WindowEvent> windowEventEventHandler = event -> {
-      // do something
-      Logger.log(Level.INFO, "bla");
-      FileChooser fileChooser = GuiContext.getInstance().fileChooser;
-      if (fileChooser != null) {
-        try {
-          Platform.exit();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    };
-    window.setOnCloseRequest(windowEventEventHandler);
+    context.setMainWindow(window);
+    // workaround for https://bugs.openjdk.java.net/browse/JDK-8088859
+    EventHandler<WindowEvent> onCloseHandler = event -> Platform.exit();
+    window.setOnCloseRequest(onCloseHandler);
     window.show();
   }
 

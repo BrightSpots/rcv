@@ -156,7 +156,7 @@ public class GuiConfigController implements Initializable {
 
   public void buttonNewConfigClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Creating new config.");
+      Logger.log(Level.INFO, "Creating new contest.");
       GuiContext.getInstance().setConfig(null);
       selectedFile = null;
       clearConfig();
@@ -174,9 +174,6 @@ public class GuiConfigController implements Initializable {
   public void buttonLoadConfigClicked() {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
-
-      GuiContext.getInstance().fileChooser = fc;
-
       if (selectedFile == null) {
         fc.setInitialDirectory(new File(System.getProperty("user.dir")));
       } else {
@@ -184,10 +181,7 @@ public class GuiConfigController implements Initializable {
       }
       fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
       fc.setTitle("Load Config");
-      File fileToLoad = fc.showOpenDialog(GuiContext.getInstance().mainWindow);
-
-      GuiContext.getInstance().fileChooser = null;
-
+      File fileToLoad = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       if (fileToLoad != null) {
         selectedFile = fileToLoad;
         loadFile(fileToLoad);
@@ -205,7 +199,7 @@ public class GuiConfigController implements Initializable {
     }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
-    return fc.showSaveDialog(null);
+    return fc.showSaveDialog(GuiContext.getInstance().getMainWindow());
   }
 
   private void saveFile(File fileToSave) {
@@ -258,7 +252,7 @@ public class GuiConfigController implements Initializable {
     dc.setInitialDirectory(new File(System.getProperty("user.dir")));
     dc.setTitle("Output Directory");
 
-    File outputDirectory = dc.showDialog(null);
+    File outputDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
     if (outputDirectory != null) {
       textFieldOutputDirectory.setText(outputDirectory.getAbsolutePath());
     }
@@ -274,7 +268,7 @@ public class GuiConfigController implements Initializable {
     fc.getExtensionFilters().add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
     fc.setTitle("Select CVR File");
 
-    File openFile = fc.showOpenDialog(null);
+    File openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
     if (openFile != null) {
       textFieldCvrFilePath.setText(openFile.getAbsolutePath());
     }
@@ -423,7 +417,7 @@ public class GuiConfigController implements Initializable {
   }
 
   private void setDefaultValues() {
-    labelCurrentlyLoaded.setText("Currently loaded: <new config>");
+    labelCurrentlyLoaded.setText("Currently loaded: <New Contest>");
 
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.DEFAULT_TABULATE_BY_PRECINCT);
     checkBoxBatchElimination.setSelected(ContestConfig.DEFAULT_BATCH_ELIMINATION);
@@ -543,7 +537,7 @@ public class GuiConfigController implements Initializable {
       Alert alert =
           new Alert(
               AlertType.WARNING,
-              "You must either save your changes before continuing or load a new config!",
+              "You must either save your changes before continuing or load a new contest!",
               saveButton,
               ButtonType.CANCEL);
       alert.setHeaderText(null);
