@@ -287,19 +287,16 @@ class Tabulator {
         Map<String, BigDecimal> winnerToFractionalValue = cvr.getWinnerToFractionalValue();
         for (String winner : winnerToFractionalValue.keySet()) {
           if (!winnersRequiringComputation.contains(winner)) {
-            continue; // this is someone who just won this round, so we can skip them
+            continue;
           }
-          // the fractional value we should use when incrementing
           BigDecimal fractionalTransferValue = winnerToFractionalValue.get(winner);
+
           incrementTally(roundTally, fractionalTransferValue, winner);
-          for (String precinct : precinctRoundTallies.keySet()) {
-            // all the tallies for the given precinct
-            Map<Integer, Map<String, BigDecimal>> roundTalliesForPrecinct =
-                precinctRoundTallies.get(precinct);
-            // the tally for the current round for the precinct
-            Map<String, BigDecimal> roundTallyForPrecinct =
-                roundTalliesForPrecinct.get(currentRound);
-            incrementTally(roundTallyForPrecinct, fractionalTransferValue, winner);
+          if (config.isTabulateByPrecinctEnabled() && cvr.getPrecinct() != null) {
+            incrementTally(
+                precinctRoundTallies.get(cvr.getPrecinct()).get(currentRound),
+                fractionalTransferValue,
+                winner);
           }
         }
       }
