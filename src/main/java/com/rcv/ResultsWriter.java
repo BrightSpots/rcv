@@ -122,8 +122,8 @@ class ResultsWriter {
     // filename for output
     String outputFileName = String.format("%s_summary.xlsx", this.timestampString);
     // full path for output
-    String outputPath = Paths.get(config.getOutputDirectory(),
-        outputFileName).toAbsolutePath().toString();
+    String outputPath =
+        Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
     // generate the spreadsheet
     generateSummarySpreadsheet(roundTallies, null, outputPath);
   }
@@ -142,8 +142,8 @@ class ResultsWriter {
       String outputFileName =
           String.format("%s_%s_precinct_summary.xlsx", this.timestampString, precinctFileString);
       // full path for output
-      String outputPath = Paths.get(config.getOutputDirectory(),
-          outputFileName).toAbsolutePath().toString();
+      String outputPath =
+          Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
       generateSummarySpreadsheet(precinctRoundTallies.get(precinct), precinct, outputPath);
     }
   }
@@ -264,6 +264,8 @@ class ResultsWriter {
       roundPercentageCell.setCellValue("% of vote");
     }
 
+    final BigDecimal totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
+
     // Candidate votes [total, delta, percentage]
     // For each candidate: for each round: output total votes, delta votes, and final vote
     // percentage of total.
@@ -309,13 +311,15 @@ class ResultsWriter {
           votesRedistributedEachRound[dataUseRound] =
               votesRedistributedEachRound[dataUseRound].add(deltaVotes);
         }
-        //  total active votes in this round
-        BigDecimal totalActiveVotes = totalActiveVotesPerRound.get(dataUseRound);
-        // fractional percent
-        BigDecimal fraction = config.divide(thisRoundTally, totalActiveVotes);
-        // percentage of active votes
+        // total active votes for %: use current round for single-winner, first round for multi
+        BigDecimal totalActiveVotes =
+            config.getNumberOfWinners() > 1
+                ? totalActiveVotesFirstRound
+                : totalActiveVotesPerRound.get(dataUseRound);
         BigDecimal percentage =
-            fraction.signum() == 1 ? fraction.multiply(new BigDecimal(100)) : BigDecimal.ZERO;
+            thisRoundTally.signum() == 1
+                ? config.divide(thisRoundTally.multiply(new BigDecimal(100)), totalActiveVotes)
+                : BigDecimal.ZERO;
         columnIndex = ((displayRound - 1) * COLUMNS_PER_ROUND) + 1;
         // delta votes cell
         Cell deltaVotesCell = candidateRow.createCell(columnIndex++);
@@ -336,8 +340,6 @@ class ResultsWriter {
     // exhausted CVR header cell
     Cell exhaustedRowHeaderCell = exhaustedCVRRow.createCell(0);
     exhaustedRowHeaderCell.setCellValue("Inactive ballots");
-    // active votes are calculated wrt active votes in the first round
-    BigDecimal totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
     // displayRound indexes through all rounds plus final results round
     for (int displayRound = 1; displayRound <= numRounds + 1; displayRound++) {
       // flag for final round special cases
@@ -366,9 +368,12 @@ class ResultsWriter {
       }
 
       // Exhausted votes as percentage of ALL votes (note: this differs from the candidate vote
-      // percentages which are percentage of ACTIVE votes for the given round.
-      BigDecimal decimalPercentage = config.divide(thisRoundExhausted, totalActiveVotesFirstRound);
-      BigDecimal percentage = decimalPercentage.multiply(new BigDecimal(100));
+      // percentages which are percentage of ACTIVE votes for the given round).
+      BigDecimal percentage =
+          thisRoundExhausted.signum() == 1
+              ? config.divide(
+                  thisRoundExhausted.multiply(new BigDecimal(100)), totalActiveVotesFirstRound)
+              : BigDecimal.ZERO;
       columnIndex = ((displayRound - 1) * COLUMNS_PER_ROUND) + 1;
       // delta votes cell
       Cell deltaVotesCell = exhaustedCVRRow.createCell(columnIndex++);
@@ -442,8 +447,7 @@ class ResultsWriter {
       workbook.write(outputStream);
       outputStream.close();
     } catch (IOException exception) {
-      Logger.log(
-          Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
+      Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
     }
   }
 
@@ -529,33 +533,33 @@ class ResultsWriter {
     // second cell contains a value or null
     // third cell is true if second cell is numeric data, false if string
     Object[][] fields = {
-        {"About this contest", null, OutputType.STRING},
-        {"Date/time or version", "Updated " + dateString, OutputType.STRING},
-        {"Contest information", null, OutputType.STRING},
-        {"Enter information about the contest as it will be displayed", null, OutputType.STRING},
-        {"Contest name", config.getContestName(), OutputType.STRING},
-        {"Jurisdiction name", config.getContestJurisdiction(), OutputType.STRING},
-        {"Office name", config.getContestOffice(), OutputType.STRING},
-        {"Contest date", config.getContestDate(), OutputType.STRING},
-        {null, null, OutputType.STRING},
-        {"Counting information", null, OutputType.STRING},
-        {"Details of the tally to be used in the display screens", null, OutputType.STRING},
-        {"Counting method", "Ranked-choice voting", OutputType.STRING},
-        {"Formula for winning", formula, OutputType.STRING},
-        {"Formula example", "n/a", OutputType.STRING},
-        {"Threshold number", thresholdString, OutputType.STRING},
-        {"Graph threshold label", thresholdString + " of votes required to win", OutputType.STRING},
-        {null, null, OutputType.STRING},
-        {"Contest summary data", null, OutputType.STRING},
-        {"Tally detail", null, OutputType.STRING},
-        {"Single-winner/multi-winner", contestType, OutputType.STRING},
-        {"Number to be elected", config.getNumberOfWinners(), OutputType.INT},
-        {"Number of declared candidates", config.getNumDeclaredCandidates(), OutputType.INT},
-        {"Number of votes cast", totalActiveVotesFirstRound.toString(), OutputType.STRING},
-        {"Undervotes", 0, OutputType.INT},
-        {"Total # of rounds", totalActiveVotesPerRound.size(), OutputType.INT},
-        {null, null, OutputType.STRING},
-        {"Tally Data Starts Here", null, OutputType.STRING}
+      {"About this contest", null, OutputType.STRING},
+      {"Date/time or version", "Updated " + dateString, OutputType.STRING},
+      {"Contest information", null, OutputType.STRING},
+      {"Enter information about the contest as it will be displayed", null, OutputType.STRING},
+      {"Contest name", config.getContestName(), OutputType.STRING},
+      {"Jurisdiction name", config.getContestJurisdiction(), OutputType.STRING},
+      {"Office name", config.getContestOffice(), OutputType.STRING},
+      {"Contest date", config.getContestDate(), OutputType.STRING},
+      {null, null, OutputType.STRING},
+      {"Counting information", null, OutputType.STRING},
+      {"Details of the tally to be used in the display screens", null, OutputType.STRING},
+      {"Counting method", "Ranked-choice voting", OutputType.STRING},
+      {"Formula for winning", formula, OutputType.STRING},
+      {"Formula example", "n/a", OutputType.STRING},
+      {"Threshold number", thresholdString, OutputType.STRING},
+      {"Graph threshold label", thresholdString + " of votes required to win", OutputType.STRING},
+      {null, null, OutputType.STRING},
+      {"Contest summary data", null, OutputType.STRING},
+      {"Tally detail", null, OutputType.STRING},
+      {"Single-winner/multi-winner", contestType, OutputType.STRING},
+      {"Number to be elected", config.getNumberOfWinners(), OutputType.INT},
+      {"Number of declared candidates", config.getNumDeclaredCandidates(), OutputType.INT},
+      {"Number of votes cast", totalActiveVotesFirstRound.toString(), OutputType.STRING},
+      {"Undervotes", 0, OutputType.INT},
+      {"Total # of rounds", totalActiveVotesPerRound.size(), OutputType.INT},
+      {null, null, OutputType.STRING},
+      {"Tally Data Starts Here", null, OutputType.STRING}
     };
     // count the row we create so we can return the next empty row
     int rowCounter = 0;
