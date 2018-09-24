@@ -53,7 +53,7 @@
     "maxRankingsAllowed": 3,
     "maxSkippedRanksAllowed": 2,
     "numberOfWinners": 3,
-    "decimalPlacesForVoteArithmetic": 5,
+    "decimalPlacesForVoteArithmetic": 4,
     "minimumVoteThreshold": 0,
     "batchElimination": false,
     "continueUntilTwoCandidatesRemain": false,
