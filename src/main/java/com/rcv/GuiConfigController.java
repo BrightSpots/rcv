@@ -156,7 +156,7 @@ public class GuiConfigController implements Initializable {
 
   public void buttonNewConfigClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Creating new contest.");
+      Logger.log(Level.INFO, "Creating new config.");
       GuiContext.getInstance().setConfig(null);
       selectedFile = null;
       clearConfig();
@@ -417,7 +417,7 @@ public class GuiConfigController implements Initializable {
   }
 
   private void setDefaultValues() {
-    labelCurrentlyLoaded.setText("Currently loaded: <New Contest>");
+    labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.DEFAULT_TABULATE_BY_PRECINCT);
     checkBoxBatchElimination.setSelected(ContestConfig.DEFAULT_BATCH_ELIMINATION);
@@ -537,7 +537,7 @@ public class GuiConfigController implements Initializable {
       Alert alert =
           new Alert(
               AlertType.WARNING,
-              "You must either save your changes before continuing or load a new contest!",
+              "You must either save your changes before continuing or load a new config!",
               saveButton,
               ButtonType.CANCEL);
       alert.setHeaderText(null);

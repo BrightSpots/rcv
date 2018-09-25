@@ -43,7 +43,7 @@ class GuiContext {
   }
 
   Stage getMainWindow() {
-    return this.mainWindow;
+    return mainWindow;
   }
 
   void setMainWindow(Stage mainWindow) {
