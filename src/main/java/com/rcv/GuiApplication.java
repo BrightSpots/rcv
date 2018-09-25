@@ -17,10 +17,13 @@
 package com.rcv;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class GuiApplication extends Application {
 
@@ -29,6 +32,13 @@ public class GuiApplication extends Application {
     Parent root = FXMLLoader.load(getClass().getResource("/GuiConfigLayout.fxml"));
     window.setTitle("Universal RCV Tabulator");
     window.setScene(new Scene(root));
+    // cache main window so we can parent file choosers to it
+    GuiContext context = GuiContext.getInstance();
+    context.setMainWindow(window);
+    // workaround for https://bugs.openjdk.java.net/browse/JDK-8088859
+    EventHandler<WindowEvent> onCloseHandler = event -> Platform.exit();
+    window.setOnCloseRequest(onCloseHandler);
     window.show();
   }
+
 }

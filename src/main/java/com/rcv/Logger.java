@@ -55,15 +55,16 @@ class Logger {
   // execution log file name (%g tracks count of log file if additional versions are created)
   private static final String EXECUTION_LOG_FILE_NAME = "rcv_%g.log";
   // first value here is bytes per MB and the second is max MB for each execution log file
-  private static final Integer EXECUTION_LOG_FILE_MAX_SIZE_BYTES = 1000000 * 50;
+  private static final Integer LOG_FILE_MAX_SIZE_BYTES = 1000000 * 50;
   // how many execution files to keep
   private static final Integer EXECUTION_LOG_FILE_COUNT = 2;
+  // how many tabulation files to keep
+  // this will effectively keep ALL output from any tabulation
+  private static final Integer TABULATION_LOG_FILE_COUNT = 1000;
   // cache for logger
   private static java.util.logging.Logger logger;
   // cache for tabulation handler
   private static java.util.logging.FileHandler tabulationHandler;
-  // cache for gui handler
-  private static java.util.logging.Handler guiHandler;
   // cache for custom formatter
   private static final java.util.logging.Formatter formatter = new LogFormatter();
 
@@ -82,16 +83,15 @@ class Logger {
         EXECUTION_LOG_FILE_NAME).toAbsolutePath();
 
     // executionHandler writes to the execution log file
-    FileHandler executionHandler =
-        new FileHandler(logPath.toString(),
-            EXECUTION_LOG_FILE_MAX_SIZE_BYTES,
-            EXECUTION_LOG_FILE_COUNT,
-            true);
+    FileHandler executionHandler = new FileHandler(logPath.toString(),
+        LOG_FILE_MAX_SIZE_BYTES,
+        EXECUTION_LOG_FILE_COUNT,
+        true);
     executionHandler.setLevel(Level.INFO);
     logger.addHandler(executionHandler);
 
     // use our custom formatter for all installed handlers
-    for(Handler handler : logger.getHandlers()) {
+    for (Handler handler : logger.getHandlers()) {
       handler.setFormatter(formatter);
     }
 
@@ -107,7 +107,10 @@ class Logger {
   static void addTabulationFileLogging(String outputPath) throws IOException {
     // create file handler at FINE level (we have detailed audit logging we want to capture)
     // and use our custom formatter
-    tabulationHandler = new FileHandler(outputPath);
+    tabulationHandler = new FileHandler(outputPath,
+        LOG_FILE_MAX_SIZE_BYTES,
+        TABULATION_LOG_FILE_COUNT,
+        true);
     tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
     logger.addHandler(tabulationHandler);
@@ -128,8 +131,8 @@ class Logger {
 
   // add logging to the provided text area for display to user in the GUI
   static void addGuiLogging(TextArea textArea) {
-    // custom handler overrides publish to post text to the GUI
-    guiHandler = new Handler() {
+    // custom handler logs text to the GUI
+    java.util.logging.Handler guiHandler = new Handler() {
       @Override
       public void publish(LogRecord record) {
         if (!isLoggable(record)) {
@@ -146,10 +149,12 @@ class Logger {
           Platform.runLater(() -> textArea.appendText(msg));
         }
       }
+
       // nothing to do here
       @Override
       public void flush() {
       }
+
       // nothing to do here
       @Override
       public void close() {
