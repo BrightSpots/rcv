@@ -201,7 +201,9 @@ class Tabulator {
         }
       }
 
-      updatePastWinnerTallies();
+      if (config.getNumberOfWinners() > 1) {
+        updatePastWinnerTallies();
+      }
     }
 
     Logger.log(Level.INFO, "Tabulation completed.");
