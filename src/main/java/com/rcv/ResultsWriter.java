@@ -21,9 +21,10 @@
 
 package com.rcv;
 
-import java.io.FileOutputStream;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,9 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
 
 class ResultsWriter {
 
@@ -109,9 +110,10 @@ class ResultsWriter {
   // function: generateOverallSummarySpreadsheet
   // purpose: creates a summary spreadsheet for the full contest
   // param: roundTallies is the round-by-round count of votes per candidate
-  void generateOverallSummarySpreadsheet(Map<Integer, Map<String, BigDecimal>> roundTallies) {
+  void generateOverallSummarySpreadsheet(Map<Integer, Map<String, BigDecimal>> roundTallies)
+      throws IOException {
     // filename for output
-    String outputFileName = String.format("%s_summary.xlsx", this.timestampString);
+    String outputFileName = String.format("%s_summary.csv", this.timestampString);
     // full path for output
     String outputPath =
         Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
@@ -123,7 +125,7 @@ class ResultsWriter {
   // purpose: creates a summary spreadsheet for the votes in a particular precinct
   // param: roundTallies is map from precinct to the round-by-round vote count in the precinct
   void generatePrecinctSummarySpreadsheets(
-      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies) {
+      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies) throws IOException {
     Set<String> filenames = new HashSet<>();
     for (String precinct : precinctRoundTallies.keySet()) {
       // precinctFileString is a unique filesystem-safe string which can be used for creating
@@ -131,7 +133,7 @@ class ResultsWriter {
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       // filename for output
       String outputFileName =
-          String.format("%s_%s_precinct_summary.xlsx", this.timestampString, precinctFileString);
+          String.format("%s_%s_precinct_summary.csv", this.timestampString, precinctFileString);
       // full path for output
       String outputPath =
           Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
@@ -146,7 +148,8 @@ class ResultsWriter {
   // param: outputPath is the full path of the file to save
   // file access: write / create
   private void generateSummarySpreadsheet(
-      Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath) {
+      Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
+      throws IOException {
     Logger.log(Level.INFO, "Generating summary spreadsheet: %s", outputPath);
 
     // Get all candidates sorted by their first round tally. This determines the display order.
@@ -172,34 +175,35 @@ class ResultsWriter {
       totalActiveVotesPerRound.put(round, total);
     }
 
-    // create the output workbook
-    XSSFWorkbook workbook = new XSSFWorkbook();
-    // create the output worksheet
-    XSSFSheet worksheet = workbook.createSheet("Results");
-    // set column widths for better readability
-    worksheet.setDefaultColumnWidth(20);
+    // csvPrinter will be used to write output to csv file
+    CSVPrinter csvPrinter;
+    try {
+      BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputPath));
+      csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
+    } catch (IOException exception) {
+      Logger.log(Level.SEVERE, "Error creating csv file: %s\n%s", outputPath, exception.toString());
+      throw exception;
+    }
 
     // rowCounter contains the next empty row after all the general header rows have been created.
     // This is where we start adding round-by-round reports. For precinct sheets, there are no
     // general header rows, so we just start with the round-by-round reports.
-    int rowCounter = precinct != null && !precinct.isEmpty() ? 0 : addHeaderRows(worksheet);
+    addHeaderRows(csvPrinter, precinct);
 
-    // Round headers:
-    // firstHeaderRow is the row for round headers
-    org.apache.poi.ss.usermodel.Row firstHeaderRow = worksheet.createRow(rowCounter++);
-
+    // add a row header for the round column labels
+    csvPrinter.print("rounds");
     // round indexes over all rounds plus final results round
     for (int round = 1; round <= numRounds + 1; round++) {
       // label string will have the actual text which goes in the cell
       String label = String.format("Round %d", round);
       // cell for round label
-      Cell roundLabelCell = firstHeaderRow.createCell(round);
-      roundLabelCell.setCellValue(label);
+      csvPrinter.print(label);
     }
+    csvPrinter.println();
 
     // actions don't make sense in individual precinct results
     if (precinct == null || precinct.isEmpty()) {
-      rowCounter = addActionRows(worksheet, rowCounter);
+      addActionRows(csvPrinter);
     }
 
     final BigDecimal totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
@@ -211,12 +215,10 @@ class ResultsWriter {
     for (String candidate : sortedCandidates) {
       // show each candidate row with their totals for each round
       // row for the current candidate
-      org.apache.poi.ss.usermodel.Row candidateRow = worksheet.createRow(rowCounter++);
-      // header cell for the candidate
-      Cell rowHeaderCell = candidateRow.createCell(0);
       // text for the candidate name
       String candidateDisplayName = this.config.getNameForCandidateID(candidate);
-      rowHeaderCell.setCellValue(candidateDisplayName);
+      csvPrinter.print(candidateDisplayName);
+
       // displayRound indexes over all rounds plus final results round
       for (int displayRound = 1; displayRound <= numRounds + 1; displayRound++) {
         // flag for the last round results which are special-cased
@@ -231,16 +233,16 @@ class ResultsWriter {
           thisRoundTally = BigDecimal.ZERO;
         }
         // total votes cell
-        Cell totalVotesCell = candidateRow.createCell(displayRound);
-        totalVotesCell.setCellValue(thisRoundTally.toString());
+        csvPrinter.print(thisRoundTally.toString());
       }
+      // advance to next line
+      csvPrinter.println();
     }
 
     // row for the exhausted CVR counts
-    org.apache.poi.ss.usermodel.Row exhaustedCVRRow = worksheet.createRow(rowCounter++);
     // exhausted CVR header cell
-    Cell exhaustedRowHeaderCell = exhaustedCVRRow.createCell(0);
-    exhaustedRowHeaderCell.setCellValue("Exhausted ballots");
+    csvPrinter.print("Exhausted ballots");
+
     // displayRound indexes through all rounds plus final results round
     for (int displayRound = 1; displayRound <= numRounds + 1; displayRound++) {
       // flag for final round special cases
@@ -257,112 +259,88 @@ class ResultsWriter {
             totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(dataUseRound));
       }
       // total votes cell
-      Cell totalVotesCell = exhaustedCVRRow.createCell(displayRound);
-      totalVotesCell.setCellValue(thisRoundExhausted.toString());
+      csvPrinter.print(thisRoundExhausted.toString());
     }
+    csvPrinter.println();
 
     // write xls to disk
     try {
       // output stream is used to write data to disk
-      FileOutputStream outputStream = new FileOutputStream(outputPath);
-      workbook.write(outputStream);
-      outputStream.close();
+      csvPrinter.flush();
+      csvPrinter.close();
     } catch (IOException exception) {
       Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
+      throw exception;
     }
   }
 
-  private int addActionRows(XSSFSheet worksheet, int rowCounter) {
+  private void addActionRows(CSVPrinter csvPrinter) throws IOException {
     // "action" row describes whether elimination(s) happened or winner(s) were selected
     // we will fill in the action cells while we iterate through
     // the candidate eliminations row since the indexing logic is identical
 
     // eliminationsRow will contain the eliminated candidate names
-    org.apache.poi.ss.usermodel.Row eliminationsRow = worksheet.createRow(rowCounter++);
-    eliminationsRow.createCell(0).setCellValue("Defeated");
-
-    // Winner -- display is shifted to subsequent round for display
-    // electedRow will contain the winning candidate(s) name
-    org.apache.poi.ss.usermodel.Row winnersRow = worksheet.createRow(rowCounter++);
-    winnersRow.createCell(0).setCellValue("Elected");
+    csvPrinter.print("Defeated");
+    // insert an extra blank column to account for the row header
+    csvPrinter.print("");
 
     for (int round = 1; round <= numRounds; round++) {
       // list of all candidates eliminated in this round
       List<String> eliminated = roundToEliminatedCandidates.get(round);
-      List<String> winners = roundToWinningCandidates.get(round);
-      // note we shift the eliminated candidate(s) display and action into the subsequent column
       if (eliminated != null && eliminated.size() > 0) {
-        // we should never have both winners and losers in the same round
-        assert !(winners != null && winners.size() > 0);
-
-        addActionRowCandidates(round, eliminationsRow, eliminated);
-      } else if (winners != null && winners.size() > 0) {
-        addActionRowCandidates(round, winnersRow, winners);
+        addActionRowCandidates(eliminated, csvPrinter);
+      } else {
+        csvPrinter.print("");
       }
     }
+    csvPrinter.println();
 
-    return rowCounter;
+    // Winner -- display is shifted to subsequent round for display
+    csvPrinter.print("Elected");
+    // insert an extra blank column to account for the row header
+    csvPrinter.print("");
+
+    for (int round = 1; round <= numRounds; round++) {
+      // list of all candidates eliminated in this round
+      List<String> winners = roundToWinningCandidates.get(round);
+      // note we shift the eliminated candidate(s) display and action into the subsequent column
+      if (winners != null && winners.size() > 0) {
+        addActionRowCandidates(winners, csvPrinter);
+      } else {
+        csvPrinter.print("");
+      }
+    }
+    csvPrinter.println();
   }
 
-  private void addActionRowCandidates(
-      int round,
-      org.apache.poi.ss.usermodel.Row candidateRow,
-      List<String> candidates)
-  {
+  private void addActionRowCandidates(List<String> candidates,
+      CSVPrinter csvPrinter)
+      throws IOException {
     List<String> candidateDisplayNames = new ArrayList<>();
+    // build list of display names
     for(String candidate : candidates) {
       candidateDisplayNames.add(config.getNameForCandidateID(candidate));
     }
-
+    // concatenate them using semi-colon for display in a single cell
     String candidateCellText = String.join("; ", candidateDisplayNames);
-
-    // add 1 to account for the row header cell
-    int columnIndex = (round) + 1;
-    Cell candidateCell = candidateRow.createCell(columnIndex);
-    candidateCell.setCellValue(candidateCellText);
+    // print the candidate name list
+    csvPrinter.print(candidateCellText);
   }
 
   // function: addHeaderRows
-  // purpose: add header rows and cell to the top of the visualizer spreadsheet
+  // purpose: add arbitrary header rows and cell to the top of the visualizer spreadsheet
   // param: worksheet to which we will be adding rows and cells
   // param: totalActiveVotesPerRound map of round to votes active in that round
   // returns: the next (empty) row index
-  private int addHeaderRows(XSSFSheet worksheet) {
-
-    // literal array to structure output cell text data
-    // first cell is header text
-    // second cell contains a value or null
-    // third cell is true if second cell is numeric data, false if string
-    Object[][] fields = {
-      {"Contest", config.getContestName(), OutputType.STRING},
-      {"Jurisdiction", config.getContestJurisdiction(), OutputType.STRING},
-      {"Office", config.getContestOffice(), OutputType.STRING},
-      {"Date", config.getContestDate(), OutputType.STRING},
-      {null, null, OutputType.STRING},
-    };
-    // count the row we create so we can return the next empty row
-    int rowCounter = 0;
-    // index over all fields in the row structure
-    for (Object[] rowFields : fields) {
-      // row for the next row
-      org.apache.poi.ss.usermodel.Row row = worksheet.createRow(rowCounter++);
-      // create a cell if any text in the first element
-      if (rowFields[0] != null) {
-        row.createCell(0).setCellValue((String) rowFields[0]);
-      }
-      // if second element is non-null create a cell for it
-      if (rowFields[1] != null) {
-        if (rowFields[2] == OutputType.INT) {
-          row.createCell(1).setCellValue((int) rowFields[1]);
-        } else if (rowFields[2] == OutputType.FLOAT) {
-          row.createCell(1).setCellValue((Float) rowFields[1]);
-        } else {
-          row.createCell(1).setCellValue((String) rowFields[1]);
-        }
-      }
+  private void addHeaderRows(CSVPrinter csvPrinter, String precinct) throws IOException {
+    csvPrinter.printRecord("Contest", config.getContestName());
+    csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
+    csvPrinter.printRecord("Office", config.getContestOffice());
+    csvPrinter.printRecord("Date", config.getContestDate());
+    if (precinct != null && !precinct.isEmpty()) {
+      csvPrinter.printRecord("Precinct", precinct);
     }
-
-    return rowCounter;
+    csvPrinter.println();
   }
 
   // function: sortCandidatesByTally

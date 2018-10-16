@@ -22,6 +22,7 @@
 package com.rcv;
 
 import com.rcv.CastVoteRecord.VoteOutcomeType;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
@@ -544,7 +545,7 @@ class Tabulator {
   // purpose: create a ResultsWriter object with the tabulation results data and use it
   // to generate the results spreadsheets
   // param: timestamp string to use when creating output filenames
-  void generateSummarySpreadsheet(String timestamp) {
+  void generateSummarySpreadsheet(String timestamp) throws IOException {
     // writer object will create the output xls
     ResultsWriter writer =
         new ResultsWriter()
