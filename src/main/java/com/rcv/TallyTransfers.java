@@ -13,16 +13,29 @@ class TallyTransfers {
   // For each target candidate the map value is total vote values received from that source.
   // For round 1 source candidate is always null since the votes had no prior recipient.
   // Exhausted votes have null as the target.
-  private final Map<Integer, Map<String, Map<String, BigDecimal>>> mTransfers = new HashMap<>();
+  public final Map<Integer, Map<String, Map<String, BigDecimal>>> tallyTransfers = new HashMap<>();
+
+
+  Map<String, Map<String, BigDecimal>> getTransfersForRound(Integer round) {
+    return tallyTransfers.get(round);
+  }
 
   // add vote transfer value for given round
   void addTransfer(Integer round,
       String sourceCandidate,
       String targetCandidate,
       BigDecimal value) {
+	// null source means we are transferring the initial count
+    if(sourceCandidate == null) {
+      sourceCandidate = "uncounted";
+    }
+    // null target means exhausted
+    if(targetCandidate == null) {
+      targetCandidate = "exhausted";
+    }
 
     // lookup or create transfer entries for specified round
-    Map<String, Map<String, BigDecimal>> roundEntries = mTransfers
+    Map<String, Map<String, BigDecimal>> roundEntries = tallyTransfers
         .computeIfAbsent(round, k -> new HashMap<>());
     // lookup or create map for the source candidate
     Map<String, BigDecimal> candidateEntries = roundEntries

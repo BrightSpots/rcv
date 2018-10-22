@@ -136,7 +136,7 @@ class Tabulator {
       // Conversely, the currentRoundCandidateToTally object returned here will contain fewer
       // entries, each of which will have as many or more votes than they did in prior rounds.
       // Eventually the winner(s) will be chosen.
-      Map<String, BigDecimal> currentRoundCandidateToTally = getTallyForRound(currentRound);
+      Map<String, BigDecimal> currentRoundCandidateToTally = computeTallyForRound(currentRound);
       roundTallies.put(currentRound, currentRoundCandidateToTally);
 
       // The winning threshold in a multi-seat contest is based on the number of active votes in the
@@ -556,7 +556,8 @@ class Tabulator {
             .setCandidatesToRoundEliminated(candidateToRoundEliminated)
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
-            .setTimestampString(timestamp);
+            .setTimestampString(timestamp)
+            .setTallyTransfers(tallyTransfers);
 
     writer.generateOverallSummarySpreadsheet(roundTallies);
 
@@ -707,17 +708,14 @@ class Tabulator {
 
   }
 
-  // function: getTallyForRound
-  // purpose: return a map of candidate ID to vote tallies for this round
-  //   generated based on previously eliminated candidateIDs contained in
-  //   candidateToRoundEliminated object.
-  //   After each call the candidateToRoundEliminated object will get
-  //   more entries as candidateIDs are eliminated.
-  //   Conversely the roundTally object returned here will contain fewer entries each
-  //   of which will have more votes.
+  // function: computeTallyForRound
+  // purpose: perform tabulation on all cvrs to determine who they should count for in this round
+  //  - exhaust cvrs if they should be exhausted for various reasons
+  //  - assign cvrs to continuing candidates if they have been transferred or in the initial count
+  // returns a map of candidate ID to vote tallies for this round
   // param: the current round
   // return: map of candidateID to vote tallies for this round
-  private Map<String, BigDecimal> getTallyForRound(int currentRound) {
+  private Map<String, BigDecimal> computeTallyForRound(int currentRound) {
     // map of candidateID to vote tally to store the results
     Map<String, BigDecimal> roundTally = getNewTally();
 

@@ -21,7 +21,11 @@
 
 package com.rcv;
 
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -50,6 +54,16 @@ class ResultsWriter {
   private ContestConfig config;
   // timestampString string to use when generating output file names
   private String timestampString;
+  // TallyTransfer object contains totals votes transferred each round
+  private TallyTransfers tallyTransfers;
+
+  // function: setTallyTransfers
+  // purpose: setter for tally transfer object used when generating json summary output
+  // param: TallyTransfer object
+  ResultsWriter setTallyTransfers(TallyTransfers tallyTransfers) {
+    this.tallyTransfers = tallyTransfers;
+    return this;
+  }
 
   // function: setNumRounds
   // purpose: setter for total number of rounds
@@ -113,12 +127,15 @@ class ResultsWriter {
   void generateOverallSummarySpreadsheet(Map<Integer, Map<String, BigDecimal>> roundTallies)
       throws IOException {
     // filename for output
-    String outputFileName = String.format("%s_summary.csv", this.timestampString);
+    String outputFileName = String.format("%s_summary", this.timestampString);
     // full path for output
     String outputPath =
         Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
     // generate the spreadsheet
     generateSummarySpreadsheet(roundTallies, null, outputPath);
+
+    // generate json output
+    generateSummaryJson(outputPath, roundTallies);
   }
 
   // function: generatePrecinctSummarySpreadsheet
@@ -133,7 +150,7 @@ class ResultsWriter {
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       // filename for output
       String outputFileName =
-          String.format("%s_%s_precinct_summary.csv", this.timestampString, precinctFileString);
+          String.format("%s_%s_precinct_summary", this.timestampString, precinctFileString);
       // full path for output
       String outputPath =
           Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
@@ -150,7 +167,8 @@ class ResultsWriter {
   private void generateSummarySpreadsheet(
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
       throws IOException {
-    Logger.log(Level.INFO, "Generating summary spreadsheet: %s", outputPath);
+    String csvPath = outputPath+".csv";
+    Logger.log(Level.INFO, "Generating summary spreadsheets: %s", csvPath);
 
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
@@ -178,12 +196,13 @@ class ResultsWriter {
     // csvPrinter will be used to write output to csv file
     CSVPrinter csvPrinter;
     try {
-      BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputPath));
+      BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error creating csv file: %s\n%s", outputPath, exception.toString());
+      Logger.log(Level.SEVERE, "Error creating csv file: %s\n%s", csvPath, exception.toString());
       throw exception;
     }
+
 
     // rowCounter contains the next empty row after all the general header rows have been created.
     // This is where we start adding round-by-round reports. For precinct sheets, there are no
@@ -331,7 +350,6 @@ class ResultsWriter {
   // purpose: add arbitrary header rows and cell to the top of the visualizer spreadsheet
   // param: worksheet to which we will be adding rows and cells
   // param: totalActiveVotesPerRound map of round to votes active in that round
-  // returns: the next (empty) row index
   private void addHeaderRows(CSVPrinter csvPrinter, String precinct) throws IOException {
     csvPrinter.printRecord("Contest", config.getContestName());
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
@@ -397,9 +415,98 @@ class ResultsWriter {
     return filename;
   }
 
-  private enum OutputType {
-    STRING,
-    INT,
-    FLOAT,
+  // function: generateSummaryJson
+  // purpose: create summary json data for use in visualizer, unit tests and other tools
+  // param: outputPath where to write json file
+  // param: roundTallies all tally information
+  void generateSummaryJson(String outputPath, Map<Integer, Map<String, BigDecimal>> roundTallies)
+      throws IOException {
+    // mapper converts java objects to json
+    ObjectMapper mapper = new ObjectMapper();
+    // jsonWriter writes those object to disk
+    ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
+    // jsonPath for output json summary
+    String jsonPath = outputPath+".json";
+    // log output location
+    Logger.log(Level.INFO, "Generating summary json: %s", jsonPath);
+    // outFile is the target file
+    File outFile = new File(jsonPath);
+
+    // root object dict will have two entries:
+    // results - vote totals, transfers, and candidates elected / defeated
+    // TODO: add needed config info
+    // config - global config into
+    HashMap<String, Object> outputJson = new HashMap<>();
+    // results will be a list of round data objects
+    ArrayList<Object> results = new ArrayList<>();
+    // for each round create objects for json serialization
+    for(Integer round = 1; round <= numRounds; round++) {
+      // actions is a list of one or more action objects
+      ArrayList<Object> actions = new ArrayList<>();
+      // add any winning actions
+      addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);
+      // add any defeated actions
+      addActionObjects("defeated", roundToEliminatedCandidates.get(round), round, actions);
+
+      // container for all json data this round:
+      HashMap<String, Object> roundData = new HashMap<>();
+      // add round number (this is implied by the ordering but for debugging we are explicit)
+      roundData.put("round",round);
+      // add actions
+      roundData.put("actions", actions);
+      // add tally
+      roundData.put("tallies", roundTallies.get(round));
+      // add roundData to results list
+      results.add(roundData);
+    }
+    // add results to root object
+    outputJson.put("results", results);
+
+    // write results to disk
+    try {
+      jsonWriter.writeValue(outFile, outputJson);
+    } catch (IOException exception) {
+      Logger.log(Level.SEVERE, "Error writing to json file:%s\n%s", jsonPath, exception.toString());
+      throw exception;
+    }
   }
+
+  // adds action objects to input action list representing all actions applied this round
+  // each action will have a type followed by a list of 0 or more vote transfers
+  // (sometimes there is no vote transfer if a candidate had no votes to transfer)
+  private void addActionObjects(String actionType,
+      List<String> candidates,
+      Integer round,
+      ArrayList<Object> actions) {
+
+    // check for valid candidates:
+    // "drop undeclared write-in" may result in no one actually being eliminated
+    if (candidates != null && candidates.size() > 0) {
+
+      // transfers contains all vote transfers for this round
+      // we add one to the round since transfers are currently stored under the round AFTER
+      // the tallies which triggered them
+      Map<String, Map<String, BigDecimal>> roundTransfers =
+          this.tallyTransfers.getTransfersForRound(round+1);
+
+      // candidate iterates over all candidates who had this action applied to them
+      for(String candidate : candidates) {
+        // for each candidate create an action object
+        HashMap<String, Object> action = new HashMap<>();
+        // add the specified action type
+        action.put(actionType, config.getNameForCandidateID(candidate));
+        // check if there are any transfers
+        if(roundTransfers != null) {
+          Map<String, BigDecimal> transfersFromCandidate = roundTransfers.get(candidate);
+          if(transfersFromCandidate != null) {
+            // add transfers
+            action.put("transfers", transfersFromCandidate);
+          }
+        }
+        // add the action object to list
+        actions.add(action);
+      }
+    }
+  }
+
 }
