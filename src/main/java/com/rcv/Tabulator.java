@@ -136,7 +136,7 @@ class Tabulator {
       // Conversely, the currentRoundCandidateToTally object returned here will contain fewer
       // entries, each of which will have as many or more votes than they did in prior rounds.
       // Eventually the winner(s) will be chosen.
-      Map<String, BigDecimal> currentRoundCandidateToTally = computeTallyForRound(currentRound);
+      Map<String, BigDecimal> currentRoundCandidateToTally = computeTalliesForRound(currentRound);
       roundTallies.put(currentRound, currentRoundCandidateToTally);
 
       // The winning threshold in a multi-seat contest is based on the number of active votes in the
@@ -672,28 +672,15 @@ class Tabulator {
     return decision;
   }
 
-  // function: exhaustCastVoteRecord
-  // purpose:
-  //  exhausts the cvr
-  //  logs the results to audit log
-  //  update tallyTransfers counts
-  private void exhaustCastVoteRecord(CastVoteRecord cvr, int currentRound, String reason) {
-    tallyTransfers.addTransfer(currentRound,
-        cvr.getCurrentRecipientOfVote(),
-        null,
-        cvr.getFractionalTransferValue());
-    cvr.exhaust();
-    cvr.setCurrentRecipientOfVote(null);
-    cvr.logRoundOutcome(currentRound, VoteOutcomeType.EXHAUSTED, reason, null);
-  }
-
-  // function: recordCandidateSelectionForRound
+  // function: recordSelectionForCastVoteRecord
   // purpose:
   //  set new recipient of cvr
   //  logs the results to audit log
   //  update tallyTransfers counts
-  private void recordCandidateSelectionForRound(CastVoteRecord cvr, int currentRound,
-      String selectedCandidate) {
+  private void recordSelectionForCastVoteRecord(CastVoteRecord cvr,
+      int currentRound,
+      String selectedCandidate,
+      String outcomeDescription) {
     // update transfer counts
     tallyTransfers.addTransfer(currentRound,
         cvr.getCurrentRecipientOfVote(),
@@ -702,20 +689,23 @@ class Tabulator {
     // update cvr recipient
     cvr.setCurrentRecipientOfVote(selectedCandidate);
 
+    VoteOutcomeType outcomeType = (selectedCandidate == null) ?
+        VoteOutcomeType.EXHAUSTED :
+        VoteOutcomeType.COUNTED;
     // log the vote transfer
     cvr.logRoundOutcome(
-        currentRound, VoteOutcomeType.COUNTED, selectedCandidate, cvr.getFractionalTransferValue());
+        currentRound, outcomeType, outcomeDescription, cvr.getFractionalTransferValue());
 
   }
 
-  // function: computeTallyForRound
+  // function: computeTalliesForRound
   // purpose: perform tabulation on all cvrs to determine who they should count for in this round
   //  - exhaust cvrs if they should be exhausted for various reasons
   //  - assign cvrs to continuing candidates if they have been transferred or in the initial count
   // returns a map of candidate ID to vote tallies for this round
   // param: the current round
   // return: map of candidateID to vote tallies for this round
-  private Map<String, BigDecimal> computeTallyForRound(int currentRound) {
+  private Map<String, BigDecimal> computeTalliesForRound(int currentRound) {
     // map of candidateID to vote tally to store the results
     Map<String, BigDecimal> roundTally = getNewTally();
 
@@ -776,7 +766,7 @@ class Tabulator {
         // check for undervote exhaustion from too many consecutive skipped ranks
         if (config.getMaxSkippedRanksAllowed() != null
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
-          exhaustCastVoteRecord(cvr, currentRound, "undervote");
+          recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
           break;
         }
         lastRankSeen = rank;
@@ -799,7 +789,7 @@ class Tabulator {
           }
           // if duplicate was found, exhaust cvr
           if (duplicateCandidate != null && !duplicateCandidate.isEmpty()) {
-            exhaustCastVoteRecord(cvr, currentRound, "duplicate candidate: " + duplicateCandidate);
+            recordSelectionForCastVoteRecord(cvr, currentRound, null,  "duplicate candidate: " + duplicateCandidate);
             break;
           }
         }
@@ -808,7 +798,7 @@ class Tabulator {
         // overvoteDecision is the overvote decision for this ranking
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidateSet);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          exhaustCastVoteRecord(cvr, currentRound, "overvote");
+          recordSelectionForCastVoteRecord(cvr, currentRound, null, "overvote");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           continue;
@@ -834,7 +824,7 @@ class Tabulator {
           selectedCandidate = candidate;
 
           // transfer cvr to selected candidate
-          recordCandidateSelectionForRound(cvr, currentRound, selectedCandidate);
+          recordSelectionForCastVoteRecord(cvr, currentRound, selectedCandidate, selectedCandidate);
 
           // If enabled, this will also update the roundTallyByPrecinct
           incrementTallies(
@@ -855,9 +845,9 @@ class Tabulator {
         if (rank == cvr.rankToCandidateIDs.lastKey()) {
           if (config.getMaxSkippedRanksAllowed() != null
               && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
-            exhaustCastVoteRecord(cvr, currentRound, "undervote");
+            recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
           } else {
-            exhaustCastVoteRecord(cvr, currentRound, "no continuing candidates");
+            recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
           }
         }
 
