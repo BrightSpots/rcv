@@ -135,6 +135,8 @@ class CastVoteRecord {
 
   // function: getFractionalTransferValue
   // purpose: getter for fractionalTransferValue
+  // the FTV for this cast vote record (by default the FTV is exactly one vote, but it
+  // could be less in a multi-winner contest if this CVR already helped elect a winner.)
   // returns: value of field
   BigDecimal getFractionalTransferValue() {
     // remainingValue starts at one, and we subtract all the parts that are already allocated

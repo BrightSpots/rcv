@@ -756,19 +756,19 @@ class Tabulator {
 
       // iterate through the rankings in this cvr from most to least preferred.
       // for each ranking:
-      //  if it results in an overvote or undervote exhaust the cvr
+      //  if it results in an overvote or undervote, exhaust the cvr
       //  if a selected candidate is continuing, count cvr for that candidate
-      //  if no selected continuing candidate, look at the next ranking
+      //  if no selected candidate is continuing, look at the next ranking
       //  if there are no more rankings, exhaust the cvr
 
       // lastRankSeen tracks the last rank in the current rankings set
       // This is used to determine how many skipped rankings occurred for undervotes.
       int lastRankSeen = 0;
-      // candidatesSeen is the set of candidates we've encountered while processing this CVR
-      // in this round; only relevant if exhaustOnDuplicateCandidate is enabled
+      // candidatesSeen is set of candidates encountered while processing this CVR in this round
+      // used to detect duplicate candidates if exhaustOnDuplicateCandidate is enabled
       Set<String> candidatesSeen = new HashSet<>();
 
-      // selectedCandidate will hold the new candidate selection if there is one
+      // selectedCandidate holds the new candidate selection if there is one
       String selectedCandidate = null;
 
       // rank iterates over all ranks in this cvr from most preferred to least
@@ -782,7 +782,7 @@ class Tabulator {
         lastRankSeen = rank;
 
         // candidateSet contains all candidates selected at the current rank
-        // (some ballots support multiple candidate selections at a single rank)
+        // some ballots support multiple candidates selected at a single rank
         Set<String> candidateSet = cvr.rankToCandidateIDs.get(rank);
 
         // check for a duplicate candidate if enabled
@@ -797,7 +797,7 @@ class Tabulator {
             }
             candidatesSeen.add(candidate);
           }
-          // if duplicate was found, exhaust cvr and exit the rankings loop
+          // if duplicate was found, exhaust cvr
           if (duplicateCandidate != null && !duplicateCandidate.isEmpty()) {
             exhaustCastVoteRecord(cvr, currentRound, "duplicate candidate: " + duplicateCandidate);
             break;
@@ -814,16 +814,19 @@ class Tabulator {
           continue;
         }
 
-        // current ranking is not an overvote or undervote
-        // see if a ranked candidate is continuing
+        // the current ranking is not an overvote or undervote
+        // see if any ranked candidates are continuing
+
         // candidateID indexes through all candidates selected at this rank
         for (String candidate : candidateSet) {
           if (!isCandidateContinuing(candidate)) {
             continue;
           }
+
           // TODO: it's weird to have this check here
-          // handle testing elsewhere, remove this assert, and add break statement
+          // handle testing in unit tests, remove this assert, and add break statement
           // at end of this for loop
+
           // If this fails, it means the code failed to handle an overvote with multiple
           // continuing candidates.
           assert selectedCandidate == null;
@@ -833,14 +836,10 @@ class Tabulator {
           // transfer cvr to selected candidate
           recordCandidateSelectionForRound(cvr, currentRound, selectedCandidate);
 
-          // the FTV for this cast vote record (by default the FTV is exactly one vote, but it
-          // could be less in a multi-winner contest if this CVR already helped elect a winner.)
-          BigDecimal fractionalTransferValue = cvr.getFractionalTransferValue();
-          // Increment round tally for this candidate by the fractional transfer value of the CVR
           // If enabled, this will also update the roundTallyByPrecinct
           incrementTallies(
               roundTally,
-              fractionalTransferValue,
+              cvr.getFractionalTransferValue(),
               selectedCandidate,
               roundTallyByPrecinct,
               cvr.getPrecinct());
@@ -851,9 +850,9 @@ class Tabulator {
           break;
         }
 
-        // if this is the last ranking we are all out of rankings and must exhaust this cvr
+        // if this is the last ranking we are out of rankings and must exhaust this cvr
+        // determine if the reason is skipping too many ranks, or no continuing candidates
         if (rank == cvr.rankToCandidateIDs.lastKey()) {
-          // determine if the reason is skipping too many ranks or no continuing candidates
           if (config.getMaxSkippedRanksAllowed() != null
               && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
             exhaustCastVoteRecord(cvr, currentRound, "undervote");
