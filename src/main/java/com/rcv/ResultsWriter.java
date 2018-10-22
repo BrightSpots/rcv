@@ -203,16 +203,13 @@ class ResultsWriter {
       throw exception;
     }
 
-
-    // rowCounter contains the next empty row after all the general header rows have been created.
-    // This is where we start adding round-by-round reports. For precinct sheets, there are no
-    // general header rows, so we just start with the round-by-round reports.
+    // print contest info
     addHeaderRows(csvPrinter, precinct);
 
     // add a row header for the round column labels
     csvPrinter.print("rounds");
-    // round indexes over all rounds plus final results round
-    for (int round = 1; round <= numRounds + 1; round++) {
+    // round indexes over all rounds
+    for (int round = 1; round <= numRounds; round++) {
       // label string will have the actual text which goes in the cell
       String label = String.format("Round %d", round);
       // cell for round label
@@ -262,20 +259,16 @@ class ResultsWriter {
     // exhausted CVR header cell
     csvPrinter.print("Exhausted ballots");
 
-    // displayRound indexes through all rounds plus final results round
-    for (int displayRound = 1; displayRound <= numRounds + 1; displayRound++) {
-      // flag for final round special cases
-      boolean isFinalResults = displayRound == numRounds + 1;
-      // data to display for this round
-      int dataUseRound = isFinalResults ? numRounds : displayRound;
+    // displayRound indexes through all rounds
+    for (int displayRound = 1; displayRound <= numRounds; displayRound++) {
       // count of votes exhausted this round
       BigDecimal thisRoundExhausted = BigDecimal.ZERO;
 
-      if (dataUseRound > 1) {
+      if (displayRound > 1) {
         // Exhausted count is the difference between the total votes in round 1 and the total votes
         // in the current round.
         thisRoundExhausted =
-            totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(dataUseRound));
+            totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(displayRound));
       }
       // total votes cell
       csvPrinter.print(thisRoundExhausted.toString());
@@ -293,16 +286,11 @@ class ResultsWriter {
     }
   }
 
+  // "action" rows describe which candidates were eliminated or elected
   private void addActionRows(CSVPrinter csvPrinter) throws IOException {
-    // "action" row describes whether elimination(s) happened or winner(s) were selected
-    // we will fill in the action cells while we iterate through
-    // the candidate eliminations row since the indexing logic is identical
 
-    // eliminationsRow will contain the eliminated candidate names
-    csvPrinter.print("Defeated");
-    // insert an extra blank column to account for the row header
-    csvPrinter.print("");
-
+    // losers
+    csvPrinter.print("Eliminated");
     for (int round = 1; round <= numRounds; round++) {
       // list of all candidates eliminated in this round
       List<String> eliminated = roundToEliminatedCandidates.get(round);
@@ -314,15 +302,12 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    // Winner -- display is shifted to subsequent round for display
+    // winners
     csvPrinter.print("Elected");
-    // insert an extra blank column to account for the row header
-    csvPrinter.print("");
-
+    // for each round print any candidates who were elected
     for (int round = 1; round <= numRounds; round++) {
       // list of all candidates eliminated in this round
       List<String> winners = roundToWinningCandidates.get(round);
-      // note we shift the eliminated candidate(s) display and action into the subsequent column
       if (winners != null && winners.size() > 0) {
         addActionRowCandidates(winners, csvPrinter);
       } else {
