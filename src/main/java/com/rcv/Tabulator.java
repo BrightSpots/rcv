@@ -688,14 +688,20 @@ class Tabulator {
         cvr.getFractionalTransferValue());
     // update cvr recipient
     cvr.setCurrentRecipientOfVote(selectedCandidate);
-
+    // exhaust if needed
+    if (selectedCandidate == null) {
+      cvr.exhaust();
+    }
+    // determine outcome type
     VoteOutcomeType outcomeType = (selectedCandidate == null) ?
         VoteOutcomeType.EXHAUSTED :
         VoteOutcomeType.COUNTED;
-    // log the vote transfer
+    // log the vote outcome
     cvr.logRoundOutcome(
-        currentRound, outcomeType, outcomeDescription, cvr.getFractionalTransferValue());
-
+        currentRound,
+        outcomeType,
+        outcomeDescription,
+        cvr.getFractionalTransferValue());
   }
 
   // function: computeTalliesForRound
@@ -794,7 +800,7 @@ class Tabulator {
           }
         }
 
-        // check for other types of overvote
+        // check for an overvote
         // overvoteDecision is the overvote decision for this ranking
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidateSet);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {

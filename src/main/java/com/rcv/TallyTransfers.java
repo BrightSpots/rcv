@@ -11,9 +11,8 @@ class TallyTransfers {
   // Map of round number to vote transfers which occurred in that round
   // transfers for a round are a map of SOURCE candidate(s) to one or more TARGET candidates.
   // For each target candidate the map value is total vote values received from that source.
-  // For round 1 source candidate is always null since the votes had no prior recipient.
-  // Exhausted votes have null as the target.
-  public final Map<Integer, Map<String, Map<String, BigDecimal>>> tallyTransfers = new HashMap<>();
+  // For round 1 source candidate is marked "uncounted" since the votes had no prior recipient.
+  private final Map<Integer, Map<String, Map<String, BigDecimal>>> tallyTransfers = new HashMap<>();
 
 
   Map<String, Map<String, BigDecimal>> getTransfersForRound(Integer round) {
@@ -25,7 +24,7 @@ class TallyTransfers {
       String sourceCandidate,
       String targetCandidate,
       BigDecimal value) {
-	// null source means we are transferring the initial count
+    // null source means we are transferring the initial count
     if(sourceCandidate == null) {
       sourceCandidate = "uncounted";
     }

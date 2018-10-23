@@ -44,7 +44,7 @@ import org.apache.commons.csv.CSVPrinter;
 
 class ResultsWriter {
 
-  // number of round needed to elect winner(s)
+  // number of rounds needed to elect winner(s)
   private int numRounds;
   // map from round number to list of candidates eliminated in that round
   private Map<Integer, List<String>> roundToEliminatedCandidates;
@@ -404,7 +404,8 @@ class ResultsWriter {
   // purpose: create summary json data for use in visualizer, unit tests and other tools
   // param: outputPath where to write json file
   // param: roundTallies all tally information
-  void generateSummaryJson(String outputPath, Map<Integer, Map<String, BigDecimal>> roundTallies)
+  private void generateSummaryJson(String outputPath,
+      Map<Integer, Map<String, BigDecimal>> roundTallies)
       throws IOException {
     // mapper converts java objects to json
     ObjectMapper mapper = new ObjectMapper();
