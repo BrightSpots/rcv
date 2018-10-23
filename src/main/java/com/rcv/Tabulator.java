@@ -22,6 +22,7 @@
 package com.rcv;
 
 import com.rcv.CastVoteRecord.VoteOutcomeType;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
@@ -60,6 +61,9 @@ class Tabulator {
   private int currentRound = 0;
   // tracks required winning threshold
   private BigDecimal winningThreshold;
+  // tracks vote transfer summaries for visualizer
+  private TallyTransfers tallyTransfers = new TallyTransfers();
+
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
@@ -132,7 +136,7 @@ class Tabulator {
       // Conversely, the currentRoundCandidateToTally object returned here will contain fewer
       // entries, each of which will have as many or more votes than they did in prior rounds.
       // Eventually the winner(s) will be chosen.
-      Map<String, BigDecimal> currentRoundCandidateToTally = getTallyForRound(currentRound);
+      Map<String, BigDecimal> currentRoundCandidateToTally = computeTalliesForRound(currentRound);
       roundTallies.put(currentRound, currentRoundCandidateToTally);
 
       // The winning threshold in a multi-seat contest is based on the number of active votes in the
@@ -544,7 +548,7 @@ class Tabulator {
   // purpose: create a ResultsWriter object with the tabulation results data and use it
   // to generate the results spreadsheets
   // param: timestamp string to use when creating output filenames
-  void generateSummarySpreadsheet(String timestamp) {
+  void generateSummarySpreadsheet(String timestamp) throws IOException {
     // writer object will create the output xls
     ResultsWriter writer =
         new ResultsWriter()
@@ -552,7 +556,8 @@ class Tabulator {
             .setCandidatesToRoundEliminated(candidateToRoundEliminated)
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
-            .setTimestampString(timestamp);
+            .setTimestampString(timestamp)
+            .setTallyTransfers(tallyTransfers);
 
     writer.generateOverallSummarySpreadsheet(roundTallies);
 
@@ -667,17 +672,46 @@ class Tabulator {
     return decision;
   }
 
-  // function: getTallyForRound
-  // purpose: return a map of candidate ID to vote tallies for this round
-  //   generated based on previously eliminated candidateIDs contained in
-  //   candidateToRoundEliminated object.
-  //   After each call the candidateToRoundEliminated object will get
-  //   more entries as candidateIDs are eliminated.
-  //   Conversely the roundTally object returned here will contain fewer entries each
-  //   of which will have more votes.
+  // function: recordSelectionForCastVoteRecord
+  // purpose:
+  //  set new recipient of cvr
+  //  logs the results to audit log
+  //  update tallyTransfers counts
+  private void recordSelectionForCastVoteRecord(CastVoteRecord cvr,
+      int currentRound,
+      String selectedCandidate,
+      String outcomeDescription) {
+    // update transfer counts
+    tallyTransfers.addTransfer(currentRound,
+        cvr.getCurrentRecipientOfVote(),
+        selectedCandidate,
+        cvr.getFractionalTransferValue());
+    // update cvr recipient
+    cvr.setCurrentRecipientOfVote(selectedCandidate);
+    // exhaust if needed
+    if (selectedCandidate == null) {
+      cvr.exhaust();
+    }
+    // determine outcome type
+    VoteOutcomeType outcomeType = (selectedCandidate == null) ?
+        VoteOutcomeType.EXHAUSTED :
+        VoteOutcomeType.COUNTED;
+    // log the vote outcome
+    cvr.logRoundOutcome(
+        currentRound,
+        outcomeType,
+        outcomeDescription,
+        cvr.getFractionalTransferValue());
+  }
+
+  // function: computeTalliesForRound
+  // purpose: perform tabulation on all cvrs to determine who they should count for in this round
+  //  - exhaust cvrs if they should be exhausted for various reasons
+  //  - assign cvrs to continuing candidates if they have been transferred or in the initial count
+  // returns a map of candidate ID to vote tallies for this round
   // param: the current round
   // return: map of candidateID to vote tallies for this round
-  private Map<String, BigDecimal> getTallyForRound(int currentRound) {
+  private Map<String, BigDecimal> computeTalliesForRound(int currentRound) {
     // map of candidateID to vote tally to store the results
     Map<String, BigDecimal> roundTally = getNewTally();
 
@@ -689,17 +723,24 @@ class Tabulator {
       }
     }
 
-    // CVR indexes over the cast vote records to count votes for continuing candidates
+    // Loop over ALL cast vote records to determine who they should count for in this round,
+    // based on which candidates have already been eliminated and elected.
+    // At each iteration a cvr will either:
+    //  count for the same candidate it currently does
+    //  count for a different candidate
+    //  become exhausted
+    //  remain exhausted
     for (CastVoteRecord cvr : castVoteRecords) {
-      // If this CVR was assigned to a candidate last round and that candidate is still continuing,
-      // we can safely assume that the CVR should still be assigned to that candidate in this round.
-      if (!cvr.isExhausted()
-          && cvr.getCurrentRecipientOfVote() != null
-          && isCandidateContinuing(cvr.getCurrentRecipientOfVote())) {
 
-        // this vote stays with its current recipient
-        // we don't log this as we only want to capture when cvr recipient changes, is exhausted
-        // or skipped
+      // check for already exhausted
+      if (cvr.isExhausted()) {
+        continue;
+      }
+
+      // check for current recipient continuing
+      if (cvr.getCurrentRecipientOfVote() != null
+          && isCandidateContinuing(cvr.getCurrentRecipientOfVote())) {
+        // current candidate is continuing so rollover their vote into the current round
         incrementTallies(
             roundTally,
             cvr.getFractionalTransferValue(),
@@ -709,124 +750,115 @@ class Tabulator {
         continue;
       }
 
-      // check for exhaustion
-      cvr.setCurrentRecipientOfVote(null);
-      if (cvr.isExhausted()) {
-        continue;
-      }
+      // iterate through the rankings in this cvr from most to least preferred.
+      // for each ranking:
+      //  if it results in an overvote or undervote, exhaust the cvr
+      //  if a selected candidate is continuing, count cvr for that candidate
+      //  if no selected candidate is continuing, look at the next ranking
+      //  if there are no more rankings, exhaust the cvr
 
-      // lastRankSeen tracks the last rank in this rankings set as we iterate through it.
-      // This is used to determine how many skipped rankings occurred in the case of undervotes.
+      // lastRankSeen tracks the last rank in the current rankings set
+      // This is used to determine how many skipped rankings occurred for undervotes.
       int lastRankSeen = 0;
-      // candidatesSeen is the set of candidates we've encountered while processing this CVR
-      // in this round; only relevant if exhaustOnDuplicateCandidate is enabled
+      // candidatesSeen is set of candidates encountered while processing this CVR in this round
+      // used to detect duplicate candidates if exhaustOnDuplicateCandidate is enabled
       Set<String> candidatesSeen = new HashSet<>();
-      // rank iterates over all ranks in this CVR ranking set, from most preferred to least
+
+      // selectedCandidate holds the new candidate selection if there is one
+      String selectedCandidate = null;
+
+      // rank iterates over all ranks in this cvr from most preferred to least
       for (int rank : cvr.rankToCandidateIDs.keySet()) {
-        // check for undervote exhaustion (too many consecutive skipped ranks)
+        // check for undervote exhaustion from too many consecutive skipped ranks
         if (config.getMaxSkippedRanksAllowed() != null
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
-          cvr.exhaust();
-          cvr.logRoundOutcome(currentRound, VoteOutcomeType.EXHAUSTED, "undervote", null);
-
+          recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
           break;
         }
         lastRankSeen = rank;
 
-        // candidateSet is all candidates selected at the current rank
+        // candidateSet contains all candidates selected at the current rank
+        // some ballots support multiple candidates selected at a single rank
         Set<String> candidateSet = cvr.rankToCandidateIDs.get(rank);
 
-        // possibly check for a duplicate candidate
+        // check for a duplicate candidate if enabled
         if (config.isExhaustOnDuplicateCandidateEnabled()) {
           // the identity of the duplicate candidate, if found
           String duplicateCandidate = null;
           for (String candidate : candidateSet) {
             if (candidatesSeen.contains(candidate)) {
+              // duplicate is found, exit the loop so we can exhaust the cvr
               duplicateCandidate = candidate;
-              break; // finding one duplicate is enough
+              break;
             }
             candidatesSeen.add(candidate);
           }
+          // if duplicate was found, exhaust cvr
           if (duplicateCandidate != null && !duplicateCandidate.isEmpty()) {
-            cvr.exhaust();
-            cvr.logRoundOutcome(
-                currentRound,
-                VoteOutcomeType.EXHAUSTED,
-                "duplicate candidate: " + duplicateCandidate,
-                null);
+            recordSelectionForCastVoteRecord(cvr, currentRound, null,  "duplicate candidate: " + duplicateCandidate);
             break;
           }
         }
 
+        // check for an overvote
         // overvoteDecision is the overvote decision for this ranking
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidateSet);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          cvr.exhaust();
-          cvr.logRoundOutcome(currentRound, VoteOutcomeType.EXHAUSTED, "overvote", null);
+          recordSelectionForCastVoteRecord(cvr, currentRound, null, "overvote");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           continue;
         }
 
-        // selectedCandidate for this rank
-        String selectedCandidate = null;
+        // the current ranking is not an overvote or undervote
+        // see if any ranked candidates are continuing
+
         // candidateID indexes through all candidates selected at this rank
         for (String candidate : candidateSet) {
           if (!isCandidateContinuing(candidate)) {
             continue;
           }
+
+          // TODO: it's weird to have this check here
+          // handle testing in unit tests, remove this assert, and add break statement
+          // at end of this for loop
+
           // If this fails, it means the code failed to handle an overvote with multiple
           // continuing candidates.
           assert selectedCandidate == null;
-          // we found a continuing candidate
+          // we found a continuing candidate so this cvr counts for them
           selectedCandidate = candidate;
-          // the FTV for this cast vote record (by default the FTV is exactly one vote, but it
-          // could be less in a multi-winner contest if this CVR already helped elect a winner.)
-          BigDecimal fractionalTransferValue = cvr.getFractionalTransferValue();
 
-          // We set this in case we need to redistribute votes if this is a multi-winner race and
-          // this candidate wins, but there are still more winners to come.
-          cvr.setCurrentRecipientOfVote(selectedCandidate);
+          // transfer cvr to selected candidate
+          recordSelectionForCastVoteRecord(cvr, currentRound, selectedCandidate, selectedCandidate);
 
-          // Increment round tally for this candidate by the fractional transfer value of the CVR
           // If enabled, this will also update the roundTallyByPrecinct
           incrementTallies(
               roundTally,
-              fractionalTransferValue,
+              cvr.getFractionalTransferValue(),
               selectedCandidate,
               roundTallyByPrecinct,
               cvr.getPrecinct());
-
-          // log the vote transfer to new recipient
-          cvr.logRoundOutcome(
-              currentRound, VoteOutcomeType.COUNTED, selectedCandidate, fractionalTransferValue);
         }
 
+        // if we found a continuing candidate stop looking through rankings
         if (selectedCandidate != null) {
-          // we've found our candidate
           break;
         }
+
+        // if this is the last ranking we are out of rankings and must exhaust this cvr
+        // determine if the reason is skipping too many ranks, or no continuing candidates
+        if (rank == cvr.rankToCandidateIDs.lastKey()) {
+          if (config.getMaxSkippedRanksAllowed() != null
+              && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
+            recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
+          } else {
+            recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
+          }
+        }
+
       } // end looping over the rankings within one ballot
 
-      // Once we get here (having iterated through some or all of this CVR's rankings), either:
-      // a) the ballot is exhausted,
-      // b) we've counted it toward a candidate, or
-      // c) neither.
-
-      // If (c) is the case, we definitely want to exhaust the ballot, and the only thing to resolve
-      // is the official reason for exhaustion: did it skip too many rankings at the end of the
-      // ballot, or did it just no longer have any continuing candidates?
-      if (!cvr.isExhausted() && cvr.getCurrentRecipientOfVote() == null) {
-        if (config.getMaxSkippedRanksAllowed() != null
-            && config.getMaxRankingsAllowed() - lastRankSeen > config.getMaxSkippedRanksAllowed()) {
-          cvr.exhaust();
-          cvr.logRoundOutcome(currentRound, VoteOutcomeType.EXHAUSTED, "undervote", null);
-        } else {
-          cvr.exhaust();
-          cvr.logRoundOutcome(
-              currentRound, VoteOutcomeType.EXHAUSTED, "no continuing candidates", null);
-        }
-      }
     } // end looping over all ballots
 
     // Take the tallies for this round for each precinct and merge them into the main map tracking

@@ -158,7 +158,11 @@ public class Main extends GuiApplication {
             // do the tabulation
             tabulator.tabulate();
             // generate visualizer spreadsheet data
-            tabulator.generateSummarySpreadsheet(timestampString);
+            try {
+              tabulator.generateSummarySpreadsheet(timestampString);
+            } catch (IOException e) {
+              Logger.log(Level.SEVERE, "Error writing summary spreadsheet: %s", e.toString());
+            }
             isTabulationCompleted = true;
           } else {
             Logger.log(Level.SEVERE, "No cast vote records found.");

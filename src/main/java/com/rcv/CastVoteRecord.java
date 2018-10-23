@@ -73,7 +73,7 @@ class CastVoteRecord {
   // function: logRoundOutcome
   // purpose: logs the outcome for this CVR for this round for auditing purposes
   // param: outcomeType indicates what happened
-  // param: detail reflects who (if anyone) received the vote or why it was exhausted/ignored
+  // param: detail reflects who received the vote OR why it was exhausted/ignored
   // param: fractionalTransferValue if someone received the vote (not exhausted/ignored)
   void logRoundOutcome(int round,
       VoteOutcomeType outcomeType,
@@ -119,8 +119,7 @@ class CastVoteRecord {
   }
 
   // function: exhaust
-  // purpose: transition the CVR into exhausted state with the given reason
-  // param: round the exhaustion occurs
+  // purpose: transition the CVR into exhausted state
   void exhaust() {
     assert !isExhausted;
     isExhausted = true;
@@ -135,6 +134,8 @@ class CastVoteRecord {
 
   // function: getFractionalTransferValue
   // purpose: getter for fractionalTransferValue
+  // the FTV for this cast vote record (by default the FTV is exactly one vote, but it
+  // could be less in a multi-winner contest if this CVR already helped elect a winner.)
   // returns: value of field
   BigDecimal getFractionalTransferValue() {
     // remainingValue starts at one, and we subtract all the parts that are already allocated

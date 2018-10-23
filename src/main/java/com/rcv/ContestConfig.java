@@ -461,6 +461,10 @@ class ContestConfig {
   // param: candidateID the ID of the candidate whose name we want to lookup
   // returns: the full name for the given candidateID
   String getNameForCandidateID(String candidateID) {
+    if (getUndeclaredWriteInLabel() != null &&
+        getUndeclaredWriteInLabel().equals(candidateID)) {
+      return "Undeclared";
+    }
     return candidateCodeToNameMap.get(candidateID);
   }
 
