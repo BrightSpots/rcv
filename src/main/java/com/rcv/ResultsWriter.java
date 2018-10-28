@@ -14,9 +14,9 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Purpose:
- * Helper class takes tabulation results data as input and generates results xls file which
- * contains results summary information. Currently we support an xlsx spreadsheet which can be
- * visualized in a web browser.
+ * Helper class takes tabulation results data as input and generates summary files which
+ * contains results summary information.
+ * Currently we support a csv summary file and a json summary file
  */
 
 package com.rcv;
@@ -286,11 +286,14 @@ class ResultsWriter {
     }
   }
 
+  // function: addActionRows
   // "action" rows describe which candidates were eliminated or elected
+  // purpose: output rows to csv file describing which actions were taken in each round
+  // param: csvPrinter object for writing csv file
   private void addActionRows(CSVPrinter csvPrinter) throws IOException {
-
-    // losers
+    // print eliminated candidates in first action row
     csvPrinter.print("Eliminated");
+    // for each round print any candidates who were eliminated
     for (int round = 1; round <= numRounds; round++) {
       // list of all candidates eliminated in this round
       List<String> eliminated = roundToEliminatedCandidates.get(round);
@@ -302,7 +305,7 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    // winners
+    // print elected candidates in second action row
     csvPrinter.print("Elected");
     // for each round print any candidates who were elected
     for (int round = 1; round <= numRounds; round++) {
@@ -317,6 +320,10 @@ class ResultsWriter {
     csvPrinter.println();
   }
 
+  // function: addActionRowCandidates
+  // purpose: add the given candidate(s) names to the csv file next cell
+  // param: candidates list of candidate names to add to the next cell
+  // param: csvPrinter object for output to csv file
   private void addActionRowCandidates(List<String> candidates,
       CSVPrinter csvPrinter)
       throws IOException {
@@ -404,6 +411,7 @@ class ResultsWriter {
   // purpose: create summary json data for use in visualizer, unit tests and other tools
   // param: outputPath where to write json file
   // param: roundTallies all tally information
+  // file access: write to outputPath
   private void generateSummaryJson(String outputPath,
       Map<Integer, Map<String, BigDecimal>> roundTallies)
       throws IOException {
@@ -418,36 +426,34 @@ class ResultsWriter {
     // outFile is the target file
     File outFile = new File(jsonPath);
 
-    // root object dict will have two entries:
-    // results - vote totals, transfers, and candidates elected / defeated
+    // root outputJson dict will have two entries:
+    // results - vote totals, transfers, and candidates elected / eliminated
     // TODO: add needed config info
     // config - global config into
     HashMap<String, Object> outputJson = new HashMap<>();
     // results will be a list of round data objects
     ArrayList<Object> results = new ArrayList<>();
     // for each round create objects for json serialization
-    for(Integer round = 1; round <= numRounds; round++) {
-      // actions is a list of one or more action objects
-      ArrayList<Object> actions = new ArrayList<>();
-      // add any winning actions
-      addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);
-      // add any defeated actions
-      addActionObjects("defeated", roundToEliminatedCandidates.get(round), round, actions);
-
+    for(int round = 1; round <= numRounds; round++) {
       // container for all json data this round:
       HashMap<String, Object> roundData = new HashMap<>();
       // add round number (this is implied by the ordering but for debugging we are explicit)
       roundData.put("round",round);
-      // add actions
+      // actions is a list of one or more action objects
+      ArrayList<Object> actions = new ArrayList<>();
+      // add any elected actions
+      addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);
+      // add any elimination actions
+      addActionObjects("eliminated", roundToEliminatedCandidates.get(round), round, actions);
+      // add action objects
       roundData.put("actions", actions);
-      // add tally
+      // add tally object
       roundData.put("tallies", roundTallies.get(round));
       // add roundData to results list
       results.add(roundData);
     }
     // add results to root object
     outputJson.put("results", results);
-
     // write results to disk
     try {
       jsonWriter.writeValue(outFile, outputJson);
@@ -457,12 +463,17 @@ class ResultsWriter {
     }
   }
 
-  // adds action objects to input action list representing all actions applied this round
-  // each action will have a type followed by a list of 0 or more vote transfers
-  // (sometimes there is no vote transfer if a candidate had no votes to transfer)
+  // function: addActionObjects
+  // purpose: adds action objects to input action list representing all actions applied this round
+  //  each action will have a type followed by a list of 0 or more vote transfers
+  //  (sometimes there is no vote transfer if a candidate had no votes to transfer)
+  // param: actionType is this an elimination or election action
+  // param: candidates list of all candidates action is applied to
+  // param: round which this action occurred
+  // param: actions list to add new action objects to
   private void addActionObjects(String actionType,
       List<String> candidates,
-      Integer round,
+      int round,
       ArrayList<Object> actions) {
 
     // check for valid candidates:

@@ -1,3 +1,24 @@
+/*
+ * Ranked Choice Voting Universal Tabulator
+ * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ * the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * TallyTransfers is a container class which stores a map for each round showing how many votes were
+ * transferred from each candidate to each candidate.
+ * The primary purpose for this is generating sankey plots which visually show the flow of votes
+ * over the course of a tabulation.
+ */
+
 package com.rcv;
 
 import java.math.BigDecimal;
@@ -14,13 +35,21 @@ class TallyTransfers {
   // For round 1 source candidate is marked "uncounted" since the votes had no prior recipient.
   private final Map<Integer, Map<String, Map<String, BigDecimal>>> tallyTransfers = new HashMap<>();
 
-
-  Map<String, Map<String, BigDecimal>> getTransfersForRound(Integer round) {
+  // function: getTransfersForRound
+  // purpose: getter for tallyTransfers object
+  // param: round for which to return transfers
+  // returns: tally transfer map for specified round
+  Map<String, Map<String, BigDecimal>> getTransfersForRound(int round) {
     return tallyTransfers.get(round);
   }
 
-  // add vote transfer value for given round
-  void addTransfer(Integer round,
+  // function: addTransfer
+  // purpose: add vote transfer value for given round
+  // param: round transfers should be added to
+  // param: sourceCandidate from which the transfers originate
+  // param: targetCandidate to which the transfers go
+  // param: value total value of all transfers
+  void addTransfer(int round,
       String sourceCandidate,
       String targetCandidate,
       BigDecimal value) {
