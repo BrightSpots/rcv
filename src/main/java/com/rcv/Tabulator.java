@@ -64,7 +64,6 @@ class Tabulator {
   // tracks vote transfer summaries for visualizer
   private TallyTransfers tallyTransfers = new TallyTransfers();
 
-
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
   // which will be used when reading input cast vote records
@@ -167,9 +166,11 @@ class Tabulator {
             BigDecimal extraVotes = candidateVotes.subtract(winningThreshold);
             // fractional transfer percentage
             BigDecimal surplusFraction = config.divide(extraVotes, candidateVotes);
+            Logger.log(Level.INFO, "%s won with surplus fraction: %s", winner,
+                surplusFraction.toString());
             for (CastVoteRecord cvr : castVoteRecords) {
               if (winner.equals(cvr.getCurrentRecipientOfVote())) {
-                cvr.recordCurrentRecipientAsWinner(surplusFraction);
+                cvr.recordCurrentRecipientAsWinner(surplusFraction, config);
               }
             }
           }
@@ -677,12 +678,11 @@ class Tabulator {
   //  set new recipient of cvr
   //  logs the results to audit log
   //  update tallyTransfers counts
-  private void recordSelectionForCastVoteRecord(CastVoteRecord cvr,
-      int currentRound,
-      String selectedCandidate,
-      String outcomeDescription) {
+  private void recordSelectionForCastVoteRecord(
+      CastVoteRecord cvr, int currentRound, String selectedCandidate, String outcomeDescription) {
     // update transfer counts
-    tallyTransfers.addTransfer(currentRound,
+    tallyTransfers.addTransfer(
+        currentRound,
         cvr.getCurrentRecipientOfVote(),
         selectedCandidate,
         cvr.getFractionalTransferValue());
@@ -693,15 +693,11 @@ class Tabulator {
       cvr.exhaust();
     }
     // determine outcome type
-    VoteOutcomeType outcomeType = (selectedCandidate == null) ?
-        VoteOutcomeType.EXHAUSTED :
-        VoteOutcomeType.COUNTED;
+    VoteOutcomeType outcomeType =
+        (selectedCandidate == null) ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
     // log the vote outcome
     cvr.logRoundOutcome(
-        currentRound,
-        outcomeType,
-        outcomeDescription,
-        cvr.getFractionalTransferValue());
+        currentRound, outcomeType, outcomeDescription, cvr.getFractionalTransferValue());
   }
 
   // function: computeTalliesForRound
@@ -795,7 +791,8 @@ class Tabulator {
           }
           // if duplicate was found, exhaust cvr
           if (duplicateCandidate != null && !duplicateCandidate.isEmpty()) {
-            recordSelectionForCastVoteRecord(cvr, currentRound, null,  "duplicate candidate: " + duplicateCandidate);
+            recordSelectionForCastVoteRecord(
+                cvr, currentRound, null, "duplicate candidate: " + duplicateCandidate);
             break;
           }
         }
@@ -856,9 +853,7 @@ class Tabulator {
             recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
           }
         }
-
       } // end looping over the rankings within one ballot
-
     } // end looping over all ballots
 
     // Take the tallies for this round for each precinct and merge them into the main map tracking

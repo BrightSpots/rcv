@@ -24,6 +24,7 @@ import com.rcv.RawContestConfig.CVRSource;
 import com.rcv.RawContestConfig.Candidate;
 import com.rcv.Tabulator.TieBreakMode;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -285,6 +286,10 @@ class ContestConfig {
   // returns: the quotient
   BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
     return dividend.divide(divisor, getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
+  }
+
+  BigDecimal multiply(BigDecimal multiplier, BigDecimal multiplicand) {
+    return multiplier.multiply(multiplicand).setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
   }
 
   // function: getOutputDirectory
