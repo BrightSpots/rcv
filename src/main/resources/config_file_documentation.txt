@@ -88,6 +88,11 @@ Config file must be valid JSON format. Examples can be found under the test fold
       value: string of length [1..1000]
       default: none
 
+    "excluded" optional
+      candidate should be ignored during tabulation
+      value: true | false
+      default: false
+
   "rules" required
     set of configuration parameters that specify the tabulation rules
     the "rules" section contains the following parameters:

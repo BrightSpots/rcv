@@ -143,7 +143,12 @@
           <VBox>
             <HBox alignment="CENTER_LEFT" spacing="4.0">
               <TextField promptText="Name *" fx:id="textFieldCandidateName"/>
-              <TextField promptText="Code" fx:id="textFieldCandidateCode"/>
+              <TextField promptText="Code" fx:id="textFieldCandidateCode" maxWidth="100.0"/>
+              <CheckBox mnemonicParsing="false" text="Excluded" fx:id="checkBoxCandidateExcluded">
+                <VBox.margin>
+                  <Insets top="4.0"/>
+                </VBox.margin>
+              </CheckBox>
               <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>
               <Region prefHeight="25.0" prefWidth="39.0"/>
               <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
@@ -156,8 +161,10 @@
               <columns>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="230.0"
                   text="Name" fx:id="tableColumnCandidateName"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="230.0"
+                <TableColumn editable="false" minWidth="20.0" prefWidth="100.0"
                   text="Code" fx:id="tableColumnCandidateCode"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="100.0"
+                  text="Excluded" fx:id="tableColumnCandidateExcluded"/>
               </columns>
             </TableView>
             <padding>

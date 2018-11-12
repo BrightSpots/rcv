@@ -51,6 +51,7 @@ class ContestConfig {
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
+  private Set<String> excludedCandidates = new HashSet<>();
   // whether or not there are any validation errors
   private boolean isValid;
 
@@ -386,6 +387,10 @@ class ContestConfig {
     return getCandidateCodeList().size();
   }
 
+  boolean candidateIsExcluded(String candidate) {
+    return excludedCandidates.contains(candidate);
+  }
+
   // function: getOvervoteRule
   // purpose: return overvote rule enum to use
   // returns: overvote rule to use for this config
@@ -488,14 +493,15 @@ class ContestConfig {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
         String code = candidate.getCode();
         String name = candidate.getName();
-        if (code != null && !code.isEmpty()) {
-          if (!candidateCodeToNameMap.keySet().contains(code)) {
-            candidateCodeToNameMap.put(code, name);
-            candidatePermutation.add(code);
-          }
-        } else if (!candidateCodeToNameMap.keySet().contains(name)) {
-          candidateCodeToNameMap.put(name, name);
-          candidatePermutation.add(name);
+        if (code == null || code.isEmpty()) {
+          code = name;
+        }
+
+        // duplicate names or codes get caught in validation
+        candidateCodeToNameMap.put(code, name);
+        candidatePermutation.add(code);
+        if (candidate.isExcluded()) {
+          excludedCandidates.add(code);
         }
       }
 

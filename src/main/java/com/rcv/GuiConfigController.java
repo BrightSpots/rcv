@@ -118,9 +118,13 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<Candidate, String> tableColumnCandidateCode;
   @FXML
+  private TableColumn<Candidate, Boolean> tableColumnCandidateExcluded;
+  @FXML
   private TextField textFieldCandidateName;
   @FXML
   private TextField textFieldCandidateCode;
+  @FXML
+  private CheckBox checkBoxCandidateExcluded;
   @FXML
   private ChoiceBox<Tabulator.TieBreakMode> choiceTiebreakMode;
   @FXML
@@ -308,9 +312,11 @@ public class GuiConfigController implements Initializable {
     } else {
       candidate.setName(textFieldCandidateName.getText());
       candidate.setCode(textFieldCandidateCode.getText());
+      candidate.setExcluded(checkBoxCandidateExcluded.isSelected());
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
       textFieldCandidateCode.clear();
+      checkBoxCandidateExcluded.setSelected(false);
     }
   }
 
@@ -371,6 +377,7 @@ public class GuiConfigController implements Initializable {
 
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+    tableColumnCandidateExcluded.setCellValueFactory(new PropertyValueFactory<>("excluded"));
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
     choiceTiebreakMode.getItems().addAll(Tabulator.TieBreakMode.values());
@@ -452,6 +459,7 @@ public class GuiConfigController implements Initializable {
 
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
+    checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
     choiceTiebreakMode.setValue(null);
