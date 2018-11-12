@@ -24,7 +24,6 @@ import com.rcv.RawContestConfig.CVRSource;
 import com.rcv.RawContestConfig.Candidate;
 import com.rcv.Tabulator.TieBreakMode;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -117,8 +116,7 @@ class ContestConfig {
 
         if (source.getFirstVoteColumnIndex() == null) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFilePath());
+          Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFilePath());
         } else if (source.getFirstVoteColumnIndex() < 1
             || source.getFirstVoteColumnIndex() > 1000) {
           isValid = false;
@@ -250,8 +248,7 @@ class ContestConfig {
 
       if (isBatchEliminationEnabled()) {
         isValid = false;
-        Logger.log(
-            Level.SEVERE, "batchElimination can't be true in a multi-winner contest.");
+        Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-winner contest.");
       }
 
       if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
@@ -289,7 +286,9 @@ class ContestConfig {
   }
 
   BigDecimal multiply(BigDecimal multiplier, BigDecimal multiplicand) {
-    return multiplier.multiply(multiplicand).setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
+    return multiplier
+        .multiply(multiplicand)
+        .setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
   }
 
   // function: getOutputDirectory
@@ -466,8 +465,7 @@ class ContestConfig {
   // param: candidateID the ID of the candidate whose name we want to lookup
   // returns: the full name for the given candidateID
   String getNameForCandidateID(String candidateID) {
-    if (getUndeclaredWriteInLabel() != null &&
-        getUndeclaredWriteInLabel().equals(candidateID)) {
+    if (getUndeclaredWriteInLabel() != null && getUndeclaredWriteInLabel().equals(candidateID)) {
       return "Undeclared";
     }
     return candidateCodeToNameMap.get(candidateID);

@@ -24,7 +24,6 @@ package com.rcv;
 import com.rcv.CastVoteRecord.VoteOutcomeType;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -166,8 +165,8 @@ class Tabulator {
             BigDecimal extraVotes = candidateVotes.subtract(winningThreshold);
             // fractional transfer percentage
             BigDecimal surplusFraction = config.divide(extraVotes, candidateVotes);
-            Logger.log(Level.INFO, "%s won with surplus fraction: %s", winner,
-                surplusFraction.toString());
+            Logger.log(
+                Level.INFO, "%s won with surplus fraction: %s", winner, surplusFraction.toString());
             for (CastVoteRecord cvr : castVoteRecords) {
               if (winner.equals(cvr.getCurrentRecipientOfVote())) {
                 cvr.recordCurrentRecipientAsWinner(surplusFraction, config);
@@ -324,8 +323,8 @@ class Tabulator {
     // divisor for threshold is num winners + 1
     BigDecimal divisor = new BigDecimal(config.getNumberOfWinners() + 1);
     // threshold = floor(votes / (num_winners + 1)) + 1
-    winningThreshold =
-        currentRoundTotalVotes.divide(divisor, RoundingMode.DOWN).add(BigDecimal.ONE);
+    winningThreshold = currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
+    Logger.log(Level.INFO, "Winning threshold set to %s", winningThreshold.toString());
   }
 
   // purpose: determine if we should continue tabulating based on how many winners have been
@@ -387,7 +386,7 @@ class Tabulator {
     } else { // see if anyone has exceeded the threshold
       // tally indexes over all tallies to find any winners
       for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
-        if (tally.compareTo(winningThreshold) > 0) {
+        if (tally.compareTo(winningThreshold) >= 0) {
           // we have winner(s)
           List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
           selectedWinners.addAll(winningCandidates);
@@ -610,7 +609,7 @@ class Tabulator {
       // currentCandidates is all candidates receiving the current vote tally
       List<String> currentCandidates = currentRoundTallyToCandidates.get(currentVoteTally);
       BigDecimal totalForThisRound =
-          currentVoteTally.multiply(new BigDecimal(currentCandidates.size()));
+          config.multiply(currentVoteTally, new BigDecimal(currentCandidates.size()));
       runningTotal = runningTotal.add(totalForThisRound);
       candidatesSeen.addAll(currentCandidates);
     }
