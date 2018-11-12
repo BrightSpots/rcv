@@ -75,10 +75,8 @@ class CastVoteRecord {
   // param: outcomeType indicates what happened
   // param: detail reflects who received the vote OR why it was exhausted/ignored
   // param: fractionalTransferValue if someone received the vote (not exhausted/ignored)
-  void logRoundOutcome(int round,
-      VoteOutcomeType outcomeType,
-      String detail,
-      BigDecimal fractionalTransferValue) {
+  void logRoundOutcome(
+      int round, VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
 
     StringBuilder logStringBuilder = new StringBuilder();
     // add round and ID
@@ -148,11 +146,11 @@ class CastVoteRecord {
 
   // function: recordCurrentRecipientAsWinner
   // purpose: stores the current recipient as a winner using the specified surplus fraction
-  void recordCurrentRecipientAsWinner(BigDecimal surplusFraction) {
+  void recordCurrentRecipientAsWinner(BigDecimal surplusFraction, ContestConfig config) {
     // take the current FTV of this vote and allocate (1 - surplusFraction) of that amount to the
     // new winner
     BigDecimal newAllocatedValue =
-        getFractionalTransferValue().multiply(BigDecimal.ONE.subtract(surplusFraction));
+        config.multiply(getFractionalTransferValue(), BigDecimal.ONE.subtract(surplusFraction));
     winnerToFractionalValue.put(getCurrentRecipientOfVote(), newAllocatedValue);
   }
 
@@ -205,5 +203,4 @@ class CastVoteRecord {
     IGNORED,
     EXHAUSTED,
   }
-
 }

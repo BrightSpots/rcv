@@ -1,0 +1,51 @@
+{
+  "outputSettings" : {
+    "contestName" : "Herb1",
+    "outputDirectory" : "test_output",
+    "contestDate" : "2018-11-09",
+    "contestJurisdiction" : "Herb",
+    "contestOffice" : "Herb1",
+    "tabulateByPrecinct" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_data/cvr_random60_herb1.xlsx",
+    "firstVoteColumnIndex" : 2,
+    "provider" : ""
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "code" : ""
+  }, {
+    "name" : "B",
+    "code" : ""
+  }, {
+    "name" : "C",
+    "code" : ""
+  }, {
+    "name" : "D",
+    "code" : ""
+  }, {
+    "name" : "E",
+    "code" : ""
+  }, {
+    "name" : "F",
+    "code" : ""
+  } ],
+  "rules" : {
+    "tiebreakMode" : "interactive",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "maxRankingsAllowed" : 6,
+    "maxSkippedRanksAllowed" : 1,
+    "numberOfWinners" : 3,
+    "decimalPlacesForVoteArithmetic" : 4,
+    "minimumVoteThreshold" : 0,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : "Multi-winner"
+  }
+}
