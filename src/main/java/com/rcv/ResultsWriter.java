@@ -155,6 +155,9 @@ class ResultsWriter {
       String outputPath =
           Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
       generateSummarySpreadsheet(precinctRoundTallies.get(precinct), precinct, outputPath);
+
+      // generate json output
+      generateSummaryJson(outputPath, precinctRoundTallies.get(precinct));
     }
   }
 
