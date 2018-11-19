@@ -235,15 +235,10 @@ class ResultsWriter {
       String candidateDisplayName = this.config.getNameForCandidateID(candidate);
       csvPrinter.print(candidateDisplayName);
 
-      // displayRound indexes over all rounds plus final results round
-      for (int displayRound = 1; displayRound <= numRounds + 1; displayRound++) {
-        // flag for the last round results which are special-cased
-        boolean isFinalResults = displayRound == numRounds + 1;
-        // For the Final Results "round", we're mostly copying the data from the final round.
-        // round from which to display data
-        int dataUseRound = isFinalResults ? numRounds : displayRound;
+      // displayRound indexes over all rounds
+      for (int displayRound = 1; displayRound <= numRounds; displayRound++) {
         // vote tally this round
-        BigDecimal thisRoundTally = roundTallies.get(dataUseRound).get(candidate);
+        BigDecimal thisRoundTally = roundTallies.get(displayRound).get(candidate);
         // not all candidates may have a tally in every round
         if (thisRoundTally == null) {
           thisRoundTally = BigDecimal.ZERO;
