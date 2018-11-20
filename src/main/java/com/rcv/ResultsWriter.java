@@ -46,6 +46,8 @@ class ResultsWriter {
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
+  // threshold to win
+  private BigDecimal winningThreshold;
   // map from round number to list of candidates eliminated in that round
   private Map<Integer, List<String>> roundToEliminatedCandidates;
   // map from round number to list of candidates winning in that round
@@ -70,6 +72,14 @@ class ResultsWriter {
   // param: numRounds total number of rounds
   ResultsWriter setNumRounds(int numRounds) {
     this.numRounds = numRounds;
+    return this;
+  }
+
+  // function: setWinningThreshold
+  // purpose: setter for winning threshold
+  // param: threshold to win
+  ResultsWriter setWinningThreshold(BigDecimal threshold) {
+    this.winningThreshold = threshold;
     return this;
   }
 
@@ -180,7 +190,6 @@ class ResultsWriter {
     List<String> sortedCandidates = sortCandidatesByTally(firstRoundTally);
 
     // totalActiveVotesPerRound is a map of round to total votes cast in each round
-    // this will be used to calculate the percentage of total votes each candidate achieves
     Map<Integer, BigDecimal> totalActiveVotesPerRound = new HashMap<>();
     // round indexes over all rounds plus final results round
     for (int round = 1; round <= numRounds; round++) {
@@ -210,7 +219,7 @@ class ResultsWriter {
     addHeaderRows(csvPrinter, precinct);
 
     // add a row header for the round column labels
-    csvPrinter.print("rounds");
+    csvPrinter.print("Rounds");
     // round indexes over all rounds
     for (int round = 1; round <= numRounds; round++) {
       // label string will have the actual text which goes in the cell
@@ -227,9 +236,7 @@ class ResultsWriter {
 
     final BigDecimal totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
 
-    // Candidate votes [total, delta, percentage]
-    // For each candidate: for each round: output total votes, delta votes, and final vote
-    // percentage of total.
+    // For each candidate: for each round: output total votes
     // candidate indexes over all candidates
     for (String candidate : sortedCandidates) {
       // show each candidate row with their totals for each round
@@ -345,6 +352,7 @@ class ResultsWriter {
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
     csvPrinter.printRecord("Office", config.getContestOffice());
     csvPrinter.printRecord("Date", config.getContestDate());
+    csvPrinter.printRecord("Threshold", winningThreshold.toString());
     if (precinct != null && !precinct.isEmpty()) {
       csvPrinter.printRecord("Precinct", precinct);
     }
@@ -426,9 +434,12 @@ class ResultsWriter {
 
     // root outputJson dict will have two entries:
     // results - vote totals, transfers, and candidates elected / eliminated
-    // TODO: add needed config info
     // config - global config into
     HashMap<String, Object> outputJson = new HashMap<>();
+    // config will contain contest configuration info
+    HashMap<String, Object> configData = new HashMap<>();
+    // add winning threshold
+    configData.put("threshold", winningThreshold.toString());
     // results will be a list of round data objects
     ArrayList<Object> results = new ArrayList<>();
     // for each round create objects for json serialization
@@ -450,6 +461,8 @@ class ResultsWriter {
       // add roundData to results list
       results.add(roundData);
     }
+    // add config data to root object
+    outputJson.put("config", configData);
     // add results to root object
     outputJson.put("results", results);
     // write results to disk
