@@ -220,9 +220,13 @@ class Tabulator {
         Level.INFO,
         "There are %d declared candidates for this contest:",
         config.getNumDeclaredCandidates());
-    // candidateID indexes over all candidate IDs to log them
-    for (String candidateID : candidateIDs) {
-      Logger.log(Level.INFO, "%s", candidateID);
+    // candidate indexes over all candidate IDs to log them
+    for (String candidate : candidateIDs) {
+      Logger.log(
+          Level.INFO,
+          "%s%s",
+          candidate,
+          config.candidateIsExcluded(candidate) ? " (excluded from tabulation)" : "");
     }
 
     if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {

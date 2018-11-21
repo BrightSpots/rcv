@@ -440,6 +440,8 @@ public class GuiConfigController implements Initializable {
         String.valueOf(ContestConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
     textFieldMinimumVoteThreshold.setText(
         String.valueOf(ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
+
+    checkBoxCandidateExcluded.setSelected(ContestConfig.DEFAULT_CANDIDATE_EXCLUDED);
   }
 
   private void clearConfig() {
