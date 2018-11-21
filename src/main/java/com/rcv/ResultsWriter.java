@@ -145,7 +145,7 @@ class ResultsWriter {
     generateSummarySpreadsheet(roundTallies, null, outputPath);
 
     // generate json output
-    generateSummaryJson(outputPath, roundTallies);
+    generateSummaryJson(roundTallies, null, outputPath);
   }
 
   // function: generatePrecinctSummarySpreadsheet
@@ -167,12 +167,12 @@ class ResultsWriter {
       generateSummarySpreadsheet(precinctRoundTallies.get(precinct), precinct, outputPath);
 
       // generate json output
-      generateSummaryJson(outputPath, precinctRoundTallies.get(precinct));
+      generateSummaryJson(precinctRoundTallies.get(precinct), precinct, outputPath);
     }
   }
 
   // function: generateSummarySpreadsheet
-  // purpose: creates a summary spreadsheet .xlsx file
+  // purpose: creates a summary spreadsheet .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
   // param: precinct indicates which precinct we're reporting results for (null means all)
   // param: outputPath is the full path of the file to save
@@ -418,9 +418,11 @@ class ResultsWriter {
   // param: outputPath where to write json file
   // param: roundTallies all tally information
   // file access: write to outputPath
-  private void generateSummaryJson(String outputPath,
-      Map<Integer, Map<String, BigDecimal>> roundTallies)
+  private void generateSummaryJson(Map<Integer, Map<String, BigDecimal>> roundTallies,
+      String precinct,
+      String outputPath)
       throws IOException {
+
     // mapper converts java objects to json
     ObjectMapper mapper = new ObjectMapper();
     // jsonWriter writes those object to disk
@@ -438,8 +440,15 @@ class ResultsWriter {
     HashMap<String, Object> outputJson = new HashMap<>();
     // config will contain contest configuration info
     HashMap<String, Object> configData = new HashMap<>();
-    // add winning threshold
-    configData.put("threshold", winningThreshold.toString());
+    // add config header info
+    configData.put("Contest", config.getContestName());
+    configData.put("Jurisdiction", config.getContestJurisdiction());
+    configData.put("Office", config.getContestOffice());
+    configData.put("Date", config.getContestDate());
+    configData.put("Threshold", winningThreshold.toString());
+    if (precinct != null && !precinct.isEmpty()) {
+      configData.put("Precinct", precinct);
+    }
     // results will be a list of round data objects
     ArrayList<Object> results = new ArrayList<>();
     // for each round create objects for json serialization
@@ -447,24 +456,26 @@ class ResultsWriter {
       // container for all json data this round:
       HashMap<String, Object> roundData = new HashMap<>();
       // add round number (this is implied by the ordering but for debugging we are explicit)
-      roundData.put("round",round);
+      roundData.put("Round", round);
+      // add actions if this is not a precinct summary
+      if (precinct == null || precinct.isEmpty()) {
       // actions is a list of one or more action objects
-      ArrayList<Object> actions = new ArrayList<>();
-      // add any elected actions
-      addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);
-      // add any elimination actions
-      addActionObjects("eliminated", roundToEliminatedCandidates.get(round), round, actions);
-      // add action objects
-      roundData.put("actions", actions);
+        ArrayList<Object> actions = new ArrayList<>();
+        addActionObjects("Elected", roundToWinningCandidates.get(round), round, actions);
+        // add any elimination actions
+        addActionObjects("Eliminated", roundToEliminatedCandidates.get(round), round, actions);
+        // add action objects
+        roundData.put("Actions", actions);
+      }
       // add tally object
-      roundData.put("tallies", roundTallies.get(round));
+      roundData.put("Tallies", roundTallies.get(round));
       // add roundData to results list
       results.add(roundData);
     }
     // add config data to root object
-    outputJson.put("config", configData);
+    outputJson.put("Config", configData);
     // add results to root object
-    outputJson.put("results", results);
+    outputJson.put("Results", results);
     // write results to disk
     try {
       jsonWriter.writeValue(outFile, outputJson);
