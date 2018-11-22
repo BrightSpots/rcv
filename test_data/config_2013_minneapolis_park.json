@@ -1,67 +1,65 @@
 {
-  "outputSettings": {
-    "contestName": "2013 Minneapolis Park Board",
-    "outputDirectory": "test_output/2013_minneapolis_park",
-    "contestDate": "",
-    "contestJurisdiction": "Minneapolis",
-    "contestOffice": "Park and Recreation Commissioner",
-    "tabulateByPrecinct": false
+  "outputSettings" : {
+    "contestName" : "2013 Minneapolis Park Board",
+    "outputDirectory" : "test_output/2013_minneapolis_park",
+    "contestDate" : "",
+    "contestJurisdiction" : "Minneapolis",
+    "contestOffice" : "Park and Recreation Commissioner",
+    "tabulateByPrecinct" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "test_data/cvr_2013_minneapolis_park.xlsx",
-      "firstVoteColumnIndex": 2,
-      "precinctColumnIndex": 1,
-      "provider": "ES&S"
-    }
-  ],
-  "candidates": [
-    {
-      "name": "ANNIE YOUNG"
-    },
-    {
-      "name": "CASPER HILL"
-    },
-    {
-      "name": "HASHIM YONIS"
-    },
-    {
-      "name": "ISHMAEL ISRAEL"
-    },
-    {
-      "name": "JASON STONE"
-    },
-    {
-      "name": "JOHN ERWIN"
-    },
-    {
-      "name": "MARY LYNN MCPHERSON"
-    },
-    {
-      "name": "MEG FORNEY"
-    },
-    {
-      "name": "STEVE BARLAND"
-    },
-    {
-      "name": "TOM NORDYKE"
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "random",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "maxRankingsAllowed": 3,
-    "maxSkippedRanksAllowed": 2,
-    "numberOfWinners": 3,
-    "decimalPlacesForVoteArithmetic": 4,
-    "minimumVoteThreshold": 0,
-    "batchElimination": false,
-    "continueUntilTwoCandidatesRemain": false,
-    "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI",
-    "rulesDescription": "Minneapolis Rules"
+  "cvrFileSources" : [ {
+    "filePath" : "test_data/cvr_2013_minneapolis_park.xlsx",
+    "firstVoteColumnIndex" : 2,
+    "precinctColumnIndex" : 1,
+    "provider" : "ES&S"
+  } ],
+  "candidates" : [ {
+    "name" : "ANNIE YOUNG",
+    "excluded" : false
+  }, {
+    "name" : "CASPER HILL",
+    "excluded" : false
+  }, {
+    "name" : "HASHIM YONIS",
+    "excluded" : false
+  }, {
+    "name" : "ISHMAEL ISRAEL",
+    "excluded" : false
+  }, {
+    "name" : "JASON STONE",
+    "excluded" : false
+  }, {
+    "name" : "JOHN ERWIN",
+    "excluded" : false
+  }, {
+    "name" : "MARY LYNN MCPHERSON",
+    "excluded" : false
+  }, {
+    "name" : "MEG FORNEY",
+    "excluded" : false
+  }, {
+    "name" : "STEVE BARLAND",
+    "excluded" : false
+  }, {
+    "name" : "TOM NORDYKE",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "maxRankingsAllowed" : 3,
+    "maxSkippedRanksAllowed" : 2,
+    "numberOfWinners" : 3,
+    "decimalPlacesForVoteArithmetic" : 4,
+    "minimumVoteThreshold" : 0,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "integralWinningThreshold" : true,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "rulesDescription" : "Minneapolis Rules"
   }
 }

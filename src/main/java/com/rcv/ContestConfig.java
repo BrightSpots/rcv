@@ -41,6 +41,7 @@ class ContestConfig {
   static final boolean DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
+  static final boolean DEFAULT_INTEGRAL_WINNING_THRESHOLD = true;
   static final int DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final int DEFAULT_NUMBER_OF_WINNERS = 1;
   static final BigDecimal DEFAULT_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
@@ -282,6 +283,10 @@ class ContestConfig {
     return rawConfig.rules.decimalPlacesForVoteArithmetic == null
         ? DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC
         : rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
+  boolean isWinningThresholdIntegral() {
+    return rawConfig.rules.integralWinningThreshold;
   }
 
   // function: divide

@@ -156,6 +156,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
   @FXML
+  private CheckBox checkBoxIntegralWinningThreshold;
+  @FXML
   private ButtonBar buttonBar;
 
   public void buttonNewConfigClicked() {
@@ -434,6 +436,7 @@ public class GuiConfigController implements Initializable {
         ContestConfig.DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
         ContestConfig.DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
+    checkBoxIntegralWinningThreshold.setSelected(ContestConfig.DEFAULT_INTEGRAL_WINNING_THRESHOLD);
 
     textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.DEFAULT_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic.setText(
@@ -479,6 +482,7 @@ public class GuiConfigController implements Initializable {
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
     checkBoxExhaustOnDuplicateCandidate.setSelected(false);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(false);
+    checkBoxIntegralWinningThreshold.setSelected(false);
 
     setDefaultValues();
   }
@@ -605,6 +609,7 @@ public class GuiConfigController implements Initializable {
     checkBoxExhaustOnDuplicateCandidate.setSelected(config.isExhaustOnDuplicateCandidateEnabled());
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
         config.isTreatBlankAsUndeclaredWriteInEnabled());
+    checkBoxIntegralWinningThreshold.setSelected(config.isWinningThresholdIntegral());
   }
 
   private Integer getIntValueElse(TextField textField, Integer defaultValue) {
@@ -666,6 +671,7 @@ public class GuiConfigController implements Initializable {
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
     rules.treatBlankAsUndeclaredWriteIn = checkBoxTreatBlankAsUndeclaredWriteIn.isSelected();
+    rules.integralWinningThreshold = checkBoxIntegralWinningThreshold.isSelected();
     rules.overvoteLabel = textFieldOvervoteLabel.getText();
     rules.undervoteLabel = textFieldUndervoteLabel.getText();
     rules.undeclaredWriteInLabel = textFieldUndeclaredWriteInLabel.getText();

@@ -181,6 +181,7 @@ public class RawContestConfig {
     public boolean exhaustOnDuplicateCandidate;
     // shall we treat blank cells as UWIs?
     public boolean treatBlankAsUndeclaredWriteIn;
+    public boolean integralWinningThreshold;
     // overvote label
     public String overvoteLabel;
     // undervote label

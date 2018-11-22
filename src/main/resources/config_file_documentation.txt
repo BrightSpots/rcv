@@ -127,6 +127,14 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: [0..20]
         default: 4
 
+      "integralWinningThreshold" optional
+        the vote threshold used to determine winners should be an integer
+        if true, threshold = floor(V/(S+1)) + 1
+        if false, threshold = V(S+1) + 10^-d
+        where V = total number of votes (in the current round for single-seat or in the first round for multi-seat); S = numberOfWinners; and d = decimalPlacesForVoteArithmetic
+        value: true | false
+        default: true
+
       "minimumVoteThreshold" optional
         the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
         example: 150
