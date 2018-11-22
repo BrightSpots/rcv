@@ -220,9 +220,13 @@ class Tabulator {
         Level.INFO,
         "There are %d declared candidates for this contest:",
         config.getNumDeclaredCandidates());
-    // candidateID indexes over all candidate IDs to log them
-    for (String candidateID : candidateIDs) {
-      Logger.log(Level.INFO, "%s", candidateID);
+    // candidate indexes over all candidate IDs to log them
+    for (String candidate : candidateIDs) {
+      Logger.log(
+          Level.INFO,
+          "%s%s",
+          candidate,
+          config.candidateIsExcluded(candidate) ? " (excluded from tabulation)" : "");
     }
 
     if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
@@ -359,7 +363,9 @@ class Tabulator {
   // returns: candidate status
   private CandidateStatus getCandidateStatus(String candidate) {
     CandidateStatus status = CandidateStatus.CONTINUING;
-    if (winnerToRound.containsKey(candidate)) {
+    if (config.candidateIsExcluded(candidate)) {
+      status = CandidateStatus.EXCLUDED;
+    } else if (winnerToRound.containsKey(candidate)) {
       status = CandidateStatus.WINNER;
     } else if (candidateToRoundEliminated.containsKey(candidate)) {
       status = CandidateStatus.ELIMINATED;
@@ -998,6 +1004,7 @@ class Tabulator {
     WINNER,
     ELIMINATED,
     INVALID,
+    EXCLUDED,
   }
 
   // simple container class used during batch elimination process to store the results

@@ -126,6 +126,7 @@ public class RawContestConfig {
     private String name;
     // candidate ID
     private String code;
+    private boolean excluded;
 
     public String getName() {
       return name;
@@ -141,6 +142,14 @@ public class RawContestConfig {
 
     public void setCode(String code) {
       this.code = code;
+    }
+
+    public boolean isExcluded() {
+      return excluded;
+    }
+
+    public void setExcluded(boolean excluded) {
+      this.excluded = excluded;
     }
   }
 

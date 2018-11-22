@@ -45,12 +45,15 @@ class ContestConfig {
   static final int DEFAULT_NUMBER_OF_WINNERS = 1;
   static final BigDecimal DEFAULT_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
 
+  static final boolean DEFAULT_CANDIDATE_EXCLUDED = false;
+
   // underlying rawConfig object data
   final RawContestConfig rawConfig;
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
+  private final Set<String> excludedCandidates = new HashSet<>();
   // whether or not there are any validation errors
   private boolean isValid;
 
@@ -189,6 +192,11 @@ class ContestConfig {
     if (getNumDeclaredCandidates() < 1) {
       isValid = false;
       Logger.log(Level.SEVERE, "Config must contain at least one declared candidate.");
+    }
+
+    if (getNumDeclaredCandidates() == excludedCandidates.size()) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "Config must contain at least one non-excluded candidate.");
     }
   }
 
@@ -386,6 +394,10 @@ class ContestConfig {
     return getCandidateCodeList().size();
   }
 
+  boolean candidateIsExcluded(String candidate) {
+    return excludedCandidates.contains(candidate);
+  }
+
   // function: getOvervoteRule
   // purpose: return overvote rule enum to use
   // returns: overvote rule to use for this config
@@ -488,14 +500,15 @@ class ContestConfig {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
         String code = candidate.getCode();
         String name = candidate.getName();
-        if (code != null && !code.isEmpty()) {
-          if (!candidateCodeToNameMap.keySet().contains(code)) {
-            candidateCodeToNameMap.put(code, name);
-            candidatePermutation.add(code);
-          }
-        } else if (!candidateCodeToNameMap.keySet().contains(name)) {
-          candidateCodeToNameMap.put(name, name);
-          candidatePermutation.add(name);
+        if (code == null || code.isEmpty()) {
+          code = name;
+        }
+
+        // duplicate names or codes get caught in validation
+        candidateCodeToNameMap.put(code, name);
+        candidatePermutation.add(code);
+        if (candidate.isExcluded()) {
+          excludedCandidates.add(code);
         }
       }
 
