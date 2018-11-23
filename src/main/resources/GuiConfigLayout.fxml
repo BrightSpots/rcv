@@ -199,8 +199,8 @@
               </padding>
             </VBox>
             <VBox spacing="8.0">
-              <CheckBox mnemonicParsing="false" text="Integral Winning Threshold"
-                fx:id="checkBoxIntegralWinningThreshold">
+              <CheckBox mnemonicParsing="false" text="Non-Integer Winning Threshold"
+                fx:id="checkBoxNonIntegerWinningThreshold">
                 <VBox.margin>
                   <Insets top="4.0"/>
                 </VBox.margin>

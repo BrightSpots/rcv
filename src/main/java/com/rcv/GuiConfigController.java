@@ -148,6 +148,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldRulesDescription;
   @FXML
+  private CheckBox checkBoxNonIntegerWinningThreshold;
+  @FXML
   private CheckBox checkBoxBatchElimination;
   @FXML
   private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
@@ -155,8 +157,6 @@ public class GuiConfigController implements Initializable {
   private CheckBox checkBoxExhaustOnDuplicateCandidate;
   @FXML
   private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
-  @FXML
-  private CheckBox checkBoxIntegralWinningThreshold;
   @FXML
   private ButtonBar buttonBar;
 
@@ -429,6 +429,8 @@ public class GuiConfigController implements Initializable {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.DEFAULT_TABULATE_BY_PRECINCT);
+    checkBoxNonIntegerWinningThreshold.setSelected(
+        ContestConfig.DEFAULT_NON_INTEGER_WINNING_THRESHOLD);
     checkBoxBatchElimination.setSelected(ContestConfig.DEFAULT_BATCH_ELIMINATION);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(
         ContestConfig.DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
@@ -436,7 +438,6 @@ public class GuiConfigController implements Initializable {
         ContestConfig.DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
         ContestConfig.DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
-    checkBoxIntegralWinningThreshold.setSelected(ContestConfig.DEFAULT_INTEGRAL_WINNING_THRESHOLD);
 
     textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.DEFAULT_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic.setText(
@@ -478,11 +479,11 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.clear();
     textFieldUndeclaredWriteInLabel.clear();
     textFieldRulesDescription.clear();
+    checkBoxNonIntegerWinningThreshold.setSelected(false);
     checkBoxBatchElimination.setSelected(false);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
     checkBoxExhaustOnDuplicateCandidate.setSelected(false);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(false);
-    checkBoxIntegralWinningThreshold.setSelected(false);
 
     setDefaultValues();
   }
@@ -603,13 +604,13 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.setText(config.getUndervoteLabel());
     textFieldUndeclaredWriteInLabel.setText(config.getUndeclaredWriteInLabel());
     textFieldRulesDescription.setText(config.getRulesDescription());
+    checkBoxNonIntegerWinningThreshold.setSelected(config.isNonIntegerWinningThresholdEnabled());
     checkBoxBatchElimination.setSelected(config.isBatchEliminationEnabled());
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(
         config.willContinueUntilTwoCandidatesRemain());
     checkBoxExhaustOnDuplicateCandidate.setSelected(config.isExhaustOnDuplicateCandidateEnabled());
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
         config.isTreatBlankAsUndeclaredWriteInEnabled());
-    checkBoxIntegralWinningThreshold.setSelected(config.isWinningThresholdIntegral());
   }
 
   private Integer getIntValueElse(TextField textField, Integer defaultValue) {
@@ -667,11 +668,11 @@ public class GuiConfigController implements Initializable {
     rules.minimumVoteThreshold =
         getIntValueElse(
             textFieldMinimumVoteThreshold, ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
+    rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
     rules.treatBlankAsUndeclaredWriteIn = checkBoxTreatBlankAsUndeclaredWriteIn.isSelected();
-    rules.integralWinningThreshold = checkBoxIntegralWinningThreshold.isSelected();
     rules.overvoteLabel = textFieldOvervoteLabel.getText();
     rules.undervoteLabel = textFieldUndervoteLabel.getText();
     rules.undeclaredWriteInLabel = textFieldUndeclaredWriteInLabel.getText();

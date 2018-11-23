@@ -37,11 +37,11 @@ class ContestConfig {
 
   // TODO: if any booleans are unspecified in config file, they default to false no matter what
   static final boolean DEFAULT_TABULATE_BY_PRECINCT = false;
+  static final boolean DEFAULT_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean DEFAULT_BATCH_ELIMINATION = false;
   static final boolean DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
-  static final boolean DEFAULT_INTEGRAL_WINNING_THRESHOLD = true;
   static final int DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final int DEFAULT_NUMBER_OF_WINNERS = 1;
   static final BigDecimal DEFAULT_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
@@ -285,8 +285,8 @@ class ContestConfig {
         : rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
-  boolean isWinningThresholdIntegral() {
-    return rawConfig.rules.integralWinningThreshold;
+  boolean isNonIntegerWinningThresholdEnabled() {
+    return rawConfig.rules.nonIntegerWinningThreshold;
   }
 
   // function: divide

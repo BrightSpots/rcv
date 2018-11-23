@@ -56,7 +56,7 @@
     "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
-    "integralWinningThreshold" : true,
+    "nonIntegerWinningThreshold": false,
     "overvoteLabel" : "overvote",
     "undervoteLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
