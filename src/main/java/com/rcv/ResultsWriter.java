@@ -245,10 +245,10 @@ class ResultsWriter {
       String candidateDisplayName = this.config.getNameForCandidateID(candidate);
       csvPrinter.print(candidateDisplayName);
 
-      // displayRound indexes over all rounds
-      for (int displayRound = 1; displayRound <= numRounds; displayRound++) {
+      // round indexes over all rounds
+      for (int round = 1; round <= numRounds; round++) {
         // vote tally this round
-        BigDecimal thisRoundTally = roundTallies.get(displayRound).get(candidate);
+        BigDecimal thisRoundTally = roundTallies.get(round).get(candidate);
         // not all candidates may have a tally in every round
         if (thisRoundTally == null) {
           thisRoundTally = BigDecimal.ZERO;
@@ -264,16 +264,16 @@ class ResultsWriter {
     // exhausted CVR header cell
     csvPrinter.print("Exhausted ballots");
 
-    // displayRound indexes through all rounds
-    for (int displayRound = 1; displayRound <= numRounds; displayRound++) {
+    // round indexes through all rounds
+    for (int round = 1; round <= numRounds; round++) {
       // count of votes exhausted this round
       BigDecimal thisRoundExhausted = BigDecimal.ZERO;
 
-      if (displayRound > 1) {
+      if (round > 1) {
         // Exhausted count is the difference between the total votes in round 1 and the total votes
         // in the current round.
         thisRoundExhausted =
-            totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(displayRound));
+            totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(round));
       }
       // total votes cell
       csvPrinter.print(thisRoundExhausted.toString());
