@@ -128,12 +128,12 @@ Config file must be valid JSON format. Examples can be found under the test fold
         default: 4
 
       "nonIntegerWinningThreshold" optional
-        the vote threshold used to determine winners should be an integer
+        the vote threshold used to determine winners can be a non-integer
         if true, threshold = V/(S+1) + 10^-d
         if false, threshold = floor(V/(S+1)) + 1
         where V = total number of votes (in the current round for single-seat or in the first round for multi-seat); S = numberOfWinners; and d = decimalPlacesForVoteArithmetic
         value: true | false
-        default: true
+        default: false
 
       "minimumVoteThreshold" optional
         the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
