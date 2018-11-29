@@ -14,22 +14,28 @@
   } ],
   "candidates" : [ {
     "name" : "A",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "B",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "C",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "D",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "E",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "F",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   } ],
   "rules" : {
     "tiebreakMode" : "interactive",
@@ -39,6 +45,7 @@
     "numberOfWinners" : 3,
     "decimalPlacesForVoteArithmetic" : 4,
     "minimumVoteThreshold" : 0,
+    "nonIntegerWinningThreshold": false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,

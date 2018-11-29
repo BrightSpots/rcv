@@ -148,6 +148,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldRulesDescription;
   @FXML
+  private CheckBox checkBoxNonIntegerWinningThreshold;
+  @FXML
   private CheckBox checkBoxBatchElimination;
   @FXML
   private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
@@ -427,6 +429,8 @@ public class GuiConfigController implements Initializable {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.DEFAULT_TABULATE_BY_PRECINCT);
+    checkBoxNonIntegerWinningThreshold.setSelected(
+        ContestConfig.DEFAULT_NON_INTEGER_WINNING_THRESHOLD);
     checkBoxBatchElimination.setSelected(ContestConfig.DEFAULT_BATCH_ELIMINATION);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(
         ContestConfig.DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
@@ -475,6 +479,7 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.clear();
     textFieldUndeclaredWriteInLabel.clear();
     textFieldRulesDescription.clear();
+    checkBoxNonIntegerWinningThreshold.setSelected(false);
     checkBoxBatchElimination.setSelected(false);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
     checkBoxExhaustOnDuplicateCandidate.setSelected(false);
@@ -599,6 +604,7 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.setText(config.getUndervoteLabel());
     textFieldUndeclaredWriteInLabel.setText(config.getUndeclaredWriteInLabel());
     textFieldRulesDescription.setText(config.getRulesDescription());
+    checkBoxNonIntegerWinningThreshold.setSelected(config.isNonIntegerWinningThresholdEnabled());
     checkBoxBatchElimination.setSelected(config.isBatchEliminationEnabled());
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(
         config.willContinueUntilTwoCandidatesRemain());
@@ -662,6 +668,7 @@ public class GuiConfigController implements Initializable {
     rules.minimumVoteThreshold =
         getIntValueElse(
             textFieldMinimumVoteThreshold, ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
+    rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();

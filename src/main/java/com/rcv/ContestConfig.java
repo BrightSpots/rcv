@@ -37,6 +37,7 @@ class ContestConfig {
 
   // TODO: if any booleans are unspecified in config file, they default to false no matter what
   static final boolean DEFAULT_TABULATE_BY_PRECINCT = false;
+  static final boolean DEFAULT_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean DEFAULT_BATCH_ELIMINATION = false;
   static final boolean DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
@@ -282,6 +283,10 @@ class ContestConfig {
     return rawConfig.rules.decimalPlacesForVoteArithmetic == null
         ? DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC
         : rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
+  boolean isNonIntegerWinningThresholdEnabled() {
+    return rawConfig.rules.nonIntegerWinningThreshold;
   }
 
   // function: divide

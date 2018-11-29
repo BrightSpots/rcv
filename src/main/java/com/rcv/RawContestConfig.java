@@ -171,6 +171,7 @@ public class RawContestConfig {
     public Integer decimalPlacesForVoteArithmetic;
     // minimum votes needed to continue
     public Integer minimumVoteThreshold;
+    public boolean nonIntegerWinningThreshold;
     // are we using batch elimination?
     public boolean batchElimination;
     // keep tabulating beyond selecting winner until only two candidates remain

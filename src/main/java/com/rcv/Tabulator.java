@@ -317,6 +317,7 @@ class Tabulator {
   // purpose: determine and store the threshold to win
   // param: currentRoundCandidateToTally map of candidateID to their tally for a particular round
   private void setWinningThreshold(Map<String, BigDecimal> currentRoundCandidateToTally) {
+    // TODO: add unit test for logic in this method
     // currentRoundTotalVotes holds total active votes in this round
     BigDecimal currentRoundTotalVotes = BigDecimal.ZERO;
     // numVotes indexes over all vote tallies in this round
@@ -326,8 +327,16 @@ class Tabulator {
 
     // divisor for threshold is num winners + 1
     BigDecimal divisor = new BigDecimal(config.getNumberOfWinners() + 1);
-    // threshold = floor(votes / (num_winners + 1)) + 1
-    winningThreshold = currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
+    if (config.isNonIntegerWinningThresholdEnabled()) {
+      // threshold = (votes / (num_winners + 1)) + 10^(-1 * decimalPlacesForVoteArithmetic)
+      BigDecimal augend =
+          config.divide(
+              BigDecimal.ONE, BigDecimal.TEN.pow(config.getDecimalPlacesForVoteArithmetic()));
+      winningThreshold = config.divide(currentRoundTotalVotes, divisor).add(augend);
+    } else {
+      // threshold = floor(votes / (num_winners + 1)) + 1
+      winningThreshold = currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
+    }
     Logger.log(Level.INFO, "Winning threshold set to %s", winningThreshold.toString());
   }
 
@@ -389,7 +398,7 @@ class Tabulator {
     // If the number of continuing candidates equals the number of seats to fill, everyone wins.
     if (currentRoundCandidateToTally.size() == config.getNumberOfWinners() - winnerToRound.size()) {
       selectedWinners.addAll(currentRoundCandidateToTally.keySet());
-    } else { // see if anyone has exceeded the threshold
+    } else { // see if anyone has met or exceeded the threshold
       // tally indexes over all tallies to find any winners
       for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
         if (tally.compareTo(winningThreshold) >= 0) {
