@@ -131,11 +131,11 @@ class StreamingCVRReader {
 
   // function: handleEmptyCells
   // purpose: Handle empty cells encountered while parsing a CVR.  Unlike empty rows, empty cells
-  // do not trigger parsing callbacks so their existence must be inferred.
-  // param: currentRank the rank at which we should stop handling empty cells
+  // do not trigger parsing callbacks so their existence must be inferred and handled when they
+  // occur in a rankings cell.
+  // param: currentRank the rank at which we stop inferring empty cells.
   void handleEmptyCells(int currentRank) {
-      // previousRank is the rank after which we should start handling empty cells
-      // rank iterates between previousRank and endRank adding audit data and possibly UWI rankings
+      // rank iterates between lastRankSeen and currentRank adding audit data and UWI rankings
       for (int rank = lastRankSeen + 1;  rank < currentRank; rank++) {
         // add data to audit log
         currentCVRData.add("empty cell");
@@ -151,14 +151,13 @@ class StreamingCVRReader {
   // function: beginCVR
   // purpose: prepare to begin parsing a new CVR
   void beginCVR() {
-    // setup containers for parsing a new cvr from this row
+    // setup data structures for parsing a new CVR
     CVRIndex++;
     currentRankings = new LinkedList<>();
     currentCVRData = new LinkedList<>();
     currentSuppliedCVRID = null;
     currentPrecinct = null;
     lastRankSeen = 0;
-    Logger.log(Level.INFO, "new cvr:" + CVRIndex);
   }
 
   // function: endCVR
@@ -175,16 +174,20 @@ class StreamingCVRReader {
         currentCVRData, currentRankings);
     // add it to overall list
     CVRList.add(newRecord);
+    // provide some user feedback on the CVR count
+    if(CVRList.size() % 50000 == 0) {
+      Logger.log(Level.INFO, String.format("Parsed %d cast vote records ...", CVRList.size()));
+    }
   }
 
   // function: CVRCell
-  // purpose: handle a new CVR cell
+  // purpose: handle a new CVR cell data
   // param: col column of this cell
   // param: row of this cell (unused)
   // param: cellData data contained in this cell
   void CVRCell(int col, int row, String cellData) {
 
-    // add cell data to full audit string
+    // add cell data to "full" audit string
     currentCVRData.add(cellData);
 
     // check for a currentPrecinct string or CVR ID string
@@ -194,34 +197,34 @@ class StreamingCVRReader {
       currentSuppliedCVRID = cellData;
     }
 
-    // check for unexpected column value
-    if (col >= firstVoteColumnIndex + config.getMaxRankingsAllowed()) {
-      Logger.log(Level.WARNING,String.format("unexpected cell data at col:%d: %s", col, cellData));
-    } else if (col >= firstVoteColumnIndex ) {
-      // this column is in valid range
+    // see if this column is in the ranking range
+    if (col >= firstVoteColumnIndex &&
+        col < firstVoteColumnIndex + config.getMaxRankingsAllowed()) {
 
-      // handle any empty cells which may exist between this cell and any previous one
+      // rank for this column
       Integer currentRank = col - firstVoteColumnIndex + 1;
+      // handle any empty cells which may exist between this cell and any previous one
       handleEmptyCells(currentRank);
       // get the candidate name
       String candidate = cellData.trim();
-      // check for an undervote label -- it will not result in a ranking
+      // skip undervotes
       if(!candidate.equals(config.getUndervoteLabel())) {
-        // if candidate is overvote map it to our internal overvote string
+        // map overvotes to our internal overvote string
         if (candidate.equals(config.getOvervoteLabel())) {
           candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
         } else if (!config.getCandidateCodeList().contains(candidate)
             && !candidate.equals(config.getUndeclaredWriteInLabel())) {
-          // add unrecognized candidate to the map
+          // this is an unrecognized candidate so add it to the unrecognized candidate map
+          // this helps identify problems with CVRs
           unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
         }
         // create and add the new ranking
         Pair<Integer, String> ranking = new Pair<>(currentRank, candidate);
         currentRankings.add(ranking);
       }
+      // update lastRankSeen - used to handle empty ranking cells
       lastRankSeen = currentRank;
     }
-
   }
 
 
@@ -302,8 +305,6 @@ class StreamingCVRReader {
         sheetContentsHandler,
         true);
 
-    Logger.log(Level.INFO,"Streaming XML reader");
-
     // create the xml parser and set content handler
     XMLReader parser = XMLReaderFactory.createXMLReader();
     parser.setContentHandler(handler);
@@ -318,7 +319,6 @@ class StreamingCVRReader {
     // return the input list with additions
     return CVRList;
   }
-
 
   static class UnrecognizedCandidatesException extends Exception {
 
