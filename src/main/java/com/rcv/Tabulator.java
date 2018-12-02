@@ -156,17 +156,23 @@ class Tabulator {
         for (String winner : winners) {
           winnerToRound.put(winner, currentRound);
         }
-        for (String winner : winners) {
-          // are there still more winners to select in future rounds?
-          if (winnerToRound.size() < config.getNumberOfWinners()) {
+        // In multi-seat contests, we always redistribute the surplus (if any).
+        if (config.getNumberOfWinners() > 1) {
+          for (String winner : winners) {
             // number of votes the candidate got this round
             BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
             // number that were surplus (beyond the required threshold)
             BigDecimal extraVotes = candidateVotes.subtract(winningThreshold);
             // fractional transfer percentage
-            BigDecimal surplusFraction = config.divide(extraVotes, candidateVotes);
+            BigDecimal surplusFraction =
+                extraVotes.signum() == 1
+                    ? config.divide(extraVotes, candidateVotes)
+                    : BigDecimal.ZERO;
             Logger.log(
-                Level.INFO, "%s won with surplus fraction: %s", winner, surplusFraction.toString());
+                Level.INFO,
+                "%s won with a surplus fraction of %s",
+                winner,
+                surplusFraction.toString());
             for (CastVoteRecord cvr : castVoteRecords) {
               if (winner.equals(cvr.getCurrentRecipientOfVote())) {
                 cvr.recordCurrentRecipientAsWinner(surplusFraction, config);
@@ -174,7 +180,10 @@ class Tabulator {
             }
           }
         }
-      } else { // if no winners in this round, determine who will be eliminated
+      } else if (winnerToRound.size() < config.getNumberOfWinners()) {
+        // since there are no winners in this round and we still need to fill more seats, let's
+        // determine which candidate(s) will be eliminated
+
         // container for eliminated candidate(s)
         List<String> eliminated;
 
@@ -347,12 +356,17 @@ class Tabulator {
     // how many candidates have already been eliminated
     int numEliminatedCandidates = candidateToRoundEliminated.keySet().size();
     // how many winners have been selected
-    int numWinners = winnerToRound.size();
+    int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
     if (config.willContinueUntilTwoCandidatesRemain()) {
-      return numEliminatedCandidates + numWinners + 1 < config.getNumCandidates();
+      return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates();
     } else {
-      return numWinners < config.getNumberOfWinners();
+      int lastWinnerRound = winnerToRound.values().stream().mapToInt(v -> v).max().orElse(-1);
+      // If there are more seats to fill, we should keep going, of course.
+      // But also: if we've selected all the winners in a multi-seat contest, we should tabulate one
+      // extra round in order to show the effect of redistributing the final surpluses.
+      return numWinnersDeclared < config.getNumberOfWinners()
+          || (config.getNumberOfWinners() > 1 && lastWinnerRound == currentRound);
     }
   }
 
@@ -395,16 +409,20 @@ class Tabulator {
     // store result here
     List<String> selectedWinners = new LinkedList<>();
 
-    // If the number of continuing candidates equals the number of seats to fill, everyone wins.
-    if (currentRoundCandidateToTally.size() == config.getNumberOfWinners() - winnerToRound.size()) {
-      selectedWinners.addAll(currentRoundCandidateToTally.keySet());
-    } else { // see if anyone has met or exceeded the threshold
-      // tally indexes over all tallies to find any winners
-      for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
-        if (tally.compareTo(winningThreshold) >= 0) {
-          // we have winner(s)
-          List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
-          selectedWinners.addAll(winningCandidates);
+    // We should only look for more winners if we haven't already filled all the seats.
+    if (winnerToRound.size() < config.getNumberOfWinners()) {
+      // If the number of continuing candidates equals the number of seats to fill, everyone wins.
+      if (currentRoundCandidateToTally.size()
+          == config.getNumberOfWinners() - winnerToRound.size()) {
+        selectedWinners.addAll(currentRoundCandidateToTally.keySet());
+      } else { // see if anyone has met or exceeded the threshold
+        // tally indexes over all tallies to find any winners
+        for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
+          if (tally.compareTo(winningThreshold) >= 0) {
+            // we have winner(s)
+            List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
+            selectedWinners.addAll(winningCandidates);
+          }
         }
       }
     }
