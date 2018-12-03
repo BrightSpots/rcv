@@ -61,17 +61,17 @@ class StreamingCVRReader {
   private int CVRIndex = 0;
   // map for tracking unrecognized candidates during parsing
   Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
-  // list of currentRankings read from this row
+  // list of currentRankings for CVR in progress
   LinkedList<Pair<Integer, String>> currentRankings;
-  // list of raw strings read from this row, for the audit log
+  // list of raw strings for CVR in progress
   LinkedList<String> currentCVRData;
-  // current vote supplied ID
+  // supplied CVR ID for CVR in progress
   String currentSuppliedCVRID;
-  // current currentPrecinct ID
+  // precinct ID for CVR in progress
   String currentPrecinct;
-  // place to store input CVR list for appending new CVRs
+  // place to store input CVR list (new CVRs will be appended as we parse)
   List<CastVoteRecord> CVRList;
-  // last cell parsed for this CVR
+  // last rankings cell observed for CVR in progress
   int lastRankSeen;
 
   // function: CVRReader
@@ -91,7 +91,7 @@ class StreamingCVRReader {
         source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex() - 1 : null;
   }
 
-  // given Excel-style address string return the address as a pair of Integers
+  // given Excel-style address string return the cell address as a pair of Integers
   // representing zero-based column and row of the cell address
   public static Pair<Integer, Integer> getCellAddress(String address) {
     // this regex will parse a string into
@@ -102,7 +102,7 @@ class StreamingCVRReader {
       Logger.log(Level.SEVERE, "invalid cell address:" + address);
       throw new InvalidParameterException();
     }
-    // row is the row of the cell
+    // row is the 0-based row of the cell
     Integer row = Integer.parseInt(addressParts[1]) - 1;
     // col is the 0-based column of the cell
     Integer col = getColumnIndex(addressParts[0]);
@@ -180,12 +180,12 @@ class StreamingCVRReader {
     }
   }
 
-  // function: CVRCell
-  // purpose: handle a new CVR cell data
+  // function: cvrCell
+  // purpose: handle CVR cell data callback
   // param: col column of this cell
   // param: row of this cell (unused)
   // param: cellData data contained in this cell
-  void CVRCell(int col, int row, String cellData) {
+  void cvrCell(int col, int row, String cellData) {
 
     // add cell data to "full" audit string
     currentCVRData.add(cellData);
@@ -284,7 +284,7 @@ class StreamingCVRReader {
         int row = address.getValue();
         // we assume exactly one header row so skip cells in the first row
         if(row > 0) {
-          CVRCell(col, row, s1);
+          cvrCell(col, row, s1);
         }
       }
 

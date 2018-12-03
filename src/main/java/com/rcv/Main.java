@@ -214,22 +214,18 @@ public class Main extends GuiApplication {
             "Source file contains unrecognized candidate(s): %s",
             source.getFilePath());
         // map from name to number of times encountered
-        Map<String, Integer> candidateCounts = exception.candidateCounts;
         for (String candidate : exception.candidateCounts.keySet()) {
           Logger.log(
               Level.SEVERE,
               "Unrecognized candidate \"%s\" appears %d time(s).",
               candidate,
-              candidateCounts.get(candidate));
+              exception.candidateCounts.get(candidate));
         }
         encounteredSourceProblem = true;
       } catch (IOException e) {
         Logger.log(Level.SEVERE, "Error opening source file %s", source.getFilePath());
         encounteredSourceProblem = true;
-      } catch (SAXException e) {
-        Logger.log(Level.SEVERE, "Error parsing source file %s", source.getFilePath());
-        encounteredSourceProblem = true;
-      } catch (OpenXML4JException e) {
+      } catch (SAXException | OpenXML4JException e) {
         Logger.log(Level.SEVERE, "Error parsing source file %s", source.getFilePath());
         encounteredSourceProblem = true;
       }
