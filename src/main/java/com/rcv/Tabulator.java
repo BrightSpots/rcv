@@ -572,7 +572,8 @@ class Tabulator {
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
             .setTimestampString(timestamp)
-            .setTallyTransfers(tallyTransfers);
+            .setTallyTransfers(tallyTransfers)
+            .setWinningThreshold(winningThreshold);
 
     writer.generateOverallSummarySpreadsheet(roundTallies);
 

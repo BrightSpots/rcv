@@ -24,6 +24,7 @@ package com.rcv;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +47,8 @@ class ResultsWriter {
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
+  // threshold to win
+  private BigDecimal winningThreshold;
   // map from round number to list of candidates eliminated in that round
   private Map<Integer, List<String>> roundToEliminatedCandidates;
   // map from round number to list of candidates winning in that round
@@ -70,6 +73,14 @@ class ResultsWriter {
   // param: numRounds total number of rounds
   ResultsWriter setNumRounds(int numRounds) {
     this.numRounds = numRounds;
+    return this;
+  }
+
+  // function: setWinningThreshold
+  // purpose: setter for winning threshold
+  // param: threshold to win
+  ResultsWriter setWinningThreshold(BigDecimal threshold) {
+    this.winningThreshold = threshold;
     return this;
   }
 
@@ -135,7 +146,7 @@ class ResultsWriter {
     generateSummarySpreadsheet(roundTallies, null, outputPath);
 
     // generate json output
-    generateSummaryJson(outputPath, roundTallies);
+    generateSummaryJson(roundTallies, null, outputPath);
   }
 
   // function: generatePrecinctSummarySpreadsheet
@@ -155,11 +166,14 @@ class ResultsWriter {
       String outputPath =
           Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
       generateSummarySpreadsheet(precinctRoundTallies.get(precinct), precinct, outputPath);
+
+      // generate json output
+      generateSummaryJson(precinctRoundTallies.get(precinct), precinct, outputPath);
     }
   }
 
   // function: generateSummarySpreadsheet
-  // purpose: creates a summary spreadsheet .xlsx file
+  // purpose: creates a summary spreadsheet .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
   // param: precinct indicates which precinct we're reporting results for (null means all)
   // param: outputPath is the full path of the file to save
@@ -177,7 +191,6 @@ class ResultsWriter {
     List<String> sortedCandidates = sortCandidatesByTally(firstRoundTally);
 
     // totalActiveVotesPerRound is a map of round to total votes cast in each round
-    // this will be used to calculate the percentage of total votes each candidate achieves
     Map<Integer, BigDecimal> totalActiveVotesPerRound = new HashMap<>();
     // round indexes over all rounds plus final results round
     for (int round = 1; round <= numRounds; round++) {
@@ -207,7 +220,7 @@ class ResultsWriter {
     addHeaderRows(csvPrinter, precinct);
 
     // add a row header for the round column labels
-    csvPrinter.print("rounds");
+    csvPrinter.print("Rounds");
     // round indexes over all rounds
     for (int round = 1; round <= numRounds; round++) {
       // label string will have the actual text which goes in the cell
@@ -224,9 +237,7 @@ class ResultsWriter {
 
     final BigDecimal totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
 
-    // Candidate votes [total, delta, percentage]
-    // For each candidate: for each round: output total votes, delta votes, and final vote
-    // percentage of total.
+    // For each candidate: for each round: output total votes
     // candidate indexes over all candidates
     for (String candidate : sortedCandidates) {
       // show each candidate row with their totals for each round
@@ -235,15 +246,10 @@ class ResultsWriter {
       String candidateDisplayName = this.config.getNameForCandidateID(candidate);
       csvPrinter.print(candidateDisplayName);
 
-      // displayRound indexes over all rounds plus final results round
-      for (int displayRound = 1; displayRound <= numRounds + 1; displayRound++) {
-        // flag for the last round results which are special-cased
-        boolean isFinalResults = displayRound == numRounds + 1;
-        // For the Final Results "round", we're mostly copying the data from the final round.
-        // round from which to display data
-        int dataUseRound = isFinalResults ? numRounds : displayRound;
+      // round indexes over all rounds
+      for (int round = 1; round <= numRounds; round++) {
         // vote tally this round
-        BigDecimal thisRoundTally = roundTallies.get(dataUseRound).get(candidate);
+        BigDecimal thisRoundTally = roundTallies.get(round).get(candidate);
         // not all candidates may have a tally in every round
         if (thisRoundTally == null) {
           thisRoundTally = BigDecimal.ZERO;
@@ -259,16 +265,16 @@ class ResultsWriter {
     // exhausted CVR header cell
     csvPrinter.print("Exhausted ballots");
 
-    // displayRound indexes through all rounds
-    for (int displayRound = 1; displayRound <= numRounds; displayRound++) {
+    // round indexes through all rounds
+    for (int round = 1; round <= numRounds; round++) {
       // count of votes exhausted this round
       BigDecimal thisRoundExhausted = BigDecimal.ZERO;
 
-      if (displayRound > 1) {
+      if (round > 1) {
         // Exhausted count is the difference between the total votes in round 1 and the total votes
         // in the current round.
         thisRoundExhausted =
-            totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(displayRound));
+            totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(round));
       }
       // total votes cell
       csvPrinter.print(thisRoundExhausted.toString());
@@ -347,6 +353,7 @@ class ResultsWriter {
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
     csvPrinter.printRecord("Office", config.getContestOffice());
     csvPrinter.printRecord("Date", config.getContestDate());
+    csvPrinter.printRecord("Threshold", winningThreshold.toString());
     if (precinct != null && !precinct.isEmpty()) {
       csvPrinter.printRecord("Precinct", precinct);
     }
@@ -412,11 +419,16 @@ class ResultsWriter {
   // param: outputPath where to write json file
   // param: roundTallies all tally information
   // file access: write to outputPath
-  private void generateSummaryJson(String outputPath,
-      Map<Integer, Map<String, BigDecimal>> roundTallies)
+  private void generateSummaryJson(Map<Integer, Map<String, BigDecimal>> roundTallies,
+      String precinct,
+      String outputPath)
       throws IOException {
+
     // mapper converts java objects to json
     ObjectMapper mapper = new ObjectMapper();
+    // set mapper to order keys alphabeticaly for more legible output
+    mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+
     // jsonWriter writes those object to disk
     ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
     // jsonPath for output json summary
@@ -428,9 +440,19 @@ class ResultsWriter {
 
     // root outputJson dict will have two entries:
     // results - vote totals, transfers, and candidates elected / eliminated
-    // TODO: add needed config info
     // config - global config into
     HashMap<String, Object> outputJson = new HashMap<>();
+    // config will contain contest configuration info
+    HashMap<String, Object> configData = new HashMap<>();
+    // add config header info
+    configData.put("Contest", config.getContestName());
+    configData.put("Jurisdiction", config.getContestJurisdiction());
+    configData.put("Office", config.getContestOffice());
+    configData.put("Date", config.getContestDate());
+    configData.put("Threshold", winningThreshold.toString());
+    if (precinct != null && !precinct.isEmpty()) {
+      configData.put("Precinct", precinct);
+    }
     // results will be a list of round data objects
     ArrayList<Object> results = new ArrayList<>();
     // for each round create objects for json serialization
@@ -438,22 +460,26 @@ class ResultsWriter {
       // container for all json data this round:
       HashMap<String, Object> roundData = new HashMap<>();
       // add round number (this is implied by the ordering but for debugging we are explicit)
-      roundData.put("round",round);
+      roundData.put("Round", round);
+      // add actions if this is not a precinct summary
+      if (precinct == null || precinct.isEmpty()) {
       // actions is a list of one or more action objects
-      ArrayList<Object> actions = new ArrayList<>();
-      // add any elected actions
-      addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);
-      // add any elimination actions
-      addActionObjects("eliminated", roundToEliminatedCandidates.get(round), round, actions);
-      // add action objects
-      roundData.put("actions", actions);
+        ArrayList<Object> actions = new ArrayList<>();
+        addActionObjects("Elected", roundToWinningCandidates.get(round), round, actions);
+        // add any elimination actions
+        addActionObjects("Eliminated", roundToEliminatedCandidates.get(round), round, actions);
+        // add action objects
+        roundData.put("Actions", actions);
+      }
       // add tally object
-      roundData.put("tallies", roundTallies.get(round));
+      roundData.put("Tallies", roundTallies.get(round));
       // add roundData to results list
       results.add(roundData);
     }
+    // add config data to root object
+    outputJson.put("Config", configData);
     // add results to root object
-    outputJson.put("results", results);
+    outputJson.put("Results", results);
     // write results to disk
     try {
       jsonWriter.writeValue(outFile, outputJson);
