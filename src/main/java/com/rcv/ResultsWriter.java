@@ -24,6 +24,7 @@ package com.rcv;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -425,6 +426,9 @@ class ResultsWriter {
 
     // mapper converts java objects to json
     ObjectMapper mapper = new ObjectMapper();
+    // set mapper to order keys alphabeticaly for more legible output
+    mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+
     // jsonWriter writes those object to disk
     ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
     // jsonPath for output json summary
