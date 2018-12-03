@@ -123,7 +123,9 @@ class StreamingCVRReader {
       result *= 26;
       // charValue maps the current character to a value between 0 and 25
       int charValue = columnAddress.charAt(i) - 'A';
-      assert(charValue >= 0 && charValue < 26);
+      if(charValue < 0 || charValue >= 26) {
+        throw new InvalidParameterException();
+      }
       result += charValue;
     }
     return result;
