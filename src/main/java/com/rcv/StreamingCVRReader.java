@@ -320,10 +320,18 @@ class StreamingCVRReader {
     return CVRList;
   }
 
+  // exception class used when an unrecognized candidate is encountered during cvr parsing
+  // purpose is to help identify issues with cast vote record files and configuration files
   static class UnrecognizedCandidatesException extends Exception {
 
+    // candidateCounts maps an unrecognized candidate name to the count of how many times it was
+    // encountered during CVR parsing
     public final Map<String, Integer> candidateCounts;
 
+    // function: UnrecognizedCandidatesException
+    // purpose: constructor
+    // param: candidateCounts maps unrecognized candidates to the number of times they were
+    // encountered during parsing
     UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
       this.candidateCounts = candidateCounts;
     }
