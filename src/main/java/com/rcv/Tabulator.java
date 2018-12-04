@@ -361,6 +361,8 @@ class Tabulator {
     if (config.willContinueUntilTwoCandidatesRemain()) {
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates();
     } else {
+      // This line just finds the most recent round in which we've declared a winner (or -1 if we
+      // haven't declared any winners yet).
       int lastWinnerRound = winnerToRound.values().stream().mapToInt(v -> v).max().orElse(-1);
       // If there are more seats to fill, we should keep going, of course.
       // But also: if we've selected all the winners in a multi-seat contest, we should tabulate one
