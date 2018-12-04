@@ -60,19 +60,19 @@ class StreamingCVRReader {
   // used for generating CVR IDs
   private int CVRIndex = 0;
   // map for tracking unrecognized candidates during parsing
-  Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
+  private Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // list of currentRankings for CVR in progress
-  LinkedList<Pair<Integer, String>> currentRankings;
+  private LinkedList<Pair<Integer, String>> currentRankings;
   // list of raw strings for CVR in progress
-  LinkedList<String> currentCVRData;
+  private LinkedList<String> currentCVRData;
   // supplied CVR ID for CVR in progress
-  String currentSuppliedCVRID;
+  private String currentSuppliedCVRID;
   // precinct ID for CVR in progress
-  String currentPrecinct;
+  private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
-  List<CastVoteRecord> CVRList;
+  private List<CastVoteRecord> CVRList;
   // last rankings cell observed for CVR in progress
-  int lastRankSeen;
+  private int lastRankSeen;
 
   // function: CVRReader
   // purpose: class constructor
@@ -93,7 +93,7 @@ class StreamingCVRReader {
 
   // given Excel-style address string return the cell address as a pair of Integers
   // representing zero-based column and row of the cell address
-  public static Pair<Integer, Integer> getCellAddress(String address) {
+  private static Pair<Integer, Integer> getCellAddress(String address) {
     // this regex will parse a string into
     // a sequence of one or more non-digits followed by a sequence of one or more digits
     // and store these substrings into addressParts array
@@ -109,26 +109,29 @@ class StreamingCVRReader {
     // return the result as a Pair
     return new Pair<>(col, row);
   }
+
   // function: getColumnIndex
   // purpose: given alphabetic representation of an Excel columnAddress returns the zero-based
   // integer index of the column, e.g. "A" returns 0 and "AB" returns 27
-  // param: columnAddress the input columnAddress String
+  // param: columnAddress the column portion of an Excel cell address string
   // return: column index
-  public static int getColumnIndex(String columnAddress) {
+  private static int getColumnIndex(String columnAddress) {
     // result is column index
     int result = 0;
     // i indexes over the "digits" of the columnAddress string
     for (int i = 0; i < columnAddress.length(); i++) {
       // at each iteration the current total will be multiplied by 26, "shifting" it left one place
       result *= 26;
-      // charValue maps the current character to a value between 0 and 25
-      int charValue = columnAddress.charAt(i) - 'A';
-      if(charValue < 0 || charValue >= 26) {
+      // charValue maps the current character to a value between 1 and 26
+      int charValue = columnAddress.charAt(i) - '@';
+      if (charValue < 1 || charValue > 26) {
+        Logger.log(Level.SEVERE, "invalid cell address:" + columnAddress);
         throw new InvalidParameterException();
       }
       result += charValue;
     }
-    return result;
+    // finally subtract one to convert to zero-based index
+    return result - 1;
   }
 
   // function: handleEmptyCells
@@ -136,23 +139,23 @@ class StreamingCVRReader {
   // do not trigger parsing callbacks so their existence must be inferred and handled when they
   // occur in a rankings cell.
   // param: currentRank the rank at which we stop inferring empty cells.
-  void handleEmptyCells(int currentRank) {
-      // rank iterates between lastRankSeen and currentRank adding audit data and UWI rankings
-      for (int rank = lastRankSeen + 1;  rank < currentRank; rank++) {
-        // add data to audit log
-        currentCVRData.add("empty cell");
-        // add UWI ranking if required by settings
-        if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
-          Logger.log(Level.WARNING, "Empty cell -- treating as UWI");
-          // add the new ranking
-          currentRankings.add(new Pair<>(rank, config.getUndeclaredWriteInLabel()));
-        }
+  private void handleEmptyCells(int currentRank) {
+    // rank iterates between lastRankSeen and currentRank adding audit data and UWI rankings
+    for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {
+      // add data to audit log
+      currentCVRData.add("empty cell");
+      // add UWI ranking if required by settings
+      if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
+        Logger.log(Level.WARNING, "Empty cell -- treating as UWI");
+        // add the new ranking
+        currentRankings.add(new Pair<>(rank, config.getUndeclaredWriteInLabel()));
       }
+    }
   }
 
   // function: beginCVR
   // purpose: prepare to begin parsing a new CVR
-  void beginCVR() {
+  private void beginCVR() {
     // setup data structures for parsing a new CVR
     CVRIndex++;
     currentRankings = new LinkedList<>();
@@ -164,7 +167,7 @@ class StreamingCVRReader {
 
   // function: endCVR
   // purpose: complete construction of new CVR object
-  void endCVR() {
+  private void endCVR() {
     // handle any empty cells which may appear at the end of this row
     handleEmptyCells(config.getMaxRankingsAllowed() + 1);
     // determine what the new cvr ID will be
@@ -187,7 +190,7 @@ class StreamingCVRReader {
   // param: col column of this cell
   // param: row of this cell (unused)
   // param: cellData data contained in this cell
-  void cvrCell(int col, int row, String cellData) {
+  private void cvrCell(int col, int row, String cellData) {
 
     // add cell data to "full" audit string
     currentCVRData.add(cellData);
@@ -297,7 +300,7 @@ class StreamingCVRReader {
       // param: s1 header footer data
       @Override
       public void headerFooter(String s, boolean b, String s1) {
-        Logger.log(Level.WARNING, String.format("unexpected xml data: %s %d %s", s, b, s1));
+        Logger.log(Level.WARNING, String.format("unexpected xml data: %s %b %s", s, b, s1));
       }
     };
 
@@ -328,7 +331,7 @@ class StreamingCVRReader {
 
     // candidateCounts maps an unrecognized candidate name to the count of how many times it was
     // encountered during CVR parsing
-    public final Map<String, Integer> candidateCounts;
+    final Map<String, Integer> candidateCounts;
 
     // function: UnrecognizedCandidatesException
     // purpose: constructor
