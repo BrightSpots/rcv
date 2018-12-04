@@ -70,30 +70,6 @@ class CastVoteRecord {
     sortRankings(rankings);
   }
 
-  // function: equals
-  // purpose: validate that two CVRs are equivalent for test purposes
-  // param: left CastVoteRecord to test for equality
-  // param: right CastVoteRecord to test for equality
-  // returns: true if left CastVoteRecord is logically equal to right CastVoteRecord
-  static boolean equalsCVR(CastVoteRecord left, CastVoteRecord right) {
-    // computedID is true if both computedIDs are null or equal
-    boolean computedID = (left.computedID == null && right.computedID == null) ||
-        left.computedID.equals(right.computedID);
-    // suppliedID is true if both suppliedIDs are null or equal
-    boolean suppliedID = (left.suppliedID == null && right.suppliedID == null) ||
-        left.suppliedID.equals(right.suppliedID);
-    // precinct is true if both precincts are null or equal
-    boolean precinct = (left.precinct == null && right.precinct == null) ||
-        left.precinct.equals(right.precinct);
-    // fullCVRData is true if both fullCVRData are equal
-    boolean fullCVRData = left.fullCVRData.equals(right.fullCVRData);
-    // rankings is true if both rankings sets are equal
-    boolean rankings = left.rankToCandidateIDs.equals(right.rankToCandidateIDs);
-    // returned result is true if all previous results are true
-    boolean result = (computedID && suppliedID && precinct && fullCVRData && rankings);
-    return result;
-  }
-
   // function: logRoundOutcome
   // purpose: logs the outcome for this CVR for this round for auditing purposes
   // param: outcomeType indicates what happened

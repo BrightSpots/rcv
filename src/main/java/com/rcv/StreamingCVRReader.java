@@ -58,7 +58,7 @@ class StreamingCVRReader {
   // column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
   // used for generating CVR IDs
-  private int CVRIndex = 0;
+  private int cvrIndex = 0;
   // map for tracking unrecognized candidates during parsing
   private Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // list of currentRankings for CVR in progress
@@ -70,11 +70,11 @@ class StreamingCVRReader {
   // precinct ID for CVR in progress
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
-  private List<CastVoteRecord> CVRList;
+  private List<CastVoteRecord> cvrList;
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
 
-  // function: CVRReader
+  // function: StreamingCVRReader
   // purpose: class constructor
   // param: config an ContestConfig object specifying rules for interpreting CVR file data
   // param: source file to read
@@ -157,7 +157,7 @@ class StreamingCVRReader {
   // purpose: prepare to begin parsing a new CVR
   private void beginCVR() {
     // setup data structures for parsing a new CVR
-    CVRIndex++;
+    cvrIndex++;
     currentRankings = new LinkedList<>();
     currentCVRData = new LinkedList<>();
     currentSuppliedCVRID = null;
@@ -172,25 +172,24 @@ class StreamingCVRReader {
     handleEmptyCells(config.getMaxRankingsAllowed() + 1);
     // determine what the new cvr ID will be
     String computedCastVoteRecordID = String
-        .format("%s(%d)", StreamingCVRReader.this.excelFileName, CVRIndex);
+        .format("%s(%d)", excelFileName, cvrIndex);
     // create new cast vote record
     CastVoteRecord newRecord = new CastVoteRecord(
         computedCastVoteRecordID, currentSuppliedCVRID, currentPrecinct,
         currentCVRData, currentRankings);
     // add it to overall list
-    CVRList.add(newRecord);
+    cvrList.add(newRecord);
     // provide some user feedback on the CVR count
-    if(CVRList.size() % 50000 == 0) {
-      Logger.log(Level.INFO, String.format("Parsed %d cast vote records ...", CVRList.size()));
+    if(cvrList.size() % 50000 == 0) {
+      Logger.log(Level.INFO, String.format("Parsed %d cast vote records ...", cvrList.size()));
     }
   }
 
   // function: cvrCell
   // purpose: handle CVR cell data callback
   // param: col column of this cell
-  // param: row of this cell (unused)
   // param: cellData data contained in this cell
-  private void cvrCell(int col, int row, String cellData) {
+  private void cvrCell(int col, String cellData) {
 
     // add cell data to "full" audit string
     currentCVRData.add(cellData);
@@ -241,7 +240,7 @@ class StreamingCVRReader {
       throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException {
 
     // cache the cvr list so it is accessible in callbacks
-    CVRList = castVoteRecords;
+    cvrList = castVoteRecords;
 
     // open the zip package
     OPCPackage pkg = OPCPackage.open(excelFilePath);
@@ -289,7 +288,7 @@ class StreamingCVRReader {
         int row = address.getValue();
         // we assume exactly one header row so skip cells in the first row
         if(row > 0) {
-          cvrCell(col, row, s1);
+          cvrCell(col, s1);
         }
       }
 
@@ -322,7 +321,7 @@ class StreamingCVRReader {
     }
 
     // return the input list with additions
-    return CVRList;
+    return cvrList;
   }
 
   // exception class used when an unrecognized candidate is encountered during cvr parsing
