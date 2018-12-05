@@ -24,8 +24,8 @@
 
 package com.rcv;
 
-import com.rcv.CVRReader.SourceWithUnrecognizedCandidatesException;
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
+import com.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +35,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.xml.sax.SAXException;
 
 public class Main extends GuiApplication {
 
@@ -201,25 +203,30 @@ public class Main extends GuiApplication {
       Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       // the CVRs parsed from this source
       try {
-        List<CastVoteRecord> cvrs = new CVRReader(config, source).parseCVRFile(castVoteRecords);
+        List<CastVoteRecord> cvrs = new StreamingCVRReader(config, source).parseCVRFile(castVoteRecords);
         if (cvrs.isEmpty()) {
           Logger.log(Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
           encounteredSourceProblem = true;
         }
-      } catch (SourceWithUnrecognizedCandidatesException exception) {
+      } catch (UnrecognizedCandidatesException exception) {
         Logger.log(
             Level.SEVERE,
             "Source file contains unrecognized candidate(s): %s",
             source.getFilePath());
         // map from name to number of times encountered
-        Map<String, Integer> candidateCounts = exception.getCandidateCounts();
-        for (String candidate : candidateCounts.keySet()) {
+        for (String candidate : exception.candidateCounts.keySet()) {
           Logger.log(
               Level.SEVERE,
               "Unrecognized candidate \"%s\" appears %d time(s).",
               candidate,
-              candidateCounts.get(candidate));
+              exception.candidateCounts.get(candidate));
         }
+        encounteredSourceProblem = true;
+      } catch (IOException e) {
+        Logger.log(Level.SEVERE, "Error opening source file %s", source.getFilePath());
+        encounteredSourceProblem = true;
+      } catch (SAXException | OpenXML4JException e) {
+        Logger.log(Level.SEVERE, "Error parsing source file %s", source.getFilePath());
         encounteredSourceProblem = true;
       }
     }
