@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,6 +37,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class TabulatorTests {
+
+  // folder where we store test inputs
+  private static final String TEST_ASSET_FOLDER = "test_data";
 
   // function: fileCompare
   // purpose: compare file contents line by line to identify any differences and give an
@@ -84,30 +88,46 @@ class TabulatorTests {
     return result;
   }
 
+  // function: runTabulationTest
+  // purpose: helper function to support running various tabulation tests
+  // param: configFile name of  configuration file
+  // param: expectedFile name of expected summary results json file
+  static void runTabulationTest(String configFile, String expectedFile) {
+    // full path to config file
+    String configPath = Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, configFile)
+            .toAbsolutePath()
+            .toString();
+    // full path to expected results file
+    String expectedPath = Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, expectedFile)
+        .toAbsolutePath()
+        .toString();
+    // load the contest config
+    ContestConfig config = Main.loadContestConfig(configPath);
+    Assertions.assertNotNull(config);
+    executeTabulation(config);
+    // actualSummaryOutputPath is the summary json we just tabulated
+    String actualSummaryOutputPath = Main.getSummaryOutputPath();
+    // compare actual to expected
+    assertTrue(fileCompare(actualSummaryOutputPath, expectedPath));
+  }
+
+  // function: setup
+  // purpose: runs once at the beginning of testing to setup logging
   @BeforeAll
   public static void setup() {
     try {
       Logger.setup();
     } catch (IOException exception) {
+      // this is non-fatal
       System.err.print(String.format("Failed to start system logging!\n%s", exception.toString()));
     }
   }
 
+  // function: testPortlandMayor
+  // purpose: test tabulation of Portland contest
   @Test
   @DisplayName("Portland Mayor 2015")
   void testPortlandMayor() {
-    // call main with Portland Mayor config path to run the tabulation
-    ContestConfig config = Main.loadContestConfig("./test_data/config_2015_portland_mayor.json");
-    if (config != null) {
-      executeTabulation(config);
-      // actualSummaryOutputPath is the summary json we just tabulated
-      String actualSummaryOutputPath = Main.getSummaryOutputPath();
-      // expected path is the known correct tabulation
-      String expectedOutputPath = "./test_data/2015_portland_mayor_expected.json";
-      // compare the file outputs
-      assertTrue(fileCompare(actualSummaryOutputPath, expectedOutputPath));
-    } else {
-      Assertions.fail("Unable to create config object for test");
-    }
+    runTabulationTest("config_2015_portland_mayor.json", "2015_portland_mayor_expected.json");
   }
 }
