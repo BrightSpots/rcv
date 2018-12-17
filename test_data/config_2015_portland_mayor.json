@@ -1,82 +1,80 @@
 {
-  "outputSettings": {
-    "contestName": "Portland 2015 Mayoral Race",
-    "outputDirectory": "test_output/2015_portland_mayor",
-    "contestDate": "2015-11-03",
-    "contestJurisdiction": "Portland, ME",
-    "contestOffice": "Mayor",
-    "tabulateByPrecinct": false
+  "outputSettings" : {
+    "contestName" : "Portland 2015 Mayoral Race",
+    "outputDirectory" : "test_output/2015_portland_mayor",
+    "contestDate" : "2015-11-03",
+    "contestJurisdiction" : "Portland, ME",
+    "contestOffice" : "Mayor",
+    "tabulateByPrecinct" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "test_data/cvr_2015_portland_mayor.xlsx",
-      "firstVoteColumnIndex": 4,
-      "precinctColumnIndex": 2,
-      "provider": "ES&S"
-    }
-  ],
-  "candidates": [
-    {
-      "name": "Brennan, Michael F."
-    },
-    {
-      "name": "Bragdon, Charles E."
-    },
-    {
-      "name": "Bryant, Peter G."
-    },
-    {
-      "name": "Carmona, Ralph C."
-    },
-    {
-      "name": "Dodge, Richard A."
-    },
-    {
-      "name": "Duson, Jill C."
-    },
-    {
-      "name": "Eder, John M."
-    },
-    {
-      "name": "Haadoow, Hamza A."
-    },
-    {
-      "name": "Lapchick, Jodie L."
-    },
-    {
-      "name": "Marshall, David A."
-    },
-    {
-      "name": "Mavodones, Nicholas M. Jr."
-    },
-    {
-      "name": "Miller, Markos S."
-    },
-    {
-      "name": "Rathband, Jed"
-    },
-    {
-      "name": "Strimling, Ethan K."
-    },
-    {
-      "name": "Vail, Christopher L."
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "random",
-    "overvoteRule": "exhaustImmediately",
-    "maxRankingsAllowed": 15,
-    "maxSkippedRanksAllowed": 1,
-    "numberOfWinners": 1,
-    "decimalPlacesForVoteArithmetic": 4,
-    "minimumVoteThreshold": 0,
-    "batchElimination": true,
-    "continueUntilTwoCandidatesRemain": false,
-    "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI",
-    "rulesDescription": "Maine Rules"
+  "cvrFileSources" : [ {
+    "filePath" : "test_data/cvr_2015_portland_mayor.xlsx",
+    "firstVoteColumnIndex" : 4,
+    "precinctColumnIndex" : 2,
+    "provider" : "ES&S"
+  } ],
+  "candidates" : [ {
+    "name" : "Brennan, Michael F.",
+    "excluded" : false
+  }, {
+    "name" : "Bragdon, Charles E.",
+    "excluded" : false
+  }, {
+    "name" : "Bryant, Peter G.",
+    "excluded" : false
+  }, {
+    "name" : "Carmona, Ralph C.",
+    "excluded" : false
+  }, {
+    "name" : "Dodge, Richard A.",
+    "excluded" : false
+  }, {
+    "name" : "Duson, Jill C.",
+    "excluded" : false
+  }, {
+    "name" : "Eder, John M.",
+    "excluded" : false
+  }, {
+    "name" : "Haadoow, Hamza A.",
+    "excluded" : false
+  }, {
+    "name" : "Lapchick, Jodie L.",
+    "excluded" : false
+  }, {
+    "name" : "Marshall, David A.",
+    "excluded" : false
+  }, {
+    "name" : "Mavodones, Nicholas M. Jr.",
+    "excluded" : false
+  }, {
+    "name" : "Miller, Markos S.",
+    "excluded" : false
+  }, {
+    "name" : "Rathband, Jed",
+    "excluded" : false
+  }, {
+    "name" : "Strimling, Ethan K.",
+    "excluded" : false
+  }, {
+    "name" : "Vail, Christopher L.",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "usePermutationInConfig",
+    "overvoteRule" : "exhaustImmediately",
+    "maxRankingsAllowed" : 15,
+    "maxSkippedRanksAllowed" : 1,
+    "numberOfWinners" : 1,
+    "decimalPlacesForVoteArithmetic" : 4,
+    "minimumVoteThreshold" : 0,
+    "nonIntegerWinningThreshold" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "rulesDescription" : "Maine Rules"
   }
 }
