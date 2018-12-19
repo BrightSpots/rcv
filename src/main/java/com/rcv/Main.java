@@ -134,7 +134,7 @@ public class Main extends GuiApplication {
     if (isConfigValid) {
       boolean isTabulationLogSetUp = false;
       // current date-time formatted as a string used for creating unique output files names
-      String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+      final String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
       // %g format is for log file naming
       String tabulationLogPath =
           Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log",

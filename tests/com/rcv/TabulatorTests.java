@@ -79,10 +79,10 @@ class TabulatorTests {
         }
       }
     } catch (FileNotFoundException e) {
-      Logger.log(Level.SEVERE, "file not found!");
+      Logger.log(Level.SEVERE, "file not found: " + e.toString());
       result = false;
     } catch (IOException e) {
-      Logger.log(Level.SEVERE, "error reading file!");
+      Logger.log(Level.SEVERE, "error reading file: " + e.toString());
       result = false;
     }
     return result;
