@@ -33,12 +33,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
 public class Main extends GuiApplication {
+
+  // summaryOutputPath is generated from timestamp + config file
+  // we cache it here to help support testing
+  private static String summaryOutputPath;
+
+  // function: getSummaryOutputPath
+  // purpose: return the last summaryOutputPath generated for tabulation
+  // returns: the last getSummaryOutputPath
+  public static String getSummaryOutputPath() {
+    return summaryOutputPath;
+  }
 
   // function: main
   // purpose: main entry point to the rcv tabulator program
@@ -66,7 +76,6 @@ public class Main extends GuiApplication {
         Logger.log(Level.SEVERE, "Aborting because config is invalid.");
       }
     }
-
     System.exit(0);
   }
 
@@ -74,7 +83,7 @@ public class Main extends GuiApplication {
   // purpose: attempts to create config object
   // param: path to config file
   // returns: the new ContestConfig object, or null if there was a problem
-  static ContestConfig loadContestConfig(String configPath) {
+  public static ContestConfig loadContestConfig(String configPath) {
     // config: the new object
     ContestConfig config = null;
 
@@ -128,7 +137,15 @@ public class Main extends GuiApplication {
       final String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
       // %g format is for log file naming
       String tabulationLogPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
+          Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log",
+              timestampString))
+              .toAbsolutePath()
+              .toString();
+
+      // cache summaryOutputPath for testing
+      summaryOutputPath =
+          Paths.get(config.getOutputDirectory(), String.format("%s_summary.json",
+              timestampString))
               .toAbsolutePath()
               .toString();
       try {

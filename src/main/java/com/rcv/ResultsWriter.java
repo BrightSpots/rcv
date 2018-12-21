@@ -25,6 +25,8 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -426,8 +428,13 @@ class ResultsWriter {
 
     // mapper converts java objects to json
     ObjectMapper mapper = new ObjectMapper();
-    // set mapper to order keys alphabeticaly for more legible output
+    // set mapper to order keys alphabetically for more legible output
     mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+    // create a module to contain a serializer for BigDecimal serialization
+    SimpleModule module = new SimpleModule();
+    module.addSerializer(BigDecimal.class, new ToStringSerializer());
+    // attach serializer to mapper
+    mapper.registerModule(module);
 
     // jsonWriter writes those object to disk
     ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
@@ -445,13 +452,13 @@ class ResultsWriter {
     // config will contain contest configuration info
     HashMap<String, Object> configData = new HashMap<>();
     // add config header info
-    configData.put("Contest", config.getContestName());
-    configData.put("Jurisdiction", config.getContestJurisdiction());
-    configData.put("Office", config.getContestOffice());
-    configData.put("Date", config.getContestDate());
-    configData.put("Threshold", winningThreshold.toString());
+    configData.put("contest", config.getContestName());
+    configData.put("jurisdiction", config.getContestJurisdiction());
+    configData.put("office", config.getContestOffice());
+    configData.put("date", config.getContestDate());
+    configData.put("threshold", winningThreshold);
     if (precinct != null && !precinct.isEmpty()) {
-      configData.put("Precinct", precinct);
+      configData.put("precinct", precinct);
     }
     // results will be a list of round data objects
     ArrayList<Object> results = new ArrayList<>();
@@ -460,26 +467,26 @@ class ResultsWriter {
       // container for all json data this round:
       HashMap<String, Object> roundData = new HashMap<>();
       // add round number (this is implied by the ordering but for debugging we are explicit)
-      roundData.put("Round", round);
+      roundData.put("round", round);
       // add actions if this is not a precinct summary
       if (precinct == null || precinct.isEmpty()) {
       // actions is a list of one or more action objects
         ArrayList<Object> actions = new ArrayList<>();
-        addActionObjects("Elected", roundToWinningCandidates.get(round), round, actions);
+        addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);
         // add any elimination actions
-        addActionObjects("Eliminated", roundToEliminatedCandidates.get(round), round, actions);
+        addActionObjects("eliminated", roundToEliminatedCandidates.get(round), round, actions);
         // add action objects
-        roundData.put("Actions", actions);
+        roundData.put("tallyResults", actions);
       }
       // add tally object
-      roundData.put("Tallies", roundTallies.get(round));
+      roundData.put("tally", roundTallies.get(round));
       // add roundData to results list
       results.add(roundData);
     }
     // add config data to root object
-    outputJson.put("Config", configData);
+    outputJson.put("config", configData);
     // add results to root object
-    outputJson.put("Results", results);
+    outputJson.put("results", results);
     // write results to disk
     try {
       jsonWriter.writeValue(outFile, outputJson);
