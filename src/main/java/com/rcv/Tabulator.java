@@ -180,9 +180,12 @@ class Tabulator {
             }
           }
         }
-      } else if (winnerToRound.size() < config.getNumberOfWinners()) {
-        // since there are no winners in this round and we still need to fill more seats, let's
-        // determine which candidate(s) will be eliminated
+      } else if (winnerToRound.size() < config.getNumberOfWinners()
+          || (config.willContinueUntilTwoCandidatesRemain()
+          && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)) {
+        // We need to make more eliminations if
+        // a) we haven't found all the winners yet, or
+        // b) we've found our winner, but we're continuing until we have only two candidates
 
         // container for eliminated candidate(s)
         List<String> eliminated;
@@ -359,7 +362,10 @@ class Tabulator {
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
     if (config.willContinueUntilTwoCandidatesRemain()) {
-      return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates();
+      // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
+      // round after we've made our final elimination.
+      return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
+          || candidateToRoundEliminated.values().contains(currentRound);
     } else {
       // This line just finds the most recent round in which we've declared a winner (or -1 if we
       // haven't declared any winners yet).
