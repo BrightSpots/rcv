@@ -367,14 +367,11 @@ class Tabulator {
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
           || candidateToRoundEliminated.values().contains(currentRound);
     } else {
-      // This line just finds the most recent round in which we've declared a winner (or -1 if we
-      // haven't declared any winners yet).
-      int lastWinnerRound = winnerToRound.values().stream().mapToInt(v -> v).max().orElse(-1);
       // If there are more seats to fill, we should keep going, of course.
       // But also: if we've selected all the winners in a multi-seat contest, we should tabulate one
       // extra round in order to show the effect of redistributing the final surpluses.
       return numWinnersDeclared < config.getNumberOfWinners()
-          || (config.getNumberOfWinners() > 1 && lastWinnerRound == currentRound);
+          || (config.getNumberOfWinners() > 1 && winnerToRound.values().contains(currentRound));
     }
   }
 
