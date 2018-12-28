@@ -215,7 +215,7 @@ public class Main extends GuiApplication {
 
     // At each iteration of the following loop, we add records from another source file.
     // source: index over config sources
-    for (RawContestConfig.CVRSource source : config.rawConfig.cvrFileSources) {
+    for (RawContestConfig.CVRSource source : config.getRawConfig().cvrFileSources) {
       Path cvrPath = Paths.get(source.getFilePath()).toAbsolutePath();
       Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       // the CVRs parsed from this source

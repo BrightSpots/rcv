@@ -1,0 +1,45 @@
+{
+  "outputSettings" : {
+    "contestName" : "Minimum threshold test",
+    "outputDirectory" : "test_output/test_minimum_threshold",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_data/cvr_test_minimum_threshold.xlsx",
+    "firstVoteColumnIndex" : 2,
+    "firstVoteRowIndex" : 2,
+    "provider" : ""
+  } ],
+  "candidates" : [ {
+    "name" : "Gargamel",
+    "excluded" : false
+  }, {
+    "name" : "Skeletor",
+    "excluded" : false
+  }, {
+    "name" : "Megatron",
+    "excluded" : false
+  }, {
+    "name" : "Garfield",
+    "excluded" : false
+  }, {
+    "name" : "Odie",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "numberOfWinners" : 1,
+    "decimalPlacesForVoteArithmetic" : 4,
+    "minimumVoteThreshold" : 0,
+    "nonIntegerWinningThreshold" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "rulesDescription" : ""
+  }
+}

@@ -110,15 +110,17 @@ Config file must be valid JSON format. Examples can be found under the test fold
         how the program should handle an overvote when it encounters one
         value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
 
-      "maxRankingsAllowed" required
+      "maxRankingsAllowed" optional
         maximum number of candidates that a ballot is allowed to rank
         example: 15
         values: [1..100]
+        default: the number of declared candidates
 
-      "maxSkippedRanksAllowed" required
+      "maxSkippedRanksAllowed" optional
         maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
         example: 1
         value: [0..100]
+        default: unlimited
 
       "numberOfWinners" optional
         the number of seats to be won in this contest

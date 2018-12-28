@@ -517,7 +517,7 @@ public class GuiConfigController implements Initializable {
             new ObjectMapper()
                 .writer()
                 .withDefaultPrettyPrinter()
-                .writeValueAsString(GuiContext.getInstance().getConfig().rawConfig);
+                .writeValueAsString(GuiContext.getInstance().getConfig().getRawConfig());
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
     } catch (JsonProcessingException exception) {
@@ -585,45 +585,45 @@ public class GuiConfigController implements Initializable {
 
   private void loadConfig(ContestConfig config) {
     clearConfig();
+    RawContestConfig rawConfig = config.getRawConfig();
 
-    textFieldContestName.setText(config.getContestName());
-    textFieldOutputDirectory.setText(config.getOutputDirectory());
-    if (config.getContestDate() != null && !config.getContestDate().isEmpty()) {
-      datePickerContestDate.setValue(LocalDate.parse(config.getContestDate(), DATE_TIME_FORMATTER));
+    OutputSettings outputSettings = rawConfig.outputSettings;
+    textFieldContestName.setText(outputSettings.contestName);
+    textFieldOutputDirectory.setText(outputSettings.outputDirectory);
+    if (outputSettings.contestDate != null && !outputSettings.contestDate.isEmpty()) {
+      datePickerContestDate
+          .setValue(LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
     }
-    textFieldContestJurisdiction.setText(config.getContestJurisdiction());
-    textFieldContestOffice.setText(config.getContestOffice());
-    checkBoxTabulateByPrecinct.setSelected(config.isTabulateByPrecinctEnabled());
+    textFieldContestJurisdiction.setText(outputSettings.contestJurisdiction);
+    textFieldContestOffice.setText(outputSettings.contestOffice);
+    checkBoxTabulateByPrecinct.setSelected(outputSettings.tabulateByPrecinct);
 
-    if (config.rawConfig.cvrFileSources != null) {
-      tableViewCvrFiles.setItems(
-          FXCollections.observableArrayList(config.rawConfig.cvrFileSources));
-    }
-
-    if (config.rawConfig.candidates != null) {
-      tableViewCandidates.setItems(FXCollections.observableArrayList(config.rawConfig.candidates));
+    if (rawConfig.cvrFileSources != null) {
+      tableViewCvrFiles.setItems(FXCollections.observableArrayList(rawConfig.cvrFileSources));
     }
 
+    if (rawConfig.candidates != null) {
+      tableViewCandidates.setItems(FXCollections.observableArrayList(rawConfig.candidates));
+    }
+
+    ContestRules rules = rawConfig.rules;
     choiceTiebreakMode.setValue(config.getTiebreakMode());
     choiceOvervoteRule.setValue(config.getOvervoteRule());
-    setTextFieldToInteger(textFieldMaxRankingsAllowed, config.getMaxRankingsAllowed());
-    setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, config.getMaxSkippedRanksAllowed());
-    setTextFieldToInteger(textFieldNumberOfWinners, config.getNumberOfWinners());
+    setTextFieldToInteger(textFieldMaxRankingsAllowed, rules.maxRankingsAllowed);
+    setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, rules.maxSkippedRanksAllowed);
+    setTextFieldToInteger(textFieldNumberOfWinners, rules.numberOfWinners);
     setTextFieldToInteger(
-        textFieldDecimalPlacesForVoteArithmetic, config.getDecimalPlacesForVoteArithmetic());
-    setTextFieldToInteger(
-        textFieldMinimumVoteThreshold, config.getMinimumVoteThreshold().intValue());
-    textFieldOvervoteLabel.setText(config.getOvervoteLabel());
-    textFieldUndervoteLabel.setText(config.getUndervoteLabel());
-    textFieldUndeclaredWriteInLabel.setText(config.getUndeclaredWriteInLabel());
-    textFieldRulesDescription.setText(config.getRulesDescription());
-    checkBoxNonIntegerWinningThreshold.setSelected(config.isNonIntegerWinningThresholdEnabled());
-    checkBoxBatchElimination.setSelected(config.isBatchEliminationEnabled());
-    checkBoxContinueUntilTwoCandidatesRemain.setSelected(
-        config.willContinueUntilTwoCandidatesRemain());
-    checkBoxExhaustOnDuplicateCandidate.setSelected(config.isExhaustOnDuplicateCandidateEnabled());
-    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
-        config.isTreatBlankAsUndeclaredWriteInEnabled());
+        textFieldDecimalPlacesForVoteArithmetic, rules.decimalPlacesForVoteArithmetic);
+    setTextFieldToInteger(textFieldMinimumVoteThreshold, rules.minimumVoteThreshold);
+    textFieldOvervoteLabel.setText(rules.overvoteLabel);
+    textFieldUndervoteLabel.setText(rules.undervoteLabel);
+    textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
+    textFieldRulesDescription.setText(rules.rulesDescription);
+    checkBoxNonIntegerWinningThreshold.setSelected(rules.nonIntegerWinningThreshold);
+    checkBoxBatchElimination.setSelected(rules.batchElimination);
+    checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
+    checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
+    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
   }
 
   private Integer getIntValueElse(TextField textField, Integer defaultValue) {
