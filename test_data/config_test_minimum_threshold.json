@@ -11,6 +11,7 @@
     {
       "filePath": "test_data/cvr_test_minimum_threshold.xlsx",
       "firstVoteColumnIndex": 2,
+      "firstVoteRowIndex": 2,
       "provider": "ES&S"
     }
   ],

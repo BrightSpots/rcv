@@ -11,6 +11,7 @@
     {
       "filePath": "test_data/cvr_2018_maine_governor_primary_dem.xlsx",
       "firstVoteColumnIndex": 4,
+      "firstVoteRowIndex": 2,
       "idColumnIndex": 1,
       "precinctColumnIndex": 2,
       "provider": "ES&S"

@@ -96,6 +96,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CVRSource, Integer> tableColumnCvrFirstVoteCol;
   @FXML
+  private TableColumn<CVRSource, Integer> tableColumnCvrFirstVoteRow;
+  @FXML
   private TableColumn<CVRSource, Integer> tableColumnCvrIdCol;
   @FXML
   private TableColumn<CVRSource, Integer> tableColumnCvrPrecinctCol;
@@ -105,6 +107,8 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldCvrFilePath;
   @FXML
   private TextField textFieldCvrFirstVoteCol;
+  @FXML
+  private TextField textFieldCvrFirstVoteRow;
   @FXML
   private TextField textFieldCvrIdCol;
   @FXML
@@ -286,15 +290,19 @@ public class GuiConfigController implements Initializable {
       Logger.log(Level.WARNING, "CVR file path is required!");
     } else if (textFieldCvrFirstVoteCol.getText().isEmpty()) {
       Logger.log(Level.WARNING, "CVR first vote column is required!");
+    } else if (textFieldCvrFirstVoteRow.getText().isEmpty()) {
+      Logger.log(Level.WARNING, "CVR first vote row is required!");
     } else {
       cvrSource.setFilePath(textFieldCvrFilePath.getText());
       cvrSource.setFirstVoteColumnIndex(getIntValueElse(textFieldCvrFirstVoteCol, null));
+      cvrSource.setFirstVoteRowIndex(getIntValueElse(textFieldCvrFirstVoteRow, null));
       cvrSource.setIdColumnIndex(getIntValueElse(textFieldCvrIdCol, null));
       cvrSource.setPrecinctColumnIndex(getIntValueElse(textFieldCvrPrecinctCol, null));
       cvrSource.setProvider(textFieldCvrProvider.getText());
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
+      textFieldCvrFirstVoteRow.clear();
       textFieldCvrIdCol.clear();
       textFieldCvrPrecinctCol.clear();
       textFieldCvrProvider.clear();
@@ -364,6 +372,9 @@ public class GuiConfigController implements Initializable {
     textFieldCvrFirstVoteCol
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteCol));
+    textFieldCvrFirstVoteRow
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteRow));
     textFieldCvrIdCol.textProperty().addListener(new TextFieldListenerNonNegInt(textFieldCvrIdCol));
     textFieldCvrPrecinctCol
         .textProperty()
@@ -371,6 +382,7 @@ public class GuiConfigController implements Initializable {
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
     tableColumnCvrFirstVoteCol.setCellValueFactory(
         new PropertyValueFactory<>("firstVoteColumnIndex"));
+    tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
     tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
     tableColumnCvrPrecinctCol.setCellValueFactory(
         new PropertyValueFactory<>("precinctColumnIndex"));
@@ -458,6 +470,7 @@ public class GuiConfigController implements Initializable {
 
     textFieldCvrFilePath.clear();
     textFieldCvrFirstVoteCol.clear();
+    textFieldCvrFirstVoteRow.clear();
     textFieldCvrIdCol.clear();
     textFieldCvrPrecinctCol.clear();
     textFieldCvrProvider.clear();

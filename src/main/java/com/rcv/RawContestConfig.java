@@ -70,6 +70,8 @@ public class RawContestConfig {
     private String filePath;
     // 1-indexed column where rankings data begins
     private Integer firstVoteColumnIndex;
+    // 1-indexed row where first CVR appears
+    private Integer firstVoteRowIndex;
     // 1-indexed column containing CVR ID (if any)
     private Integer idColumnIndex;
     // 1-indexed column containing precinct (if any)
@@ -91,6 +93,14 @@ public class RawContestConfig {
 
     public void setFirstVoteColumnIndex(Integer firstVoteColumnIndex) {
       this.firstVoteColumnIndex = firstVoteColumnIndex;
+    }
+
+    public Integer getFirstVoteRowIndex() {
+      return firstVoteRowIndex;
+    }
+
+    public void setFirstVoteRowIndex(Integer firstVoteRowIndex) {
+      this.firstVoteRowIndex = firstVoteRowIndex;
     }
 
     public Integer getIdColumnIndex() {

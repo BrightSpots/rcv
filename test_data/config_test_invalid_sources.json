@@ -11,6 +11,7 @@
     {
       "filePath": "test_data/nonexistent_path",
       "firstVoteColumnIndex": 3,
+      "firstVoteRowIndex": 2,
       "precinctColumnIndex": 1,
       "provider": "ES&S"
     },
@@ -20,6 +21,7 @@
     },
     {
       "firstVoteColumnIndex": 3,
+      "firstVoteRowIndex": 0,
       "precinctColumnIndex": 1,
       "provider": "ES&S"
     },

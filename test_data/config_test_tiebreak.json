@@ -11,6 +11,7 @@
     {
       "filePath": "test_data/cvr_test_tiebreak.xlsx",
       "firstVoteColumnIndex": 2,
+      "firstVoteRowIndex": 2,
       "provider": "ES&S"
     }
   ],

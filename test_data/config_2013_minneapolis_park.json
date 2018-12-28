@@ -10,6 +10,7 @@
   "cvrFileSources" : [ {
     "filePath" : "test_data/cvr_2013_minneapolis_park.xlsx",
     "firstVoteColumnIndex" : 2,
+    "firstVoteRowIndex": 2,
     "precinctColumnIndex" : 1,
     "provider" : "ES&S"
   } ],

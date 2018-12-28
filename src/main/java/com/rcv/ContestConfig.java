@@ -52,9 +52,9 @@ class ContestConfig {
   final RawContestConfig rawConfig;
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
+  private final Set<String> excludedCandidates = new HashSet<>();
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
-  private final Set<String> excludedCandidates = new HashSet<>();
   // whether or not there are any validation errors
   private boolean isValid;
 
@@ -128,6 +128,15 @@ class ContestConfig {
               Level.SEVERE,
               "firstVoteColumnIndex must be from 1 to 1000: %s",
               source.getFilePath());
+        }
+
+        if (source.getFirstVoteRowIndex() == null) {
+          isValid = false;
+          Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", source.getFilePath());
+        } else if (source.getFirstVoteRowIndex() < 1 || source.getFirstVoteRowIndex() > 1000) {
+          isValid = false;
+          Logger.log(
+              Level.SEVERE, "firstVoteRowIndex must be from 1 to 1000: %s", source.getFilePath());
         }
 
         if (source.getIdColumnIndex() != null

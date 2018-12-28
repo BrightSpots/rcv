@@ -11,6 +11,7 @@
     {
       "filePath": "test_data/cvr_2013_minneapolis_mayor.xlsx",
       "firstVoteColumnIndex": 2,
+      "firstVoteRowIndex": 2,
       "precinctColumnIndex": 1,
       "provider": "ES&S"
     }

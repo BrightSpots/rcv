@@ -11,6 +11,7 @@
     {
       "filePath": "test_data/cvr_test_continue_tabulation.xlsx",
       "firstVoteColumnIndex": 4,
+      "firstVoteRowIndex": 2,
       "provider": "ES&S"
     }
   ],
