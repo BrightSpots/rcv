@@ -1,7 +1,7 @@
 {
   "outputSettings": {
     "contestName": "Portland 2015 Mayoral Race",
-    "outputDirectory": "test",
+    "outputDirectory": "test_output/continue_tabulation",
     "contestDate": "2015-11-03",
     "contestJurisdiction": "Portland, ME",
     "contestOffice": "Mayor",

@@ -57,7 +57,7 @@ class TabulatorTests {
       BufferedReader reader2 = new BufferedReader(new FileReader(path2));
 
       // loop until EOF is encountered
-      while(true) {
+      while (true) {
         // line1 and line2 store current line read from readers or null if EOF
         String line1 = reader1.readLine();
         String line2 = reader2.readLine();
@@ -67,14 +67,14 @@ class TabulatorTests {
           break;
         } else if (line1 == null || line2 == null) {
           // one file ended but the other did not
-          Logger.log(Level.SEVERE,"files are unequal lengths");
+          Logger.log(Level.SEVERE, "files are unequal lengths");
           result = false;
           break;
         }
         // both files have content so compare it
         if (!line1.equals(line2)) {
           // report inequality and keep processing in case there are more inequalities
-          Logger.log(Level.SEVERE,"files are not equal:\n%s\n%s", line1, line2);
+          Logger.log(Level.SEVERE, "files are not equal:\n%s\n%s", line1, line2);
           result = false;
         }
       }
@@ -94,13 +94,15 @@ class TabulatorTests {
   // param: expectedFile name of expected summary results json file
   static void runTabulationTest(String configFile, String expectedFile) {
     // full path to config file
-    String configPath = Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, configFile)
+    String configPath =
+        Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, configFile)
             .toAbsolutePath()
             .toString();
     // full path to expected results file
-    String expectedPath = Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, expectedFile)
-        .toAbsolutePath()
-        .toString();
+    String expectedPath =
+        Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, expectedFile)
+            .toAbsolutePath()
+            .toString();
     // load the contest config
     ContestConfig config = Main.loadContestConfig(configPath);
     Assertions.assertNotNull(config);
@@ -129,5 +131,12 @@ class TabulatorTests {
   @DisplayName("Portland Mayor 2015")
   void testPortlandMayor() {
     runTabulationTest("config_2015_portland_mayor.json", "2015_portland_mayor_expected.json");
+  }
+
+  @Test
+  @DisplayName("Continue Until Two Candidates Remain")
+  void testContinueUntilTwoCandidatesRemain() {
+    runTabulationTest(
+        "config_test_continue_tabulation.json", "test_continue_tabulation_expected.json");
   }
 }
