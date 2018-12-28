@@ -186,11 +186,11 @@
               <ChoiceBox prefWidth="220.0" fx:id="choiceTiebreakMode"/>
               <Label text="Overvote Rule *"/>
               <ChoiceBox prefWidth="220.0" fx:id="choiceOvervoteRule"/>
-              <Label text="Max Rankings Allowed *"/>
-              <TextField maxWidth="220.0" promptText="Max Rankings Allowed *"
+              <Label text="Max Rankings Allowed"/>
+              <TextField maxWidth="220.0" promptText="Max Rankings Allowed"
                 fx:id="textFieldMaxRankingsAllowed"/>
-              <Label text="Max Skipped Ranks Allowed *"/>
-              <TextField maxWidth="220.0" promptText="Max Skipped Ranks Allowed *"
+              <Label text="Max Skipped Ranks Allowed"/>
+              <TextField maxWidth="220.0" promptText="Max Skipped Ranks Allowed"
                 fx:id="textFieldMaxSkippedRanksAllowed"/>
               <Label text="Number of Winners"/>
               <TextField maxWidth="220.0" promptText="Number of Winners"

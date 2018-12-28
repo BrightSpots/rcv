@@ -50,7 +50,7 @@ class ContestConfig {
   static final boolean DEFAULT_CANDIDATE_EXCLUDED = false;
 
   // underlying rawConfig object data
-  final RawContestConfig rawConfig;
+  private final RawContestConfig rawConfig;
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   private final Set<String> excludedCandidates = new HashSet<>();
@@ -65,6 +65,10 @@ class ContestConfig {
   ContestConfig(RawContestConfig rawConfig) {
     this.rawConfig = rawConfig;
     this.processCandidateData();
+  }
+
+  RawContestConfig getRawConfig() {
+    return rawConfig;
   }
 
   // function: validate
@@ -248,18 +252,13 @@ class ContestConfig {
               + "or alwaysSkipToNextRank.");
     }
 
-    if (getMaxRankingsAllowed() == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "maxRankingsAllowed is required.");
-    } else if (getMaxRankingsAllowed() < 1 || getMaxRankingsAllowed() > 100) {
+    if (getMaxRankingsAllowed() < 1 || getMaxRankingsAllowed() > 100) {
       isValid = false;
       Logger.log(Level.SEVERE, "maxRankingsAllowed must be from 1 to 100.");
     }
 
-    if (getMaxSkippedRanksAllowed() == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed is required.");
-    } else if (getMaxSkippedRanksAllowed() < 0 || getMaxSkippedRanksAllowed() > 100) {
+    if (getMaxSkippedRanksAllowed() != null
+        && (getMaxSkippedRanksAllowed() < 0 || getMaxSkippedRanksAllowed() > 100)) {
       isValid = false;
       Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be from 0 to 100.");
     }
@@ -395,9 +394,11 @@ class ContestConfig {
 
   // function: getMaxRankingsAllowed
   // purpose: getter for maxRankingsAllowed
-  // returns: max rankings allowed
-  Integer getMaxRankingsAllowed() {
-    return rawConfig.rules.maxRankingsAllowed;
+  // returns: max rankings allowed (or falls back to the number of candidates)
+  int getMaxRankingsAllowed() {
+    return rawConfig.rules.maxRankingsAllowed != null
+        ? rawConfig.rules.maxRankingsAllowed
+        : getNumDeclaredCandidates();
   }
 
   // function: getRulesDescription
