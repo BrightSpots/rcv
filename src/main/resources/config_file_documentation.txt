@@ -56,6 +56,11 @@ Config file must be valid JSON format. Examples can be found under the test fold
         example: 3
         value: [1..1000]
 
+      "firstVoteRowIndex" required
+        index of the row (starting from 1) that contains the rankings for the first CVR
+        example: 2
+        value: [1..1000]
+
       "idColumnIndex" optional
         index of the column (starting from 1) that contains the unique ID for each CVR
         example: 1

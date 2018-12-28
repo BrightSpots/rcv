@@ -53,6 +53,8 @@ class StreamingCVRReader {
   private final String excelFileName;
   // column index of first ranking
   private final int firstVoteColumnIndex;
+  // row index of first CVR
+  private final int firstVoteRowIndex;
   // column index of CVR ID (if present)
   private final Integer idColumnIndex;
   // column index of currentPrecinct name (if present)
@@ -86,6 +88,7 @@ class StreamingCVRReader {
 
     // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
     this.firstVoteColumnIndex = source.getFirstVoteColumnIndex() - 1;
+    this.firstVoteRowIndex = source.getFirstVoteRowIndex() - 1;
     this.idColumnIndex = source.getIdColumnIndex() != null ? source.getIdColumnIndex() - 1 : null;
     this.precinctColumnIndex =
         source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex() - 1 : null;
@@ -98,7 +101,7 @@ class StreamingCVRReader {
     // a sequence of one or more non-digits followed by a sequence of one or more digits
     // and store these substrings into addressParts array
     String[] addressParts = address.split("(?<=\\D)(?=\\d)");
-    if(addressParts.length != 2) {
+    if (addressParts.length != 2) {
       Logger.log(Level.SEVERE, "invalid cell address:" + address);
       throw new InvalidParameterException();
     }
@@ -171,16 +174,19 @@ class StreamingCVRReader {
     // handle any empty cells which may appear at the end of this row
     handleEmptyCells(config.getMaxRankingsAllowed() + 1);
     // determine what the new cvr ID will be
-    String computedCastVoteRecordID = String
-        .format("%s(%d)", excelFileName, cvrIndex);
+    String computedCastVoteRecordID = String.format("%s(%d)", excelFileName, cvrIndex);
     // create new cast vote record
-    CastVoteRecord newRecord = new CastVoteRecord(
-        computedCastVoteRecordID, currentSuppliedCVRID, currentPrecinct,
-        currentCVRData, currentRankings);
+    CastVoteRecord newRecord =
+        new CastVoteRecord(
+            computedCastVoteRecordID,
+            currentSuppliedCVRID,
+            currentPrecinct,
+            currentCVRData,
+            currentRankings);
     // add it to overall list
     cvrList.add(newRecord);
     // provide some user feedback on the CVR count
-    if(cvrList.size() % 50000 == 0) {
+    if (cvrList.size() % 50000 == 0) {
       Logger.log(Level.INFO, String.format("Parsed %d cast vote records ...", cvrList.size()));
     }
   }
@@ -202,8 +208,8 @@ class StreamingCVRReader {
     }
 
     // see if this column is in the ranking range
-    if (col >= firstVoteColumnIndex &&
-        col < firstVoteColumnIndex + config.getMaxRankingsAllowed()) {
+    if (col >= firstVoteColumnIndex
+        && col < firstVoteColumnIndex + config.getMaxRankingsAllowed()) {
 
       // rank for this column
       Integer currentRank = col - firstVoteColumnIndex + 1;
@@ -212,7 +218,7 @@ class StreamingCVRReader {
       // get the candidate name
       String candidate = cellData.trim();
       // skip undervotes
-      if(!candidate.equals(config.getUndervoteLabel())) {
+      if (!candidate.equals(config.getUndervoteLabel())) {
         // map overvotes to our internal overvote string
         if (candidate.equals(config.getOvervoteLabel())) {
           candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
@@ -230,7 +236,6 @@ class StreamingCVRReader {
       lastRankSeen = currentRank;
     }
   }
-
 
   // function: parseCVRFile
   // purpose: parse the given file into a List of CastVoteRecords for tabulation
@@ -251,63 +256,59 @@ class StreamingCVRReader {
     // styles data is used for creating ContentHandler
     StylesTable styles = reader.getStylesTable();
     // SheetContentsHandler is used to handle parsing callbacks
-    SheetContentsHandler sheetContentsHandler = new SheetContentsHandler() {
-      // function: startRow
-      // purpose: startRow callback handler during xml parsing
-      // param: i the row which has started
-      @Override
-      public void startRow(int i) {
-        // we assume exactly one header row so skip the first row
-        if(i > 0) {
-          beginCVR();
-        }
-      }
+    SheetContentsHandler sheetContentsHandler =
+        new SheetContentsHandler() {
+          // function: startRow
+          // purpose: startRow callback handler during xml parsing
+          // param: i the row which has started
+          @Override
+          public void startRow(int i) {
+            if (i >= firstVoteRowIndex) {
+              beginCVR();
+            }
+          }
 
-      // function: endRow
-      // purpose: endRow callback handler during xml parsing
-      // row has completed, we will create a new cvr object
-      // param: i the row which has ended
-      @Override
-      public void endRow(int i) {
-        // we assume exactly one header row so skip the first row
-        if(i > 0) {
-          endCVR();
-        }
-      }
+          // function: endRow
+          // purpose: endRow callback handler during xml parsing
+          // row has completed, we will create a new cvr object
+          // param: i the row which has ended
+          @Override
+          public void endRow(int i) {
+            if (i >= firstVoteRowIndex) {
+              endCVR();
+            }
+          }
 
-      // function: cell
-      // purpose: cell callback handler during xml parsing
-      // param: s cell address encoded as col,row
-      // param: s1 cell data
-      // param: xssfComment additional cell data (unused)
-      @Override
-      public void cell(String s, String s1, XSSFComment xssfComment) {
-        // address contains the row and col of this cell
-        Pair<Integer,Integer> address = getCellAddress(s);
-        int col = address.getKey();
-        int row = address.getValue();
-        // we assume exactly one header row so skip cells in the first row
-        if(row > 0) {
-          cvrCell(col, s1);
-        }
-      }
+          // function: cell
+          // purpose: cell callback handler during xml parsing
+          // param: s cell address encoded as col,row
+          // param: s1 cell data
+          // param: xssfComment additional cell data (unused)
+          @Override
+          public void cell(String s, String s1, XSSFComment xssfComment) {
+            // address contains the row and col of this cell
+            Pair<Integer, Integer> address = getCellAddress(s);
+            int col = address.getKey();
+            int row = address.getValue();
+            if (row >= firstVoteRowIndex) {
+              cvrCell(col, s1);
+            }
+          }
 
-      // function: headerFooter
-      // purpose: header footer callback from xml parsing - unused
-      // param: s header footer data
-      // param: b header footer data
-      // param: s1 header footer data
-      @Override
-      public void headerFooter(String s, boolean b, String s1) {
-        Logger.log(Level.WARNING, String.format("unexpected xml data: %s %b %s", s, b, s1));
-      }
-    };
+          // function: headerFooter
+          // purpose: header footer callback from xml parsing - unused
+          // param: s header footer data
+          // param: b header footer data
+          // param: s1 header footer data
+          @Override
+          public void headerFooter(String s, boolean b, String s1) {
+            Logger.log(Level.WARNING, String.format("unexpected xml data: %s %b %s", s, b, s1));
+          }
+        };
 
     // create the ContentHandler to handle parsing callbacks
-    ContentHandler handler = new XSSFSheetXMLHandler(styles,
-        sharedStrings,
-        sheetContentsHandler,
-        true);
+    ContentHandler handler =
+        new XSSFSheetXMLHandler(styles, sharedStrings, sheetContentsHandler, true);
 
     // create the xml parser and set content handler
     XMLReader parser = XMLReaderFactory.createXMLReader();
@@ -339,6 +340,5 @@ class StreamingCVRReader {
     UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
       this.candidateCounts = candidateCounts;
     }
-
   }
 }
