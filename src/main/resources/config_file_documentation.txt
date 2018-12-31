@@ -11,9 +11,11 @@ Config file must be valid JSON format. Examples can be found under the test fold
         example: "Portland Mayoral Race 2017"
         value: text string of length [1..1000]
 
-      "outputDirectory" required
-        directory for output files (visualizer and audit)
+      "outputDirectory" optional
+        directory for visualizer and audit output files (absolute or relative path)
+        note: if not supplied, files will be saved to the current working directory
         example: /Path/To/TabulatorResults
+        example: output_data/contest1
         value: string of length [1..1000]
 
       "contestDate" optional
@@ -103,7 +105,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
     the "rules" section contains the following parameters:
 
       "tiebreakMode" required
-        how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round.
+        how the program should decide which candidate to eliminate when multiple candidates are tied for last place among continuing candidates in a given round
         value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive" | "usePermutationInConfig" | "generatePermutation"
 
       "overvoteRule" required
@@ -113,24 +115,24 @@ Config file must be valid JSON format. Examples can be found under the test fold
       "maxRankingsAllowed" optional
         maximum number of candidates that a ballot is allowed to rank
         example: 15
-        values: [1..100]
+        values: [1..]
         default: the number of declared candidates
 
       "maxSkippedRanksAllowed" optional
         maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
+        note: if this parameter is not set, it will be treated as unlimited
         example: 1
         value: [0..100]
-        default: unlimited
+        default: 1
 
-      "numberOfWinners" optional
+      "numberOfWinners" required
         the number of seats to be won in this contest
         note: we use fractional vote transfer to redistribute votes in multi-seat contests
         value: [1..100]
         default: 1
 
-      "decimalPlacesForVoteArithmetic" optional
-        number of rounding decimal places when computing fractional vote transfers and winning thresholds
-        valid in multi-seat contests with fractional vote transfer
+      "decimalPlacesForVoteArithmetic" required
+        number of rounding decimal places when computing winning thresholds and fractional vote transfers
         value: [0..20]
         default: 4
 
@@ -145,7 +147,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
       "minimumVoteThreshold" optional
         the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
         example: 150
-        value: [0..10000]
+        value: [0..1000000]
         default: 0
 
       "batchElimination" optional
