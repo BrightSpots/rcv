@@ -44,6 +44,7 @@ class ContestConfig {
   static final boolean DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
+  static final int DEFAULT_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final int DEFAULT_NUMBER_OF_WINNERS = 1;
   static final BigDecimal DEFAULT_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
 
@@ -252,29 +253,38 @@ class ContestConfig {
               + "or alwaysSkipToNextRank.");
     }
 
-    if (getMaxRankingsAllowed() < 1 || getMaxRankingsAllowed() > 100) {
+    if (getNumDeclaredCandidates() >= 1 && getMaxRankingsAllowed() < 1) {
       isValid = false;
-      Logger.log(Level.SEVERE, "maxRankingsAllowed must be from 1 to 100.");
+      Logger.log(Level.SEVERE, "maxRankingsAllowed must be 1 or higher.");
     }
 
     if (getMaxSkippedRanksAllowed() != null
         && (getMaxSkippedRanksAllowed() < 0 || getMaxSkippedRanksAllowed() > 100)) {
       isValid = false;
-      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be from 0 to 100.");
+      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be from 0 to 100 if it's supplied.");
     }
 
-    if (getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
+    if (getNumberOfWinners() == null || getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
       isValid = false;
       Logger.log(Level.SEVERE, "numberOfWinners must be from 1 to 100.");
     }
 
-    if (getMinimumVoteThreshold().intValue() < 0 || getMinimumVoteThreshold().intValue() > 10000) {
+    if (getMinimumVoteThreshold() == null
+        || getMinimumVoteThreshold().intValue() < 0
+        || getMinimumVoteThreshold().intValue() > 1000000) {
       isValid = false;
-      Logger.log(Level.SEVERE, "minimumVoteThreshold must be from 0 to 10000.");
+      Logger.log(Level.SEVERE, "minimumVoteThreshold must be from 0 to 1000000.");
     }
 
-    // If this is a multi-seat contest, we validate a number of extra parameters.
-    if (getNumberOfWinners() > 1) {
+    if (getDecimalPlacesForVoteArithmetic() == null
+        || getDecimalPlacesForVoteArithmetic() < 0
+        || getDecimalPlacesForVoteArithmetic() > 20) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 0 to 20.");
+    }
+
+    // If this is a multi-seat contest, we validate a couple extra parameters.
+    if (getNumberOfWinners() != null && getNumberOfWinners() > 1) {
       if (willContinueUntilTwoCandidatesRemain()) {
         isValid = false;
         Logger.log(
@@ -286,30 +296,21 @@ class ContestConfig {
         isValid = false;
         Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-winner contest.");
       }
-
-      if (getDecimalPlacesForVoteArithmetic() < 0 || getDecimalPlacesForVoteArithmetic() > 20) {
-        isValid = false;
-        Logger.log(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 0 to 20.");
-      }
     }
   }
 
   // function: getNumberWinners
   // purpose: how many winners for this contest
-  // returns: number of winners or default value if it's not specified
+  // returns: number of winners
   Integer getNumberOfWinners() {
-    return rawConfig.rules.numberOfWinners == null
-        ? DEFAULT_NUMBER_OF_WINNERS
-        : rawConfig.rules.numberOfWinners;
+    return rawConfig.rules.numberOfWinners;
   }
 
   // function: getDecimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
-  // returns: number of places to round to or default value if it's not specified
+  // returns: number of places to round to
   Integer getDecimalPlacesForVoteArithmetic() {
-    return rawConfig.rules.decimalPlacesForVoteArithmetic == null
-        ? DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC
-        : rawConfig.rules.decimalPlacesForVoteArithmetic;
+    return rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
   boolean isNonIntegerWinningThresholdEnabled() {
@@ -451,21 +452,21 @@ class ContestConfig {
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use or default value if it's not specified
   BigDecimal getMinimumVoteThreshold() {
-    return rawConfig.rules.minimumVoteThreshold == null
-        ? DEFAULT_MINIMUM_VOTE_THRESHOLD
-        : new BigDecimal(rawConfig.rules.minimumVoteThreshold);
+    return rawConfig.rules.minimumVoteThreshold != null
+        ? new BigDecimal(rawConfig.rules.minimumVoteThreshold)
+        : null;
   }
 
   // function: getMaxSkippedRanksAllowed
   // purpose: getter for maxSkippedRanksAllowed rule
-  // returns: max skipped ranks allowed in this config
+  // returns: max skipped ranks allowed in this config (possibly null)
   Integer getMaxSkippedRanksAllowed() {
     return rawConfig.rules.maxSkippedRanksAllowed;
   }
 
   // function: getUndeclaredWriteInLabel
   // purpose: getter for UWI label
-  // returns: overvote rule for this config
+  // returns: UWI label for this config
   String getUndeclaredWriteInLabel() {
     return rawConfig.rules.undeclaredWriteInLabel;
   }
@@ -518,10 +519,9 @@ class ContestConfig {
   // param: candidateID the ID of the candidate whose name we want to lookup
   // returns: the full name for the given candidateID
   String getNameForCandidateID(String candidateID) {
-    if (getUndeclaredWriteInLabel() != null && getUndeclaredWriteInLabel().equals(candidateID)) {
-      return "Undeclared";
-    }
-    return candidateCodeToNameMap.get(candidateID);
+    return getUndeclaredWriteInLabel() != null && getUndeclaredWriteInLabel().equals(candidateID)
+        ? "Undeclared"
+        : candidateCodeToNameMap.get(candidateID);
   }
 
   // function: getCandidatePermutation
