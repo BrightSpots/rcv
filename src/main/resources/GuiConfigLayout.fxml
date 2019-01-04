@@ -97,16 +97,21 @@
                     text="Select"/>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <TextField prefHeight="25.0" prefWidth="170.0"
-                    promptText="First Vote Column Index *"
+                  <TextField prefHeight="25.0" prefWidth="160.0"
+                    promptText="First Vote Col Index *"
                     fx:id="textFieldCvrFirstVoteCol"/>
-                  <TextField prefHeight="25.0" prefWidth="120.0" promptText="ID Column Index"
+                  <TextField prefHeight="25.0" prefWidth="160.0"
+                    promptText="First Vote Row Index *"
+                    fx:id="textFieldCvrFirstVoteRow"/>
+                  <TextField prefHeight="25.0" prefWidth="120.0" promptText="ID Col Index"
                     fx:id="textFieldCvrIdCol"/>
-                  <TextField prefHeight="25.0" prefWidth="150.0" promptText="Precinct Column Index"
-                    fx:id="textFieldCvrPrecinctCol"/>
                 </HBox>
-                <TextField maxWidth="448.0" prefHeight="25.0" prefWidth="300.0"
-                  promptText="Provider" fx:id="textFieldCvrProvider"/>
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <TextField prefHeight="25.0" prefWidth="175.0" promptText="Precinct Col Index"
+                    fx:id="textFieldCvrPrecinctCol"/>
+                  <TextField maxWidth="250.0" prefHeight="25.0" prefWidth="175.0"
+                    promptText="Provider" fx:id="textFieldCvrProvider"/>
+                </HBox>
               </VBox>
               <VBox alignment="BOTTOM_LEFT" spacing="4.0">
                 <padding>
@@ -122,15 +127,17 @@
             </HBox>
             <TableView fx:id="tableViewCvrFiles">
               <columns>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="240.0"
+                <TableColumn editable="false" minWidth="20.0" prefWidth="210.0"
                   text="File Path" fx:id="tableColumnCvrFilePath"/>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
                   text="First Vote&#10;Column&#10;Index" fx:id="tableColumnCvrFirstVoteCol"/>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
+                  text="First Vote&#10;Row&#10;Index" fx:id="tableColumnCvrFirstVoteRow"/>
+                <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
                   text="ID&#10;Column&#10;Index" fx:id="tableColumnCvrIdCol"/>
                 <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
                   text="Precinct&#10;Column&#10;Index" fx:id="tableColumnCvrPrecinctCol"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="140.0"
+                <TableColumn editable="false" minWidth="20.0" prefWidth="110.0"
                   text="Provider" fx:id="tableColumnCvrProvider"/>
               </columns>
             </TableView>
@@ -143,7 +150,7 @@
           <VBox>
             <HBox alignment="CENTER_LEFT" spacing="4.0">
               <TextField promptText="Name *" fx:id="textFieldCandidateName"/>
-              <TextField promptText="Code" fx:id="textFieldCandidateCode" maxWidth="100.0"/>
+              <TextField maxWidth="100.0" promptText="Code" fx:id="textFieldCandidateCode"/>
               <CheckBox mnemonicParsing="false" text="Excluded" fx:id="checkBoxCandidateExcluded">
                 <VBox.margin>
                   <Insets top="4.0"/>
