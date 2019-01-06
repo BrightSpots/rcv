@@ -20,8 +20,44 @@
 package com.rcv;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 class FileUtils {
+
+  // cache location for finding and creating user files and folders
+  private static String userFolder = null;
+
+  // function: setUserFolder
+  // param: userFolder default folder for finding and creating files and folders
+  static void setUserFolder(String rootFolder) {
+    FileUtils.userFolder = rootFolder;
+  }
+
+  // function: getUserFolder returns root for loading and saving user files
+  // returns:
+  static String getUserFolder() {
+    // return userFolder if it exists fallback to current working directory
+    // fallback to current working directory
+      return (userFolder == null) ? (System.getProperty("user.dir")) : userFolder;
+  }
+
+  // function: resolveUserPath
+  // purpose: given input user path returns an absolute path for use in File IO
+  // param: user path
+  // returns: resolved path
+  static String resolveUserPath(String userPath) {
+    // create File for IO operations
+    File userFile = new File(userPath);
+    // resolvedPath will be returned to caller
+    String resolvedPath;
+    // if input path is not absolute prepend the userFolder location
+    if(userFile.isAbsolute()) {
+      resolvedPath = userFile.getAbsolutePath();
+    } else {
+      resolvedPath = Paths.get(FileUtils.getUserFolder(), userPath).toAbsolutePath().toString();
+    }
+    return resolvedPath;
+  }
 
   static void createOutputDirectory(String dir) throws UnableToCreateDirectoryException {
     if (dir != null && !dir.isEmpty()) {

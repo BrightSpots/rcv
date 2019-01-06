@@ -23,6 +23,7 @@ package com.rcv;
 import com.rcv.RawContestConfig.CVRSource;
 import com.rcv.RawContestConfig.Candidate;
 import com.rcv.Tabulator.TieBreakMode;
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "Contest name is required.");
     }
 
-    if (getOutputDirectory() == null || getOutputDirectory().isEmpty()) {
+    if (getOutputDirectoryRaw() == null || getOutputDirectoryRaw().isEmpty()) {
       isValid = false;
       Logger.log(Level.SEVERE, "Output directory is required.");
     }
@@ -107,17 +108,27 @@ class ContestConfig {
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
-        if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
+        // perform checks on source input path
+        if (source.getFilePathRaw() == null || source.getFilePathRaw().isEmpty()) {
           isValid = false;
           Logger.log(Level.SEVERE, "filePath is required for each CVR file.");
-        } else if (cvrFilePathSet.contains(source.getFilePath())) {
+          continue;
+        }
+
+        // look for duplicate paths
+        if (cvrFilePathSet.contains(source.getFilePath())) {
           isValid = false;
           Logger.log(
               Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s", source.getFilePath());
         } else {
           cvrFilePathSet.add(source.getFilePath());
         }
-
+        // ensure file exists
+        if (!new File(source.getFilePath()).exists()) {
+          isValid = false;
+          Logger.log(Level.SEVERE, "CVR file not found: %s", source.getFilePath());
+        }
+        // ensure valid first vote column value
         if (source.getFirstVoteColumnIndex() == null) {
           isValid = false;
           Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFilePath());
@@ -130,6 +141,7 @@ class ContestConfig {
               source.getFilePath());
         }
 
+        // ensure valid first vote row value
         if (source.getFirstVoteRowIndex() == null) {
           isValid = false;
           Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", source.getFilePath());
@@ -138,14 +150,14 @@ class ContestConfig {
           Logger.log(
               Level.SEVERE, "firstVoteRowIndex must be from 1 to 1000: %s", source.getFilePath());
         }
-
+        // ensure valid id column value
         if (source.getIdColumnIndex() != null
             && (source.getIdColumnIndex() < 1 || source.getIdColumnIndex() > 1000)) {
           isValid = false;
           Logger.log(
               Level.SEVERE, "idColumnIndex must be from 1 to 1000: %s", source.getFilePath());
         }
-
+        // ensure valid precinct column value
         if (isTabulateByPrecinctEnabled()) {
           if (source.getPrecinctColumnIndex() == null) {
             isValid = false;
@@ -313,15 +325,22 @@ class ContestConfig {
         .setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
   }
 
-  // function: getOutputDirectory
+  // function: getOutputDirectoryRaw
   // purpose: getter for outputDirectory
-  // returns: directory string from config or falls back to working directory
-  String getOutputDirectory() {
+  // returns: raw string from config or falls back to user folder if none is set
+  String getOutputDirectoryRaw() {
     // outputDirectory is where output files should be written
     return (rawConfig.outputSettings.outputDirectory != null
         && !rawConfig.outputSettings.outputDirectory.isEmpty())
         ? rawConfig.outputSettings.outputDirectory
-        : System.getProperty("user.dir");
+        : FileUtils.getUserFolder();
+  }
+
+  // function: getOutputDirectory
+  // purpose: get the directory location where output files should be written
+  // returns: path to directory where output files should be written
+  String getOutputDirectory() {
+    return FileUtils.resolveUserPath(getOutputDirectoryRaw());
   }
 
   // function: willContinueUntilTwoCandidatesRemain
