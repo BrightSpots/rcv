@@ -333,7 +333,7 @@ class ContestConfig {
     return (rawConfig.outputSettings.outputDirectory != null
         && !rawConfig.outputSettings.outputDirectory.isEmpty())
         ? rawConfig.outputSettings.outputDirectory
-        : FileUtils.getUserFolder();
+        : FileUtils.getUserDirectory();
   }
 
   // function: getOutputDirectory

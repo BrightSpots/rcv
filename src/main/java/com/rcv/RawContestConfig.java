@@ -86,8 +86,8 @@ public class RawContestConfig {
     public String getFilePath() {
       return FileUtils.resolveUserPath(getFilePathRaw());
     }
-
-    public void setFilePath(String filePath) {
+    // set underlying raw path string
+    public void setFilePathRaw(String filePath) {
       this.filePath = filePath;
     }
 

@@ -70,7 +70,7 @@ public class Main extends GuiApplication {
       // config file for configuring the tabulator
       String configPath = args[0];
       // set config file parent folder as default user folder
-      FileUtils.setUserFolder(new File(configPath).getParent());
+      FileUtils.setUserDirectory(new File(configPath).getParent());
       // load configuration
       ContestConfig config = loadContestConfig(configPath);
       if (config != null) {

@@ -25,20 +25,20 @@ import java.nio.file.Paths;
 class FileUtils {
 
   // cache location for finding and creating user files and folders
-  private static String userFolder = null;
+  private static String userDirectory = null;
 
-  // function: setUserFolder
-  // param: userFolder default folder for finding and creating files and folders
-  static void setUserFolder(String rootFolder) {
-    FileUtils.userFolder = rootFolder;
+  // function: setUserDirectory
+  // param: userDirectory default folder for finding and creating files and folders
+  static void setUserDirectory(String userDirectory) {
+    FileUtils.userDirectory = userDirectory;
   }
 
-  // function: getUserFolder returns root for loading and saving user files
-  // returns:
-  static String getUserFolder() {
-    // return userFolder if it exists fallback to current working directory
+  // function: getUserDirectory
+  // returns: returns root for loading and saving user files
+  static String getUserDirectory() {
+    // return userDirectory if it exists fallback to current working directory
     // fallback to current working directory
-      return (userFolder == null) ? (System.getProperty("user.dir")) : userFolder;
+    return userDirectory == null ? System.getProperty("user.dir") : userDirectory;
   }
 
   // function: resolveUserPath
@@ -50,11 +50,11 @@ class FileUtils {
     File userFile = new File(userPath);
     // resolvedPath will be returned to caller
     String resolvedPath;
-    // if input path is not absolute prepend the userFolder location
-    if(userFile.isAbsolute()) {
+    // if input path is not absolute prepend the userDirectory location
+    if (userFile.isAbsolute()) {
       resolvedPath = userFile.getAbsolutePath();
     } else {
-      resolvedPath = Paths.get(FileUtils.getUserFolder(), userPath).toAbsolutePath().toString();
+      resolvedPath = Paths.get(FileUtils.getUserDirectory(), userPath).toAbsolutePath().toString();
     }
     return resolvedPath;
   }

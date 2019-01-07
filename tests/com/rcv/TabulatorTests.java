@@ -109,7 +109,7 @@ class TabulatorTests {
             .toAbsolutePath()
             .toString();
     // we use config file parent folder as default for resolving user paths
-    FileUtils.setUserFolder(new File(configPath).getParent());
+    FileUtils.setUserDirectory(new File(configPath).getParent());
     // load the contest config
     ContestConfig config = Main.loadContestConfig(configPath);
     Assertions.assertNotNull(config);
