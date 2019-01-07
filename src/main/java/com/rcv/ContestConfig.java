@@ -109,53 +109,56 @@ class ContestConfig {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
         // perform checks on source input path
-        if (source.getFilePathRaw() == null || source.getFilePathRaw().isEmpty()) {
+        if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
           isValid = false;
           Logger.log(Level.SEVERE, "filePath is required for each CVR file.");
           continue;
         }
 
         // look for duplicate paths
-        if (cvrFilePathSet.contains(source.getFilePath())) {
+        if (cvrFilePathSet.contains(source.getFullFilePath())) {
           isValid = false;
           Logger.log(
-              Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s", source.getFilePath());
+              Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s",
+              source.getFullFilePath());
         } else {
-          cvrFilePathSet.add(source.getFilePath());
+          cvrFilePathSet.add(source.getFullFilePath());
         }
         // ensure file exists
-        if (!new File(source.getFilePath()).exists()) {
+        if (!new File(source.getFullFilePath()).exists()) {
           isValid = false;
-          Logger.log(Level.SEVERE, "CVR file not found: %s", source.getFilePath());
+          Logger.log(Level.SEVERE, "CVR file not found: %s", source.getFullFilePath());
         }
         // ensure valid first vote column value
         if (source.getFirstVoteColumnIndex() == null) {
           isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFilePath());
+          Logger
+              .log(Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFullFilePath());
         } else if (source.getFirstVoteColumnIndex() < 1
             || source.getFirstVoteColumnIndex() > 1000) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
               "firstVoteColumnIndex must be from 1 to 1000: %s",
-              source.getFilePath());
+              source.getFullFilePath());
         }
 
         // ensure valid first vote row value
         if (source.getFirstVoteRowIndex() == null) {
           isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", source.getFilePath());
+          Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", source.getFullFilePath());
         } else if (source.getFirstVoteRowIndex() < 1 || source.getFirstVoteRowIndex() > 1000) {
           isValid = false;
           Logger.log(
-              Level.SEVERE, "firstVoteRowIndex must be from 1 to 1000: %s", source.getFilePath());
+              Level.SEVERE, "firstVoteRowIndex must be from 1 to 1000: %s",
+              source.getFullFilePath());
         }
         // ensure valid id column value
         if (source.getIdColumnIndex() != null
             && (source.getIdColumnIndex() < 1 || source.getIdColumnIndex() > 1000)) {
           isValid = false;
           Logger.log(
-              Level.SEVERE, "idColumnIndex must be from 1 to 1000: %s", source.getFilePath());
+              Level.SEVERE, "idColumnIndex must be from 1 to 1000: %s", source.getFullFilePath());
         }
         // ensure valid precinct column value
         if (isTabulateByPrecinctEnabled()) {
@@ -164,14 +167,14 @@ class ContestConfig {
             Logger.log(
                 Level.SEVERE,
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
-                source.getFilePath());
+                source.getFullFilePath());
           } else if (source.getPrecinctColumnIndex() < 1
               || source.getPrecinctColumnIndex() > 1000) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
                 "precinctColumnIndex must be from 1 to 1000: %s",
-                source.getFilePath());
+                source.getFullFilePath());
           }
         }
       }
