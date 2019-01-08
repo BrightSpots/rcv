@@ -23,11 +23,12 @@
       "Miller, Markos S." : "3",
       "Rathband, Jed" : "2",
       "Strimling, Ethan K." : "1",
-      "UWI" : "0",
+      "Undeclared": "0",
       "Vail, Christopher L." : "6"
     },
     "tallyResults" : [ {
-      "eliminated" : "Undeclared"
+      "eliminated": "Undeclared",
+      "transfers": {}
     }, {
       "eliminated" : "Strimling, Ethan K.",
       "transfers" : {
@@ -276,7 +277,8 @@
       "Mavodones, Nicholas M. Jr." : "54"
     },
     "tallyResults" : [ {
-      "elected" : "Mavodones, Nicholas M. Jr."
+      "elected": "Mavodones, Nicholas M. Jr.",
+      "transfers": {}
     } ]
   } ]
 }

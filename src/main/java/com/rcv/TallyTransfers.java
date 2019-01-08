@@ -49,30 +49,26 @@ class TallyTransfers {
   // param: sourceCandidate from which the transfers originate
   // param: targetCandidate to which the transfers go
   // param: value total value of all transfers
-  void addTransfer(int round,
-      String sourceCandidate,
-      String targetCandidate,
-      BigDecimal value) {
+  void addTransfer(int round, String sourceCandidate, String targetCandidate, BigDecimal value) {
     // null source means we are transferring the initial count
-    if(sourceCandidate == null) {
+    if (sourceCandidate == null) {
       sourceCandidate = "uncounted";
     }
     // null target means exhausted
-    if(targetCandidate == null) {
+    if (targetCandidate == null) {
       targetCandidate = "exhausted";
     }
 
     // lookup or create transfer entries for specified round
-    Map<String, Map<String, BigDecimal>> roundEntries = tallyTransfers
-        .computeIfAbsent(round, k -> new HashMap<>());
+    Map<String, Map<String, BigDecimal>> roundEntries =
+        tallyTransfers.computeIfAbsent(round, k -> new HashMap<>());
     // lookup or create map for the source candidate
-    Map<String, BigDecimal> candidateEntries = roundEntries
-        .computeIfAbsent(sourceCandidate, k -> new HashMap<>());
+    Map<String, BigDecimal> candidateEntries =
+        roundEntries.computeIfAbsent(sourceCandidate, k -> new HashMap<>());
     // lookup or create entry for the destination candidate
     BigDecimal currentValue = candidateEntries.getOrDefault(targetCandidate, BigDecimal.ZERO);
     // add transfer value and store the result
     BigDecimal newTally = currentValue.add(value);
     candidateEntries.put(targetCandidate, newTally);
   }
-
 }
