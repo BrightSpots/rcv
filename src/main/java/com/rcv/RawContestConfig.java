@@ -79,11 +79,16 @@ public class RawContestConfig {
     // provider for this source e.g. "ES&S"
     private String provider;
 
+    // get underlying file path string
     public String getFilePath() {
       return filePath;
     }
-
-    public void setFilePath(String filePath) {
+    // get full file path string
+    public String getFullFilePath() {
+      return FileUtils.resolveUserPath(getFilePath());
+    }
+    // set underlying raw path string
+    public void setFilePathRaw(String filePath) {
       this.filePath = filePath;
     }
 

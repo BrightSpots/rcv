@@ -174,6 +174,8 @@ public class GuiConfigController implements Initializable {
   }
 
   private void loadFile(File fileToLoad) {
+    // set loaded file parent folder as the new default user folder
+    FileUtils.setUserDirectory(fileToLoad.getParent());
     GuiContext.getInstance().setConfig(Main.loadContestConfig(fileToLoad.getAbsolutePath()));
     if (GuiContext.getInstance().getConfig() != null) {
       loadConfig(GuiContext.getInstance().getConfig());
@@ -185,7 +187,7 @@ public class GuiConfigController implements Initializable {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
       if (selectedFile == null) {
-        fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
       } else {
         fc.setInitialDirectory(new File(selectedFile.getParent()));
       }
@@ -202,7 +204,7 @@ public class GuiConfigController implements Initializable {
   private File getSaveFile() {
     FileChooser fc = new FileChooser();
     if (selectedFile == null) {
-      fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+      fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
     } else {
       fc.setInitialDirectory(new File(selectedFile.getParent()));
       fc.setInitialFileName(selectedFile.getName());
@@ -213,6 +215,8 @@ public class GuiConfigController implements Initializable {
   }
 
   private void saveFile(File fileToSave) {
+    // set save file parent folder as the new default user folder
+    FileUtils.setUserDirectory(fileToSave.getParent());
     JsonParser.createFileFromRawContestConfig(fileToSave, createRawContestConfig());
     // Reload to keep GUI fields updated in case invalid values are replaced during save process
     loadFile(fileToSave);
@@ -259,9 +263,8 @@ public class GuiConfigController implements Initializable {
 
   public void buttonOutputDirectoryClicked() {
     DirectoryChooser dc = new DirectoryChooser();
-    dc.setInitialDirectory(new File(System.getProperty("user.dir")));
+    dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
     dc.setTitle("Output Directory");
-
     File outputDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
     if (outputDirectory != null) {
       textFieldOutputDirectory.setText(outputDirectory.getAbsolutePath());
@@ -274,7 +277,7 @@ public class GuiConfigController implements Initializable {
 
   public void buttonCvrFilePathClicked() {
     FileChooser fc = new FileChooser();
-    fc.setInitialDirectory(new File(System.getProperty("user.dir")));
+    fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
     fc.getExtensionFilters().add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
     fc.setTitle("Select CVR File");
 
@@ -293,7 +296,7 @@ public class GuiConfigController implements Initializable {
     } else if (textFieldCvrFirstVoteRow.getText().isEmpty()) {
       Logger.log(Level.WARNING, "CVR first vote row is required!");
     } else {
-      cvrSource.setFilePath(textFieldCvrFilePath.getText());
+      cvrSource.setFilePathRaw(textFieldCvrFilePath.getText());
       cvrSource.setFirstVoteColumnIndex(getIntValueElse(textFieldCvrFirstVoteCol, null));
       cvrSource.setFirstVoteRowIndex(getIntValueElse(textFieldCvrFirstVoteRow, null));
       cvrSource.setIdColumnIndex(getIntValueElse(textFieldCvrIdCol, null));
@@ -587,7 +590,7 @@ public class GuiConfigController implements Initializable {
     clearConfig();
 
     textFieldContestName.setText(config.getContestName());
-    textFieldOutputDirectory.setText(config.getOutputDirectory());
+    textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
     if (config.getContestDate() != null && !config.getContestDate().isEmpty()) {
       datePickerContestDate.setValue(LocalDate.parse(config.getContestDate(), DATE_TIME_FORMATTER));
     }

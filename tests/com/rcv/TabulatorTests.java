@@ -26,6 +26,7 @@ import static com.rcv.Main.executeTabulation;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -90,19 +91,23 @@ class TabulatorTests {
 
   // function: runTabulationTest
   // purpose: helper function to support running various tabulation tests
-  // param: configFile name of  configuration file
-  // param: expectedFile name of expected summary results json file
-  static void runTabulationTest(String configFile, String expectedFile) {
+  // param: stem base name of folder containing config file cvr files and expected result files
+  static void runTabulationTest(String stem) {
     // full path to config file
-    String configPath =
-        Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, configFile)
-            .toAbsolutePath()
-            .toString();
+    String configPath = Paths.get(System.getProperty("user.dir"),
+        TEST_ASSET_FOLDER, stem,
+        stem + "_config.json")
+        .toAbsolutePath()
+        .toString();
     // full path to expected results file
-    String expectedPath =
-        Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, expectedFile)
-            .toAbsolutePath()
-            .toString();
+    String expectedPath = Paths.get(System.getProperty("user.dir"),
+        TEST_ASSET_FOLDER,
+        stem,
+        stem + "_expected.json")
+        .toAbsolutePath()
+        .toString();
+    // we use config file parent folder as default for resolving user paths
+    FileUtils.setUserDirectory(new File(configPath).getParent());
     // load the contest config
     ContestConfig config = Main.loadContestConfig(configPath);
     Assertions.assertNotNull(config);
@@ -128,15 +133,23 @@ class TabulatorTests {
   // function: testPortlandMayor
   // purpose: test tabulation of Portland contest
   @Test
-  @DisplayName("Portland Mayor 2015")
+  @DisplayName("2015 Portland Mayor")
   void testPortlandMayor() {
-    runTabulationTest("config_2015_portland_mayor.json", "2015_portland_mayor_expected.json");
+    runTabulationTest("2015_portland_mayor");
   }
+
+  // function: test2013MinneapolisMayorScale
+  // purpose: test large scale (1,000,000+) cvr contest
+  @Test
+  @DisplayName("2013 Minneapolis Mayor Scale")
+  void test2013MinneapolisMayorScale() {
+    runTabulationTest("2013_minneapolis_mayor_scale");
+  }
+
 
   @Test
   @DisplayName("Continue Until Two Candidates Remain")
   void testContinueUntilTwoCandidatesRemain() {
-    runTabulationTest(
-        "config_test_continue_tabulation.json", "test_continue_tabulation_expected.json");
+    runTabulationTest("continue_tabulation");
   }
 }
