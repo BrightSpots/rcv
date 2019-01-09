@@ -94,20 +94,18 @@ class TabulatorTests {
   // param: stem base name of folder containing config file cvr files and expected result files
   static void runTabulationTest(String stem) {
     // full path to config file
-    String configPath =
-        Paths.get(System.getProperty("user.dir"),
-            TEST_ASSET_FOLDER, stem,
-            stem + "_config.json")
-            .toAbsolutePath()
-            .toString();
+    String configPath = Paths.get(System.getProperty("user.dir"),
+        TEST_ASSET_FOLDER, stem,
+        stem + "_config.json")
+        .toAbsolutePath()
+        .toString();
     // full path to expected results file
-    String expectedPath =
-        Paths.get(System.getProperty("user.dir"),
-            TEST_ASSET_FOLDER,
-            stem,
-            stem + "_expected.json")
-            .toAbsolutePath()
-            .toString();
+    String expectedPath = Paths.get(System.getProperty("user.dir"),
+        TEST_ASSET_FOLDER,
+        stem,
+        stem + "_expected.json")
+        .toAbsolutePath()
+        .toString();
     // we use config file parent folder as default for resolving user paths
     FileUtils.setUserDirectory(new File(configPath).getParent());
     // load the contest config

@@ -78,7 +78,8 @@ public class RawContestConfig {
     private Integer precinctColumnIndex;
     // provider for this source e.g. "ES&S"
     private String provider;
-    // get underlying raw path string
+
+    // get underlying file path string
     public String getFilePath() {
       return filePath;
     }

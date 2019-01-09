@@ -124,11 +124,13 @@ class ContestConfig {
         } else {
           cvrFilePathSet.add(source.getFullFilePath());
         }
+
         // ensure file exists
         if (!new File(source.getFullFilePath()).exists()) {
           isValid = false;
           Logger.log(Level.SEVERE, "CVR file not found: %s", source.getFullFilePath());
         }
+
         // ensure valid first vote column value
         if (source.getFirstVoteColumnIndex() == null) {
           isValid = false;
@@ -153,6 +155,7 @@ class ContestConfig {
               Level.SEVERE, "firstVoteRowIndex must be from 1 to 1000: %s",
               source.getFullFilePath());
         }
+
         // ensure valid id column value
         if (source.getIdColumnIndex() != null
             && (source.getIdColumnIndex() < 1 || source.getIdColumnIndex() > 1000)) {
@@ -160,6 +163,7 @@ class ContestConfig {
           Logger.log(
               Level.SEVERE, "idColumnIndex must be from 1 to 1000: %s", source.getFullFilePath());
         }
+
         // ensure valid precinct column value
         if (isTabulateByPrecinctEnabled()) {
           if (source.getPrecinctColumnIndex() == null) {

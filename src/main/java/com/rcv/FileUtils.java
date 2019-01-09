@@ -36,7 +36,7 @@ class FileUtils {
   // function: getUserDirectory
   // returns: returns root for loading and saving user files
   static String getUserDirectory() {
-    // return userDirectory if it exists fallback to current working directory
+    // return userDirectory if it exists
     // fallback to current working directory
     return userDirectory == null ? System.getProperty("user.dir") : userDirectory;
   }
