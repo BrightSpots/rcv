@@ -441,26 +441,26 @@ public class GuiConfigController implements Initializable {
   private void setDefaultValues() {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
-    checkBoxTabulateByPrecinct.setSelected(ContestConfig.DEFAULT_TABULATE_BY_PRECINCT);
+    checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
     checkBoxNonIntegerWinningThreshold.setSelected(
-        ContestConfig.DEFAULT_NON_INTEGER_WINNING_THRESHOLD);
-    checkBoxBatchElimination.setSelected(ContestConfig.DEFAULT_BATCH_ELIMINATION);
+        ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
+    checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(
-        ContestConfig.DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
+        ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
     checkBoxExhaustOnDuplicateCandidate.setSelected(
-        ContestConfig.DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES);
+        ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
-        ContestConfig.DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
+        ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
 
-    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.DEFAULT_NUMBER_OF_WINNERS));
+    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.SUGGESTED_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic.setText(
-        String.valueOf(ContestConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+        String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
     textFieldMaxSkippedRanksAllowed.setText(
-        String.valueOf(ContestConfig.DEFAULT_MAX_SKIPPED_RANKS_ALLOWED));
+        String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
     textFieldMinimumVoteThreshold.setText(
-        String.valueOf(ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
+        String.valueOf(ContestConfig.SUGGESTED_MINIMUM_VOTE_THRESHOLD));
 
-    checkBoxCandidateExcluded.setSelected(ContestConfig.DEFAULT_CANDIDATE_EXCLUDED);
+    checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
   }
 
   private void clearConfig() {

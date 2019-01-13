@@ -37,18 +37,18 @@ import java.util.logging.Level;
 class ContestConfig {
 
   // TODO: if any booleans are unspecified in config file, they default to false no matter what
-  static final boolean DEFAULT_TABULATE_BY_PRECINCT = false;
-  static final boolean DEFAULT_NON_INTEGER_WINNING_THRESHOLD = false;
-  static final boolean DEFAULT_BATCH_ELIMINATION = false;
-  static final boolean DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
-  static final boolean DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
-  static final boolean DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
-  static final int DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
-  static final int DEFAULT_MAX_SKIPPED_RANKS_ALLOWED = 1;
-  static final int DEFAULT_NUMBER_OF_WINNERS = 1;
-  static final BigDecimal DEFAULT_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
+  static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
+  static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
+  static final boolean SUGGESTED_BATCH_ELIMINATION = false;
+  static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
+  static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
+  static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
+  static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
+  static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
+  static final int SUGGESTED_NUMBER_OF_WINNERS = 1;
+  static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
 
-  static final boolean DEFAULT_CANDIDATE_EXCLUDED = false;
+  static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
 
   // underlying rawConfig object data
   private final RawContestConfig rawConfig;
@@ -98,11 +98,6 @@ class ContestConfig {
     if (getContestName() == null || getContestName().isEmpty()) {
       isValid = false;
       Logger.log(Level.SEVERE, "Contest name is required.");
-    }
-
-    if (getOutputDirectoryRaw() == null || getOutputDirectoryRaw().isEmpty()) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "Output directory is required.");
     }
   }
 
@@ -258,15 +253,16 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "maxRankingsAllowed must be 1 or higher.");
     }
 
-    if (getMaxSkippedRanksAllowed() != null
-        && (getMaxSkippedRanksAllowed() < 0 || getMaxSkippedRanksAllowed() > 100)) {
+    if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
       isValid = false;
-      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be from 0 to 100 if it's supplied.");
+      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be non-negative if it's supplied.");
     }
 
-    if (getNumberOfWinners() == null || getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
+    if (getNumberOfWinners() == null || getNumberOfWinners() < 1
+        || getNumberOfWinners() > getNumDeclaredCandidates()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "numberOfWinners must be from 1 to 100.");
+      Logger.log(Level.SEVERE, "numberOfWinners must be at least 1 and no more than the number " +
+          "of declared candidates.");
     }
 
     if (getMinimumVoteThreshold() == null
