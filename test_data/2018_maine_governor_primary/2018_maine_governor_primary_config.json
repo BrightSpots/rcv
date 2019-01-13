@@ -1,7 +1,7 @@
 {
   "outputSettings": {
     "contestName": "Maine 2018 Democratic Governor Primary race",
-    "outputDirectory": "test_output/2018_maine_gov_primary_dem",
+    "outputDirectory": "output",
     "contestDate": "2018-06-12",
     "contestJurisdiction": "Maine",
     "contestOffice": "Governor",
@@ -9,7 +9,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "test_data/cvr_2018_maine_governor_primary_dem.xlsx",
+      "filePath": "2018_maine_governor_primary_cvr.xlsx",
       "firstVoteColumnIndex": 4,
       "firstVoteRowIndex": 2,
       "idColumnIndex": 1,

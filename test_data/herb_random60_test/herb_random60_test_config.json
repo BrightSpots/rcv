@@ -1,14 +1,14 @@
 {
   "outputSettings" : {
     "contestName" : "Herb1",
-    "outputDirectory" : "test_output",
+    "outputDirectory" : "output",
     "contestDate" : "2018-11-09",
     "contestJurisdiction" : "Herb",
     "contestOffice" : "Herb1",
     "tabulateByPrecinct" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "test_data/cvr_random60_herb1.xlsx",
+    "filePath" : "herb_random60_test_cvr.xlsx",
     "firstVoteColumnIndex" : 2,
     "firstVoteRowIndex": 2,
     "provider" : ""
