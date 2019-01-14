@@ -1,7 +1,7 @@
 {
   "outputSettings": {
     "contestName": "2017 Minneapolis mayoral race",
-    "outputDirectory": "test_output/2017_minneapolis_mayor",
+    "outputDirectory": "output",
     "contestDate": "2017-11-07",
     "contestJurisdiction": "Minneapolis, MN",
     "contestOffice": "Mayor",
@@ -9,7 +9,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "test_data/cvr_2017_minneapolis_mayor.xlsx",
+      "filePath": "2017_minneapolis_mayor_cvr.xlsx",
       "firstVoteColumnIndex": 2,
       "firstVoteRowIndex": 2,
       "precinctColumnIndex": 1,

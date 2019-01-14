@@ -1,15 +1,15 @@
 {
   "outputSettings": {
-    "contestName": "Tiebreak test",
-    "outputDirectory": "test_output/test_tiebreak",
-    "contestDate": "2017-12-03",
+    "contestName": "Minimum threshold test",
+    "outputDirectory": "output",
+    "contestDate": "2018-01-07",
     "contestJurisdiction": "Funkytown, USA",
     "contestOffice": "Sergeant-at-Arms",
     "tabulateByPrecinct": false
   },
   "cvrFileSources": [
     {
-      "filePath": "test_data/cvr_test_tiebreak.xlsx",
+      "filePath": "minimum_threshold_test_cvr.xlsx",
       "firstVoteColumnIndex": 2,
       "firstVoteRowIndex": 2,
       "provider": "ES&S"
@@ -17,32 +17,33 @@
   ],
   "candidates": [
     {
-      "name": "Mookie Blaylock"
+      "name": "Gargamel"
     },
     {
-      "name": "Yinka Dare"
+      "name": "Skeletor"
     },
     {
-      "name": "George Gervin"
+      "name": "Megatron"
     },
     {
-      "name": "Sedale Threatt"
+      "name": "Garfield"
+    },
+    {
+      "name": "Odie"
     }
   ],
   "rules": {
-    "tiebreakMode": "interactive",
-    "overvoteRule": "alwaysSkipToNextRank",
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
     "maxRankingsAllowed": 3,
-    "maxSkippedRanksAllowed": 0,
+    "maxSkippedRanksAllowed": 1,
     "numberOfWinners": 1,
     "decimalPlacesForVoteArithmetic": 4,
-    "minimumVoteThreshold": 0,
-    "batchElimination": true,
+    "minimumVoteThreshold": 3,
+    "batchElimination": false,
     "continueUntilTwoCandidatesRemain": false,
     "exhaustOnDuplicateCandidate": false,
     "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
     "rulesDescription": "Doyle Rules"
   }
 }
