@@ -41,26 +41,25 @@ import javafx.util.Pair;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
-public class TabulatorSession {
+class TabulatorSession {
 
   // configPath points to config file we use for configuring tabulation
   private String configPath;
   // summaryOutputPath is generated from timestamp + config file
-  // we cache it here to support testing
-  public String summaryOutputPath;
+  String summaryOutputPath;
   // precinct IDs discovered during CVR parsing to support testing
-  public Set<String> precinctIDs;
+  private Set<String> precinctIDs;
 
   // function: TabulatorSession
   // purpose: TabulatorSession constructor
   // param: configPath path to config json file
-  public TabulatorSession(String configPath) {
+  TabulatorSession(String configPath) {
     this.configPath = configPath;
   }
 
   // function: tabulate
   // purpose: run tabulation
-  public void tabulate() {
+  void tabulate() {
     // load configuration
     ContestConfig config = loadContestConfig();
     if (config != null) {
@@ -73,7 +72,7 @@ public class TabulatorSession {
   // function: loadContestConfig
   // purpose: attempts to load config file
   // returns: new ContestConfig if successful otherwise null
-  public ContestConfig loadContestConfig() {
+  ContestConfig loadContestConfig() {
     if(configPath == null) {
       Logger.log(Level.SEVERE, "No config path specified!");
       return null;
@@ -120,7 +119,7 @@ public class TabulatorSession {
   // purpose: execute tabulation for given ContestConfig
   // param: config object containing CVR file paths to parse
   // returns: String indicating whether or not execution was successful
-  void executeTabulation(ContestConfig config) {
+  private void executeTabulation(ContestConfig config) {
     Logger.log(Level.INFO, "Starting tabulation process...");
 
     boolean isTabulationCompleted = false;
@@ -256,7 +255,6 @@ public class TabulatorSession {
       Logger.log(Level.SEVERE, "Parsing cast vote records failed!");
       castVoteRecords = null;
     }
-
-    return new Pair(castVoteRecords, precinctIDs);
+    return new Pair<>(castVoteRecords, precinctIDs);
   }
 }

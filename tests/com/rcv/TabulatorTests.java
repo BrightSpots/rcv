@@ -209,29 +209,35 @@ class TabulatorTests {
     runTabulationTest("minneapolis_multi_seat_threshold");
   }
 
+  // function: testDuplicate
+  // purpose: test for overvotes
   @Test
   @DisplayName("test for overvotes")
   void testDuplicate() {
     runTabulationTest("duplicate_test");
   }
 
+  // function: testExcludedCandidate
+  // purpose: test excluding candidates in config file
   @Test
   @DisplayName("test excluding candidates in config file")
   void testExcludedCandidate() {
     runTabulationTest("excluded_test");
   }
 
+  // function: testMinimumThreshold
+  // purpose: test minimum vote threshold setting
   @Test
   @DisplayName("test minimum vote threshold setting")
   void testMinimumThreshold() {
     runTabulationTest("minimum_threshold_test");
   }
 
+  // function: skipToNextTest
+  // purpose: test skipping to next candidate after overvote
   @Test
   @DisplayName("test skipping to next candidate after overvote")
   void skipToNextTest() {
     runTabulationTest("skip_to_next_test");
   }
-
-
 }
