@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -73,6 +74,9 @@ class StreamingCVRReader {
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
   private List<CastVoteRecord> cvrList;
+  // store precinceIDs (new IDs will be added as we parse)
+  private Set<String> precinctIDs;
+
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
 
@@ -185,6 +189,10 @@ class StreamingCVRReader {
             currentRankings);
     // add it to overall list
     cvrList.add(newRecord);
+    // add precinct ID if one was found
+    if(currentPrecinct != null) {
+      precinctIDs.add(currentPrecinct);
+    }
     // provide some user feedback on the CVR count
     if (cvrList.size() % 50000 == 0) {
       Logger.log(Level.INFO, String.format("Parsed %d cast vote records ...", cvrList.size()));
@@ -240,12 +248,15 @@ class StreamingCVRReader {
   // function: parseCVRFile
   // purpose: parse the given file into a List of CastVoteRecords for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
+  // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   // returns: list of parsed CVRs
-  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords)
+  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String>precinctIDs)
       throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException {
 
     // cache the cvr list so it is accessible in callbacks
     cvrList = castVoteRecords;
+    // cache precinctIDs set so it is accessible in callbacks
+    this.precinctIDs = precinctIDs;
 
     // open the zip package
     OPCPackage pkg = OPCPackage.open(excelFilePath);

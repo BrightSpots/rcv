@@ -22,17 +22,14 @@
 
 package com.rcv;
 
-import static com.rcv.Main.executeTabulation;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Level;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -106,14 +103,12 @@ class TabulatorTests {
         stem + "_expected.json")
         .toAbsolutePath()
         .toString();
-    // we use config file parent folder as default for resolving user paths
-    FileUtils.setUserDirectory(new File(configPath).getParent());
-    // load the contest config
-    ContestConfig config = Main.loadContestConfig(configPath);
-    Assertions.assertNotNull(config);
-    executeTabulation(config);
+
+    // create a session object and run the tabulation
+    TabulatorSession session = new TabulatorSession(configPath);
+    session.tabulate();
     // actualSummaryOutputPath is the summary json we just tabulated
-    String actualSummaryOutputPath = Main.getSummaryOutputPath();
+    String actualSummaryOutputPath = session.summaryOutputPath;
     // compare actual to expected
     assertTrue(fileCompare(actualSummaryOutputPath, expectedPath));
   }
