@@ -1,42 +1,49 @@
 {
   "outputSettings": {
-    "contestName": "Duplicate test",
-    "outputDirectory": "test_output/test_duplicate",
-    "contestDate": "2018-05-21",
+    "contestName": "Overvote2",
+    "outputDirectory": "output",
+    "contestDate": "2018-07-28",
     "contestJurisdiction": "Funkytown, USA",
-    "contestOffice": "Director of Produce",
+    "contestOffice": "Exhausted",
     "tabulateByPrecinct": false
   },
   "cvrFileSources": [
     {
-      "filePath": "test_data/cvr_test_duplicate.xlsx",
+      "filePath": "skip_to_next_test_cvr.xlsx",
       "firstVoteColumnIndex": 2,
       "firstVoteRowIndex": 2,
+      "idColumnIndex": 1,
       "provider": "ES&S"
     }
   ],
   "candidates": [
     {
-      "name": "Banana"
+      "name": "A"
     },
     {
-      "name": "Kumquat"
+      "name": "B"
     },
     {
-      "name": "Durian"
+      "name": "C"
+    },
+    {
+      "name": "D"
     }
   ],
   "rules": {
     "tiebreakMode": "random",
     "overvoteRule": "alwaysSkipToNextRank",
-    "maxRankingsAllowed": 3,
+    "maxRankingsAllowed": 4,
+    "maxSkippedRanksAllowed": 1,
     "numberOfWinners": 1,
     "decimalPlacesForVoteArithmetic": 4,
     "minimumVoteThreshold": 0,
     "batchElimination": false,
     "continueUntilTwoCandidatesRemain": false,
-    "exhaustOnDuplicateCandidate": true,
+    "exhaustOnDuplicateCandidate": false,
     "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
     "rulesDescription": "Doyle Rules"
   }
 }

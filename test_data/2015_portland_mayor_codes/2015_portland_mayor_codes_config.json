@@ -1,7 +1,7 @@
 {
   "outputSettings": {
     "contestName": "Portland 2015 Mayoral Race",
-    "outputDirectory": "test_output/2015_portland_mayor_codes",
+    "outputDirectory": "output",
     "contestDate": "2015-11-03",
     "contestJurisdiction": "Portland, ME",
     "contestOffice": "Mayor",
@@ -9,7 +9,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "test_data/cvr_2015_portland_mayor_codes.xlsx",
+      "filePath": "2015_portland_mayor_codes_cvr.xlsx",
       "firstVoteColumnIndex": 4,
       "firstVoteRowIndex": 2,
       "precinctColumnIndex": 2,

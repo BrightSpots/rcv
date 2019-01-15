@@ -1,10 +1,10 @@
 {
   "outputSettings": {
     "contestName": "Validation test for params",
-    "outputDirectory": "test_output/test_invalid_params",
+    "outputDirectory": "output",
     "contestDate": "2018-07-19",
     "contestJurisdiction": "none",
-    "contestOffice": "nonie",
+    "contestOffice": "none",
     "tabulateByPrecinct": false
   },
   "cvrFileSources": [],

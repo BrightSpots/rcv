@@ -1,14 +1,14 @@
 {
   "outputSettings" : {
     "contestName" : "Tiebreak test",
-    "outputDirectory" : "test_output/test_tiebreak",
+    "outputDirectory" : "output",
     "contestDate" : "2017-12-03",
     "contestJurisdiction" : "Funkytown, USA",
     "contestOffice" : "Sergeant-at-Arms",
     "tabulateByPrecinct" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "test_data/cvr_test_tiebreak.xlsx",
+    "filePath" : "excluded_test_cvr.xlsx",
     "firstVoteColumnIndex" : 2,
     "firstVoteRowIndex": 2,
     "provider" : "ES&S"
