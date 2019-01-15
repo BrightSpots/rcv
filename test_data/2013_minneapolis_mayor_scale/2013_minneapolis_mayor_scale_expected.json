@@ -44,7 +44,7 @@
       "STEPHANIE WOODRUFF" : "13156",
       "TONY LANE" : "2847",
       "TROY BENJEGERDES" : "1937",
-      "UWI" : "1521"
+      "Undeclared" : "1521"
     },
     "tallyResults" : [ {
       "eliminated" : "Undeclared",
@@ -1515,7 +1515,8 @@
       "MARK ANDREW" : "324246"
     },
     "tallyResults" : [ {
-      "elected" : "BETSY HODGES"
+      "elected" : "BETSY HODGES",
+      "transfers" : { }
     } ]
   } ]
 }

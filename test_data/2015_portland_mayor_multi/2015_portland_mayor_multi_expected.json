@@ -4,7 +4,7 @@
     "date" : "2015-11-03",
     "jurisdiction" : "Portland, ME",
     "office" : "Mayor",
-    "threshold" : "48"
+    "threshold" : "17"
   },
   "results" : [ {
     "round" : 1,
@@ -29,14 +29,34 @@
     "tallyResults" : [ {
       "eliminated" : "Undeclared",
       "transfers" : { }
-    }, {
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "Bragdon, Charles E." : "11",
+      "Brennan, Michael F." : "6",
+      "Bryant, Peter G." : "9",
+      "Carmona, Ralph C." : "12",
+      "Dodge, Richard A." : "10",
+      "Duson, Jill C." : "5",
+      "Eder, John M." : "3",
+      "Haadoow, Hamza A." : "8",
+      "Lapchick, Jodie L." : "7",
+      "Marshall, David A." : "2",
+      "Mavodones, Nicholas M. Jr." : "13",
+      "Miller, Markos S." : "3",
+      "Rathband, Jed" : "2",
+      "Strimling, Ethan K." : "1",
+      "Vail, Christopher L." : "6"
+    },
+    "tallyResults" : [ {
       "eliminated" : "Strimling, Ethan K.",
       "transfers" : {
         "Vail, Christopher L." : "1"
       }
     } ]
   }, {
-    "round" : 2,
+    "round" : 3,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -60,7 +80,7 @@
       }
     } ]
   }, {
-    "round" : 3,
+    "round" : 4,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -83,7 +103,7 @@
       }
     } ]
   }, {
-    "round" : 4,
+    "round" : 5,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -105,7 +125,7 @@
       }
     } ]
   }, {
-    "round" : 5,
+    "round" : 6,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -126,7 +146,7 @@
       }
     } ]
   }, {
-    "round" : 6,
+    "round" : 7,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -140,50 +160,34 @@
       "Vail, Christopher L." : "7"
     },
     "tallyResults" : [ {
-      "eliminated" : "Brennan, Michael F.",
+      "elected" : "Mavodones, Nicholas M. Jr.",
       "transfers" : {
-        "Bragdon, Charles E." : "3",
-        "Bryant, Peter G." : "2",
-        "Carmona, Ralph C." : "1"
-      }
-    } ]
-  }, {
-    "round" : 7,
-    "tally" : {
-      "Bragdon, Charles E." : "14",
-      "Bryant, Peter G." : "11",
-      "Carmona, Ralph C." : "13",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "8",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Mavodones, Nicholas M. Jr." : "20",
-      "Vail, Christopher L." : "7"
-    },
-    "tallyResults" : [ {
-      "eliminated" : "Vail, Christopher L.",
-      "transfers" : {
-        "Mavodones, Nicholas M. Jr." : "6",
-        "exhausted" : "1"
+        "Duson, Jill C." : "0.30000",
+        "Haadoow, Hamza A." : "0.75000",
+        "Lapchick, Jodie L." : "0.90000",
+        "exhausted" : "1.05000"
       }
     } ]
   }, {
     "round" : 8,
     "tally" : {
-      "Bragdon, Charles E." : "14",
-      "Bryant, Peter G." : "11",
-      "Carmona, Ralph C." : "13",
+      "Bragdon, Charles E." : "11",
+      "Brennan, Michael F." : "6",
+      "Bryant, Peter G." : "9",
+      "Carmona, Ralph C." : "12",
       "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "8",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Mavodones, Nicholas M. Jr." : "26"
+      "Duson, Jill C." : "8.30000",
+      "Haadoow, Hamza A." : "8.75000",
+      "Lapchick, Jodie L." : "7.90000",
+      "Mavodones, Nicholas M. Jr." : "17.00000",
+      "Vail, Christopher L." : "7"
     },
     "tallyResults" : [ {
-      "eliminated" : "Lapchick, Jodie L.",
+      "eliminated" : "Brennan, Michael F.",
       "transfers" : {
-        "Haadoow, Hamza A." : "1",
-        "Mavodones, Nicholas M. Jr." : "6"
+        "Bragdon, Charles E." : "3",
+        "Bryant, Peter G." : "2",
+        "Carmona, Ralph C." : "1"
       }
     } ]
   }, {
@@ -193,33 +197,37 @@
       "Bryant, Peter G." : "11",
       "Carmona, Ralph C." : "13",
       "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "8",
-      "Haadoow, Hamza A." : "9",
-      "Mavodones, Nicholas M. Jr." : "32"
+      "Duson, Jill C." : "8.30000",
+      "Haadoow, Hamza A." : "8.75000",
+      "Lapchick, Jodie L." : "7.90000",
+      "Mavodones, Nicholas M. Jr." : "17.00000",
+      "Vail, Christopher L." : "7"
     },
     "tallyResults" : [ {
-      "eliminated" : "Duson, Jill C.",
+      "eliminated" : "Vail, Christopher L.",
       "transfers" : {
-        "Bryant, Peter G." : "1",
-        "Dodge, Richard A." : "5",
-        "Mavodones, Nicholas M. Jr." : "2"
+        "Lapchick, Jodie L." : "2",
+        "exhausted" : "5"
       }
     } ]
   }, {
     "round" : 10,
     "tally" : {
       "Bragdon, Charles E." : "14",
-      "Bryant, Peter G." : "12",
+      "Bryant, Peter G." : "11",
       "Carmona, Ralph C." : "13",
-      "Dodge, Richard A." : "15",
-      "Haadoow, Hamza A." : "9",
-      "Mavodones, Nicholas M. Jr." : "34"
+      "Dodge, Richard A." : "10",
+      "Duson, Jill C." : "8.30000",
+      "Haadoow, Hamza A." : "8.75000",
+      "Lapchick, Jodie L." : "9.90000",
+      "Mavodones, Nicholas M. Jr." : "17.00000"
     },
     "tallyResults" : [ {
-      "eliminated" : "Haadoow, Hamza A.",
+      "eliminated" : "Duson, Jill C.",
       "transfers" : {
-        "Carmona, Ralph C." : "2",
-        "Mavodones, Nicholas M. Jr." : "7"
+        "Bryant, Peter G." : "1",
+        "Carmona, Ralph C." : "0.30000",
+        "Dodge, Richard A." : "7"
       }
     } ]
   }, {
@@ -227,58 +235,104 @@
     "tally" : {
       "Bragdon, Charles E." : "14",
       "Bryant, Peter G." : "12",
-      "Carmona, Ralph C." : "15",
-      "Dodge, Richard A." : "15",
-      "Mavodones, Nicholas M. Jr." : "41"
+      "Carmona, Ralph C." : "13.30000",
+      "Dodge, Richard A." : "17",
+      "Haadoow, Hamza A." : "8.75000",
+      "Lapchick, Jodie L." : "9.90000",
+      "Mavodones, Nicholas M. Jr." : "17.00000"
     },
     "tallyResults" : [ {
-      "eliminated" : "Bryant, Peter G.",
+      "elected" : "Dodge, Richard A.",
       "transfers" : {
-        "Bragdon, Charles E." : "9",
-        "Carmona, Ralph C." : "2",
-        "Mavodones, Nicholas M. Jr." : "1"
+        "Bryant, Peter G." : "0.00000",
+        "Carmona, Ralph C." : "0.00000",
+        "Lapchick, Jodie L." : "0.00000"
       }
     } ]
   }, {
     "round" : 12,
     "tally" : {
-      "Bragdon, Charles E." : "23",
-      "Carmona, Ralph C." : "17",
-      "Dodge, Richard A." : "15",
-      "Mavodones, Nicholas M. Jr." : "42"
+      "Bragdon, Charles E." : "14",
+      "Bryant, Peter G." : "12.00000",
+      "Carmona, Ralph C." : "13.30000",
+      "Dodge, Richard A." : "17.00000",
+      "Haadoow, Hamza A." : "8.75000",
+      "Lapchick, Jodie L." : "9.90000",
+      "Mavodones, Nicholas M. Jr." : "17.00000"
     },
     "tallyResults" : [ {
-      "eliminated" : "Dodge, Richard A.",
+      "eliminated" : "Haadoow, Hamza A.",
       "transfers" : {
-        "Bragdon, Charles E." : "1",
-        "Carmona, Ralph C." : "11",
-        "Mavodones, Nicholas M. Jr." : "3"
+        "Bryant, Peter G." : "5.15000",
+        "Carmona, Ralph C." : "3.15000",
+        "exhausted" : "0.45000"
       }
     } ]
   }, {
     "round" : 13,
     "tally" : {
-      "Bragdon, Charles E." : "24",
-      "Carmona, Ralph C." : "28",
-      "Mavodones, Nicholas M. Jr." : "45"
+      "Bragdon, Charles E." : "14",
+      "Bryant, Peter G." : "17.15000",
+      "Carmona, Ralph C." : "16.45000",
+      "Dodge, Richard A." : "17.00000",
+      "Lapchick, Jodie L." : "9.90000",
+      "Mavodones, Nicholas M. Jr." : "17.00000"
     },
     "tallyResults" : [ {
-      "eliminated" : "Bragdon, Charles E.",
+      "elected" : "Bryant, Peter G.",
       "transfers" : {
-        "Carmona, Ralph C." : "12",
-        "Mavodones, Nicholas M. Jr." : "9",
-        "exhausted" : "3"
+        "Bragdon, Charles E." : "0.08750",
+        "Carmona, Ralph C." : "0.01750",
+        "Lapchick, Jodie L." : "0.04375",
+        "exhausted" : "0.00131"
       }
     } ]
   }, {
     "round" : 14,
     "tally" : {
-      "Carmona, Ralph C." : "40",
-      "Mavodones, Nicholas M. Jr." : "54"
+      "Bragdon, Charles E." : "14.08750",
+      "Bryant, Peter G." : "16.99994",
+      "Carmona, Ralph C." : "16.46750",
+      "Dodge, Richard A." : "17.00000",
+      "Lapchick, Jodie L." : "9.94375",
+      "Mavodones, Nicholas M. Jr." : "17.00000"
     },
     "tallyResults" : [ {
-      "elected" : "Mavodones, Nicholas M. Jr.",
-      "transfers" : { }
+      "eliminated" : "Lapchick, Jodie L.",
+      "transfers" : {
+        "Bragdon, Charles E." : "1.04375",
+        "Carmona, Ralph C." : "8.90000"
+      }
     } ]
+  }, {
+    "round" : 15,
+    "tally" : {
+      "Bragdon, Charles E." : "15.13125",
+      "Bryant, Peter G." : "16.99994",
+      "Carmona, Ralph C." : "25.36750",
+      "Dodge, Richard A." : "17.00000",
+      "Mavodones, Nicholas M. Jr." : "17.00000"
+    },
+    "tallyResults" : [ {
+      "elected" : "Carmona, Ralph C.",
+      "transfers" : {
+        "exhausted" : "8.36750"
+      }
+    }, {
+      "elected" : "Bragdon, Charles E.",
+      "transfers" : {
+        "exhausted" : "0.00000"
+      }
+    } ]
+  }, {
+    "round" : 16,
+    "tally" : {
+      "Bragdon, Charles E." : "15.13125",
+      "Bryant, Peter G." : "16.99994",
+      "Carmona, Ralph C." : "17.00000",
+      "Dodge, Richard A." : "17.00000",
+      "Mavodones, Nicholas M. Jr." : "17.00000"
+    },
+    "tallyResults" : [ ]
   } ]
 }

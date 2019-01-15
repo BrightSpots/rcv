@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2018 Jonath  an Moldover, Louis Eisenberg, and Hylton Edingfield
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -53,6 +53,8 @@ class TabulatorTests {
       // reader1 and reader2 are used to read lines from the files for comparison
       BufferedReader reader1 = new BufferedReader(new FileReader(path1));
       BufferedReader reader2 = new BufferedReader(new FileReader(path2));
+      // track current line to tell user where problems occur
+      int currentLine = 1;
 
       // loop until EOF is encountered
       while (true) {
@@ -72,9 +74,10 @@ class TabulatorTests {
         // both files have content so compare it
         if (!line1.equals(line2)) {
           // report inequality and keep processing in case there are more inequalities
-          Logger.log(Level.SEVERE, "files are not equal:\n%s\n%s", line1, line2);
+          Logger.log(Level.SEVERE, "files are not equal (%d)\n%s\n%s", currentLine, line1, line2);
           result = false;
         }
+        currentLine++;
       }
     } catch (FileNotFoundException e) {
       Logger.log(Level.SEVERE, "file not found: " + e.toString());
@@ -110,7 +113,7 @@ class TabulatorTests {
     // actualSummaryOutputPath is the summary json we just tabulated
     String actualSummaryOutputPath = session.summaryOutputPath;
     // compare actual to expected
-    assertTrue(fileCompare(actualSummaryOutputPath, expectedPath));
+    assertTrue(fileCompare(expectedPath, actualSummaryOutputPath));
   }
 
   // function: setup
@@ -133,6 +136,22 @@ class TabulatorTests {
     runTabulationTest("2015_portland_mayor");
   }
 
+  // function: testPortlandMayor
+  // purpose: test tabulation of Portland contest using candidate codes
+  @Test
+  @DisplayName("2015 Portland Mayor Candidate Codes")
+  void testPortlandMayorCodes() {
+    runTabulationTest("2015_portland_mayor_codes");
+  }
+
+  // function: testPortlandMayorMulti
+  // purpose: test tabulation of Portland contest
+  @Test
+  @DisplayName("2015 Portland Mayor multi-seat contest")
+  void testPortlandMayorMulti() {
+    runTabulationTest("2015_portland_mayor_multi");
+  }
+
   // function: test2013MinneapolisMayorScale
   // purpose: test large scale (1,000,000+) cvr contest
   @Test
@@ -141,10 +160,78 @@ class TabulatorTests {
     runTabulationTest("2013_minneapolis_mayor_scale");
   }
 
-
+  // function: testContinueUntilTwoCandidatesRemain
+  // purpose: test rule to continue tabulation until only two candidates remain potentially after
+  // all winner(s) have been elected
   @Test
   @DisplayName("Continue Until Two Candidates Remain")
   void testContinueUntilTwoCandidatesRemain() {
-    runTabulationTest("continue_tabulation");
+    runTabulationTest("continue_tabulation_test");
   }
+
+  // function: test2017MinneapolisMayor
+  // purpose: test 2017 Minneapolis Mayor contest
+  @Test
+  @DisplayName("2017 Minneapolis Mayor")
+  void test2017MinneapolisMayor() {
+    runTabulationTest("2017_minneapolis_mayor");
+  }
+
+  // function: test2013MinneapolisMayor
+  // purpose: test 2013 Minneapolis Mayor contest
+  @Test
+  @DisplayName("2013 Minneapolis Mayor")
+  void test2013MinneapolisMayor() {
+    runTabulationTest("2013_minneapolis_mayor");
+  }
+
+  // function: test2013MinneapolisPark
+  // purpose: test 2013 Minneapolis Park contest
+  @Test
+  @DisplayName("2013 Minneapolis Park")
+  void test2013MinneapolisPark() {
+    runTabulationTest("2013_minneapolis_park");
+  }
+
+  // function: test2018MaineGovPrimaryDem
+  // purpose: test 2018 Maine Governor Democratic Primary contest
+  @Test
+  @DisplayName("2018 Maine Governor Democratic Primary")
+  void test2018MaineGovPrimaryDem() {
+    runTabulationTest("2018_maine_governor_primary");
+  }
+
+  // function: testMinneapolisMultiSeatThreshold
+  // purpose: test testMinneapolisMultiSeatThreshold
+  @Test
+  @DisplayName("testMinneapolisMultiSeatThreshold")
+  void testMinneapolisMultiSeatThreshold() {
+    runTabulationTest("minneapolis_multi_seat_threshold");
+  }
+
+  @Test
+  @DisplayName("test for overvotes")
+  void testDuplicate() {
+    runTabulationTest("duplicate_test");
+  }
+
+  @Test
+  @DisplayName("test excluding candidates in config file")
+  void testExcludedCandidate() {
+    runTabulationTest("excluded_test");
+  }
+
+  @Test
+  @DisplayName("test minimum vote threshold setting")
+  void testMinimumThreshold() {
+    runTabulationTest("minimum_threshold_test");
+  }
+
+  @Test
+  @DisplayName("test skipping to next candidate after overvote")
+  void skipToNextTest() {
+    runTabulationTest("skip_to_next_test");
+  }
+
+
 }
