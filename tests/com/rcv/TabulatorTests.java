@@ -22,6 +22,7 @@
 
 package com.rcv;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
@@ -89,16 +90,21 @@ class TabulatorTests {
     return result;
   }
 
+  // function: getConfigPath
+  // purpose: given stem returns path to config file in test asset folder
+  // returns: path to config file
+  static String getConfigPath(String stem) {
+    return Paths.get(System.getProperty("user.dir"),
+      TEST_ASSET_FOLDER, stem,
+      stem + "_config.json")
+      .toAbsolutePath()
+      .toString();
+  }
+
   // function: runTabulationTest
   // purpose: helper function to support running various tabulation tests
   // param: stem base name of folder containing config file cvr files and expected result files
   static void runTabulationTest(String stem) {
-    // full path to config file
-    String configPath = Paths.get(System.getProperty("user.dir"),
-        TEST_ASSET_FOLDER, stem,
-        stem + "_config.json")
-        .toAbsolutePath()
-        .toString();
     // full path to expected results file
     String expectedPath = Paths.get(System.getProperty("user.dir"),
         TEST_ASSET_FOLDER,
@@ -108,7 +114,7 @@ class TabulatorTests {
         .toString();
 
     // create a session object and run the tabulation
-    TabulatorSession session = new TabulatorSession(configPath);
+    TabulatorSession session = new TabulatorSession(TabulatorTests.getConfigPath(stem));
     session.tabulate();
     // actualSummaryOutputPath is the summary json we just tabulated
     String actualSummaryOutputPath = session.summaryOutputPath;
@@ -127,6 +133,27 @@ class TabulatorTests {
       System.err.print(String.format("Failed to start system logging!\n%s", exception.toString()));
     }
   }
+
+  // function: invalidParamsTest
+  // purpose: test invalid params in config file
+  @Test
+  @DisplayName("test invalid params in config file")
+  void invalidParamsTest() {
+    TabulatorSession session =
+      new TabulatorSession(TabulatorTests.getConfigPath("invalid_params_test"));
+    assertFalse(session.loadContestConfig().validate());
+  }
+
+  // function: invalidSourcesTest
+  // purpose: test invalid source files
+  @Test
+  @DisplayName("test invalid source files")
+  void invalidSourcesTest() {
+    TabulatorSession session =
+      new TabulatorSession(TabulatorTests.getConfigPath("invalid_sources_test"));
+    assertFalse(session.loadContestConfig().validate());
+  }
+
 
   // function: testPortlandMayor
   // purpose: test tabulation of Portland contest
