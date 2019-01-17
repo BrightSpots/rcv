@@ -74,7 +74,7 @@ class StreamingCVRReader {
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
   private List<CastVoteRecord> cvrList;
-  // store precinceIDs (new IDs will be added as we parse)
+  // store precinctIDs (new IDs will be added as we parse)
   private Set<String> precinctIDs;
 
   // last rankings cell observed for CVR in progress

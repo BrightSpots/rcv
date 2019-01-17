@@ -721,8 +721,10 @@ public class GuiConfigController implements Initializable {
   }
 
   private static class TabulatorService extends Service<Void> {
+
     // path to config file we will use for tabulation
     private String configPath;
+
     // function: TabulatorService
     // purpose: constructor for Service object which runs a tabulation
     // param: configPath path to config file to be tabulated

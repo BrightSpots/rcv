@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import javafx.util.Pair;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
@@ -48,7 +47,7 @@ class TabulatorSession {
   // summaryOutputPath is generated from timestamp + config file
   String summaryOutputPath;
   // precinct IDs discovered during CVR parsing to support testing
-  private Set<String> precinctIDs;
+  private Set<String> precinctIDs = new HashSet<>();
 
   // function: TabulatorSession
   // purpose: TabulatorSession constructor
@@ -159,14 +158,9 @@ class TabulatorSession {
 
       if (isTabulationLogSetUp) {
         Logger.log(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
-        // Read cast vote records from CVR files
+        // Read cast vote records and precinct IDs from CVR files
+        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
         // parse the cast vote records
-        Pair<List<CastVoteRecord>, Set<String>> cvrInfo = parseCastVoteRecords(config);
-        // save precinctIDs for use with regression tests
-        precinctIDs = cvrInfo.getValue();
-        // castVoteRecords will contain all cast vote records parsed by the reader
-        List<CastVoteRecord> castVoteRecords = cvrInfo.getKey();
-
         if (castVoteRecords != null) {
           if (!castVoteRecords.isEmpty()) {
             // tabulator for tabulation logic
@@ -201,13 +195,10 @@ class TabulatorSession {
   // function: parseCastVoteRecords
   // purpose: parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
-  // returns: list of all CastVoteRecord objects parsed from CVR files (or null if there's an error)
-  //   and Set of all precinct IDs discovered during parsing
-  private Pair<List<CastVoteRecord>, Set<String>> parseCastVoteRecords(ContestConfig config) {
+  // param: precinctIDs a set of precinctIDs which will be populated during cvr parsing
+  // returns: list of parsed CVRs
+  private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config, Set<String> precinctIDs) {
     Logger.log(Level.INFO, "Parsing cast vote records...");
-
-    // precincts will contain all precincts found in this CVR
-    Set<String> precinctIDs = new HashSet<>();
 
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
@@ -255,6 +246,6 @@ class TabulatorSession {
       Logger.log(Level.SEVERE, "Parsing cast vote records failed!");
       castVoteRecords = null;
     }
-    return new Pair<>(castVoteRecords, precinctIDs);
+    return castVoteRecords;
   }
 }
