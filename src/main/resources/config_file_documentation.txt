@@ -113,18 +113,6 @@ Config file must be valid JSON format. Examples can be found under the test fold
         how the program should handle an overvote when it encounters one
         value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
 
-      "maxRankingsAllowed" optional
-        maximum number of candidates that a ballot is allowed to rank
-        example: 15
-        values: [1..]
-        if not supplied: the number of declared candidates
-
-      "maxSkippedRanksAllowed" optional
-        maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
-        example: 1
-        value: [0..]
-        if not supplied: unlimited
-
       "numberOfWinners" required
         the number of seats to be won in this contest
         note: we use fractional vote transfer to redistribute votes in multi-seat contests
@@ -134,6 +122,23 @@ Config file must be valid JSON format. Examples can be found under the test fold
         number of rounding decimal places when computing winning thresholds and fractional vote transfers
         value: [0..20]
 
+      "minimumVoteThreshold" required
+        the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
+        example: 150
+        value: [0..1000000]
+
+      "maxSkippedRanksAllowed" optional
+        maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
+        example: 1
+        value: [0..]
+        if not supplied: unlimited
+
+      "maxRankingsAllowed" optional
+        maximum number of candidates that a ballot is allowed to rank
+        example: 15
+        values: [1..]
+        if not supplied: the number of declared candidates
+
       "nonIntegerWinningThreshold" optional
         the vote threshold used to determine winners can be a non-integer
         if true, threshold = V/(S+1) + 10^-d
@@ -141,11 +146,6 @@ Config file must be valid JSON format. Examples can be found under the test fold
         where V = total number of votes (in the current round for single-seat or in the first round for multi-seat); S = numberOfWinners; and d = decimalPlacesForVoteArithmetic
         value: true | false
         if not supplied: false
-
-      "minimumVoteThreshold" required
-        the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
-        example: 150
-        value: [0..1000000]
 
       "batchElimination" optional
         tabulator will use batch elimination (only valid for single-winner contests)

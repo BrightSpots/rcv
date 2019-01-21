@@ -134,15 +134,15 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
   @FXML
-  private TextField textFieldMaxRankingsAllowed;
-  @FXML
-  private TextField textFieldMaxSkippedRanksAllowed;
-  @FXML
   private TextField textFieldNumberOfWinners;
   @FXML
   private TextField textFieldDecimalPlacesForVoteArithmetic;
   @FXML
   private TextField textFieldMinimumVoteThreshold;
+  @FXML
+  private TextField textFieldMaxSkippedRanksAllowed;
+  @FXML
+  private TextField textFieldMaxRankingsAllowed;
   @FXML
   private TextField textFieldOvervoteLabel;
   @FXML
@@ -402,12 +402,6 @@ public class GuiConfigController implements Initializable {
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
 
-    textFieldMaxRankingsAllowed
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldMaxRankingsAllowed));
-    textFieldMaxSkippedRanksAllowed
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldMaxSkippedRanksAllowed));
     textFieldNumberOfWinners
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
@@ -417,6 +411,12 @@ public class GuiConfigController implements Initializable {
     textFieldMinimumVoteThreshold
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
+    textFieldMaxSkippedRanksAllowed
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldMaxSkippedRanksAllowed));
+    textFieldMaxRankingsAllowed
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldMaxRankingsAllowed));
 
     setDefaultValues();
 
@@ -486,11 +486,11 @@ public class GuiConfigController implements Initializable {
 
     choiceTiebreakMode.setValue(null);
     choiceOvervoteRule.setValue(null);
-    textFieldMaxRankingsAllowed.clear();
-    textFieldMaxSkippedRanksAllowed.clear();
     textFieldNumberOfWinners.clear();
     textFieldDecimalPlacesForVoteArithmetic.clear();
     textFieldMinimumVoteThreshold.clear();
+    textFieldMaxSkippedRanksAllowed.clear();
+    textFieldMaxRankingsAllowed.clear();
     textFieldOvervoteLabel.clear();
     textFieldUndervoteLabel.clear();
     textFieldUndeclaredWriteInLabel.clear();
@@ -612,12 +612,12 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = rawConfig.rules;
     choiceTiebreakMode.setValue(config.getTiebreakMode());
     choiceOvervoteRule.setValue(config.getOvervoteRule());
-    setTextFieldToInteger(textFieldMaxRankingsAllowed, rules.maxRankingsAllowed);
-    setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, rules.maxSkippedRanksAllowed);
     setTextFieldToInteger(textFieldNumberOfWinners, rules.numberOfWinners);
     setTextFieldToInteger(
         textFieldDecimalPlacesForVoteArithmetic, rules.decimalPlacesForVoteArithmetic);
     setTextFieldToInteger(textFieldMinimumVoteThreshold, rules.minimumVoteThreshold);
+    setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, rules.maxSkippedRanksAllowed);
+    setTextFieldToInteger(textFieldMaxRankingsAllowed, rules.maxRankingsAllowed);
     textFieldOvervoteLabel.setText(rules.overvoteLabel);
     textFieldUndervoteLabel.setText(rules.undervoteLabel);
     textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
@@ -665,12 +665,12 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, Tabulator.OvervoteRule.RULE_UNKNOWN);
-    rules.maxRankingsAllowed = getIntValueOrNull(textFieldMaxRankingsAllowed);
-    rules.maxSkippedRanksAllowed = getIntValueOrNull(textFieldMaxSkippedRanksAllowed);
     rules.numberOfWinners = getIntValueOrNull(textFieldNumberOfWinners);
     rules.decimalPlacesForVoteArithmetic =
         getIntValueOrNull(textFieldDecimalPlacesForVoteArithmetic);
     rules.minimumVoteThreshold = getIntValueOrNull(textFieldMinimumVoteThreshold);
+    rules.maxSkippedRanksAllowed = getIntValueOrNull(textFieldMaxSkippedRanksAllowed);
+    rules.maxRankingsAllowed = getIntValueOrNull(textFieldMaxRankingsAllowed);
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
