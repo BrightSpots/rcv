@@ -842,6 +842,9 @@ class Tabulator {
           recordSelectionForCastVoteRecord(cvr, currentRound, null, "overvote");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
+          if (rank == cvr.rankToCandidateIDs.lastKey()) {
+            recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
+          }
           continue;
         }
 

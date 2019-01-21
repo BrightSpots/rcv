@@ -13,36 +13,36 @@ Config file must be valid JSON format. Examples can be found under the test fold
 
       "outputDirectory" optional
         directory for visualizer and audit output files (absolute or relative path)
-        note: if not supplied, files will be saved to the current working directory
         example: /Path/To/TabulatorResults
         example: output_data/contest1
         value: string of length [1..1000]
+        if not supplied: files will be saved to the current working directory
 
       "contestDate" optional
         date of the contest
         used for visualizer output only (not used in tabulation)
         example: "2015-11-03"
         value: text string of length [1..1000]
-        default: none
+        if not supplied: none
 
       "contestJurisdiction" optional
         text description of the jurisdiction of this contest
         used for visualizer output only (not used in tabulation)
         example: "Portland, ME"
         value: text string of length [1..1000]
-        default: none
+        if not supplied: none
 
       "contestOffice" optional
         text description of the office being contested
         used for visualizer output only (not used in tabulation)
         example: "Mayor"
         value: text string of length [1..1000]
-        default: none
+        if not supplied: none
 
       "tabulateByPrecinct" optional
         tabulator will generate a results spreadsheet for each precinct
         value: true | false
-        default: false
+        if not supplied: false
 
   "cvrFileSources" required
     list of input CVR file paths and their associated parameters
@@ -67,18 +67,19 @@ Config file must be valid JSON format. Examples can be found under the test fold
         index of the column (starting from 1) that contains the unique ID for each CVR
         example: 1
         value: [1..1000]
-        default: none
+        if not supplied: none
 
       "precinctColumnIndex" required if "tabulateByPrecinct" is in use
         index of the column (starting from 1) that contains the precinct name for each CVR
         example: 2
         value: [1..1000]
+        if not supplied: none
 
       "provider" optional
         text description of the vendor / machine which generated this file -- not used by the tabulator
         example: "ES&S"
         value: text string of length [1..1000]
-        default: none
+        if not supplied: none
 
   "candidates" required
     list of registered candidate names and associated candidate code
@@ -93,12 +94,12 @@ Config file must be valid JSON format. Examples can be found under the test fold
       candidate code which may appear in CVRs in lieu of full candidate name
       example: "JCD"
       value: string of length [1..1000]
-      default: none
+      if not supplied: none
 
     "excluded" optional
       candidate should be ignored during tabulation
       value: true | false
-      default: false
+      if not supplied: false
 
   "rules" required
     set of configuration parameters that specify the tabulation rules
@@ -116,25 +117,22 @@ Config file must be valid JSON format. Examples can be found under the test fold
         maximum number of candidates that a ballot is allowed to rank
         example: 15
         values: [1..]
-        default: the number of declared candidates
+        if not supplied: the number of declared candidates
 
       "maxSkippedRanksAllowed" optional
         maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted
-        note: if this parameter is not set, it will be treated as unlimited
         example: 1
-        value: [0..100]
-        default: 1
+        value: [0..]
+        if not supplied: unlimited
 
       "numberOfWinners" required
         the number of seats to be won in this contest
         note: we use fractional vote transfer to redistribute votes in multi-seat contests
-        value: [1..100]
-        default: 1
+        value: [1..number of declared candidates]
 
       "decimalPlacesForVoteArithmetic" required
         number of rounding decimal places when computing winning thresholds and fractional vote transfers
         value: [0..20]
-        default: 4
 
       "nonIntegerWinningThreshold" optional
         the vote threshold used to determine winners can be a non-integer
@@ -142,54 +140,53 @@ Config file must be valid JSON format. Examples can be found under the test fold
         if false, threshold = floor(V/(S+1)) + 1
         where V = total number of votes (in the current round for single-seat or in the first round for multi-seat); S = numberOfWinners; and d = decimalPlacesForVoteArithmetic
         value: true | false
-        default: false
+        if not supplied: false
 
-      "minimumVoteThreshold" optional
+      "minimumVoteThreshold" required
         the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
         example: 150
         value: [0..1000000]
-        default: 0
 
       "batchElimination" optional
         tabulator will use batch elimination (only valid for single-winner contests)
         value: true | false
-        default: false
+        if not supplied: false
 
       "continueUntilTwoCandidatesRemain" optional
         tabulator will keep tabulating (beyond winning round) until only two candidates remain (only valid for single-winner contests)
         value: true | false
-        default: false
+        if not supplied: false
 
       "exhaustOnDuplicateCandidate" optional
         tabulator will exhaust a ballot when it encounters a duplicate candidate (instead of just skipping the duplicate)
         value: true | false
-        default: false
+        if not supplied: false
 
       "treatBlankAsUndeclaredWriteIn" optional
         tabulator will interpret a blank cell in a CVR as a vote for an undeclared write-in
         value: true | false
-        default: false
+        if not supplied: false
 
       "overvoteLabel" optional
         label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately" (because the other option, exhaustIfMultipleContinuing, relies on knowing which specific candidates were involved in each overvote)
         example: "OVERVOTE"
         value: string of length [1..1000]
-        default: none
+        if not supplied: none
 
       "undervoteLabel" optional
         the special label used in the cast vote records to denote an undervote
         example: "UNDERVOTE"
         value: string of length [1..1000]
-        default: none
+        if not supplied: none
 
       "undeclaredWriteInLabel" optional
         the special label used in the cast vote records to denote a vote for an undeclared write-in
         example: "UWI"
         value: string of length [1..1000]
-        default: none
+        if not supplied: none
 
       "rulesDescription" optional
         text description of this rules configuration for organizing your config files -- not used by the tabulator
         Example "Maine Rules"
         value: string of length [1..1000]
-        default: none
+        if not supplied: none

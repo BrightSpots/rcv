@@ -26,8 +26,8 @@ package com.rcv;
 
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import com.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -67,8 +67,11 @@ public class Main extends GuiApplication {
     } else {
       // assume user wants to use CLI
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
+      // config file for configuring the tabulator
       String configPath = args[0];
-      // config file for running the tabulator
+      // set config file parent folder as default user folder
+      FileUtils.setUserDirectory(new File(configPath).getParent());
+      // load configuration
       ContestConfig config = loadContestConfig(configPath);
       if (config != null) {
         executeTabulation(config);
@@ -216,20 +219,20 @@ public class Main extends GuiApplication {
     // At each iteration of the following loop, we add records from another source file.
     // source: index over config sources
     for (RawContestConfig.CVRSource source : config.getRawConfig().cvrFileSources) {
-      Path cvrPath = Paths.get(source.getFilePath()).toAbsolutePath();
-      Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
+      Logger.log(Level.INFO, "Reading cast vote record file: %s...", source.getFullFilePath());
       // the CVRs parsed from this source
       try {
-        List<CastVoteRecord> cvrs = new StreamingCVRReader(config, source).parseCVRFile(castVoteRecords);
+        List<CastVoteRecord> cvrs =
+            new StreamingCVRReader(config, source).parseCVRFile(castVoteRecords);
         if (cvrs.isEmpty()) {
-          Logger.log(Level.SEVERE, "Source file contains no CVRs: %s", source.getFilePath());
+          Logger.log(Level.SEVERE, "Source file contains no CVRs: %s", source.getFullFilePath());
           encounteredSourceProblem = true;
         }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.log(
             Level.SEVERE,
             "Source file contains unrecognized candidate(s): %s",
-            source.getFilePath());
+            source.getFullFilePath());
         // map from name to number of times encountered
         for (String candidate : exception.candidateCounts.keySet()) {
           Logger.log(
@@ -240,10 +243,10 @@ public class Main extends GuiApplication {
         }
         encounteredSourceProblem = true;
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error opening source file %s", source.getFilePath());
+        Logger.log(Level.SEVERE, "Error opening source file %s", source.getFullFilePath());
         encounteredSourceProblem = true;
       } catch (SAXException | OpenXML4JException e) {
-        Logger.log(Level.SEVERE, "Error parsing source file %s", source.getFilePath());
+        Logger.log(Level.SEVERE, "Error parsing source file %s", source.getFullFilePath());
         encounteredSourceProblem = true;
       }
     }

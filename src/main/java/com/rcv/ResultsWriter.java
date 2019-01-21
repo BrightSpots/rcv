@@ -44,7 +44,6 @@ import java.util.logging.Level;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-
 class ResultsWriter {
 
   // number of rounds needed to elect winner(s)
@@ -183,7 +182,7 @@ class ResultsWriter {
   private void generateSummarySpreadsheet(
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
       throws IOException {
-    String csvPath = outputPath+".csv";
+    String csvPath = outputPath + ".csv";
     Logger.log(Level.INFO, "Generating summary spreadsheets: %s", csvPath);
 
     // Get all candidates sorted by their first round tally. This determines the display order.
@@ -243,7 +242,6 @@ class ResultsWriter {
     // candidate indexes over all candidates
     for (String candidate : sortedCandidates) {
       // show each candidate row with their totals for each round
-      // row for the current candidate
       // text for the candidate name
       String candidateDisplayName = this.config.getNameForCandidateID(candidate);
       csvPrinter.print(candidateDisplayName);
@@ -332,12 +330,11 @@ class ResultsWriter {
   // purpose: add the given candidate(s) names to the csv file next cell
   // param: candidates list of candidate names to add to the next cell
   // param: csvPrinter object for output to csv file
-  private void addActionRowCandidates(List<String> candidates,
-      CSVPrinter csvPrinter)
+  private void addActionRowCandidates(List<String> candidates, CSVPrinter csvPrinter)
       throws IOException {
     List<String> candidateDisplayNames = new ArrayList<>();
     // build list of display names
-    for(String candidate : candidates) {
+    for (String candidate : candidates) {
       candidateDisplayNames.add(config.getNameForCandidateID(candidate));
     }
     // concatenate them using semi-colon for display in a single cell
@@ -421,9 +418,8 @@ class ResultsWriter {
   // param: outputPath where to write json file
   // param: roundTallies all tally information
   // file access: write to outputPath
-  private void generateSummaryJson(Map<Integer, Map<String, BigDecimal>> roundTallies,
-      String precinct,
-      String outputPath)
+  private void generateSummaryJson(
+      Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
       throws IOException {
 
     // mapper converts java objects to json
@@ -439,7 +435,7 @@ class ResultsWriter {
     // jsonWriter writes those object to disk
     ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
     // jsonPath for output json summary
-    String jsonPath = outputPath+".json";
+    String jsonPath = outputPath + ".json";
     // log output location
     Logger.log(Level.INFO, "Generating summary json: %s", jsonPath);
     // outFile is the target file
@@ -463,14 +459,14 @@ class ResultsWriter {
     // results will be a list of round data objects
     ArrayList<Object> results = new ArrayList<>();
     // for each round create objects for json serialization
-    for(int round = 1; round <= numRounds; round++) {
+    for (int round = 1; round <= numRounds; round++) {
       // container for all json data this round:
       HashMap<String, Object> roundData = new HashMap<>();
       // add round number (this is implied by the ordering but for debugging we are explicit)
       roundData.put("round", round);
       // add actions if this is not a precinct summary
       if (precinct == null || precinct.isEmpty()) {
-      // actions is a list of one or more action objects
+        // actions is a list of one or more action objects
         ArrayList<Object> actions = new ArrayList<>();
         addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);
         // add any elimination actions
@@ -479,7 +475,7 @@ class ResultsWriter {
         roundData.put("tallyResults", actions);
       }
       // add tally object
-      roundData.put("tally", roundTallies.get(round));
+      roundData.put("tally", updateCandidateNamesInTally(roundTallies.get(round)));
       // add roundData to results list
       results.add(roundData);
     }
@@ -496,6 +492,14 @@ class ResultsWriter {
     }
   }
 
+  private Map<String, BigDecimal> updateCandidateNamesInTally(Map<String, BigDecimal> tally) {
+    Map<String, BigDecimal> newTally = new HashMap<>();
+    for (String key : tally.keySet()) {
+      newTally.put(config.getNameForCandidateID(key), tally.get(key));
+    }
+    return newTally;
+  }
+
   // function: addActionObjects
   // purpose: adds action objects to input action list representing all actions applied this round
   //  each action will have a type followed by a list of 0 or more vote transfers
@@ -504,39 +508,38 @@ class ResultsWriter {
   // param: candidates list of all candidates action is applied to
   // param: round which this action occurred
   // param: actions list to add new action objects to
-  private void addActionObjects(String actionType,
-      List<String> candidates,
-      int round,
-      ArrayList<Object> actions) {
-
+  private void addActionObjects(
+      String actionType, List<String> candidates, int round, ArrayList<Object> actions) {
     // check for valid candidates:
     // "drop undeclared write-in" may result in no one actually being eliminated
     if (candidates != null && candidates.size() > 0) {
-
       // transfers contains all vote transfers for this round
       // we add one to the round since transfers are currently stored under the round AFTER
       // the tallies which triggered them
       Map<String, Map<String, BigDecimal>> roundTransfers =
-          this.tallyTransfers.getTransfersForRound(round+1);
+          tallyTransfers.getTransfersForRound(round + 1);
 
       // candidate iterates over all candidates who had this action applied to them
-      for(String candidate : candidates) {
+      for (String candidate : candidates) {
         // for each candidate create an action object
         HashMap<String, Object> action = new HashMap<>();
         // add the specified action type
         action.put(actionType, config.getNameForCandidateID(candidate));
         // check if there are any transfers
-        if(roundTransfers != null) {
+        if (roundTransfers != null) {
           Map<String, BigDecimal> transfersFromCandidate = roundTransfers.get(candidate);
-          if(transfersFromCandidate != null) {
+          if (transfersFromCandidate != null) {
             // add transfers
             action.put("transfers", transfersFromCandidate);
           }
+        }
+        if (!action.containsKey("transfers")) {
+          // add an empty map
+          action.put("transfers", new HashMap<String, BigDecimal>());
         }
         // add the action object to list
         actions.add(action);
       }
     }
   }
-
 }

@@ -23,6 +23,7 @@ package com.rcv;
 import com.rcv.RawContestConfig.CVRSource;
 import com.rcv.RawContestConfig.Candidate;
 import com.rcv.Tabulator.TieBreakMode;
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -36,18 +37,18 @@ import java.util.logging.Level;
 class ContestConfig {
 
   // TODO: if any booleans are unspecified in config file, they default to false no matter what
-  static final boolean DEFAULT_TABULATE_BY_PRECINCT = false;
-  static final boolean DEFAULT_NON_INTEGER_WINNING_THRESHOLD = false;
-  static final boolean DEFAULT_BATCH_ELIMINATION = false;
-  static final boolean DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
-  static final boolean DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
-  static final boolean DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
-  static final int DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
-  static final int DEFAULT_MAX_SKIPPED_RANKS_ALLOWED = 1;
-  static final int DEFAULT_NUMBER_OF_WINNERS = 1;
-  static final BigDecimal DEFAULT_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
+  static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
+  static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
+  static final boolean SUGGESTED_BATCH_ELIMINATION = false;
+  static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
+  static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
+  static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
+  static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
+  static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
+  static final int SUGGESTED_NUMBER_OF_WINNERS = 1;
+  static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
 
-  static final boolean DEFAULT_CANDIDATE_EXCLUDED = false;
+  static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
 
   // underlying rawConfig object data
   private final RawContestConfig rawConfig;
@@ -98,11 +99,6 @@ class ContestConfig {
       isValid = false;
       Logger.log(Level.SEVERE, "Contest name is required.");
     }
-
-    if (getOutputDirectory() == null || getOutputDirectory().isEmpty()) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "Output directory is required.");
-    }
   }
 
   private void validateCvrFileSources() {
@@ -112,59 +108,77 @@ class ContestConfig {
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
+        // perform checks on source input path
         if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
           isValid = false;
           Logger.log(Level.SEVERE, "filePath is required for each CVR file.");
-        } else if (cvrFilePathSet.contains(source.getFilePath())) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s", source.getFilePath());
-        } else {
-          cvrFilePathSet.add(source.getFilePath());
+          continue;
         }
 
+        // look for duplicate paths
+        if (cvrFilePathSet.contains(source.getFullFilePath())) {
+          isValid = false;
+          Logger.log(
+              Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s",
+              source.getFullFilePath());
+        } else {
+          cvrFilePathSet.add(source.getFullFilePath());
+        }
+
+        // ensure file exists
+        if (!new File(source.getFullFilePath()).exists()) {
+          isValid = false;
+          Logger.log(Level.SEVERE, "CVR file not found: %s", source.getFullFilePath());
+        }
+
+        // ensure valid first vote column value
         if (source.getFirstVoteColumnIndex() == null) {
           isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFilePath());
+          Logger
+              .log(Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFullFilePath());
         } else if (source.getFirstVoteColumnIndex() < 1
             || source.getFirstVoteColumnIndex() > 1000) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
               "firstVoteColumnIndex must be from 1 to 1000: %s",
-              source.getFilePath());
+              source.getFullFilePath());
         }
 
+        // ensure valid first vote row value
         if (source.getFirstVoteRowIndex() == null) {
           isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", source.getFilePath());
+          Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", source.getFullFilePath());
         } else if (source.getFirstVoteRowIndex() < 1 || source.getFirstVoteRowIndex() > 1000) {
           isValid = false;
           Logger.log(
-              Level.SEVERE, "firstVoteRowIndex must be from 1 to 1000: %s", source.getFilePath());
+              Level.SEVERE, "firstVoteRowIndex must be from 1 to 1000: %s",
+              source.getFullFilePath());
         }
 
+        // ensure valid id column value
         if (source.getIdColumnIndex() != null
             && (source.getIdColumnIndex() < 1 || source.getIdColumnIndex() > 1000)) {
           isValid = false;
           Logger.log(
-              Level.SEVERE, "idColumnIndex must be from 1 to 1000: %s", source.getFilePath());
+              Level.SEVERE, "idColumnIndex must be from 1 to 1000: %s", source.getFullFilePath());
         }
 
+        // ensure valid precinct column value
         if (isTabulateByPrecinctEnabled()) {
           if (source.getPrecinctColumnIndex() == null) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
-                source.getFilePath());
+                source.getFullFilePath());
           } else if (source.getPrecinctColumnIndex() < 1
               || source.getPrecinctColumnIndex() > 1000) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
                 "precinctColumnIndex must be from 1 to 1000: %s",
-                source.getFilePath());
+                source.getFullFilePath());
           }
         }
       }
@@ -239,15 +253,16 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "maxRankingsAllowed must be 1 or higher.");
     }
 
-    if (getMaxSkippedRanksAllowed() != null
-        && (getMaxSkippedRanksAllowed() < 0 || getMaxSkippedRanksAllowed() > 100)) {
+    if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
       isValid = false;
-      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be from 0 to 100 if it's supplied.");
+      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be non-negative if it's supplied.");
     }
 
-    if (getNumberOfWinners() == null || getNumberOfWinners() < 1 || getNumberOfWinners() > 100) {
+    if (getNumberOfWinners() == null || getNumberOfWinners() < 1
+        || getNumberOfWinners() > getNumDeclaredCandidates()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "numberOfWinners must be from 1 to 100.");
+      Logger.log(Level.SEVERE, "numberOfWinners must be at least 1 and no more than the number " +
+          "of declared candidates.");
     }
 
     if (getMinimumVoteThreshold() == null
@@ -313,15 +328,22 @@ class ContestConfig {
         .setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
   }
 
-  // function: getOutputDirectory
+  // function: getOutputDirectoryRaw
   // purpose: getter for outputDirectory
-  // returns: directory string from config or falls back to working directory
-  String getOutputDirectory() {
+  // returns: raw string from config or falls back to user folder if none is set
+  String getOutputDirectoryRaw() {
     // outputDirectory is where output files should be written
     return (rawConfig.outputSettings.outputDirectory != null
         && !rawConfig.outputSettings.outputDirectory.isEmpty())
         ? rawConfig.outputSettings.outputDirectory
-        : System.getProperty("user.dir");
+        : FileUtils.getUserDirectory();
+  }
+
+  // function: getOutputDirectory
+  // purpose: get the directory location where output files should be written
+  // returns: path to directory where output files should be written
+  String getOutputDirectory() {
+    return FileUtils.resolveUserPath(getOutputDirectoryRaw());
   }
 
   // function: willContinueUntilTwoCandidatesRemain
