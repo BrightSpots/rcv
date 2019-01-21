@@ -57,9 +57,9 @@
           <VBox spacing="8.0">
             <Label text="Contest Name *"/>
             <TextField maxWidth="220.0" promptText="Contest Name *" fx:id="textFieldContestName"/>
-            <Label text="Output Directory *"/>
+            <Label text="Output Directory"/>
             <HBox alignment="CENTER_LEFT" spacing="8.0">
-              <TextField prefWidth="400.0" promptText="Output Directory *"
+              <TextField prefWidth="400.0" promptText="Output Directory"
                 fx:id="textFieldOutputDirectory"/>
               <Button mnemonicParsing="false" onAction="#buttonOutputDirectoryClicked"
                 text="Select"/>
@@ -186,21 +186,21 @@
               <ChoiceBox prefWidth="220.0" fx:id="choiceTiebreakMode"/>
               <Label text="Overvote Rule *"/>
               <ChoiceBox prefWidth="220.0" fx:id="choiceOvervoteRule"/>
-              <Label text="Max Rankings Allowed *"/>
-              <TextField maxWidth="220.0" promptText="Max Rankings Allowed *"
-                fx:id="textFieldMaxRankingsAllowed"/>
-              <Label text="Max Skipped Ranks Allowed *"/>
-              <TextField maxWidth="220.0" promptText="Max Skipped Ranks Allowed *"
-                fx:id="textFieldMaxSkippedRanksAllowed"/>
-              <Label text="Number of Winners"/>
+              <Label text="Number of Winners *"/>
               <TextField maxWidth="220.0" promptText="Number of Winners"
                 fx:id="textFieldNumberOfWinners"/>
-              <Label text="Decimal Places for Vote Arithmetic"/>
+              <Label text="Decimal Places for Vote Arithmetic *"/>
               <TextField maxWidth="220.0" promptText="Decimal Places for Vote Arithmetic"
                 fx:id="textFieldDecimalPlacesForVoteArithmetic"/>
-              <Label text="Minimum Vote Threshold"/>
+              <Label text="Minimum Vote Threshold *"/>
               <TextField maxWidth="220.0" promptText="Minimum Vote Threshold"
                 fx:id="textFieldMinimumVoteThreshold"/>
+              <Label text="Max Skipped Ranks Allowed"/>
+              <TextField maxWidth="220.0" promptText="Max Skipped Ranks Allowed"
+                fx:id="textFieldMaxSkippedRanksAllowed"/>
+              <Label text="Max Rankings Allowed"/>
+              <TextField maxWidth="220.0" promptText="Max Rankings Allowed"
+                fx:id="textFieldMaxRankingsAllowed"/>
               <padding>
                 <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
               </padding>
