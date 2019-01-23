@@ -46,6 +46,9 @@ class TabulatorSession {
   private String configPath;
   // summaryOutputPath is generated from timestamp + config file
   String summaryOutputPath;
+  // cache output path location
+  String outputPath;
+
   // precinct IDs discovered during CVR parsing to support testing
   private Set<String> precinctIDs = new HashSet<>();
 
@@ -141,6 +144,9 @@ class TabulatorSession {
               timestampString))
               .toAbsolutePath()
               .toString();
+
+      // cache outputPath for testing
+      outputPath = config.getOutputDirectory();
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         Logger.addTabulationFileLogging(tabulationLogPath);

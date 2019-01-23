@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -39,6 +40,8 @@ class TabulatorTests {
 
   // folder where we store test inputs
   private static final String TEST_ASSET_FOLDER = "test_data";
+  // limit log output to avoid spam
+  private static final Integer MAX_LOG_ERRORS = 10;
 
   // function: fileCompare
   // purpose: compare file contents line by line to identify any differences and give an
@@ -47,7 +50,7 @@ class TabulatorTests {
   // param: path2 path to second file to be compared
   // returns: true if the file contents are equal otherwise false
   // file access: read-only for path1 and path2
-  static boolean fileCompare(String path1, String path2) {
+  private static boolean fileCompare(String path1, String path2) {
     // result will be true if file contents are equal - assume equal until learning otherwise
     boolean result = true;
     try {
@@ -56,6 +59,9 @@ class TabulatorTests {
       BufferedReader reader2 = new BufferedReader(new FileReader(path2));
       // track current line to tell user where problems occur
       int currentLine = 1;
+      // track output to avoid spam
+      int errorCount = 0;
+      // max outputs
 
       // loop until EOF is encountered
       while (true) {
@@ -74,9 +80,15 @@ class TabulatorTests {
         }
         // both files have content so compare it
         if (!line1.equals(line2)) {
-          // report inequality and keep processing in case there are more inequalities
-          Logger.log(Level.SEVERE, "files are not equal (%d)\n%s\n%s", currentLine, line1, line2);
+          // update flags and report inequality
+          errorCount++;
           result = false;
+          Logger.log(Level.SEVERE, "Files are not equal (line %d):\n%s\n%s", currentLine, line1,
+              line2);
+          // see if we should keep processing
+          if (errorCount >= MAX_LOG_ERRORS) {
+            break;
+          }
         }
         currentLine++;
       }
@@ -90,13 +102,11 @@ class TabulatorTests {
     return result;
   }
 
-  // function: getConfigPath
-  // purpose: given stem returns path to config file in test asset folder
-  // returns: path to config file
-  static String getConfigPath(String stem) {
-    return Paths.get(System.getProperty("user.dir"),
-      TEST_ASSET_FOLDER, stem,
-      stem + "_config.json")
+  // function: getTestFilePath
+  // purpose: given stem and suffix returns path to file in test asset folder
+  // returns: path to file in test folder
+  private static String getTestFilePath(String stem, String suffix) {
+    return Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem, stem + suffix)
       .toAbsolutePath()
       .toString();
   }
@@ -104,28 +114,29 @@ class TabulatorTests {
   // function: runTabulationTest
   // purpose: helper function to support running various tabulation tests
   // param: stem base name of folder containing config file cvr files and expected result files
-  static void runTabulationTest(String stem) {
+  private static void runTabulationTest(String stem) {
     // full path to expected results file
-    String expectedPath = Paths.get(System.getProperty("user.dir"),
-        TEST_ASSET_FOLDER,
-        stem,
-        stem + "_expected.json")
-        .toAbsolutePath()
-        .toString();
-
+    String expectedPath = getTestFilePath(stem, "_expected.json");
     // create a session object and run the tabulation
-    TabulatorSession session = new TabulatorSession(TabulatorTests.getConfigPath(stem));
+    TabulatorSession session = new TabulatorSession(getTestFilePath(stem, "_config.json"));
     session.tabulate();
     // actualSummaryOutputPath is the summary json we just tabulated
     String actualSummaryOutputPath = session.summaryOutputPath;
     // compare actual to expected
     assertTrue(fileCompare(expectedPath, actualSummaryOutputPath));
+    // test passed so cleanup test output folder
+    File ouputFolder = new File(session.outputPath);
+    for (File file : ouputFolder.listFiles()) {
+      if (!file.isDirectory()) {
+        file.delete();
+      }
+    }
   }
 
   // function: setup
   // purpose: runs once at the beginning of testing to setup logging
   @BeforeAll
-  public static void setup() {
+  static void setup() {
     try {
       Logger.setup();
     } catch (IOException exception) {
@@ -140,7 +151,7 @@ class TabulatorTests {
   @DisplayName("test invalid params in config file")
   void invalidParamsTest() {
     TabulatorSession session =
-      new TabulatorSession(TabulatorTests.getConfigPath("invalid_params_test"));
+        new TabulatorSession(getTestFilePath("invalid_params_test", "_config.json"));
     assertFalse(session.loadContestConfig().validate());
   }
 
@@ -150,7 +161,7 @@ class TabulatorTests {
   @DisplayName("test invalid source files")
   void invalidSourcesTest() {
     TabulatorSession session =
-      new TabulatorSession(TabulatorTests.getConfigPath("invalid_sources_test"));
+        new TabulatorSession(getTestFilePath("invalid_sources_test", "_config.json"));
     assertFalse(session.loadContestConfig().validate());
   }
 
