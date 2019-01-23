@@ -174,9 +174,11 @@ public class GuiConfigController implements Initializable {
   }
 
   private void loadFile(File fileToLoad) {
-    // set loaded file parent folder as the new default user folder
-    FileUtils.setUserDirectory(fileToLoad.getParent());
-    GuiContext.getInstance().setConfig(Main.loadContestConfig(fileToLoad.getAbsolutePath()));
+    // create a TabulatorSession object to load the config file specified by user
+    TabulatorSession session = new TabulatorSession(fileToLoad.getAbsolutePath());
+    // load and cache the config object
+    GuiContext.getInstance().setConfig(session.loadContestConfig());
+    // if config loaded use it to populate the GUI
     if (GuiContext.getInstance().getConfig() != null) {
       loadConfig(GuiContext.getInstance().getConfig());
       labelCurrentlyLoaded.setText("Currently loaded: " + fileToLoad.getAbsolutePath());
@@ -243,7 +245,7 @@ public class GuiConfigController implements Initializable {
     if (checkForSaveAndTabulate()) {
       if (GuiContext.getInstance().getConfig() != null) {
         buttonBar.setDisable(true);
-        TabulatorService service = new TabulatorService();
+        TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
         service.setOnSucceeded(event -> buttonBar.setDisable(false));
         service.setOnCancelled(event -> buttonBar.setDisable(false));
         service.setOnFailed(event -> buttonBar.setDisable(false));
@@ -707,12 +709,24 @@ public class GuiConfigController implements Initializable {
 
   private static class TabulatorService extends Service<Void> {
 
+    // path to config file we will use for tabulation
+    private String configPath;
+
+    // function: TabulatorService
+    // purpose: constructor for Service object which runs a tabulation
+    // param: configPath path to config file to be tabulated
+    TabulatorService(String configPath) {
+      this.configPath = configPath;
+    }
+
     @Override
     protected Task<Void> createTask() {
       return new Task<>() {
         @Override
         protected Void call() {
-          Main.executeTabulation(GuiContext.getInstance().getConfig());
+          // create session object used for tabulation
+          TabulatorSession session = new TabulatorSession(configPath);
+          session.tabulate();
           return null;
         }
       };

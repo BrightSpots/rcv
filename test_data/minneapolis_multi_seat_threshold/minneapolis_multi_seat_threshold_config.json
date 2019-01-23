@@ -1,0 +1,52 @@
+{
+  "outputSettings" : {
+    "contestName" : "Multi_winner2",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-09-30",
+    "contestJurisdiction" : "Multi-winner",
+    "contestOffice" : "Multi_winner2",
+    "tabulateByPrecinct" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "minneapolis_multi_seat_threshold_cvr.xlsx",
+    "firstVoteColumnIndex" : 2,
+    "firstVoteRowIndex": 2,
+    "provider" : ""
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "code" : ""
+  }, {
+    "name" : "B",
+    "code" : ""
+  }, {
+    "name" : "C",
+    "code" : ""
+  }, {
+    "name" : "D",
+    "code" : ""
+  }, {
+    "name" : "E",
+    "code" : ""
+  }, {
+    "name" : "F",
+    "code" : ""
+  } ],
+  "rules" : {
+    "tiebreakMode" : "interactive",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "maxRankingsAllowed" : 6,
+    "maxSkippedRanksAllowed" : 1,
+    "numberOfWinners" : 3,
+    "decimalPlacesForVoteArithmetic" : 4,
+    "minimumVoteThreshold" : 0,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : "Multi-winner Test2"
+  }
+}

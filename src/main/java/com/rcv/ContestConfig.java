@@ -50,7 +50,7 @@ class ContestConfig {
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
 
   // underlying rawConfig object data
-  private final RawContestConfig rawConfig;
+  final RawContestConfig rawConfig;
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   private final Set<String> excludedCandidates = new HashSet<>();

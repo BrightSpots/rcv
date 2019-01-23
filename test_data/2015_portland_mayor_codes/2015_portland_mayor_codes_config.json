@@ -79,7 +79,7 @@
     }
   ],
   "rules": {
-    "tiebreakMode": "random",
+    "tiebreakMode": "usePermutationInConfig",
     "overvoteRule": "exhaustImmediately",
     "maxRankingsAllowed": 15,
     "maxSkippedRanksAllowed": 1,

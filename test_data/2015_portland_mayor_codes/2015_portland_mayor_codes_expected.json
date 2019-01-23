@@ -32,7 +32,7 @@
     }, {
       "eliminated" : "Strimling, Ethan K.",
       "transfers" : {
-        "Vail, Christopher L." : "1"
+        "CLV" : "1"
       }
     } ]
   }, {
@@ -56,7 +56,7 @@
     "tallyResults" : [ {
       "eliminated" : "Rathband, Jed",
       "transfers" : {
-        "Mavodones, Nicholas M. Jr." : "2"
+        "NMM" : "2"
       }
     } ]
   }, {
@@ -79,7 +79,7 @@
     "tallyResults" : [ {
       "eliminated" : "Marshall, David A.",
       "transfers" : {
-        "Miller, Markos S." : "2"
+        "MSM" : "2"
       }
     } ]
   }, {
@@ -101,7 +101,7 @@
     "tallyResults" : [ {
       "eliminated" : "Eder, John M.",
       "transfers" : {
-        "Duson, Jill C." : "3"
+        "JCD" : "3"
       }
     } ]
   }, {
@@ -122,7 +122,7 @@
     "tallyResults" : [ {
       "eliminated" : "Miller, Markos S.",
       "transfers" : {
-        "Mavodones, Nicholas M. Jr." : "5"
+        "NMM" : "5"
       }
     } ]
   }, {
@@ -142,9 +142,9 @@
     "tallyResults" : [ {
       "eliminated" : "Brennan, Michael F.",
       "transfers" : {
-        "Bragdon, Charles E." : "3",
-        "Bryant, Peter G." : "2",
-        "Carmona, Ralph C." : "1"
+        "CEB" : "3",
+        "PGB" : "2",
+        "RCC" : "1"
       }
     } ]
   }, {
@@ -163,7 +163,7 @@
     "tallyResults" : [ {
       "eliminated" : "Vail, Christopher L.",
       "transfers" : {
-        "Mavodones, Nicholas M. Jr." : "6",
+        "NMM" : "6",
         "exhausted" : "1"
       }
     } ]
@@ -182,8 +182,8 @@
     "tallyResults" : [ {
       "eliminated" : "Lapchick, Jodie L.",
       "transfers" : {
-        "Haadoow, Hamza A." : "1",
-        "Mavodones, Nicholas M. Jr." : "6"
+        "HAH" : "1",
+        "NMM" : "6"
       }
     } ]
   }, {
@@ -200,9 +200,9 @@
     "tallyResults" : [ {
       "eliminated" : "Duson, Jill C.",
       "transfers" : {
-        "Bryant, Peter G." : "1",
-        "Dodge, Richard A." : "5",
-        "Mavodones, Nicholas M. Jr." : "2"
+        "NMM" : "2",
+        "PGB" : "1",
+        "RAD" : "5"
       }
     } ]
   }, {
@@ -218,8 +218,8 @@
     "tallyResults" : [ {
       "eliminated" : "Haadoow, Hamza A.",
       "transfers" : {
-        "Carmona, Ralph C." : "2",
-        "Mavodones, Nicholas M. Jr." : "7"
+        "NMM" : "7",
+        "RCC" : "2"
       }
     } ]
   }, {
@@ -234,9 +234,9 @@
     "tallyResults" : [ {
       "eliminated" : "Bryant, Peter G.",
       "transfers" : {
-        "Bragdon, Charles E." : "9",
-        "Carmona, Ralph C." : "2",
-        "Mavodones, Nicholas M. Jr." : "1"
+        "CEB" : "9",
+        "NMM" : "1",
+        "RCC" : "2"
       }
     } ]
   }, {
@@ -250,9 +250,9 @@
     "tallyResults" : [ {
       "eliminated" : "Dodge, Richard A.",
       "transfers" : {
-        "Bragdon, Charles E." : "1",
-        "Carmona, Ralph C." : "11",
-        "Mavodones, Nicholas M. Jr." : "3"
+        "CEB" : "1",
+        "NMM" : "3",
+        "RCC" : "11"
       }
     } ]
   }, {
@@ -265,8 +265,8 @@
     "tallyResults" : [ {
       "eliminated" : "Bragdon, Charles E.",
       "transfers" : {
-        "Carmona, Ralph C." : "12",
-        "Mavodones, Nicholas M. Jr." : "9",
+        "NMM" : "9",
+        "RCC" : "12",
         "exhausted" : "3"
       }
     } ]
