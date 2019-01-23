@@ -134,15 +134,15 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
   @FXML
-  private TextField textFieldMaxRankingsAllowed;
-  @FXML
-  private TextField textFieldMaxSkippedRanksAllowed;
-  @FXML
   private TextField textFieldNumberOfWinners;
   @FXML
   private TextField textFieldDecimalPlacesForVoteArithmetic;
   @FXML
   private TextField textFieldMinimumVoteThreshold;
+  @FXML
+  private TextField textFieldMaxSkippedRanksAllowed;
+  @FXML
+  private TextField textFieldMaxRankingsAllowed;
   @FXML
   private TextField textFieldOvervoteLabel;
   @FXML
@@ -299,10 +299,10 @@ public class GuiConfigController implements Initializable {
       Logger.log(Level.WARNING, "CVR first vote row is required!");
     } else {
       cvrSource.setFilePathRaw(textFieldCvrFilePath.getText());
-      cvrSource.setFirstVoteColumnIndex(getIntValueElse(textFieldCvrFirstVoteCol, null));
-      cvrSource.setFirstVoteRowIndex(getIntValueElse(textFieldCvrFirstVoteRow, null));
-      cvrSource.setIdColumnIndex(getIntValueElse(textFieldCvrIdCol, null));
-      cvrSource.setPrecinctColumnIndex(getIntValueElse(textFieldCvrPrecinctCol, null));
+      cvrSource.setFirstVoteColumnIndex(getIntValueOrNull(textFieldCvrFirstVoteCol));
+      cvrSource.setFirstVoteRowIndex(getIntValueOrNull(textFieldCvrFirstVoteRow));
+      cvrSource.setIdColumnIndex(getIntValueOrNull(textFieldCvrIdCol));
+      cvrSource.setPrecinctColumnIndex(getIntValueOrNull(textFieldCvrPrecinctCol));
       cvrSource.setProvider(textFieldCvrProvider.getText());
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
@@ -404,12 +404,6 @@ public class GuiConfigController implements Initializable {
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
 
-    textFieldMaxRankingsAllowed
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldMaxRankingsAllowed));
-    textFieldMaxSkippedRanksAllowed
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldMaxSkippedRanksAllowed));
     textFieldNumberOfWinners
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
@@ -419,6 +413,12 @@ public class GuiConfigController implements Initializable {
     textFieldMinimumVoteThreshold
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
+    textFieldMaxSkippedRanksAllowed
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldMaxSkippedRanksAllowed));
+    textFieldMaxRankingsAllowed
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldMaxRankingsAllowed));
 
     setDefaultValues();
 
@@ -437,32 +437,32 @@ public class GuiConfigController implements Initializable {
   }
 
   private void setTextFieldToInteger(TextField textField, Integer value) {
-    if (value != null) {
-      textField.setText(Integer.toString(value));
-    }
+    textField.setText(value != null ? Integer.toString(value) : "");
   }
 
   private void setDefaultValues() {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
-    checkBoxTabulateByPrecinct.setSelected(ContestConfig.DEFAULT_TABULATE_BY_PRECINCT);
+    checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
     checkBoxNonIntegerWinningThreshold.setSelected(
-        ContestConfig.DEFAULT_NON_INTEGER_WINNING_THRESHOLD);
-    checkBoxBatchElimination.setSelected(ContestConfig.DEFAULT_BATCH_ELIMINATION);
+        ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
+    checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(
-        ContestConfig.DEFAULT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
+        ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
     checkBoxExhaustOnDuplicateCandidate.setSelected(
-        ContestConfig.DEFAULT_EXHAUST_ON_DUPLICATE_CANDIDATES);
+        ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
-        ContestConfig.DEFAULT_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
+        ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
 
-    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.DEFAULT_NUMBER_OF_WINNERS));
+    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.SUGGESTED_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic.setText(
-        String.valueOf(ContestConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+        String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+    textFieldMaxSkippedRanksAllowed.setText(
+        String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
     textFieldMinimumVoteThreshold.setText(
-        String.valueOf(ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD));
+        String.valueOf(ContestConfig.SUGGESTED_MINIMUM_VOTE_THRESHOLD));
 
-    checkBoxCandidateExcluded.setSelected(ContestConfig.DEFAULT_CANDIDATE_EXCLUDED);
+    checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
   }
 
   private void clearConfig() {
@@ -488,11 +488,11 @@ public class GuiConfigController implements Initializable {
 
     choiceTiebreakMode.setValue(null);
     choiceOvervoteRule.setValue(null);
-    textFieldMaxRankingsAllowed.clear();
-    textFieldMaxSkippedRanksAllowed.clear();
     textFieldNumberOfWinners.clear();
     textFieldDecimalPlacesForVoteArithmetic.clear();
     textFieldMinimumVoteThreshold.clear();
+    textFieldMaxSkippedRanksAllowed.clear();
+    textFieldMaxRankingsAllowed.clear();
     textFieldOvervoteLabel.clear();
     textFieldUndervoteLabel.clear();
     textFieldUndeclaredWriteInLabel.clear();
@@ -522,7 +522,7 @@ public class GuiConfigController implements Initializable {
             new ObjectMapper()
                 .writer()
                 .withDefaultPrettyPrinter()
-                .writeValueAsString(GuiContext.getInstance().getConfig().rawConfig);
+                .writeValueAsString(GuiContext.getInstance().getConfig().getRawConfig());
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
     } catch (JsonProcessingException exception) {
@@ -590,63 +590,55 @@ public class GuiConfigController implements Initializable {
 
   private void loadConfig(ContestConfig config) {
     clearConfig();
+    RawContestConfig rawConfig = config.getRawConfig();
 
-    textFieldContestName.setText(config.getContestName());
+    OutputSettings outputSettings = rawConfig.outputSettings;
+    textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
-    if (config.getContestDate() != null && !config.getContestDate().isEmpty()) {
-      datePickerContestDate.setValue(LocalDate.parse(config.getContestDate(), DATE_TIME_FORMATTER));
+    if (outputSettings.contestDate != null && !outputSettings.contestDate.isEmpty()) {
+      datePickerContestDate.setValue(
+          LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
     }
-    textFieldContestJurisdiction.setText(config.getContestJurisdiction());
-    textFieldContestOffice.setText(config.getContestOffice());
-    checkBoxTabulateByPrecinct.setSelected(config.isTabulateByPrecinctEnabled());
+    textFieldContestJurisdiction.setText(outputSettings.contestJurisdiction);
+    textFieldContestOffice.setText(outputSettings.contestOffice);
+    checkBoxTabulateByPrecinct.setSelected(outputSettings.tabulateByPrecinct);
 
-    if (config.rawConfig.cvrFileSources != null) {
-      tableViewCvrFiles.setItems(
-          FXCollections.observableArrayList(config.rawConfig.cvrFileSources));
-    }
-
-    if (config.rawConfig.candidates != null) {
-      tableViewCandidates.setItems(FXCollections.observableArrayList(config.rawConfig.candidates));
+    if (rawConfig.cvrFileSources != null) {
+      tableViewCvrFiles.setItems(FXCollections.observableArrayList(rawConfig.cvrFileSources));
     }
 
+    if (rawConfig.candidates != null) {
+      tableViewCandidates.setItems(FXCollections.observableArrayList(rawConfig.candidates));
+    }
+
+    ContestRules rules = rawConfig.rules;
     choiceTiebreakMode.setValue(config.getTiebreakMode());
     choiceOvervoteRule.setValue(config.getOvervoteRule());
-    setTextFieldToInteger(textFieldMaxRankingsAllowed, config.getMaxRankingsAllowed());
-    setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, config.getMaxSkippedRanksAllowed());
-    setTextFieldToInteger(textFieldNumberOfWinners, config.getNumberOfWinners());
+    setTextFieldToInteger(textFieldNumberOfWinners, rules.numberOfWinners);
     setTextFieldToInteger(
-        textFieldDecimalPlacesForVoteArithmetic, config.getDecimalPlacesForVoteArithmetic());
-    setTextFieldToInteger(
-        textFieldMinimumVoteThreshold, config.getMinimumVoteThreshold().intValue());
-    textFieldOvervoteLabel.setText(config.getOvervoteLabel());
-    textFieldUndervoteLabel.setText(config.getUndervoteLabel());
-    textFieldUndeclaredWriteInLabel.setText(config.getUndeclaredWriteInLabel());
-    textFieldRulesDescription.setText(config.getRulesDescription());
-    checkBoxNonIntegerWinningThreshold.setSelected(config.isNonIntegerWinningThresholdEnabled());
-    checkBoxBatchElimination.setSelected(config.isBatchEliminationEnabled());
-    checkBoxContinueUntilTwoCandidatesRemain.setSelected(
-        config.willContinueUntilTwoCandidatesRemain());
-    checkBoxExhaustOnDuplicateCandidate.setSelected(config.isExhaustOnDuplicateCandidateEnabled());
-    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
-        config.isTreatBlankAsUndeclaredWriteInEnabled());
+        textFieldDecimalPlacesForVoteArithmetic, rules.decimalPlacesForVoteArithmetic);
+    setTextFieldToInteger(textFieldMinimumVoteThreshold, rules.minimumVoteThreshold);
+    setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, rules.maxSkippedRanksAllowed);
+    setTextFieldToInteger(textFieldMaxRankingsAllowed, rules.maxRankingsAllowed);
+    textFieldOvervoteLabel.setText(rules.overvoteLabel);
+    textFieldUndervoteLabel.setText(rules.undervoteLabel);
+    textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
+    textFieldRulesDescription.setText(rules.rulesDescription);
+    checkBoxNonIntegerWinningThreshold.setSelected(rules.nonIntegerWinningThreshold);
+    checkBoxBatchElimination.setSelected(rules.batchElimination);
+    checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
+    checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
+    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
   }
 
-  private Integer getIntValueElse(TextField textField, Integer defaultValue) {
-    Integer returnValue;
+  private Integer getIntValueOrNull(TextField textField) {
+    Integer returnValue = null;
     try {
-      if (textField.getText().isEmpty()) {
-        throw new IllegalArgumentException();
+      if (textField.getText() != null && !textField.getText().isEmpty()) {
+        returnValue = Integer.valueOf(textField.getText());
       }
-      returnValue = Integer.valueOf(textField.getText());
     } catch (Exception exception) {
-      if (!(textField.getText().isEmpty() && defaultValue == null)) {
-        Logger.log(
-            Level.WARNING,
-            "Integer required! Illegal value '%s' was replaced by '%s'",
-            textField.getText(),
-            defaultValue);
-      }
-      returnValue = defaultValue;
+      Logger.log(Level.WARNING, "Integer required! Illegal value '%s' found.", textField.getText());
     }
     return returnValue;
   }
@@ -675,17 +667,12 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, Tabulator.OvervoteRule.RULE_UNKNOWN);
-    rules.maxRankingsAllowed = getIntValueElse(textFieldMaxRankingsAllowed, null);
-    rules.maxSkippedRanksAllowed = getIntValueElse(textFieldMaxSkippedRanksAllowed, null);
-    rules.numberOfWinners =
-        getIntValueElse(textFieldNumberOfWinners, ContestConfig.DEFAULT_NUMBER_OF_WINNERS);
+    rules.numberOfWinners = getIntValueOrNull(textFieldNumberOfWinners);
     rules.decimalPlacesForVoteArithmetic =
-        getIntValueElse(
-            textFieldDecimalPlacesForVoteArithmetic,
-            ContestConfig.DEFAULT_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
-    rules.minimumVoteThreshold =
-        getIntValueElse(
-            textFieldMinimumVoteThreshold, ContestConfig.DEFAULT_MINIMUM_VOTE_THRESHOLD.intValue());
+        getIntValueOrNull(textFieldDecimalPlacesForVoteArithmetic);
+    rules.minimumVoteThreshold = getIntValueOrNull(textFieldMinimumVoteThreshold);
+    rules.maxSkippedRanksAllowed = getIntValueOrNull(textFieldMaxSkippedRanksAllowed);
+    rules.maxRankingsAllowed = getIntValueOrNull(textFieldMaxRankingsAllowed);
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();

@@ -176,16 +176,16 @@ public class RawContestConfig {
     public String tiebreakMode;
     // which overvote rule to use
     public String overvoteRule;
-    // max rankings allowed
-    public Integer maxRankingsAllowed;
-    // max number of skipped rankings allowed
-    public Integer maxSkippedRanksAllowed;
     // setting for number of winners
     public Integer numberOfWinners;
     // how far to round vote values when performing arithmetic
     public Integer decimalPlacesForVoteArithmetic;
     // minimum votes needed to continue
     public Integer minimumVoteThreshold;
+    // max number of skipped rankings allowed
+    public Integer maxSkippedRanksAllowed;
+    // max rankings allowed
+    public Integer maxRankingsAllowed;
     public boolean nonIntegerWinningThreshold;
     // are we using batch elimination?
     public boolean batchElimination;
