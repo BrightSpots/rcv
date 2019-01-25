@@ -59,6 +59,32 @@ class ContestConfig {
   // whether or not there are any validation errors
   private boolean isValid;
 
+  // function: loadContestConfig
+  // purpose: create ContestConfig from configPath
+  // 1 create rawContestConfig from file - this can fail for IO issues or invalid json
+  // 2 validate rawContestConfig - this can fail
+  // 3 create ContestConfig wrapper class (cannot fail)
+  static ContestConfig loadContestConfig(String configPath) {
+    if (configPath == null) {
+      Logger.log(Level.SEVERE, "No config path specified!");
+      return null;
+    }
+    // set config file parent folder as default user folder
+    FileUtils.setUserDirectory(new File(configPath).getParent());
+
+    // rawConfig holds the basic contest config data parsed from json
+    // this will be null if there is a problem loading it
+    RawContestConfig rawConfig = JsonParser.parseObjectFromFile(configPath, RawContestConfig.class);
+    if (rawConfig == null) {
+      Logger.log(Level.SEVERE, "Failed to load contest config:%s", configPath);
+    } else {
+      Logger.log(Level.SEVERE, "Loaded contest config:%s", configPath);
+    }
+
+    // return new ContestConfig object or null
+    return rawConfig == null ? null : new ContestConfig(rawConfig);
+  }
+
   // function: ContestConfig
   // purpose: create a new ContestConfig object
   // param: rawConfig underlying rawConfig object this object wraps
@@ -77,12 +103,14 @@ class ContestConfig {
   boolean validate() {
     Logger.log(Level.INFO, "Validating config...");
     isValid = true;
-
-    validateOutputSettings();
-    validateCvrFileSources();
-    validateCandidates();
-    validateRules();
-
+    if(validateFields()) {
+      validateOutputSettings();
+      validateCvrFileSources();
+      validateCandidates();
+      validateRules();
+    } else {
+      isValid = false;
+    }
     if (isValid) {
       Logger.log(Level.INFO, "Config validation successful.");
     } else {
@@ -90,6 +118,23 @@ class ContestConfig {
           Level.SEVERE, "Config validation failed! Please modify the config file and try again.");
     }
 
+    return isValid;
+  }
+
+  private boolean validateFields() {
+    boolean isValid = false;
+    if (rawConfig.outputSettings == null) {
+      Logger.log(Level.SEVERE, "No 'outputSettings' field specified!");
+    }
+    if (rawConfig.cvrFileSources == null) {
+      Logger.log(Level.SEVERE, "No 'cvrFileSources' field specified!");
+    }
+    if (rawConfig.candidates == null) {
+      Logger.log(Level.SEVERE, "No 'candidates' field specified!");
+    }
+    if (rawConfig.rules == null) {
+      Logger.log(Level.SEVERE, "No 'rules' field specified!");
+    }
     return isValid;
   }
 

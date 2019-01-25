@@ -23,6 +23,7 @@
 package com.rcv;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
@@ -150,9 +151,10 @@ class TabulatorTests {
   @Test
   @DisplayName("test invalid params in config file")
   void invalidParamsTest() {
-    TabulatorSession session =
-        new TabulatorSession(getTestFilePath("invalid_params_test", "_config.json"));
-    assertFalse(session.loadContestConfig().validate());
+    String configPath = getTestFilePath("invalid_params_test", "_config.json");
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    assertNotNull(config);
+    assertFalse(config.validate());
   }
 
   // function: invalidSourcesTest
@@ -160,9 +162,10 @@ class TabulatorTests {
   @Test
   @DisplayName("test invalid source files")
   void invalidSourcesTest() {
-    TabulatorSession session =
-        new TabulatorSession(getTestFilePath("invalid_sources_test", "_config.json"));
-    assertFalse(session.loadContestConfig().validate());
+    String configPath = getTestFilePath("invalid_sources_test", "_config.json");
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    assertNotNull(config);
+    assertFalse(config.validate());
   }
 
 

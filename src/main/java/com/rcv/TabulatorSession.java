@@ -27,7 +27,6 @@ package com.rcv;
 
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
 import com.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -63,58 +62,12 @@ class TabulatorSession {
   // purpose: run tabulation
   void tabulate() {
     // load configuration
-    ContestConfig config = loadContestConfig();
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null) {
       executeTabulation(config);
     } else {
       Logger.log(Level.SEVERE, "Aborting because config is invalid.");
     }
-  }
-
-  // function: loadContestConfig
-  // purpose: attempts to load config file
-  // returns: new ContestConfig if successful otherwise null
-  ContestConfig loadContestConfig() {
-    if(configPath == null) {
-      Logger.log(Level.SEVERE, "No config path specified!");
-      return null;
-    }
-    // set config file parent folder as default user folder
-    FileUtils.setUserDirectory(new File(configPath).getParent());
-    // config: the new contestConfig object
-    ContestConfig config = null;
-
-    // rawConfig holds the basic contest config data parsed from json
-    // this will be null if there is a problem loading it
-    RawContestConfig rawConfig = JsonParser.createRawContestConfigFromFile(configPath);
-
-    // if raw config failed alert user
-    if (rawConfig == null) {
-      Logger.log(Level.SEVERE, "Failed to load config file:\n%s", configPath);
-    } else if (rawConfig.outputSettings == null) {
-      Logger.log(
-          Level.SEVERE,
-          "No 'outputSettings' field specified! Failed to load config file:\n%s",
-          configPath);
-    } else if (rawConfig.cvrFileSources == null) {
-      Logger.log(
-          Level.SEVERE,
-          "No 'cvrFileSources' field specified! Failed to load config file:\n%s",
-          configPath);
-    } else if (rawConfig.candidates == null) {
-      Logger.log(
-          Level.SEVERE,
-          "No 'candidates' field specified! Failed to load config file:\n%s",
-          configPath);
-    } else if (rawConfig.rules == null) {
-      Logger.log(
-          Level.SEVERE, "No 'rules' field specified! Failed to load config file:\n%s", configPath);
-    } else {
-      // proceed to create the ContestConfig wrapper
-      config = new ContestConfig(rawConfig);
-      Logger.log(Level.INFO, "Successfully loaded config file: %s", configPath);
-    }
-    return config;
   }
 
   // function: executeTabulation
