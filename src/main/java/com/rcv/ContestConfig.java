@@ -60,15 +60,18 @@ class ContestConfig {
   private boolean isValid;
 
   // function: loadContestConfig
-  // purpose: create ContestConfig from configPath
-  // 1 create rawContestConfig from file - this can fail for IO issues or invalid json
-  // 2 validate rawContestConfig - this can fail
-  // 3 create ContestConfig wrapper class (cannot fail)
+  // purpose: factory method to create ContestConfig from configPath
+  // - create rawContestConfig from file - can fail for IO issues or invalid json
+  // - validate rawContestConfig - can fail if certain elements do not exist
+  // - if the above succeed create and return ContestConfig wrapping rawContestConfig (cannot fail)
+  // returns: new ContestConfig object if checks pass otherwise null
   static ContestConfig loadContestConfig(String configPath) {
     if (configPath == null) {
       Logger.log(Level.SEVERE, "No config path specified!");
       return null;
     }
+    // config will hold the new ContestConfig if construction succeeds
+    ContestConfig config = null;
     // set config file parent folder as default user folder
     FileUtils.setUserDirectory(new File(configPath).getParent());
 
@@ -76,13 +79,43 @@ class ContestConfig {
     // this will be null if there is a problem loading it
     RawContestConfig rawConfig = JsonParser.parseObjectFromFile(configPath, RawContestConfig.class);
     if (rawConfig == null) {
-      Logger.log(Level.SEVERE, "Failed to load contest config:%s", configPath);
+      Logger.log(Level.SEVERE, "Failed to load contest config: %s", configPath);
     } else {
-      Logger.log(Level.SEVERE, "Loaded contest config:%s", configPath);
+      Logger.log(Level.SEVERE, "Loaded: %s", configPath);
+      // perform some additional sanity checks
+      if(validateFields(rawConfig)) {
+        config = new ContestConfig(rawConfig);
+      } else {
+        Logger.log(Level.SEVERE, "Failed to create contest config!");
+      }
     }
+    // if checks passed return new ContestConfig object otherwise null
+    return config;
+  }
 
-    // return new ContestConfig object or null
-    return rawConfig == null ? null : new ContestConfig(rawConfig);
+  // function: validateFields
+  // purpose: perform some validation checks
+  // param: RawContestConfig to perform checks against
+  // returns: true if checks pass otherwise false
+  private static boolean validateFields(RawContestConfig rawConfig) {
+    boolean isValid = true;
+    if (rawConfig.outputSettings == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No 'outputSettings' field specified!");
+    }
+    if (rawConfig.cvrFileSources == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No 'cvrFileSources' field specified!");
+    }
+    if (rawConfig.candidates == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No 'candidates' field specified!");
+    }
+    if (rawConfig.rules == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No 'rules' field specified!");
+    }
+    return isValid;
   }
 
   // function: ContestConfig
@@ -103,14 +136,10 @@ class ContestConfig {
   boolean validate() {
     Logger.log(Level.INFO, "Validating config...");
     isValid = true;
-    if(validateFields()) {
-      validateOutputSettings();
-      validateCvrFileSources();
-      validateCandidates();
-      validateRules();
-    } else {
-      isValid = false;
-    }
+    validateOutputSettings();
+    validateCvrFileSources();
+    validateCandidates();
+    validateRules();
     if (isValid) {
       Logger.log(Level.INFO, "Config validation successful.");
     } else {
@@ -118,23 +147,6 @@ class ContestConfig {
           Level.SEVERE, "Config validation failed! Please modify the config file and try again.");
     }
 
-    return isValid;
-  }
-
-  private boolean validateFields() {
-    boolean isValid = false;
-    if (rawConfig.outputSettings == null) {
-      Logger.log(Level.SEVERE, "No 'outputSettings' field specified!");
-    }
-    if (rawConfig.cvrFileSources == null) {
-      Logger.log(Level.SEVERE, "No 'cvrFileSources' field specified!");
-    }
-    if (rawConfig.candidates == null) {
-      Logger.log(Level.SEVERE, "No 'candidates' field specified!");
-    }
-    if (rawConfig.rules == null) {
-      Logger.log(Level.SEVERE, "No 'rules' field specified!");
-    }
     return isValid;
   }
 
