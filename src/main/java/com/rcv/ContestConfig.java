@@ -36,7 +36,6 @@ import java.util.logging.Level;
 
 class ContestConfig {
 
-  // TODO: if any booleans are unspecified in config file, they default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
@@ -83,21 +82,21 @@ class ContestConfig {
     } else {
       Logger.log(Level.SEVERE, "Loaded: %s", configPath);
       // perform some additional sanity checks
-      if(validateFields(rawConfig)) {
+      if(validateRawConfigFields(rawConfig)) {
+        // checks passed so create the ContestConfig
         config = new ContestConfig(rawConfig);
       } else {
         Logger.log(Level.SEVERE, "Failed to create contest config!");
       }
     }
-    // if checks passed return new ContestConfig object otherwise null
     return config;
   }
 
-  // function: validateFields
+  // function: validateRawConfigFields
   // purpose: perform some validation checks
   // param: RawContestConfig to perform checks against
   // returns: true if checks pass otherwise false
-  private static boolean validateFields(RawContestConfig rawConfig) {
+  private static boolean validateRawConfigFields(RawContestConfig rawConfig) {
     boolean isValid = true;
     if (rawConfig.outputSettings == null) {
       isValid = false;
