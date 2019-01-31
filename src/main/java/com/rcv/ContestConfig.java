@@ -82,7 +82,7 @@ class ContestConfig {
     } else {
       Logger.log(Level.SEVERE, "Loaded: %s", configPath);
       // perform some additional sanity checks
-      if(validateRawConfigFields(rawConfig)) {
+      if (validateRawConfigFields(rawConfig)) {
         // checks passed so create the ContestConfig
         config = new ContestConfig(rawConfig);
       } else {
