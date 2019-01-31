@@ -241,9 +241,8 @@ public class GuiConfigController implements Initializable {
   }
 
   // tabulate whatever is currently entered into the GUI:
-  // 1 will require user to save if there are un-saved changes
-  // 2 will create tabulation session from the saved config path
-  // 3 start tabulation process
+  // - require user to save if there are un-saved changes
+  // - create and launch TabulatorService from the saved config path
   public void buttonTabulateClicked() {
     if (checkForSaveAndTabulate()) {
       if (GuiContext.getInstance().getConfig() != null) {
