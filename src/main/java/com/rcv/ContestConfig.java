@@ -268,10 +268,10 @@ class ContestConfig {
     }
 
     if (getDecimalPlacesForVoteArithmetic() == null
-        || getDecimalPlacesForVoteArithmetic() < 0
+        || getDecimalPlacesForVoteArithmetic() < 1
         || getDecimalPlacesForVoteArithmetic() > 20) {
       isValid = false;
-      Logger.log(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 0 to 20.");
+      Logger.log(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 1 to 20.");
     }
 
     if (getMinimumVoteThreshold() == null
@@ -321,13 +321,13 @@ class ContestConfig {
   // param: divisor is the denominator in the division operation
   // returns: the quotient
   BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
-    return dividend.divide(divisor, getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
+    return dividend.divide(divisor, getDecimalPlacesForVoteArithmetic(), RoundingMode.DOWN);
   }
 
   BigDecimal multiply(BigDecimal multiplier, BigDecimal multiplicand) {
     return multiplier
         .multiply(multiplicand)
-        .setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.HALF_EVEN);
+        .setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.DOWN);
   }
 
   // function: getOutputDirectoryRaw
