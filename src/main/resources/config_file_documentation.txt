@@ -120,7 +120,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
 
       "decimalPlacesForVoteArithmetic" required
         number of rounding decimal places when computing winning thresholds and fractional vote transfers
-        value: [0..20]
+        value: [1..20]
 
       "minimumVoteThreshold" required
         the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
