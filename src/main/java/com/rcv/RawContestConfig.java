@@ -15,8 +15,8 @@
  *
  * Purpose:
  * RawContestConfig defines the data model used for a contest configuration. It is used
- * by JsonParser to map JSON configuration files into Java objects. We use Jackson JSON parser with \
- * annotations below to facilitate parsing (see JsonParser.java).
+ * by JsonParser to map JSON configuration files into Java objects.
+ * We use Jackson JSON parser with annotations below to facilitate parsing.
  */
 
 package com.rcv;

@@ -218,7 +218,7 @@ public class GuiConfigController implements Initializable {
     // set save file parent folder as the new default user folder
     FileUtils.setUserDirectory(fileToSave.getParent());
     // create a rawConfig object from GUI content and serialize it as json
-    JsonParser.parseObjectToFile(fileToSave, createRawContestConfig());
+    JsonParser.writeToFile(fileToSave, createRawContestConfig());
     // Reload to keep GUI fields updated in case invalid values are replaced during save process
     loadFile(fileToSave);
   }

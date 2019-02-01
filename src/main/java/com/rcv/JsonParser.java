@@ -13,8 +13,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Purpose:
- * Wrapper for Jackson JSON parser to parse JSON files into Java objects.
+ * Purpose: wrapper around Jackson JSON package for reading and writing json objects to disk
  */
 
 package com.rcv;
@@ -29,13 +28,12 @@ import java.util.logging.Level;
 
 class JsonParser {
 
-  // function: parseObjectFromFile
+  // function: readFromFile
   // purpose: parse input json file into an object of the specified type
   // param: jsonFilePath path to json file to be parsed into java
   // param: valueType class of the object to be created from parsed json
-  // file access: read
   // returns: instance of the object parsed from json or null if there was a problem
-  static <T> T parseObjectFromFile(String jsonFilePath, Class<T> valueType) {
+  static <T> T readFromFile(String jsonFilePath, Class<T> valueType) {
     T createdObject;
     try {
       // fileReader will read the json file from disk
@@ -60,15 +58,17 @@ class JsonParser {
     return createdObject;
   }
 
-
-  static void parseObjectToFile(File jsonFile, Object config) {
+  // function: writeToFile
+  // purpose: write object to file as json
+  // param: jsonFile File object to write to
+  // param: objectToSerialize object to be written
+  static void writeToFile(File jsonFile, Object objectToSerialize) {
     try {
-      new ObjectMapper().writer().withDefaultPrettyPrinter().writeValue(jsonFile, config);
-      Logger.log(
-          Level.INFO, "Saved object to: %s", jsonFile.getAbsolutePath());
+      new ObjectMapper().writer().withDefaultPrettyPrinter().writeValue(jsonFile,
+          objectToSerialize);
+      Logger.log(Level.INFO, "Saved object to: %s", jsonFile.getAbsolutePath());
     } catch (IOException exception) {
-      Logger.log(
-          Level.SEVERE,
+      Logger.log(Level.SEVERE,
           "Error saving file: %s\n%s",
           jsonFile.getAbsolutePath(),
           exception.toString());

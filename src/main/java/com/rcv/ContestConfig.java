@@ -76,11 +76,11 @@ class ContestConfig {
 
     // rawConfig holds the basic contest config data parsed from json
     // this will be null if there is a problem loading it
-    RawContestConfig rawConfig = JsonParser.parseObjectFromFile(configPath, RawContestConfig.class);
+    RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
     if (rawConfig == null) {
       Logger.log(Level.SEVERE, "Failed to load contest config: %s", configPath);
     } else {
-      Logger.log(Level.SEVERE, "Loaded: %s", configPath);
+      Logger.log(Level.INFO, "Loaded: %s", configPath);
       // perform some additional sanity checks
       if (validateRawConfigFields(rawConfig)) {
         // checks passed so create the ContestConfig
