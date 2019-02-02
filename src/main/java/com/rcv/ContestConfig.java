@@ -36,6 +36,7 @@ import java.util.logging.Level;
 
 class ContestConfig {
 
+  // If any booleans are unspecified in config file, they should default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
@@ -78,11 +79,11 @@ class ContestConfig {
     // this will be null if there is a problem loading it
     RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
     if (rawConfig == null) {
-      Logger.log(Level.SEVERE, "Failed to load contest config: %s", configPath);
+      Logger.log(Level.SEVERE, "Failed to load contest config:\n%s", configPath);
     } else {
       Logger.log(Level.INFO, "Loaded: %s", configPath);
       // perform some additional sanity checks
-      if (validateRawConfigFields(rawConfig)) {
+      if (rawConfig.validate()) {
         // checks passed so create the ContestConfig
         config = new ContestConfig(rawConfig);
       } else {
@@ -92,30 +93,6 @@ class ContestConfig {
     return config;
   }
 
-  // function: validateRawConfigFields
-  // purpose: perform some validation checks
-  // param: RawContestConfig to perform checks against
-  // returns: true if checks pass otherwise false
-  private static boolean validateRawConfigFields(RawContestConfig rawConfig) {
-    boolean isValid = true;
-    if (rawConfig.outputSettings == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No 'outputSettings' field specified!");
-    }
-    if (rawConfig.cvrFileSources == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No 'cvrFileSources' field specified!");
-    }
-    if (rawConfig.candidates == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No 'candidates' field specified!");
-    }
-    if (rawConfig.rules == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No 'rules' field specified!");
-    }
-    return isValid;
-  }
 
   // function: ContestConfig
   // purpose: create a new ContestConfig object
