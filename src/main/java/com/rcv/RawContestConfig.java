@@ -15,8 +15,8 @@
  *
  * Purpose:
  * RawContestConfig defines the data model used for a contest configuration. It is used
- * by JsonParser to map JSON configuration files into Java objects. We use Jackson JSON parser with \
- * annotations below to facilitate parsing (see JsonParser.java).
+ * by JsonParser to map JSON configuration files into Java objects.
+ * We use Jackson JSON parser with annotations below to facilitate parsing.
  */
 
 package com.rcv;
@@ -24,6 +24,7 @@ package com.rcv;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
+import java.util.logging.Level;
 
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -131,6 +132,30 @@ public class RawContestConfig {
     public void setProvider(String provider) {
       this.provider = provider;
     }
+  }
+
+  // function: validate
+  // purpose: perform some basic validation checks
+  // returns: true if checks pass otherwise false
+  public boolean validate() {
+    boolean isValid = true;
+    if (outputSettings == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No 'outputSettings' field specified!");
+    }
+    if (cvrFileSources == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No 'cvrFileSources' field specified!");
+    }
+    if (candidates == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No 'candidates' field specified!");
+    }
+    if (rules == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No 'rules' field specified!");
+    }
+    return isValid;
   }
 
   // Candidate: contains a full candidate name and optionally a candidate ID

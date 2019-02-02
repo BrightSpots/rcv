@@ -174,10 +174,8 @@ public class GuiConfigController implements Initializable {
   }
 
   private void loadFile(File fileToLoad) {
-    // create a TabulatorSession object to load the config file specified by user
-    TabulatorSession session = new TabulatorSession(fileToLoad.getAbsolutePath());
     // load and cache the config object
-    GuiContext.getInstance().setConfig(session.loadContestConfig());
+    GuiContext.getInstance().setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath()));
     // if config loaded use it to populate the GUI
     if (GuiContext.getInstance().getConfig() != null) {
       loadConfig(GuiContext.getInstance().getConfig());
@@ -219,7 +217,8 @@ public class GuiConfigController implements Initializable {
   private void saveFile(File fileToSave) {
     // set save file parent folder as the new default user folder
     FileUtils.setUserDirectory(fileToSave.getParent());
-    JsonParser.createFileFromRawContestConfig(fileToSave, createRawContestConfig());
+    // create a rawConfig object from GUI content and serialize it as json
+    JsonParser.writeToFile(fileToSave, createRawContestConfig());
     // Reload to keep GUI fields updated in case invalid values are replaced during save process
     loadFile(fileToSave);
   }
@@ -231,7 +230,7 @@ public class GuiConfigController implements Initializable {
       saveFile(fileToSave);
     }
   }
-
+  // validate whatever is currently entered into the GUI - does not save data
   public void buttonValidateClicked() {
     buttonBar.setDisable(true);
     ValidatorService service = new ValidatorService(createRawContestConfig());
@@ -241,6 +240,9 @@ public class GuiConfigController implements Initializable {
     service.start();
   }
 
+  // tabulate whatever is currently entered into the GUI:
+  // - require user to save if there are un-saved changes
+  // - create and launch TabulatorService from the saved config path
   public void buttonTabulateClicked() {
     if (checkForSaveAndTabulate()) {
       if (GuiContext.getInstance().getConfig() != null) {

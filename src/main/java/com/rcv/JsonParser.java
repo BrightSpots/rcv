@@ -13,8 +13,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Purpose:
- * Wrapper for Jackson JSON parser to parse JSON files into Java objects.
+ * Purpose: wrapper around Jackson JSON package for reading and writing json objects to disk
  */
 
 package com.rcv;
@@ -29,40 +28,47 @@ import java.util.logging.Level;
 
 class JsonParser {
 
-  // function: createRawContestConfigFromFile
-  // purpose: parse input json file into a RawContestConfig
+  // function: readFromFile
+  // purpose: parse input json file into an object of the specified type
   // param: jsonFilePath path to json file to be parsed into java
-  // file access: read
-  // returns: instance of the RawContestConfig parsed from json, or null if there was a problem
-  static RawContestConfig createRawContestConfigFromFile(String jsonFilePath) {
-    RawContestConfig rawConfig;
+  // param: valueType class of the object to be created from parsed json
+  // returns: instance of the object parsed from json or null if there was a problem
+  static <T> T readFromFile(String jsonFilePath, Class<T> valueType) {
+    T createdObject;
     try {
-      rawConfig =
-          new ObjectMapper().readValue(new FileReader(jsonFilePath), RawContestConfig.class);
+      // fileReader will read the json file from disk
+      FileReader fileReader = new FileReader(jsonFilePath);
+      // objectMapper will map json values into the new java object
+      ObjectMapper objectMapper = new ObjectMapper();
+      // object is the newly created object populated with json values
+      createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException exception) {
       Logger.log(
           Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
       Logger.log(
           Level.SEVERE, "Check your file formatting and values to make sure they are correct.");
-      rawConfig = null;
+      createdObject = null;
     } catch (IOException exception) {
       Logger.log(
           Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
       Logger.log(
           Level.SEVERE, "Check your file path and permissions and make sure they are correct.");
-      rawConfig = null;
+      createdObject = null;
     }
-    return rawConfig;
+    return createdObject;
   }
 
-  static void createFileFromRawContestConfig(File jsonFile, RawContestConfig config) {
+  // function: writeToFile
+  // purpose: write object to file as json
+  // param: jsonFile File object to write to
+  // param: objectToSerialize object to be written
+  static void writeToFile(File jsonFile, Object objectToSerialize) {
     try {
-      new ObjectMapper().writer().withDefaultPrettyPrinter().writeValue(jsonFile, config);
-      Logger.log(
-          Level.INFO, "Saved config via the GUI to: %s", jsonFile.getAbsolutePath());
+      new ObjectMapper().writer().withDefaultPrettyPrinter().writeValue(jsonFile,
+          objectToSerialize);
+      Logger.log(Level.INFO, "Saved object to: %s", jsonFile.getAbsolutePath());
     } catch (IOException exception) {
-      Logger.log(
-          Level.SEVERE,
+      Logger.log(Level.SEVERE,
           "Error saving file: %s\n%s",
           jsonFile.getAbsolutePath(),
           exception.toString());

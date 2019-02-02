@@ -36,7 +36,7 @@ import java.util.logging.Level;
 
 class ContestConfig {
 
-  // TODO: if any booleans are unspecified in config file, they default to false no matter what
+  // If any booleans are unspecified in config file, they should default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
@@ -59,6 +59,41 @@ class ContestConfig {
   // whether or not there are any validation errors
   private boolean isValid;
 
+  // function: loadContestConfig
+  // purpose: factory method to create ContestConfig from configPath
+  // - create rawContestConfig from file - can fail for IO issues or invalid json
+  // - validate rawContestConfig - can fail if certain elements do not exist
+  // - if the above succeed create and return ContestConfig wrapping rawContestConfig (cannot fail)
+  // returns: new ContestConfig object if checks pass otherwise null
+  static ContestConfig loadContestConfig(String configPath) {
+    if (configPath == null) {
+      Logger.log(Level.SEVERE, "No config path specified!");
+      return null;
+    }
+    // config will hold the new ContestConfig if construction succeeds
+    ContestConfig config = null;
+    // set config file parent folder as default user folder
+    FileUtils.setUserDirectory(new File(configPath).getParent());
+
+    // rawConfig holds the basic contest config data parsed from json
+    // this will be null if there is a problem loading it
+    RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
+    if (rawConfig == null) {
+      Logger.log(Level.SEVERE, "Failed to load contest config:\n%s", configPath);
+    } else {
+      Logger.log(Level.INFO, "Loaded: %s", configPath);
+      // perform some additional sanity checks
+      if (rawConfig.validate()) {
+        // checks passed so create the ContestConfig
+        config = new ContestConfig(rawConfig);
+      } else {
+        Logger.log(Level.SEVERE, "Failed to create contest config!");
+      }
+    }
+    return config;
+  }
+
+
   // function: ContestConfig
   // purpose: create a new ContestConfig object
   // param: rawConfig underlying rawConfig object this object wraps
@@ -77,12 +112,10 @@ class ContestConfig {
   boolean validate() {
     Logger.log(Level.INFO, "Validating config...");
     isValid = true;
-
     validateOutputSettings();
     validateCvrFileSources();
     validateCandidates();
     validateRules();
-
     if (isValid) {
       Logger.log(Level.INFO, "Config validation successful.");
     } else {
