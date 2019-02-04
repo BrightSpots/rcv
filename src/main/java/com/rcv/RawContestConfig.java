@@ -21,6 +21,7 @@
 
 package com.rcv;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
@@ -85,6 +86,7 @@ public class RawContestConfig {
       return filePath;
     }
     // get full file path string
+    @JsonIgnore
     public String getFullFilePath() {
       return FileUtils.resolveUserPath(getFilePath());
     }
