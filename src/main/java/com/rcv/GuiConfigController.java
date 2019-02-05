@@ -174,6 +174,8 @@ public class GuiConfigController implements Initializable {
   }
 
   private void loadFile(File fileToLoad) {
+    // set the user dir for future loads
+    FileUtils.setUserDirectory(fileToLoad.getParent());
     // load and cache the config object
     GuiContext.getInstance().setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath()));
     // if config loaded use it to populate the GUI
@@ -233,7 +235,9 @@ public class GuiConfigController implements Initializable {
   // validate whatever is currently entered into the GUI - does not save data
   public void buttonValidateClicked() {
     buttonBar.setDisable(true);
-    ValidatorService service = new ValidatorService(createRawContestConfig());
+    ContestConfig config = new ContestConfig(createRawContestConfig(),
+        FileUtils.getUserDirectory());
+    ValidatorService service = new ValidatorService(config);
     service.setOnSucceeded(event -> buttonBar.setDisable(false));
     service.setOnCancelled(event -> buttonBar.setDisable(false));
     service.setOnFailed(event -> buttonBar.setDisable(false));
@@ -300,7 +304,7 @@ public class GuiConfigController implements Initializable {
     } else if (textFieldCvrFirstVoteRow.getText().isEmpty()) {
       Logger.log(Level.WARNING, "CVR first vote row is required!");
     } else {
-      cvrSource.setFilePathRaw(textFieldCvrFilePath.getText());
+      cvrSource.setFilePath(textFieldCvrFilePath.getText());
       cvrSource.setFirstVoteColumnIndex(getIntValueOrNull(textFieldCvrFirstVoteCol));
       cvrSource.setFirstVoteRowIndex(getIntValueOrNull(textFieldCvrFirstVoteRow));
       cvrSource.setIdColumnIndex(getIntValueOrNull(textFieldCvrIdCol));
@@ -691,10 +695,10 @@ public class GuiConfigController implements Initializable {
 
   private static class ValidatorService extends Service<Void> {
 
-    private final RawContestConfig rawContestConfig;
+    private final ContestConfig contestConfig;
 
-    ValidatorService(RawContestConfig rawContestConfig) {
-      this.rawContestConfig = rawContestConfig;
+    ValidatorService(ContestConfig contestConfig) {
+      this.contestConfig = contestConfig;
     }
 
     @Override
@@ -702,7 +706,7 @@ public class GuiConfigController implements Initializable {
       return new Task<>() {
         @Override
         protected Void call() {
-          new ContestConfig(rawContestConfig).validate();
+          contestConfig.validate();
           return null;
         }
       };
