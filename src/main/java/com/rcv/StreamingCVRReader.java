@@ -86,7 +86,7 @@ class StreamingCVRReader {
   // param: source file to read
   StreamingCVRReader(ContestConfig config, CVRSource source) {
     this.config = config;
-    this.excelFilePath = source.getFullFilePath();
+    this.excelFilePath = config.resolveConfigPath(source.getFilePath());
     // cvrFileName for generating cvrIDs
     this.excelFileName = new File(excelFilePath).getName();
 

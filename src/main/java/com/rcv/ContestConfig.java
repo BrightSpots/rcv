@@ -26,6 +26,7 @@ import com.rcv.Tabulator.TieBreakMode;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,6 +60,19 @@ class ContestConfig {
   // whether or not there are any validation errors
   private boolean isValid;
 
+  // path from which any relative paths should be resolved
+  private String sourceDirectory;
+
+  // function: ContestConfig
+  // purpose: create a new ContestConfig object
+  // param: rawConfig underlying rawConfig object this object wraps
+  // param: sourceDirectory folder to use for resolving relative paths
+  ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
+    this.rawConfig = rawConfig;
+    this.sourceDirectory = sourceDirectory;
+    this.processCandidateData();
+  }
+
   // function: loadContestConfig
   // purpose: factory method to create ContestConfig from configPath
   // - create rawContestConfig from file - can fail for IO issues or invalid json
@@ -72,8 +86,6 @@ class ContestConfig {
     }
     // config will hold the new ContestConfig if construction succeeds
     ContestConfig config = null;
-    // set config file parent folder as default user folder
-    FileUtils.setUserDirectory(new File(configPath).getParent());
 
     // rawConfig holds the basic contest config data parsed from json
     // this will be null if there is a problem loading it
@@ -85,7 +97,7 @@ class ContestConfig {
       // perform some additional sanity checks
       if (rawConfig.validate()) {
         // checks passed so create the ContestConfig
-        config = new ContestConfig(rawConfig);
+        config = new ContestConfig(rawConfig, new File(configPath).getParent());
       } else {
         Logger.log(Level.SEVERE, "Failed to create contest config!");
       }
@@ -93,13 +105,23 @@ class ContestConfig {
     return config;
   }
 
-
-  // function: ContestConfig
-  // purpose: create a new ContestConfig object
-  // param: rawConfig underlying rawConfig object this object wraps
-  ContestConfig(RawContestConfig rawConfig) {
-    this.rawConfig = rawConfig;
-    this.processCandidateData();
+  // function: resolveConfigPath
+  // purpose: given a path returns absolute path for use in File IO
+  // param: path from this config file (cvr or output folder)
+  // returns: resolved path
+  String resolveConfigPath(String configPath) {
+    // create File for IO operations
+    File userFile = new File(configPath);
+    // resolvedPath will be returned to caller
+    String resolvedPath;
+    if (userFile.isAbsolute()) {
+      // path is already absolute so use as-is
+      resolvedPath = userFile.getAbsolutePath();
+    } else {
+      // return sourceDirectory/configPath
+      resolvedPath = Paths.get(sourceDirectory, configPath).toAbsolutePath().toString();
+    }
+    return resolvedPath;
   }
 
   RawContestConfig getRawConfig() {
@@ -146,56 +168,47 @@ class ContestConfig {
           Logger.log(Level.SEVERE, "filePath is required for each CVR file.");
           continue;
         }
+        // full path to CVR
+        String cvrPath = resolveConfigPath(source.getFilePath());
 
         // look for duplicate paths
-        if (cvrFilePathSet.contains(source.getFullFilePath())) {
+        if (cvrFilePathSet.contains(cvrPath)) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "Duplicate CVR filePaths are not allowed: %s",
-              source.getFullFilePath());
+          Logger.log(Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s", cvrPath);
         } else {
-          cvrFilePathSet.add(source.getFullFilePath());
+          cvrFilePathSet.add(cvrPath);
         }
 
         // ensure file exists
-        if (!new File(source.getFullFilePath()).exists()) {
+        if (!new File(cvrPath).exists()) {
           isValid = false;
-          Logger.log(Level.SEVERE, "CVR file not found: %s", source.getFullFilePath());
+          Logger.log(Level.SEVERE, "CVR file not found: %s", cvrPath);
         }
 
         // ensure valid first vote column value
         if (source.getFirstVoteColumnIndex() == null) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE, "firstVoteColumnIndex is required: %s", source.getFullFilePath());
+          Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", cvrPath);
         } else if (source.getFirstVoteColumnIndex() < 1
             || source.getFirstVoteColumnIndex() > 1000) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "firstVoteColumnIndex must be from 1 to 1000: %s",
-              source.getFullFilePath());
+          Logger.log(Level.SEVERE, "firstVoteColumnIndex must be from 1 to 1000: %s", cvrPath);
         }
 
         // ensure valid first vote row value
         if (source.getFirstVoteRowIndex() == null) {
           isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", source.getFullFilePath());
+          Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", cvrPath);
         } else if (source.getFirstVoteRowIndex() < 1 || source.getFirstVoteRowIndex() > 1000) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "firstVoteRowIndex must be from 1 to 1000: %s",
-              source.getFullFilePath());
+          Logger.log(Level.SEVERE, "firstVoteRowIndex must be from 1 to 1000: %s", cvrPath);
         }
 
         // ensure valid id column value
         if (source.getIdColumnIndex() != null
             && (source.getIdColumnIndex() < 1 || source.getIdColumnIndex() > 1000)) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE, "idColumnIndex must be from 1 to 1000: %s", source.getFullFilePath());
+          Logger.log(Level.SEVERE, "idColumnIndex must be from 1 to 1000: %s", cvrPath);
         }
 
         // ensure valid precinct column value
@@ -205,14 +218,11 @@ class ContestConfig {
             Logger.log(
                 Level.SEVERE,
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
-                source.getFullFilePath());
+                cvrPath);
           } else if (source.getPrecinctColumnIndex() < 1
               || source.getPrecinctColumnIndex() > 1000) {
             isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "precinctColumnIndex must be from 1 to 1000: %s",
-                source.getFullFilePath());
+            Logger.log(Level.SEVERE, "precinctColumnIndex must be from 1 to 1000: %s", cvrPath);
           }
         }
       }
@@ -378,7 +388,7 @@ class ContestConfig {
   // purpose: get the directory location where output files should be written
   // returns: path to directory where output files should be written
   String getOutputDirectory() {
-    return FileUtils.resolveUserPath(getOutputDirectoryRaw());
+    return resolveConfigPath(getOutputDirectoryRaw());
   }
 
   // function: willContinueUntilTwoCandidatesRemain

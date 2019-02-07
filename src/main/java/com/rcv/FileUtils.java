@@ -20,7 +20,6 @@
 package com.rcv;
 
 import java.io.File;
-import java.nio.file.Paths;
 
 class FileUtils {
 
@@ -39,24 +38,6 @@ class FileUtils {
     // return userDirectory if it exists
     // fallback to current working directory
     return userDirectory == null ? System.getProperty("user.dir") : userDirectory;
-  }
-
-  // function: resolveUserPath
-  // purpose: given input user path returns an absolute path for use in File IO
-  // param: user path
-  // returns: resolved path
-  static String resolveUserPath(String userPath) {
-    // create File for IO operations
-    File userFile = new File(userPath);
-    // resolvedPath will be returned to caller
-    String resolvedPath;
-    // if input path is not absolute prepend the userDirectory location
-    if (userFile.isAbsolute()) {
-      resolvedPath = userFile.getAbsolutePath();
-    } else {
-      resolvedPath = Paths.get(FileUtils.getUserDirectory(), userPath).toAbsolutePath().toString();
-    }
-    return resolvedPath;
   }
 
   static void createOutputDirectory(String dir) throws UnableToCreateDirectoryException {

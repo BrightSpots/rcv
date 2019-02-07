@@ -167,20 +167,23 @@ class TabulatorSession {
     // At each iteration of the following loop, we add records from another source file.
     // source: index over config sources
     for (RawContestConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      Logger.log(Level.INFO, "Reading cast vote record file: %s...", source.getFullFilePath());
+      // cvrPath is the resolved path to this source
+      String cvrPath = config.resolveConfigPath(source.getFilePath());
+
+      Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       // the CVRs parsed from this source
       try {
         List<CastVoteRecord> cvrs =
             new StreamingCVRReader(config, source).parseCVRFile(castVoteRecords, precinctIDs);
         if (cvrs.isEmpty()) {
-          Logger.log(Level.SEVERE, "Source file contains no CVRs: %s", source.getFullFilePath());
+          Logger.log(Level.SEVERE, "Source file contains no CVRs: %s", cvrPath);
           encounteredSourceProblem = true;
         }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.log(
             Level.SEVERE,
             "Source file contains unrecognized candidate(s): %s",
-            source.getFullFilePath());
+            cvrPath);
         // map from name to number of times encountered
         for (String candidate : exception.candidateCounts.keySet()) {
           Logger.log(
@@ -191,10 +194,10 @@ class TabulatorSession {
         }
         encounteredSourceProblem = true;
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error opening source file %s", source.getFullFilePath());
+        Logger.log(Level.SEVERE, "Error opening source file %s", cvrPath);
         encounteredSourceProblem = true;
       } catch (SAXException | OpenXML4JException e) {
-        Logger.log(Level.SEVERE, "Error parsing source file %s", source.getFullFilePath());
+        Logger.log(Level.SEVERE, "Error parsing source file %s", cvrPath);
         encounteredSourceProblem = true;
       }
     }
