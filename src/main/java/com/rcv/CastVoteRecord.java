@@ -133,7 +133,7 @@ class CastVoteRecord {
   // function: getFractionalTransferValue
   // purpose: getter for fractionalTransferValue
   // the FTV for this cast vote record (by default the FTV is exactly one vote, but it
-  // could be less in a multi-winner contest if this CVR already helped elect a winner.)
+  // could be less in a multi-winner contest if this CVR already helped elect a winner)
   // returns: value of field
   BigDecimal getFractionalTransferValue() {
     // remainingValue starts at one, and we subtract all the parts that are already allocated
@@ -147,10 +147,15 @@ class CastVoteRecord {
   // function: recordCurrentRecipientAsWinner
   // purpose: stores the current recipient as a winner using the specified surplus fraction
   void recordCurrentRecipientAsWinner(BigDecimal surplusFraction, ContestConfig config) {
-    // take the current FTV of this vote and allocate (1 - surplusFraction) of that amount to the
-    // new winner
+    // Take the current FTV of this vote and allocate (1 - surplusFraction) of that amount to the
+    // new winner.
+    // Note that we do the operations in this specific order (multiply the surplus fraction by the
+    // current FTV and then subtract that from the current FTV) because we always round down when
+    // we multiply or divide, and we want to ensure that this errs on the side of leaving more of
+    // the vote with the winner (i.e. not redistributing more than we intended to).
     BigDecimal newAllocatedValue =
-        config.multiply(getFractionalTransferValue(), BigDecimal.ONE.subtract(surplusFraction));
+        getFractionalTransferValue()
+            .subtract(config.multiply(getFractionalTransferValue(), surplusFraction));
     winnerToFractionalValue.put(getCurrentRecipientOfVote(), newAllocatedValue);
   }
 

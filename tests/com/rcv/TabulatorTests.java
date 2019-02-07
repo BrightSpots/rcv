@@ -84,8 +84,8 @@ class TabulatorTests {
           // update flags and report inequality
           errorCount++;
           result = false;
-          Logger.log(Level.SEVERE, "Files are not equal (line %d):\n%s\n%s", currentLine, line1,
-              line2);
+          Logger.log(
+              Level.SEVERE, "Files are not equal (line %d):\n%s\n%s", currentLine, line1, line2);
           // see if we should keep processing
           if (errorCount >= MAX_LOG_ERRORS) {
             break;
@@ -108,8 +108,8 @@ class TabulatorTests {
   // returns: path to file in test folder
   private static String getTestFilePath(String stem, String suffix) {
     return Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem, stem + suffix)
-      .toAbsolutePath()
-      .toString();
+        .toAbsolutePath()
+        .toString();
   }
 
   // function: runTabulationTest
@@ -167,7 +167,6 @@ class TabulatorTests {
     assertNotNull(config);
     assertFalse(config.validate());
   }
-
 
   // function: testPortlandMayor
   // purpose: test tabulation of Portland contest
@@ -266,11 +265,19 @@ class TabulatorTests {
     runTabulationTest("minimum_threshold_test");
   }
 
-  // function: skipToNextTest
+  // function: testSkipToNext
   // purpose: test skipping to next candidate after overvote
   @Test
   @DisplayName("test skipping to next candidate after overvote")
-  void skipToNextTest() {
+  void testSkipToNext() {
     runTabulationTest("skip_to_next_test");
+  }
+
+  // function: testMultiWinnerRedistribution
+  // purpose: tests multiple surplus redistributions
+  @Test
+  @DisplayName("test redistributing surplus from CVRs multiple times")
+  void testMultiWinnerRedistribution() {
+    runTabulationTest("multi_winner_redistribution");
   }
 }
