@@ -61,15 +61,15 @@ class ContestConfig {
   private boolean isValid;
 
   // path from which any relative paths should be resolved
-  private String sourceFolder;
+  private String sourceDirectory;
 
   // function: ContestConfig
   // purpose: create a new ContestConfig object
   // param: rawConfig underlying rawConfig object this object wraps
-  // param: sourceFolder folder to use for resolving relative paths
-  ContestConfig(RawContestConfig rawConfig, String sourceFolder) {
+  // param: sourceDirectory folder to use for resolving relative paths
+  ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     this.rawConfig = rawConfig;
-    this.sourceFolder = sourceFolder;
+    this.sourceDirectory = sourceDirectory;
     this.processCandidateData();
   }
 
@@ -106,19 +106,20 @@ class ContestConfig {
   }
 
   // function: resolveConfigPath
-  // purpose: given input config path returns an absolute path for use in File IO
-  // param: some path from this config file (cvr or output folder)
+  // purpose: given a path returns absolute path for use in File IO
+  // param: path from this config file (cvr or output folder)
   // returns: resolved path
   String resolveConfigPath(String configPath) {
     // create File for IO operations
     File userFile = new File(configPath);
     // resolvedPath will be returned to caller
     String resolvedPath;
-    // if input path is not absolute prepend the userDirectory location
     if (userFile.isAbsolute()) {
+      // path is already absolute so use as-is
       resolvedPath = userFile.getAbsolutePath();
     } else {
-      resolvedPath = Paths.get(sourceFolder, configPath).toAbsolutePath().toString();
+      // return sourceDirectory/configPath
+      resolvedPath = Paths.get(sourceDirectory, configPath).toAbsolutePath().toString();
     }
     return resolvedPath;
   }
