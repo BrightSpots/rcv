@@ -145,17 +145,17 @@ class CastVoteRecord {
   }
 
   // function: recordCurrentRecipientAsWinner
-  // purpose: stores the current recipient as a winner using the specified surplus fraction
+  // purpose: calculate and store new vote value for current (newly elected) recipient
+  // param: surplusFraction fraction of this vote's current value which is now surplus and will
+  // be transferred
+  // param: config used for vote math
   void recordCurrentRecipientAsWinner(BigDecimal surplusFraction, ContestConfig config) {
-    // Take the current FTV of this vote and allocate (1 - surplusFraction) of that amount to the
-    // new winner.
-    // Note that we do the operations in this specific order (multiply the surplus fraction by the
-    // current FTV and then subtract that from the current FTV) because we always round down when
-    // we multiply or divide, and we want to ensure that this errs on the side of leaving more of
-    // the vote with the winner (i.e. not redistributing more than we intended to).
-    BigDecimal newAllocatedValue =
-        getFractionalTransferValue()
-            .subtract(config.multiply(getFractionalTransferValue(), surplusFraction));
+    // Calculate transfer amount rounding DOWN to ensure we leave more of the vote with
+    // the winner. This avoids transferring more than intended which could leave the winner with
+    // less than the winning threshold.
+    BigDecimal transferAmount = config.multiply(getFractionalTransferValue(), surplusFraction);
+    // calculate newAllocatedValue counted to the current winner and store it
+    BigDecimal newAllocatedValue = getFractionalTransferValue().subtract(transferAmount);
     winnerToFractionalValue.put(getCurrentRecipientOfVote(), newAllocatedValue);
   }
 
