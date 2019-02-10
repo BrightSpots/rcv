@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 class TabulatorTests {
 
   // folder where we store test inputs
-  private static final String TEST_ASSET_FOLDER = "test_data";
+  private static final String TEST_ASSET_FOLDER = "src/test/resources/test_data";
   // limit log output to avoid spam
   private static final Integer MAX_LOG_ERRORS = 10;
 

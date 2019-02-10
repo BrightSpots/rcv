@@ -4,9 +4,6 @@
 # Log file
 *.log*
 
-# Lock files
-*/test_data/~*
-
 # Test output
 */test_data/*/output/
 
@@ -14,5 +11,4 @@
 .idea
 .DS_Store
 out
-test_output
 tmp
