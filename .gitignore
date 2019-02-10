@@ -5,10 +5,10 @@
 *.log*
 
 # Lock files
-test_data/~*
+*/test_data/~*
 
 # Test output
-test_data/*/output/*
+*/test_data/*/output/
 
 # Project-specific exclusions
 .idea
