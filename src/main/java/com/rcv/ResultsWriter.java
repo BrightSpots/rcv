@@ -183,7 +183,7 @@ class ResultsWriter {
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
-    Logger.log(Level.INFO, "Generating summary spreadsheets: %s", csvPath);
+    Logger.log(Level.INFO, "Generating summary spreadsheets: %s...", csvPath);
 
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
@@ -213,7 +213,7 @@ class ResultsWriter {
       BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error creating csv file: %s\n%s", csvPath, exception.toString());
+      Logger.log(Level.SEVERE, "Error creating CSV file: %s\n%s", csvPath, exception.toString());
       throw exception;
     }
 
@@ -437,7 +437,7 @@ class ResultsWriter {
     // jsonPath for output json summary
     String jsonPath = outputPath + ".json";
     // log output location
-    Logger.log(Level.INFO, "Generating summary json: %s", jsonPath);
+    Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
     // outFile is the target file
     File outFile = new File(jsonPath);
 
@@ -487,7 +487,8 @@ class ResultsWriter {
     try {
       jsonWriter.writeValue(outFile, outputJson);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error writing to json file:%s\n%s", jsonPath, exception.toString());
+      Logger
+          .log(Level.SEVERE, "Error writing to JSON file: %s\n%s", jsonPath, exception.toString());
       throw exception;
     }
   }

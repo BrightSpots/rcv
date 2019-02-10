@@ -81,7 +81,7 @@ class ContestConfig {
   // returns: new ContestConfig object if checks pass otherwise null
   static ContestConfig loadContestConfig(String configPath) {
     if (configPath == null) {
-      Logger.log(Level.SEVERE, "No config path specified!");
+      Logger.log(Level.SEVERE, "No contest config path specified!");
       return null;
     }
     // config will hold the new ContestConfig if construction succeeds
@@ -91,9 +91,9 @@ class ContestConfig {
     // this will be null if there is a problem loading it
     RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
     if (rawConfig == null) {
-      Logger.log(Level.SEVERE, "Failed to load contest config:\n%s", configPath);
+      Logger.log(Level.SEVERE, "Failed to load contest config: %s", configPath);
     } else {
-      Logger.log(Level.INFO, "Loaded: %s", configPath);
+      Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
       // perform some additional sanity checks
       if (rawConfig.validate()) {
         // checks passed so create the ContestConfig
@@ -132,17 +132,18 @@ class ContestConfig {
   // purpose: validate the correctness of the config data
   // returns any detected problems
   boolean validate() {
-    Logger.log(Level.INFO, "Validating config...");
+    Logger.log(Level.INFO, "Validating contest config...");
     isValid = true;
     validateOutputSettings();
     validateCvrFileSources();
     validateCandidates();
     validateRules();
     if (isValid) {
-      Logger.log(Level.INFO, "Config validation successful.");
+      Logger.log(Level.INFO, "Contest config validation successful.");
     } else {
       Logger.log(
-          Level.SEVERE, "Config validation failed! Please modify the config file and try again.");
+          Level.SEVERE,
+          "Contest config validation failed! Please modify the contest config file and try again.");
     }
 
     return isValid;
@@ -151,21 +152,21 @@ class ContestConfig {
   private void validateOutputSettings() {
     if (getContestName() == null || getContestName().isEmpty()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest name is required.");
+      Logger.log(Level.SEVERE, "Contest name is required!");
     }
   }
 
   private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Config must contain at least 1 CVR file.");
+      Logger.log(Level.SEVERE, "Contest config must contain at least 1 CVR file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
         // perform checks on source input path
         if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
           isValid = false;
-          Logger.log(Level.SEVERE, "filePath is required for each CVR file.");
+          Logger.log(Level.SEVERE, "filePath is required for each CVR file!");
           continue;
         }
         // full path to CVR
@@ -235,7 +236,7 @@ class ContestConfig {
     for (Candidate candidate : rawConfig.candidates) {
       if (candidate.getName() == null || candidate.getName().isEmpty()) {
         isValid = false;
-        Logger.log(Level.SEVERE, "Name is required for each candidate.");
+        Logger.log(Level.SEVERE, "Name is required for each candidate!");
       } else if (candidateNameSet.contains(candidate.getName())) {
         isValid = false;
         Logger.log(
@@ -259,27 +260,27 @@ class ContestConfig {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "If candidate codes are used, a unique code is required for each candidate.");
+          "If candidate codes are used, a unique code is required for each candidate!");
     }
 
     if (getNumDeclaredCandidates() < 1) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Config must contain at least 1 declared candidate.");
+      Logger.log(Level.SEVERE, "Contest config must contain at least 1 declared candidate!");
     } else if (getNumDeclaredCandidates() == excludedCandidates.size()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Config must contain at least 1 non-excluded candidate.");
+      Logger.log(Level.SEVERE, "Contest config must contain at least 1 non-excluded candidate!");
     }
   }
 
   private void validateRules() {
     if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Invalid tie-break mode.");
+      Logger.log(Level.SEVERE, "Invalid tie-break mode!");
     }
 
     if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Invalid overvote rule.");
+      Logger.log(Level.SEVERE, "Invalid overvote rule!");
     } else if ((getOvervoteLabel() != null && !getOvervoteLabel().isEmpty())
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
@@ -287,17 +288,17 @@ class ContestConfig {
       Logger.log(
           Level.SEVERE,
           "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately "
-              + "or alwaysSkipToNextRank.");
+              + "or alwaysSkipToNextRank!");
     }
 
     if (getNumDeclaredCandidates() >= 1 && getMaxRankingsAllowed() < 1) {
       isValid = false;
-      Logger.log(Level.SEVERE, "maxRankingsAllowed must be 1 or higher.");
+      Logger.log(Level.SEVERE, "maxRankingsAllowed must be 1 or higher!");
     }
 
     if (getMaxSkippedRanksAllowed() != null && getMaxSkippedRanksAllowed() < 0) {
       isValid = false;
-      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be non-negative if it's supplied.");
+      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be non-negative if it's supplied!");
     }
 
     if (getNumberOfWinners() == null
@@ -307,21 +308,21 @@ class ContestConfig {
       Logger.log(
           Level.SEVERE,
           "numberOfWinners must be at least 1 and no more than the number "
-              + "of declared candidates.");
+              + "of declared candidates!");
     }
 
     if (getDecimalPlacesForVoteArithmetic() == null
         || getDecimalPlacesForVoteArithmetic() < 1
         || getDecimalPlacesForVoteArithmetic() > 20) {
       isValid = false;
-      Logger.log(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 1 to 20.");
+      Logger.log(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from 1 to 20!");
     }
 
     if (getMinimumVoteThreshold() == null
         || getMinimumVoteThreshold().intValue() < 0
         || getMinimumVoteThreshold().intValue() > 1000000) {
       isValid = false;
-      Logger.log(Level.SEVERE, "minimumVoteThreshold must be from 0 to 1000000.");
+      Logger.log(Level.SEVERE, "minimumVoteThreshold must be from 0 to 1000000!");
     }
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
@@ -330,12 +331,12 @@ class ContestConfig {
         isValid = false;
         Logger.log(
             Level.SEVERE,
-            "continueUntilTwoCandidatesRemain can't be true in a multi-winner contest.");
+            "continueUntilTwoCandidatesRemain can't be true in a multi-winner contest!");
       }
 
       if (isBatchEliminationEnabled()) {
         isValid = false;
-        Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-winner contest.");
+        Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-winner contest!");
       }
     }
   }

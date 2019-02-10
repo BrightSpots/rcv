@@ -75,7 +75,7 @@ class TabulatorTests {
           break;
         } else if (line1 == null || line2 == null) {
           // one file ended but the other did not
-          Logger.log(Level.SEVERE, "files are unequal lengths");
+          Logger.log(Level.SEVERE, "Files are unequal lengths!");
           result = false;
           break;
         }
@@ -94,10 +94,10 @@ class TabulatorTests {
         currentLine++;
       }
     } catch (FileNotFoundException e) {
-      Logger.log(Level.SEVERE, "file not found: " + e.toString());
+      Logger.log(Level.SEVERE, "File not found!\n%s", e.toString());
       result = false;
     } catch (IOException e) {
-      Logger.log(Level.SEVERE, "error reading file: " + e.toString());
+      Logger.log(Level.SEVERE, "Error reading file!\n%s", e.toString());
       result = false;
     }
     return result;

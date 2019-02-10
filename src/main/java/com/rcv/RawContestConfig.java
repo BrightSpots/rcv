@@ -138,19 +138,19 @@ public class RawContestConfig {
     boolean isValid = true;
     if (outputSettings == null) {
       isValid = false;
-      Logger.log(Level.SEVERE, "No 'outputSettings' field specified!");
+      Logger.log(Level.SEVERE, "No \"outputSettings\" field specified!");
     }
     if (cvrFileSources == null) {
       isValid = false;
-      Logger.log(Level.SEVERE, "No 'cvrFileSources' field specified!");
+      Logger.log(Level.SEVERE, "No \"cvrFileSources\" field specified!");
     }
     if (candidates == null) {
       isValid = false;
-      Logger.log(Level.SEVERE, "No 'candidates' field specified!");
+      Logger.log(Level.SEVERE, "No \"candidates\" field specified!");
     }
     if (rules == null) {
       isValid = false;
-      Logger.log(Level.SEVERE, "No 'rules' field specified!");
+      Logger.log(Level.SEVERE, "No \"rules\" field specified!");
     }
     return isValid;
   }

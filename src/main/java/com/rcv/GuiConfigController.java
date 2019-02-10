@@ -166,7 +166,7 @@ public class GuiConfigController implements Initializable {
 
   public void buttonNewConfigClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Creating new config.");
+      Logger.log(Level.INFO, "Creating new contest config...");
       GuiContext.getInstance().setConfig(null);
       selectedFile = null;
       clearConfig();
@@ -257,14 +257,15 @@ public class GuiConfigController implements Initializable {
         service.setOnFailed(event -> buttonBar.setDisable(false));
         service.start();
       } else {
-        Logger.log(Level.WARNING, "Please load a config file before attempting to tabulate!");
+        Logger
+            .log(Level.WARNING, "Please load a contest config file before attempting to tabulate!");
       }
     }
   }
 
   public void buttonExitClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Exiting tabulator GUI.");
+      Logger.log(Level.INFO, "Exiting tabulator GUI...");
       Platform.exit();
     }
   }
@@ -329,7 +330,7 @@ public class GuiConfigController implements Initializable {
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
     if (textFieldCandidateName.getText().isEmpty()) {
-      Logger.log(Level.WARNING, "Candidate name field is required!");
+      Logger.log(Level.WARNING, "Candidate name is required!");
     } else {
       candidate.setName(textFieldCandidateName.getText());
       candidate.setCode(textFieldCandidateCode.getText());
@@ -350,7 +351,7 @@ public class GuiConfigController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
-    Logger.log(Level.INFO, "Opening tabulator GUI.");
+    Logger.log(Level.INFO, "Opening tabulator GUI...");
 
     String helpText;
     try {
@@ -360,8 +361,9 @@ public class GuiConfigController implements Initializable {
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception exception) {
-      Logger.log(Level.SEVERE, "Error loading: %s\n%s", CONFIG_FILE_NAME, exception.toString());
-      helpText = String.format("<Error loading %s>", CONFIG_FILE_NAME);
+      Logger.log(Level.SEVERE, "Error loading contest config: %s\n%s", CONFIG_FILE_NAME,
+          exception.toString());
+      helpText = String.format("<Error loading contest config: %s>", CONFIG_FILE_NAME);
     }
     textAreaHelp.setText(helpText);
 
@@ -576,7 +578,7 @@ public class GuiConfigController implements Initializable {
       Alert alert =
           new Alert(
               AlertType.WARNING,
-              "You must either save your changes before continuing or load a new config!",
+              "You must either save your changes before continuing or load a new contest config!",
               saveButton,
               ButtonType.CANCEL);
       alert.setHeaderText(null);
@@ -644,7 +646,8 @@ public class GuiConfigController implements Initializable {
         returnValue = Integer.valueOf(textField.getText());
       }
     } catch (Exception exception) {
-      Logger.log(Level.WARNING, "Integer required! Illegal value '%s' found.", textField.getText());
+      Logger.log(
+          Level.WARNING, "Integer required! Illegal value \"%s\" found.", textField.getText());
     }
     return returnValue;
   }

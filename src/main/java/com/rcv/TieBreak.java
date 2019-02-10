@@ -235,7 +235,7 @@ class TieBreak {
         Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
       }
       if (selectedCandidate == null || selectedCandidate.isEmpty()) {
-        Logger.log(Level.WARNING, "Invalid selection. Please try again.");
+        Logger.log(Level.WARNING, "Invalid selection! Please try again.");
       }
     }
 

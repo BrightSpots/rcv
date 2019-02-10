@@ -106,7 +106,7 @@ class StreamingCVRReader {
     // and store these substrings into addressParts array
     String[] addressParts = address.split("(?<=\\D)(?=\\d)");
     if (addressParts.length != 2) {
-      Logger.log(Level.SEVERE, "invalid cell address:" + address);
+      Logger.log(Level.SEVERE, "Invalid cell address: %s", address);
       throw new InvalidParameterException();
     }
     // row is the 0-based row of the cell
@@ -132,7 +132,7 @@ class StreamingCVRReader {
       // charValue maps the current character to a value between 1 and 26
       int charValue = columnAddress.charAt(i) - '@';
       if (charValue < 1 || charValue > 26) {
-        Logger.log(Level.SEVERE, "invalid cell address:" + columnAddress);
+        Logger.log(Level.SEVERE, "Invalid cell address: %s", columnAddress);
         throw new InvalidParameterException();
       }
       result += charValue;
@@ -153,7 +153,7 @@ class StreamingCVRReader {
       currentCVRData.add("empty cell");
       // add UWI ranking if required by settings
       if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
-        Logger.log(Level.WARNING, "Empty cell -- treating as UWI");
+        Logger.log(Level.WARNING, "Empty cell! Treating as UWI.");
         // add the new ranking
         currentRankings.add(new Pair<>(rank, config.getUndeclaredWriteInLabel()));
       }
@@ -195,7 +195,7 @@ class StreamingCVRReader {
     }
     // provide some user feedback on the CVR count
     if (cvrList.size() % 50000 == 0) {
-      Logger.log(Level.INFO, String.format("Parsed %d cast vote records ...", cvrList.size()));
+      Logger.log(Level.INFO, String.format("Parsed %d cast vote records.", cvrList.size()));
     }
   }
 
@@ -313,7 +313,7 @@ class StreamingCVRReader {
           // param: s1 header footer data
           @Override
           public void headerFooter(String s, boolean b, String s1) {
-            Logger.log(Level.WARNING, String.format("unexpected xml data: %s %b %s", s, b, s1));
+            Logger.log(Level.WARNING, String.format("Unexpected XML data: %s %b %s", s, b, s1));
           }
         };
 

@@ -66,7 +66,7 @@ class TabulatorSession {
     if (config != null) {
       executeTabulation(config);
     } else {
-      Logger.log(Level.SEVERE, "Aborting because config is invalid.");
+      Logger.log(Level.SEVERE, "Aborting because contest config is invalid!");
     }
   }
 
@@ -130,14 +130,14 @@ class TabulatorSession {
             try {
               tabulator.generateSummarySpreadsheet(timestampString);
             } catch (IOException e) {
-              Logger.log(Level.SEVERE, "Error writing summary spreadsheet: %s", e.toString());
+              Logger.log(Level.SEVERE, "Error writing summary spreadsheet:\n%s", e.toString());
             }
             isTabulationCompleted = true;
           } else {
-            Logger.log(Level.SEVERE, "No cast vote records found.");
+            Logger.log(Level.SEVERE, "No cast vote records found!");
           }
         } else {
-          Logger.log(Level.SEVERE, "Skipping tabulation due to source file errors.");
+          Logger.log(Level.SEVERE, "Skipping tabulation due to source file errors!");
         }
         Logger.log(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
         Logger.removeTabulationFileLogging();
@@ -188,7 +188,7 @@ class TabulatorSession {
         for (String candidate : exception.candidateCounts.keySet()) {
           Logger.log(
               Level.SEVERE,
-              "Unrecognized candidate \"%s\" appears %d time(s).",
+              "Unrecognized candidate \"%s\" appears %d time(s)!",
               candidate,
               exception.candidateCounts.get(candidate));
         }

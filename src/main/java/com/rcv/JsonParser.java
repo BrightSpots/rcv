@@ -46,13 +46,13 @@ class JsonParser {
       Logger.log(
           Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
       Logger.log(
-          Level.SEVERE, "Check your file formatting and values to make sure they are correct.");
+          Level.SEVERE, "Check file formatting and values and make sure they are correct!");
       createdObject = null;
     } catch (IOException exception) {
       Logger.log(
           Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
       Logger.log(
-          Level.SEVERE, "Check your file path and permissions and make sure they are correct.");
+          Level.SEVERE, "Check file path and permissions and make sure they are correct!");
       createdObject = null;
     }
     return createdObject;
