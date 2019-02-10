@@ -40,5 +40,4 @@ public class GuiApplication extends Application {
     window.setOnCloseRequest(onCloseHandler);
     window.show();
   }
-
 }

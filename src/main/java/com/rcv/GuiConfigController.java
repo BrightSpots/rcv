@@ -177,7 +177,8 @@ public class GuiConfigController implements Initializable {
     // set the user dir for future loads
     FileUtils.setUserDirectory(fileToLoad.getParent());
     // load and cache the config object
-    GuiContext.getInstance().setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath()));
+    GuiContext.getInstance()
+        .setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath()));
     // if config loaded use it to populate the GUI
     if (GuiContext.getInstance().getConfig() != null) {
       loadConfig(GuiContext.getInstance().getConfig());
@@ -235,8 +236,8 @@ public class GuiConfigController implements Initializable {
   // validate whatever is currently entered into the GUI - does not save data
   public void buttonValidateClicked() {
     buttonBar.setDisable(true);
-    ContestConfig config = new ContestConfig(createRawContestConfig(),
-        FileUtils.getUserDirectory());
+    ContestConfig config =
+        new ContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
     ValidatorService service = new ValidatorService(config);
     service.setOnSucceeded(event -> buttonBar.setDisable(false));
     service.setOnCancelled(event -> buttonBar.setDisable(false));
@@ -257,8 +258,8 @@ public class GuiConfigController implements Initializable {
         service.setOnFailed(event -> buttonBar.setDisable(false));
         service.start();
       } else {
-        Logger
-            .log(Level.WARNING, "Please load a contest config file before attempting to tabulate!");
+        Logger.log(
+            Level.WARNING, "Please load a contest config file before attempting to tabulate!");
       }
     }
   }
@@ -361,7 +362,10 @@ public class GuiConfigController implements Initializable {
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception exception) {
-      Logger.log(Level.SEVERE, "Error loading contest config: %s\n%s", CONFIG_FILE_NAME,
+      Logger.log(
+          Level.SEVERE,
+          "Error loading contest config: %s\n%s",
+          CONFIG_FILE_NAME,
           exception.toString());
       helpText = String.format("<Error loading contest config: %s>", CONFIG_FILE_NAME);
     }

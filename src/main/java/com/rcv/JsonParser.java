@@ -45,14 +45,11 @@ class JsonParser {
     } catch (JsonParseException | JsonMappingException exception) {
       Logger.log(
           Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
-      Logger.log(
-          Level.SEVERE, "Check file formatting and values and make sure they are correct!");
+      Logger.log(Level.SEVERE, "Check file formatting and values and make sure they are correct!");
       createdObject = null;
     } catch (IOException exception) {
-      Logger.log(
-          Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
-      Logger.log(
-          Level.SEVERE, "Check file path and permissions and make sure they are correct!");
+      Logger.log(Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
+      Logger.log(Level.SEVERE, "Check file path and permissions and make sure they are correct!");
       createdObject = null;
     }
     return createdObject;
@@ -64,11 +61,14 @@ class JsonParser {
   // param: objectToSerialize object to be written
   static void writeToFile(File jsonFile, Object objectToSerialize) {
     try {
-      new ObjectMapper().writer().withDefaultPrettyPrinter().writeValue(jsonFile,
-          objectToSerialize);
+      new ObjectMapper()
+          .writer()
+          .withDefaultPrettyPrinter()
+          .writeValue(jsonFile, objectToSerialize);
       Logger.log(Level.INFO, "Saved object to: %s", jsonFile.getAbsolutePath());
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE,
+      Logger.log(
+          Level.SEVERE,
           "Error saving file: %s\n%s",
           jsonFile.getAbsolutePath(),
           exception.toString());

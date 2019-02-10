@@ -205,9 +205,12 @@ class ContestConfig {
         } else if (source.getFirstVoteColumnIndex() < MIN_COLUMN_INDEX
             || source.getFirstVoteColumnIndex() > MAX_COLUMN_INDEX) {
           isValid = false;
-          Logger
-              .log(Level.SEVERE, "firstVoteColumnIndex must be from %d to %d: %s", MIN_COLUMN_INDEX,
-                  MAX_COLUMN_INDEX, cvrPath);
+          Logger.log(
+              Level.SEVERE,
+              "firstVoteColumnIndex must be from %d to %d: %s",
+              MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX,
+              cvrPath);
         }
 
         // ensure valid first vote row value
@@ -217,8 +220,12 @@ class ContestConfig {
         } else if (source.getFirstVoteRowIndex() < MIN_ROW_INDEX
             || source.getFirstVoteRowIndex() > MAX_ROW_INDEX) {
           isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteRowIndex must be from %d to %d: %s", MIN_ROW_INDEX,
-              MAX_ROW_INDEX, cvrPath);
+          Logger.log(
+              Level.SEVERE,
+              "firstVoteRowIndex must be from %d to %d: %s",
+              MIN_ROW_INDEX,
+              MAX_ROW_INDEX,
+              cvrPath);
         }
 
         // ensure valid id column value
@@ -226,8 +233,12 @@ class ContestConfig {
             && (source.getIdColumnIndex() < MIN_COLUMN_INDEX
             || source.getIdColumnIndex() > MAX_COLUMN_INDEX)) {
           isValid = false;
-          Logger.log(Level.SEVERE, "idColumnIndex must be from %d to %d: %s", MIN_COLUMN_INDEX,
-              MAX_COLUMN_INDEX, cvrPath);
+          Logger.log(
+              Level.SEVERE,
+              "idColumnIndex must be from %d to %d: %s",
+              MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX,
+              cvrPath);
         }
 
         // ensure valid precinct column value
@@ -241,8 +252,12 @@ class ContestConfig {
           } else if (source.getPrecinctColumnIndex() < MIN_COLUMN_INDEX
               || source.getPrecinctColumnIndex() > MAX_COLUMN_INDEX) {
             isValid = false;
-            Logger.log(Level.SEVERE, "precinctColumnIndex must be from %d to %d: %s",
-                MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, cvrPath);
+            Logger.log(
+                Level.SEVERE,
+                "precinctColumnIndex must be from %d to %d: %s",
+                MIN_COLUMN_INDEX,
+                MAX_COLUMN_INDEX,
+                cvrPath);
           }
         }
       }
@@ -312,14 +327,16 @@ class ContestConfig {
 
     if (getNumDeclaredCandidates() >= 1 && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED) {
       isValid = false;
-      Logger
-          .log(Level.SEVERE, "maxRankingsAllowed must be %d or higher!", MIN_MAX_RANKINGS_ALLOWED);
+      Logger.log(
+          Level.SEVERE, "maxRankingsAllowed must be %d or higher!", MIN_MAX_RANKINGS_ALLOWED);
     }
 
     if (getMaxSkippedRanksAllowed() != null
         && getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
       isValid = false;
-      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must be %d or higher if it's supplied!",
+      Logger.log(
+          Level.SEVERE,
+          "maxSkippedRanksAllowed must be %d or higher if it's supplied!",
           MIN_MAX_SKIPPED_RANKS_ALLOWED);
     }
 
@@ -330,23 +347,30 @@ class ContestConfig {
       Logger.log(
           Level.SEVERE,
           "numberOfWinners must be at least %d and no more than the number "
-              + "of declared candidates!", MIN_NUMBER_OF_WINNERS);
+              + "of declared candidates!",
+          MIN_NUMBER_OF_WINNERS);
     }
 
     if (getDecimalPlacesForVoteArithmetic() == null
         || getDecimalPlacesForVoteArithmetic() < MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC
         || getDecimalPlacesForVoteArithmetic() > MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC) {
       isValid = false;
-      Logger.log(Level.SEVERE, "decimalPlacesForVoteArithmetic must be from %d to %d!",
-          MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
+      Logger.log(
+          Level.SEVERE,
+          "decimalPlacesForVoteArithmetic must be from %d to %d!",
+          MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC,
+          MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
     }
 
     if (getMinimumVoteThreshold() == null
         || getMinimumVoteThreshold().intValue() < MIN_MINIMUM_VOTE_THRESHOLD
         || getMinimumVoteThreshold().intValue() > MAX_MINIMUM_VOTE_THRESHOLD) {
       isValid = false;
-      Logger.log(Level.SEVERE, "minimumVoteThreshold must be from %d to %d!",
-          MIN_MINIMUM_VOTE_THRESHOLD, MAX_MINIMUM_VOTE_THRESHOLD);
+      Logger.log(
+          Level.SEVERE,
+          "minimumVoteThreshold must be from %d to %d!",
+          MIN_MINIMUM_VOTE_THRESHOLD,
+          MAX_MINIMUM_VOTE_THRESHOLD);
     }
 
     // If this is a multi-seat contest, we validate a couple extra parameters.

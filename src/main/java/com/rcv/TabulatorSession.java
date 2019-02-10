@@ -41,13 +41,12 @@ import org.xml.sax.SAXException;
 
 class TabulatorSession {
 
-  // configPath points to config file we use for configuring tabulation
-  private String configPath;
   // summaryOutputPath is generated from timestamp + config file
   String summaryOutputPath;
   // cache output path location
   String outputPath;
-
+  // configPath points to config file we use for configuring tabulation
+  private String configPath;
   // precinct IDs discovered during CVR parsing to support testing
   private Set<String> precinctIDs = new HashSet<>();
 
@@ -86,15 +85,13 @@ class TabulatorSession {
       final String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
       // %g format is for log file naming
       String tabulationLogPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log",
-              timestampString))
+          Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
               .toAbsolutePath()
               .toString();
 
       // cache summaryOutputPath for testing
       summaryOutputPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_summary.json",
-              timestampString))
+          Paths.get(config.getOutputDirectory(), String.format("%s_summary.json", timestampString))
               .toAbsolutePath()
               .toString();
 
@@ -180,10 +177,7 @@ class TabulatorSession {
           encounteredSourceProblem = true;
         }
       } catch (UnrecognizedCandidatesException exception) {
-        Logger.log(
-            Level.SEVERE,
-            "Source file contains unrecognized candidate(s): %s",
-            cvrPath);
+        Logger.log(Level.SEVERE, "Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
         for (String candidate : exception.candidateCounts.keySet()) {
           Logger.log(

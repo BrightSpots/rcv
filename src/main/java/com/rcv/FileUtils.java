@@ -26,18 +26,18 @@ class FileUtils {
   // cache location for finding and creating user files and folders
   private static String userDirectory = null;
 
-  // function: setUserDirectory
-  // param: userDirectory default folder for finding and creating files and folders
-  static void setUserDirectory(String userDirectory) {
-    FileUtils.userDirectory = userDirectory;
-  }
-
   // function: getUserDirectory
   // returns: returns root for loading and saving user files
   static String getUserDirectory() {
     // return userDirectory if it exists
     // fallback to current working directory
     return userDirectory == null ? System.getProperty("user.dir") : userDirectory;
+  }
+
+  // function: setUserDirectory
+  // param: userDirectory default folder for finding and creating files and folders
+  static void setUserDirectory(String userDirectory) {
+    FileUtils.userDirectory = userDirectory;
   }
 
   static void createOutputDirectory(String dir) throws UnableToCreateDirectoryException {

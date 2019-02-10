@@ -190,7 +190,7 @@ class StreamingCVRReader {
     // add it to overall list
     cvrList.add(newRecord);
     // add precinct ID if one was found
-    if(currentPrecinct != null) {
+    if (currentPrecinct != null) {
       precinctIDs.add(currentPrecinct);
     }
     // provide some user feedback on the CVR count
@@ -250,7 +250,7 @@ class StreamingCVRReader {
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   // returns: list of parsed CVRs
-  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String>precinctIDs)
+  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
       throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException {
 
     // cache the cvr list so it is accessible in callbacks

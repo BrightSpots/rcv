@@ -487,8 +487,8 @@ class ResultsWriter {
     try {
       jsonWriter.writeValue(outFile, outputJson);
     } catch (IOException exception) {
-      Logger
-          .log(Level.SEVERE, "Error writing to JSON file: %s\n%s", jsonPath, exception.toString());
+      Logger.log(
+          Level.SEVERE, "Error writing to JSON file: %s\n%s", jsonPath, exception.toString());
       throw exception;
     }
   }
