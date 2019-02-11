@@ -51,10 +51,12 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -351,6 +353,17 @@ public class GuiConfigController implements Initializable {
         .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
   }
 
+  public void changeCandidateName(CellEditEvent cellEditEvent) {
+    Candidate candidateSelected = tableViewCandidates.getSelectionModel().getSelectedItem();
+    String candidateName = cellEditEvent.getNewValue().toString().trim();
+    if (candidateName.isEmpty()) {
+      Logger.log(Level.WARNING, "Candidate name is required!");
+    } else {
+      candidateSelected.setName(candidateName);
+    }
+    tableViewCandidates.refresh();
+  }
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
@@ -361,8 +374,8 @@ public class GuiConfigController implements Initializable {
       //noinspection ConstantConditions
       helpText =
           new BufferedReader(
-              new InputStreamReader(ClassLoader.getSystemResourceAsStream(
-                  CONFIG_FILE_DOCUMENTATION_FILENAME)))
+              new InputStreamReader(
+                  ClassLoader.getSystemResourceAsStream(CONFIG_FILE_DOCUMENTATION_FILENAME)))
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception exception) {
@@ -371,8 +384,9 @@ public class GuiConfigController implements Initializable {
           "Error loading config file documentation: %s\n%s",
           CONFIG_FILE_DOCUMENTATION_FILENAME,
           exception.toString());
-      helpText = String.format("<Error loading config file documentation: %s>",
-          CONFIG_FILE_DOCUMENTATION_FILENAME);
+      helpText =
+          String.format(
+              "<Error loading config file documentation: %s>", CONFIG_FILE_DOCUMENTATION_FILENAME);
     }
     textAreaHelp.setText(helpText);
 
@@ -412,9 +426,11 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
+    tableColumnCandidateName.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
     tableColumnCandidateExcluded.setCellValueFactory(new PropertyValueFactory<>("excluded"));
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    tableViewCandidates.setEditable(true);
 
     choiceTiebreakMode.getItems().addAll(Tabulator.TieBreakMode.values());
     choiceTiebreakMode.getItems().remove(Tabulator.TieBreakMode.MODE_UNKNOWN);
@@ -535,11 +551,14 @@ public class GuiConfigController implements Initializable {
         // All fields are currently empty / default values so no point in asking to save
         needsSaving = false;
       } else if (GuiContext.getInstance().getConfig() != null) {
+        // Compare to version currently saved on the hard drive
         String savedConfigString =
             new ObjectMapper()
                 .writer()
                 .withDefaultPrettyPrinter()
-                .writeValueAsString(GuiContext.getInstance().getConfig().getRawConfig());
+                .writeValueAsString(
+                    JsonParser.readFromFile(
+                        selectedFile.getAbsolutePath(), RawContestConfig.class, false));
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
     } catch (JsonProcessingException exception) {

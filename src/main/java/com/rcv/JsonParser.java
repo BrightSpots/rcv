@@ -33,8 +33,9 @@ class JsonParser {
   // purpose: parse input json file into an object of the specified type
   // param: jsonFilePath path to json file to be parsed into java
   // param: valueType class of the object to be created from parsed json
+  // param: logsEnabled display log messages
   // returns: instance of the object parsed from json or null if there was a problem
-  static <T> T readFromFile(String jsonFilePath, Class<T> valueType) {
+  static <T> T readFromFile(String jsonFilePath, Class<T> valueType, boolean logsEnabled) {
     T createdObject;
     try {
       // fileReader will read the json file from disk
@@ -44,16 +45,25 @@ class JsonParser {
       // object is the newly created object populated with json values
       createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException exception) {
-      Logger.log(
-          Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
-      Logger.log(Level.SEVERE, "Check file formatting and values and make sure they are correct!");
+      if (logsEnabled) {
+        Logger.log(
+            Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
+        Logger.log(
+            Level.SEVERE, "Check file formatting and values and make sure they are correct!");
+      }
       createdObject = null;
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
-      Logger.log(Level.SEVERE, "Check file path and permissions and make sure they are correct!");
+      if (logsEnabled) {
+        Logger.log(Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
+        Logger.log(Level.SEVERE, "Check file path and permissions and make sure they are correct!");
+      }
       createdObject = null;
     }
     return createdObject;
+  }
+
+  static <T> T readFromFile(String jsonFilePath, Class<T> valueType) {
+    return readFromFile(jsonFilePath, valueType, true);
   }
 
   // function: writeToFile
