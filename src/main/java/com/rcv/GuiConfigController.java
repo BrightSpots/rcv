@@ -34,6 +34,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -55,6 +56,7 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
@@ -332,6 +334,29 @@ public class GuiConfigController implements Initializable {
         .removeAll(tableViewCvrFiles.getSelectionModel().getSelectedItems());
   }
 
+  public void changeCvrFilePath(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    String cvrFilePath = cellEditEvent.getNewValue().toString().trim();
+    if (cvrFilePath.isEmpty()) {
+      Logger.log(Level.WARNING, "CVR file path is required!");
+    } else {
+      cvrSelected.setFilePath(cvrFilePath);
+    }
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    cvrSelected.setIdColumnIndex(getIntValueOrNull(cellEditEvent.getNewValue().toString().trim()));
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrProvider(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    cvrSelected.setProvider(cellEditEvent.getNewValue().toString().trim());
+    tableViewCvrFiles.refresh();
+  }
+
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
     if (textFieldCandidateName.getText().isEmpty()) {
@@ -363,6 +388,19 @@ public class GuiConfigController implements Initializable {
     }
     tableViewCandidates.refresh();
   }
+
+  public void changeCandidateCode(CellEditEvent cellEditEvent) {
+    Candidate candidateSelected = tableViewCandidates.getSelectionModel().getSelectedItem();
+    candidateSelected.setCode(cellEditEvent.getNewValue().toString().trim());
+    tableViewCandidates.refresh();
+  }
+
+  // TODO: Changes to Excluded column don't stick yet
+//  public void changeCandidateExcluded(CellEditEvent cellEditEvent) {
+//    Candidate candidateSelected = tableViewCandidates.getSelectionModel().getSelectedItem();
+////    candidateSelected.setExcluded(cellEditEvent.getNewValue().toString());
+//    tableViewCandidates.refresh();
+//  }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -416,19 +454,26 @@ public class GuiConfigController implements Initializable {
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldCvrPrecinctCol));
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
+    tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
         new PropertyValueFactory<>("firstVoteColumnIndex"));
     tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
     tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
+    // TODO: Need to figure out how to get equivalent setCellFactory for Integer values
     tableColumnCvrPrecinctCol.setCellValueFactory(
         new PropertyValueFactory<>("precinctColumnIndex"));
     tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
+    tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    tableViewCvrFiles.setEditable(true);
 
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
     tableColumnCandidateName.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
-    tableColumnCandidateExcluded.setCellValueFactory(new PropertyValueFactory<>("excluded"));
+    tableColumnCandidateCode.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCandidateExcluded.setCellValueFactory(
+        c -> new SimpleBooleanProperty(c.getValue().isExcluded()));
+    tableColumnCandidateExcluded.setCellFactory(tc -> new CheckBoxTableCell<>());
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
 
@@ -668,14 +713,18 @@ public class GuiConfigController implements Initializable {
   }
 
   private Integer getIntValueOrNull(TextField textField) {
+    return getIntValueOrNull(textField.getText());
+  }
+
+  private Integer getIntValueOrNull(String str) {
     Integer returnValue = null;
     try {
-      if (textField.getText() != null && !textField.getText().isEmpty()) {
-        returnValue = Integer.valueOf(textField.getText());
+      if (str != null && !str.isEmpty()) {
+        returnValue = Integer.valueOf(str);
       }
     } catch (Exception exception) {
       Logger.log(
-          Level.WARNING, "Integer required! Illegal value \"%s\" found.", textField.getText());
+          Level.WARNING, "Integer required! Illegal value \"%s\" found.", str);
     }
     return returnValue;
   }
