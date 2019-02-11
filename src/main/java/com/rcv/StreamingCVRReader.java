@@ -60,10 +60,10 @@ class StreamingCVRReader {
   private final Integer idColumnIndex;
   // column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
+  // map for tracking unrecognized candidates during parsing
+  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // used for generating CVR IDs
   private int cvrIndex = 0;
-  // map for tracking unrecognized candidates during parsing
-  private Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // list of currentRankings for CVR in progress
   private LinkedList<Pair<Integer, String>> currentRankings;
   // list of raw strings for CVR in progress
@@ -106,7 +106,7 @@ class StreamingCVRReader {
     // and store these substrings into addressParts array
     String[] addressParts = address.split("(?<=\\D)(?=\\d)");
     if (addressParts.length != 2) {
-      Logger.log(Level.SEVERE, "invalid cell address:" + address);
+      Logger.log(Level.SEVERE, "Invalid cell address: %s", address);
       throw new InvalidParameterException();
     }
     // row is the 0-based row of the cell
@@ -132,7 +132,7 @@ class StreamingCVRReader {
       // charValue maps the current character to a value between 1 and 26
       int charValue = columnAddress.charAt(i) - '@';
       if (charValue < 1 || charValue > 26) {
-        Logger.log(Level.SEVERE, "invalid cell address:" + columnAddress);
+        Logger.log(Level.SEVERE, "Invalid cell address: %s", columnAddress);
         throw new InvalidParameterException();
       }
       result += charValue;
@@ -153,7 +153,7 @@ class StreamingCVRReader {
       currentCVRData.add("empty cell");
       // add UWI ranking if required by settings
       if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
-        Logger.log(Level.WARNING, "Empty cell -- treating as UWI");
+        Logger.log(Level.WARNING, "Empty cell! Treating as UWI.");
         // add the new ranking
         currentRankings.add(new Pair<>(rank, config.getUndeclaredWriteInLabel()));
       }
@@ -190,12 +190,12 @@ class StreamingCVRReader {
     // add it to overall list
     cvrList.add(newRecord);
     // add precinct ID if one was found
-    if(currentPrecinct != null) {
+    if (currentPrecinct != null) {
       precinctIDs.add(currentPrecinct);
     }
     // provide some user feedback on the CVR count
     if (cvrList.size() % 50000 == 0) {
-      Logger.log(Level.INFO, String.format("Parsed %d cast vote records ...", cvrList.size()));
+      Logger.log(Level.INFO, String.format("Parsed %d cast vote records.", cvrList.size()));
     }
   }
 
@@ -250,7 +250,7 @@ class StreamingCVRReader {
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   // returns: list of parsed CVRs
-  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String>precinctIDs)
+  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
       throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException {
 
     // cache the cvr list so it is accessible in callbacks
@@ -262,10 +262,10 @@ class StreamingCVRReader {
     OPCPackage pkg = OPCPackage.open(excelFilePath);
     // pull out strings
     ReadOnlySharedStringsTable sharedStrings = new ReadOnlySharedStringsTable(pkg);
-    // reader is used to extract styles data
-    XSSFReader reader = new XSSFReader(pkg);
+    // XSSF reader is used to extract styles data
+    XSSFReader xssfReader = new XSSFReader(pkg);
     // styles data is used for creating ContentHandler
-    StylesTable styles = reader.getStylesTable();
+    StylesTable styles = xssfReader.getStylesTable();
     // SheetContentsHandler is used to handle parsing callbacks
     SheetContentsHandler sheetContentsHandler =
         new SheetContentsHandler() {
@@ -313,7 +313,7 @@ class StreamingCVRReader {
           // param: s1 header footer data
           @Override
           public void headerFooter(String s, boolean b, String s1) {
-            Logger.log(Level.WARNING, String.format("unexpected xml data: %s %b %s", s, b, s1));
+            Logger.log(Level.WARNING, String.format("Unexpected XML data: %s %b %s", s, b, s1));
           }
         };
 
@@ -321,11 +321,11 @@ class StreamingCVRReader {
     ContentHandler handler =
         new XSSFSheetXMLHandler(styles, sharedStrings, sheetContentsHandler, true);
 
-    // create the xml parser and set content handler
-    XMLReader parser = XMLReaderFactory.createXMLReader();
-    parser.setContentHandler(handler);
+    // create the XML reader and set content handler
+    XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+    xmlReader.setContentHandler(handler);
     // trigger parsing
-    parser.parse(new InputSource(reader.getSheetsData().next()));
+    xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));
 
     // throw if there were any unrecognized candidates -- this is considered bad
     if (this.unrecognizedCandidateCounts.size() > 0) {

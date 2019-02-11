@@ -60,11 +60,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
 
+@SuppressWarnings("WeakerAccess")
 public class GuiConfigController implements Initializable {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final String CONFIG_FILE_NAME = "config_file_documentation.txt";
+  private static final String CONFIG_FILE_DOCUMENTATION_FILENAME = "config_file_documentation.txt";
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
@@ -166,7 +167,7 @@ public class GuiConfigController implements Initializable {
 
   public void buttonNewConfigClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Creating new config.");
+      Logger.log(Level.INFO, "Creating new contest config...");
       GuiContext.getInstance().setConfig(null);
       selectedFile = null;
       clearConfig();
@@ -177,7 +178,8 @@ public class GuiConfigController implements Initializable {
     // set the user dir for future loads
     FileUtils.setUserDirectory(fileToLoad.getParent());
     // load and cache the config object
-    GuiContext.getInstance().setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath()));
+    GuiContext.getInstance()
+        .setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath()));
     // if config loaded use it to populate the GUI
     if (GuiContext.getInstance().getConfig() != null) {
       loadConfig(GuiContext.getInstance().getConfig());
@@ -232,11 +234,12 @@ public class GuiConfigController implements Initializable {
       saveFile(fileToSave);
     }
   }
+
   // validate whatever is currently entered into the GUI - does not save data
   public void buttonValidateClicked() {
     buttonBar.setDisable(true);
-    ContestConfig config = new ContestConfig(createRawContestConfig(),
-        FileUtils.getUserDirectory());
+    ContestConfig config =
+        new ContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
     ValidatorService service = new ValidatorService(config);
     service.setOnSucceeded(event -> buttonBar.setDisable(false));
     service.setOnCancelled(event -> buttonBar.setDisable(false));
@@ -257,14 +260,15 @@ public class GuiConfigController implements Initializable {
         service.setOnFailed(event -> buttonBar.setDisable(false));
         service.start();
       } else {
-        Logger.log(Level.WARNING, "Please load a config file before attempting to tabulate!");
+        Logger.log(
+            Level.WARNING, "Please load a contest config file before attempting to tabulate!");
       }
     }
   }
 
   public void buttonExitClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Exiting tabulator GUI.");
+      Logger.log(Level.INFO, "Exiting tabulator GUI...");
       Platform.exit();
     }
   }
@@ -329,7 +333,7 @@ public class GuiConfigController implements Initializable {
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
     if (textFieldCandidateName.getText().isEmpty()) {
-      Logger.log(Level.WARNING, "Candidate name field is required!");
+      Logger.log(Level.WARNING, "Candidate name is required!");
     } else {
       candidate.setName(textFieldCandidateName.getText());
       candidate.setCode(textFieldCandidateCode.getText());
@@ -350,18 +354,25 @@ public class GuiConfigController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
-    Logger.log(Level.INFO, "Opening tabulator GUI.");
+    Logger.log(Level.INFO, "Opening tabulator GUI...");
 
     String helpText;
     try {
+      //noinspection ConstantConditions
       helpText =
           new BufferedReader(
-              new InputStreamReader(ClassLoader.getSystemResourceAsStream(CONFIG_FILE_NAME)))
+              new InputStreamReader(ClassLoader.getSystemResourceAsStream(
+                  CONFIG_FILE_DOCUMENTATION_FILENAME)))
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception exception) {
-      Logger.log(Level.SEVERE, "Error loading: %s\n%s", CONFIG_FILE_NAME, exception.toString());
-      helpText = String.format("<Error loading %s>", CONFIG_FILE_NAME);
+      Logger.log(
+          Level.SEVERE,
+          "Error loading config file documentation: %s\n%s",
+          CONFIG_FILE_DOCUMENTATION_FILENAME,
+          exception.toString());
+      helpText = String.format("<Error loading config file documentation: %s>",
+          CONFIG_FILE_DOCUMENTATION_FILENAME);
     }
     textAreaHelp.setText(helpText);
 
@@ -576,7 +587,7 @@ public class GuiConfigController implements Initializable {
       Alert alert =
           new Alert(
               AlertType.WARNING,
-              "You must either save your changes before continuing or load a new config!",
+              "You must either save your changes before continuing or load a new contest config!",
               saveButton,
               ButtonType.CANCEL);
       alert.setHeaderText(null);
@@ -644,7 +655,8 @@ public class GuiConfigController implements Initializable {
         returnValue = Integer.valueOf(textField.getText());
       }
     } catch (Exception exception) {
-      Logger.log(Level.WARNING, "Integer required! Illegal value '%s' found.", textField.getText());
+      Logger.log(
+          Level.WARNING, "Integer required! Illegal value \"%s\" found.", textField.getText());
     }
     return returnValue;
   }
@@ -716,7 +728,7 @@ public class GuiConfigController implements Initializable {
   private static class TabulatorService extends Service<Void> {
 
     // path to config file we will use for tabulation
-    private String configPath;
+    private final String configPath;
 
     // function: TabulatorService
     // purpose: constructor for Service object which runs a tabulation

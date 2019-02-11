@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 class TabulatorTests {
 
   // folder where we store test inputs
-  private static final String TEST_ASSET_FOLDER = "test_data";
+  private static final String TEST_ASSET_FOLDER = "src/test/resources/test_data";
   // limit log output to avoid spam
   private static final Integer MAX_LOG_ERRORS = 10;
 
@@ -75,7 +75,7 @@ class TabulatorTests {
           break;
         } else if (line1 == null || line2 == null) {
           // one file ended but the other did not
-          Logger.log(Level.SEVERE, "files are unequal lengths");
+          Logger.log(Level.SEVERE, "Files are unequal lengths!");
           result = false;
           break;
         }
@@ -94,10 +94,10 @@ class TabulatorTests {
         currentLine++;
       }
     } catch (FileNotFoundException e) {
-      Logger.log(Level.SEVERE, "file not found: " + e.toString());
+      Logger.log(Level.SEVERE, "File not found!\n%s", e.toString());
       result = false;
     } catch (IOException e) {
-      Logger.log(Level.SEVERE, "error reading file: " + e.toString());
+      Logger.log(Level.SEVERE, "Error reading file!\n%s", e.toString());
       result = false;
     }
     return result;
@@ -126,10 +126,14 @@ class TabulatorTests {
     // compare actual to expected
     assertTrue(fileCompare(expectedPath, actualSummaryOutputPath));
     // test passed so cleanup test output folder
-    File ouputFolder = new File(session.outputPath);
-    for (File file : ouputFolder.listFiles()) {
-      if (!file.isDirectory()) {
-        file.delete();
+    File outputFolder = new File(session.outputPath);
+    if (outputFolder.listFiles() != null) {
+      //noinspection ConstantConditions
+      for (File file : outputFolder.listFiles()) {
+        if (!file.isDirectory()) {
+          //noinspection ResultOfMethodCallIgnored
+          file.delete();
+        }
       }
     }
   }

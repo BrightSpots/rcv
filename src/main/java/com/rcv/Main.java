@@ -44,7 +44,7 @@ public class Main extends GuiApplication {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       // check for unexpected input
       if (args.length > 1) {
-        Logger.log(Level.WARNING, "Too many arguments.  Need 1 but got: %d", args.length);
+        Logger.log(Level.WARNING, "Too many arguments!  Need 1 but got: %d", args.length);
       }
       // config file for configuring the tabulator
       String configPath = args[0];

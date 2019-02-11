@@ -45,6 +45,30 @@ public class RawContestConfig {
   RawContestConfig() {
   }
 
+  // function: validate
+  // purpose: perform some basic validation checks
+  // returns: true if checks pass otherwise false
+  public boolean validate() {
+    boolean isValid = true;
+    if (outputSettings == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No \"outputSettings\" field specified!");
+    }
+    if (cvrFileSources == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No \"cvrFileSources\" field specified!");
+    }
+    if (candidates == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No \"candidates\" field specified!");
+    }
+    if (rules == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "No \"rules\" field specified!");
+    }
+    return isValid;
+  }
+
   // OutputSettings: encapsulates the output settings
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -64,6 +88,7 @@ public class RawContestConfig {
   }
 
   // CVRSource: encapsulates a source cast vote record file
+  @SuppressWarnings("unused")
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CVRSource {
@@ -129,30 +154,6 @@ public class RawContestConfig {
     public void setProvider(String provider) {
       this.provider = provider;
     }
-  }
-
-  // function: validate
-  // purpose: perform some basic validation checks
-  // returns: true if checks pass otherwise false
-  public boolean validate() {
-    boolean isValid = true;
-    if (outputSettings == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No 'outputSettings' field specified!");
-    }
-    if (cvrFileSources == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No 'cvrFileSources' field specified!");
-    }
-    if (candidates == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No 'candidates' field specified!");
-    }
-    if (rules == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No 'rules' field specified!");
-    }
-    return isValid;
   }
 
   // Candidate: contains a full candidate name and optionally a candidate ID

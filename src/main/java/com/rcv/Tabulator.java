@@ -61,7 +61,7 @@ class Tabulator {
   // tracks required winning threshold
   private BigDecimal winningThreshold;
   // tracks vote transfer summaries for visualizer
-  private TallyTransfers tallyTransfers = new TallyTransfers();
+  private final TallyTransfers tallyTransfers = new TallyTransfers();
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
@@ -100,7 +100,7 @@ class Tabulator {
       // vote count for this candidate
       BigDecimal votes = roundTally.get(candidate);
       if (shouldLog) {
-        Logger.log(Level.INFO, "Candidate %s got %s votes.", candidate, votes.toString());
+        Logger.log(Level.INFO, "Candidate \"%s\" got %s votes.", candidate, votes.toString());
       }
       // all candidates in the existing output structure (if any) who received the same vote tally
       LinkedList<String> candidates =
@@ -170,7 +170,7 @@ class Tabulator {
                     : BigDecimal.ZERO;
             Logger.log(
                 Level.INFO,
-                "%s won with a surplus fraction of %s",
+                "Candidate \"%s\" won with a surplus fraction of %s.",
                 winner,
                 surplusFraction.toString());
             for (CastVoteRecord cvr : castVoteRecords) {
@@ -349,7 +349,7 @@ class Tabulator {
       // threshold = floor(votes / (num_winners + 1)) + 1
       winningThreshold = currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
     }
-    Logger.log(Level.INFO, "Winning threshold set to %s", winningThreshold.toString());
+    Logger.log(Level.INFO, "Winning threshold set to %s.", winningThreshold.toString());
   }
 
   // purpose: determine if we should continue tabulating based on how many winners have been
@@ -435,7 +435,7 @@ class Tabulator {
     for (String winner : selectedWinners) {
       Logger.log(
           Level.INFO,
-          "%s won in round %d with %s votes.",
+          "Candidate \"%s\" won in round %d with %s votes.",
           winner,
           currentRound,
           currentRoundCandidateToTally.get(winner).toString());
@@ -461,8 +461,7 @@ class Tabulator {
       eliminated.add(label);
       Logger.log(
           Level.INFO,
-          "Eliminated %s in round %d because it represents undeclared write-ins. It had "
-              + "%s votes.",
+          "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It had %s votes.",
           label,
           currentRound,
           currentRoundCandidateToTally.get(label).toString());
@@ -489,8 +488,7 @@ class Tabulator {
             eliminated.add(candidate);
             Logger.log(
                 Level.INFO,
-                "Eliminated %s in round %d because they only had %s vote(s), below the "
-                    + "minimum threshold of %s.",
+                "Eliminated candidate \"%s\" in round %d because they only had %s vote(s), below the minimum threshold of %s.",
                 candidate,
                 currentRound,
                 tally.toString(),
@@ -520,8 +518,7 @@ class Tabulator {
           eliminated.add(elimination.candidateID);
           Logger.log(
               Level.INFO,
-              "Batch-eliminated %s in round %d. The running total was %s vote(s) and the "
-                  + "next-highest count was %s vote(s).",
+              "Batch-eliminated candidate \"%s\" in round %d. The running total was %s vote(s) and the next-highest count was %s vote(s).",
               elimination.candidateID,
               currentRound,
               elimination.runningTotal.toString(),
@@ -562,7 +559,7 @@ class Tabulator {
       // TODO: If returned eliminatedCandidate is null, infinite loop!
       Logger.log(
           Level.INFO,
-          "%s lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
+          "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
           eliminatedCandidate,
           currentRound,
           tieBreak.nonLosingCandidateDescription(),
@@ -573,7 +570,7 @@ class Tabulator {
       eliminatedCandidate = lastPlaceCandidates.getFirst();
       Logger.log(
           Level.INFO,
-          "%s was eliminated in round %d with %s vote(s).",
+          "Candidate \"%s\" was eliminated in round %d with %s vote(s).",
           eliminatedCandidate,
           currentRound,
           minVotes.toString());

@@ -42,14 +42,13 @@ import org.xml.sax.SAXException;
 class TabulatorSession {
 
   // configPath points to config file we use for configuring tabulation
-  private String configPath;
+  private final String configPath;
+  // precinct IDs discovered during CVR parsing to support testing
+  private final Set<String> precinctIDs = new HashSet<>();
   // summaryOutputPath is generated from timestamp + config file
   String summaryOutputPath;
   // cache output path location
   String outputPath;
-
-  // precinct IDs discovered during CVR parsing to support testing
-  private Set<String> precinctIDs = new HashSet<>();
 
   // function: TabulatorSession
   // purpose: TabulatorSession constructor
@@ -66,7 +65,7 @@ class TabulatorSession {
     if (config != null) {
       executeTabulation(config);
     } else {
-      Logger.log(Level.SEVERE, "Aborting because config is invalid.");
+      Logger.log(Level.SEVERE, "Aborting because contest config is invalid!");
     }
   }
 
@@ -86,15 +85,13 @@ class TabulatorSession {
       final String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
       // %g format is for log file naming
       String tabulationLogPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log",
-              timestampString))
+          Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
               .toAbsolutePath()
               .toString();
 
       // cache summaryOutputPath for testing
       summaryOutputPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_summary.json",
-              timestampString))
+          Paths.get(config.getOutputDirectory(), String.format("%s_summary.json", timestampString))
               .toAbsolutePath()
               .toString();
 
@@ -130,14 +127,14 @@ class TabulatorSession {
             try {
               tabulator.generateSummarySpreadsheet(timestampString);
             } catch (IOException e) {
-              Logger.log(Level.SEVERE, "Error writing summary spreadsheet: %s", e.toString());
+              Logger.log(Level.SEVERE, "Error writing summary spreadsheet:\n%s", e.toString());
             }
             isTabulationCompleted = true;
           } else {
-            Logger.log(Level.SEVERE, "No cast vote records found.");
+            Logger.log(Level.SEVERE, "No cast vote records found!");
           }
         } else {
-          Logger.log(Level.SEVERE, "Skipping tabulation due to source file errors.");
+          Logger.log(Level.SEVERE, "Skipping tabulation due to source file errors!");
         }
         Logger.log(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
         Logger.removeTabulationFileLogging();
@@ -180,15 +177,12 @@ class TabulatorSession {
           encounteredSourceProblem = true;
         }
       } catch (UnrecognizedCandidatesException exception) {
-        Logger.log(
-            Level.SEVERE,
-            "Source file contains unrecognized candidate(s): %s",
-            cvrPath);
+        Logger.log(Level.SEVERE, "Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
         for (String candidate : exception.candidateCounts.keySet()) {
           Logger.log(
               Level.SEVERE,
-              "Unrecognized candidate \"%s\" appears %d time(s).",
+              "Unrecognized candidate \"%s\" appears %d time(s)!",
               candidate,
               exception.candidateCounts.get(candidate));
         }
