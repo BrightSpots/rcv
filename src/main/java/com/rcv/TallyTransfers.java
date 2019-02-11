@@ -15,7 +15,7 @@
  *
  * TallyTransfers is a container class which stores a map for each round showing how many votes were
  * transferred from each candidate to each candidate.
- * The primary purpose for this is generating sankey plots which visually show the flow of votes
+ * The primary purpose for this is generating Sankey plots which visually show the flow of votes
  * over the course of a tabulation.
  */
 

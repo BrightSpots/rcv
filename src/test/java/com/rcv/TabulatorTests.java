@@ -126,10 +126,14 @@ class TabulatorTests {
     // compare actual to expected
     assertTrue(fileCompare(expectedPath, actualSummaryOutputPath));
     // test passed so cleanup test output folder
-    File ouputFolder = new File(session.outputPath);
-    for (File file : ouputFolder.listFiles()) {
-      if (!file.isDirectory()) {
-        file.delete();
+    File outputFolder = new File(session.outputPath);
+    if (outputFolder.listFiles() != null) {
+      //noinspection ConstantConditions
+      for (File file : outputFolder.listFiles()) {
+        if (!file.isDirectory()) {
+          //noinspection ResultOfMethodCallIgnored
+          file.delete();
+        }
       }
     }
   }

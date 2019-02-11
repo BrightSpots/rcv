@@ -41,14 +41,14 @@ import org.xml.sax.SAXException;
 
 class TabulatorSession {
 
+  // configPath points to config file we use for configuring tabulation
+  private final String configPath;
+  // precinct IDs discovered during CVR parsing to support testing
+  private final Set<String> precinctIDs = new HashSet<>();
   // summaryOutputPath is generated from timestamp + config file
   String summaryOutputPath;
   // cache output path location
   String outputPath;
-  // configPath points to config file we use for configuring tabulation
-  private String configPath;
-  // precinct IDs discovered during CVR parsing to support testing
-  private Set<String> precinctIDs = new HashSet<>();
 
   // function: TabulatorSession
   // purpose: TabulatorSession constructor

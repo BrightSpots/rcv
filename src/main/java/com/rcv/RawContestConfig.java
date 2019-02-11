@@ -88,6 +88,7 @@ public class RawContestConfig {
   }
 
   // CVRSource: encapsulates a source cast vote record file
+  @SuppressWarnings("unused")
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CVRSource {

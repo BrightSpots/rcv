@@ -60,11 +60,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
 
+@SuppressWarnings("WeakerAccess")
 public class GuiConfigController implements Initializable {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final String CONFIG_FILE_NAME = "config_file_documentation.txt";
+  private static final String CONFIG_FILE_DOCUMENTATION_FILENAME = "config_file_documentation.txt";
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
@@ -233,6 +234,7 @@ public class GuiConfigController implements Initializable {
       saveFile(fileToSave);
     }
   }
+
   // validate whatever is currently entered into the GUI - does not save data
   public void buttonValidateClicked() {
     buttonBar.setDisable(true);
@@ -356,18 +358,21 @@ public class GuiConfigController implements Initializable {
 
     String helpText;
     try {
+      //noinspection ConstantConditions
       helpText =
           new BufferedReader(
-              new InputStreamReader(ClassLoader.getSystemResourceAsStream(CONFIG_FILE_NAME)))
+              new InputStreamReader(ClassLoader.getSystemResourceAsStream(
+                  CONFIG_FILE_DOCUMENTATION_FILENAME)))
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception exception) {
       Logger.log(
           Level.SEVERE,
-          "Error loading contest config: %s\n%s",
-          CONFIG_FILE_NAME,
+          "Error loading config file documentation: %s\n%s",
+          CONFIG_FILE_DOCUMENTATION_FILENAME,
           exception.toString());
-      helpText = String.format("<Error loading contest config: %s>", CONFIG_FILE_NAME);
+      helpText = String.format("<Error loading config file documentation: %s>",
+          CONFIG_FILE_DOCUMENTATION_FILENAME);
     }
     textAreaHelp.setText(helpText);
 
@@ -723,7 +728,7 @@ public class GuiConfigController implements Initializable {
   private static class TabulatorService extends Service<Void> {
 
     // path to config file we will use for tabulation
-    private String configPath;
+    private final String configPath;
 
     // function: TabulatorService
     // purpose: constructor for Service object which runs a tabulation

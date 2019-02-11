@@ -61,7 +61,7 @@ class Tabulator {
   // tracks required winning threshold
   private BigDecimal winningThreshold;
   // tracks vote transfer summaries for visualizer
-  private TallyTransfers tallyTransfers = new TallyTransfers();
+  private final TallyTransfers tallyTransfers = new TallyTransfers();
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list

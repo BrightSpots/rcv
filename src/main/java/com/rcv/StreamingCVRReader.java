@@ -60,10 +60,10 @@ class StreamingCVRReader {
   private final Integer idColumnIndex;
   // column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
+  // map for tracking unrecognized candidates during parsing
+  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // used for generating CVR IDs
   private int cvrIndex = 0;
-  // map for tracking unrecognized candidates during parsing
-  private Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // list of currentRankings for CVR in progress
   private LinkedList<Pair<Integer, String>> currentRankings;
   // list of raw strings for CVR in progress
@@ -262,10 +262,10 @@ class StreamingCVRReader {
     OPCPackage pkg = OPCPackage.open(excelFilePath);
     // pull out strings
     ReadOnlySharedStringsTable sharedStrings = new ReadOnlySharedStringsTable(pkg);
-    // reader is used to extract styles data
-    XSSFReader reader = new XSSFReader(pkg);
+    // XSSF reader is used to extract styles data
+    XSSFReader xssfReader = new XSSFReader(pkg);
     // styles data is used for creating ContentHandler
-    StylesTable styles = reader.getStylesTable();
+    StylesTable styles = xssfReader.getStylesTable();
     // SheetContentsHandler is used to handle parsing callbacks
     SheetContentsHandler sheetContentsHandler =
         new SheetContentsHandler() {
@@ -321,11 +321,11 @@ class StreamingCVRReader {
     ContentHandler handler =
         new XSSFSheetXMLHandler(styles, sharedStrings, sheetContentsHandler, true);
 
-    // create the xml parser and set content handler
-    XMLReader parser = XMLReaderFactory.createXMLReader();
-    parser.setContentHandler(handler);
+    // create the XML reader and set content handler
+    XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+    xmlReader.setContentHandler(handler);
     // trigger parsing
-    parser.parse(new InputSource(reader.getSheetsData().next()));
+    xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));
 
     // throw if there were any unrecognized candidates -- this is considered bad
     if (this.unrecognizedCandidateCounts.size() > 0) {

@@ -73,7 +73,7 @@ class ContestConfig {
   private boolean isValid;
 
   // path from which any relative paths should be resolved
-  private String sourceDirectory;
+  private final String sourceDirectory;
 
   // function: ContestConfig
   // purpose: create a new ContestConfig object
@@ -490,13 +490,6 @@ class ContestConfig {
     return rawConfig.rules.maxRankingsAllowed != null
         ? rawConfig.rules.maxRankingsAllowed
         : getNumDeclaredCandidates();
-  }
-
-  // function: getRulesDescription
-  // purpose: getter for rules description
-  // returns: rules description
-  String getRulesDescription() {
-    return rawConfig.rules.rulesDescription;
   }
 
   // function: isBatchEliminationEnabled
