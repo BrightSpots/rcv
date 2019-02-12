@@ -34,7 +34,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -56,7 +55,6 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
@@ -471,9 +469,9 @@ public class GuiConfigController implements Initializable {
     tableColumnCandidateName.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
     tableColumnCandidateCode.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCandidateExcluded.setCellValueFactory(
-        c -> new SimpleBooleanProperty(c.getValue().isExcluded()));
-    tableColumnCandidateExcluded.setCellFactory(tc -> new CheckBoxTableCell<>());
+//    tableColumnCandidateExcluded.setCellValueFactory(
+//        c -> new SimpleBooleanProperty(c.getValue().isExcluded()));
+//    tableColumnCandidateExcluded.setCellFactory(tc -> new CheckBoxTableCell<>());
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
 

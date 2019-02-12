@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.rcv.CandidateExcludedValueFactory?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
@@ -171,7 +172,12 @@
                 <TableColumn minWidth="20.0" onEditCommit="#changeCandidateCode" prefWidth="100.0"
                   text="Code" fx:id="tableColumnCandidateCode"/>
                 <TableColumn minWidth="20.0" prefWidth="100.0"
-                  text="Excluded" fx:id="tableColumnCandidateExcluded"/>
+                  text="Excluded" fx:id="tableColumnCandidateExcluded">
+                  <cellValueFactory>
+                    <CandidateExcludedValueFactory/>
+                  </cellValueFactory>
+                </TableColumn>
+
               </columns>
             </TableView>
             <padding>
