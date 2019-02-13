@@ -34,6 +34,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -393,13 +394,6 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.refresh();
   }
 
-  // TODO: Changes to Excluded column don't stick yet
-//  public void changeCandidateExcluded(CellEditEvent cellEditEvent) {
-//    Candidate candidateSelected = tableViewCandidates.getSelectionModel().getSelectedItem();
-////    candidateSelected.setExcluded(cellEditEvent.getNewValue().toString());
-//    tableViewCandidates.refresh();
-//  }
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
@@ -469,9 +463,19 @@ public class GuiConfigController implements Initializable {
     tableColumnCandidateName.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
     tableColumnCandidateCode.setCellFactory(TextFieldTableCell.forTableColumn());
-//    tableColumnCandidateExcluded.setCellValueFactory(
-//        c -> new SimpleBooleanProperty(c.getValue().isExcluded()));
-//    tableColumnCandidateExcluded.setCellFactory(tc -> new CheckBoxTableCell<>());
+    tableColumnCandidateExcluded.setCellValueFactory(
+        c -> {
+          Candidate candidate = c.getValue();
+          CheckBox checkBox = new CheckBox();
+          checkBox.selectedProperty().setValue(candidate.isExcluded());
+          checkBox
+              .selectedProperty()
+              .addListener((ov, old_val, new_val) -> candidate.setExcluded(new_val));
+          // TODO: Address warning here when noinspection is removed
+          //noinspection unchecked
+          return new SimpleObjectProperty(checkBox);
+        });
+
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
 
@@ -721,8 +725,7 @@ public class GuiConfigController implements Initializable {
         returnValue = Integer.valueOf(str);
       }
     } catch (Exception exception) {
-      Logger.log(
-          Level.WARNING, "Integer required! Illegal value \"%s\" found.", str);
+      Logger.log(Level.WARNING, "Integer required! Illegal value \"%s\" found.", str);
     }
     return returnValue;
   }
