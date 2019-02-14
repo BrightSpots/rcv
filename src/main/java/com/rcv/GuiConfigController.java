@@ -62,6 +62,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
+import javafx.util.converter.IntegerStringConverter;
 
 @SuppressWarnings("WeakerAccess")
 public class GuiConfigController implements Initializable {
@@ -346,7 +347,9 @@ public class GuiConfigController implements Initializable {
 
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    cvrSelected.setIdColumnIndex(getIntValueOrNull(cellEditEvent.getNewValue().toString().trim()));
+    // FIXME: If user enters bad data, value is nulled out instead of reverting to previous value
+    cvrSelected.setIdColumnIndex(
+        cellEditEvent.getNewValue() == null ? null : (Integer) cellEditEvent.getNewValue());
     tableViewCvrFiles.refresh();
   }
 
@@ -451,7 +454,8 @@ public class GuiConfigController implements Initializable {
         new PropertyValueFactory<>("firstVoteColumnIndex"));
     tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
     tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
-    // TODO: Need to figure out how to get equivalent setCellFactory for Integer values
+    tableColumnCvrIdCol.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrPrecinctCol.setCellValueFactory(
         new PropertyValueFactory<>("precinctColumnIndex"));
     tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
@@ -475,7 +479,6 @@ public class GuiConfigController implements Initializable {
           //noinspection unchecked
           return new SimpleObjectProperty(checkBox);
         });
-
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
 
@@ -720,6 +723,7 @@ public class GuiConfigController implements Initializable {
 
   private Integer getIntValueOrNull(String str) {
     Integer returnValue = null;
+    str = str.trim();
     try {
       if (str != null && !str.isEmpty()) {
         returnValue = Integer.valueOf(str);
@@ -835,6 +839,17 @@ public class GuiConfigController implements Initializable {
       if (!newValue.matches("\\d*")) {
         textField.setText(oldValue);
       }
+    }
+  }
+
+  private class SimpleIntegerStringConverter extends IntegerStringConverter {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Integer fromString(String value) {
+      return getIntValueOrNull(value);
     }
   }
 }
