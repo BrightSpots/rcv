@@ -305,19 +305,22 @@ public class GuiConfigController implements Initializable {
 
   public void buttonAddCvrFileClicked() {
     CVRSource cvrSource = new CVRSource();
-    if (textFieldCvrFilePath.getText().isEmpty()) {
+    String cvrFilePath = textFieldCvrFilePath.getText().trim();
+    String cvrFirstVoteCol = textFieldCvrFirstVoteCol.getText().trim();
+    String cvrFirstVoteRow = textFieldCvrFirstVoteRow.getText().trim();
+    if (cvrFilePath.isEmpty()) {
       Logger.log(Level.WARNING, "CVR file path is required!");
-    } else if (textFieldCvrFirstVoteCol.getText().isEmpty()) {
-      Logger.log(Level.WARNING, "CVR first vote column is required!");
-    } else if (textFieldCvrFirstVoteRow.getText().isEmpty()) {
-      Logger.log(Level.WARNING, "CVR first vote row is required!");
+    } else if (cvrFirstVoteCol.isEmpty()) {
+      Logger.log(Level.WARNING, "CVR first vote column index is required!");
+    } else if (cvrFirstVoteRow.isEmpty()) {
+      Logger.log(Level.WARNING, "CVR first vote row index is required!");
     } else {
-      cvrSource.setFilePath(textFieldCvrFilePath.getText());
-      cvrSource.setFirstVoteColumnIndex(getIntValueOrNull(textFieldCvrFirstVoteCol));
-      cvrSource.setFirstVoteRowIndex(getIntValueOrNull(textFieldCvrFirstVoteRow));
+      cvrSource.setFilePath(cvrFilePath);
+      cvrSource.setFirstVoteColumnIndex(getIntValueOrNull(cvrFirstVoteCol));
+      cvrSource.setFirstVoteRowIndex(getIntValueOrNull(cvrFirstVoteRow));
       cvrSource.setIdColumnIndex(getIntValueOrNull(textFieldCvrIdCol));
       cvrSource.setPrecinctColumnIndex(getIntValueOrNull(textFieldCvrPrecinctCol));
-      cvrSource.setProvider(textFieldCvrProvider.getText());
+      cvrSource.setProvider(textFieldCvrProvider.getText().trim());
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
@@ -348,7 +351,7 @@ public class GuiConfigController implements Initializable {
   public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
     if (cellEditEvent.getNewValue() == null) {
-      Logger.log(Level.WARNING, "First Vote Column Index is required!");
+      Logger.log(Level.WARNING, "CVR first vote column is required!");
     } else {
       cvrSelected.setFirstVoteColumnIndex((Integer) cellEditEvent.getNewValue());
     }
@@ -358,7 +361,7 @@ public class GuiConfigController implements Initializable {
   public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
     if (cellEditEvent.getNewValue() == null) {
-      Logger.log(Level.WARNING, "First Vote Row Index is required!");
+      Logger.log(Level.WARNING, "CVR first vote row index is required!");
     } else {
       cvrSelected.setFirstVoteRowIndex((Integer) cellEditEvent.getNewValue());
     }
@@ -389,11 +392,12 @@ public class GuiConfigController implements Initializable {
 
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
-    if (textFieldCandidateName.getText().isEmpty()) {
+    String candidateName = textFieldCandidateName.getText().trim();
+    if (candidateName.isEmpty()) {
       Logger.log(Level.WARNING, "Candidate name is required!");
     } else {
-      candidate.setName(textFieldCandidateName.getText());
-      candidate.setCode(textFieldCandidateCode.getText());
+      candidate.setName(candidateName);
+      candidate.setCode(textFieldCandidateCode.getText().trim());
       candidate.setExcluded(checkBoxCandidateExcluded.isSelected());
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
