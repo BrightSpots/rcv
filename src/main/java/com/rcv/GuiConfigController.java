@@ -345,10 +345,38 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.refresh();
   }
 
+  public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    if (cellEditEvent.getNewValue() == null) {
+      Logger.log(Level.WARNING, "First Vote Column Index is required!");
+    } else {
+      cvrSelected.setFirstVoteColumnIndex((Integer) cellEditEvent.getNewValue());
+    }
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    if (cellEditEvent.getNewValue() == null) {
+      Logger.log(Level.WARNING, "First Vote Row Index is required!");
+    } else {
+      cvrSelected.setFirstVoteRowIndex((Integer) cellEditEvent.getNewValue());
+    }
+    tableViewCvrFiles.refresh();
+  }
+
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
     // FIXME: If user enters bad data, value is nulled out instead of reverting to previous value
     cvrSelected.setIdColumnIndex(
+        cellEditEvent.getNewValue() == null ? null : (Integer) cellEditEvent.getNewValue());
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrPrecinctCol(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // FIXME: If user enters bad data, value is nulled out instead of reverting to previous value
+    cvrSelected.setPrecinctColumnIndex(
         cellEditEvent.getNewValue() == null ? null : (Integer) cellEditEvent.getNewValue());
     tableViewCvrFiles.refresh();
   }
@@ -452,12 +480,18 @@ public class GuiConfigController implements Initializable {
     tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
         new PropertyValueFactory<>("firstVoteColumnIndex"));
+    tableColumnCvrFirstVoteCol.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
+    tableColumnCvrFirstVoteRow.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
     tableColumnCvrIdCol.setCellFactory(
         TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrPrecinctCol.setCellValueFactory(
         new PropertyValueFactory<>("precinctColumnIndex"));
+    tableColumnCvrPrecinctCol.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
     tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -723,10 +757,12 @@ public class GuiConfigController implements Initializable {
 
   private Integer getIntValueOrNull(String str) {
     Integer returnValue = null;
-    str = str.trim();
     try {
-      if (str != null && !str.isEmpty()) {
-        returnValue = Integer.valueOf(str);
+      if (str != null) {
+        str = str.trim();
+        if (!str.isEmpty()) {
+          returnValue = Integer.valueOf(str);
+        }
       }
     } catch (Exception exception) {
       Logger.log(Level.WARNING, "Integer required! Illegal value \"%s\" found.", str);
@@ -843,10 +879,6 @@ public class GuiConfigController implements Initializable {
   }
 
   private class SimpleIntegerStringConverter extends IntegerStringConverter {
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Integer fromString(String value) {
       return getIntValueOrNull(value);

@@ -129,13 +129,13 @@
               <columns>
                 <TableColumn minWidth="20.0" onEditCommit="#changeCvrFilePath" prefWidth="210.0"
                   text="File Path" fx:id="tableColumnCvrFilePath"/>
-                <TableColumn minWidth="20.0" prefWidth="70.0"
+                <TableColumn minWidth="20.0" onEditCommit="#changeCvrFirstVoteCol" prefWidth="70.0"
                   text="First Vote&#10;Column&#10;Index" fx:id="tableColumnCvrFirstVoteCol"/>
-                <TableColumn minWidth="20.0" prefWidth="70.0"
+                <TableColumn minWidth="20.0" onEditCommit="#changeCvrFirstVoteRow" prefWidth="70.0"
                   text="First Vote&#10;Row&#10;Index" fx:id="tableColumnCvrFirstVoteRow"/>
                 <TableColumn minWidth="20.0" onEditCommit="#changeCvrIdColIndex" prefWidth="70.0"
                   text="ID&#10;Column&#10;Index" fx:id="tableColumnCvrIdCol"/>
-                <TableColumn minWidth="20.0" prefWidth="70.0"
+                <TableColumn minWidth="20.0" onEditCommit="#changeCvrPrecinctCol" prefWidth="70.0"
                   text="Precinct&#10;Column&#10;Index" fx:id="tableColumnCvrPrecinctCol"/>
                 <TableColumn minWidth="20.0" onEditCommit="#changeCvrProvider" prefWidth="110.0"
                   text="Provider" fx:id="tableColumnCvrProvider"/>
