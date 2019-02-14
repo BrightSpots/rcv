@@ -217,7 +217,11 @@ public class GuiConfigController implements Initializable {
     }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
-    return fc.showSaveDialog(GuiContext.getInstance().getMainWindow());
+    File fileToSave = fc.showSaveDialog(GuiContext.getInstance().getMainWindow());
+    if (fileToSave != null) {
+      selectedFile = fileToSave;
+    }
+    return fileToSave;
   }
 
   private void saveFile(File fileToSave) {
@@ -232,7 +236,6 @@ public class GuiConfigController implements Initializable {
   public void buttonSaveClicked() {
     File fileToSave = getSaveFile();
     if (fileToSave != null) {
-      selectedFile = fileToSave;
       saveFile(fileToSave);
     }
   }
