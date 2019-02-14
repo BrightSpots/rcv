@@ -159,11 +159,6 @@
             <HBox alignment="CENTER_LEFT" spacing="4.0">
               <TextField promptText="Name *" fx:id="textFieldCandidateName"/>
               <TextField maxWidth="100.0" promptText="Code" fx:id="textFieldCandidateCode"/>
-              <CheckBox mnemonicParsing="false" text="Excluded" fx:id="checkBoxCandidateExcluded">
-                <VBox.margin>
-                  <Insets top="4.0"/>
-                </VBox.margin>
-              </CheckBox>
               <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>
               <Region prefHeight="25.0" prefWidth="39.0"/>
               <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"

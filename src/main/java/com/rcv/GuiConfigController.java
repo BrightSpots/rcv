@@ -133,8 +133,6 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCandidateCode;
   @FXML
-  private CheckBox checkBoxCandidateExcluded;
-  @FXML
   private ChoiceBox<Tabulator.TieBreakMode> choiceTiebreakMode;
   @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
@@ -398,11 +396,10 @@ public class GuiConfigController implements Initializable {
     } else {
       candidate.setName(candidateName);
       candidate.setCode(textFieldCandidateCode.getText().trim());
-      candidate.setExcluded(checkBoxCandidateExcluded.isSelected());
+      candidate.setExcluded(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
       textFieldCandidateCode.clear();
-      checkBoxCandidateExcluded.setSelected(false);
     }
   }
 
@@ -582,8 +579,6 @@ public class GuiConfigController implements Initializable {
         String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
     textFieldMinimumVoteThreshold.setText(
         String.valueOf(ContestConfig.SUGGESTED_MINIMUM_VOTE_THRESHOLD));
-
-    checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
   }
 
   private void clearConfig() {
@@ -604,7 +599,6 @@ public class GuiConfigController implements Initializable {
 
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
-    checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
     choiceTiebreakMode.setValue(null);
