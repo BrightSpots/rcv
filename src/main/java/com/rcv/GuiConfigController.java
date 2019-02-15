@@ -642,8 +642,8 @@ public class GuiConfigController implements Initializable {
                 .writer()
                 .withDefaultPrettyPrinter()
                 .writeValueAsString(
-                    JsonParser.readFromFile(
-                        selectedFile.getAbsolutePath(), RawContestConfig.class, false));
+                    JsonParser.readFromFileWithoutLogging(
+                        selectedFile.getAbsolutePath(), RawContestConfig.class));
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
     } catch (JsonProcessingException exception) {

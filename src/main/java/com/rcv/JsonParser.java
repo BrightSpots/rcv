@@ -35,7 +35,7 @@ class JsonParser {
   // param: valueType class of the object to be created from parsed json
   // param: logsEnabled display log messages
   // returns: instance of the object parsed from json or null if there was a problem
-  static <T> T readFromFile(String jsonFilePath, Class<T> valueType, boolean logsEnabled) {
+  private static <T> T readFromFile(String jsonFilePath, Class<T> valueType, boolean logsEnabled) {
     T createdObject;
     try {
       // fileReader will read the json file from disk
@@ -64,6 +64,10 @@ class JsonParser {
 
   static <T> T readFromFile(String jsonFilePath, Class<T> valueType) {
     return readFromFile(jsonFilePath, valueType, true);
+  }
+
+  static <T> T readFromFileWithoutLogging(String jsonFilePath, Class<T> valueType) {
+    return readFromFile(jsonFilePath, valueType, false);
   }
 
   // function: writeToFile
