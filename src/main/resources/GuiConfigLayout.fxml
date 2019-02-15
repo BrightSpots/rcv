@@ -20,7 +20,7 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
   minHeight="-Infinity"
   minWidth="-Infinity" prefHeight="800.0" prefWidth="900.0"
-  stylesheets="GuiStyles.css" xmlns="http://javafx.com/javafx/8.0.121"
+  stylesheets="GuiStyles.css" xmlns="http://javafx.com/javafx/8.0.172-ea"
   fx:controller="com.rcv.GuiConfigController">
   <top>
     <VBox BorderPane.alignment="TOP_LEFT">
@@ -97,11 +97,9 @@
                     text="Select"/>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <TextField prefHeight="25.0" prefWidth="160.0"
-                    promptText="First Vote Col Index *"
+                  <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Col Index *"
                     fx:id="textFieldCvrFirstVoteCol"/>
-                  <TextField prefHeight="25.0" prefWidth="160.0"
-                    promptText="First Vote Row Index *"
+                  <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Row Index *"
                     fx:id="textFieldCvrFirstVoteRow"/>
                   <TextField prefHeight="25.0" prefWidth="120.0" promptText="ID Col Index"
                     fx:id="textFieldCvrIdCol"/>
@@ -112,10 +110,16 @@
                   <TextField maxWidth="250.0" prefHeight="25.0" prefWidth="175.0"
                     promptText="Provider" fx:id="textFieldCvrProvider"/>
                 </HBox>
+                <Label
+                  text="Note: double-click existing entries below to edit and press Enter to save changes.">
+                  <padding>
+                    <Insets left="2.0"/>
+                  </padding>
+                </Label>
               </VBox>
               <VBox alignment="BOTTOM_LEFT" spacing="4.0">
                 <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  <Insets bottom="22.0" left="4.0" right="4.0" top="4.0"/>
                 </padding>
                 <Button mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add"/>
                 <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
@@ -127,18 +131,22 @@
             </HBox>
             <TableView fx:id="tableViewCvrFiles">
               <columns>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="210.0"
-                  text="File Path" fx:id="tableColumnCvrFilePath"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
-                  text="First Vote&#10;Column&#10;Index" fx:id="tableColumnCvrFirstVoteCol"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
-                  text="First Vote&#10;Row&#10;Index" fx:id="tableColumnCvrFirstVoteRow"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
-                  text="ID&#10;Column&#10;Index" fx:id="tableColumnCvrIdCol"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="70.0"
-                  text="Precinct&#10;Column&#10;Index" fx:id="tableColumnCvrPrecinctCol"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="110.0"
-                  text="Provider" fx:id="tableColumnCvrProvider"/>
+                <TableColumn minWidth="20.0" onEditCommit="#changeCvrFilePath"
+                  prefWidth="210.0" text="File Path" fx:id="tableColumnCvrFilePath"/>
+                <TableColumn minWidth="20.0" onEditCommit="#changeCvrFirstVoteCol"
+                  prefWidth="70.0" text="First Vote&#10;Column&#10;Index"
+                  fx:id="tableColumnCvrFirstVoteCol"/>
+                <TableColumn minWidth="20.0" onEditCommit="#changeCvrFirstVoteRow"
+                  prefWidth="70.0" text="First Vote&#10;Row&#10;Index"
+                  fx:id="tableColumnCvrFirstVoteRow"/>
+                <TableColumn minWidth="20.0" onEditCommit="#changeCvrIdColIndex"
+                  prefWidth="70.0" text="ID&#10;Column&#10;Index"
+                  fx:id="tableColumnCvrIdCol"/>
+                <TableColumn minWidth="20.0" onEditCommit="#changeCvrPrecinctCol"
+                  prefWidth="70.0" text="Precinct&#10;Column&#10;Index"
+                  fx:id="tableColumnCvrPrecinctCol"/>
+                <TableColumn minWidth="20.0" onEditCommit="#changeCvrProvider"
+                  prefWidth="110.0" text="Provider" fx:id="tableColumnCvrProvider"/>
               </columns>
             </TableView>
             <padding>
@@ -151,11 +159,6 @@
             <HBox alignment="CENTER_LEFT" spacing="4.0">
               <TextField promptText="Name *" fx:id="textFieldCandidateName"/>
               <TextField maxWidth="100.0" promptText="Code" fx:id="textFieldCandidateCode"/>
-              <CheckBox mnemonicParsing="false" text="Excluded" fx:id="checkBoxCandidateExcluded">
-                <VBox.margin>
-                  <Insets top="4.0"/>
-                </VBox.margin>
-              </CheckBox>
               <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>
               <Region prefHeight="25.0" prefWidth="39.0"/>
               <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
@@ -164,14 +167,20 @@
                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
               </padding>
             </HBox>
+            <Label
+              text="Note: double-click existing entries below to edit and press Enter to save changes.">
+              <padding>
+                <Insets bottom="2.0" left="6.0"/>
+              </padding>
+            </Label>
             <TableView fx:id="tableViewCandidates">
               <columns>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="230.0"
-                  text="Name" fx:id="tableColumnCandidateName"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="100.0"
-                  text="Code" fx:id="tableColumnCandidateCode"/>
-                <TableColumn editable="false" minWidth="20.0" prefWidth="100.0"
-                  text="Excluded" fx:id="tableColumnCandidateExcluded"/>
+                <TableColumn minWidth="20.0" onEditCommit="#changeCandidateName"
+                  prefWidth="230.0" text="Name" fx:id="tableColumnCandidateName"/>
+                <TableColumn minWidth="20.0" onEditCommit="#changeCandidateCode"
+                  prefWidth="100.0" text="Code" fx:id="tableColumnCandidateCode"/>
+                <TableColumn minWidth="20.0" prefWidth="100.0" text="Excluded"
+                  fx:id="tableColumnCandidateExcluded"/>
               </columns>
             </TableView>
             <padding>
@@ -264,7 +273,8 @@
   </right>
   <bottom>
     <TextArea BorderPane.alignment="TOP_LEFT" editable="false" id="textStatus" prefHeight="200.0"
-      prefWidth="200.0" styleClass="console-text-area" wrapText="true" fx:id="textAreaStatus">
+      prefWidth="200.0" styleClass="console-text-area" wrapText="true"
+      fx:id="textAreaStatus">
       <BorderPane.margin>
         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
       </BorderPane.margin>

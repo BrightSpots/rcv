@@ -56,12 +56,12 @@ class Tabulator {
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
   // map from candidate ID to the round in which they won
   private final Map<String, Integer> winnerToRound = new HashMap<>();
+  // tracks vote transfer summaries for visualizer
+  private final TallyTransfers tallyTransfers = new TallyTransfers();
   // tracks the current round (and when tabulation is complete, the total number of rounds)
   private int currentRound = 0;
   // tracks required winning threshold
   private BigDecimal winningThreshold;
-  // tracks vote transfer summaries for visualizer
-  private final TallyTransfers tallyTransfers = new TallyTransfers();
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list

@@ -34,6 +34,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -51,14 +52,17 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
+import javafx.util.converter.IntegerStringConverter;
 
 @SuppressWarnings("WeakerAccess")
 public class GuiConfigController implements Initializable {
@@ -128,8 +132,6 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldCandidateName;
   @FXML
   private TextField textFieldCandidateCode;
-  @FXML
-  private CheckBox checkBoxCandidateExcluded;
   @FXML
   private ChoiceBox<Tabulator.TieBreakMode> choiceTiebreakMode;
   @FXML
@@ -215,7 +217,11 @@ public class GuiConfigController implements Initializable {
     }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
-    return fc.showSaveDialog(GuiContext.getInstance().getMainWindow());
+    File fileToSave = fc.showSaveDialog(GuiContext.getInstance().getMainWindow());
+    if (fileToSave != null) {
+      selectedFile = fileToSave;
+    }
+    return fileToSave;
   }
 
   private void saveFile(File fileToSave) {
@@ -230,7 +236,6 @@ public class GuiConfigController implements Initializable {
   public void buttonSaveClicked() {
     File fileToSave = getSaveFile();
     if (fileToSave != null) {
-      selectedFile = fileToSave;
       saveFile(fileToSave);
     }
   }
@@ -301,19 +306,22 @@ public class GuiConfigController implements Initializable {
 
   public void buttonAddCvrFileClicked() {
     CVRSource cvrSource = new CVRSource();
-    if (textFieldCvrFilePath.getText().isEmpty()) {
+    String cvrFilePath = textFieldCvrFilePath.getText().trim();
+    String cvrFirstVoteCol = textFieldCvrFirstVoteCol.getText().trim();
+    String cvrFirstVoteRow = textFieldCvrFirstVoteRow.getText().trim();
+    if (cvrFilePath.isEmpty()) {
       Logger.log(Level.WARNING, "CVR file path is required!");
-    } else if (textFieldCvrFirstVoteCol.getText().isEmpty()) {
-      Logger.log(Level.WARNING, "CVR first vote column is required!");
-    } else if (textFieldCvrFirstVoteRow.getText().isEmpty()) {
-      Logger.log(Level.WARNING, "CVR first vote row is required!");
+    } else if (cvrFirstVoteCol.isEmpty()) {
+      Logger.log(Level.WARNING, "CVR first vote column index is required!");
+    } else if (cvrFirstVoteRow.isEmpty()) {
+      Logger.log(Level.WARNING, "CVR first vote row index is required!");
     } else {
-      cvrSource.setFilePath(textFieldCvrFilePath.getText());
-      cvrSource.setFirstVoteColumnIndex(getIntValueOrNull(textFieldCvrFirstVoteCol));
-      cvrSource.setFirstVoteRowIndex(getIntValueOrNull(textFieldCvrFirstVoteRow));
+      cvrSource.setFilePath(cvrFilePath);
+      cvrSource.setFirstVoteColumnIndex(getIntValueOrNull(cvrFirstVoteCol));
+      cvrSource.setFirstVoteRowIndex(getIntValueOrNull(cvrFirstVoteRow));
       cvrSource.setIdColumnIndex(getIntValueOrNull(textFieldCvrIdCol));
       cvrSource.setPrecinctColumnIndex(getIntValueOrNull(textFieldCvrPrecinctCol));
-      cvrSource.setProvider(textFieldCvrProvider.getText());
+      cvrSource.setProvider(textFieldCvrProvider.getText().trim());
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
@@ -330,18 +338,71 @@ public class GuiConfigController implements Initializable {
         .removeAll(tableViewCvrFiles.getSelectionModel().getSelectedItems());
   }
 
+  public void changeCvrFilePath(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    String cvrFilePath = cellEditEvent.getNewValue().toString().trim();
+    if (cvrFilePath.isEmpty()) {
+      Logger.log(Level.WARNING, "CVR file path is required!");
+    } else {
+      cvrSelected.setFilePath(cvrFilePath);
+    }
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    if (cellEditEvent.getNewValue() == null) {
+      Logger.log(Level.WARNING, "CVR first vote column is required!");
+    } else {
+      cvrSelected.setFirstVoteColumnIndex((Integer) cellEditEvent.getNewValue());
+    }
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    if (cellEditEvent.getNewValue() == null) {
+      Logger.log(Level.WARNING, "CVR first vote row index is required!");
+    } else {
+      cvrSelected.setFirstVoteRowIndex((Integer) cellEditEvent.getNewValue());
+    }
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // FIXME: If user enters bad data, value is nulled out instead of reverting to previous value
+    cvrSelected.setIdColumnIndex(
+        cellEditEvent.getNewValue() == null ? null : (Integer) cellEditEvent.getNewValue());
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrPrecinctCol(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // FIXME: If user enters bad data, value is nulled out instead of reverting to previous value
+    cvrSelected.setPrecinctColumnIndex(
+        cellEditEvent.getNewValue() == null ? null : (Integer) cellEditEvent.getNewValue());
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrProvider(CellEditEvent cellEditEvent) {
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    cvrSelected.setProvider(cellEditEvent.getNewValue().toString().trim());
+    tableViewCvrFiles.refresh();
+  }
+
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
-    if (textFieldCandidateName.getText().isEmpty()) {
+    String candidateName = textFieldCandidateName.getText().trim();
+    if (candidateName.isEmpty()) {
       Logger.log(Level.WARNING, "Candidate name is required!");
     } else {
-      candidate.setName(textFieldCandidateName.getText());
-      candidate.setCode(textFieldCandidateCode.getText());
-      candidate.setExcluded(checkBoxCandidateExcluded.isSelected());
+      candidate.setName(candidateName);
+      candidate.setCode(textFieldCandidateCode.getText().trim());
+      candidate.setExcluded(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
       textFieldCandidateCode.clear();
-      checkBoxCandidateExcluded.setSelected(false);
     }
   }
 
@@ -349,6 +410,23 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates
         .getItems()
         .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
+  }
+
+  public void changeCandidateName(CellEditEvent cellEditEvent) {
+    Candidate candidateSelected = tableViewCandidates.getSelectionModel().getSelectedItem();
+    String candidateName = cellEditEvent.getNewValue().toString().trim();
+    if (candidateName.isEmpty()) {
+      Logger.log(Level.WARNING, "Candidate name is required!");
+    } else {
+      candidateSelected.setName(candidateName);
+    }
+    tableViewCandidates.refresh();
+  }
+
+  public void changeCandidateCode(CellEditEvent cellEditEvent) {
+    Candidate candidateSelected = tableViewCandidates.getSelectionModel().getSelectedItem();
+    candidateSelected.setCode(cellEditEvent.getNewValue().toString().trim());
+    tableViewCandidates.refresh();
   }
 
   @Override
@@ -361,8 +439,8 @@ public class GuiConfigController implements Initializable {
       //noinspection ConstantConditions
       helpText =
           new BufferedReader(
-              new InputStreamReader(ClassLoader.getSystemResourceAsStream(
-                  CONFIG_FILE_DOCUMENTATION_FILENAME)))
+              new InputStreamReader(
+                  ClassLoader.getSystemResourceAsStream(CONFIG_FILE_DOCUMENTATION_FILENAME)))
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception exception) {
@@ -371,8 +449,9 @@ public class GuiConfigController implements Initializable {
           "Error loading config file documentation: %s\n%s",
           CONFIG_FILE_DOCUMENTATION_FILENAME,
           exception.toString());
-      helpText = String.format("<Error loading config file documentation: %s>",
-          CONFIG_FILE_DOCUMENTATION_FILENAME);
+      helpText =
+          String.format(
+              "<Error loading config file documentation: %s>", CONFIG_FILE_DOCUMENTATION_FILENAME);
     }
     textAreaHelp.setText(helpText);
 
@@ -402,19 +481,44 @@ public class GuiConfigController implements Initializable {
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldCvrPrecinctCol));
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
+    tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
         new PropertyValueFactory<>("firstVoteColumnIndex"));
+    tableColumnCvrFirstVoteCol.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
+    tableColumnCvrFirstVoteRow.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
+    tableColumnCvrIdCol.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrPrecinctCol.setCellValueFactory(
         new PropertyValueFactory<>("precinctColumnIndex"));
+    tableColumnCvrPrecinctCol.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
+    tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    tableViewCvrFiles.setEditable(true);
 
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
+    tableColumnCandidateName.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
-    tableColumnCandidateExcluded.setCellValueFactory(new PropertyValueFactory<>("excluded"));
+    tableColumnCandidateCode.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCandidateExcluded.setCellValueFactory(
+        c -> {
+          Candidate candidate = c.getValue();
+          CheckBox checkBox = new CheckBox();
+          checkBox.selectedProperty().setValue(candidate.isExcluded());
+          checkBox
+              .selectedProperty()
+              .addListener((ov, old_val, new_val) -> candidate.setExcluded(new_val));
+          // TODO: Address warning here when noinspection is removed
+          //noinspection unchecked
+          return new SimpleObjectProperty(checkBox);
+        });
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    tableViewCandidates.setEditable(true);
 
     choiceTiebreakMode.getItems().addAll(Tabulator.TieBreakMode.values());
     choiceTiebreakMode.getItems().remove(Tabulator.TieBreakMode.MODE_UNKNOWN);
@@ -478,8 +582,6 @@ public class GuiConfigController implements Initializable {
         String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
     textFieldMinimumVoteThreshold.setText(
         String.valueOf(ContestConfig.SUGGESTED_MINIMUM_VOTE_THRESHOLD));
-
-    checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
   }
 
   private void clearConfig() {
@@ -500,7 +602,6 @@ public class GuiConfigController implements Initializable {
 
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
-    checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
     choiceTiebreakMode.setValue(null);
@@ -535,11 +636,14 @@ public class GuiConfigController implements Initializable {
         // All fields are currently empty / default values so no point in asking to save
         needsSaving = false;
       } else if (GuiContext.getInstance().getConfig() != null) {
+        // Compare to version currently saved on the hard drive
         String savedConfigString =
             new ObjectMapper()
                 .writer()
                 .withDefaultPrettyPrinter()
-                .writeValueAsString(GuiContext.getInstance().getConfig().getRawConfig());
+                .writeValueAsString(
+                    JsonParser.readFromFileWithoutLogging(
+                        selectedFile.getAbsolutePath(), RawContestConfig.class));
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
     } catch (JsonProcessingException exception) {
@@ -649,14 +753,20 @@ public class GuiConfigController implements Initializable {
   }
 
   private Integer getIntValueOrNull(TextField textField) {
+    return getIntValueOrNull(textField.getText());
+  }
+
+  private Integer getIntValueOrNull(String str) {
     Integer returnValue = null;
     try {
-      if (textField.getText() != null && !textField.getText().isEmpty()) {
-        returnValue = Integer.valueOf(textField.getText());
+      if (str != null) {
+        str = str.trim();
+        if (!str.isEmpty()) {
+          returnValue = Integer.valueOf(str);
+        }
       }
     } catch (Exception exception) {
-      Logger.log(
-          Level.WARNING, "Integer required! Illegal value \"%s\" found.", textField.getText());
+      Logger.log(Level.WARNING, "Integer required! Illegal value \"%s\" found.", str);
     }
     return returnValue;
   }
@@ -766,6 +876,13 @@ public class GuiConfigController implements Initializable {
       if (!newValue.matches("\\d*")) {
         textField.setText(oldValue);
       }
+    }
+  }
+
+  private class SimpleIntegerStringConverter extends IntegerStringConverter {
+    @Override
+    public Integer fromString(String value) {
+      return getIntValueOrNull(value);
     }
   }
 }
