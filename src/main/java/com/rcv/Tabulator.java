@@ -62,6 +62,8 @@ class Tabulator {
   private int currentRound = 0;
   // tracks required winning threshold
   private BigDecimal winningThreshold;
+  // tracks residual surplus from multi-seat contest vote transfers
+  private Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
@@ -136,6 +138,9 @@ class Tabulator {
       // Eventually the winner(s) will be chosen.
       Map<String, BigDecimal> currentRoundCandidateToTally = computeTalliesForRound(currentRound);
       roundTallies.put(currentRound, currentRoundCandidateToTally);
+      roundToResidualSurplus.put(
+          currentRound,
+          currentRound == 1 ? BigDecimal.ZERO : roundToResidualSurplus.get(currentRound - 1));
 
       // The winning threshold in a multi-seat contest is based on the number of active votes in the
       // first round.
@@ -302,7 +307,7 @@ class Tabulator {
       }
     }
 
-    // process all the CVRs if needed
+    // process all the CVRs if needed (if we have any winners from the previous round to process)
     if (winnersRequiringComputation.size() > 0) {
       for (CastVoteRecord cvr : castVoteRecords) {
         // the record of winners who got partial votes from this CVR
@@ -320,6 +325,22 @@ class Tabulator {
                 fractionalTransferValue,
                 winner);
           }
+        }
+      }
+
+      // We need to handle residual surplus (fractional surplus that can't be transferred due to
+      // rounding).
+      // For each winner from the previous round, record the residual surplus and then update
+      // the winner's new total to be exactly the winning threshold value.
+      for (String winner : winnersRequiringComputation) {
+        BigDecimal winnerTally = roundTally.get(winner);
+        BigDecimal winnerResidual = winnerTally.subtract(winningThreshold);
+        if (winnerResidual.signum() == 1) {
+          Logger.log(
+              Level.INFO, "%s had residual surplus of %s.", winner, winnerResidual.toString());
+          roundToResidualSurplus.put(
+              currentRound, roundToResidualSurplus.get(currentRound).add(winnerResidual));
+          roundTally.put(winner, winningThreshold);
         }
       }
     }
@@ -593,7 +614,8 @@ class Tabulator {
             .setContestConfig(config)
             .setTimestampString(timestamp)
             .setTallyTransfers(tallyTransfers)
-            .setWinningThreshold(winningThreshold);
+            .setWinningThreshold(winningThreshold)
+            .setRoundToResidualSurplus(roundToResidualSurplus);
 
     writer.generateOverallSummarySpreadsheet(roundTallies);
 

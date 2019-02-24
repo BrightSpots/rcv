@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import org.apache.commons.csv.CSVFormat;
@@ -60,6 +61,12 @@ class ResultsWriter {
   private String timestampString;
   // TallyTransfer object contains totals votes transferred each round
   private TallyTransfers tallyTransfers;
+  private Map<Integer, BigDecimal> roundToResidualSurplus;
+
+  ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
+    this.roundToResidualSurplus = roundToResidualSurplus;
+    return this;
+  }
 
   // function: setTallyTransfers
   // purpose: setter for tally transfer object used when generating json summary output
@@ -261,25 +268,38 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    // row for the exhausted CVR counts
-    // exhausted CVR header cell
-    csvPrinter.print("Exhausted ballots");
+    // row for the inactive CVR counts
+    // inactive CVR header cell
+    csvPrinter.print("Inactive ballots");
 
     // round indexes through all rounds
     for (int round = 1; round <= numRounds; round++) {
-      // count of votes exhausted this round
-      BigDecimal thisRoundExhausted = BigDecimal.ZERO;
+      // count of votes inactive this round
+      BigDecimal thisRoundInactive = BigDecimal.ZERO;
 
       if (round > 1) {
         // Exhausted count is the difference between the total votes in round 1 and the total votes
         // in the current round.
-        thisRoundExhausted =
-            totalActiveVotesFirstRound.subtract(totalActiveVotesPerRound.get(round));
+        thisRoundInactive =
+            totalActiveVotesFirstRound
+                .subtract(totalActiveVotesPerRound.get(round))
+                .subtract(roundToResidualSurplus.get(round));
       }
       // total votes cell
-      csvPrinter.print(thisRoundExhausted.toString());
+      csvPrinter.print(thisRoundInactive.toString());
     }
     csvPrinter.println();
+
+    // row for residual surplus (if needed)
+    Optional<BigDecimal> maxResidual =
+        roundToResidualSurplus.values().stream().max(BigDecimal::compareTo);
+    if (maxResidual.isPresent() && maxResidual.get().signum() == 1) {
+      csvPrinter.print("Residual surplus");
+      for (int round = 1; round <= numRounds; round++) {
+        csvPrinter.print(roundToResidualSurplus.get(round).toString());
+      }
+      csvPrinter.println();
+    }
 
     // write xls to disk
     try {
