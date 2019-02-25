@@ -39,7 +39,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import org.apache.commons.csv.CSVFormat;
@@ -291,9 +290,9 @@ class ResultsWriter {
     csvPrinter.println();
 
     // row for residual surplus (if needed)
-    Optional<BigDecimal> maxResidual =
-        roundToResidualSurplus.values().stream().max(BigDecimal::compareTo);
-    if (maxResidual.isPresent() && maxResidual.get().signum() == 1) {
+    // We check if we accumulated any residual surplus over the course of the tabulation by testing
+    // whether the value in the final round is positive.
+    if (roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round).toString());
