@@ -40,6 +40,7 @@ class ContestConfig {
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
+  static final boolean SUGGESTED_SEQUENTIAL_MULTI_SEAT = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
@@ -379,12 +380,17 @@ class ContestConfig {
         isValid = false;
         Logger.log(
             Level.SEVERE,
-            "continueUntilTwoCandidatesRemain can't be true in a multi-winner contest!");
+            "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest!");
       }
 
       if (isBatchEliminationEnabled()) {
         isValid = false;
-        Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-winner contest!");
+        Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
+      }
+    } else {
+      if (isSequentialMultiSeatEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a single-seat contest!");
       }
     }
   }
@@ -401,6 +407,10 @@ class ContestConfig {
   // returns: number of places to round to
   Integer getDecimalPlacesForVoteArithmetic() {
     return rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
+  boolean isSequentialMultiSeatEnabled() {
+    return rawConfig.rules.sequentialMultiSeat;
   }
 
   boolean isNonIntegerWinningThresholdEnabled() {

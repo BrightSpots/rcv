@@ -155,6 +155,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldRulesDescription;
   @FXML
+  private CheckBox checkBoxSequentialMultiSeat;
+  @FXML
   private CheckBox checkBoxNonIntegerWinningThreshold;
   @FXML
   private CheckBox checkBoxBatchElimination;
@@ -565,6 +567,7 @@ public class GuiConfigController implements Initializable {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
+    checkBoxSequentialMultiSeat.setSelected(ContestConfig.SUGGESTED_SEQUENTIAL_MULTI_SEAT);
     checkBoxNonIntegerWinningThreshold.setSelected(
         ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
     checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
@@ -615,6 +618,7 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.clear();
     textFieldUndeclaredWriteInLabel.clear();
     textFieldRulesDescription.clear();
+    checkBoxSequentialMultiSeat.setSelected(false);
     checkBoxNonIntegerWinningThreshold.setSelected(false);
     checkBoxBatchElimination.setSelected(false);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
@@ -745,6 +749,7 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.setText(rules.undervoteLabel);
     textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
     textFieldRulesDescription.setText(rules.rulesDescription);
+    checkBoxSequentialMultiSeat.setSelected(rules.sequentialMultiSeat);
     checkBoxNonIntegerWinningThreshold.setSelected(rules.nonIntegerWinningThreshold);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
@@ -801,6 +806,7 @@ public class GuiConfigController implements Initializable {
     rules.minimumVoteThreshold = getIntValueOrNull(textFieldMinimumVoteThreshold);
     rules.maxSkippedRanksAllowed = getIntValueOrNull(textFieldMaxSkippedRanksAllowed);
     rules.maxRankingsAllowed = getIntValueOrNull(textFieldMaxRankingsAllowed);
+    rules.sequentialMultiSeat = checkBoxSequentialMultiSeat.isSelected();
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();

@@ -139,6 +139,12 @@ Config file must be valid JSON format. Examples can be found under the test fold
         values: [1..]
         if not supplied: the number of declared candidates
 
+      "sequentialMultiSeat" optional
+        instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats
+        can't be true if numberOfWinners = 1
+        value: true | false
+        if not supplied: false
+
       "nonIntegerWinningThreshold" optional
         the vote threshold used to determine winners can be a non-integer
         if true, threshold = V/(S+1) + 10^-d
