@@ -116,15 +116,23 @@ class TabulatorTests {
   // purpose: helper function to support running various tabulation tests
   // param: stem base name of folder containing config file cvr files and expected result files
   private static void runTabulationTest(String stem) {
-    // full path to expected results file
-    String expectedPath = getTestFilePath(stem, "_expected.json");
+    String configPath = getTestFilePath(stem, "_config.json");
     // create a session object and run the tabulation
-    TabulatorSession session = new TabulatorSession(getTestFilePath(stem, "_config.json"));
+    TabulatorSession session = new TabulatorSession(configPath);
     session.tabulate();
-    // actualSummaryOutputPath is the summary json we just tabulated
-    String actualSummaryOutputPath = session.summaryOutputPath;
-    // compare actual to expected
-    assertTrue(fileCompare(expectedPath, actualSummaryOutputPath));
+
+    String timestampString = session.getTimestampString();
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    assertNotNull(config);
+
+    if (config.isSequentialMultiSeatEnabled()) {
+      for (int i = 1; i <= config.getNumberOfWinners(); i++) {
+        compareJson(config, stem, timestampString, i);
+      }
+    } else {
+      compareJson(config, stem, timestampString, null);
+    }
+
     // test passed so cleanup test output folder
     File outputFolder = new File(session.outputPath);
     if (outputFolder.listFiles() != null) {
@@ -136,6 +144,18 @@ class TabulatorTests {
         }
       }
     }
+  }
+
+  private static void compareJson(
+      ContestConfig config, String stem, String timestampString, Integer sequentialNumber) {
+    String actualOutputPath =
+        ResultsWriter.getSummaryOutputPath(
+            config.getOutputDirectory(), timestampString, sequentialNumber)
+            + ".json";
+    String expectedPath =
+        getTestFilePath(
+            stem, (sequentialNumber != null ? "_" + sequentialNumber : "") + "_expected.json");
+    assertTrue(fileCompare(expectedPath, actualOutputPath));
   }
 
   // function: setup
@@ -283,5 +303,13 @@ class TabulatorTests {
   @DisplayName("test redistributing surplus from CVRs multiple times")
   void testMultiWinnerRedistribution() {
     runTabulationTest("multi_winner_redistribution");
+  }
+
+  // function: testSequentialMultiSeat
+  // purpose: tests sequentialMultiSeat option
+  @Test
+  @DisplayName("test sequential multi-seat logic")
+  void testSequentialMultiSeat() {
+    runTabulationTest("2013_minneapolis_park_sequential");
   }
 }

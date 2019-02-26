@@ -45,8 +45,6 @@ class TabulatorSession {
   private final String configPath;
   // precinct IDs discovered during CVR parsing to support testing
   private final Set<String> precinctIDs = new HashSet<>();
-  // summaryOutputPath is generated from timestamp + config file
-  String summaryOutputPath;
   // cache output path location
   String outputPath;
   private String tabulationLogPath;
@@ -59,8 +57,13 @@ class TabulatorSession {
     this.configPath = configPath;
   }
 
+  String getTimestampString() {
+    return timestampString;
+  }
+
   // function: tabulate
   // purpose: run tabulation
+  // returns: list of winners
   void tabulate() {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
@@ -102,12 +105,6 @@ class TabulatorSession {
     // %g format is for log file naming
     tabulationLogPath =
         Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
-            .toAbsolutePath()
-            .toString();
-
-    // cache summaryOutputPath for testing
-    summaryOutputPath =
-        Paths.get(config.getOutputDirectory(), String.format("%s_summary.json", timestampString))
             .toAbsolutePath()
             .toString();
 

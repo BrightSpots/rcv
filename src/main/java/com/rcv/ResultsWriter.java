@@ -62,6 +62,14 @@ class ResultsWriter {
   private TallyTransfers tallyTransfers;
   private Map<Integer, BigDecimal> roundToResidualSurplus;
 
+  static String getSummaryOutputPath(
+      String outputDirectory, String timestampString, Integer sequentialTabulationNumber) {
+    String sequentialSuffix =
+        sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
+    String fileName = String.format("%s_summary" + sequentialSuffix, timestampString);
+    return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
+  }
+
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
     this.roundToResidualSurplus = roundToResidualSurplus;
     return this;
@@ -144,15 +152,13 @@ class ResultsWriter {
   // param: roundTallies is the round-by-round count of votes per candidate
   void generateOverallSummaryFiles(Map<Integer, Map<String, BigDecimal>> roundTallies)
       throws IOException {
-    String sequentialSuffix = "";
-    if (config.isSequentialMultiSeatEnabled()) {
-      sequentialSuffix = "_" + (config.getSequentialWinners().size() + 1);
-    }
-    // filename for output
-    String outputFileName = String.format("%s_summary" + sequentialSuffix, this.timestampString);
-    // full path for output
     String outputPath =
-        Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
+        getSummaryOutputPath(
+            config.getOutputDirectory(),
+            timestampString,
+            config.isSequentialMultiSeatEnabled()
+                ? config.getSequentialWinners().size() + 1
+                : null);
     // generate the spreadsheet
     generateSummarySpreadsheet(roundTallies, null, outputPath);
 
