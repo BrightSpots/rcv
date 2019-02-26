@@ -139,13 +139,17 @@ class ResultsWriter {
     return this;
   }
 
-  // function: generateOverallSummarySpreadsheet
-  // purpose: creates a summary spreadsheet for the full contest
+  // function: generateOverallSummaryFiles
+  // purpose: creates a summary spreadsheet and JSON for the full contest
   // param: roundTallies is the round-by-round count of votes per candidate
-  void generateOverallSummarySpreadsheet(Map<Integer, Map<String, BigDecimal>> roundTallies)
+  void generateOverallSummaryFiles(Map<Integer, Map<String, BigDecimal>> roundTallies)
       throws IOException {
+    String sequentialSuffix = "";
+    if (config.isSequentialMultiSeatEnabled()) {
+      sequentialSuffix = "_" + (config.getSequentialWinners().size() + 1);
+    }
     // filename for output
-    String outputFileName = String.format("%s_summary", this.timestampString);
+    String outputFileName = String.format("%s_summary" + sequentialSuffix, this.timestampString);
     // full path for output
     String outputPath =
         Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();

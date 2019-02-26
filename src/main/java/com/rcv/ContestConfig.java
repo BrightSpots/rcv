@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -68,13 +70,14 @@ class ContestConfig {
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   private final Set<String> excludedCandidates = new HashSet<>();
+  // path from which any relative paths should be resolved
+  private final String sourceDirectory;
+  // used for sequential multi-seat
+  private final List<String> sequentialWinners = new LinkedList<>();
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
   // whether or not there are any validation errors
   private boolean isValid;
-
-  // path from which any relative paths should be resolved
-  private final String sourceDirectory;
 
   // function: ContestConfig
   // purpose: create a new ContestConfig object
@@ -402,6 +405,18 @@ class ContestConfig {
     return rawConfig.rules.numberOfWinners;
   }
 
+  void setNumberOfWinners(int numberOfWinners) {
+    rawConfig.rules.numberOfWinners = numberOfWinners;
+  }
+
+  List<String> getSequentialWinners() {
+    return sequentialWinners;
+  }
+
+  void addSequentialWinner(String winner) {
+    sequentialWinners.add(winner);
+  }
+
   // function: getDecimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to
@@ -622,6 +637,14 @@ class ContestConfig {
   // returns: ordered list of candidates
   ArrayList<String> getCandidatePermutation() {
     return candidatePermutation;
+  }
+
+  void setCandidateExclusionStatus(String candidateCode, boolean excluded) {
+    if (excluded) {
+      excludedCandidates.add(candidateCode);
+    } else {
+      excludedCandidates.remove(candidateCode);
+    }
   }
 
   // function: processCandidateData
