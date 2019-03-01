@@ -1,284 +1,299 @@
 {
-  "config" : {
-    "contest" : "Portland 2015 Mayoral Race",
-    "date" : "2015-11-03",
-    "jurisdiction" : "Portland, ME",
-    "office" : "Mayor",
-    "threshold" : "48"
+  "config": {
+    "contest": "Portland 2015 Mayoral Race",
+    "date": "2015-11-03",
+    "jurisdiction": "Portland, ME",
+    "office": "Mayor",
+    "threshold": "48"
   },
-  "results" : [ {
-    "round" : 1,
-    "tally" : {
-      "Bragdon, Charles E." : "11",
-      "Brennan, Michael F." : "6",
-      "Bryant, Peter G." : "9",
-      "Carmona, Ralph C." : "12",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "5",
-      "Eder, John M." : "3",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Marshall, David A." : "2",
-      "Mavodones, Nicholas M. Jr." : "13",
-      "Miller, Markos S." : "3",
-      "Rathband, Jed" : "2",
-      "Strimling, Ethan K." : "1",
-      "Undeclared" : "0",
-      "Vail, Christopher L." : "6"
+  "results": [
+    {
+      "round": 1,
+      "tally": {
+        "Bragdon, Charles E.": "11",
+        "Brennan, Michael F.": "6",
+        "Bryant, Peter G.": "9",
+        "Carmona, Ralph C.": "12",
+        "Dodge, Richard A.": "10",
+        "Duson, Jill C.": "5",
+        "Eder, John M.": "3",
+        "Haadoow, Hamza A.": "8",
+        "Lapchick, Jodie L.": "7",
+        "Marshall, David A.": "2",
+        "Mavodones, Nicholas M. Jr.": "13",
+        "Miller, Markos S.": "3",
+        "Rathband, Jed": "2",
+        "Strimling, Ethan K.": "1",
+        "Undeclared": "0",
+        "Vail, Christopher L.": "6"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Undeclared",
-      "transfers" : { }
+      "tallyResults": [
+        {
+          "eliminated": "Undeclared",
+          "transfers": {}
     }, {
-      "eliminated" : "Strimling, Ethan K.",
-      "transfers" : {
-        "CLV" : "1"
+          "eliminated": "Strimling, Ethan K.",
+          "transfers": {
+            "CLV": "1"
       }
     } ]
   }, {
-    "round" : 2,
-    "tally" : {
-      "Bragdon, Charles E." : "11",
-      "Brennan, Michael F." : "6",
-      "Bryant, Peter G." : "9",
-      "Carmona, Ralph C." : "12",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "5",
-      "Eder, John M." : "3",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Marshall, David A." : "2",
-      "Mavodones, Nicholas M. Jr." : "13",
-      "Miller, Markos S." : "3",
-      "Rathband, Jed" : "2",
-      "Vail, Christopher L." : "7"
+      "round": 2,
+      "tally": {
+        "Bragdon, Charles E.": "11",
+        "Brennan, Michael F.": "6",
+        "Bryant, Peter G.": "9",
+        "Carmona, Ralph C.": "12",
+        "Dodge, Richard A.": "10",
+        "Duson, Jill C.": "5",
+        "Eder, John M.": "3",
+        "Haadoow, Hamza A.": "8",
+        "Lapchick, Jodie L.": "7",
+        "Marshall, David A.": "2",
+        "Mavodones, Nicholas M. Jr.": "13",
+        "Miller, Markos S.": "3",
+        "Rathband, Jed": "2",
+        "Vail, Christopher L.": "7"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Rathband, Jed",
-      "transfers" : {
-        "NMM" : "2"
+      "tallyResults": [
+        {
+          "eliminated": "Rathband, Jed",
+          "transfers": {
+            "NMM": "2"
       }
     } ]
   }, {
-    "round" : 3,
-    "tally" : {
-      "Bragdon, Charles E." : "11",
-      "Brennan, Michael F." : "6",
-      "Bryant, Peter G." : "9",
-      "Carmona, Ralph C." : "12",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "5",
-      "Eder, John M." : "3",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Marshall, David A." : "2",
-      "Mavodones, Nicholas M. Jr." : "15",
-      "Miller, Markos S." : "3",
-      "Vail, Christopher L." : "7"
+      "round": 3,
+      "tally": {
+        "Bragdon, Charles E.": "11",
+        "Brennan, Michael F.": "6",
+        "Bryant, Peter G.": "9",
+        "Carmona, Ralph C.": "12",
+        "Dodge, Richard A.": "10",
+        "Duson, Jill C.": "5",
+        "Eder, John M.": "3",
+        "Haadoow, Hamza A.": "8",
+        "Lapchick, Jodie L.": "7",
+        "Marshall, David A.": "2",
+        "Mavodones, Nicholas M. Jr.": "15",
+        "Miller, Markos S.": "3",
+        "Vail, Christopher L.": "7"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Marshall, David A.",
-      "transfers" : {
-        "MSM" : "2"
+      "tallyResults": [
+        {
+          "eliminated": "Marshall, David A.",
+          "transfers": {
+            "MSM": "2"
       }
     } ]
   }, {
-    "round" : 4,
-    "tally" : {
-      "Bragdon, Charles E." : "11",
-      "Brennan, Michael F." : "6",
-      "Bryant, Peter G." : "9",
-      "Carmona, Ralph C." : "12",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "5",
-      "Eder, John M." : "3",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Mavodones, Nicholas M. Jr." : "15",
-      "Miller, Markos S." : "5",
-      "Vail, Christopher L." : "7"
+      "round": 4,
+      "tally": {
+        "Bragdon, Charles E.": "11",
+        "Brennan, Michael F.": "6",
+        "Bryant, Peter G.": "9",
+        "Carmona, Ralph C.": "12",
+        "Dodge, Richard A.": "10",
+        "Duson, Jill C.": "5",
+        "Eder, John M.": "3",
+        "Haadoow, Hamza A.": "8",
+        "Lapchick, Jodie L.": "7",
+        "Mavodones, Nicholas M. Jr.": "15",
+        "Miller, Markos S.": "5",
+        "Vail, Christopher L.": "7"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Eder, John M.",
-      "transfers" : {
-        "JCD" : "3"
+      "tallyResults": [
+        {
+          "eliminated": "Eder, John M.",
+          "transfers": {
+            "JCD": "3"
       }
     } ]
   }, {
-    "round" : 5,
-    "tally" : {
-      "Bragdon, Charles E." : "11",
-      "Brennan, Michael F." : "6",
-      "Bryant, Peter G." : "9",
-      "Carmona, Ralph C." : "12",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "8",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Mavodones, Nicholas M. Jr." : "15",
-      "Miller, Markos S." : "5",
-      "Vail, Christopher L." : "7"
+      "round": 5,
+      "tally": {
+        "Bragdon, Charles E.": "11",
+        "Brennan, Michael F.": "6",
+        "Bryant, Peter G.": "9",
+        "Carmona, Ralph C.": "12",
+        "Dodge, Richard A.": "10",
+        "Duson, Jill C.": "8",
+        "Haadoow, Hamza A.": "8",
+        "Lapchick, Jodie L.": "7",
+        "Mavodones, Nicholas M. Jr.": "15",
+        "Miller, Markos S.": "5",
+        "Vail, Christopher L.": "7"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Miller, Markos S.",
-      "transfers" : {
-        "NMM" : "5"
+      "tallyResults": [
+        {
+          "eliminated": "Miller, Markos S.",
+          "transfers": {
+            "NMM": "5"
       }
     } ]
   }, {
-    "round" : 6,
-    "tally" : {
-      "Bragdon, Charles E." : "11",
-      "Brennan, Michael F." : "6",
-      "Bryant, Peter G." : "9",
-      "Carmona, Ralph C." : "12",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "8",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Mavodones, Nicholas M. Jr." : "20",
-      "Vail, Christopher L." : "7"
+      "round": 6,
+      "tally": {
+        "Bragdon, Charles E.": "11",
+        "Brennan, Michael F.": "6",
+        "Bryant, Peter G.": "9",
+        "Carmona, Ralph C.": "12",
+        "Dodge, Richard A.": "10",
+        "Duson, Jill C.": "8",
+        "Haadoow, Hamza A.": "8",
+        "Lapchick, Jodie L.": "7",
+        "Mavodones, Nicholas M. Jr.": "20",
+        "Vail, Christopher L.": "7"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Brennan, Michael F.",
-      "transfers" : {
-        "CEB" : "3",
-        "PGB" : "2",
-        "RCC" : "1"
+      "tallyResults": [
+        {
+          "eliminated": "Brennan, Michael F.",
+          "transfers": {
+            "CEB": "3",
+            "PGB": "2",
+            "RCC": "1"
       }
     } ]
   }, {
-    "round" : 7,
-    "tally" : {
-      "Bragdon, Charles E." : "14",
-      "Bryant, Peter G." : "11",
-      "Carmona, Ralph C." : "13",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "8",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Mavodones, Nicholas M. Jr." : "20",
-      "Vail, Christopher L." : "7"
+      "round": 7,
+      "tally": {
+        "Bragdon, Charles E.": "14",
+        "Bryant, Peter G.": "11",
+        "Carmona, Ralph C.": "13",
+        "Dodge, Richard A.": "10",
+        "Duson, Jill C.": "8",
+        "Haadoow, Hamza A.": "8",
+        "Lapchick, Jodie L.": "7",
+        "Mavodones, Nicholas M. Jr.": "20",
+        "Vail, Christopher L.": "7"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Vail, Christopher L.",
-      "transfers" : {
-        "NMM" : "6",
-        "exhausted" : "1"
+      "tallyResults": [
+        {
+          "eliminated": "Vail, Christopher L.",
+          "transfers": {
+            "NMM": "6",
+            "exhausted": "1"
       }
     } ]
   }, {
-    "round" : 8,
-    "tally" : {
-      "Bragdon, Charles E." : "14",
-      "Bryant, Peter G." : "11",
-      "Carmona, Ralph C." : "13",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "8",
-      "Haadoow, Hamza A." : "8",
-      "Lapchick, Jodie L." : "7",
-      "Mavodones, Nicholas M. Jr." : "26"
+      "round": 8,
+      "tally": {
+        "Bragdon, Charles E.": "14",
+        "Bryant, Peter G.": "11",
+        "Carmona, Ralph C.": "13",
+        "Dodge, Richard A.": "10",
+        "Duson, Jill C.": "8",
+        "Haadoow, Hamza A.": "8",
+        "Lapchick, Jodie L.": "7",
+        "Mavodones, Nicholas M. Jr.": "26"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Lapchick, Jodie L.",
-      "transfers" : {
-        "HAH" : "1",
-        "NMM" : "6"
+      "tallyResults": [
+        {
+          "eliminated": "Lapchick, Jodie L.",
+          "transfers": {
+            "HAH": "1",
+            "NMM": "6"
       }
     } ]
   }, {
-    "round" : 9,
-    "tally" : {
-      "Bragdon, Charles E." : "14",
-      "Bryant, Peter G." : "11",
-      "Carmona, Ralph C." : "13",
-      "Dodge, Richard A." : "10",
-      "Duson, Jill C." : "8",
-      "Haadoow, Hamza A." : "9",
-      "Mavodones, Nicholas M. Jr." : "32"
+      "round": 9,
+      "tally": {
+        "Bragdon, Charles E.": "14",
+        "Bryant, Peter G.": "11",
+        "Carmona, Ralph C.": "13",
+        "Dodge, Richard A.": "10",
+        "Duson, Jill C.": "8",
+        "Haadoow, Hamza A.": "9",
+        "Mavodones, Nicholas M. Jr.": "32"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Duson, Jill C.",
-      "transfers" : {
-        "NMM" : "2",
-        "PGB" : "1",
-        "RAD" : "5"
+      "tallyResults": [
+        {
+          "eliminated": "Duson, Jill C.",
+          "transfers": {
+            "NMM": "2",
+            "PGB": "1",
+            "RAD": "5"
       }
     } ]
   }, {
-    "round" : 10,
-    "tally" : {
-      "Bragdon, Charles E." : "14",
-      "Bryant, Peter G." : "12",
-      "Carmona, Ralph C." : "13",
-      "Dodge, Richard A." : "15",
-      "Haadoow, Hamza A." : "9",
-      "Mavodones, Nicholas M. Jr." : "34"
+      "round": 10,
+      "tally": {
+        "Bragdon, Charles E.": "14",
+        "Bryant, Peter G.": "12",
+        "Carmona, Ralph C.": "13",
+        "Dodge, Richard A.": "15",
+        "Haadoow, Hamza A.": "9",
+        "Mavodones, Nicholas M. Jr.": "34"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Haadoow, Hamza A.",
-      "transfers" : {
-        "NMM" : "7",
-        "RCC" : "2"
+      "tallyResults": [
+        {
+          "eliminated": "Haadoow, Hamza A.",
+          "transfers": {
+            "NMM": "7",
+            "RCC": "2"
       }
     } ]
   }, {
-    "round" : 11,
-    "tally" : {
-      "Bragdon, Charles E." : "14",
-      "Bryant, Peter G." : "12",
-      "Carmona, Ralph C." : "15",
-      "Dodge, Richard A." : "15",
-      "Mavodones, Nicholas M. Jr." : "41"
+      "round": 11,
+      "tally": {
+        "Bragdon, Charles E.": "14",
+        "Bryant, Peter G.": "12",
+        "Carmona, Ralph C.": "15",
+        "Dodge, Richard A.": "15",
+        "Mavodones, Nicholas M. Jr.": "41"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Bryant, Peter G.",
-      "transfers" : {
-        "CEB" : "9",
-        "NMM" : "1",
-        "RCC" : "2"
+      "tallyResults": [
+        {
+          "eliminated": "Bryant, Peter G.",
+          "transfers": {
+            "CEB": "9",
+            "NMM": "1",
+            "RCC": "2"
       }
     } ]
   }, {
-    "round" : 12,
-    "tally" : {
-      "Bragdon, Charles E." : "23",
-      "Carmona, Ralph C." : "17",
-      "Dodge, Richard A." : "15",
-      "Mavodones, Nicholas M. Jr." : "42"
+      "round": 12,
+      "tally": {
+        "Bragdon, Charles E.": "23",
+        "Carmona, Ralph C.": "17",
+        "Dodge, Richard A.": "15",
+        "Mavodones, Nicholas M. Jr.": "42"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Dodge, Richard A.",
-      "transfers" : {
-        "CEB" : "1",
-        "NMM" : "3",
-        "RCC" : "11"
+      "tallyResults": [
+        {
+          "eliminated": "Dodge, Richard A.",
+          "transfers": {
+            "CEB": "1",
+            "NMM": "3",
+            "RCC": "11"
       }
     } ]
   }, {
-    "round" : 13,
-    "tally" : {
-      "Bragdon, Charles E." : "24",
-      "Carmona, Ralph C." : "28",
-      "Mavodones, Nicholas M. Jr." : "45"
+      "round": 13,
+      "tally": {
+        "Bragdon, Charles E.": "24",
+        "Carmona, Ralph C.": "28",
+        "Mavodones, Nicholas M. Jr.": "45"
     },
-    "tallyResults" : [ {
-      "eliminated" : "Bragdon, Charles E.",
-      "transfers" : {
-        "NMM" : "9",
-        "RCC" : "12",
-        "exhausted" : "3"
+      "tallyResults": [
+        {
+          "eliminated": "Bragdon, Charles E.",
+          "transfers": {
+            "NMM": "9",
+            "RCC": "12",
+            "exhausted": "3"
       }
     } ]
   }, {
-    "round" : 14,
-    "tally" : {
-      "Carmona, Ralph C." : "40",
-      "Mavodones, Nicholas M. Jr." : "54"
+      "round": 14,
+      "tally": {
+        "Carmona, Ralph C.": "40",
+        "Mavodones, Nicholas M. Jr.": "54"
     },
-    "tallyResults" : [ {
-      "elected" : "Mavodones, Nicholas M. Jr.",
-      "transfers" : { }
+      "tallyResults": [
+        {
+          "elected": "Mavodones, Nicholas M. Jr.",
+          "transfers": {}
     } ]
   } ]
 }

@@ -21,6 +21,7 @@
 
 package com.rcv;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -451,8 +452,8 @@ class ResultsWriter {
     // attach serializer to mapper
     mapper.registerModule(module);
 
-    // jsonWriter writes those object to disk
-    ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
+    // jsonWriter writes the object to disk
+    ObjectWriter jsonWriter = mapper.writer(new CustomPrettyPrinter());
     // jsonPath for output json summary
     String jsonPath = outputPath + ".json";
     // log output location
@@ -560,6 +561,22 @@ class ResultsWriter {
         // add the action object to list
         actions.add(action);
       }
+    }
+  }
+
+  private class CustomPrettyPrinter extends DefaultPrettyPrinter {
+
+    public CustomPrettyPrinter() {
+    }
+
+    @Override
+    public CustomPrettyPrinter createInstance() {
+      return new CustomPrettyPrinter();
+    }
+
+    @Override
+    public void writeObjectFieldValueSeparator(JsonGenerator jg) throws IOException {
+      jg.writeRaw(": ");
     }
   }
 }
