@@ -210,6 +210,7 @@ public class RawContestConfig {
     // max rankings allowed
     public Integer maxRankingsAllowed;
     public boolean nonIntegerWinningThreshold;
+    public boolean hareQuota;
     // are we using batch elimination?
     public boolean batchElimination;
     // keep tabulating beyond selecting winner until only two candidates remain

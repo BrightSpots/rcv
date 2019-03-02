@@ -157,6 +157,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxNonIntegerWinningThreshold;
   @FXML
+  private CheckBox checkBoxHareQuota;
+  @FXML
   private CheckBox checkBoxBatchElimination;
   @FXML
   private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
@@ -567,6 +569,7 @@ public class GuiConfigController implements Initializable {
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
     checkBoxNonIntegerWinningThreshold.setSelected(
         ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
+    checkBoxHareQuota.setSelected(ContestConfig.SUGGESTED_HARE_QUOTA);
     checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(
         ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
@@ -616,6 +619,7 @@ public class GuiConfigController implements Initializable {
     textFieldUndeclaredWriteInLabel.clear();
     textFieldRulesDescription.clear();
     checkBoxNonIntegerWinningThreshold.setSelected(false);
+    checkBoxHareQuota.setSelected(false);
     checkBoxBatchElimination.setSelected(false);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
     checkBoxExhaustOnDuplicateCandidate.setSelected(false);
@@ -746,6 +750,7 @@ public class GuiConfigController implements Initializable {
     textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
     textFieldRulesDescription.setText(rules.rulesDescription);
     checkBoxNonIntegerWinningThreshold.setSelected(rules.nonIntegerWinningThreshold);
+    checkBoxHareQuota.setSelected(rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
@@ -802,6 +807,7 @@ public class GuiConfigController implements Initializable {
     rules.maxSkippedRanksAllowed = getIntValueOrNull(textFieldMaxSkippedRanksAllowed);
     rules.maxRankingsAllowed = getIntValueOrNull(textFieldMaxRankingsAllowed);
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
+    rules.hareQuota = checkBoxHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();

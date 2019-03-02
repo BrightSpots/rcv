@@ -221,6 +221,12 @@
                   <Insets top="4.0"/>
                 </VBox.margin>
               </CheckBox>
+              <CheckBox mnemonicParsing="false" text="Hare Quota"
+                fx:id="checkBoxHareQuota">
+                <VBox.margin>
+                  <Insets top="4.0"/>
+                </VBox.margin>
+              </CheckBox>
               <CheckBox mnemonicParsing="false" text="Batch Elimination"
                 fx:id="checkBoxBatchElimination">
                 <VBox.margin>

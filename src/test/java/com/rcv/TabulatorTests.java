@@ -284,4 +284,12 @@ class TabulatorTests {
   void testMultiWinnerRedistribution() {
     runTabulationTest("multi_winner_redistribution");
   }
+
+  // function: testHareQuota
+  // purpose: tests Hare quota
+  @Test
+  @DisplayName("test Hare quota")
+  void testHareQuota() {
+    runTabulationTest("2013_minneapolis_park_hare");
+  }
 }

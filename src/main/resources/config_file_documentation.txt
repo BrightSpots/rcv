@@ -144,6 +144,13 @@ Config file must be valid JSON format. Examples can be found under the test fold
         if true, threshold = V/(S+1) + 10^-d
         if false, threshold = floor(V/(S+1)) + 1
         where V = total number of votes (in the current round for single-seat or in the first round for multi-seat); S = numberOfWinners; and d = decimalPlacesForVoteArithmetic
+        (note that S+1 in the formulas above becomes just S if hareQuota is set to true)
+        value: true | false
+        if not supplied: false
+
+      "hareQuota" optional
+        the winning threshold should be computed using the Hare quota (votes divided by seats) instead of the preferred Droop quota (votes divided by seats+1)
+        only valid for multi-seat contests
         value: true | false
         if not supplied: false
 

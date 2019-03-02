@@ -41,6 +41,7 @@ class ContestConfig {
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
+  static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
@@ -67,13 +68,12 @@ class ContestConfig {
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   private final Set<String> excludedCandidates = new HashSet<>();
+  // path from which any relative paths should be resolved
+  private final String sourceDirectory;
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
   // whether or not there are any validation errors
   private boolean isValid;
-
-  // path from which any relative paths should be resolved
-  private final String sourceDirectory;
 
   // function: ContestConfig
   // purpose: create a new ContestConfig object
@@ -386,6 +386,11 @@ class ContestConfig {
         isValid = false;
         Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-winner contest!");
       }
+    } else {
+      if (isHareQuotaEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "hareQuota can't be true in a single-seat contest!");
+      }
     }
   }
 
@@ -405,6 +410,10 @@ class ContestConfig {
 
   boolean isNonIntegerWinningThresholdEnabled() {
     return rawConfig.rules.nonIntegerWinningThreshold;
+  }
+
+  boolean isHareQuotaEnabled() {
+    return rawConfig.rules.hareQuota;
   }
 
   // function: divide
