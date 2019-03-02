@@ -74,9 +74,9 @@ class TabulatorSession {
         // temporarily set config to single-seat so we can run sequential elections
         config.setNumberOfWinners(1);
         while (config.getSequentialWinners().size() < numWinners) {
-          Set<String> newWinners = executeTabulation(config);
-          assert (newWinners.size() == 1);
-          String newWinner = (String) newWinners.toArray()[0];
+          Set<String> newWinnerSet = runTabulationForConfig(config);
+          assert (newWinnerSet.size() == 1);
+          String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
         }
@@ -87,7 +87,7 @@ class TabulatorSession {
         }
       } else {
         // normal operation (not sequential multi-seat)
-        executeTabulation(config);
+        runTabulationForConfig(config);
       }
 
       Logger.removeTabulationFileLogging();
@@ -131,7 +131,7 @@ class TabulatorSession {
   // purpose: execute tabulation for given ContestConfig
   // param: config object containing CVR file paths to parse
   // returns: set of winners from tabulation
-  private Set<String> executeTabulation(ContestConfig config) {
+  private Set<String> runTabulationForConfig(ContestConfig config) {
     Set<String> winners = new HashSet<>();
 
     Logger.log(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);

@@ -154,7 +154,7 @@ class TabulatorTests {
             + ".json";
     String expectedPath =
         getTestFilePath(
-            stem, (sequentialNumber != null ? "_" + sequentialNumber : "") + "_expected.json");
+            stem, ResultsWriter.sequentialSuffixForOutputPath(sequentialNumber) + "_expected.json");
     assertTrue(fileCompare(expectedPath, actualOutputPath));
   }
 

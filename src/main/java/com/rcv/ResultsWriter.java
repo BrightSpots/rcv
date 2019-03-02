@@ -62,11 +62,16 @@ class ResultsWriter {
   private TallyTransfers tallyTransfers;
   private Map<Integer, BigDecimal> roundToResidualSurplus;
 
+  static String sequentialSuffixForOutputPath(Integer sequentialTabulationNumber) {
+    return sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
+  }
+
   static String getSummaryOutputPath(
       String outputDirectory, String timestampString, Integer sequentialTabulationNumber) {
-    String sequentialSuffix =
-        sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
-    String fileName = String.format("%s_summary" + sequentialSuffix, timestampString);
+    String fileName =
+        String.format(
+            "%s_summary" + sequentialSuffixForOutputPath(sequentialTabulationNumber),
+            timestampString);
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
   }
 
