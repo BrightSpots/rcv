@@ -209,6 +209,7 @@ public class RawContestConfig {
     public Integer maxSkippedRanksAllowed;
     // max rankings allowed
     public Integer maxRankingsAllowed;
+    public boolean sequentialMultiSeat;
     public boolean nonIntegerWinningThreshold;
     // are we using batch elimination?
     public boolean batchElimination;

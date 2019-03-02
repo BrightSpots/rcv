@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -40,6 +42,7 @@ class ContestConfig {
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
+  static final boolean SUGGESTED_SEQUENTIAL_MULTI_SEAT = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
@@ -67,13 +70,14 @@ class ContestConfig {
   // this is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   private final Set<String> excludedCandidates = new HashSet<>();
+  // path from which any relative paths should be resolved
+  private final String sourceDirectory;
+  // used for sequential multi-seat
+  private final List<String> sequentialWinners = new LinkedList<>();
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
   // whether or not there are any validation errors
   private boolean isValid;
-
-  // path from which any relative paths should be resolved
-  private final String sourceDirectory;
 
   // function: ContestConfig
   // purpose: create a new ContestConfig object
@@ -379,12 +383,17 @@ class ContestConfig {
         isValid = false;
         Logger.log(
             Level.SEVERE,
-            "continueUntilTwoCandidatesRemain can't be true in a multi-winner contest!");
+            "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest!");
       }
 
       if (isBatchEliminationEnabled()) {
         isValid = false;
-        Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-winner contest!");
+        Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
+      }
+    } else {
+      if (isSequentialMultiSeatEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a single-seat contest!");
       }
     }
   }
@@ -396,11 +405,27 @@ class ContestConfig {
     return rawConfig.rules.numberOfWinners;
   }
 
+  void setNumberOfWinners(int numberOfWinners) {
+    rawConfig.rules.numberOfWinners = numberOfWinners;
+  }
+
+  List<String> getSequentialWinners() {
+    return sequentialWinners;
+  }
+
+  void addSequentialWinner(String winner) {
+    sequentialWinners.add(winner);
+  }
+
   // function: getDecimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to
   Integer getDecimalPlacesForVoteArithmetic() {
     return rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
+  boolean isSequentialMultiSeatEnabled() {
+    return rawConfig.rules.sequentialMultiSeat;
   }
 
   boolean isNonIntegerWinningThresholdEnabled() {
@@ -612,6 +637,14 @@ class ContestConfig {
   // returns: ordered list of candidates
   ArrayList<String> getCandidatePermutation() {
     return candidatePermutation;
+  }
+
+  void setCandidateExclusionStatus(String candidateCode, boolean excluded) {
+    if (excluded) {
+      excludedCandidates.add(candidateCode);
+    } else {
+      excludedCandidates.remove(candidateCode);
+    }
   }
 
   // function: processCandidateData
