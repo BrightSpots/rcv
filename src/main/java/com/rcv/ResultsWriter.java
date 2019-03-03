@@ -62,6 +62,19 @@ class ResultsWriter {
   private TallyTransfers tallyTransfers;
   private Map<Integer, BigDecimal> roundToResidualSurplus;
 
+  static String sequentialSuffixForOutputPath(Integer sequentialTabulationNumber) {
+    return sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
+  }
+
+  static String getSummaryOutputPath(
+      String outputDirectory, String timestampString, Integer sequentialTabulationNumber) {
+    String fileName =
+        String.format(
+            "%s_summary" + sequentialSuffixForOutputPath(sequentialTabulationNumber),
+            timestampString);
+    return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
+  }
+
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
     this.roundToResidualSurplus = roundToResidualSurplus;
     return this;
@@ -139,16 +152,18 @@ class ResultsWriter {
     return this;
   }
 
-  // function: generateOverallSummarySpreadsheet
-  // purpose: creates a summary spreadsheet for the full contest
+  // function: generateOverallSummaryFiles
+  // purpose: creates a summary spreadsheet and JSON for the full contest
   // param: roundTallies is the round-by-round count of votes per candidate
-  void generateOverallSummarySpreadsheet(Map<Integer, Map<String, BigDecimal>> roundTallies)
+  void generateOverallSummaryFiles(Map<Integer, Map<String, BigDecimal>> roundTallies)
       throws IOException {
-    // filename for output
-    String outputFileName = String.format("%s_summary", this.timestampString);
-    // full path for output
     String outputPath =
-        Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
+        getSummaryOutputPath(
+            config.getOutputDirectory(),
+            timestampString,
+            config.isSequentialMultiSeatEnabled()
+                ? config.getSequentialWinners().size() + 1
+                : null);
     // generate the spreadsheet
     generateSummarySpreadsheet(roundTallies, null, outputPath);
 

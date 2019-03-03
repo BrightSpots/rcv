@@ -45,10 +45,10 @@ class TabulatorSession {
   private final String configPath;
   // precinct IDs discovered during CVR parsing to support testing
   private final Set<String> precinctIDs = new HashSet<>();
-  // summaryOutputPath is generated from timestamp + config file
-  String summaryOutputPath;
   // cache output path location
   String outputPath;
+  private String tabulationLogPath;
+  private String timestampString;
 
   // function: TabulatorSession
   // purpose: TabulatorSession constructor
@@ -57,95 +57,113 @@ class TabulatorSession {
     this.configPath = configPath;
   }
 
+  String getTimestampString() {
+    return timestampString;
+  }
+
   // function: tabulate
   // purpose: run tabulation
+  // returns: list of winners
   void tabulate() {
-    // load configuration
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    if (config != null) {
-      executeTabulation(config);
+    if (config != null && config.validate() && setUpLogging(config)) {
+      Logger.log(Level.INFO, "Starting tabulation process...");
+
+      if (config.isSequentialMultiSeatEnabled()) {
+        int numWinners = config.getNumberOfWinners();
+        // temporarily set config to single-seat so we can run sequential elections
+        config.setNumberOfWinners(1);
+        while (config.getSequentialWinners().size() < numWinners) {
+          Set<String> newWinnerSet = runTabulationForConfig(config);
+          assert (newWinnerSet.size() == 1);
+          String newWinner = (String) newWinnerSet.toArray()[0];
+          config.setCandidateExclusionStatus(newWinner, true);
+          config.addSequentialWinner(newWinner);
+        }
+        // revert config to original state
+        config.setNumberOfWinners(numWinners);
+        for (String winner : config.getSequentialWinners()) {
+          config.setCandidateExclusionStatus(winner, false);
+        }
+      } else {
+        // normal operation (not sequential multi-seat)
+        runTabulationForConfig(config);
+      }
+
+      Logger.removeTabulationFileLogging();
+      Logger.log(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
     } else {
       Logger.log(Level.SEVERE, "Aborting because contest config is invalid!");
     }
   }
 
+  private boolean setUpLogging(ContestConfig config) {
+    boolean success = false;
+
+    // current date-time formatted as a string used for creating unique output files names
+    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+    // %g format is for log file naming
+    tabulationLogPath =
+        Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
+            .toAbsolutePath()
+            .toString();
+
+    // cache outputPath for testing
+    outputPath = config.getOutputDirectory();
+    try {
+      FileUtils.createOutputDirectory(config.getOutputDirectory());
+      Logger.addTabulationFileLogging(tabulationLogPath);
+      success = true;
+    } catch (UnableToCreateDirectoryException exception) {
+      Logger.log(
+          Level.SEVERE,
+          "Failed to create output directory: %s\n%s",
+          config.getOutputDirectory(),
+          exception.toString());
+    } catch (IOException exception) {
+      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
+    }
+
+    return success;
+  }
+
   // function: executeTabulation
   // purpose: execute tabulation for given ContestConfig
   // param: config object containing CVR file paths to parse
-  // returns: String indicating whether or not execution was successful
-  private void executeTabulation(ContestConfig config) {
-    Logger.log(Level.INFO, "Starting tabulation process...");
+  // returns: set of winners from tabulation
+  private Set<String> runTabulationForConfig(ContestConfig config) {
+    Set<String> winners = new HashSet<>();
 
-    boolean isTabulationCompleted = false;
-    boolean isConfigValid = config.validate();
-
-    if (isConfigValid) {
-      boolean isTabulationLogSetUp = false;
-      // current date-time formatted as a string used for creating unique output files names
-      final String timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-      // %g format is for log file naming
-      String tabulationLogPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
-              .toAbsolutePath()
-              .toString();
-
-      // cache summaryOutputPath for testing
-      summaryOutputPath =
-          Paths.get(config.getOutputDirectory(), String.format("%s_summary.json", timestampString))
-              .toAbsolutePath()
-              .toString();
-
-      // cache outputPath for testing
-      outputPath = config.getOutputDirectory();
-      try {
-        FileUtils.createOutputDirectory(config.getOutputDirectory());
-        Logger.addTabulationFileLogging(tabulationLogPath);
-        isTabulationLogSetUp = true;
-      } catch (UnableToCreateDirectoryException exception) {
-        Logger.log(
-            Level.SEVERE,
-            "Failed to create output directory: %s\n%s",
-            config.getOutputDirectory(),
-            exception.toString());
-      } catch (IOException exception) {
-        Logger.log(
-            Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
-      }
-
-      if (isTabulationLogSetUp) {
-        Logger.log(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
-        // Read cast vote records and precinct IDs from CVR files
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
-        // parse the cast vote records
-        if (castVoteRecords != null) {
-          if (!castVoteRecords.isEmpty()) {
-            // tabulator for tabulation logic
-            Tabulator tabulator = new Tabulator(castVoteRecords, config);
-            // do the tabulation
-            tabulator.tabulate();
-            // generate visualizer spreadsheet data
-            try {
-              tabulator.generateSummarySpreadsheet(timestampString);
-            } catch (IOException e) {
-              Logger.log(Level.SEVERE, "Error writing summary spreadsheet:\n%s", e.toString());
-            }
-            isTabulationCompleted = true;
-          } else {
-            Logger.log(Level.SEVERE, "No cast vote records found!");
-          }
-        } else {
-          Logger.log(Level.SEVERE, "Skipping tabulation due to source file errors!");
+    Logger.log(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
+    // Read cast vote records and precinct IDs from CVR files
+    List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
+    // parse the cast vote records
+    if (castVoteRecords != null) {
+      if (!castVoteRecords.isEmpty()) {
+        // tabulator for tabulation logic
+        Tabulator tabulator = new Tabulator(castVoteRecords, config);
+        // do the tabulation
+        winners = tabulator.tabulate();
+        // generate visualizer spreadsheet data
+        try {
+          tabulator.generateSummaryFiles(timestampString);
+        } catch (IOException e) {
+          Logger.log(Level.SEVERE, "Error writing summary spreadsheet:\n%s", e.toString());
         }
-        Logger.log(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
-        Logger.removeTabulationFileLogging();
+      } else {
+        Logger.log(Level.SEVERE, "No cast vote records found!");
       }
+    } else {
+      Logger.log(Level.SEVERE, "Skipping tabulation due to source file errors!");
     }
 
-    if (isTabulationCompleted) {
+    if (winners.size() > 0) {
       Logger.log(Level.INFO, "Tabulation process completed.");
     } else {
       Logger.log(Level.SEVERE, "Unable to complete tabulation process!");
     }
+
+    return winners;
   }
 
   // function: parseCastVoteRecords

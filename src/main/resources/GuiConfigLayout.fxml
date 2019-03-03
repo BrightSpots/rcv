@@ -215,6 +215,12 @@
               </padding>
             </VBox>
             <VBox spacing="8.0">
+              <CheckBox mnemonicParsing="false" text="Sequential Multi-Seat"
+                fx:id="checkBoxSequentialMultiSeat">
+                <VBox.margin>
+                  <Insets top="4.0"/>
+                </VBox.margin>
+              </CheckBox>
               <CheckBox mnemonicParsing="false" text="Non-Integer Winning Threshold"
                 fx:id="checkBoxNonIntegerWinningThreshold">
                 <VBox.margin>

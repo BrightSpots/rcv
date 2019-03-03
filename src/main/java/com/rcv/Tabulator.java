@@ -116,7 +116,8 @@ class Tabulator {
   // function: tabulate
   // purpose: run the main tabulation routine to determine contest results
   //  this is the high-level control of the tabulation algorithm
-  void tabulate() {
+  // returns: set containing winner(s)
+  Set<String> tabulate() {
     logSummaryInfo();
     Logger.log(Level.INFO, "Starting tabulation...");
 
@@ -228,6 +229,7 @@ class Tabulator {
     }
 
     Logger.log(Level.INFO, "Tabulation completed.");
+    return winnerToRound.keySet();
   }
 
   // function: logSummaryInfo
@@ -605,11 +607,11 @@ class Tabulator {
     return eliminated;
   }
 
-  // function: generateSummarySpreadsheet
+  // function: generateSummaryFiles
   // purpose: create a ResultsWriter object with the tabulation results data and use it
   // to generate the results spreadsheets
   // param: timestamp string to use when creating output filenames
-  void generateSummarySpreadsheet(String timestamp) throws IOException {
+  void generateSummaryFiles(String timestamp) throws IOException {
     // writer object will create the output xls
     ResultsWriter writer =
         new ResultsWriter()
@@ -622,7 +624,7 @@ class Tabulator {
             .setWinningThreshold(winningThreshold)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
-    writer.generateOverallSummarySpreadsheet(roundTallies);
+    writer.generateOverallSummaryFiles(roundTallies);
 
     if (config.isTabulateByPrecinctEnabled()) {
       writer.generatePrecinctSummarySpreadsheets(precinctRoundTallies);
