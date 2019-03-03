@@ -360,8 +360,13 @@ class Tabulator {
       currentRoundTotalVotes = currentRoundTotalVotes.add(numVotes);
     }
 
-    // divisor for threshold is num winners + 1
-    BigDecimal divisor = new BigDecimal(config.getNumberOfWinners() + 1);
+    // divisor for threshold is num winners + 1 (unless archaic Hare quota option is enabled, in
+    // which case it's just num winners)
+    BigDecimal divisor =
+        new BigDecimal(
+            config.isHareQuotaEnabled()
+                ? config.getNumberOfWinners()
+                : config.getNumberOfWinners() + 1);
     if (config.isNonIntegerWinningThresholdEnabled()) {
       // threshold = (votes / (num_winners + 1)) + 10^(-1 * decimalPlacesForVoteArithmetic)
       BigDecimal augend =

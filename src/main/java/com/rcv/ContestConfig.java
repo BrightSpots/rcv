@@ -44,6 +44,7 @@ class ContestConfig {
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
   static final boolean SUGGESTED_SEQUENTIAL_MULTI_SEAT = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
+  static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
@@ -395,6 +396,11 @@ class ContestConfig {
         isValid = false;
         Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a single-seat contest!");
       }
+    } else {
+      if (isHareQuotaEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "hareQuota can only be true in a multi-seat contest!");
+      }
     }
   }
 
@@ -430,6 +436,10 @@ class ContestConfig {
 
   boolean isNonIntegerWinningThresholdEnabled() {
     return rawConfig.rules.nonIntegerWinningThreshold;
+  }
+
+  boolean isHareQuotaEnabled() {
+    return rawConfig.rules.hareQuota;
   }
 
   // function: divide
