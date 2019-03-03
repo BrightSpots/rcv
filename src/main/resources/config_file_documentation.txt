@@ -149,7 +149,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         if not supplied: false
 
       "hareQuota" optional
-        the winning threshold should be computed using the Hare quota (votes divided by seats) instead of the preferred Droop quota (votes divided by seats+1)
+        the winning threshold should be computed using the Hare quota (votes divided by seats) instead of the preferred Droop quota (votes divided by (seats+1))
         only valid for multi-seat contests
         value: true | false
         if not supplied: false
