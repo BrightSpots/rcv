@@ -396,7 +396,7 @@ class ContestConfig {
         isValid = false;
         Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a single-seat contest!");
       }
-    } else {
+
       if (isHareQuotaEnabled()) {
         isValid = false;
         Logger.log(Level.SEVERE, "hareQuota can only be true in a multi-seat contest!");
