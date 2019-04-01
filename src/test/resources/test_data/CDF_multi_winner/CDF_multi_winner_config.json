@@ -1,0 +1,41 @@
+{
+  "outputSettings" : {
+    "contestName" : "CDF Test Election",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "CDF_multi_winner_cvr.json",
+    "firstVoteColumnIndex" : 1,
+    "firstVoteRowIndex" : 1,
+    "idColumnIndex" : 1,
+    "provider" : "CDF"
+  } ],
+  "candidates" : [ {
+    "name" : "CDF",
+    "code" : "CDF",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "numberOfWinners" : 1,
+    "decimalPlacesForVoteArithmetic" : 4,
+    "minimumVoteThreshold" : 0,
+    "maxSkippedRanksAllowed" : 1,
+    "sequentialMultiSeat" : false,
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : ""
+  }
+}
