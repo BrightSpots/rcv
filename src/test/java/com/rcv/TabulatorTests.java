@@ -316,6 +316,14 @@ class TabulatorTests {
   // function: testSequentialMultiSeat
   // purpose: tests sequentialMultiSeat option
   @Test
+  @DisplayName("test Common Data Format multi-winner contest")
+  void testCDFMultiWinner() {
+    runTabulationTest("CDF_multi_winner");
+  }
+
+  // function: testSequentialMultiSeat
+  // purpose: tests sequentialMultiSeat option
+  @Test
   @DisplayName("test sequential multi-seat logic")
   void testSequentialMultiSeat() {
     runTabulationTest("2013_minneapolis_park_sequential");

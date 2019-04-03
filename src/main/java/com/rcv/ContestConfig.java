@@ -145,6 +145,18 @@ class ContestConfig {
     return rawConfig;
   }
 
+  // function: addCandidates
+  // purpose: add candidates parsed externally from CDF file
+  // param: candidates
+  void addCandidates(Set<String> candidateNames) {
+    for(String candidate : candidateNames) {
+      RawContestConfig.Candidate candidateObject = new RawContestConfig.Candidate();
+      candidateObject.setName(candidate);
+      rawConfig.candidates.add(candidateObject);
+      processCandidateData();
+    }
+  }
+
   // function: validate
   // purpose: validate the correctness of the config data
   // returns any detected problems
