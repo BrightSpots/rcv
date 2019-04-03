@@ -44,6 +44,11 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: true | false
         if not supplied: false
 
+      "generateCdfJson" optional
+        tabulator will generate a JSON of cast vote records in the Common Data Format
+        value: true | false
+        if not supplied: false
+
   "cvrFileSources" required
     list of input CVR file paths and their associated parameters
     each "cvrFileSources" list item contains the following parameters:
