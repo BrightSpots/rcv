@@ -14,7 +14,8 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Purpose:
- * Helper class to read and parse a Common Data Format file into cast vote record objects.
+ * Helper class to read and parse a Common Data Format file into cast vote record objects
+ * and candidate names.
  */
 
 package com.rcv;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
@@ -33,43 +33,43 @@ class CommonDataFormatReader {
 
   // path of the source file
   private final String filePath;
-  // name of the source file
-  private final String fileName;
 
   // function: CommonDataFormatReader
   // purpose: class constructor
   // param: filePath source file to read
   CommonDataFormatReader(String filePath) {
     this.filePath = filePath;
-    // cvrFileName for generating cvrIDs
-    fileName = new File(filePath).getName();
   }
 
-  // returns list of candidates in the contained elections
+  // function: getCandidates
+  // purpose: returns list of candidates parsed from CDF election json
   Set<String> getCandidates()
   {
+    // container for results
     Set<String> candidates = new HashSet<>();
     try {
-      HashMap<Object, Object> json = JsonParser.readFromFile(filePath, HashMap.class);
-      // election is a list of contests
-      ArrayList<Object> electionArray = (ArrayList<Object>) json.get("Election");
-      // for each contest get the contest selections
+      // try to read in the file
+      HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
+      // top-level election is a list of election objects:
+      ArrayList electionArray = (ArrayList) json.get("Election");
       for(Object electionObject : electionArray) {
-        Map<String, Object> election = (Map<String, Object>) electionObject;
-        ArrayList<Object> contestArray = (ArrayList<Object>) election.get("Contest");
+        HashMap election = (HashMap) electionObject;
+        // for each election get the contests it contains
+        ArrayList contestArray = (ArrayList) election.get("Contest");
         for(Object contestObject : contestArray) {
-          Map<String, Object> contest = (Map<String, Object>) contestObject;
-          ArrayList<Object> contestSelectionArray = (ArrayList<Object>) contest.get("ContestSelection");
+          HashMap contest = (HashMap) contestObject;
+          // for each contest get the contest selections
+          ArrayList contestSelectionArray = (ArrayList) contest.get("ContestSelection");
           for(Object contestSelectionObject : contestSelectionArray) {
-            Map<String, Object> contestSelection = (Map<String, Object>) contestSelectionObject;
+            HashMap contestSelection = (HashMap) contestSelectionObject;
+            // selectionID is the candidate name
             String selectionID = (String) contestSelection.get("@id");
             candidates.add(selectionID);
           }
         }
       }
     } catch (Exception e) {
-      String message = String.format("Error parsing candidate data: %s", e.toString());
-      Logger.log(Level.SEVERE, message);
+      Logger.log(Level.SEVERE, String.format("Error parsing candidate data: %s", e.toString()));
     }
     return candidates;
   }
@@ -82,54 +82,56 @@ class CommonDataFormatReader {
   List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords) {
 
     List<CastVoteRecord> cvrs = new ArrayList<>();
-    // count cvrs as they are read and use index to generate IDs for them
+    // cvrIndex and fileName are used to generate IDs for cvrs
     Integer cvrIndex = 0;
+    String fileName = new File(filePath).getName();
+
     try {
-      HashMap<Object, Object> json = JsonParser.readFromFile(filePath, HashMap.class);
+      HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
       // we expect a top-level "CVR" object containing a list of CVR objects
-      ArrayList<Object> CVRs = (ArrayList<Object>) json.get("CVR");
+      ArrayList CVRs = (ArrayList) json.get("CVR");
       // for each CVR object extract the current snapshot
       // it will be used to build the ballot data
       for (Object CVR : CVRs) {
-        HashMap<Object, Object> CVRObject = (HashMap<Object, Object>) CVR;
+        HashMap CVRObject = (HashMap) CVR;
         String currentSnapshotID = (String) CVRObject.get("CurrentSnapshotId");
         // get ballotID
         String ballotID = (String) CVRObject.get("BallotPrePrintedId");
         // compute internal ballot ID
         String computedCastVoteRecordID = String.format("%s(%d)", fileName, ++cvrIndex);
 
-        ArrayList<Object> CVRSnapshots = (ArrayList<Object>) CVRObject.get("CVRSnapshot");
+        ArrayList CVRSnapshots = (ArrayList) CVRObject.get("CVRSnapshot");
         for (Object snapshotObject : CVRSnapshots) {
-          HashMap<Object, Object> snapshot = (HashMap<Object, Object>) snapshotObject;
+          HashMap snapshot = (HashMap) snapshotObject;
           if (snapshot.get("@id").equals(currentSnapshotID)) {
-            // this is the current snapshot for this CVR -- we will create a new CVR from it
+            // we found the current CVR snapshot
+            // parse out the rankings and create a new cvr
 
             // list to contain rankings as they are parsed
             List<Pair<Integer, String>> rankings = new ArrayList<>();
 
             // at the top level is a list of contests each of which contains selections
-            ArrayList<Object> CVRContests = (ArrayList<Object>) snapshot.get("CVRContest");
+            ArrayList CVRContests = (ArrayList) snapshot.get("CVRContest");
             for (Object contestObject : CVRContests) {
               // extract the CVRContest
-              HashMap<Object, Object> CVRContest = (HashMap<Object, Object>) contestObject;
+              HashMap CVRContest = (HashMap) contestObject;
               // contest contains contestSelections
-              ArrayList<Object> contestSelections = (ArrayList<Object>) CVRContest
+              ArrayList contestSelections = (ArrayList) CVRContest
                   .get("CVRContestSelection");
               for (Object contestSelectionObject : contestSelections) {
                 // extract the contestSelection
-                HashMap<Object, Object> contestSelection = (HashMap<Object, Object>) contestSelectionObject;
+                HashMap contestSelection = (HashMap) contestSelectionObject;
                 // selectionID is the candidate/contest ID for this selection position
                 String selectionID = (String) contestSelection.get("ContestSelectionId");
                 // extract all the positions (ranks) which this selection has been assigned
-                ArrayList<Object> selectionPositions = (ArrayList<Object>) contestSelection
+                ArrayList selectionPositions = (ArrayList) contestSelection
                     .get("SelectionPosition");
                 for (Object selectionPositionObject : selectionPositions) {
                   // extract the position object
-                  HashMap<Object, Object> selectionPosition = (HashMap<Object, Object>) selectionPositionObject;
+                  HashMap selectionPosition = (HashMap) selectionPositionObject;
                   // and finally the rank
                   Integer rank = (Integer) selectionPosition.get("Rank");
                   assert rank != null;
-                  Logger.log(Level.INFO, String.format("Rank: %s", rank.toString()));
                   // create a new ranking object and save it
                   rankings.add(new Pair<>(rank, selectionID));
                 }
@@ -150,8 +152,7 @@ class CommonDataFormatReader {
         }
       }
     } catch (Exception e) {
-      String message = String.format("Error parsing CDF data: %s", e.toString());
-      Logger.log(Level.SEVERE, message);
+      Logger.log(Level.SEVERE, String.format("Error parsing CDF data: %s", e.toString()));
     }
 
     // return the input list with additions
