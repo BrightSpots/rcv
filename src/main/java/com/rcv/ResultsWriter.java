@@ -598,7 +598,7 @@ class ResultsWriter {
         selectionMapList.add(
             Map.ofEntries(
                 entry("ContestSelectionId", candidate),
-                entry("SelectionPosition", selectionPositionMap),
+                entry("SelectionPosition", new Map[]{selectionPositionMap}),
                 entry("@type", "CVR.CVRContestSelection")));
       }
     }
