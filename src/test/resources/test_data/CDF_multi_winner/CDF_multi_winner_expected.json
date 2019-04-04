@@ -1,0 +1,82 @@
+{
+  "config" : {
+    "contest" : "CDF Test Election",
+    "date" : "",
+    "jurisdiction" : "",
+    "office" : "",
+    "threshold" : "14"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "sel-A" : "6",
+      "sel-B" : "5",
+      "sel-C" : "9",
+      "sel-D" : "2",
+      "sel-E" : "4",
+      "sel-F" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "sel-D",
+      "transfers" : {
+        "exhausted" : "1",
+        "sel-C" : "1"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "sel-A" : "6",
+      "sel-B" : "5",
+      "sel-C" : "10",
+      "sel-E" : "4",
+      "sel-F" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "sel-F",
+      "transfers" : {
+        "sel-A" : "1",
+        "sel-C" : "2"
+      }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "sel-A" : "7",
+      "sel-B" : "5",
+      "sel-C" : "12",
+      "sel-E" : "4"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "sel-E",
+      "transfers" : {
+        "sel-A" : "2",
+        "sel-C" : "2"
+      }
+    } ]
+  }, {
+    "round" : 4,
+    "tally" : {
+      "sel-A" : "9",
+      "sel-B" : "5",
+      "sel-C" : "14"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "sel-B",
+      "transfers" : {
+        "exhausted" : "2",
+        "sel-C" : "3"
+      }
+    } ]
+  }, {
+    "round" : 5,
+    "tally" : {
+      "sel-A" : "9",
+      "sel-C" : "17"
+    },
+    "tallyResults" : [ {
+      "elected" : "sel-C",
+      "transfers" : { }
+    } ]
+  } ]
+}

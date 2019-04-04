@@ -195,6 +195,7 @@ class ContestConfig {
           Logger.log(Level.SEVERE, "filePath is required for each CVR file!");
           continue;
         }
+
         // full path to CVR
         String cvrPath = resolveConfigPath(source.getFilePath());
 
@@ -212,6 +213,21 @@ class ContestConfig {
           Logger.log(Level.SEVERE, "CVR file not found: %s", cvrPath);
         }
 
+        // perform CDF checks
+        if (source.getProvider().equals("CDF")) {
+          if (rawConfig.cvrFileSources.size() != 1) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
+          }
+          if (isTabulateByPrecinctEnabled()) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "Tabulate By Precinct may not be used with CDF files.");
+          }
+          continue;
+        }
+
+        // perform ES&S checks
+        
         // ensure valid first vote column value
         if (source.getFirstVoteColumnIndex() == null) {
           isValid = false;
