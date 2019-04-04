@@ -21,6 +21,8 @@
 
 package com.rcv;
 
+import static java.util.Map.entry;
+
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -33,7 +35,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -45,6 +49,11 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 class ResultsWriter {
+
+  private static final String CDF_CONTEST_ID = "contest-001";
+  private static final String CDF_ELECTION_ID = "election-001";
+  private static final String CDF_GPU_ID = "gpu-001";
+  private static final String CDF_REPORTING_DEVICE_ID = "rd-001";
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
@@ -66,13 +75,43 @@ class ResultsWriter {
     return sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
   }
 
-  static String getSummaryOutputPath(
-      String outputDirectory, String timestampString, Integer sequentialTabulationNumber) {
+  static String getOutputFilePath(
+      String outputDirectory,
+      String outputType,
+      String timestampString,
+      Integer sequentialTabulationNumber) {
     String fileName =
         String.format(
-            "%s_summary" + sequentialSuffixForOutputPath(sequentialTabulationNumber),
-            timestampString);
+            "%s_%s%s",
+            timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationNumber));
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
+  }
+
+  private static String generateCvrSnapshotID(String cvrID, int round) {
+    return String.format("ballot-%s-round-%d", cvrID, round);
+  }
+
+  private static void generateJsonFile(String path, Map<String, Object> json) throws IOException {
+    // mapper converts java objects to json
+    ObjectMapper mapper = new ObjectMapper();
+    // set mapper to order keys alphabetically for more legible output
+    mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+    // create a module to contain a serializer for BigDecimal serialization
+    SimpleModule module = new SimpleModule();
+    module.addSerializer(BigDecimal.class, new ToStringSerializer());
+    // attach serializer to mapper
+    mapper.registerModule(module);
+
+    // jsonWriter writes those object to disk
+    ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
+    File outFile = new File(path);
+
+    try {
+      jsonWriter.writeValue(outFile, json);
+    } catch (IOException exception) {
+      Logger.log(Level.SEVERE, "Error writing to JSON file: %s\n%s", path, exception.toString());
+      throw exception;
+    }
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
@@ -150,25 +189,6 @@ class ResultsWriter {
   ResultsWriter setTimestampString(String timestampString) {
     this.timestampString = timestampString;
     return this;
-  }
-
-  // function: generateOverallSummaryFiles
-  // purpose: creates a summary spreadsheet and JSON for the full contest
-  // param: roundTallies is the round-by-round count of votes per candidate
-  void generateOverallSummaryFiles(Map<Integer, Map<String, BigDecimal>> roundTallies)
-      throws IOException {
-    String outputPath =
-        getSummaryOutputPath(
-            config.getOutputDirectory(),
-            timestampString,
-            config.isSequentialMultiSeatEnabled()
-                ? config.getSequentialWinners().size() + 1
-                : null);
-    // generate the spreadsheet
-    generateSummarySpreadsheet(roundTallies, null, outputPath);
-
-    // generate json output
-    generateSummaryJson(roundTallies, null, outputPath);
   }
 
   // function: generatePrecinctSummarySpreadsheet
@@ -447,6 +467,106 @@ class ResultsWriter {
     return filename;
   }
 
+  // function: generateOverallSummaryFiles
+  // purpose: creates a summary spreadsheet and JSON for the full contest
+  // param: roundTallies is the round-by-round count of votes per candidate
+  void generateOverallSummaryFiles(Map<Integer, Map<String, BigDecimal>> roundTallies)
+      throws IOException {
+    String outputPath =
+        getOutputFilePath(
+            config.getOutputDirectory(),
+            "summary",
+            timestampString,
+            config.isSequentialMultiSeatEnabled()
+                ? config.getSequentialWinners().size() + 1
+                : null);
+    // generate the spreadsheet
+    generateSummarySpreadsheet(roundTallies, null, outputPath);
+
+    // generate json output
+    generateSummaryJson(roundTallies, null, outputPath);
+  }
+
+  void generateCdfJson(List<CastVoteRecord> castVoteRecords) throws IOException {
+    HashMap<String, Object> outputJson = new HashMap<>();
+
+    String outputPath =
+        getOutputFilePath(
+            config.getOutputDirectory(),
+            "cvr_cdf",
+            timestampString,
+            config.isSequentialMultiSeatEnabled()
+                ? config.getSequentialWinners().size() + 1
+                : null)
+            + ".json";
+
+    Logger.log(Level.INFO, "Generating CVR CDF JSON file: %s...", outputPath);
+
+    outputJson.put("CVR", generateCdfMapForCvrs(castVoteRecords));
+    outputJson.put("Election", new Map[]{generateCdfMapForElection()});
+    outputJson.put(
+        "GeneratedDate", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
+    outputJson.put(
+        "GpUnit",
+        new Map[]{
+            Map.ofEntries(
+                entry("@id", CDF_GPU_ID),
+                entry("OtherType", "election scope gpunit"),
+                entry("Type", "other"),
+                entry("@type", "CVR.GpUnit"))
+        });
+    outputJson.put("ReportGeneratingDeviceIds", new String[]{CDF_REPORTING_DEVICE_ID});
+    outputJson.put(
+        "ReportingDevice",
+        new Map[]{
+            Map.ofEntries(
+                entry("@id", CDF_REPORTING_DEVICE_ID), entry("@type", "CVR.ReportingDevice"))
+        });
+    outputJson.put("Version", "1.0.0");
+    outputJson.put("@type", "CVR.CastVoteRecordReport");
+
+    generateJsonFile(outputPath, outputJson);
+  }
+
+  private List<Map<String, Object>> generateCdfMapForCvrs(List<CastVoteRecord> castVoteRecords) {
+    List<Map<String, Object>> cvrMaps = new LinkedList<>();
+
+    for (CastVoteRecord cvr : castVoteRecords) {
+      cvrMaps.add(
+          Map.ofEntries(
+              entry("BallotPrePrintedId", cvr.getID()),
+              entry("CurrentSnapshotId", generateCvrSnapshotID(cvr.getID(), numRounds)),
+              entry("CVRSnapshot", "will fill in"),
+              entry("ElectionId", CDF_ELECTION_ID),
+              entry("@type", "CVR.CVR")));
+    }
+
+    return cvrMaps;
+  }
+
+  private Map<String, Object> generateCdfMapForElection() {
+    HashMap<String, Object> electionMap = new HashMap<>();
+
+    List<Map<String, String>> contestSelections = new LinkedList<>();
+    for (String candidate : config.getCandidateCodeList()) {
+      contestSelections.add(
+          Map.ofEntries(entry("@id", candidate), entry("@type", "CVR.ContestSelection")));
+    }
+
+    Map<String, Object> contestJson =
+        Map.ofEntries(
+            entry("@id", CDF_CONTEST_ID),
+            entry("ContestSelection", contestSelections),
+            entry("@type", "CVR.CandidateContest"));
+
+    electionMap.put("@id", CDF_ELECTION_ID);
+    electionMap.put("Contest", new Map[]{contestJson});
+    electionMap.put("ElectionScopeId", CDF_GPU_ID);
+    electionMap.put("@type", "CVR.Election");
+
+    return electionMap;
+  }
+
   // function: generateSummaryJson
   // purpose: create summary json data for use in visualizer, unit tests and other tools
   // param: outputPath where to write json file
@@ -455,25 +575,8 @@ class ResultsWriter {
   private void generateSummaryJson(
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
       throws IOException {
-
-    // mapper converts java objects to json
-    ObjectMapper mapper = new ObjectMapper();
-    // set mapper to order keys alphabetically for more legible output
-    mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-    // create a module to contain a serializer for BigDecimal serialization
-    SimpleModule module = new SimpleModule();
-    module.addSerializer(BigDecimal.class, new ToStringSerializer());
-    // attach serializer to mapper
-    mapper.registerModule(module);
-
-    // jsonWriter writes those object to disk
-    ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
-    // jsonPath for output json summary
     String jsonPath = outputPath + ".json";
-    // log output location
     Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
-    // outFile is the target file
-    File outFile = new File(jsonPath);
 
     // root outputJson dict will have two entries:
     // results - vote totals, transfers, and candidates elected / eliminated
@@ -517,14 +620,9 @@ class ResultsWriter {
     outputJson.put("config", configData);
     // add results to root object
     outputJson.put("results", results);
+
     // write results to disk
-    try {
-      jsonWriter.writeValue(outFile, outputJson);
-    } catch (IOException exception) {
-      Logger.log(
-          Level.SEVERE, "Error writing to JSON file: %s\n%s", jsonPath, exception.toString());
-      throw exception;
-    }
+    generateJsonFile(jsonPath, outputJson);
   }
 
   private Map<String, BigDecimal> updateCandidateNamesInTally(Map<String, BigDecimal> tally) {

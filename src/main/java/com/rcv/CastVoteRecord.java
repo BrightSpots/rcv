@@ -70,6 +70,10 @@ class CastVoteRecord {
     sortRankings(rankings);
   }
 
+  String getID() {
+    return suppliedID != null ? suppliedID : computedID;
+  }
+
   // function: logRoundOutcome
   // purpose: logs the outcome for this CVR for this round for auditing purposes
   // param: outcomeType indicates what happened

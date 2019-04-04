@@ -629,6 +629,10 @@ class Tabulator {
     if (config.isTabulateByPrecinctEnabled()) {
       writer.generatePrecinctSummarySpreadsheets(precinctRoundTallies);
     }
+
+    if (config.isGenerateCdfJsonEnabled()) {
+      writer.generateCdfJson(castVoteRecords);
+    }
   }
 
   // Function: runBatchElimination
