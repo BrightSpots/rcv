@@ -132,6 +132,8 @@ class CastVoteRecord {
     return cdfSnapshotData;
   }
 
+  // purpose: store info that we'll need in order to generate the CVR JSON snapshots in the Common
+  // Data Format at the end of the tabulation (if this option is enabled)
   void logCdfSnapshotData(int round) {
     List<Pair<String, BigDecimal>> data = new LinkedList<>();
     for (Entry<String, BigDecimal> entry : winnerToFractionalValue.entrySet()) {

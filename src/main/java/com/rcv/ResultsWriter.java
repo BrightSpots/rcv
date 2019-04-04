@@ -531,6 +531,7 @@ class ResultsWriter {
     generateJsonFile(outputPath, outputJson);
   }
 
+  // purpose: helper method for generateCdfJson to compile the data for all the CVR snapshots
   private List<Map<String, Object>> generateCdfMapForCvrs(List<CastVoteRecord> castVoteRecords) {
     List<Map<String, Object>> cvrMaps = new LinkedList<>();
 
@@ -562,6 +563,7 @@ class ResultsWriter {
     return cvrMaps;
   }
 
+  // purpose: helper for generateCdfMapForCvrs to handle a single CVR in a single round
   private Map<String, Object> generateCvrSnapshotMap(
       CastVoteRecord cvr, Integer round, List<Pair<String, BigDecimal>> currentRoundSnapshotData) {
     List<Map<String, Object>> selectionMapList = new LinkedList<>();
