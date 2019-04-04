@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import javafx.util.Pair;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -87,10 +88,6 @@ class ResultsWriter {
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
   }
 
-  private static String generateCvrSnapshotID(String cvrID, int round) {
-    return String.format("ballot-%s-round-%d", cvrID, round);
-  }
-
   private static void generateJsonFile(String path, Map<String, Object> json) throws IOException {
     // mapper converts java objects to json
     ObjectMapper mapper = new ObjectMapper();
@@ -112,6 +109,12 @@ class ResultsWriter {
       Logger.log(Level.SEVERE, "Error writing to JSON file: %s\n%s", path, exception.toString());
       throw exception;
     }
+  }
+
+  private static String generateCvrSnapshotID(String cvrID, Integer round) {
+    return round != null
+        ? String.format("ballot-%s-round-%d", cvrID, round)
+        : String.format("ballot-%s", cvrID);
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
@@ -532,16 +535,86 @@ class ResultsWriter {
     List<Map<String, Object>> cvrMaps = new LinkedList<>();
 
     for (CastVoteRecord cvr : castVoteRecords) {
+      List<Map<String, Object>> cvrSnapshots = new LinkedList<>();
+      cvrSnapshots.add(generateCvrSnapshotMap(cvr, null, null));
+
+      List<Pair<String, BigDecimal>> previousRoundSnapshotData = null;
+      for (int round = 1; round <= numRounds; round++) {
+        List<Pair<String, BigDecimal>> currentRoundSnapshotData =
+            cvr.getCdfSnapshotData().get(round);
+        if (currentRoundSnapshotData == null) {
+          assert previousRoundSnapshotData != null; // this would indicate a bug in the tabulation
+          currentRoundSnapshotData = previousRoundSnapshotData;
+        }
+        cvrSnapshots.add(generateCvrSnapshotMap(cvr, round, currentRoundSnapshotData));
+        previousRoundSnapshotData = currentRoundSnapshotData;
+      }
+
       cvrMaps.add(
           Map.ofEntries(
               entry("BallotPrePrintedId", cvr.getID()),
               entry("CurrentSnapshotId", generateCvrSnapshotID(cvr.getID(), numRounds)),
-              entry("CVRSnapshot", "will fill in"),
+              entry("CVRSnapshot", cvrSnapshots),
               entry("ElectionId", CDF_ELECTION_ID),
               entry("@type", "CVR.CVR")));
     }
 
     return cvrMaps;
+  }
+
+  private Map<String, Object> generateCvrSnapshotMap(
+      CastVoteRecord cvr, Integer round, List<Pair<String, BigDecimal>> currentRoundSnapshotData) {
+    List<Map<String, Object>> selectionMapList = new LinkedList<>();
+    for (int rank : cvr.rankToCandidateIDs.keySet()) {
+      for (String candidate : cvr.rankToCandidateIDs.get(rank)) {
+        String isAllocable = "unknown";
+        BigDecimal numberVotes = BigDecimal.ONE;
+        if (currentRoundSnapshotData != null) {
+          // scanning the list isn't actually expensive because it will almost always be very short
+          for (Pair<String, BigDecimal> allocation : currentRoundSnapshotData) {
+            if (allocation.getKey().equals(candidate)) {
+              isAllocable = "yes";
+              numberVotes = allocation.getValue();
+              break;
+            }
+          }
+          if (isAllocable.equals("unknown")) {
+            isAllocable = "no";
+            // not sure what numberVotes should be in this situation
+          }
+        }
+        Map<String, Object> selectionPositionMap =
+            Map.ofEntries(
+                entry("HasIndication", "yes"),
+                entry("IsAllocable", isAllocable),
+                entry(
+                    "NumberVotes",
+                    numberVotes), // TODO: render as num instead of string (no quotes)?
+                entry("Rank", rank),
+                entry("@type", "CVR.SelectionPosition"));
+
+        selectionMapList.add(
+            Map.ofEntries(
+                entry("ContestSelectionId", candidate),
+                entry("SelectionPosition", selectionPositionMap),
+                entry("@type", "CVR.CVRContestSelection")));
+      }
+    }
+
+    Map<String, Object> contestMap =
+        Map.ofEntries(
+            entry("ContestId", CDF_CONTEST_ID),
+            entry("CVRContestSelection", selectionMapList),
+            entry("@type", "CVR.CVRContest"));
+
+    Map<String, Object> snapshotMap =
+        Map.ofEntries(
+            entry("@id", generateCvrSnapshotID(cvr.getID(), round)),
+            entry("CVRContest", new Map[]{contestMap}),
+            entry("Type", round != null ? "interpreted" : "original"),
+            entry("@type", "CVR.CVRSnapshot"));
+
+    return snapshotMap;
   }
 
   private Map<String, Object> generateCdfMapForElection() {

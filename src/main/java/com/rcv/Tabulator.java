@@ -766,6 +766,10 @@ class Tabulator {
     // log the vote outcome
     cvr.logRoundOutcome(
         currentRound, outcomeType, outcomeDescription, cvr.getFractionalTransferValue());
+
+    if (config.isGenerateCdfJsonEnabled()) {
+      cvr.logCdfSnapshotData(currentRound);
+    }
   }
 
   // function: computeTalliesForRound

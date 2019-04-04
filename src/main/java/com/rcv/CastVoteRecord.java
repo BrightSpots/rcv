@@ -23,8 +23,10 @@ package com.rcv;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -50,6 +52,12 @@ class CastVoteRecord {
   private boolean isExhausted;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
+  // If CVR CDF output is enabled, we store the necessary info here: for each round, the list of
+  // candidates this ballot is counting toward (0 or 1 in a single-seat contest; 0 to n in a
+  // multi-seat contest because of fractional vote transfers), and how much of the vote each is
+  // getting. As a memory optimization, if the data is unchanged from the previous round, we don't
+  // add a new entry.
+  private Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
 
   // function: CastVoteRecord
   // purpose: create a new CVR object
@@ -118,6 +126,23 @@ class CastVoteRecord {
 
     // output with level FINE routes to audit log
     Logger.log(Level.FINE, logStringBuilder.toString());
+  }
+
+  Map<Integer, List<Pair<String, BigDecimal>>> getCdfSnapshotData() {
+    return cdfSnapshotData;
+  }
+
+  void logCdfSnapshotData(int round) {
+    List<Pair<String, BigDecimal>> data = new LinkedList<>();
+    for (Entry<String, BigDecimal> entry : winnerToFractionalValue.entrySet()) {
+      // TODO: can we avoid duplicating this in memory?
+      data.add(new Pair(entry.getKey(), entry.getValue()));
+    }
+    if (currentRecipientOfVote != null) {
+      data.add(new Pair(currentRecipientOfVote, getFractionalTransferValue()));
+    }
+
+    cdfSnapshotData.put(round, data);
   }
 
   // function: exhaust
