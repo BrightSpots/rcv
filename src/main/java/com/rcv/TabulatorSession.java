@@ -66,7 +66,7 @@ class TabulatorSession {
   // returns: list of winners
   void tabulate() {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    if (config != null /* && config.validate() */ && setUpLogging(config)) {
+    if (config != null && config.validate() && setUpLogging(config)) {
       Logger.log(Level.INFO, "Starting tabulation process...");
 
       if (config.isSequentialMultiSeatEnabled()) {
@@ -191,8 +191,6 @@ class TabulatorSession {
         List<CastVoteRecord> cvrs;
         if(source.getProvider().equals("CDF")) {
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath);
-          Set<String> candidates = reader.parseCandidates();
-          config.addCandidates(candidates);
           cvrs = reader.parseCVRFile(castVoteRecords);
         } else {
           // use xlsx reader for ES&S

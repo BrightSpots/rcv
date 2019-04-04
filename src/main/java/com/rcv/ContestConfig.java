@@ -84,10 +84,18 @@ class ContestConfig {
   // purpose: create a new ContestConfig object
   // param: rawConfig underlying rawConfig object this object wraps
   // param: sourceDirectory folder to use for resolving relative paths
-  ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
+  private ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     this.rawConfig = rawConfig;
     this.sourceDirectory = sourceDirectory;
-    this.processCandidateData();
+  }
+
+  // function: loadContestConfig
+  // purpose: create ContestConfig from pre-populated rawConfig and default folder
+  // returns: new ContestConfig object if checks pass otherwise null
+  static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
+    ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
+    config.processCandidateData();
+    return config;
   }
 
   // function: loadContestConfig
@@ -119,6 +127,7 @@ class ContestConfig {
         Logger.log(Level.SEVERE, "Failed to create contest config!");
       }
     }
+    config.processCandidateData();
     return config;
   }
 
@@ -143,18 +152,6 @@ class ContestConfig {
 
   RawContestConfig getRawConfig() {
     return rawConfig;
-  }
-
-  // function: addCandidates
-  // purpose: add candidates parsed externally from CDF file
-  // param: candidates
-  void addCandidates(Set<String> candidateNames) {
-    for(String candidate : candidateNames) {
-      RawContestConfig.Candidate candidateObject = new RawContestConfig.Candidate();
-      candidateObject.setName(candidate);
-      rawConfig.candidates.add(candidateObject);
-      processCandidateData();
-    }
   }
 
   // function: validate
@@ -670,8 +667,29 @@ class ContestConfig {
   }
 
   // function: processCandidateData
-  // purpose: builds map of candidate ID to candidate name and possibly generates tie-break ordering
+  // purpose: perform pre-processing on candidates:
+  // 1) if there are any CDF input sources extract candidates names from them
+  // 2) build map of candidate ID to candidate name
+  // 3) generates tie-break ordering if needed
   private void processCandidateData() {
+
+    for (RawContestConfig.CVRSource source : rawConfig.cvrFileSources) {
+      // cvrPath is the resolved path to this source
+      String cvrPath = resolveConfigPath(source.getFilePath());
+      // for any CDF sources extract candidate names
+      if (source.getProvider().equals("CDF")) {
+        CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath);
+        Set<String> candidates = reader.getCandidates();
+        // create and add Candidate objects to the rawConfig
+        for(String candidate : candidates) {
+          RawContestConfig.Candidate candidateObject = new RawContestConfig.Candidate();
+          candidateObject.setName(candidate);
+          rawConfig.candidates.add(candidateObject);
+        }
+      }
+    }
+
+    // build candidate code to name map
     candidateCodeToNameMap = new HashMap<>();
 
     if (rawConfig.candidates != null) {

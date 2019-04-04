@@ -35,29 +35,21 @@ class CommonDataFormatReader {
   private final String filePath;
   // name of the source file
   private final String fileName;
-  // map for tracking unrecognized candidates during parsing
-  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  // last rankings cell observed for CVR in progress
-  private int lastRankSeen;
-
-  // function: StreamingCVRReader
+  // function: CommonDataFormatReader
   // purpose: class constructor
-  // param: config an ContestConfig object specifying rules for interpreting CVR file data
-  // param: source file to read
+  // param: filePath source file to read
   CommonDataFormatReader(String filePath) {
     this.filePath = filePath;
     // cvrFileName for generating cvrIDs
     fileName = new File(filePath).getName();
   }
 
-  // returns list of candidateIDs for this election
-  Set<String> parseCandidates()
+  // returns list of candidates in the contained elections
+  Set<String> getCandidates()
   {
     HashMap<Object, Object> json = JsonParser.readFromFile(this.filePath, HashMap.class);
-
-    Set<String> candidates = new HashSet<String>();
-
+    Set<String> candidates = new HashSet<>();
     // election is a list of contests
     ArrayList<Object> electionArray = (ArrayList<Object>) json.get("Election");
     // for each contest get the contest selections
@@ -78,7 +70,6 @@ class CommonDataFormatReader {
   }
 
 
-
   // function: parseCVRFile
   // purpose: parse the given file into a List of CastVoteRecords for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
@@ -86,11 +77,10 @@ class CommonDataFormatReader {
   List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords) {
 
     List<CastVoteRecord> cvrs = new ArrayList<>();
-
-    // use CDF reader for json
+    // count cvrs as they are read and use index to generate IDs for them
     Integer cvrIndex = 0;
 
-    HashMap<Object, Object> json = JsonParser.readFromFile(this.filePath, HashMap.class);
+    HashMap<Object, Object> json = JsonParser.readFromFile(filePath, HashMap.class);
     // we expect a top-level "CVR" object containing a list of CVR objects
     ArrayList<Object> CVRs = (ArrayList<Object>) json.get("CVR");
     // for each CVR object extract the current snapshot
@@ -101,7 +91,7 @@ class CommonDataFormatReader {
       // get ballotID
       String ballotID = (String) CVRObject.get("BallotPrePrintedId");
       // compute internal ballot ID
-      String computedCastVoteRecordID = String.format("%s(%d)", this.fileName, ++cvrIndex);
+      String computedCastVoteRecordID = String.format("%s(%d)", fileName, ++cvrIndex);
 
       ArrayList<Object> CVRSnapshots = (ArrayList<Object>) CVRObject.get("CVRSnapshot");
       for (Object snapshotObject : CVRSnapshots) {
@@ -112,9 +102,7 @@ class CommonDataFormatReader {
           // list to contain rankings as they are parsed
           List<Pair<Integer, String>> rankings = new ArrayList<>();
 
-          // keep drilling down into the data structure to get the actual rankings:
           // at the top level is a list of contests each of which contains selections
-          // (there could be multiple contests in CDF format)
           ArrayList<Object> CVRContests = (ArrayList<Object>) snapshot.get("CVRContest");
           for (Object contestObject : CVRContests) {
             // extract the CVRContest
@@ -150,10 +138,8 @@ class CommonDataFormatReader {
           if (cvrs.size() % 50000 == 0) {
             Logger.log(Level.INFO, String.format("Parsed %d cast vote records.", cvrs.size()));
           }
-
         }
       }
-
     }
     // return the input list with additions
     return castVoteRecords;
