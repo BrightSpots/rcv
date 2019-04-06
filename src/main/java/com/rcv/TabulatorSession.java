@@ -186,19 +186,13 @@ class TabulatorSession {
       String cvrPath = config.resolveConfigPath(source.getFilePath());
 
       Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
-      // the CVRs parsed from this source
       try {
-        List<CastVoteRecord> cvrs;
         if(source.getProvider().equals("CDF")) {
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath);
-          cvrs = reader.parseCVRFile(castVoteRecords);
+          reader.parseCVRFile(castVoteRecords);
         } else {
           // use xlsx reader for ES&S
-          cvrs = new StreamingCVRReader(config, source).parseCVRFile(castVoteRecords, precinctIDs);
-        }
-        if (cvrs.isEmpty()) {
-          Logger.log(Level.SEVERE, "Source file contains no CVRs: %s", cvrPath);
-          encounteredSourceProblem = true;
+          new StreamingCVRReader(config, source).parseCVRFile(castVoteRecords, precinctIDs);
         }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.log(Level.SEVERE, "Source file contains unrecognized candidate(s): %s", cvrPath);

@@ -249,8 +249,7 @@ class StreamingCVRReader {
   // purpose: parse the given file into a List of CastVoteRecords for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
-  // returns: list of parsed CVRs
-  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
+  void parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
       throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException {
 
     // cache the cvr list so it is accessible in callbacks
@@ -331,9 +330,6 @@ class StreamingCVRReader {
     if (this.unrecognizedCandidateCounts.size() > 0) {
       throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
-
-    // return the input list with additions
-    return cvrList;
   }
 
   // exception class used when an unrecognized candidate is encountered during cvr parsing

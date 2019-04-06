@@ -94,7 +94,12 @@ class ContestConfig {
   // returns: new ContestConfig object if checks pass otherwise null
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
-    config.processCandidateData();
+    try {
+      config.processCandidateData();
+    } catch (Exception e) {
+      Logger.log(Level.SEVERE, "Error processing candidate data:", e.toString());
+      config = null;
+    }
     return config;
   }
 
@@ -121,13 +126,12 @@ class ContestConfig {
       Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
       // perform some additional sanity checks
       if (rawConfig.validate()) {
-        // checks passed so create the ContestConfig
-        config = new ContestConfig(rawConfig, new File(configPath).getParent());
+        // checks passed so continue processing
+        config = loadContestConfig(rawConfig, new File(configPath).getParent());
       } else {
         Logger.log(Level.SEVERE, "Failed to create contest config!");
       }
     }
-    config.processCandidateData();
     return config;
   }
 
@@ -221,73 +225,72 @@ class ContestConfig {
           }
           if (isTabulateByPrecinctEnabled()) {
             isValid = false;
-            Logger.log(Level.SEVERE, "Tabulate By Precinct may not be used with CDF files.");
+            Logger.log(Level.SEVERE, "tabulateByPrecinct may not be used with CDF files.");
           }
-          continue;
-        }
+        } else {
+          // perform ES&S checks
 
-        // perform ES&S checks
-        
-        // ensure valid first vote column value
-        if (source.getFirstVoteColumnIndex() == null) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", cvrPath);
-        } else if (source.getFirstVoteColumnIndex() < MIN_COLUMN_INDEX
-            || source.getFirstVoteColumnIndex() > MAX_COLUMN_INDEX) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "firstVoteColumnIndex must be from %d to %d: %s",
-              MIN_COLUMN_INDEX,
-              MAX_COLUMN_INDEX,
-              cvrPath);
-        }
-
-        // ensure valid first vote row value
-        if (source.getFirstVoteRowIndex() == null) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", cvrPath);
-        } else if (source.getFirstVoteRowIndex() < MIN_ROW_INDEX
-            || source.getFirstVoteRowIndex() > MAX_ROW_INDEX) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "firstVoteRowIndex must be from %d to %d: %s",
-              MIN_ROW_INDEX,
-              MAX_ROW_INDEX,
-              cvrPath);
-        }
-
-        // ensure valid id column value
-        if (source.getIdColumnIndex() != null
-            && (source.getIdColumnIndex() < MIN_COLUMN_INDEX
-            || source.getIdColumnIndex() > MAX_COLUMN_INDEX)) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "idColumnIndex must be from %d to %d: %s",
-              MIN_COLUMN_INDEX,
-              MAX_COLUMN_INDEX,
-              cvrPath);
-        }
-
-        // ensure valid precinct column value
-        if (isTabulateByPrecinctEnabled()) {
-          if (source.getPrecinctColumnIndex() == null) {
+          // ensure valid first vote column value
+          if (source.getFirstVoteColumnIndex() == null) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", cvrPath);
+          } else if (source.getFirstVoteColumnIndex() < MIN_COLUMN_INDEX
+              || source.getFirstVoteColumnIndex() > MAX_COLUMN_INDEX) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
-                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
-                cvrPath);
-          } else if (source.getPrecinctColumnIndex() < MIN_COLUMN_INDEX
-              || source.getPrecinctColumnIndex() > MAX_COLUMN_INDEX) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "precinctColumnIndex must be from %d to %d: %s",
+                "firstVoteColumnIndex must be from %d to %d: %s",
                 MIN_COLUMN_INDEX,
                 MAX_COLUMN_INDEX,
                 cvrPath);
+          }
+
+          // ensure valid first vote row value
+          if (source.getFirstVoteRowIndex() == null) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", cvrPath);
+          } else if (source.getFirstVoteRowIndex() < MIN_ROW_INDEX
+              || source.getFirstVoteRowIndex() > MAX_ROW_INDEX) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "firstVoteRowIndex must be from %d to %d: %s",
+                MIN_ROW_INDEX,
+                MAX_ROW_INDEX,
+                cvrPath);
+          }
+
+          // ensure valid id column value
+          if (source.getIdColumnIndex() != null
+              && (source.getIdColumnIndex() < MIN_COLUMN_INDEX
+              || source.getIdColumnIndex() > MAX_COLUMN_INDEX)) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "idColumnIndex must be from %d to %d: %s",
+                MIN_COLUMN_INDEX,
+                MAX_COLUMN_INDEX,
+                cvrPath);
+          }
+
+          // ensure valid precinct column value
+          if (isTabulateByPrecinctEnabled()) {
+            if (source.getPrecinctColumnIndex() == null) {
+              isValid = false;
+              Logger.log(
+                  Level.SEVERE,
+                  "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
+                  cvrPath);
+            } else if (source.getPrecinctColumnIndex() < MIN_COLUMN_INDEX
+                || source.getPrecinctColumnIndex() > MAX_COLUMN_INDEX) {
+              isValid = false;
+              Logger.log(
+                  Level.SEVERE,
+                  "precinctColumnIndex must be from %d to %d: %s",
+                  MIN_COLUMN_INDEX,
+                  MAX_COLUMN_INDEX,
+                  cvrPath);
+            }
           }
         }
       }

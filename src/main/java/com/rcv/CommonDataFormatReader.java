@@ -43,8 +43,7 @@ class CommonDataFormatReader {
 
   // function: getCandidates
   // purpose: returns list of candidates parsed from CDF election json
-  Set<String> getCandidates()
-  {
+  Set<String> getCandidates() {
     // container for results
     Set<String> candidates = new HashSet<>();
     try {
@@ -54,8 +53,10 @@ class CommonDataFormatReader {
       ArrayList electionArray = (ArrayList) json.get("Election");
       for(Object electionObject : electionArray) {
         HashMap election = (HashMap) electionObject;
-        // for each election get the contests it contains
+        // each election contains one or more contests
         ArrayList contestArray = (ArrayList) election.get("Contest");
+        // currently we only support a single contest per file
+        assert contestArray.size() == 1;
         for(Object contestObject : contestArray) {
           HashMap contest = (HashMap) contestObject;
           // for each contest get the contest selections
@@ -78,12 +79,9 @@ class CommonDataFormatReader {
   // function: parseCVRFile
   // purpose: parse the given file into a List of CastVoteRecords for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
-  // returns: list of parsed CVRs
-  List<CastVoteRecord> parseCVRFile(List<CastVoteRecord> castVoteRecords) {
-
-    List<CastVoteRecord> cvrs = new ArrayList<>();
+  void parseCVRFile(List<CastVoteRecord> castVoteRecords) {
     // cvrIndex and fileName are used to generate IDs for cvrs
-    Integer cvrIndex = 0;
+    int cvrIndex = 0;
     String fileName = new File(filePath).getName();
 
     try {
@@ -141,12 +139,12 @@ class CommonDataFormatReader {
             // create new cast vote record
             CastVoteRecord newRecord = new CastVoteRecord(computedCastVoteRecordID,
                 ballotID, null, null, rankings);
-            cvrs.add(newRecord);
             castVoteRecords.add(newRecord);
 
             // provide some user feedback on the CVR count
-            if (cvrs.size() % 50000 == 0) {
-              Logger.log(Level.INFO, String.format("Parsed %d cast vote records.", cvrs.size()));
+            if (castVoteRecords.size() % 50000 == 0) {
+              Logger.log(Level.INFO, String.format("Parsed %d cast vote records.",
+                  castVoteRecords.size()));
             }
           }
         }
@@ -154,9 +152,6 @@ class CommonDataFormatReader {
     } catch (Exception e) {
       Logger.log(Level.SEVERE, String.format("Error parsing CDF data: %s", e.toString()));
     }
-
-    // return the input list with additions
-    return castVoteRecords;
   }
 }
 

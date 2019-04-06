@@ -58,6 +58,12 @@ public class RawContestConfig {
       isValid = false;
       Logger.log(Level.SEVERE, "No \"cvrFileSources\" field specified!");
     }
+    for (CVRSource source : cvrFileSources) {
+      if (source.getFilePath() == null) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "No file specified for CVR Source");
+      }
+    }
     if (candidates == null) {
       isValid = false;
       Logger.log(Level.SEVERE, "No \"candidates\" field specified!");
