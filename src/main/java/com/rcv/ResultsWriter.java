@@ -27,8 +27,6 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -93,11 +91,6 @@ class ResultsWriter {
     ObjectMapper mapper = new ObjectMapper();
     // set mapper to order keys alphabetically for more legible output
     mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-    // create a module to contain a serializer for BigDecimal serialization
-    SimpleModule module = new SimpleModule();
-    module.addSerializer(BigDecimal.class, new ToStringSerializer());
-    // attach serializer to mapper
-    mapper.registerModule(module);
 
     // jsonWriter writes those object to disk
     ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
