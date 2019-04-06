@@ -95,6 +95,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxTabulateByPrecinct;
   @FXML
+  private CheckBox checkBoxGenerateCdfJson;
+  @FXML
   private TableView<CVRSource> tableViewCvrFiles;
   @FXML
   private TableColumn<CVRSource, String> tableColumnCvrFilePath;
@@ -569,6 +571,7 @@ public class GuiConfigController implements Initializable {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
+    checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
     checkBoxSequentialMultiSeat.setSelected(ContestConfig.SUGGESTED_SEQUENTIAL_MULTI_SEAT);
     checkBoxNonIntegerWinningThreshold.setSelected(
         ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
@@ -597,6 +600,7 @@ public class GuiConfigController implements Initializable {
     textFieldContestJurisdiction.clear();
     textFieldContestOffice.clear();
     checkBoxTabulateByPrecinct.setSelected(false);
+    checkBoxGenerateCdfJson.setSelected(false);
 
     textFieldCvrFilePath.clear();
     textFieldCvrFirstVoteCol.clear();
@@ -731,6 +735,7 @@ public class GuiConfigController implements Initializable {
     textFieldContestJurisdiction.setText(outputSettings.contestJurisdiction);
     textFieldContestOffice.setText(outputSettings.contestOffice);
     checkBoxTabulateByPrecinct.setSelected(outputSettings.tabulateByPrecinct);
+    checkBoxGenerateCdfJson.setSelected(outputSettings.generateCdfJson);
 
     if (rawConfig.cvrFileSources != null) {
       tableViewCvrFiles.setItems(FXCollections.observableArrayList(rawConfig.cvrFileSources));
@@ -796,6 +801,7 @@ public class GuiConfigController implements Initializable {
     outputSettings.contestJurisdiction = textFieldContestJurisdiction.getText();
     outputSettings.contestOffice = textFieldContestOffice.getText();
     outputSettings.tabulateByPrecinct = checkBoxTabulateByPrecinct.isSelected();
+    outputSettings.generateCdfJson = checkBoxGenerateCdfJson.isSelected();
     config.outputSettings = outputSettings;
 
     config.cvrFileSources = new ArrayList<>(tableViewCvrFiles.getItems());

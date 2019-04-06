@@ -150,8 +150,8 @@ class TabulatorTests {
   private static void compareJson(
       ContestConfig config, String stem, String timestampString, Integer sequentialNumber) {
     String actualOutputPath =
-        ResultsWriter.getSummaryOutputPath(
-            config.getOutputDirectory(), timestampString, sequentialNumber)
+        ResultsWriter.getOutputFilePath(
+            config.getOutputDirectory(), "summary", timestampString, sequentialNumber)
             + ".json";
     String expectedPath =
         getTestFilePath(

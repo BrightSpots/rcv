@@ -81,6 +81,12 @@
                 <Insets top="10.0"/>
               </VBox.margin>
             </CheckBox>
+            <CheckBox mnemonicParsing="false" text="Generate CDF JSON"
+              fx:id="checkBoxGenerateCdfJson">
+              <VBox.margin>
+                <Insets top="10.0"/>
+              </VBox.margin>
+            </CheckBox>
             <padding>
               <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
             </padding>

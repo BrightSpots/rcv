@@ -41,6 +41,7 @@ class ContestConfig {
 
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
+  static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
   static final boolean SUGGESTED_SEQUENTIAL_MULTI_SEAT = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
@@ -544,6 +545,10 @@ class ContestConfig {
   // returns: true if and only if we should tabulate by precinct
   boolean isTabulateByPrecinctEnabled() {
     return rawConfig.outputSettings.tabulateByPrecinct;
+  }
+
+  boolean isGenerateCdfJsonEnabled() {
+    return rawConfig.outputSettings.generateCdfJson;
   }
 
   // function: getMaxRankingsAllowed

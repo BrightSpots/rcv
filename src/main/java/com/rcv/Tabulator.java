@@ -629,6 +629,10 @@ class Tabulator {
     if (config.isTabulateByPrecinctEnabled()) {
       writer.generatePrecinctSummarySpreadsheets(precinctRoundTallies);
     }
+
+    if (config.isGenerateCdfJsonEnabled()) {
+      writer.generateCdfJson(castVoteRecords);
+    }
   }
 
   // Function: runBatchElimination
@@ -762,6 +766,10 @@ class Tabulator {
     // log the vote outcome
     cvr.logRoundOutcome(
         currentRound, outcomeType, outcomeDescription, cvr.getFractionalTransferValue());
+
+    if (config.isGenerateCdfJsonEnabled()) {
+      cvr.logCdfSnapshotData(currentRound);
+    }
   }
 
   // function: computeTalliesForRound

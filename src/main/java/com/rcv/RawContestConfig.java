@@ -91,6 +91,7 @@ public class RawContestConfig {
     public String contestOffice;
     // should we report round-by-round results by precinct also?
     public boolean tabulateByPrecinct;
+    public boolean generateCdfJson;
   }
 
   // CVRSource: encapsulates a source cast vote record file
