@@ -14,11 +14,7 @@
     "idColumnIndex" : 1,
     "provider" : "CDF"
   } ],
-  "candidates" : [ {
-    "name" : "CDF",
-    "code" : "CDF",
-    "excluded" : false
-  } ],
+  "candidates" : [],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "exhaustImmediately",

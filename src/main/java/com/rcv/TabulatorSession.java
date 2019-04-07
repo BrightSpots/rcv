@@ -172,7 +172,7 @@ class TabulatorSession {
   // param: precinctIDs a set of precinctIDs which will be populated during cvr parsing
   // returns: list of parsed CVRs
   private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config, Set<String> precinctIDs) {
-    Logger.log(Level.INFO, "Parsing cast vote records...");
+    Logger.log(Level.INFO, "Parsing cast vote records");
 
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
@@ -186,13 +186,13 @@ class TabulatorSession {
       String cvrPath = config.resolveConfigPath(source.getFilePath());
 
       Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
-      // the CVRs parsed from this source
       try {
-        List<CastVoteRecord> cvrs =
-            new StreamingCVRReader(config, source).parseCVRFile(castVoteRecords, precinctIDs);
-        if (cvrs.isEmpty()) {
-          Logger.log(Level.SEVERE, "Source file contains no CVRs: %s", cvrPath);
-          encounteredSourceProblem = true;
+        if (source.getProvider().equals("CDF")) {
+          CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath);
+          reader.parseCVRFile(castVoteRecords);
+        } else {
+          // use xlsx reader for ES&S
+          new StreamingCVRReader(config, source).parseCVRFile(castVoteRecords, precinctIDs);
         }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.log(Level.SEVERE, "Source file contains unrecognized candidate(s): %s", cvrPath);

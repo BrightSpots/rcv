@@ -85,10 +85,23 @@ class ContestConfig {
   // purpose: create a new ContestConfig object
   // param: rawConfig underlying rawConfig object this object wraps
   // param: sourceDirectory folder to use for resolving relative paths
-  ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
+  private ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     this.rawConfig = rawConfig;
     this.sourceDirectory = sourceDirectory;
-    this.processCandidateData();
+  }
+
+  // function: loadContestConfig
+  // purpose: create ContestConfig from pre-populated rawConfig and default folder
+  // returns: new ContestConfig object if checks pass otherwise null
+  static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
+    ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
+    try {
+      config.processCandidateData();
+    } catch (Exception e) {
+      Logger.log(Level.SEVERE, "Error processing candidate data:", e.toString());
+      config = null;
+    }
+    return config;
   }
 
   // function: loadContestConfig
@@ -114,8 +127,8 @@ class ContestConfig {
       Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
       // perform some additional sanity checks
       if (rawConfig.validate()) {
-        // checks passed so create the ContestConfig
-        config = new ContestConfig(rawConfig, new File(configPath).getParent());
+        // checks passed so continue processing
+        config = loadContestConfig(rawConfig, new File(configPath).getParent());
       } else {
         Logger.log(Level.SEVERE, "Failed to create contest config!");
       }
@@ -187,6 +200,7 @@ class ContestConfig {
           Logger.log(Level.SEVERE, "filePath is required for each CVR file!");
           continue;
         }
+
         // full path to CVR
         String cvrPath = resolveConfigPath(source.getFilePath());
 
@@ -204,66 +218,80 @@ class ContestConfig {
           Logger.log(Level.SEVERE, "CVR file not found: %s", cvrPath);
         }
 
-        // ensure valid first vote column value
-        if (source.getFirstVoteColumnIndex() == null) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", cvrPath);
-        } else if (source.getFirstVoteColumnIndex() < MIN_COLUMN_INDEX
-            || source.getFirstVoteColumnIndex() > MAX_COLUMN_INDEX) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "firstVoteColumnIndex must be from %d to %d: %s",
-              MIN_COLUMN_INDEX,
-              MAX_COLUMN_INDEX,
-              cvrPath);
-        }
+        // perform CDF checks
+        if (source.getProvider().equals("CDF")) {
+          if (rawConfig.cvrFileSources.size() != 1) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
+          }
+          if (isTabulateByPrecinctEnabled()) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "tabulateByPrecinct may not be used with CDF files.");
+          }
+        } else {
+          // perform ES&S checks
 
-        // ensure valid first vote row value
-        if (source.getFirstVoteRowIndex() == null) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", cvrPath);
-        } else if (source.getFirstVoteRowIndex() < MIN_ROW_INDEX
-            || source.getFirstVoteRowIndex() > MAX_ROW_INDEX) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "firstVoteRowIndex must be from %d to %d: %s",
-              MIN_ROW_INDEX,
-              MAX_ROW_INDEX,
-              cvrPath);
-        }
-
-        // ensure valid id column value
-        if (source.getIdColumnIndex() != null
-            && (source.getIdColumnIndex() < MIN_COLUMN_INDEX
-            || source.getIdColumnIndex() > MAX_COLUMN_INDEX)) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "idColumnIndex must be from %d to %d: %s",
-              MIN_COLUMN_INDEX,
-              MAX_COLUMN_INDEX,
-              cvrPath);
-        }
-
-        // ensure valid precinct column value
-        if (isTabulateByPrecinctEnabled()) {
-          if (source.getPrecinctColumnIndex() == null) {
+          // ensure valid first vote column value
+          if (source.getFirstVoteColumnIndex() == null) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", cvrPath);
+          } else if (source.getFirstVoteColumnIndex() < MIN_COLUMN_INDEX
+              || source.getFirstVoteColumnIndex() > MAX_COLUMN_INDEX) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
-                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
-                cvrPath);
-          } else if (source.getPrecinctColumnIndex() < MIN_COLUMN_INDEX
-              || source.getPrecinctColumnIndex() > MAX_COLUMN_INDEX) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "precinctColumnIndex must be from %d to %d: %s",
+                "firstVoteColumnIndex must be from %d to %d: %s",
                 MIN_COLUMN_INDEX,
                 MAX_COLUMN_INDEX,
                 cvrPath);
+          }
+
+          // ensure valid first vote row value
+          if (source.getFirstVoteRowIndex() == null) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", cvrPath);
+          } else if (source.getFirstVoteRowIndex() < MIN_ROW_INDEX
+              || source.getFirstVoteRowIndex() > MAX_ROW_INDEX) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "firstVoteRowIndex must be from %d to %d: %s",
+                MIN_ROW_INDEX,
+                MAX_ROW_INDEX,
+                cvrPath);
+          }
+
+          // ensure valid id column value
+          if (source.getIdColumnIndex() != null
+              && (source.getIdColumnIndex() < MIN_COLUMN_INDEX
+              || source.getIdColumnIndex() > MAX_COLUMN_INDEX)) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "idColumnIndex must be from %d to %d: %s",
+                MIN_COLUMN_INDEX,
+                MAX_COLUMN_INDEX,
+                cvrPath);
+          }
+
+          // ensure valid precinct column value
+          if (isTabulateByPrecinctEnabled()) {
+            if (source.getPrecinctColumnIndex() == null) {
+              isValid = false;
+              Logger.log(
+                  Level.SEVERE,
+                  "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
+                  cvrPath);
+            } else if (source.getPrecinctColumnIndex() < MIN_COLUMN_INDEX
+                || source.getPrecinctColumnIndex() > MAX_COLUMN_INDEX) {
+              isValid = false;
+              Logger.log(
+                  Level.SEVERE,
+                  "precinctColumnIndex must be from %d to %d: %s",
+                  MIN_COLUMN_INDEX,
+                  MAX_COLUMN_INDEX,
+                  cvrPath);
+            }
           }
         }
       }
@@ -663,8 +691,29 @@ class ContestConfig {
   }
 
   // function: processCandidateData
-  // purpose: builds map of candidate ID to candidate name and possibly generates tie-break ordering
+  // purpose: perform pre-processing on candidates:
+  // 1) if there are any CDF input sources extract candidates names from them
+  // 2) build map of candidate ID to candidate name
+  // 3) generates tie-break ordering if needed
   private void processCandidateData() {
+
+    for (RawContestConfig.CVRSource source : rawConfig.cvrFileSources) {
+      // cvrPath is the resolved path to this source
+      String cvrPath = resolveConfigPath(source.getFilePath());
+      // for any CDF sources extract candidate names
+      if (source.getProvider().equals("CDF")) {
+        CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath);
+        Set<String> candidates = reader.getCandidates();
+        // create and add Candidate objects to the rawConfig
+        for(String candidate : candidates) {
+          RawContestConfig.Candidate candidateObject = new RawContestConfig.Candidate();
+          candidateObject.setName(candidate);
+          rawConfig.candidates.add(candidateObject);
+        }
+      }
+    }
+
+    // build candidate code to name map
     candidateCodeToNameMap = new HashMap<>();
 
     if (rawConfig.candidates != null) {

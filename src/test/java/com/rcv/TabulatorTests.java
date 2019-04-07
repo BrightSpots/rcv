@@ -24,6 +24,7 @@ package com.rcv;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
@@ -188,8 +189,7 @@ class TabulatorTests {
   void invalidSourcesTest() {
     String configPath = getTestFilePath("invalid_sources_test", "_config.json");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    assertNotNull(config);
-    assertFalse(config.validate());
+    assertNull(config);
   }
 
   // function: testPortlandMayor
@@ -311,6 +311,14 @@ class TabulatorTests {
   @DisplayName("test Hare quota")
   void testHareQuota() {
     runTabulationTest("2013_minneapolis_park_hare");
+  }
+
+  // function: testSequentialMultiSeat
+  // purpose: tests sequentialMultiSeat option
+  @Test
+  @DisplayName("test Common Data Format multi-winner contest")
+  void testCDFMultiWinner() {
+    runTabulationTest("CDF_multi_winner");
   }
 
   // function: testSequentialMultiSeat

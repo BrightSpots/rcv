@@ -250,7 +250,7 @@ public class GuiConfigController implements Initializable {
   public void buttonValidateClicked() {
     buttonBar.setDisable(true);
     ContestConfig config =
-        new ContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
+        ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
     ValidatorService service = new ValidatorService(config);
     service.setOnSucceeded(event -> buttonBar.setDisable(false));
     service.setOnCancelled(event -> buttonBar.setDisable(false));
