@@ -8,27 +8,8 @@
     "tabulateByPrecinct" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "test_set_1_exhaust_at_overvote_cvr.xlsx",
-    "firstVoteColumnIndex" : 2,
-    "firstVoteRowIndex" : 2,
-    "provider" : "ESS"
-  } ],
-  "candidates" : [ {
-    "name" : "A",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "B",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "C",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "D",
-    "code" : "",
-    "excluded" : false
+    "filePath": "test_set_1_exhaust_at_overvote_cvr.json",
+    "provider": "CDF"
   } ],
   "rules" : {
     "tiebreakMode" : "random",

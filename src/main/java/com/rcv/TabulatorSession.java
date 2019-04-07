@@ -55,10 +55,33 @@ class TabulatorSession {
   // param: configPath path to config json file
   TabulatorSession(String configPath) {
     this.configPath = configPath;
+    // current date-time formatted as a string used for creating unique output files names
+    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
   String getTimestampString() {
     return timestampString;
+  }
+
+  // purpose: special mode to just export the CVR as CDF JSON instead of tabulating
+  void convertToCdf() {
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    if (config != null && config.validate()) {
+      try {
+        FileUtils.createOutputDirectory(config.getOutputDirectory());
+        ResultsWriter writer =
+            new ResultsWriter()
+                .setNumRounds(0)
+                .setContestConfig(config)
+                .setTimestampString(timestampString);
+        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
+        writer.generateCdfJson(castVoteRecords);
+      } catch (IOException | UnableToCreateDirectoryException exception) {
+        Logger.log(Level.SEVERE, "CDF JSON generation failed.");
+      }
+    } else {
+      Logger.log(Level.SEVERE, "Failed to load config.");
+    }
   }
 
   // function: tabulate
@@ -100,8 +123,6 @@ class TabulatorSession {
   private boolean setUpLogging(ContestConfig config) {
     boolean success = false;
 
-    // current date-time formatted as a string used for creating unique output files names
-    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
     // %g format is for log file naming
     tabulationLogPath =
         Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))

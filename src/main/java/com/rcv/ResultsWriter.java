@@ -105,7 +105,7 @@ class ResultsWriter {
   }
 
   private static String generateCvrSnapshotID(String cvrID, Integer round) {
-    return round != null
+    return round != null && round > 0
         ? String.format("ballot-%s-round-%d", cvrID, round)
         : String.format("ballot-%s", cvrID);
   }
@@ -582,9 +582,7 @@ class ResultsWriter {
             Map.ofEntries(
                 entry("HasIndication", "yes"),
                 entry("IsAllocable", isAllocable),
-                entry(
-                    "NumberVotes",
-                    numberVotes), // TODO: render as num instead of string (no quotes)?
+                entry("NumberVotes", numberVotes),
                 entry("Rank", rank),
                 entry("@type", "CVR.SelectionPosition"));
 

@@ -43,14 +43,19 @@ public class Main extends GuiApplication {
     } else {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       // check for unexpected input
-      if (args.length > 1) {
-        Logger.log(Level.WARNING, "Too many arguments!  Need 1 but got: %d", args.length);
+      if (args.length > 2) {
+        Logger.log(Level.WARNING, "Too many arguments! Max is 2 but got: %d", args.length);
       }
       // config file for configuring the tabulator
       String configPath = args[0];
+      boolean convertToCdf = args.length == 2 && args[1].equals("convert-to-cdf");
       // session object will manage the tabulation process
       TabulatorSession session = new TabulatorSession(configPath);
-      session.tabulate();
+      if (convertToCdf) {
+        session.convertToCdf();
+      } else {
+        session.tabulate();
+      }
     }
     System.exit(0);
   }
