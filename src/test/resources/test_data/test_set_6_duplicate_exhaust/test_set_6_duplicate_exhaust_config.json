@@ -1,0 +1,52 @@
+{
+  "outputSettings" : {
+    "contestName" : "Test Set 6",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-03-06",
+    "contestJurisdiction" : "TestSets_Single_winner",
+    "contestOffice" : "Duplicate choice exhaust",
+    "tabulateByPrecinct" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_set_6_duplicate_exhaust_cvr.xlsx",
+    "firstVoteColumnIndex" : 2,
+    "firstVoteRowIndex" : 2,
+    "provider" : "ess"
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "B",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "C",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "D",
+    "code" : "",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "numberOfWinners" : 1,
+    "decimalPlacesForVoteArithmetic" : 1,
+    "minimumVoteThreshold" : 0,
+    "maxSkippedRanksAllowed" : 4,
+    "maxRankingsAllowed" : 4,
+    "sequentialMultiSeat" : false,
+    "nonIntegerWinningThreshold" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : true,
+    "exhaustOnDuplicateCandidate" : true,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : "Duplicate choice exhaust"
+  }
+}

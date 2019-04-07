@@ -320,4 +320,68 @@ class TabulatorTests {
   void testSequentialMultiSeat() {
     runTabulationTest("2013_minneapolis_park_sequential");
   }
+
+  // function: nistTest0
+  // purpose: tests skipped first choice
+  @Test
+  @DisplayName("skipped first choice")
+  void nistTest0() {
+    runTabulationTest("test_set_0_skipped_first_choice");
+  }
+
+  // function: nistTest1
+  // purpose: tests exhaust at overvote option
+  @Test
+  @DisplayName("exhaust at overvote rule")
+  void nistTest1() {
+    runTabulationTest("test_set_1_exhaust_at_overvote");
+  }
+
+  // function: nistTest2
+  // purpose: tests overvote skips to next rank option
+  @Test
+  @DisplayName("overvote skips to next rank")
+  void nistTest2() {
+    runTabulationTest("test_set_2_overvote_skip_to_next");
+  }
+
+  // function: nistTest3
+  // purpose: tests skipped choice exhausts option
+  @Test
+  @DisplayName("skipped choice exhausts option")
+  void nistTest3() {
+    runTabulationTest("test_set_3_skipped_choice_exhaust");
+  }
+
+  // function: nistTest4
+  // purpose: tests skipped choice next option
+  @Test
+  @DisplayName("skipped choice next option")
+  void nistTest4() {
+    runTabulationTest("test_set_4_skipped_choice_next");
+  }
+
+  // function: nistTest5
+  // purpose: tests two skipped ranks exhausts option
+  @Test
+  @DisplayName("two skipped ranks exhausts option")
+  void nistTest5() {
+    runTabulationTest("test_set_5_two_skipped_choice_exhaust");
+  }
+
+  // function: nistTest6
+  // purpose: tests duplicate rank exhausts option
+  @Test
+  @DisplayName("duplicate rank exhausts")
+  void nistTest6() {
+    runTabulationTest("test_set_6_duplicate_exhaust");
+  }
+
+  // function: nistTest7
+  // purpose: tests duplicate rank skips to next option
+  @Test
+  @DisplayName("duplicate rank skips to next option")
+  void nistTest7() {
+    runTabulationTest("test_set_7_duplicate_skip_to_next");
+  }
 }

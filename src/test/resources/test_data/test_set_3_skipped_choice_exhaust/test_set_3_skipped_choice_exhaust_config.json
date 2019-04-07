@@ -1,0 +1,48 @@
+{
+  "outputSettings" : {
+    "contestName" : "ExhaustSkip",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-08-06",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Exhausted",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_set_3_skipped_choice_exhaust_cvr.xlsx",
+    "firstVoteColumnIndex" : 2,
+    "firstVoteRowIndex" : 2,
+    "provider" : "ES&S"
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "excluded" : false
+  }, {
+    "name" : "B",
+    "excluded" : false
+  }, {
+    "name" : "C",
+    "excluded" : false
+  }, {
+    "name" : "D",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "numberOfWinners" : 1,
+    "decimalPlacesForVoteArithmetic" : 1,
+    "minimumVoteThreshold" : 0,
+    "maxSkippedRanksAllowed" : 0,
+    "maxRankingsAllowed" : 4,
+    "sequentialMultiSeat" : false,
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote"
+  }
+}
