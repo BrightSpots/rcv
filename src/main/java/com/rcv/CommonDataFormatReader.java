@@ -76,6 +76,38 @@ class CommonDataFormatReader {
   }
 
 
+  // function: parseRankingsFromSnapshot
+  // purpose: parse a list of contest selection rankings from a NIST "Snapshot" HashMap
+  private List<Pair<Integer, String>> parseRankingsFromSnapshot(HashMap snapshot) {
+    // list to contain rankings as they are parsed
+    List<Pair<Integer, String>> rankings = new ArrayList<>();
+    // at the top level is a list of contests each of which contains selections
+    ArrayList CVRContests = (ArrayList) snapshot.get("CVRContest");
+    for (Object contestObject : CVRContests) {
+      HashMap CVRContest = (HashMap) contestObject;
+      // each contest contains contestSelections
+      ArrayList contestSelections = (ArrayList) CVRContest.get("CVRContestSelection");
+      for (Object contestSelectionObject : contestSelections) {
+        HashMap contestSelection = (HashMap) contestSelectionObject;
+        // selectionID is the candidate/contest ID for this selection position
+        String selectionID = (String) contestSelection.get("ContestSelectionId");
+        // extract all the positions (ranks) which this selection has been assigned
+        ArrayList selectionPositions = (ArrayList) contestSelection.get("SelectionPosition");
+        for (Object selectionPositionObject : selectionPositions) {
+          // extract the position object
+          HashMap selectionPosition = (HashMap) selectionPositionObject;
+          // and finally the rank
+          Integer rank = (Integer) selectionPosition.get("Rank");
+          assert rank != null && rank >= 1;
+          // create a new ranking object and save it
+          rankings.add(new Pair<>(rank, selectionID));
+        }
+      }
+    }
+    return rankings;
+  }
+
+
   // function: parseCVRFile
   // purpose: parse the given file into a List of CastVoteRecords for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
@@ -101,51 +133,49 @@ class CommonDataFormatReader {
         ArrayList CVRSnapshots = (ArrayList) CVRObject.get("CVRSnapshot");
         for (Object snapshotObject : CVRSnapshots) {
           HashMap snapshot = (HashMap) snapshotObject;
-          if (snapshot.get("@id").equals(currentSnapshotID)) {
-            // we found the current CVR snapshot
-            // parse out the rankings and create a new cvr
+          if (!snapshot.get("@id").equals(currentSnapshotID)) {
+            continue;
+          }
 
-            // list to contain rankings as they are parsed
-            List<Pair<Integer, String>> rankings = new ArrayList<>();
-
-            // at the top level is a list of contests each of which contains selections
-            ArrayList CVRContests = (ArrayList) snapshot.get("CVRContest");
-            for (Object contestObject : CVRContests) {
-              // extract the CVRContest
-              HashMap CVRContest = (HashMap) contestObject;
-              // contest contains contestSelections
-              ArrayList contestSelections = (ArrayList) CVRContest
-                  .get("CVRContestSelection");
-              for (Object contestSelectionObject : contestSelections) {
-                // extract the contestSelection
-                HashMap contestSelection = (HashMap) contestSelectionObject;
-                // selectionID is the candidate/contest ID for this selection position
-                String selectionID = (String) contestSelection.get("ContestSelectionId");
-                // extract all the positions (ranks) which this selection has been assigned
-                ArrayList selectionPositions = (ArrayList) contestSelection
-                    .get("SelectionPosition");
-                for (Object selectionPositionObject : selectionPositions) {
-                  // extract the position object
-                  HashMap selectionPosition = (HashMap) selectionPositionObject;
-                  // and finally the rank
-                  Integer rank = (Integer) selectionPosition.get("Rank");
-                  assert rank != null;
-                  // create a new ranking object and save it
-                  rankings.add(new Pair<>(rank, selectionID));
-                }
+          // we found the current CVR snapshot so get rankings and create a new cvr
+          List<Pair<Integer, String>> rankings = parseRankingsFromSnapshot(snapshot);
+          // at the top level is a list of contests each of which contains selections
+          ArrayList CVRContests = (ArrayList) snapshot.get("CVRContest");
+          for (Object contestObject : CVRContests) {
+            // extract the CVRContest
+            HashMap CVRContest = (HashMap) contestObject;
+            // contest contains contestSelections
+            ArrayList contestSelections = (ArrayList) CVRContest
+                .get("CVRContestSelection");
+            for (Object contestSelectionObject : contestSelections) {
+              // extract the contestSelection
+              HashMap contestSelection = (HashMap) contestSelectionObject;
+              // selectionID is the candidate/contest ID for this selection position
+              String selectionID = (String) contestSelection.get("ContestSelectionId");
+              // extract all the positions (ranks) which this selection has been assigned
+              ArrayList selectionPositions = (ArrayList) contestSelection
+                  .get("SelectionPosition");
+              for (Object selectionPositionObject : selectionPositions) {
+                // extract the position object
+                HashMap selectionPosition = (HashMap) selectionPositionObject;
+                // and finally the rank
+                Integer rank = (Integer) selectionPosition.get("Rank");
+                assert rank != null;
+                // create a new ranking object and save it
+                rankings.add(new Pair<>(rank, selectionID));
               }
             }
+          }
 
-            // create new cast vote record
-            CastVoteRecord newRecord = new CastVoteRecord(computedCastVoteRecordID,
-                ballotID, null, null, rankings);
-            castVoteRecords.add(newRecord);
+          // create new cast vote record
+          CastVoteRecord newRecord = new CastVoteRecord(computedCastVoteRecordID,
+              ballotID, null, null, rankings);
+          castVoteRecords.add(newRecord);
 
-            // provide some user feedback on the CVR count
-            if (castVoteRecords.size() % 50000 == 0) {
-              Logger.log(Level.INFO, String.format("Parsed %d cast vote records.",
-                  castVoteRecords.size()));
-            }
+          // provide some user feedback on the CVR count
+          if (castVoteRecords.size() % 50000 == 0) {
+            Logger.log(Level.INFO, String.format("Parsed %d cast vote records.",
+                castVoteRecords.size()));
           }
         }
       }
