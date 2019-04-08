@@ -169,7 +169,7 @@ class TabulatorSession {
         try {
           tabulator.generateSummaryFiles(timestampString);
         } catch (IOException e) {
-          Logger.log(Level.SEVERE, "Error writing summary spreadsheet:\n%s", e.toString());
+          Logger.log(Level.SEVERE, "Error writing summary files:\n%s", e.toString());
         }
       } else {
         Logger.log(Level.SEVERE, "No cast vote records found!");

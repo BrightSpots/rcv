@@ -640,36 +640,6 @@
     } ],
     "CurrentSnapshotId" : "ballot-test_set_0_skipped_first_choice_cvr.xlsx-12",
     "ElectionId" : "election-001"
-  }, {
-    "@type" : "CVR.CVR",
-    "BallotPrePrintedId" : "test_set_0_skipped_first_choice_cvr.xlsx-13",
-    "CVRSnapshot" : [ {
-      "@id" : "ballot-test_set_0_skipped_first_choice_cvr.xlsx-13",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "original"
-    } ],
-    "CurrentSnapshotId" : "ballot-test_set_0_skipped_first_choice_cvr.xlsx-13",
-    "ElectionId" : "election-001"
-  }, {
-    "@type" : "CVR.CVR",
-    "BallotPrePrintedId" : "test_set_0_skipped_first_choice_cvr.xlsx-14",
-    "CVRSnapshot" : [ {
-      "@id" : "ballot-test_set_0_skipped_first_choice_cvr.xlsx-14",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "original"
-    } ],
-    "CurrentSnapshotId" : "ballot-test_set_0_skipped_first_choice_cvr.xlsx-14",
-    "ElectionId" : "election-001"
   } ],
   "Election" : [ {
     "@id" : "election-001",
