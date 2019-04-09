@@ -27,6 +27,8 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -91,6 +93,11 @@ class ResultsWriter {
     ObjectMapper mapper = new ObjectMapper();
     // set mapper to order keys alphabetically for more legible output
     mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+    // create a module to contain a serializer for BigDecimal serialization
+    SimpleModule module = new SimpleModule();
+    module.addSerializer(BigDecimal.class, new ToStringSerializer());
+    // attach serializer to mapper
+    mapper.registerModule(module);
 
     // jsonWriter writes those object to disk
     ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
@@ -105,7 +112,7 @@ class ResultsWriter {
   }
 
   private static String generateCvrSnapshotID(String cvrID, Integer round) {
-    return round != null
+    return round != null && round > 0
         ? String.format("ballot-%s-round-%d", cvrID, round)
         : String.format("ballot-%s", cvrID);
   }
@@ -582,9 +589,7 @@ class ResultsWriter {
             Map.ofEntries(
                 entry("HasIndication", "yes"),
                 entry("IsAllocable", isAllocable),
-                entry(
-                    "NumberVotes",
-                    numberVotes), // TODO: render as num instead of string (no quotes)?
+                entry("NumberVotes", numberVotes),
                 entry("Rank", rank),
                 entry("@type", "CVR.SelectionPosition"));
 

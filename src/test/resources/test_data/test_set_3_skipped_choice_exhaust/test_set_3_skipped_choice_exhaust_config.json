@@ -9,24 +9,10 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "test_set_3_skipped_choice_exhaust_cvr.xlsx",
-    "firstVoteColumnIndex" : 2,
-    "firstVoteRowIndex" : 2,
-    "provider" : "ES&S"
+    "filePath": "test_set_3_skipped_choice_exhaust_cvr.json",
+    "provider": "CDF"
   } ],
-  "candidates" : [ {
-    "name" : "A",
-    "excluded" : false
-  }, {
-    "name" : "B",
-    "excluded" : false
-  }, {
-    "name" : "C",
-    "excluded" : false
-  }, {
-    "name" : "D",
-    "excluded" : false
-  } ],
+  "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "alwaysSkipToNextRank",

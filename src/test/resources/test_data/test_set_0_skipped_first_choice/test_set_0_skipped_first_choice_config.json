@@ -5,31 +5,14 @@
     "contestDate" : "2019-03-06",
     "contestJurisdiction" : "TestSets_Single_winner",
     "contestOffice" : "Skiptonext_Skiponovervote",
-    "tabulateByPrecinct" : false
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
   },
   "cvrFileSources" : [ {
-    "filePath" : "test_set_0_skipped_first_choice_cvr.xlsx",
-    "firstVoteColumnIndex" : 2,
-    "firstVoteRowIndex" : 2,
-    "provider" : "ess"
+    "filePath" : "test_set_0_skipped_first_choice_cvr.json",
+    "provider" : "CDF"
   } ],
-  "candidates" : [ {
-    "name" : "A",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "B",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "C",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "D",
-    "code" : "",
-    "excluded" : false
-  } ],
+  "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "exhaustImmediately",
@@ -40,6 +23,7 @@
     "maxRankingsAllowed" : 4,
     "sequentialMultiSeat" : false,
     "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : true,
     "exhaustOnDuplicateCandidate" : false,

@@ -81,7 +81,8 @@ class TabulatorTests {
           break;
         }
         // both files have content so compare it
-        if (!line1.equals(line2)) {
+        if (!(line1.contains("GeneratedDate") && line2.contains("GeneratedDate"))
+            && !line1.equals(line2)) {
           // update flags and report inequality
           errorCount++;
           result = false;
@@ -128,10 +129,10 @@ class TabulatorTests {
 
     if (config.isSequentialMultiSeatEnabled()) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-        compareJson(config, stem, timestampString, i);
+        compareJsons(config, stem, timestampString, i);
       }
     } else {
-      compareJson(config, stem, timestampString, null);
+      compareJsons(config, stem, timestampString, null);
     }
 
     // test passed so cleanup test output folder
@@ -147,15 +148,31 @@ class TabulatorTests {
     }
   }
 
-  private static void compareJson(
+  private static void compareJsons(
       ContestConfig config, String stem, String timestampString, Integer sequentialNumber) {
+    compareJson(config, stem, "summary", timestampString, sequentialNumber);
+    if (config.isGenerateCdfJsonEnabled()) {
+      compareJson(config, stem, "cvr_cdf", timestampString, sequentialNumber);
+    }
+  }
+
+  private static void compareJson(
+      ContestConfig config,
+      String stem,
+      String jsonType,
+      String timestampString,
+      Integer sequentialNumber) {
     String actualOutputPath =
         ResultsWriter.getOutputFilePath(
-            config.getOutputDirectory(), "summary", timestampString, sequentialNumber)
+                config.getOutputDirectory(), jsonType, timestampString, sequentialNumber)
             + ".json";
     String expectedPath =
         getTestFilePath(
-            stem, ResultsWriter.sequentialSuffixForOutputPath(sequentialNumber) + "_expected.json");
+            stem,
+            ResultsWriter.sequentialSuffixForOutputPath(sequentialNumber)
+                + "_expected_"
+                + jsonType
+                + ".json");
     assertTrue(fileCompare(expectedPath, actualOutputPath));
   }
 

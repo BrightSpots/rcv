@@ -694,8 +694,9 @@ class ContestConfig {
   // purpose: perform pre-processing on candidates:
   // 1) if there are any CDF input sources extract candidates names from them
   // 2) build map of candidate ID to candidate name
-  // 3) generates tie-break ordering if needed
+  // 3) generate tie-break ordering if needed
   private void processCandidateData() {
+    candidateCodeToNameMap = new HashMap<>();
 
     for (RawContestConfig.CVRSource source : rawConfig.cvrFileSources) {
       // cvrPath is the resolved path to this source
@@ -704,20 +705,15 @@ class ContestConfig {
       if (source.getProvider().equals("CDF")) {
         CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath);
         Set<String> candidates = reader.getCandidates();
-        // create and add Candidate objects to the rawConfig
-        for(String candidate : candidates) {
-          RawContestConfig.Candidate candidateObject = new RawContestConfig.Candidate();
-          candidateObject.setName(candidate);
-          rawConfig.candidates.add(candidateObject);
+        // add each one to our data structures here
+        for (String candidate : candidates) {
+          candidateCodeToNameMap.put(candidate, candidate);
+          candidatePermutation.add(candidate);
         }
       }
     }
 
-    // build candidate code to name map
-    candidateCodeToNameMap = new HashMap<>();
-
     if (rawConfig.candidates != null) {
-      // candidate is used to index through all candidates for this contest
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
         String code = candidate.getCode();
         String name = candidate.getName();
@@ -732,15 +728,15 @@ class ContestConfig {
           excludedCandidates.add(code);
         }
       }
+    }
 
-      if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-        Collections.shuffle(candidatePermutation);
-      }
+    if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
+      Collections.shuffle(candidatePermutation);
+    }
 
-      String uwiLabel = getUndeclaredWriteInLabel();
-      if (uwiLabel != null && !uwiLabel.isEmpty()) {
-        candidateCodeToNameMap.put(uwiLabel, uwiLabel);
-      }
+    String uwiLabel = getUndeclaredWriteInLabel();
+    if (uwiLabel != null && !uwiLabel.isEmpty()) {
+      candidateCodeToNameMap.put(uwiLabel, uwiLabel);
     }
   }
 }
