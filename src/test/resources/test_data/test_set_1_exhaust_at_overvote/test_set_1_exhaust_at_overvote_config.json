@@ -11,6 +11,7 @@
     "filePath": "test_set_1_exhaust_at_overvote_cvr.json",
     "provider": "CDF"
   } ],
+  "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "exhaustImmediately",

@@ -11,6 +11,7 @@
     "filePath": "test_set_6_duplicate_exhaust_cvr.json",
     "provider": "CDF"
   } ],
+  "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "alwaysSkipToNextRank",

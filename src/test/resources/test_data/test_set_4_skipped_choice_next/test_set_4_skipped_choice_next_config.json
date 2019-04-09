@@ -11,6 +11,7 @@
     "filePath": "test_set_4_skipped_choice_next_cvr.json",
     "provider": "CDF"
   } ],
+  "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "alwaysSkipToNextRank",

@@ -12,6 +12,7 @@
     "filePath": "test_set_3_skipped_choice_exhaust_cvr.json",
     "provider": "CDF"
   } ],
+  "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "alwaysSkipToNextRank",
