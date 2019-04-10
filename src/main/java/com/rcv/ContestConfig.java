@@ -427,9 +427,26 @@ class ContestConfig {
         Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a single-seat contest!");
       }
 
+      if (isBottomsUpMultiSeatEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "bottomsUpMultiSeat can't be true in a single-seat contest!");
+      }
+
       if (isHareQuotaEnabled()) {
         isValid = false;
         Logger.log(Level.SEVERE, "hareQuota can only be true in a multi-seat contest!");
+      }
+    }
+
+    if (isBottomsUpMultiSeatEnabled()) {
+      if (isBatchEliminationEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "batchElimination can't be true in a bottoms-up contest!");
+      }
+
+      if (isSequentialMultiSeatEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a bottoms-up contest!");
       }
     }
   }
