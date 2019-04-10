@@ -44,6 +44,7 @@ class ContestConfig {
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
   static final boolean SUGGESTED_SEQUENTIAL_MULTI_SEAT = false;
+  static final boolean SUGGESTED_BOTTOMS_UP_MULTI_SEAT = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
@@ -461,6 +462,10 @@ class ContestConfig {
 
   boolean isSequentialMultiSeatEnabled() {
     return rawConfig.rules.sequentialMultiSeat;
+  }
+
+  boolean isBottomsUpMultiSeatEnabled() {
+    return rawConfig.rules.bottomsUpMultiSeat;
   }
 
   boolean isNonIntegerWinningThresholdEnabled() {

@@ -217,6 +217,7 @@ public class RawContestConfig {
     // max rankings allowed
     public Integer maxRankingsAllowed;
     public boolean sequentialMultiSeat;
+    public boolean bottomsUpMultiSeat;
     public boolean nonIntegerWinningThreshold;
     public boolean hareQuota;
     // are we using batch elimination?

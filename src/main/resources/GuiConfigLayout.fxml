@@ -227,6 +227,12 @@
                   <Insets top="4.0"/>
                 </VBox.margin>
               </CheckBox>
+              <CheckBox mnemonicParsing="false" text="Bottoms-Up Multi-Seat"
+                fx:id="checkBoxBottomsUpMultiSeat">
+                <VBox.margin>
+                  <Insets top="4.0"/>
+                </VBox.margin>
+              </CheckBox>
               <CheckBox mnemonicParsing="false" text="Non-Integer Winning Threshold"
                 fx:id="checkBoxNonIntegerWinningThreshold">
                 <VBox.margin>

@@ -150,6 +150,12 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: true | false
         if not supplied: false
 
+      "bottomsUpMultiSeat" optional
+        instead of running a normal multi-seat contest with single transferable votes, just eliminate candidates until there are numWinners remaining, then stop
+        can't be true if numberOfWinners = 1
+        value: true | false
+        if not supplied: false
+
       "nonIntegerWinningThreshold" optional
         the vote threshold used to determine winners can be a non-integer
         if true, threshold = V/(S+1) + 10^-d
