@@ -64,17 +64,21 @@ class Tabulator {
   private BigDecimal winningThreshold;
   // tracks residual surplus from multi-seat contest vote transfers
   private Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
+  // precinct Ids which may appear in the cast vote records
+  private Set<String> precinctIds;
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
   // which will be used when reading input cast vote records
   // param: castVoteRecords list of all cast vote records to be tabulated for this contest
   // param: config describes various tabulation rules to be used for tabulation
+  // param: precinct Ids which may appear in the cast vote records
   // returns: the new object
-  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config) {
+  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config, Set<String> precinctIds) {
     this.castVoteRecords = castVoteRecords;
     this.candidateIDs = config.getCandidateCodeList();
     this.config = config;
+    this.precinctIds = precinctIds;
     if (config.isTabulateByPrecinctEnabled()) {
       initPrecinctRoundTallies();
     }
@@ -622,6 +626,7 @@ class Tabulator {
             .setTimestampString(timestamp)
             .setTallyTransfers(tallyTransfers)
             .setWinningThreshold(winningThreshold)
+            .setPrecinctIds(precinctIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
     writer.generateOverallSummaryFiles(roundTallies);

@@ -346,6 +346,14 @@ class TabulatorTests {
     runTabulationTest("2013_minneapolis_park_sequential");
   }
 
+  // function: precinct_example
+  // purpose: tests a small election with precincts
+  @Test
+  @DisplayName("precinct example")
+  void precinctExample() {
+    runTabulationTest("precinct_example");
+  }
+
   // function: nistTest0
   // purpose: tests skipped first choice
   @Test
