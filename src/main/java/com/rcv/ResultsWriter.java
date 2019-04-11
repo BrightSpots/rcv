@@ -505,12 +505,12 @@ class ResultsWriter {
   }
 
   // create NIST Common Data Format CVR json
-  void generateCdfJson(List<CastVoteRecord> castVoteRecords) throws IOException {
+  void generateCdfJson(List<CastVoteRecord> castVoteRecords)
+      throws IOException, RoundSnapshotDataMissingException {
     // generate GpUnitIds for precincts (identify election jurisdiction and precincts)
     GpUnitIds = generateGpUnitIds();
 
     HashMap<String, Object> outputJson = new HashMap<>();
-
     String outputPath =
         getOutputFilePath(
             config.getOutputDirectory(),
@@ -584,7 +584,8 @@ class ResultsWriter {
   }
 
   // purpose: helper method for generateCdfJson to compile the data for all the CVR snapshots
-  private List<Map<String, Object>> generateCdfMapForCvrs(List<CastVoteRecord> castVoteRecords) {
+  private List<Map<String, Object>> generateCdfMapForCvrs(List<CastVoteRecord> castVoteRecords)
+      throws RoundSnapshotDataMissingException {
     List<Map<String, Object>> cvrMaps = new LinkedList<>();
 
     for (CastVoteRecord cvr : castVoteRecords) {
@@ -596,17 +597,11 @@ class ResultsWriter {
       for (int round = 1; round <= numRounds; round++) {
         List<Pair<String, BigDecimal>> currentRoundSnapshotData =
             cvr.getCdfSnapshotData().get(round);
-
-        // this is the hack
-        if (currentRoundSnapshotData == null && previousRoundSnapshotData == null) {
-          currentRoundSnapshotData = new ArrayList<>();
-          Pair<String, BigDecimal> placeholder = new Pair<>("Jacob Frey", BigDecimal.ONE);
-          currentRoundSnapshotData.add(placeholder);
-        }
-        // end hack
-
+        
         if (currentRoundSnapshotData == null) {
-          assert previousRoundSnapshotData != null; // this would indicate a bug in the tabulation
+          if (previousRoundSnapshotData == null) {
+            throw new RoundSnapshotDataMissingException(cvr.getID());
+          }
           currentRoundSnapshotData = previousRoundSnapshotData;
         }
         cvrSnapshots.add(generateCvrSnapshotMap(cvr, round, currentRoundSnapshotData));
@@ -813,6 +808,21 @@ class ResultsWriter {
         // add the action object to list
         actions.add(action);
       }
+    }
+  }
+
+  // Exception class used when we're unexpectedly missing snapshot data for a cast vote record
+  // during CDF JSON generation. If this happens, there's a bug in the tabulation code.
+  static class RoundSnapshotDataMissingException extends Exception {
+
+    private final String cvrId;
+
+    RoundSnapshotDataMissingException(String cvrId) {
+      this.cvrId = cvrId;
+    }
+
+    String getCvrId() {
+      return cvrId;
     }
   }
 }
