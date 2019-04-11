@@ -168,7 +168,7 @@ class TabulatorSession {
     if (castVoteRecords != null) {
       if (!castVoteRecords.isEmpty()) {
         // tabulator for tabulation logic
-        Tabulator tabulator = new Tabulator(castVoteRecords, config);
+        Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIDs);
         // do the tabulation
         winners = tabulator.tabulate();
         // generate visualizer spreadsheet data

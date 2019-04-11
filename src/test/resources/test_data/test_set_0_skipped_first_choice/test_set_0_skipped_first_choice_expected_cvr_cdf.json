@@ -2389,19 +2389,22 @@
         }
       } ]
     } ],
-    "ElectionScopeId" : "gpu-001"
+    "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2019-04-10T00:28:58-07:00",
+  "GeneratedDate" : "2019-04-10T19:52:26-07:00",
   "GpUnit" : [ {
-    "@id" : "gpu-001",
+    "@id" : "gpu-election",
     "@type" : "CVR.GpUnit",
-    "OtherType" : "election scope gpunit",
-    "Type" : "other"
+    "OtherType" : "Election Scope Jurisdiction",
+    "Type" : "other",
+    "Value" : "TestSets_Single_winner"
   } ],
   "ReportGeneratingDeviceIds" : [ "rd-001" ],
   "ReportingDevice" : [ {
     "@id" : "rd-001",
-    "@type" : "CVR.ReportingDevice"
+    "@type" : "CVR.ReportingDevice",
+    "Application" : "RCV Universal Tabulator",
+    "Manufacturer" : "Bright Spots"
   } ],
   "Version" : "1.0.0"
 }

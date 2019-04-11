@@ -65,17 +65,21 @@ class Tabulator {
   private BigDecimal winningThreshold;
   // tracks residual surplus from multi-seat contest vote transfers
   private Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
+  // precincts which may appear in the cast vote records
+  private Set<String> precinctNames;
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
   // which will be used when reading input cast vote records
   // param: castVoteRecords list of all cast vote records to be tabulated for this contest
   // param: config describes various tabulation rules to be used for tabulation
+  // param: precinct Ids which may appear in the cast vote records
   // returns: the new object
-  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config) {
+  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config, Set<String> precinctNames) {
     this.castVoteRecords = castVoteRecords;
     this.candidateIDs = config.getCandidateCodeList();
     this.config = config;
+    this.precinctNames = precinctNames;
     if (config.isTabulateByPrecinctEnabled()) {
       initPrecinctRoundTallies();
     }
@@ -623,6 +627,7 @@ class Tabulator {
             .setTimestampString(timestamp)
             .setTallyTransfers(tallyTransfers)
             .setWinningThreshold(winningThreshold)
+            .setPrecinctIds(precinctNames)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
     writer.generateOverallSummaryFiles(roundTallies);
@@ -1009,12 +1014,9 @@ class Tabulator {
   // function: initPrecinctRoundTallies
   // purpose: initialize the map tracking per-precinct round tallies
   private void initPrecinctRoundTallies() {
-    for (CastVoteRecord cvr : castVoteRecords) {
-      // the precinct for this cast vote record
-      String precinct = cvr.getPrecinct();
-      if (precinct != null && !precinct.isEmpty() && !precinctRoundTallies.containsKey(precinct)) {
-        precinctRoundTallies.put(precinct, new HashMap<>());
-      }
+    for (String precinctName : precinctNames) {
+      precinctRoundTallies.put(precinctName, new HashMap<>());
+      assert precinctName != null && !precinctName.isEmpty();
     }
   }
 
