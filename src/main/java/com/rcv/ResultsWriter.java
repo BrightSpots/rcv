@@ -62,8 +62,8 @@ class ResultsWriter {
   private int numRounds;
   // all precinct Ids which may appear in the output cvrs
   private Set<String> precinctIds;
-    // cache precinct to GpUnitId map 
-  private Map<String, String>GpUnitIds;
+  // cache precinct to GpUnitId map
+  private Map<String, String> GpUnitIds;
 
   // threshold to win
   private BigDecimal winningThreshold;
@@ -506,7 +506,6 @@ class ResultsWriter {
 
   // create NIST Common Data Format CVR json
   void generateCdfJson(List<CastVoteRecord> castVoteRecords) throws IOException {
-
     // generate GpUnitIds for precincts (identify election jurisdiction and precincts)
     GpUnitIds = generateGpUnitIds();
 
@@ -549,9 +548,8 @@ class ResultsWriter {
   // generate map of GpUnitIds
   // we map from precinctId => GpUnitId
   // as lookups will be done from precinctId during cvr creation
-  private Map<String, String> generateGpUnitIds()
-  {
-    Map<String, String>GpUnitIdToPrecinctId = new HashMap<>();
+  private Map<String, String> generateGpUnitIds() {
+    Map<String, String> GpUnitIdToPrecinctId = new HashMap<>();
     int GpUnitIdIndex = 0;
     // for every precinctId add an entry
     for (String precinctId : precinctIds) {
@@ -566,21 +564,21 @@ class ResultsWriter {
     List<Map<String, Object>> GpUnitMaps = new LinkedList<>();
     // and add the election-scope entry for the election jurisdiction
     GpUnitMaps.add(
-      Map.ofEntries(
-        entry("@id", CDF_GPU_ID),
-        entry("Type", "other"),
-        entry("OtherType", "Election Scope Jurisdiction"),
-        entry("Value", config.getContestJurisdiction()),
-        entry("@type", "CVR.GpUnit")));
+        Map.ofEntries(
+            entry("@id", CDF_GPU_ID),
+            entry("Type", "other"),
+            entry("OtherType", "Election Scope Jurisdiction"),
+            entry("Value", config.getContestJurisdiction()),
+            entry("@type", "CVR.GpUnit")));
 
     // generate GpUnit entries
     for (Entry<String, String> entry : GpUnitIds.entrySet()) {
       GpUnitMaps.add(
-        Map.ofEntries(
-          entry("@id", entry.getValue()),
-          entry("Type", "precinct"),
-          entry("Value", entry.getKey()),
-          entry("@type", "CVR.GpUnit")));
+          Map.ofEntries(
+              entry("@id", entry.getValue()),
+              entry("Type", "precinct"),
+              entry("Value", entry.getKey()),
+              entry("@type", "CVR.GpUnit")));
     }
     return GpUnitMaps;
   }
@@ -592,14 +590,15 @@ class ResultsWriter {
     for (CastVoteRecord cvr : castVoteRecords) {
       List<Map<String, Object>> cvrSnapshots = new LinkedList<>();
       cvrSnapshots.add(generateCvrSnapshotMap(cvr, null, null));
-
+      // copy most recent round snapshot data to subsequent rounds
+      // until more snapshot data is available
       List<Pair<String, BigDecimal>> previousRoundSnapshotData = null;
       for (int round = 1; round <= numRounds; round++) {
         List<Pair<String, BigDecimal>> currentRoundSnapshotData =
             cvr.getCdfSnapshotData().get(round);
 
         // this is the hack
-        if(currentRoundSnapshotData == null && previousRoundSnapshotData == null) {
+        if (currentRoundSnapshotData == null && previousRoundSnapshotData == null) {
           currentRoundSnapshotData = new ArrayList<>();
           Pair<String, BigDecimal> placeholder = new Pair<>("Jacob Frey", BigDecimal.ONE);
           currentRoundSnapshotData.add(placeholder);
@@ -613,28 +612,20 @@ class ResultsWriter {
         cvrSnapshots.add(generateCvrSnapshotMap(cvr, round, currentRoundSnapshotData));
         previousRoundSnapshotData = currentRoundSnapshotData;
       }
-      // create new cvr map entry
 
+      // create new cvr map entry
+      Map<String, Object> cvrMap = new HashMap<>();
+      cvrMap.put("BallotPrePrintedId", cvr.getID());
+      cvrMap.put("CurrentSnapshotId", generateCvrSnapshotID(cvr.getID(), numRounds));
+      cvrMap.put("CVRSnapshot", cvrSnapshots);
+      cvrMap.put("ElectionId", CDF_ELECTION_ID);
+      cvrMap.put("@type", "CVR.CVR");
       // if using precincts add GpUnitId for cvr precinct
       if (config.isTabulateByPrecinctEnabled()) {
         String GpUnitId = GpUnitIds.get(cvr.getPrecinct());
-        cvrMaps.add(
-            Map.ofEntries(
-              entry("BallotPrePrintedId", cvr.getID()),
-              entry("CurrentSnapshotId", generateCvrSnapshotID(cvr.getID(), numRounds)),
-              entry("CVRSnapshot", cvrSnapshots),
-              entry("ElectionId", CDF_ELECTION_ID),
-              entry("@type", "CVR.CVR"),
-              entry("BallotStyleUnit", GpUnitId)));
-      } else {
-        cvrMaps.add(
-            Map.ofEntries(
-              entry("BallotPrePrintedId", cvr.getID()),
-              entry("CurrentSnapshotId", generateCvrSnapshotID(cvr.getID(), numRounds)),
-              entry("CVRSnapshot", cvrSnapshots),
-              entry("ElectionId", CDF_ELECTION_ID),
-              entry("@type", "CVR.CVR")));
+        cvrMap.put("BallotStyleUnit", GpUnitId);
       }
+      cvrMaps.add(cvrMap);
     }
     return cvrMaps;
   }
