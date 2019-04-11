@@ -22,6 +22,7 @@
 package com.rcv;
 
 import com.rcv.CastVoteRecord.VoteOutcomeType;
+import com.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -631,7 +632,14 @@ class Tabulator {
     }
 
     if (config.isGenerateCdfJsonEnabled()) {
-      writer.generateCdfJson(castVoteRecords);
+      try {
+        writer.generateCdfJson(castVoteRecords);
+      } catch (RoundSnapshotDataMissingException e) {
+        Logger.log(
+            Level.SEVERE,
+            "CDF JSON generation failed due to missing snapshot for %s",
+            e.getCvrId());
+      }
     }
   }
 
@@ -799,8 +807,6 @@ class Tabulator {
     //  become exhausted
     //  remain exhausted
     for (CastVoteRecord cvr : castVoteRecords) {
-
-      // check for already exhausted
       if (cvr.isExhausted()) {
         continue;
       }
@@ -816,6 +822,11 @@ class Tabulator {
             roundTallyByPrecinct,
             cvr.getPrecinct());
         continue;
+      }
+
+      // check for a CVR with no rankings at all
+      if (cvr.rankToCandidateIDs.isEmpty()) {
+        recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
       }
 
       // iterate through the rankings in this cvr from most to least preferred.
