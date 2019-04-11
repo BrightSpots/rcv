@@ -346,6 +346,14 @@ class TabulatorTests {
     runTabulationTest("2013_minneapolis_park_sequential");
   }
 
+  // function: testSequentialMultiSeat
+  // purpose: tests sequentialMultiSeat option
+  @Test
+  @DisplayName("test bottoms-up multi-seat logic")
+  void testBottomsUpMultiSeat() {
+    runTabulationTest("2013_minneapolis_park_bottoms_up");
+  }
+
   // function: nistTest0
   // purpose: tests skipped first choice
   @Test
