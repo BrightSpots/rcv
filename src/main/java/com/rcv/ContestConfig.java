@@ -666,13 +666,13 @@ class ContestConfig {
   }
 
   // function: getNameForCandidateID
-  // purpose: lookup full candidate name given a candidate ID
-  // param: candidateID the ID of the candidate whose name we want to lookup
+  // purpose: look up full candidate name given a candidate code
+  // param: code the code of the candidate whose name we want to look up
   // returns: the full name for the given candidateID
-  String getNameForCandidateID(String candidateID) {
-    return getUndeclaredWriteInLabel() != null && getUndeclaredWriteInLabel().equals(candidateID)
+  String getNameForCandidateCode(String code) {
+    return getUndeclaredWriteInLabel() != null && getUndeclaredWriteInLabel().equals(code)
         ? "Undeclared"
-        : candidateCodeToNameMap.get(candidateID);
+        : candidateCodeToNameMap.get(code);
   }
 
   // function: getCandidatePermutation

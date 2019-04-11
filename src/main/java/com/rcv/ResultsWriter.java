@@ -56,6 +56,8 @@ class ResultsWriter {
   private static final String CDF_GPU_ID = "gpu-001";
   private static final String CDF_REPORTING_DEVICE_ID = "rd-001";
 
+  private static final Map<String, String> candidateCodeToCdfId = new HashMap<>();
+
   // number of rounds needed to elect winner(s)
   private int numRounds;
   // threshold to win
@@ -88,6 +90,10 @@ class ResultsWriter {
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
   }
 
+  static String sanitizeStringForOutput(String s) {
+    return s.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
+  }
+
   private static void generateJsonFile(String path, Map<String, Object> json) throws IOException {
     // mapper converts java objects to json
     ObjectMapper mapper = new ObjectMapper();
@@ -115,6 +121,15 @@ class ResultsWriter {
     return round != null && round > 0
         ? String.format("ballot-%s-round-%d", cvrID, round)
         : String.format("ballot-%s", cvrID);
+  }
+
+  private static String getCdfIdForCandidateCode(String code) {
+    String id = candidateCodeToCdfId.get(code);
+    if (id == null) {
+      id = String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
+      candidateCodeToCdfId.put(code, id);
+    }
+    return id;
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
@@ -287,7 +302,7 @@ class ResultsWriter {
     for (String candidate : sortedCandidates) {
       // show each candidate row with their totals for each round
       // text for the candidate name
-      String candidateDisplayName = this.config.getNameForCandidateID(candidate);
+      String candidateDisplayName = config.getNameForCandidateCode(candidate);
       csvPrinter.print(candidateDisplayName);
 
       // round indexes over all rounds
@@ -392,7 +407,7 @@ class ResultsWriter {
     List<String> candidateDisplayNames = new ArrayList<>();
     // build list of display names
     for (String candidate : candidates) {
-      candidateDisplayNames.add(config.getNameForCandidateID(candidate));
+      candidateDisplayNames.add(config.getNameForCandidateCode(candidate));
     }
     // concatenate them using semi-colon for display in a single cell
     String candidateCellText = String.join("; ", candidateDisplayNames);
@@ -456,7 +471,7 @@ class ResultsWriter {
   // return: the new filename
   private String getPrecinctFileString(String precinct, Set<String> filenames) {
     // sanitized is the precinct name with all special characters converted to underscores
-    String sanitized = precinct.replaceAll("[^a-zA-Z0-9._\\-]+", "_");
+    String sanitized = sanitizeStringForOutput(precinct);
     // filename is the string that we'll eventually return
     String filename = sanitized;
     // appendNumber is used to find a unique filename (in practice this really shouldn't be
@@ -572,13 +587,13 @@ class ResultsWriter {
       CastVoteRecord cvr, Integer round, List<Pair<String, BigDecimal>> currentRoundSnapshotData) {
     List<Map<String, Object>> selectionMapList = new LinkedList<>();
     for (int rank : cvr.rankToCandidateIDs.keySet()) {
-      for (String candidate : cvr.rankToCandidateIDs.get(rank)) {
+      for (String candidateCode : cvr.rankToCandidateIDs.get(rank)) {
         String isAllocable = "unknown";
         BigDecimal numberVotes = BigDecimal.ONE;
         if (currentRoundSnapshotData != null) {
           // scanning the list isn't actually expensive because it will almost always be very short
           for (Pair<String, BigDecimal> allocation : currentRoundSnapshotData) {
-            if (allocation.getKey().equals(candidate)) {
+            if (allocation.getKey().equals(candidateCode)) {
               isAllocable = "yes";
               numberVotes = allocation.getValue();
               break;
@@ -599,7 +614,7 @@ class ResultsWriter {
 
         selectionMapList.add(
             Map.ofEntries(
-                entry("ContestSelectionId", candidate),
+                entry("ContestSelectionId", getCdfIdForCandidateCode(candidateCode)),
                 entry("SelectionPosition", new Map[]{selectionPositionMap}),
                 entry("@type", "CVR.CVRContestSelection")));
       }
@@ -611,23 +626,29 @@ class ResultsWriter {
             entry("CVRContestSelection", selectionMapList),
             entry("@type", "CVR.CVRContest"));
 
-    Map<String, Object> snapshotMap =
-        Map.ofEntries(
+    return Map.ofEntries(
             entry("@id", generateCvrSnapshotID(cvr.getID(), round)),
             entry("CVRContest", new Map[]{contestMap}),
             entry("Type", round != null ? "interpreted" : "original"),
             entry("@type", "CVR.CVRSnapshot"));
-
-    return snapshotMap;
   }
 
   private Map<String, Object> generateCdfMapForElection() {
     HashMap<String, Object> electionMap = new HashMap<>();
 
-    List<Map<String, String>> contestSelections = new LinkedList<>();
-    for (String candidate : config.getCandidateCodeList()) {
-      contestSelections.add(
-          Map.ofEntries(entry("@id", candidate), entry("@type", "CVR.ContestSelection")));
+    List<Map<String, Object>> contestSelections = new LinkedList<>();
+    for (String candidateCode : config.getCandidateCodeList()) {
+      Map<String, String> codeMap = Map.ofEntries(
+          entry("@type", "CVR.Code"),
+          entry("Type", "other"),
+          entry("OtherType", "vendor-label"),
+          entry("Value", config.getNameForCandidateCode(candidateCode))
+      );
+      contestSelections.add(Map.ofEntries(
+          entry("@id", getCdfIdForCandidateCode(candidateCode)),
+          entry("@type", "CVR.ContestSelection"),
+          entry("Code", codeMap)
+      ));
     }
 
     Map<String, Object> contestJson =
@@ -705,7 +726,7 @@ class ResultsWriter {
   private Map<String, BigDecimal> updateCandidateNamesInTally(Map<String, BigDecimal> tally) {
     Map<String, BigDecimal> newTally = new HashMap<>();
     for (String key : tally.keySet()) {
-      newTally.put(config.getNameForCandidateID(key), tally.get(key));
+      newTally.put(config.getNameForCandidateCode(key), tally.get(key));
     }
     return newTally;
   }
@@ -734,7 +755,7 @@ class ResultsWriter {
         // for each candidate create an action object
         HashMap<String, Object> action = new HashMap<>();
         // add the specified action type
-        action.put(actionType, config.getNameForCandidateID(candidate));
+        action.put(actionType, config.getNameForCandidateCode(candidate));
         // check if there are any transfers
         if (roundTransfers != null) {
           Map<String, BigDecimal> transfersFromCandidate = roundTransfers.get(candidate);

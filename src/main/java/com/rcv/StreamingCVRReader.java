@@ -141,10 +141,6 @@ class StreamingCVRReader {
     return result - 1;
   }
 
-  private static String sanitizeStringForId(String s) {
-    return s.replaceAll("[^a-zA-Z0-9_\\-\\.]", "_");
-  }
-
   // function: handleEmptyCells
   // purpose: Handle empty cells encountered while parsing a CVR.  Unlike empty rows, empty cells
   // do not trigger parsing callbacks so their existence must be inferred and handled when they
@@ -183,7 +179,7 @@ class StreamingCVRReader {
     handleEmptyCells(config.getMaxRankingsAllowed() + 1);
     // determine what the new cvr ID will be
     String computedCastVoteRecordID =
-        String.format("%s-%d", sanitizeStringForId(excelFileName), cvrIndex);
+        String.format("%s-%d", ResultsWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
     // create new cast vote record
     CastVoteRecord newRecord =
         new CastVoteRecord(
