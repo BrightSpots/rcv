@@ -583,7 +583,7 @@ class ResultsWriter {
             entry("@id", CDF_GPU_ID),
             entry("Type", "other"),
             entry("OtherType", "Election Scope Jurisdiction"),
-            entry("Value", config.getContestJurisdiction()),
+            entry("Name", config.getContestJurisdiction()),
             entry("@type", "CVR.GpUnit")));
 
     // generate GpUnit entries
@@ -592,7 +592,7 @@ class ResultsWriter {
           Map.ofEntries(
               entry("@id", entry.getValue()),
               entry("Type", "precinct"),
-              entry("Value", entry.getKey()),
+              entry("Name", entry.getKey()),
               entry("@type", "CVR.GpUnit")));
     }
     return GpUnitMaps;
@@ -633,7 +633,7 @@ class ResultsWriter {
       // if using precincts add GpUnitId for cvr precinct
       if (config.isTabulateByPrecinctEnabled()) {
         String GpUnitId = GpUnitIds.get(cvr.getPrecinct());
-        cvrMap.put("BallotStyleUnit", GpUnitId);
+        cvrMap.put("BallotStyleUnitId", GpUnitId);
       }
       cvrMaps.add(cvrMap);
     }
@@ -681,7 +681,7 @@ class ResultsWriter {
     Map<String, Object> contestMap =
         Map.ofEntries(
             entry("ContestId", CDF_CONTEST_ID),
-            entry("CVRContestSelection", selectionMapList),
+            entry("ContestSelection", selectionMapList),
             entry("@type", "CVR.CVRContest"));
 
     return Map.ofEntries(
@@ -702,10 +702,13 @@ class ResultsWriter {
           entry("OtherType", "vendor-label"),
           entry("Value", config.getNameForCandidateCode(candidateCode))
       );
+      // codeMap is wrapped in an array
+      ArrayList<Map<String, String>> codeArray = new ArrayList<>();
+      codeArray.add(codeMap);
       contestSelections.add(Map.ofEntries(
           entry("@id", getCdfIdForCandidateCode(candidateCode)),
           entry("@type", "CVR.ContestSelection"),
-          entry("Code", codeMap)
+          entry("Code", codeArray)
       ));
     }
 
