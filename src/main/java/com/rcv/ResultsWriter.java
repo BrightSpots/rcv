@@ -612,7 +612,7 @@ class ResultsWriter {
       for (int round = 1; round <= numRounds; round++) {
         List<Pair<String, BigDecimal>> currentRoundSnapshotData =
             cvr.getCdfSnapshotData().get(round);
-        
+
         if (currentRoundSnapshotData == null) {
           if (previousRoundSnapshotData == null) {
             throw new RoundSnapshotDataMissingException(cvr.getID());
@@ -685,10 +685,10 @@ class ResultsWriter {
             entry("@type", "CVR.CVRContest"));
 
     return Map.ofEntries(
-            entry("@id", generateCvrSnapshotID(cvr.getID(), round)),
-            entry("CVRContest", new Map[]{contestMap}),
-            entry("Type", round != null ? "interpreted" : "original"),
-            entry("@type", "CVR.CVRSnapshot"));
+        entry("@id", generateCvrSnapshotID(cvr.getID(), round)),
+        entry("CVRContest", new Map[]{contestMap}),
+        entry("Type", round != null ? "interpreted" : "original"),
+        entry("@type", "CVR.CVRSnapshot"));
   }
 
   private Map<String, Object> generateCdfMapForElection() {
@@ -702,13 +702,11 @@ class ResultsWriter {
           entry("OtherType", "vendor-label"),
           entry("Value", config.getNameForCandidateCode(candidateCode))
       );
-      // codeMap is wrapped in an array
-      ArrayList<Map<String, String>> codeArray = new ArrayList<>();
-      codeArray.add(codeMap);
+
       contestSelections.add(Map.ofEntries(
           entry("@id", getCdfIdForCandidateCode(candidateCode)),
           entry("@type", "CVR.ContestSelection"),
-          entry("Code", codeArray)
+          entry("Code", new Map[]{codeMap})
       ));
     }
 
