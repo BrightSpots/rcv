@@ -26,6 +26,7 @@
 package com.rcv;
 
 import com.rcv.FileUtils.UnableToCreateDirectoryException;
+import com.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import com.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -69,13 +70,19 @@ class TabulatorSession {
     if (config != null && config.validate()) {
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
+        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
         ResultsWriter writer =
             new ResultsWriter()
                 .setNumRounds(0)
                 .setContestConfig(config)
-                .setTimestampString(timestampString);
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
-        writer.generateCdfJson(castVoteRecords);
+                .setTimestampString(timestampString)
+                .setPrecinctIds(precinctIDs);
+        try {
+          writer.generateCdfJson(castVoteRecords);
+        } catch (RoundSnapshotDataMissingException e) {
+          // This will never actually happen because no snapshots are involved when you're just
+          // translating the input to CDF, not the tabulation results.
+        }
       } catch (IOException | UnableToCreateDirectoryException exception) {
         Logger.log(Level.SEVERE, "CDF JSON generation failed.");
       }
@@ -162,7 +169,7 @@ class TabulatorSession {
     if (castVoteRecords != null) {
       if (!castVoteRecords.isEmpty()) {
         // tabulator for tabulation logic
-        Tabulator tabulator = new Tabulator(castVoteRecords, config);
+        Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIDs);
         // do the tabulation
         winners = tabulator.tabulate();
         // generate visualizer spreadsheet data

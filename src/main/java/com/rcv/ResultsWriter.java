@@ -43,6 +43,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
@@ -53,11 +54,19 @@ class ResultsWriter {
 
   private static final String CDF_CONTEST_ID = "contest-001";
   private static final String CDF_ELECTION_ID = "election-001";
-  private static final String CDF_GPU_ID = "gpu-001";
+  private static final String CDF_GPU_ID = "gpu-election";
+  private static final String CDF_GPU_ID_FORMAT = "gpu-%d";
   private static final String CDF_REPORTING_DEVICE_ID = "rd-001";
+
+  private static final Map<String, String> candidateCodeToCdfId = new HashMap<>();
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
+  // all precinct Ids which may appear in the output cvrs
+  private Set<String> precinctIds;
+  // cache precinct to GpUnitId map
+  private Map<String, String> GpUnitIds;
+
   // threshold to win
   private BigDecimal winningThreshold;
   // map from round number to list of candidates eliminated in that round
@@ -86,6 +95,10 @@ class ResultsWriter {
             "%s_%s%s",
             timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationNumber));
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
+  }
+
+  static String sanitizeStringForOutput(String s) {
+    return s.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
   }
 
   private static void generateJsonFile(String path, Map<String, Object> json) throws IOException {
@@ -117,6 +130,15 @@ class ResultsWriter {
         : String.format("ballot-%s", cvrID);
   }
 
+  private static String getCdfIdForCandidateCode(String code) {
+    String id = candidateCodeToCdfId.get(code);
+    if (id == null) {
+      id = String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
+      candidateCodeToCdfId.put(code, id);
+    }
+    return id;
+  }
+
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
     this.roundToResidualSurplus = roundToResidualSurplus;
     return this;
@@ -143,6 +165,13 @@ class ResultsWriter {
   // param: threshold to win
   ResultsWriter setWinningThreshold(BigDecimal threshold) {
     this.winningThreshold = threshold;
+    return this;
+  }
+
+  // function: setPrecinctIds
+  // purpose: setter for precinctIds
+  ResultsWriter setPrecinctIds(Set<String> precinctIds) {
+    this.precinctIds = precinctIds;
     return this;
   }
 
@@ -287,7 +316,7 @@ class ResultsWriter {
     for (String candidate : sortedCandidates) {
       // show each candidate row with their totals for each round
       // text for the candidate name
-      String candidateDisplayName = this.config.getNameForCandidateID(candidate);
+      String candidateDisplayName = config.getNameForCandidateCode(candidate);
       csvPrinter.print(candidateDisplayName);
 
       // round indexes over all rounds
@@ -392,7 +421,7 @@ class ResultsWriter {
     List<String> candidateDisplayNames = new ArrayList<>();
     // build list of display names
     for (String candidate : candidates) {
-      candidateDisplayNames.add(config.getNameForCandidateID(candidate));
+      candidateDisplayNames.add(config.getNameForCandidateCode(candidate));
     }
     // concatenate them using semi-colon for display in a single cell
     String candidateCellText = String.join("; ", candidateDisplayNames);
@@ -456,7 +485,7 @@ class ResultsWriter {
   // return: the new filename
   private String getPrecinctFileString(String precinct, Set<String> filenames) {
     // sanitized is the precinct name with all special characters converted to underscores
-    String sanitized = precinct.replaceAll("[^a-zA-Z0-9._\\-]+", "_");
+    String sanitized = sanitizeStringForOutput(precinct);
     // filename is the string that we'll eventually return
     String filename = sanitized;
     // appendNumber is used to find a unique filename (in practice this really shouldn't be
@@ -490,9 +519,13 @@ class ResultsWriter {
     generateSummaryJson(roundTallies, null, outputPath);
   }
 
-  void generateCdfJson(List<CastVoteRecord> castVoteRecords) throws IOException {
-    HashMap<String, Object> outputJson = new HashMap<>();
+  // create NIST Common Data Format CVR json
+  void generateCdfJson(List<CastVoteRecord> castVoteRecords)
+      throws IOException, RoundSnapshotDataMissingException {
+    // generate GpUnitIds for precincts (identify election jurisdiction and precincts)
+    GpUnitIds = generateGpUnitIds();
 
+    HashMap<String, Object> outputJson = new HashMap<>();
     String outputPath =
         getOutputFilePath(
             config.getOutputDirectory(),
@@ -509,21 +542,17 @@ class ResultsWriter {
     outputJson.put("Election", new Map[]{generateCdfMapForElection()});
     outputJson.put(
         "GeneratedDate", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
-    outputJson.put(
-        "GpUnit",
-        new Map[]{
-            Map.ofEntries(
-                entry("@id", CDF_GPU_ID),
-                entry("OtherType", "election scope gpunit"),
-                entry("Type", "other"),
-                entry("@type", "CVR.GpUnit"))
-        });
+    outputJson.put("GpUnit", generateCdfMapForGpUnits());
     outputJson.put("ReportGeneratingDeviceIds", new String[]{CDF_REPORTING_DEVICE_ID});
     outputJson.put(
         "ReportingDevice",
         new Map[]{
             Map.ofEntries(
-                entry("@id", CDF_REPORTING_DEVICE_ID), entry("@type", "CVR.ReportingDevice"))
+                entry("@id", CDF_REPORTING_DEVICE_ID),
+                entry("@type", "CVR.ReportingDevice"),
+                entry("Application", "RCV Universal Tabulator"),
+                entry("Manufacturer", "Bright Spots")
+            )
         });
     outputJson.put("Version", "1.0.0");
     outputJson.put("@type", "CVR.CastVoteRecordReport");
@@ -531,35 +560,83 @@ class ResultsWriter {
     generateJsonFile(outputPath, outputJson);
   }
 
+  // generate map of GpUnitIds
+  // we map from precinctId => GpUnitId
+  // as lookups will be done from precinctId during cvr creation
+  private Map<String, String> generateGpUnitIds() {
+    Map<String, String> GpUnitIdToPrecinctId = new HashMap<>();
+    int GpUnitIdIndex = 0;
+    // for every precinctId add an entry
+    for (String precinctId : precinctIds) {
+      GpUnitIdToPrecinctId.put(precinctId, String.format(CDF_GPU_ID_FORMAT, ++GpUnitIdIndex));
+    }
+    return GpUnitIdToPrecinctId;
+  }
+
+  // generates json containing precinct IDs
+  private List<Map<String, Object>> generateCdfMapForGpUnits() {
+    // create the GpUnit map
+    List<Map<String, Object>> GpUnitMaps = new LinkedList<>();
+    // and add the election-scope entry for the election jurisdiction
+    GpUnitMaps.add(
+        Map.ofEntries(
+            entry("@id", CDF_GPU_ID),
+            entry("Type", "other"),
+            entry("OtherType", "Election Scope Jurisdiction"),
+            entry("Name", config.getContestJurisdiction()),
+            entry("@type", "CVR.GpUnit")));
+
+    // generate GpUnit entries
+    for (Entry<String, String> entry : GpUnitIds.entrySet()) {
+      GpUnitMaps.add(
+          Map.ofEntries(
+              entry("@id", entry.getValue()),
+              entry("Type", "precinct"),
+              entry("Name", entry.getKey()),
+              entry("@type", "CVR.GpUnit")));
+    }
+    return GpUnitMaps;
+  }
+
   // purpose: helper method for generateCdfJson to compile the data for all the CVR snapshots
-  private List<Map<String, Object>> generateCdfMapForCvrs(List<CastVoteRecord> castVoteRecords) {
+  private List<Map<String, Object>> generateCdfMapForCvrs(List<CastVoteRecord> castVoteRecords)
+      throws RoundSnapshotDataMissingException {
     List<Map<String, Object>> cvrMaps = new LinkedList<>();
 
     for (CastVoteRecord cvr : castVoteRecords) {
       List<Map<String, Object>> cvrSnapshots = new LinkedList<>();
       cvrSnapshots.add(generateCvrSnapshotMap(cvr, null, null));
-
+      // copy most recent round snapshot data to subsequent rounds
+      // until more snapshot data is available
       List<Pair<String, BigDecimal>> previousRoundSnapshotData = null;
       for (int round = 1; round <= numRounds; round++) {
         List<Pair<String, BigDecimal>> currentRoundSnapshotData =
             cvr.getCdfSnapshotData().get(round);
+
         if (currentRoundSnapshotData == null) {
-          assert previousRoundSnapshotData != null; // this would indicate a bug in the tabulation
+          if (previousRoundSnapshotData == null) {
+            throw new RoundSnapshotDataMissingException(cvr.getID());
+          }
           currentRoundSnapshotData = previousRoundSnapshotData;
         }
         cvrSnapshots.add(generateCvrSnapshotMap(cvr, round, currentRoundSnapshotData));
         previousRoundSnapshotData = currentRoundSnapshotData;
       }
 
-      cvrMaps.add(
-          Map.ofEntries(
-              entry("BallotPrePrintedId", cvr.getID()),
-              entry("CurrentSnapshotId", generateCvrSnapshotID(cvr.getID(), numRounds)),
-              entry("CVRSnapshot", cvrSnapshots),
-              entry("ElectionId", CDF_ELECTION_ID),
-              entry("@type", "CVR.CVR")));
+      // create new cvr map entry
+      Map<String, Object> cvrMap = new HashMap<>();
+      cvrMap.put("BallotPrePrintedId", cvr.getID());
+      cvrMap.put("CurrentSnapshotId", generateCvrSnapshotID(cvr.getID(), numRounds));
+      cvrMap.put("CVRSnapshot", cvrSnapshots);
+      cvrMap.put("ElectionId", CDF_ELECTION_ID);
+      cvrMap.put("@type", "CVR.CVR");
+      // if using precincts add GpUnitId for cvr precinct
+      if (config.isTabulateByPrecinctEnabled()) {
+        String GpUnitId = GpUnitIds.get(cvr.getPrecinct());
+        cvrMap.put("BallotStyleUnitId", GpUnitId);
+      }
+      cvrMaps.add(cvrMap);
     }
-
     return cvrMaps;
   }
 
@@ -568,13 +645,13 @@ class ResultsWriter {
       CastVoteRecord cvr, Integer round, List<Pair<String, BigDecimal>> currentRoundSnapshotData) {
     List<Map<String, Object>> selectionMapList = new LinkedList<>();
     for (int rank : cvr.rankToCandidateIDs.keySet()) {
-      for (String candidate : cvr.rankToCandidateIDs.get(rank)) {
+      for (String candidateCode : cvr.rankToCandidateIDs.get(rank)) {
         String isAllocable = "unknown";
         BigDecimal numberVotes = BigDecimal.ONE;
         if (currentRoundSnapshotData != null) {
           // scanning the list isn't actually expensive because it will almost always be very short
           for (Pair<String, BigDecimal> allocation : currentRoundSnapshotData) {
-            if (allocation.getKey().equals(candidate)) {
+            if (allocation.getKey().equals(candidateCode)) {
               isAllocable = "yes";
               numberVotes = allocation.getValue();
               break;
@@ -595,7 +672,7 @@ class ResultsWriter {
 
         selectionMapList.add(
             Map.ofEntries(
-                entry("ContestSelectionId", candidate),
+                entry("ContestSelectionId", getCdfIdForCandidateCode(candidateCode)),
                 entry("SelectionPosition", new Map[]{selectionPositionMap}),
                 entry("@type", "CVR.CVRContestSelection")));
       }
@@ -604,26 +681,33 @@ class ResultsWriter {
     Map<String, Object> contestMap =
         Map.ofEntries(
             entry("ContestId", CDF_CONTEST_ID),
-            entry("CVRContestSelection", selectionMapList),
+            entry("ContestSelection", selectionMapList),
             entry("@type", "CVR.CVRContest"));
 
-    Map<String, Object> snapshotMap =
-        Map.ofEntries(
-            entry("@id", generateCvrSnapshotID(cvr.getID(), round)),
-            entry("CVRContest", new Map[]{contestMap}),
-            entry("Type", round != null ? "interpreted" : "original"),
-            entry("@type", "CVR.CVRSnapshot"));
-
-    return snapshotMap;
+    return Map.ofEntries(
+        entry("@id", generateCvrSnapshotID(cvr.getID(), round)),
+        entry("CVRContest", new Map[]{contestMap}),
+        entry("Type", round != null ? "interpreted" : "original"),
+        entry("@type", "CVR.CVRSnapshot"));
   }
 
   private Map<String, Object> generateCdfMapForElection() {
     HashMap<String, Object> electionMap = new HashMap<>();
 
-    List<Map<String, String>> contestSelections = new LinkedList<>();
-    for (String candidate : config.getCandidateCodeList()) {
-      contestSelections.add(
-          Map.ofEntries(entry("@id", candidate), entry("@type", "CVR.ContestSelection")));
+    List<Map<String, Object>> contestSelections = new LinkedList<>();
+    for (String candidateCode : config.getCandidateCodeList()) {
+      Map<String, String> codeMap = Map.ofEntries(
+          entry("@type", "CVR.Code"),
+          entry("Type", "other"),
+          entry("OtherType", "vendor-label"),
+          entry("Value", config.getNameForCandidateCode(candidateCode))
+      );
+
+      contestSelections.add(Map.ofEntries(
+          entry("@id", getCdfIdForCandidateCode(candidateCode)),
+          entry("@type", "CVR.ContestSelection"),
+          entry("Code", new Map[]{codeMap})
+      ));
     }
 
     Map<String, Object> contestJson =
@@ -701,7 +785,7 @@ class ResultsWriter {
   private Map<String, BigDecimal> updateCandidateNamesInTally(Map<String, BigDecimal> tally) {
     Map<String, BigDecimal> newTally = new HashMap<>();
     for (String key : tally.keySet()) {
-      newTally.put(config.getNameForCandidateID(key), tally.get(key));
+      newTally.put(config.getNameForCandidateCode(key), tally.get(key));
     }
     return newTally;
   }
@@ -730,7 +814,7 @@ class ResultsWriter {
         // for each candidate create an action object
         HashMap<String, Object> action = new HashMap<>();
         // add the specified action type
-        action.put(actionType, config.getNameForCandidateID(candidate));
+        action.put(actionType, config.getNameForCandidateCode(candidate));
         // check if there are any transfers
         if (roundTransfers != null) {
           Map<String, BigDecimal> transfersFromCandidate = roundTransfers.get(candidate);
@@ -746,6 +830,21 @@ class ResultsWriter {
         // add the action object to list
         actions.add(action);
       }
+    }
+  }
+
+  // Exception class used when we're unexpectedly missing snapshot data for a cast vote record
+  // during CDF JSON generation. If this happens, there's a bug in the tabulation code.
+  static class RoundSnapshotDataMissingException extends Exception {
+
+    private final String cvrId;
+
+    RoundSnapshotDataMissingException(String cvrId) {
+      this.cvrId = cvrId;
+    }
+
+    String getCvrId() {
+      return cvrId;
     }
   }
 }

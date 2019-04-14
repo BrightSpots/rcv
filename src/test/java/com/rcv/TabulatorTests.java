@@ -330,8 +330,8 @@ class TabulatorTests {
     runTabulationTest("2013_minneapolis_park_hare");
   }
 
-  // function: testSequentialMultiSeat
-  // purpose: tests sequentialMultiSeat option
+  // function: testCDFMultiWinner
+  // purpose: tests CDF for a multi-seat contest
   @Test
   @DisplayName("test Common Data Format multi-winner contest")
   void testCDFMultiWinner() {
@@ -346,12 +346,20 @@ class TabulatorTests {
     runTabulationTest("2013_minneapolis_park_sequential");
   }
 
-  // function: testSequentialMultiSeat
-  // purpose: tests sequentialMultiSeat option
+  // function: testBottomsUpMultiSeat
+  // purpose: tests bottomsUpMultiSeat option
   @Test
   @DisplayName("test bottoms-up multi-seat logic")
   void testBottomsUpMultiSeat() {
     runTabulationTest("2013_minneapolis_park_bottoms_up");
+  }
+
+  // function: precinctExample
+  // purpose: tests a small election with precincts
+  @Test
+  @DisplayName("precinct example")
+  void precinctExample() {
+    runTabulationTest("precinct_example");
   }
 
   // function: nistTest0
