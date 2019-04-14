@@ -70,12 +70,13 @@ class TabulatorSession {
     if (config != null && config.validate()) {
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
+        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
         ResultsWriter writer =
             new ResultsWriter()
                 .setNumRounds(0)
                 .setContestConfig(config)
-                .setTimestampString(timestampString);
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
+                .setTimestampString(timestampString)
+                .setPrecinctIds(precinctIDs);
         try {
           writer.generateCdfJson(castVoteRecords);
         } catch (RoundSnapshotDataMissingException e) {
