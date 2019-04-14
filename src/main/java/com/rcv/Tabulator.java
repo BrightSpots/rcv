@@ -167,8 +167,9 @@ class Tabulator {
         for (String winner : winners) {
           winnerToRound.put(winner, currentRound);
         }
-        // In multi-seat contests, we always redistribute the surplus (if any).
-        if (config.getNumberOfWinners() > 1) {
+        // In multi-seat contests, we always redistribute the surplus (if any) unless bottoms-up
+        // is enabled.
+        if (config.getNumberOfWinners() > 1 && !config.isBottomsUpMultiSeatEnabled()) {
           for (String winner : winners) {
             // number of votes the candidate got this round
             BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
@@ -402,9 +403,12 @@ class Tabulator {
     } else {
       // If there are more seats to fill, we should keep going, of course.
       // But also: if we've selected all the winners in a multi-seat contest, we should tabulate one
-      // extra round in order to show the effect of redistributing the final surpluses.
+      // extra round in order to show the effect of redistributing the final surpluses... unless
+      // bottoms-up is enabled, in which case we can stop as soon as we've declared the winners.
       return numWinnersDeclared < config.getNumberOfWinners()
-          || (config.getNumberOfWinners() > 1 && winnerToRound.values().contains(currentRound));
+          || (config.getNumberOfWinners() > 1
+          && winnerToRound.values().contains(currentRound)
+          && !config.isBottomsUpMultiSeatEnabled());
     }
   }
 
@@ -453,7 +457,10 @@ class Tabulator {
       if (currentRoundCandidateToTally.size()
           == config.getNumberOfWinners() - winnerToRound.size()) {
         selectedWinners.addAll(currentRoundCandidateToTally.keySet());
-      } else { // see if anyone has met or exceeded the threshold
+      } else if (!config.isBottomsUpMultiSeatEnabled()) {
+        // We see if anyone has met/exceeded the threshold (unless bottoms-up is enabled, in which
+        // case we just wait until there are numWinners candidates remaining and then declare all of
+        // them as winners simultaneously).
         // tally indexes over all tallies to find any winners
         for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
           if (tally.compareTo(winningThreshold) >= 0) {

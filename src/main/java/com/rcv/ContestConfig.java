@@ -44,6 +44,7 @@ class ContestConfig {
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
   static final boolean SUGGESTED_SEQUENTIAL_MULTI_SEAT = false;
+  static final boolean SUGGESTED_BOTTOMS_UP_MULTI_SEAT = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
@@ -426,9 +427,26 @@ class ContestConfig {
         Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a single-seat contest!");
       }
 
+      if (isBottomsUpMultiSeatEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "bottomsUpMultiSeat can't be true in a single-seat contest!");
+      }
+
       if (isHareQuotaEnabled()) {
         isValid = false;
         Logger.log(Level.SEVERE, "hareQuota can only be true in a multi-seat contest!");
+      }
+    }
+
+    if (isBottomsUpMultiSeatEnabled()) {
+      if (isBatchEliminationEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "batchElimination can't be true in a bottoms-up contest!");
+      }
+
+      if (isSequentialMultiSeatEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a bottoms-up contest!");
       }
     }
   }
@@ -461,6 +479,10 @@ class ContestConfig {
 
   boolean isSequentialMultiSeatEnabled() {
     return rawConfig.rules.sequentialMultiSeat;
+  }
+
+  boolean isBottomsUpMultiSeatEnabled() {
+    return rawConfig.rules.bottomsUpMultiSeat;
   }
 
   boolean isNonIntegerWinningThresholdEnabled() {
