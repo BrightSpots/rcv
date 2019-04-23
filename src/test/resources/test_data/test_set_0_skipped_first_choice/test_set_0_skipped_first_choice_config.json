@@ -22,14 +22,15 @@
     "maxSkippedRanksAllowed" : 4,
     "maxRankingsAllowed" : 4,
     "sequentialMultiSeat" : false,
+    "bottomsUpMultiSeat" : false,
     "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : true,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
     "undeclaredWriteInLabel" : "",
     "rulesDescription" : "Skiptonext_exhaustatovervote"
   }
