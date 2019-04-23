@@ -303,7 +303,8 @@ public class GuiConfigController implements Initializable {
   public void buttonCvrFilePathClicked() {
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-    fc.getExtensionFilters().add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
+    fc.getExtensionFilters()
+        .add(new ExtensionFilter("Excel and JSON files", "*.xls", "*.xlsx", "*.json"));
     fc.setTitle("Select CVR File");
 
     File openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
@@ -317,11 +318,12 @@ public class GuiConfigController implements Initializable {
     String cvrFilePath = textFieldCvrFilePath.getText().trim();
     String cvrFirstVoteCol = textFieldCvrFirstVoteCol.getText().trim();
     String cvrFirstVoteRow = textFieldCvrFirstVoteRow.getText().trim();
+    String cvrProvider = textFieldCvrProvider.getText().trim();
     if (cvrFilePath.isEmpty()) {
       Logger.log(Level.WARNING, "CVR file path is required!");
-    } else if (cvrFirstVoteCol.isEmpty()) {
+    } else if (cvrFirstVoteCol.isEmpty() && !cvrProvider.equals("CDF")) {
       Logger.log(Level.WARNING, "CVR first vote column index is required!");
-    } else if (cvrFirstVoteRow.isEmpty()) {
+    } else if (cvrFirstVoteRow.isEmpty() && !cvrProvider.equals("CDF")) {
       Logger.log(Level.WARNING, "CVR first vote row index is required!");
     } else {
       cvrSource.setFilePath(cvrFilePath);
@@ -329,7 +331,7 @@ public class GuiConfigController implements Initializable {
       cvrSource.setFirstVoteRowIndex(getIntValueOrNull(cvrFirstVoteRow));
       cvrSource.setIdColumnIndex(getIntValueOrNull(textFieldCvrIdCol));
       cvrSource.setPrecinctColumnIndex(getIntValueOrNull(textFieldCvrPrecinctCol));
-      cvrSource.setProvider(textFieldCvrProvider.getText().trim());
+      cvrSource.setProvider(cvrProvider);
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
