@@ -319,11 +319,12 @@ public class GuiConfigController implements Initializable {
     String cvrFirstVoteCol = textFieldCvrFirstVoteCol.getText().trim();
     String cvrFirstVoteRow = textFieldCvrFirstVoteRow.getText().trim();
     String cvrProvider = textFieldCvrProvider.getText().trim();
+    boolean fileIsJson = cvrFilePath.toLowerCase().endsWith(".json");
     if (cvrFilePath.isEmpty()) {
       Logger.log(Level.WARNING, "CVR file path is required!");
-    } else if (cvrFirstVoteCol.isEmpty() && !cvrProvider.equals("CDF")) {
+    } else if (cvrFirstVoteCol.isEmpty() && !fileIsJson) {
       Logger.log(Level.WARNING, "CVR first vote column index is required!");
-    } else if (cvrFirstVoteRow.isEmpty() && !cvrProvider.equals("CDF")) {
+    } else if (cvrFirstVoteRow.isEmpty() && !fileIsJson) {
       Logger.log(Level.WARNING, "CVR first vote row index is required!");
     } else {
       cvrSource.setFilePath(cvrFilePath);
