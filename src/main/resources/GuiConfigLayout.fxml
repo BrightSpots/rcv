@@ -103,9 +103,9 @@
                     text="Select"/>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Col Index *"
+                  <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Col Index"
                     fx:id="textFieldCvrFirstVoteCol"/>
-                  <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Row Index *"
+                  <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Row Index"
                     fx:id="textFieldCvrFirstVoteRow"/>
                   <TextField prefHeight="25.0" prefWidth="120.0" promptText="ID Col Index"
                     fx:id="textFieldCvrIdCol"/>
