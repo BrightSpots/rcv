@@ -216,7 +216,7 @@ class TabulatorSession {
       Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       try {
         if (source.getProvider().equals("CDF")) {
-          CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath);
+          CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
           reader.parseCVRFile(castVoteRecords);
         } else {
           // use xlsx reader for ES&S

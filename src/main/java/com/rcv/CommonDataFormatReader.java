@@ -32,12 +32,14 @@ class CommonDataFormatReader {
 
   // path of the source file
   private final String filePath;
+  private final ContestConfig config;
 
   // function: CommonDataFormatReader
   // purpose: class constructor
   // param: filePath source file to read
-  CommonDataFormatReader(String filePath) {
+  CommonDataFormatReader(String filePath, ContestConfig config) {
     this.filePath = filePath;
+    this.config = config;
   }
 
   // function: getCandidates
@@ -100,6 +102,9 @@ class CommonDataFormatReader {
         HashMap contestSelection = (HashMap) contestSelectionObject;
         // selectionID is the candidate/contest ID for this selection position
         String selectionID = (String) contestSelection.get("ContestSelectionId");
+        if (selectionID.equals(config.getOvervoteLabel())) {
+          selectionID = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+        }
         // extract all the positions (ranks) which this selection has been assigned
         ArrayList selectionPositions = (ArrayList) contestSelection.get("SelectionPosition");
         for (Object selectionPositionObject : selectionPositions) {

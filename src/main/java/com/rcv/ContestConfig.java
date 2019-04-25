@@ -725,7 +725,7 @@ class ContestConfig {
       String cvrPath = resolveConfigPath(source.getFilePath());
       // for any CDF sources extract candidate names
       if (source.getProvider().equals("CDF")) {
-        CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath);
+        CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this);
         candidateCodeToNameMap = reader.getCandidates();
         for (String candidate : candidateCodeToNameMap.keySet()) {
           candidatePermutation.add(candidate);
