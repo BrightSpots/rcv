@@ -5,11 +5,12 @@
     "contestDate" : "2019-03-06",
     "contestJurisdiction" : "TestSets_Single_winner",
     "contestOffice" : "Skipped choice_allow 1",
-    "tabulateByPrecinct" : false
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
   },
   "cvrFileSources" : [ {
-    "filePath": "test_set_5_two_skipped_choice_exhaust_cvr.json",
-    "provider": "CDF"
+    "filePath" : "test_set_5_two_skipped_choice_exhaust_cvr.json",
+    "provider" : "CDF"
   } ],
   "candidates" : [ ],
   "rules" : {
@@ -21,13 +22,15 @@
     "maxSkippedRanksAllowed" : 1,
     "maxRankingsAllowed" : 4,
     "sequentialMultiSeat" : false,
+    "bottomsUpMultiSeat" : false,
     "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : true,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
     "undeclaredWriteInLabel" : "",
     "rulesDescription" : "Skipped choice allowed 1"
   }
