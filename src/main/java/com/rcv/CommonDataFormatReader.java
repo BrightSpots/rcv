@@ -23,9 +23,8 @@ package com.rcv;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.logging.Level;
 import javafx.util.Pair;
 
@@ -42,30 +41,41 @@ class CommonDataFormatReader {
   }
 
   // function: getCandidates
-  // purpose: returns list of candidates parsed from CDF election json
-  Set<String> getCandidates() {
+  // purpose: returns map from candidate ID to name parsed from CDF election json
+  Map<String, String> getCandidates() {
     // container for results
-    Set<String> candidates = new HashSet<>();
+    Map<String, String> candidates = new HashMap<>();
     try {
       // try to read in the file
       HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
       // top-level election is a list of election objects:
       ArrayList electionArray = (ArrayList) json.get("Election");
-      for(Object electionObject : electionArray) {
+      for (Object electionObject : electionArray) {
         HashMap election = (HashMap) electionObject;
         // each election contains one or more contests
         ArrayList contestArray = (ArrayList) election.get("Contest");
         // currently we only support a single contest per file
         assert contestArray.size() == 1;
-        for(Object contestObject : contestArray) {
+        for (Object contestObject : contestArray) {
           HashMap contest = (HashMap) contestObject;
           // for each contest get the contest selections
           ArrayList contestSelectionArray = (ArrayList) contest.get("ContestSelection");
-          for(Object contestSelectionObject : contestSelectionArray) {
+          for (Object contestSelectionObject : contestSelectionArray) {
             HashMap contestSelection = (HashMap) contestSelectionObject;
-            // selectionID is the candidate name
+            // selectionID is the candidate ID
             String selectionID = (String) contestSelection.get("@id");
-            candidates.add(selectionID);
+            String selectionName = null;
+            ArrayList codeArray = (ArrayList) contestSelection.get("Code");
+            if (codeArray != null) {
+              for (Object codeObject : codeArray) {
+                HashMap code = (HashMap) codeObject;
+                String otherType = (String) code.get("OtherType");
+                if (otherType != null && otherType.equals("vendor-label")) {
+                  selectionName = (String) code.get("Value");
+                }
+              }
+            }
+            candidates.put(selectionID, selectionName != null ? selectionName : selectionID);
           }
         }
       }
@@ -74,7 +84,6 @@ class CommonDataFormatReader {
     }
     return candidates;
   }
-
 
   // function: parseRankingsFromSnapshot
   // purpose: parse a list of contest selection rankings from a NIST "Snapshot" HashMap
@@ -86,7 +95,7 @@ class CommonDataFormatReader {
     for (Object contestObject : CVRContests) {
       HashMap CVRContest = (HashMap) contestObject;
       // each contest contains contestSelections
-      ArrayList contestSelections = (ArrayList) CVRContest.get("CVRContestSelection");
+      ArrayList contestSelections = (ArrayList) CVRContest.get("ContestSelection");
       for (Object contestSelectionObject : contestSelections) {
         HashMap contestSelection = (HashMap) contestSelectionObject;
         // selectionID is the candidate/contest ID for this selection position
@@ -106,7 +115,6 @@ class CommonDataFormatReader {
     }
     return rankings;
   }
-
 
   // function: parseCVRFile
   // purpose: parse the given file into a List of CastVoteRecords for tabulation
@@ -145,16 +153,14 @@ class CommonDataFormatReader {
             // extract the CVRContest
             HashMap CVRContest = (HashMap) contestObject;
             // contest contains contestSelections
-            ArrayList contestSelections = (ArrayList) CVRContest
-                .get("CVRContestSelection");
+            ArrayList contestSelections = (ArrayList) CVRContest.get("ContestSelection");
             for (Object contestSelectionObject : contestSelections) {
               // extract the contestSelection
               HashMap contestSelection = (HashMap) contestSelectionObject;
               // selectionID is the candidate/contest ID for this selection position
               String selectionID = (String) contestSelection.get("ContestSelectionId");
               // extract all the positions (ranks) which this selection has been assigned
-              ArrayList selectionPositions = (ArrayList) contestSelection
-                  .get("SelectionPosition");
+              ArrayList selectionPositions = (ArrayList) contestSelection.get("SelectionPosition");
               for (Object selectionPositionObject : selectionPositions) {
                 // extract the position object
                 HashMap selectionPosition = (HashMap) selectionPositionObject;
@@ -168,14 +174,14 @@ class CommonDataFormatReader {
           }
 
           // create new cast vote record
-          CastVoteRecord newRecord = new CastVoteRecord(computedCastVoteRecordID,
-              ballotID, null, null, rankings);
+          CastVoteRecord newRecord =
+              new CastVoteRecord(computedCastVoteRecordID, ballotID, null, null, rankings);
           castVoteRecords.add(newRecord);
 
           // provide some user feedback on the CVR count
           if (castVoteRecords.size() % 50000 == 0) {
-            Logger.log(Level.INFO, String.format("Parsed %d cast vote records.",
-                castVoteRecords.size()));
+            Logger.log(
+                Level.INFO, String.format("Parsed %d cast vote records.", castVoteRecords.size()));
           }
         }
       }
@@ -184,4 +190,3 @@ class CommonDataFormatReader {
     }
   }
 }
-

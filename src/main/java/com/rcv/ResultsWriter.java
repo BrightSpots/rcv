@@ -133,7 +133,10 @@ class ResultsWriter {
   private static String getCdfIdForCandidateCode(String code) {
     String id = candidateCodeToCdfId.get(code);
     if (id == null) {
-      id = String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
+      id =
+          code.startsWith("cs-")
+              ? code
+              : String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
       candidateCodeToCdfId.put(code, id);
     }
     return id;
@@ -551,8 +554,7 @@ class ResultsWriter {
                 entry("@id", CDF_REPORTING_DEVICE_ID),
                 entry("@type", "CVR.ReportingDevice"),
                 entry("Application", "RCV Universal Tabulator"),
-                entry("Manufacturer", "Bright Spots")
-            )
+                entry("Manufacturer", "Bright Spots"))
         });
     outputJson.put("Version", "1.0.0");
     outputJson.put("@type", "CVR.CastVoteRecordReport");
@@ -696,18 +698,18 @@ class ResultsWriter {
 
     List<Map<String, Object>> contestSelections = new LinkedList<>();
     for (String candidateCode : config.getCandidateCodeList()) {
-      Map<String, String> codeMap = Map.ofEntries(
-          entry("@type", "CVR.Code"),
-          entry("Type", "other"),
-          entry("OtherType", "vendor-label"),
-          entry("Value", config.getNameForCandidateCode(candidateCode))
-      );
+      Map<String, String> codeMap =
+          Map.ofEntries(
+              entry("@type", "CVR.Code"),
+              entry("Type", "other"),
+              entry("OtherType", "vendor-label"),
+              entry("Value", config.getNameForCandidateCode(candidateCode)));
 
-      contestSelections.add(Map.ofEntries(
-          entry("@id", getCdfIdForCandidateCode(candidateCode)),
-          entry("@type", "CVR.ContestSelection"),
-          entry("Code", new Map[]{codeMap})
-      ));
+      contestSelections.add(
+          Map.ofEntries(
+              entry("@id", getCdfIdForCandidateCode(candidateCode)),
+              entry("@type", "CVR.ContestSelection"),
+              entry("Code", new Map[]{codeMap})));
     }
 
     Map<String, Object> contestJson =
@@ -819,8 +821,16 @@ class ResultsWriter {
         if (roundTransfers != null) {
           Map<String, BigDecimal> transfersFromCandidate = roundTransfers.get(candidate);
           if (transfersFromCandidate != null) {
-            // add transfers
-            action.put("transfers", transfersFromCandidate);
+            // We want to replace candidate IDs with names here, too.
+            Map<String, BigDecimal> translatedTransfers = new HashMap<>();
+            for (String candidateId : transfersFromCandidate.keySet()) {
+              // candidateName will be null for special values like "exhausted"
+              String candidateName = config.getNameForCandidateCode(candidateId);
+              translatedTransfers.put(
+                  candidateName != null ? candidateName : candidateId,
+                  transfersFromCandidate.get(candidateId));
+            }
+            action.put("transfers", translatedTransfers);
           }
         }
         if (!action.containsKey("transfers")) {
