@@ -58,12 +58,12 @@ Config file must be valid JSON format. Examples can be found under the test fold
         example: /Users/test_data/2015-portland-mayor-cvr.xlsx
         value: string of length [1..1000]
 
-      "firstVoteColumnIndex" required for Excel files
+      "firstVoteColumnIndex" required unless source is JSON
         index of the column (starting from 1) that contains the top-ranked candidate for each CVR
         example: 3
         value: [1..1000]
 
-      "firstVoteRowIndex" required for Excel files
+      "firstVoteRowIndex" required unless source is JSON
         index of the row (starting from 1) that contains the rankings for the first CVR
         example: 2
         value: [1..100000]
@@ -74,7 +74,7 @@ Config file must be valid JSON format. Examples can be found under the test fold
         value: [1..1000]
         if not supplied: none
 
-      "precinctColumnIndex" required for Excel files when "tabulateByPrecinct" is enabled
+      "precinctColumnIndex" required when "tabulateByPrecinct" is enabled unless source is JSON
         index of the column (starting from 1) that contains the precinct name for each CVR
         example: 2
         value: [1..1000]
