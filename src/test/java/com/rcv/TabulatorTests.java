@@ -330,14 +330,6 @@ class TabulatorTests {
     runTabulationTest("2013_minneapolis_park_hare");
   }
 
-  // function: testCDFMultiWinner
-  // purpose: tests CDF for a multi-seat contest
-  @Test
-  @DisplayName("test Common Data Format multi-winner contest")
-  void testCDFMultiWinner() {
-    runTabulationTest("CDF_multi_winner");
-  }
-
   // function: testSequentialMultiSeat
   // purpose: tests sequentialMultiSeat option
   @Test
