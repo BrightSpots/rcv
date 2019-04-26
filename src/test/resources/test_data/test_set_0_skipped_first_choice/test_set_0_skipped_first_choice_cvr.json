@@ -633,11 +633,7 @@
             "IsAllocable" : "unknown",
             "NumberVotes" : "1",
             "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
-          "SelectionPosition" : [ {
+          }, {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
@@ -649,21 +645,6 @@
       "Type" : "original"
     } ],
     "CurrentSnapshotId" : "ballot-12",
-    "ElectionId" : "election-001"
-  }, {
-    "@type" : "CVR.CVR",
-    "BallotPrePrintedId" : "test_set_0_skipped_first_choice_cvr.xlsx-13",
-    "CVRSnapshot" : [ {
-      "@id" : "ballot-test_set_0_skipped_first_choice_cvr.xlsx-13",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "ContestId" : "contest-001",
-        "ContestSelection" : [ ]
-      } ],
-      "Type" : "original"
-    } ],
-    "CurrentSnapshotId" : "ballot-test_set_0_skipped_first_choice_cvr.xlsx-13",
     "ElectionId" : "election-001"
   } ],
   "Election" : [ {
@@ -712,7 +693,7 @@
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2019-04-22T21:55:39-07:00",
+  "GeneratedDate" : "2019-04-25T23:28:48-07:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
     "@type" : "CVR.GpUnit",

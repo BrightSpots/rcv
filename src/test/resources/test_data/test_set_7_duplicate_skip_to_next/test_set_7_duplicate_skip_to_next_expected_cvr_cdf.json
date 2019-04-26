@@ -18,11 +18,7 @@
             "IsAllocable" : "unknown",
             "NumberVotes" : "1",
             "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
-          "SelectionPosition" : [ {
+          }, {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
@@ -57,14 +53,10 @@
             "IsAllocable" : "yes",
             "NumberVotes" : "1",
             "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
-          "SelectionPosition" : [ {
+          }, {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
-            "IsAllocable" : "yes",
+            "IsAllocable" : "no",
             "NumberVotes" : "1",
             "Rank" : 2
           } ]
@@ -96,11 +88,7 @@
             "IsAllocable" : "no",
             "NumberVotes" : "1",
             "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
-          "SelectionPosition" : [ {
+          }, {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "no",
@@ -135,11 +123,7 @@
             "IsAllocable" : "no",
             "NumberVotes" : "1",
             "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
-          "SelectionPosition" : [ {
+          }, {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "no",
@@ -2877,7 +2861,7 @@
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2019-04-24T22:54:21-07:00",
+  "GeneratedDate" : "2019-04-26T00:10:07-07:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
     "@type" : "CVR.GpUnit",

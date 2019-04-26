@@ -18,11 +18,7 @@
             "IsAllocable" : "unknown",
             "NumberVotes" : "1",
             "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
-          "SelectionPosition" : [ {
+          }, {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
@@ -822,7 +818,7 @@
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2019-04-24T22:53:48-07:00",
+  "GeneratedDate" : "2019-04-26T00:09:08-07:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
     "@type" : "CVR.GpUnit",
