@@ -37,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -141,6 +142,43 @@ class ResultsWriter {
       candidateCodeToCdfId.put(code, id);
     }
     return id;
+  }
+
+  // purpose: Instead of a map from rank to list of candidates, we need a sorted list of candidates
+  // with the ranks they were given. (Ordinarily a candidate will have only a single rank, but they
+  // could have multiple ranks if the ballot duplicates the candidate, i.e. assigns them multiple
+  // ranks.
+  // We sort by the lowest (best) rank, then alphabetically by name.
+  private static List<Map.Entry<String, List<Integer>>> getCandidatesWithRanksList(
+      Map<Integer, Set<String>> rankToCandidateIDs) {
+    Map<String, List<Integer>> candidateIdToRanks = new HashMap<>();
+    // first group the ranks by candidate
+    for (int rank : rankToCandidateIDs.keySet()) {
+      for (String candidateId : rankToCandidateIDs.get(rank)) {
+        candidateIdToRanks.computeIfAbsent(candidateId, k -> new LinkedList<>());
+        candidateIdToRanks.get(candidateId).add(rank);
+      }
+    }
+    // we want the ranks for a given candidate in ascending order
+    for (List<Integer> list : candidateIdToRanks.values()) {
+      Collections.sort(list);
+    }
+    List<Map.Entry<String, List<Integer>>> sortedCandidatesWithRanks =
+        new LinkedList<>(candidateIdToRanks.entrySet());
+    // and now we sort the list of candidates with ranks
+    sortedCandidatesWithRanks.sort(
+        (firstObject, secondObject) -> {
+          int ret;
+          Integer firstRank = firstObject.getValue().get(0);
+          Integer secondRank = secondObject.getValue().get(0);
+          if (!firstRank.equals(secondRank)) {
+            ret = firstRank.compareTo(secondRank);
+          } else {
+            ret = firstObject.getKey().compareTo(secondObject.getKey());
+          }
+          return ret;
+        });
+    return sortedCandidatesWithRanks;
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
@@ -643,38 +681,53 @@ class ResultsWriter {
   private Map<String, Object> generateCvrSnapshotMap(
       CastVoteRecord cvr, Integer round, List<Pair<String, BigDecimal>> currentRoundSnapshotData) {
     List<Map<String, Object>> selectionMapList = new LinkedList<>();
-    for (int rank : cvr.rankToCandidateIDs.keySet()) {
-      for (String candidateCode : cvr.rankToCandidateIDs.get(rank)) {
-        String isAllocable = "unknown";
-        BigDecimal numberVotes = BigDecimal.ONE;
-        if (currentRoundSnapshotData != null) {
-          // scanning the list isn't actually expensive because it will almost always be very short
-          for (Pair<String, BigDecimal> allocation : currentRoundSnapshotData) {
-            if (allocation.getKey().equals(candidateCode)) {
-              isAllocable = "yes";
-              numberVotes = allocation.getValue();
-              break;
-            }
-          }
-          if (isAllocable.equals("unknown")) {
-            isAllocable = "no";
-            // not sure what numberVotes should be in this situation
+    List<Map.Entry<String, List<Integer>>> candidatesWithRanksList =
+        getCandidatesWithRanksList(cvr.rankToCandidateIDs);
+
+    for (Map.Entry<String, List<Integer>> candidateWithRanks : candidatesWithRanksList) {
+      String candidateCode = candidateWithRanks.getKey();
+
+      String isAllocable = "unknown";
+      BigDecimal numberVotes = BigDecimal.ONE;
+
+      if (currentRoundSnapshotData != null) {
+        // scanning the list isn't actually expensive because it will almost always be very short
+        for (Pair<String, BigDecimal> allocation : currentRoundSnapshotData) {
+          if (allocation.getKey().equals(candidateCode)) {
+            isAllocable = "yes";
+            numberVotes = allocation.getValue();
+            break;
           }
         }
-        Map<String, Object> selectionPositionMap =
+        // didn't find an allocation, i.e. this ballot didn't contribute all or part of a vote to
+        // this candidate in this round
+        if (isAllocable.equals("unknown")) {
+          isAllocable = "no";
+          // not sure what numberVotes should be in this situation
+        }
+      }
+
+      List<Map<String, Object>> selectionPositionMaps = new LinkedList<>();
+      for (int rank : candidateWithRanks.getValue()) {
+        selectionPositionMaps.add(
             Map.ofEntries(
                 entry("HasIndication", "yes"),
                 entry("IsAllocable", isAllocable),
                 entry("NumberVotes", numberVotes),
                 entry("Rank", rank),
-                entry("@type", "CVR.SelectionPosition"));
-
-        selectionMapList.add(
-            Map.ofEntries(
-                entry("ContestSelectionId", getCdfIdForCandidateCode(candidateCode)),
-                entry("SelectionPosition", new Map[]{selectionPositionMap}),
-                entry("@type", "CVR.CVRContestSelection")));
+                entry("@type", "CVR.SelectionPosition")));
+        if (isAllocable.equals("yes")) {
+          // If there are duplicate rankings for the candidate on this ballot, only the first one
+          // can be allocable.
+          isAllocable = "no";
+        }
       }
+
+      selectionMapList.add(
+          Map.ofEntries(
+              entry("ContestSelectionId", getCdfIdForCandidateCode(candidateCode)),
+              entry("SelectionPosition", selectionPositionMaps),
+              entry("@type", "CVR.CVRContestSelection")));
     }
 
     Map<String, Object> contestMap =
