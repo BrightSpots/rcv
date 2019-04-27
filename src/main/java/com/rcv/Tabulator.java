@@ -633,6 +633,7 @@ class Tabulator {
             .setContestConfig(config)
             .setTimestampString(timestamp)
             .setTallyTransfers(tallyTransfers)
+            .setNumBallots(castVoteRecords.size())
             .setWinningThreshold(winningThreshold)
             .setPrecinctIds(precinctNames)
             .setRoundToResidualSurplus(roundToResidualSurplus);
