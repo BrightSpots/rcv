@@ -80,6 +80,7 @@ class ResultsWriter {
   // TallyTransfer object contains totals votes transferred each round
   private TallyTransfers tallyTransfers;
   private Map<Integer, BigDecimal> roundToResidualSurplus;
+  private int numBallots;
 
   static String sequentialSuffixForOutputPath(Integer sequentialTabulationNumber) {
     return sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
@@ -152,6 +153,11 @@ class ResultsWriter {
   // param: TallyTransfer object
   ResultsWriter setTallyTransfers(TallyTransfers tallyTransfers) {
     this.tallyTransfers = tallyTransfers;
+    return this;
+  }
+
+  ResultsWriter setNumBallots(int numBallots) {
+    this.numBallots = numBallots;
     return this;
   }
 
@@ -267,7 +273,7 @@ class ResultsWriter {
     // candidates sorted by first round tally
     List<String> sortedCandidates = sortCandidatesByTally(firstRoundTally);
 
-    // totalActiveVotesPerRound is a map of round to total votes cast in each round
+    // totalActiveVotesPerRound is a map of round to active votes in each round
     Map<Integer, BigDecimal> totalActiveVotesPerRound = new HashMap<>();
     // round indexes over all rounds plus final results round
     for (int round = 1; round <= numRounds; round++) {
@@ -312,8 +318,6 @@ class ResultsWriter {
       addActionRows(csvPrinter);
     }
 
-    final BigDecimal totalActiveVotesFirstRound = totalActiveVotesPerRound.get(1);
-
     // For each candidate: for each round: output total votes
     // candidate indexes over all candidates
     for (String candidate : sortedCandidates) {
@@ -343,17 +347,12 @@ class ResultsWriter {
 
     // round indexes through all rounds
     for (int round = 1; round <= numRounds; round++) {
-      // count of votes inactive this round
-      BigDecimal thisRoundInactive = BigDecimal.ZERO;
-
-      if (round > 1) {
-        // Exhausted count is the difference between the total votes in round 1 and the total votes
-        // in the current round.
-        thisRoundInactive =
-            totalActiveVotesFirstRound
-                .subtract(totalActiveVotesPerRound.get(round))
-                .subtract(roundToResidualSurplus.get(round));
-      }
+      // Exhausted/inactive count is the difference between the total ballots and the total votes
+      // still active or counting as residual surplus votes in the current round.
+      BigDecimal thisRoundInactive =
+          new BigDecimal(numBallots)
+              .subtract(totalActiveVotesPerRound.get(round))
+              .subtract(roundToResidualSurplus.get(round));
       // total votes cell
       csvPrinter.print(thisRoundInactive.toString());
     }
@@ -434,8 +433,6 @@ class ResultsWriter {
 
   // function: addHeaderRows
   // purpose: add arbitrary header rows and cell to the top of the visualizer spreadsheet
-  // param: worksheet to which we will be adding rows and cells
-  // param: totalActiveVotesPerRound map of round to votes active in that round
   private void addHeaderRows(CSVPrinter csvPrinter, String precinct) throws IOException {
     csvPrinter.printRecord("Contest", config.getContestName());
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());

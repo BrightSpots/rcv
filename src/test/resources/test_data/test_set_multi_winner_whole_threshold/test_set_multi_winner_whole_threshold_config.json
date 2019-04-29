@@ -5,39 +5,14 @@
     "contestDate" : "2019-01-18",
     "contestJurisdiction" : "Multi-winner",
     "contestOffice" : "Multi_winner2",
-    "tabulateByPrecinct" : false
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
   },
   "cvrFileSources" : [ {
-    "filePath" : "multi_winner_redistribution_cvr.xlsx",
-    "firstVoteColumnIndex" : 2,
-    "firstVoteRowIndex" : 2,
-    "provider" : ""
+    "filePath" : "test_set_multi_winner_whole_threshold_cvr.json",
+    "provider" : "CDF"
   } ],
-  "candidates" : [ {
-    "name" : "A",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "B",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "C",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "D",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "E",
-    "code" : "",
-    "excluded" : false
-  }, {
-    "name" : "F",
-    "code" : "",
-    "excluded" : false
-  } ],
+  "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "interactive",
     "overvoteRule" : "alwaysSkipToNextRank",
@@ -46,13 +21,16 @@
     "minimumVoteThreshold" : 0,
     "maxSkippedRanksAllowed" : 1,
     "maxRankingsAllowed" : 6,
-    "nonIntegerWinningThreshold" : true,
+    "sequentialMultiSeat" : false,
+    "bottomsUpMultiSeat" : false,
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
     "undeclaredWriteInLabel" : "",
     "rulesDescription" : "Multi-winner Test 3"
   }

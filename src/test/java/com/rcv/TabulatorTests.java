@@ -314,14 +314,6 @@ class TabulatorTests {
     runTabulationTest("skip_to_next_test");
   }
 
-  // function: testMultiWinnerRedistribution
-  // purpose: tests multiple surplus redistributions
-  @Test
-  @DisplayName("test redistributing surplus from CVRs multiple times")
-  void testMultiWinnerRedistribution() {
-    runTabulationTest("multi_winner_redistribution");
-  }
-
   // function: testHareQuota
   // purpose: tests Hare quota
   @Test
@@ -416,5 +408,21 @@ class TabulatorTests {
   @DisplayName("duplicate rank skips to next option")
   void nistTest7() {
     runTabulationTest("test_set_7_duplicate_skip_to_next");
+  }
+
+  // function: multiWinnerWholeThresholdTest
+  // purpose: tests multi-seat with a whole number threshold
+  @Test
+  @DisplayName("multi-seat whole number threshold")
+  void multiWinnerWholeThresholdTest() {
+    runTabulationTest("test_set_multi_winner_whole_threshold");
+  }
+
+  // function: multiWinnerFractionalThresholdTest
+  // purpose: tests multi-seat with a fractional threshold
+  @Test
+  @DisplayName("multi-seat fractional number threshold")
+  void multiWinnerFractionalThresholdTest() {
+    runTabulationTest("test_set_multi_winner_fractional_threshold");
   }
 }

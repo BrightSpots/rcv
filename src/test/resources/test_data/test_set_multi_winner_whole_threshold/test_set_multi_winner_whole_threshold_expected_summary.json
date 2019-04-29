@@ -1,0 +1,104 @@
+{
+  "config" : {
+    "contest" : "Multi_winner2",
+    "date" : "2019-01-18",
+    "jurisdiction" : "Multi-winner",
+    "office" : "Multi_winner2",
+    "threshold" : "8"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "A" : "6",
+      "B" : "5",
+      "C" : "9",
+      "D" : "2",
+      "E" : "4",
+      "F" : "3"
+    },
+    "tallyResults" : [ {
+      "elected" : "C",
+      "transfers" : {
+        "D" : "0.1111",
+        "E" : "0.7777",
+        "F" : "0.1111"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "A" : "6",
+      "B" : "5",
+      "C" : "8",
+      "D" : "2.1111",
+      "E" : "4.7777",
+      "F" : "3.1111"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "E" : "1",
+        "F" : "0.1111",
+        "exhausted" : "1"
+      }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "A" : "6",
+      "B" : "5",
+      "C" : "8",
+      "E" : "5.7777",
+      "F" : "3.2222"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "F",
+      "transfers" : {
+        "A" : "1.1111",
+        "B" : "2.1111"
+      }
+    } ]
+  }, {
+    "round" : 4,
+    "tally" : {
+      "A" : "7.1111",
+      "B" : "7.1111",
+      "C" : "8",
+      "E" : "5.7777"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "E",
+      "transfers" : {
+        "A" : "3.2222",
+        "B" : "2.1111",
+        "exhausted" : "0.4444"
+      }
+    } ]
+  }, {
+    "round" : 5,
+    "tally" : {
+      "A" : "10.3333",
+      "B" : "9.2222",
+      "C" : "8"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : {
+        "exhausted" : "2.3330"
+      }
+    }, {
+      "elected" : "B",
+      "transfers" : {
+        "exhausted" : "1.2219"
+      }
+    } ]
+  }, {
+    "round" : 6,
+    "tally" : {
+      "A" : "8",
+      "B" : "8",
+      "C" : "8"
+    },
+    "tallyResults" : [ ]
+  } ]
+}
