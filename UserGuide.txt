@@ -21,14 +21,16 @@ The Tabulator provides an interface for:
 
 Launching the Tabulator:
 
-Unzip the Tabulator .zip file and double-click rcv.jar file to launch the Tabulator.
+Once you've downloaded or built the binary, double-click rcv.jar file to launch the GUI version of the Tabulator.
 You may need to install Java SE Runtime Environment 10 first: http://www.oracle.com/technetwork/java/javase/downloads/jre10-downloads-4417026.html
+Note that the Tabulator does not currently run in a Linux environment (see issue #168) or with Java 11 (#239). It should run properly on a Mac or Windows machine running Java 10.
+You can also run the Tabulator from the command line by supplying an existing config file as the only runtime argument.
 
 Loading and Tabulating a Contest:
 
 The Tabulator includes several example contest configuration files and associated cast vote record files.
-Click "Load..." at the top of the window and browse into the "test_data" folder.
-Select config_2015_portland_mayor.json and load it.
+Click "Load..." at the top of the window and browse into the "test_data" folder under src/test/resources.
+Browse into one of the folders listed here and select the corresponding file that ends with "_config.json".
 Click on the configuration tabs (Output, CVR Files, Candidates, Rules) to see how this contest is configured.
 Click "Validate" to check if this configuration is valid.  You will see the results in the black console area at the bottom of the main window.
 Click "Tabulate" to tabulate the election.  You will see the results in the console, including the location and names of output files.
