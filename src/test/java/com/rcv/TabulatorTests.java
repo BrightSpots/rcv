@@ -314,14 +314,6 @@ class TabulatorTests {
     runTabulationTest("skip_to_next_test");
   }
 
-  // function: testMultiWinnerRedistribution
-  // purpose: tests multiple surplus redistributions
-  @Test
-  @DisplayName("test redistributing surplus from CVRs multiple times")
-  void testMultiWinnerRedistribution() {
-    runTabulationTest("multi_winner_redistribution");
-  }
-
   // function: testHareQuota
   // purpose: tests Hare quota
   @Test
