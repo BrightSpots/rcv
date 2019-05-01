@@ -588,7 +588,7 @@ class ResultsWriter {
             Map.ofEntries(
                 entry("@id", CDF_REPORTING_DEVICE_ID),
                 entry("@type", "CVR.ReportingDevice"),
-                entry("Application", "RCV Universal Tabulator"),
+                entry("Application", "RCVRC Tabulator"),
                 entry("Manufacturer", "Bright Spots"))
         });
     outputJson.put("Version", "1.0.0");
@@ -733,7 +733,7 @@ class ResultsWriter {
     Map<String, Object> contestMap =
         Map.ofEntries(
             entry("ContestId", CDF_CONTEST_ID),
-            entry("ContestSelection", selectionMapList),
+            entry("CVRContestSelection", selectionMapList),
             entry("@type", "CVR.CVRContest"));
 
     return Map.ofEntries(

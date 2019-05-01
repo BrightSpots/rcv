@@ -97,7 +97,7 @@ class CommonDataFormatReader {
     for (Object contestObject : CVRContests) {
       HashMap CVRContest = (HashMap) contestObject;
       // each contest contains contestSelections
-      ArrayList contestSelections = (ArrayList) CVRContest.get("ContestSelection");
+      ArrayList contestSelections = (ArrayList) CVRContest.get("CVRContestSelection");
       for (Object contestSelectionObject : contestSelections) {
         HashMap contestSelection = (HashMap) contestSelectionObject;
         // selectionID is the candidate/contest ID for this selection position
@@ -152,31 +152,6 @@ class CommonDataFormatReader {
 
           // we found the current CVR snapshot so get rankings and create a new cvr
           List<Pair<Integer, String>> rankings = parseRankingsFromSnapshot(snapshot);
-          // at the top level is a list of contests each of which contains selections
-          ArrayList CVRContests = (ArrayList) snapshot.get("CVRContest");
-          for (Object contestObject : CVRContests) {
-            // extract the CVRContest
-            HashMap CVRContest = (HashMap) contestObject;
-            // contest contains contestSelections
-            ArrayList contestSelections = (ArrayList) CVRContest.get("ContestSelection");
-            for (Object contestSelectionObject : contestSelections) {
-              // extract the contestSelection
-              HashMap contestSelection = (HashMap) contestSelectionObject;
-              // selectionID is the candidate/contest ID for this selection position
-              String selectionID = (String) contestSelection.get("ContestSelectionId");
-              // extract all the positions (ranks) which this selection has been assigned
-              ArrayList selectionPositions = (ArrayList) contestSelection.get("SelectionPosition");
-              for (Object selectionPositionObject : selectionPositions) {
-                // extract the position object
-                HashMap selectionPosition = (HashMap) selectionPositionObject;
-                // and finally the rank
-                Integer rank = (Integer) selectionPosition.get("Rank");
-                assert rank != null;
-                // create a new ranking object and save it
-                rankings.add(new Pair<>(rank, selectionID));
-              }
-            }
-          }
 
           // create new cast vote record
           CastVoteRecord newRecord =
