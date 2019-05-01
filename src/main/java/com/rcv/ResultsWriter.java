@@ -707,15 +707,26 @@ class ResultsWriter {
         }
       }
 
-      List<Map<String, Object>> selectionPositionMaps = new LinkedList<>();
+      String fractionalVotes = null;
+      if (!numberVotes.equals(BigDecimal.ONE)) {
+        BigDecimal remainder = numberVotes.remainder(BigDecimal.ONE);
+        if (remainder.signum() == 1) {
+          fractionalVotes = remainder.toString().substring(1); // remove the 0 before the decimal
+        }
+      }
+
+      List<Map<String, Object>> selectionPositionMapList = new LinkedList<>();
       for (int rank : candidateWithRanks.getValue()) {
-        selectionPositionMaps.add(
-            Map.ofEntries(
-                entry("HasIndication", "yes"),
-                entry("IsAllocable", isAllocable),
-                entry("NumberVotes", numberVotes),
-                entry("Rank", rank),
-                entry("@type", "CVR.SelectionPosition")));
+        Map<String, Object> selectionPositionMap = new HashMap<>();
+        selectionPositionMap.put("HasIndication", "yes");
+        selectionPositionMap.put("IsAllocable", isAllocable);
+        selectionPositionMap.put("NumberVotes", numberVotes.intValue());
+        selectionPositionMap.put("Rank", rank);
+        selectionPositionMap.put("@type", "CVR.SelectionPosition");
+        if (fractionalVotes != null) {
+          selectionPositionMap.put("FractionalVotes", fractionalVotes);
+        }
+        selectionPositionMapList.add(selectionPositionMap);
         if (isAllocable.equals("yes")) {
           // If there are duplicate rankings for the candidate on this ballot, only the first one
           // can be allocable.
@@ -726,7 +737,7 @@ class ResultsWriter {
       selectionMapList.add(
           Map.ofEntries(
               entry("ContestSelectionId", getCdfIdForCandidateCode(candidateCode)),
-              entry("SelectionPosition", selectionPositionMaps),
+              entry("SelectionPosition", selectionPositionMapList),
               entry("@type", "CVR.CVRContestSelection")));
     }
 
