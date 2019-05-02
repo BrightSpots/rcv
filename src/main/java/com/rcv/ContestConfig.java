@@ -727,9 +727,7 @@ class ContestConfig {
       if (source.getProvider().equals("CDF")) {
         CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this);
         candidateCodeToNameMap = reader.getCandidates();
-        for (String candidate : candidateCodeToNameMap.keySet()) {
-          candidatePermutation.add(candidate);
-        }
+        candidatePermutation.addAll(candidateCodeToNameMap.keySet());
       }
     }
 

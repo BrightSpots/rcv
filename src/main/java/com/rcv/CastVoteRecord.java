@@ -57,7 +57,7 @@ class CastVoteRecord {
   // multi-seat contest because of fractional vote transfers), and how much of the vote each is
   // getting. As a memory optimization, if the data is unchanged from the previous round, we don't
   // add a new entry.
-  private Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
+  private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
 
   // function: CastVoteRecord
   // purpose: create a new CVR object
@@ -138,10 +138,10 @@ class CastVoteRecord {
     List<Pair<String, BigDecimal>> data = new LinkedList<>();
     for (Entry<String, BigDecimal> entry : winnerToFractionalValue.entrySet()) {
       // TODO: can we avoid duplicating this in memory?
-      data.add(new Pair(entry.getKey(), entry.getValue()));
+      data.add(new Pair<>(entry.getKey(), entry.getValue()));
     }
     if (currentRecipientOfVote != null) {
-      data.add(new Pair(currentRecipientOfVote, getFractionalTransferValue()));
+      data.add(new Pair<>(currentRecipientOfVote, getFractionalTransferValue()));
     }
 
     cdfSnapshotData.put(round, data);

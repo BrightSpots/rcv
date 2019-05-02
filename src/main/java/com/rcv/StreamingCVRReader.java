@@ -30,6 +30,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
@@ -42,7 +45,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 class StreamingCVRReader {
 
@@ -251,7 +253,7 @@ class StreamingCVRReader {
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   void parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
-      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException {
+      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException, ParserConfigurationException {
 
     // cache the cvr list so it is accessible in callbacks
     cvrList = castVoteRecords;
@@ -322,7 +324,10 @@ class StreamingCVRReader {
         new XSSFSheetXMLHandler(styles, sharedStrings, sheetContentsHandler, true);
 
     // create the XML reader and set content handler
-    XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+    SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+    saxParserFactory.setNamespaceAware(true);
+    SAXParser saxParser = saxParserFactory.newSAXParser();
+    XMLReader xmlReader = saxParser.getXMLReader();
     xmlReader.setContentHandler(handler);
     // trigger parsing
     xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));

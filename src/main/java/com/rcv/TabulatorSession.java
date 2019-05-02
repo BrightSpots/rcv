@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
@@ -49,7 +50,7 @@ class TabulatorSession {
   // cache output path location
   String outputPath;
   private String tabulationLogPath;
-  private String timestampString;
+  private final String timestampString;
 
   // function: TabulatorSession
   // purpose: TabulatorSession constructor
@@ -236,7 +237,7 @@ class TabulatorSession {
       } catch (IOException e) {
         Logger.log(Level.SEVERE, "Error opening source file %s", cvrPath);
         encounteredSourceProblem = true;
-      } catch (SAXException | OpenXML4JException e) {
+      } catch (ParserConfigurationException | SAXException | OpenXML4JException e) {
         Logger.log(Level.SEVERE, "Error parsing source file %s", cvrPath);
         encounteredSourceProblem = true;
       }
