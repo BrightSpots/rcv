@@ -15,7 +15,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -25,7 +25,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -35,7 +35,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -45,7 +45,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -55,7 +55,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -80,7 +80,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -90,7 +90,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -100,7 +100,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -110,7 +110,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -120,7 +120,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -130,7 +130,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -155,7 +155,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -165,7 +165,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -175,7 +175,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -185,7 +185,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -195,7 +195,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -205,7 +205,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -230,7 +230,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -240,7 +240,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -250,7 +250,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -260,7 +260,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         } ],
@@ -285,7 +285,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -295,7 +295,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -320,7 +320,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -330,7 +330,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -340,7 +340,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -350,7 +350,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -360,7 +360,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -370,7 +370,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -395,7 +395,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -405,7 +405,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -415,7 +415,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -425,7 +425,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         } ],
@@ -450,7 +450,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -460,7 +460,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -470,7 +470,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -480,7 +480,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -490,7 +490,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -515,7 +515,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -525,7 +525,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -535,7 +535,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -545,7 +545,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -555,7 +555,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -580,7 +580,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -605,7 +605,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -615,7 +615,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -625,7 +625,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         } ],
@@ -650,13 +650,13 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           }, {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -666,7 +666,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -676,7 +676,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -686,7 +686,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -696,7 +696,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -721,7 +721,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -731,7 +731,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -741,7 +741,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -751,7 +751,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -776,7 +776,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -786,7 +786,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -796,7 +796,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -806,7 +806,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -816,7 +816,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -841,7 +841,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -851,7 +851,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -861,7 +861,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -871,7 +871,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -881,7 +881,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -891,7 +891,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -916,7 +916,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -926,7 +926,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -936,7 +936,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -946,7 +946,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -971,7 +971,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -981,7 +981,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -991,7 +991,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1001,7 +1001,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -1011,7 +1011,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -1021,7 +1021,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1046,7 +1046,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1056,7 +1056,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1066,7 +1066,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1076,7 +1076,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -1086,7 +1086,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -1096,7 +1096,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1121,7 +1121,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1131,7 +1131,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1141,7 +1141,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1151,7 +1151,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         } ],
@@ -1176,7 +1176,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1186,7 +1186,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1211,7 +1211,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1221,7 +1221,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1231,7 +1231,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1241,7 +1241,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -1251,7 +1251,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -1261,7 +1261,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1286,7 +1286,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1296,7 +1296,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1306,7 +1306,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1316,7 +1316,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         } ],
@@ -1341,7 +1341,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1351,7 +1351,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1361,7 +1361,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1371,7 +1371,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -1381,7 +1381,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1406,7 +1406,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1416,7 +1416,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1426,7 +1426,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1436,7 +1436,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -1446,7 +1446,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -1456,7 +1456,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1481,7 +1481,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1491,7 +1491,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1516,7 +1516,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1526,7 +1526,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1536,7 +1536,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         } ],
@@ -1561,7 +1561,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1571,7 +1571,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1581,7 +1581,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1591,7 +1591,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -1601,7 +1601,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -1611,7 +1611,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1636,7 +1636,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1646,7 +1646,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1656,7 +1656,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -1666,7 +1666,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1691,7 +1691,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1701,7 +1701,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1711,7 +1711,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1721,7 +1721,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -1731,7 +1731,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1756,7 +1756,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 1
           } ]
         }, {
@@ -1766,7 +1766,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 2
           } ]
         }, {
@@ -1776,7 +1776,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 3
           } ]
         }, {
@@ -1786,7 +1786,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 4
           } ]
         }, {
@@ -1796,7 +1796,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 5
           } ]
         }, {
@@ -1806,7 +1806,7 @@
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
             "IsAllocable" : "unknown",
-            "NumberVotes" : "1",
+            "NumberVotes" : 1,
             "Rank" : 6
           } ]
         } ],
@@ -1881,7 +1881,7 @@
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2019-05-01T12:59:07-07:00",
+  "GeneratedDate" : "2019-05-01T17:30:48-07:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
     "@type" : "CVR.GpUnit",
