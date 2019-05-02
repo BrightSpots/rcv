@@ -643,6 +643,7 @@ class ResultsWriter {
     for (CastVoteRecord cvr : castVoteRecords) {
       List<Map<String, Object>> cvrSnapshots = new LinkedList<>();
       cvrSnapshots.add(generateCvrSnapshotMap(cvr, null, null));
+      String sanitizedId = sanitizeStringForOutput(cvr.getID());
       // copy most recent round snapshot data to subsequent rounds
       // until more snapshot data is available
       List<Pair<String, BigDecimal>> previousRoundSnapshotData = null;
@@ -652,7 +653,7 @@ class ResultsWriter {
 
         if (currentRoundSnapshotData == null) {
           if (previousRoundSnapshotData == null) {
-            throw new RoundSnapshotDataMissingException(cvr.getID());
+            throw new RoundSnapshotDataMissingException(sanitizedId);
           }
           currentRoundSnapshotData = previousRoundSnapshotData;
         }
@@ -662,8 +663,8 @@ class ResultsWriter {
 
       // create new cvr map entry
       Map<String, Object> cvrMap = new HashMap<>();
-      cvrMap.put("BallotPrePrintedId", cvr.getID());
-      cvrMap.put("CurrentSnapshotId", generateCvrSnapshotID(cvr.getID(), numRounds));
+      cvrMap.put("BallotPrePrintedId", sanitizedId);
+      cvrMap.put("CurrentSnapshotId", generateCvrSnapshotID(sanitizedId, numRounds));
       cvrMap.put("CVRSnapshot", cvrSnapshots);
       cvrMap.put("ElectionId", CDF_ELECTION_ID);
       cvrMap.put("@type", "CVR.CVR");
@@ -748,7 +749,7 @@ class ResultsWriter {
             entry("@type", "CVR.CVRContest"));
 
     return Map.ofEntries(
-        entry("@id", generateCvrSnapshotID(cvr.getID(), round)),
+        entry("@id", generateCvrSnapshotID(sanitizeStringForOutput(cvr.getID()), round)),
         entry("CVRContest", new Map[]{contestMap}),
         entry("Type", round != null ? "interpreted" : "original"),
         entry("@type", "CVR.CVRSnapshot"));
@@ -758,7 +759,9 @@ class ResultsWriter {
     HashMap<String, Object> electionMap = new HashMap<>();
 
     List<Map<String, Object>> contestSelections = new LinkedList<>();
-    for (String candidateCode : config.getCandidateCodeList()) {
+    List<String> candidateCodes = new LinkedList<>(config.getCandidateCodeList());
+    Collections.sort(candidateCodes);
+    for (String candidateCode : candidateCodes) {
       Map<String, String> codeMap =
           Map.ofEntries(
               entry("@type", "CVR.Code"),
