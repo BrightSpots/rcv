@@ -50,7 +50,7 @@ class TabulatorSession {
   // cache output path location
   String outputPath;
   private String tabulationLogPath;
-  private String timestampString;
+  private final String timestampString;
 
   // function: TabulatorSession
   // purpose: TabulatorSession constructor

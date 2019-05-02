@@ -64,9 +64,9 @@ class Tabulator {
   // tracks required winning threshold
   private BigDecimal winningThreshold;
   // tracks residual surplus from multi-seat contest vote transfers
-  private Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
+  private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // precincts which may appear in the cast vote records
-  private Set<String> precinctNames;
+  private final Set<String> precinctNames;
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
