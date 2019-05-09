@@ -851,13 +851,18 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<Void> createTask() {
-      return new Task<>() {
+      Task<Void> task = new Task<>() {
         @Override
         protected Void call() {
           contestConfig.validate();
           return null;
         }
       };
+      task.setOnFailed(arg0 -> {
+        Logger.log(Level.SEVERE, "Error during validation:\n%s", task.getException().toString());
+        Logger.log(Level.SEVERE, "Validation failed!");
+      });
+      return task;
     }
   }
 
@@ -875,7 +880,7 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<Void> createTask() {
-      return new Task<>() {
+      Task<Void> task = new Task<>() {
         @Override
         protected Void call() {
           // create session object used for tabulation
@@ -884,6 +889,11 @@ public class GuiConfigController implements Initializable {
           return null;
         }
       };
+      task.setOnFailed(arg0 -> {
+        Logger.log(Level.SEVERE, "Error during tabulation:\n%s", task.getException().toString());
+        Logger.log(Level.SEVERE, "Tabulation failed!");
+      });
+      return task;
     }
   }
 
