@@ -29,7 +29,7 @@ public class GuiApplication extends Application {
 
   @Override
   public void start(Stage window) throws Exception {
-    Parent root = FXMLLoader.load(getClass().getResource("/GuiConfigLayout.fxml"));
+    Parent root = FXMLLoader.load(getClass().getResource("/com/rcv/GuiConfigLayout.fxml"));
     window.setTitle("RCVRC Tabulator");
     window.setScene(new Scene(root));
     // cache main window so we can parent file choosers to it

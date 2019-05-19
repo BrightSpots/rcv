@@ -69,7 +69,7 @@ public class GuiConfigController implements Initializable {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final String CONFIG_FILE_DOCUMENTATION_FILENAME = "config_file_documentation.txt";
+  private static final String CONFIG_FILE_DOCUMENTATION_FILENAME = "com/rcv/config_file_documentation.txt";
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
