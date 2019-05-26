@@ -11,18 +11,18 @@ repositories {
 }
 
 dependencies {
-    // FIXME: the below exclusions don't seem to work
+
     def withoutModules = {
-        exclude group: 'org.apache', module: ''
-        exclude group: 'javax.xml', module: ''
+        exclude group: 'org.apache.poi'
+        exclude group: 'javax.xml'
     }
 
-    compile 'org.apache.commons:commons-csv:1.6'
-    compile 'org.apache.poi:poi-ooxml:3.16'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.9.6', withoutModules
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
+    compile 'org.apache.poi:poi-ooxml:3.16', withoutModules
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6', withoutModules
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0'
+    compile 'org.apache.commons:commons-csv:1.6', withoutModules
+    compile 'com.fasterxml.jackson.core:jackson-core:2.9.6', withoutModules
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.6', withoutModules
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0', withoutModules
 }
 
 javafx {
