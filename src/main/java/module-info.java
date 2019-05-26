@@ -1,4 +1,4 @@
-module rcv.main {
+module com.rcv {
   requires com.fasterxml.jackson.annotation;
   requires com.fasterxml.jackson.core;
   requires com.fasterxml.jackson.databind;
@@ -8,9 +8,8 @@ module rcv.main {
   requires javafx.fxml;
   requires java.xml;
   requires poi.ooxml;
-  //  TODO: Verify that below is necessary; maybe try deleting and running
-  opens com.rcv to
-      javafx.fxml;
-
+  // enable reflexive calls from com.rcv into javafx.fxml
+  opens com.rcv to javafx.fxml;
+  // our main module
   exports com.rcv;
 }
