@@ -9,7 +9,7 @@ module com.rcv {
   requires java.xml;
   requires poi.ooxml;
   // enable reflexive calls from com.rcv into javafx.fxml
-  opens com.rcv to javafx.fxml;
+  opens com.rcv;
   // our main module
   exports com.rcv;
 }
