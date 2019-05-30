@@ -40,6 +40,9 @@ public class Main extends GuiApplication {
     // otherwise assume user wants to use CLI
     if (args.length == 0) {
       launch(args);
+    } else if (args[0].equals("-classpath")) {
+      // jlink launcher script sends -classpath in which case launch the GUI
+      launch(args);
     } else {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       // check for unexpected input
