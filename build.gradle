@@ -4,10 +4,19 @@ plugins {
     id 'org.beryx.jlink' version '2.9.4'
 }
 
+// fixes issue with TabulatorTest loading
+sourceCompatibility = JavaVersion.VERSION_11
+
 apply plugin: 'java'
 
 repositories {
     mavenCentral()
+}
+
+// fixes issue with loading resources from intelliJ
+allprojects {
+    apply plugin: 'idea'
+    idea.module.outputDir file("out/production/classes")
 }
 
 dependencies {
