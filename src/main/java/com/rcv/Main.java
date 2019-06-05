@@ -41,7 +41,11 @@ public class Main extends GuiApplication {
     if (args.length == 0) {
       launch(args);
     } else if (args[0].equals("-classpath")) {
-      // jlink launcher script sends -classpath in which case launch the GUI
+      // FIXME: what if user wants to run CLI but downloaded Gradle-built version?
+      // Gradle launch script sends -classpath, in which case launch the GUI
+      launch(args);
+    } else if (args[0].contains("-Dfile")) {
+      // Launch GUI when using IntelliJ Gradle Tasks > application > run command
       launch(args);
     } else {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");

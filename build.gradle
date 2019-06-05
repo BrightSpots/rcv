@@ -17,6 +17,12 @@ repositories {
 allprojects {
     apply plugin: 'idea'
     idea.module.outputDir file("out/production/classes")
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked"
+        }
+    }
 }
 
 dependencies {
@@ -41,6 +47,7 @@ javafx {
 mainClassName = "$moduleName/com.rcv.Main"
 
 jlink {
+    // TODO: address warnings here
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'rcv'
