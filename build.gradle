@@ -31,11 +31,11 @@ dependencies {
     compile 'org.apache.poi:poi-ooxml:4.1.0'
     compile 'org.apache.poi:poi-ooxml-schemas:4.1.0'
     compile 'org.apache.xmlbeans:xmlbeans:3.1.0'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
     compile 'org.apache.commons:commons-csv:1.6'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.9.6'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.9.9'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.9'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.0-M1'
 
 }
 

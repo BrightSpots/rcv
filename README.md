@@ -16,11 +16,11 @@ Copyright (c) 2018 Bright Spots
 #### Jackson databind General data-binding package:
 [Binaries](http://central.maven.org/maven2/com/fasterxml/jackson/core/)
 
-Jackson Annotations 2.9.6
+Jackson Annotations 2.9.9
 
-Jackson Core 2.9.6
+Jackson Core 2.9.9
 
-Jackson Databind 2.9.6
+Jackson Databind 2.9.9
 
 ## Configuration
 Config file documentation is available [here](src/main/resources/com/rcv/config_file_documentation.txt).
