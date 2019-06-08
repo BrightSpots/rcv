@@ -21,10 +21,12 @@ The Tabulator provides an interface for:
 
 ## Launching the Tabulator:
 
-Once you've downloaded or built the binary, double-click rcv.jar (or rcv.bat if built using Gradle) file to launch the GUI version of the Tabulator.
-You may need to install the Java JDK 11+ first: https://jdk.java.net/
-Note that the Tabulator does not currently run in a Linux environment (see issue #168). It should run properly on a Mac or Windows machine running JDK 11+.
-You can also run the Tabulator from the command line by supplying an existing config file as the only runtime argument.
+You must have Java JDK 11 or higher installed on your system: https://jdk.java.net/
+Once you've built the binary using Gradle or downloaded a pre-built version, run the bin/rcv script if using MacOS or Linux, or bin/rcv.bat if using Windows to launch the GUI version of the Tabulator.
+You can also run the Tabulator from the command line by including the flag "-cli" and then supplying a path to an existing config file, e.g.:
+$ rcv -cli path/to/config
+Finally, you can activate a special "convert-to-cdf" function via the command line to export the CVR as a CDF JSON instead of tabulating the results, e.g.:
+$ rcv -cli path/to/config convert-to-cdf
 
 ## Loading and Tabulating a Contest:
 
@@ -43,5 +45,3 @@ Look in the console window to see where the output spreadsheet was written, e.g.
 Double-click on the summary spreadsheet to open it.  You may have to install OpenOffice (or some other Excel file reader) first:
 	https://www.openoffice.org/download/ 
 Find the audit log file and double-click on it to open it.  It is a standard text file and can be displayed with any kind of text editor.
-
-

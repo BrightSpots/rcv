@@ -20,10 +20,6 @@ dependencies {
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.5.0-M1'
 }
 
-wrapper {
-    gradleVersion = '5.4.1'
-}
-
 // ### Application plugin settings
 application {
     mainClassName = "$moduleName/com.rcv.Main"
@@ -45,6 +41,9 @@ compileJava {
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
 }
 
 // ### JavaFX plugin settings

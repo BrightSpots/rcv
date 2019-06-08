@@ -21,6 +21,8 @@
 package com.rcv;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 public class Main extends GuiApplication {
@@ -36,26 +38,33 @@ public class Main extends GuiApplication {
       System.err.print(String.format("Failed to start system logging!\n%s", exception.toString()));
     }
 
-    // if no args provided launch the GUI
-    // otherwise assume user wants to use CLI
-    if (args.length == 0) {
-      launch(args);
-    } else if (args[0].equals("-classpath")) {
-      // FIXME: what if user wants to run CLI but downloaded Gradle-built version?
-      // Gradle launch script sends -classpath, in which case launch the GUI
-      launch(args);
-    } else if (args[0].contains("-Dfile")) {
-      // Launch GUI when using IntelliJ Gradle Tasks > application > run command
+    // Determine if user intends to use the command-line interface, and gather args if so
+    boolean useCli = false;
+    List<String> argsCli = new ArrayList<>();
+    for (String arg : args) {
+      if (!useCli && arg.equals("-cli")) {
+        useCli = true;
+      } else if (useCli) {
+        argsCli.add(arg);
+      }
+    }
+
+    if (!useCli) {
+      // Launch the GUI
       launch(args);
     } else {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       // check for unexpected input
-      if (args.length > 2) {
-        Logger.log(Level.WARNING, "Too many arguments! Max is 2 but got: %d", args.length);
+      if (argsCli.size() == 0) {
+        Logger.log(Level.SEVERE, "Please provide a path to the config file!");
+        System.exit(1);
+      } else if (argsCli.size() > 2) {
+        Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d", argsCli.size());
+        System.exit(2);
       }
       // config file for configuring the tabulator
-      String configPath = args[0];
-      boolean convertToCdf = args.length == 2 && args[1].equals("convert-to-cdf");
+      String configPath = argsCli.get(0);
+      boolean convertToCdf = argsCli.size() == 2 && argsCli.get(1).equals("convert-to-cdf");
       // session object will manage the tabulation process
       TabulatorSession session = new TabulatorSession(configPath);
       if (convertToCdf) {
@@ -64,6 +73,7 @@ public class Main extends GuiApplication {
         session.tabulate();
       }
     }
+
     System.exit(0);
   }
 }
