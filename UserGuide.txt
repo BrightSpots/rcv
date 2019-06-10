@@ -1,6 +1,6 @@
-Universal Tabulator User Guide
+# Universal Tabulator User Guide
 
-Overview:
+## Overview:
 
 The Universal Tabulator is a free open source application designed to quickly and accurately tabulate ranked choice voting elections using a variety of rules commonly in use in North America.
 
@@ -19,14 +19,16 @@ The Tabulator provides an interface for:
 - Validating contest configuration files to ensure they are well-formed, and all values are within expected ranges
 - Tabulating a contest with a contest configuration file 
 
-Launching the Tabulator:
+## Launching the Tabulator:
 
-Once you've downloaded or built the binary, double-click rcv.jar file to launch the GUI version of the Tabulator.
-You may need to install Java SE Runtime Environment 10 first: http://www.oracle.com/technetwork/java/javase/downloads/jre10-downloads-4417026.html
-Note that the Tabulator does not currently run in a Linux environment (see issue #168) or with Java 11 (#239). It should run properly on a Mac or Windows machine running Java 10.
-You can also run the Tabulator from the command line by supplying an existing config file as the only runtime argument.
+You must have Java JDK 11 or higher installed on your system: https://jdk.java.net/
+Once you've built the binary using Gradle or downloaded a pre-built version, run the bin/rcv script if using MacOS or Linux, or bin/rcv.bat if using Windows to launch the GUI version of the Tabulator.
+You can also run the Tabulator from the command line by including the flag "-cli" and then supplying a path to an existing config file, e.g.:
+$ rcv -cli path/to/config
+Finally, you can activate a special "convert-to-cdf" function via the command line to export the CVR as a CDF JSON instead of tabulating the results, e.g.:
+$ rcv -cli path/to/config convert-to-cdf
 
-Loading and Tabulating a Contest:
+## Loading and Tabulating a Contest:
 
 The Tabulator includes several example contest configuration files and associated cast vote record files.
 Click "Load..." at the top of the window and browse into the "test_data" folder under src/test/resources.
@@ -35,7 +37,7 @@ Click on the configuration tabs (Output, CVR Files, Candidates, Rules) to see ho
 Click "Validate" to check if this configuration is valid.  You will see the results in the black console area at the bottom of the main window.
 Click "Tabulate" to tabulate the election.  You will see the results in the console, including the location and names of output files.
 
-Viewing Tabulator outputs:
+## Viewing Tabulator outputs:
 
 Tabulator output file names automatically include the current date and time, e.g. 2018-09-09_15-34-00_summary.xlsx.  This keeps them separate if you tabulate the same contest multiple times.
 Look in the console window to see where the output spreadsheet was written, e.g.
@@ -43,5 +45,3 @@ Look in the console window to see where the output spreadsheet was written, e.g.
 Double-click on the summary spreadsheet to open it.  You may have to install OpenOffice (or some other Excel file reader) first:
 	https://www.openoffice.org/download/ 
 Find the audit log file and double-click on it to open it.  It is a standard text file and can be displayed with any kind of text editor.
-
-

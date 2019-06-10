@@ -1,0 +1,11 @@
+
+.help-text-area{
+    -fx-control-inner-background:#eaeaea;
+}
+
+.console-text-area{
+    -fx-control-inner-background:#282828;
+    -fx-highlight-fill: #ffffff;
+    -fx-highlight-text-fill: #000000;
+    -fx-text-fill: #ffffff;
+}

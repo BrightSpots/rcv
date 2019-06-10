@@ -1,0 +1,45 @@
+{
+  "outputSettings": {
+    "contestName": "Portland 2015 Mayoral Race",
+    "outputDirectory": "output",
+    "contestDate": "2015-11-03",
+    "contestJurisdiction": "Portland, ME",
+    "contestOffice": "Mayor",
+    "tabulateByPrecinct": false
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "continue_tabulation_test_cvr.xlsx",
+      "firstVoteColumnIndex": 4,
+      "firstVoteRowIndex": 2,
+      "provider": "ES&S"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Carmona, Ralph C."
+    },
+    {
+      "name": "Haadoow, Hamza A."
+    },
+    {
+      "name": "Vail, Christopher L."
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "maxRankingsAllowed": 15,
+    "maxSkippedRanksAllowed": 1,
+    "numberOfWinners": 1,
+    "decimalPlacesForVoteArithmetic": 5,
+    "minimumVoteThreshold": 0,
+    "batchElimination": false,
+    "continueUntilTwoCandidatesRemain": true,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "rulesDescription": "Maine + Multi-Seat Tester"
+  }
+}

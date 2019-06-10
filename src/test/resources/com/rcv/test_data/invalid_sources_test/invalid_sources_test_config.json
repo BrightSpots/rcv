@@ -1,0 +1,56 @@
+{
+  "outputSettings": {
+    "contestName": "Validation test for sources",
+    "outputDirectory": "output",
+    "contestDate": "2018-07-20",
+    "contestJurisdiction": "none",
+    "contestOffice": "none",
+    "tabulateByPrecinct": true
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "test_data/nonexistent_path",
+      "firstVoteColumnIndex": 3,
+      "firstVoteRowIndex": 2,
+      "precinctColumnIndex": 1,
+      "provider": "ES&S"
+    },
+    {
+      "filePath": "test_data/nonexistent_path2",
+      "provider": "ES&S"
+    },
+    {
+      "firstVoteColumnIndex": 3,
+      "firstVoteRowIndex": 0,
+      "precinctColumnIndex": 1,
+      "provider": "ES&S"
+    },
+    {
+      "filePath": "invalid_sources_test_cvr.xlsx",
+      "firstVoteColumnIndex": 2,
+      "provider": "ES&S"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Candidate 1"
+    },
+    {
+      "name": "Candidate 2"
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "maxRankingsAllowed": 3,
+    "maxSkippedRanksAllowed": 1,
+    "numberOfWinners": 1,
+    "decimalPlacesForVoteArithmetic": 4,
+    "minimumVoteThreshold": 0,
+    "batchElimination": false,
+    "continueUntilTwoCandidatesRemain": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "rulesDescription": "Testing our validation logic for sources"
+  }
+}

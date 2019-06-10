@@ -1,0 +1,66 @@
+plugins {
+    id 'application'
+    id 'idea'
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.7'
+    id 'org.beryx.jlink' version '2.10.4'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.apache.commons:commons-csv:1.6'
+    compile 'org.apache.poi:poi-ooxml:4.1.0'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.9.9'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.9'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.0-M1'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.5.0-M1'
+}
+
+// ### Application plugin settings
+application {
+    mainClassName = "$moduleName/com.rcv.Main"
+}
+
+// ### Idea plugin settings
+idea {
+    module {
+        outputDir = file("out/production/classes")
+    }
+}
+
+// ### Java plugin settings
+sourceCompatibility = JavaVersion.VERSION_11
+
+compileJava {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+}
+
+// ### JavaFX plugin settings
+javafx {
+    version = "12.0.1"
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+// ### jlink plugin settings
+jlink {
+    
+    mergedModule {
+        requires "java.xml"
+    }
+    
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'rcv'
+    }
+}
