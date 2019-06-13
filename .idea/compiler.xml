@@ -3,8 +3,6 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
       <module name="rcv.integrationTest" target="11" />
-      <module name="rcv.main" target="11" />
-      <module name="rcv.test" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
