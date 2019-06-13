@@ -5,10 +5,12 @@
 *.log*
 
 # Test output
-src/test/resources/test_data/*/output/
+src/test/resources/com/rcv/test_data/*/output/
 
 # Project-specific exclusions
-.idea
 .DS_Store
+.gradle
+.idea
+build
 out
 tmp
