@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (c) 2017-2019 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield.
+ * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
