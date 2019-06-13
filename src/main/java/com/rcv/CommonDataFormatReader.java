@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (c) 2019 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2017-2019 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -12,7 +12,9 @@
  *
  * You should have received a copy of the GNU Affero General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ */
+
+/*
  * Purpose:
  * Helper class to read and parse a Common Data Format file into cast vote record objects
  * and candidate names.

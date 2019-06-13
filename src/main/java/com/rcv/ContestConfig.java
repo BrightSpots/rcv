@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2017-2019 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -12,7 +12,9 @@
  *
  * You should have received a copy of the GNU Affero General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ */
+
+/*
  * Purpose:
  * Wrapper for RawContestConfig object. This class adds logic for looking up rule enum
  * names, candidate names, various configuration utilities, and cast vote record objects.

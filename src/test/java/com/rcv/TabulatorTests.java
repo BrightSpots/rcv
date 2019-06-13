@@ -1,6 +1,6 @@
 /*
  * Ranked Choice Voting Universal Tabulator
- * Copyright (c) 2018 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
+ * Copyright (c) 2017-2019 Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -12,12 +12,13 @@
  *
  * You should have received a copy of the GNU Affero General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * class TabulatorTests
- * purpose: these regression tests run various tabulations and compare the generated results to
+ */
+
+/*
+ * Purpose:
+ * These regression tests run various tabulations and compare the generated results to
  * expected results.  Passing these tests ensures that changes to tabulation code have not
  * altered the results of the tabulation.
- *
  */
 
 package com.rcv;
