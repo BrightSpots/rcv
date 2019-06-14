@@ -51,7 +51,7 @@ class TabulatorSession {
   private final String configPath;
   // precinct IDs discovered during CVR parsing to support testing
   private final Set<String> precinctIDs = new HashSet<>();
-  // cache output path location
+  // Visible for testing: cache output path location
   String outputPath;
   private String tabulationLogPath;
   private final String timestampString;
@@ -126,7 +126,8 @@ class TabulatorSession {
       }
 
       Logger.removeTabulationFileLogging();
-      Logger.log(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
+      Logger
+          .log(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath.replace("%g", "*"));
     } else {
       Logger.log(Level.SEVERE, "Aborting because contest config is invalid!");
     }
