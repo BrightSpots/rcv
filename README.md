@@ -1,7 +1,4 @@
 # Ranked Choice Voting Universal Tabulator
-Created by Jonathan Moldover, Louis Eisenberg, and Hylton Edingfield
-
-Copyright (c) 2018 Bright Spots
 
 ## Dependencies
 
@@ -16,3 +13,9 @@ Config file documentation is available [here](src/main/resources/com/rcv/config_
 
 ## User Guide
 User Guide is available [here](UserGuide.txt).
+
+## Acknowledgements
+#### Bright Spots Developers
+- Jonathan Moldover
+- Louis Eisenberg
+- Hylton Edingfield

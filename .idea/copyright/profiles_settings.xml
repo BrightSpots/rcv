@@ -1,0 +1,8 @@
+<component name="CopyrightManager">
+  <settings>
+    <module2copyright>
+      <element module="Production" copyright="BrightSpotsCopyrightProfile" />
+      <element module="Tests" copyright="BrightSpotsCopyrightProfile" />
+    </module2copyright>
+  </settings>
+</component>
