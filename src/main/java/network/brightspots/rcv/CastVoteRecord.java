@@ -20,7 +20,7 @@
  * or not). Conceptually this is a ballot.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import java.math.BigDecimal;
 import java.util.HashMap;

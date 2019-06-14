@@ -19,7 +19,7 @@
  * Handle tiebreak scenarios based on rules configuration.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -304,7 +304,7 @@ class TieBreak {
       final Stage window = new Stage();
       window.initModality(Modality.APPLICATION_MODAL);
       window.setTitle("RCV Tiebreaker");
-      String resourcePath = "/com/rcv/GuiTiebreakerLayout.fxml";
+      String resourcePath = "/network/brightspots/rcv/GuiTiebreakerLayout.fxml";
       FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
 
       try {

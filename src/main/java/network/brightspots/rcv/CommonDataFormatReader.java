@@ -20,7 +20,7 @@
  * and candidate names.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import java.io.File;
 import java.util.ArrayList;

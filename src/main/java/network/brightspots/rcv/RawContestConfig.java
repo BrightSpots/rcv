@@ -21,7 +21,7 @@
  * We use Jackson JSON parser with annotations below to facilitate parsing.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

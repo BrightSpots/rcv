@@ -21,10 +21,8 @@
  * are logged to console and audit file.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
-import com.rcv.CastVoteRecord.VoteOutcomeType;
-import com.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -37,6 +35,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
+import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
+import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 
 class Tabulator {
 

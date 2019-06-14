@@ -22,7 +22,7 @@
  * over the course of a tabulation.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import java.math.BigDecimal;
 import java.util.HashMap;

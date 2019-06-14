@@ -14,7 +14,7 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import javafx.stage.Stage;
 

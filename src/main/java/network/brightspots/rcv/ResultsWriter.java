@@ -21,7 +21,7 @@
  * Currently we support a CSV summary file and a JSON summary file.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import static java.util.Map.entry;
 

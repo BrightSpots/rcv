@@ -19,9 +19,8 @@
  * Helper class to read and parse an XLS cast vote record file into cast vote record objects.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
-import com.rcv.RawContestConfig.CVRSource;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -35,6 +34,7 @@ import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import network.brightspots.rcv.RawContestConfig.CVRSource;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;

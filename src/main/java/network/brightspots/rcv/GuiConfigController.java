@@ -14,14 +14,10 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rcv.RawContestConfig.CVRSource;
-import com.rcv.RawContestConfig.Candidate;
-import com.rcv.RawContestConfig.ContestRules;
-import com.rcv.RawContestConfig.OutputSettings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -63,6 +59,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
+import network.brightspots.rcv.RawContestConfig.CVRSource;
+import network.brightspots.rcv.RawContestConfig.Candidate;
+import network.brightspots.rcv.RawContestConfig.ContestRules;
+import network.brightspots.rcv.RawContestConfig.OutputSettings;
 
 
 @SuppressWarnings("WeakerAccess")
@@ -70,7 +70,7 @@ public class GuiConfigController implements Initializable {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final String CONFIG_FILE_DOCUMENTATION_FILENAME = "com/rcv/config_file_documentation.txt";
+  private static final String CONFIG_FILE_DOCUMENTATION_FILENAME = "network/brightspots/rcv/config_file_documentation.txt";
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;

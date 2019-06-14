@@ -19,7 +19,7 @@
  * Static utils for simple file manipulation.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import java.io.File;
 
