@@ -128,8 +128,13 @@ class ContestConfig {
       Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
       // perform some additional sanity checks
       if (rawConfig.validate()) {
-        // checks passed so continue processing
-        config = loadContestConfig(rawConfig, new File(configPath).getParent());
+        // source folder will be the parent of configPath
+        String parentFolder = new File(configPath).getParent();
+        // if there is no parent folder use current working directory
+        if (parentFolder == null) {
+          parentFolder = System.getProperty("user.dir");
+        }
+        config = loadContestConfig(rawConfig, parentFolder);
       } else {
         Logger.log(Level.SEVERE, "Failed to create contest config!");
       }
