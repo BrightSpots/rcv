@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
@@ -190,8 +191,8 @@ class TieBreak {
     String selectedCandidate = null;
     while (selectedCandidate == null || selectedCandidate.isEmpty()) {
       // TODO: Create and enable cancel option for interactive tiebreaker CLI
-      // container for user console input
-      String userInput = System.console().readLine();
+      Scanner sc = new Scanner(System.in);
+      String userInput = sc.nextLine();
       try {
         // user selected loser parsed to int
         int choice = Integer.parseInt(userInput);
