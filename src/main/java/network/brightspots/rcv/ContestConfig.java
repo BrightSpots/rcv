@@ -20,11 +20,8 @@
  * names, candidate names, various configuration utilities, and cast vote record objects.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
-import com.rcv.RawContestConfig.CVRSource;
-import com.rcv.RawContestConfig.Candidate;
-import com.rcv.Tabulator.TieBreakMode;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -38,6 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import network.brightspots.rcv.RawContestConfig.CVRSource;
+import network.brightspots.rcv.RawContestConfig.Candidate;
+import network.brightspots.rcv.Tabulator.TieBreakMode;
 
 class ContestConfig {
 

@@ -19,7 +19,7 @@
  * Wrapper around Jackson JSON package for reading and writing JSON objects to disk.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;

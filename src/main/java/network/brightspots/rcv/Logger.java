@@ -37,7 +37,7 @@
  *
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import java.io.IOException;
 import java.nio.file.Path;

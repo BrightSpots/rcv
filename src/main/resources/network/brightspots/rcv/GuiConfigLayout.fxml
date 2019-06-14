@@ -36,8 +36,8 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
   minHeight="-Infinity"
   minWidth="-Infinity" prefHeight="800.0" prefWidth="900.0"
-  stylesheets="/com/rcv/GuiStyles.css" xmlns="http://javafx.com/javafx/8.0.172-ea"
-  fx:controller="com.rcv.GuiConfigController">
+  stylesheets="/network/brightspots/rcv/GuiStyles.css" xmlns="http://javafx.com/javafx/8.0.172-ea"
+  fx:controller="network.brightspots.rcv.GuiConfigController">
   <top>
     <VBox BorderPane.alignment="TOP_LEFT">
       <ButtonBar maxHeight="50.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0"

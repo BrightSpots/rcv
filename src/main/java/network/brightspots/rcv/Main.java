@@ -20,7 +20,7 @@
  * Parse command line and launch GUI or create and run a tabulation session.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import java.io.IOException;
 import java.util.ArrayList;

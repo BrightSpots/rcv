@@ -27,11 +27,8 @@
  * precinct codes discovered while parsing CVR files.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
-import com.rcv.FileUtils.UnableToCreateDirectoryException;
-import com.rcv.ResultsWriter.RoundSnapshotDataMissingException;
-import com.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -42,6 +39,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
+import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
+import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
+import network.brightspots.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 

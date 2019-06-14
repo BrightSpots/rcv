@@ -21,7 +21,7 @@
  * altered the results of the tabulation.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,7 +42,7 @@ import org.junit.jupiter.api.Test;
 class TabulatorTests {
 
   // folder where we store test inputs
-  private static final String TEST_ASSET_FOLDER = "src/test/resources/com/rcv/test_data";
+  private static final String TEST_ASSET_FOLDER = "src/test/resources/network/brightspots/rcv/test_data";
   // limit log output to avoid spam
   private static final Integer MAX_LOG_ERRORS = 10;
 

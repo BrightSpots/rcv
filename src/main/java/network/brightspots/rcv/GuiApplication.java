@@ -14,7 +14,7 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.rcv;
+package network.brightspots.rcv;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,7 +30,8 @@ public class GuiApplication extends Application {
 
   @Override
   public void start(Stage window) throws Exception {
-    Parent root = FXMLLoader.load(getClass().getResource("/com/rcv/GuiConfigLayout.fxml"));
+    Parent root = FXMLLoader
+        .load(getClass().getResource("/network/brightspots/rcv/GuiConfigLayout.fxml"));
     window.setTitle("RCVRC Tabulator");
     window.setScene(new Scene(root));
     // cache main window so we can parent file choosers to it

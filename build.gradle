@@ -22,7 +22,7 @@ dependencies {
 
 // ### Application plugin settings
 application {
-    mainClassName = "$moduleName/com.rcv.Main"
+    mainClassName = "$moduleName/network.brightspots.rcv.Main"
 }
 
 // ### Idea plugin settings
