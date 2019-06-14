@@ -1,0 +1,48 @@
+{
+  "config" : {
+    "contest" : "Test Set 0",
+    "date" : "2019-03-06",
+    "jurisdiction" : "TestSets_Single_winner",
+    "office" : "Skiptonext_Skiponovervote",
+    "threshold" : "6"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "A" : "4",
+      "B" : "4",
+      "C" : "3",
+      "D" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "B" : "1"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "A" : "4",
+      "B" : "5",
+      "C" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "C",
+      "transfers" : {
+        "B" : "2",
+        "exhausted" : "1"
+      }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "A" : "4",
+      "B" : "7"
+    },
+    "tallyResults" : [ {
+      "elected" : "B",
+      "transfers" : { }
+    } ]
+  } ]
+}

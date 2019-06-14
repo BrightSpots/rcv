@@ -1,0 +1,37 @@
+{
+  "outputSettings" : {
+    "contestName" : "Test Set 0",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-03-06",
+    "contestJurisdiction" : "TestSets_Single_winner",
+    "contestOffice" : "Skiptonext_Skiponovervote",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_set_0_skipped_first_choice_cvr.json",
+    "provider" : "CDF"
+  } ],
+  "candidates" : [ ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "numberOfWinners" : 1,
+    "decimalPlacesForVoteArithmetic" : 1,
+    "minimumVoteThreshold" : 0,
+    "maxSkippedRanksAllowed" : 4,
+    "maxRankingsAllowed" : 4,
+    "sequentialMultiSeat" : false,
+    "bottomsUpMultiSeat" : false,
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : "Skiptonext_exhaustatovervote"
+  }
+}

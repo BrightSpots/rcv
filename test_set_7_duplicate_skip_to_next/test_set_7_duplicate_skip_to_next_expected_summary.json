@@ -1,0 +1,49 @@
+{
+  "config" : {
+    "contest" : "Test Set 6",
+    "date" : "2019-03-06",
+    "jurisdiction" : "TestSets_Single_winner",
+    "office" : "Duplicate choice skip",
+    "threshold" : "8"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "A" : "5",
+      "B" : "5",
+      "C" : "3",
+      "D" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "A" : "1",
+        "C" : "1"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "A" : "6",
+      "B" : "5",
+      "C" : "4"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "C",
+      "transfers" : {
+        "A" : "2",
+        "B" : "2"
+      }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "A" : "8",
+      "B" : "7"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    } ]
+  } ]
+}
