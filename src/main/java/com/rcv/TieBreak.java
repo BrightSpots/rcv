@@ -20,6 +20,8 @@
 package com.rcv;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -304,9 +306,8 @@ class TieBreak {
       window.initModality(Modality.APPLICATION_MODAL);
       window.setTitle("RCV Tiebreaker");
       String resourcePath = "/com/rcv/GuiTiebreakerLayout.fxml";
-      FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
-
       try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
         Parent root = loader.load();
         GuiTiebreakerController controller = loader.getController();
         controller.populateTiedCandidates(tiedCandidates);
@@ -314,10 +315,11 @@ class TieBreak {
         window.showAndWait();
         candidateToEliminate = controller.getCandidateToEliminate();
       } catch (IOException exception) {
-        Logger.log(
-            Level.SEVERE, "Failed to open: %s:\n%s", resourcePath, exception.getCause().toString());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exception.printStackTrace(pw);
+        Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath,sw.toString());
       }
-
       return candidateToEliminate;
     }
   }

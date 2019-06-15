@@ -16,6 +16,10 @@
 
 package com.rcv;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.logging.Level;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -28,10 +32,18 @@ import javafx.stage.WindowEvent;
 public class GuiApplication extends Application {
 
   @Override
-  public void start(Stage window) throws Exception {
-    Parent root = FXMLLoader.load(getClass().getResource("/com/rcv/GuiConfigLayout.fxml"));
-    window.setTitle("RCVRC Tabulator");
-    window.setScene(new Scene(root));
+  public void start(Stage window) {
+    String resourcePath = "/com/rcv/GuiConfigLayout.fxml";
+    try {
+      Parent root = FXMLLoader.load(getClass().getResource(resourcePath));
+      window.setTitle("RCVRC Tabulator");
+      window.setScene(new Scene(root));
+    } catch (IOException exception) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      exception.printStackTrace(pw);
+      Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw.toString());
+    }
     // cache main window so we can parent file choosers to it
     GuiContext context = GuiContext.getInstance();
     context.setMainWindow(window);
