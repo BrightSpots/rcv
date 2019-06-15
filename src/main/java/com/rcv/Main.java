@@ -20,7 +20,6 @@
 
 package com.rcv;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,11 +31,7 @@ public class Main extends GuiApplication {
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
-    try {
-      Logger.setup();
-    } catch (IOException exception) {
-      System.err.print(String.format("Failed to start system logging!\n%s", exception.toString()));
-    }
+    Logger.setup();
 
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;

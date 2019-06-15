@@ -71,7 +71,7 @@ class Logger {
   // function: setup
   // purpose: initialize logging module
   // throws: IOException if unable to open output log file
-  static void setup() throws IOException {
+  static void setup() {
     // cache default logger
     logger = java.util.logging.Logger.getLogger("");
     logger.setLevel(Level.FINE);
@@ -82,12 +82,19 @@ class Logger {
     Path logPath =
         Paths.get(System.getProperty("user.dir"), EXECUTION_LOG_FILE_NAME).toAbsolutePath();
 
-    // executionHandler writes to the execution log file
-    FileHandler executionHandler =
-        new FileHandler(
-            logPath.toString(), LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
-    executionHandler.setLevel(Level.INFO);
-    logger.addHandler(executionHandler);
+    // executionHandler writes to the execution log file in current working directory
+    try {
+      FileHandler executionHandler =
+          new FileHandler(
+              logPath.toString(), LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
+      executionHandler.setLevel(Level.INFO);
+      logger.addHandler(executionHandler);
+    } catch (IOException exception) {
+      log(Level.WARNING, (String.format("Failed to start system logging!\n" +
+              "Make sure you have write access in %s\n%s.",
+          System.getProperty("user.dir"),
+          exception.toString())));
+    }
 
     // use our custom formatter for all installed handlers
     for (Handler handler : logger.getHandlers()) {
@@ -95,7 +102,7 @@ class Logger {
     }
 
     // log results
-    log(Level.INFO, "RCV Tabulator logging execution to: %s", logPath.toString());
+    log(Level.INFO, "RCV Tabulator logging to: %s", logPath.toString());
   }
 
   // function: addTabulationFileLogging
