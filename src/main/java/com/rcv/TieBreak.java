@@ -207,6 +207,8 @@ class TieBreak {
       }
       if (selectedCandidate == null || selectedCandidate.isEmpty()) {
         System.out.println("Invalid selection. Please try again.");
+        System.out.println(
+            "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
       }
     }
 
@@ -239,6 +241,8 @@ class TieBreak {
       }
       if (selectedCandidate == null || selectedCandidate.isEmpty()) {
         Logger.log(Level.WARNING, "Invalid selection! Please try again.");
+        Logger.log(Level.INFO,
+            "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
       }
     }
 

@@ -31,8 +31,9 @@ public class Main extends GuiApplication {
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
-    System.out.println("RCVRC Universal Tabulator v 1.0");
+    System.out.println("RCVRC Universal Tabulator version 1.0");
     Logger.setup();
+    Logger.log(Level.INFO, "RCVRC Universal Tabulator version 1.0");
 
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;
@@ -48,7 +49,6 @@ public class Main extends GuiApplication {
     if (!useCli) {
       // Launch the GUI
       launch(args);
-      Logger.log(Level.INFO, "RCVRC Universal Tabulator v 1.0");
     } else {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       // check for unexpected input

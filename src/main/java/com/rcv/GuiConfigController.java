@@ -177,7 +177,7 @@ public class GuiConfigController implements Initializable {
 
   public void buttonNewConfigClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Creating new contest config...");
+      Logger.log(Level.INFO, "Creating new contest config.");
       GuiContext.getInstance().setConfig(null);
       selectedFile = null;
       clearConfig();
@@ -442,7 +442,7 @@ public class GuiConfigController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
-    Logger.log(Level.INFO, "Opening tabulator GUI...");
+    Logger.log(Level.INFO, "Welcome to the RCVRC Universal Tabulator!");
 
     String helpText;
     try {
