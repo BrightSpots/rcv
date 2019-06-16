@@ -31,6 +31,7 @@ public class Main extends GuiApplication {
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
+    System.out.println("RCVRC Universal Tabulator v 1.0");
     Logger.setup();
 
     // Determine if user intends to use the command-line interface, and gather args if so
@@ -47,14 +48,18 @@ public class Main extends GuiApplication {
     if (!useCli) {
       // Launch the GUI
       launch(args);
+      Logger.log(Level.INFO, "RCVRC Universal Tabulator v 1.0");
     } else {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       // check for unexpected input
       if (argsCli.size() == 0) {
+        Logger.log(Level.SEVERE, "No config file path provided on command line!");
         Logger.log(Level.SEVERE, "Please provide a path to the config file!");
+        Logger.log(Level.SEVERE, "See UserGuide.txt for more details.");
         System.exit(1);
       } else if (argsCli.size() > 2) {
         Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d", argsCli.size());
+        Logger.log(Level.SEVERE, "See UserGuide.txt for more details.");
         System.exit(2);
       }
       // config file for configuring the tabulator

@@ -50,6 +50,7 @@ class JsonParser {
             Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
         Logger.log(
             Level.SEVERE, "Check file formatting and values and make sure they are correct!");
+        Logger.log(Level.SEVERE, "See config_file_documentation.txt for more details.");
       }
       createdObject = null;
     } catch (IOException exception) {

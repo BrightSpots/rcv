@@ -102,7 +102,7 @@ class Logger {
     }
 
     // log results
-    log(Level.INFO, "RCV Tabulator logging to: %s", logPath.toString());
+    log(Level.INFO, "Execution logging to: %s", logPath.toString());
   }
 
   // function: addTabulationFileLogging
@@ -118,6 +118,7 @@ class Logger {
     tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
     logger.addHandler(tabulationHandler);
+    log(Level.INFO, "Tabulation logging to: %s", outputPath);
   }
 
   // function: removeTabulationFileLogging

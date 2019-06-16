@@ -96,10 +96,9 @@ class TabulatorSession {
   // purpose: run tabulation
   // returns: list of winners
   void tabulate() {
+    Logger.log(Level.INFO, "Starting tabulation session.");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
-      Logger.log(Level.INFO, "Starting tabulation process...");
-
       if (config.isSequentialMultiSeatEnabled()) {
         int numWinners = config.getNumberOfWinners();
         // temporarily set config to single-seat so we can run sequential elections
@@ -120,11 +119,9 @@ class TabulatorSession {
         // normal operation (not sequential multi-seat)
         runTabulationForConfig(config);
       }
-
       Logger.removeTabulationFileLogging();
-      Logger.log(Level.INFO, "Done logging tabulation to: %s", tabulationLogPath);
     } else {
-      Logger.log(Level.SEVERE, "Aborting because contest config is invalid!");
+      Logger.log(Level.SEVERE, "Aborting tabulation!");
     }
   }
 
@@ -144,15 +141,16 @@ class TabulatorSession {
       Logger.addTabulationFileLogging(tabulationLogPath);
       success = true;
     } catch (UnableToCreateDirectoryException exception) {
-      Logger.log(
-          Level.SEVERE,
-          "Failed to create output directory: %s\n%s",
-          config.getOutputDirectory(),
-          exception.toString());
+      Logger.log(Level.SEVERE, "Failed to create output directory: %s\n%s",
+          config.getOutputDirectory());
+      Logger.log(Level.SEVERE, "Check the directory name and permissions.");
     } catch (IOException exception) {
       Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
     }
-
+    if (!success) {
+      System.out.println("Failed to configure logger!");
+      Logger.log(Level.SEVERE, "Failed to configure logger!");
+    }
     return success;
   }
 
@@ -161,9 +159,8 @@ class TabulatorSession {
   // param: config object containing CVR file paths to parse
   // returns: set of winners from tabulation
   private Set<String> runTabulationForConfig(ContestConfig config) {
+    Logger.log(Level.INFO, "Beginning tabulation for config:%s", configPath);
     Set<String> winners = new HashSet<>();
-
-    Logger.log(Level.INFO, "Logging tabulation to: %s", tabulationLogPath);
     // Read cast vote records and precinct IDs from CVR files
     List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
     // parse the cast vote records
@@ -183,15 +180,15 @@ class TabulatorSession {
         Logger.log(Level.SEVERE, "No cast vote records found!");
       }
     } else {
-      Logger.log(Level.SEVERE, "Skipping tabulation due to source file errors!");
+      Logger.log(Level.SEVERE, "Skipping tabulation due to source CVR file errors!");
     }
 
     if (winners.size() > 0) {
-      Logger.log(Level.INFO, "Tabulation process completed.");
+      Logger.log(Level.INFO, "Tabulation session completed.");
+      Logger.log(Level.INFO, "Results written to %s", outputPath);
     } else {
-      Logger.log(Level.SEVERE, "Unable to complete tabulation process!");
+      Logger.log(Level.SEVERE, "Unable to complete tabulation session!");
     }
-
     return winners;
   }
 
@@ -201,7 +198,7 @@ class TabulatorSession {
   // param: precinctIDs a set of precinctIDs which will be populated during cvr parsing
   // returns: list of parsed CVRs
   private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config, Set<String> precinctIDs) {
-    Logger.log(Level.INFO, "Parsing cast vote records");
+    Logger.log(Level.INFO, "Parsing cast vote records...");
 
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();

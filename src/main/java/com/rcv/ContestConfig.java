@@ -136,7 +136,9 @@ class ContestConfig {
         }
         config = loadContestConfig(rawConfig, parentFolder);
       } else {
-        Logger.log(Level.SEVERE, "Failed to create contest config!");
+        Logger.log(Level.SEVERE, "Failed to create raw contest config!");
+        Logger.log(Level.SEVERE, "Please modify the contest config file and try again.");
+        Logger.log(Level.SEVERE, "See config_file_documentation.txt for more details.");
       }
     }
     return config;
@@ -169,7 +171,7 @@ class ContestConfig {
   // purpose: validate the correctness of the config data
   // returns any detected problems
   boolean validate() {
-    Logger.log(Level.INFO, "Validating contest config...");
+    Logger.log(Level.INFO, "Validating contest config.");
     isValid = true;
     validateOutputSettings();
     validateCvrFileSources();
@@ -181,6 +183,7 @@ class ContestConfig {
       Logger.log(
           Level.SEVERE,
           "Contest config validation failed! Please modify the contest config file and try again.");
+      Logger.log(Level.SEVERE, "See config_file_documentation.txt for more details.");
     }
 
     return isValid;
@@ -726,10 +729,10 @@ class ContestConfig {
     candidateCodeToNameMap = new HashMap<>();
 
     for (RawContestConfig.CVRSource source : rawConfig.cvrFileSources) {
-      // cvrPath is the resolved path to this source
-      String cvrPath = resolveConfigPath(source.getFilePath());
       // for any CDF sources extract candidate names
       if (source.getProvider().equals("CDF")) {
+        // cvrPath is the resolved path to this source
+        String cvrPath = resolveConfigPath(source.getFilePath());
         CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this);
         candidateCodeToNameMap = reader.getCandidates();
         candidatePermutation.addAll(candidateCodeToNameMap.keySet());
