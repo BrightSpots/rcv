@@ -30,7 +30,7 @@ import java.util.logging.Level;
 public class Main extends GuiApplication {
 
   public static String APP_NAME = "RCVRC Universal Tabulator";
-  public static String APP_VERSION = "1.0";
+  public static String APP_VERSION = "1.0.0";
 
   // function: main
   // purpose: main entry point to the rcv tabulator program
@@ -59,13 +59,14 @@ public class Main extends GuiApplication {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       // check for unexpected input
       if (argsCli.size() == 0) {
-        Logger.log(Level.SEVERE, "No config file path provided on command line!");
-        Logger.log(Level.SEVERE, "Please provide a path to the config file!");
-        Logger.log(Level.SEVERE, "See UserGuide.txt for more details.");
+        Logger.log(Level.SEVERE, "No config file path provided on command line!\n"
+            + "Please provide a path to the config file!\n"
+            + "See UserGuide.txt for more details.");
         System.exit(1);
       } else if (argsCli.size() > 2) {
-        Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d", argsCli.size());
-        Logger.log(Level.SEVERE, "See UserGuide.txt for more details.");
+        Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d\n"
+            + "See UserGuide.txt for more details.\nSee UserGuide.txt for more details.",
+            argsCli.size());
         System.exit(2);
       }
       // config file for configuring the tabulator

@@ -200,7 +200,7 @@ class StreamingCVRReader {
     }
     // provide some user feedback on the CVR count
     if (cvrList.size() % 50000 == 0) {
-      Logger.log(Level.INFO, String.format("Parsed %d cast vote records...", cvrList.size()));
+      Logger.log(Level.INFO, String.format("Parsed %d cast vote records.", cvrList.size()));
     }
   }
 

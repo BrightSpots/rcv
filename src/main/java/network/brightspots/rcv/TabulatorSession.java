@@ -186,8 +186,7 @@ class TabulatorSession {
     }
 
     if (winners.size() > 0) {
-      Logger.log(Level.INFO, "Tabulation session completed.");
-      Logger.log(Level.INFO, "Results written to %s", outputPath);
+      Logger.log(Level.INFO, "Tabulation session completed.  Results written to %s", outputPath);
     } else {
       Logger.log(Level.SEVERE, "Unable to complete tabulation session!");
     }

@@ -123,8 +123,8 @@ class ResultsWriter {
     try {
       jsonWriter.writeValue(outFile, json);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error writing to JSON file: %s\n%s", path, exception.toString());
-      Logger.log(Level.SEVERE, "Please check the file path and permissions!");
+      Logger.log(Level.SEVERE, "Error writing to JSON file: %s\n%s\n"
+          + "Please check the file path and permissions!", path, exception.toString());
       throw exception;
     }
   }
@@ -336,8 +336,8 @@ class ResultsWriter {
       BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error creating CSV file: %s\n%s", csvPath, exception.toString());
-      Logger.log(Level.SEVERE, "Please check the file path and permissions!");
+      Logger.log(Level.SEVERE, "Error creating CSV file: %s\n%s\n"
+          + "Please check the file path and permissions!", csvPath, exception.toString());
       throw exception;
     }
 

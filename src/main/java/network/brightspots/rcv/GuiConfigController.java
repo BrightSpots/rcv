@@ -178,7 +178,7 @@ public class GuiConfigController implements Initializable {
 
   public void buttonNewConfigClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Creating new contest config.");
+      Logger.log(Level.INFO, "Creating new contest config...");
       GuiContext.getInstance().setConfig(null);
       selectedFile = null;
       clearConfig();
@@ -860,8 +860,8 @@ public class GuiConfigController implements Initializable {
         }
       };
       task.setOnFailed(arg0 -> {
-        Logger.log(Level.SEVERE, "Error during validation:\n%s", task.getException().toString());
-        Logger.log(Level.SEVERE, "Validation failed!");
+        Logger.log(Level.SEVERE, "Error during validation:\n%s\n"
+            + "Validation failed!", task.getException().toString());
       });
       return task;
     }
@@ -891,8 +891,8 @@ public class GuiConfigController implements Initializable {
         }
       };
       task.setOnFailed(arg0 -> {
-        Logger.log(Level.SEVERE, "Error during tabulation:\n%s", task.getException().toString());
-        Logger.log(Level.SEVERE, "Tabulation failed!");
+        Logger.log(Level.SEVERE, "Error during tabulation:\n%s\n"
+            + "Tabulation failed!", task.getException().toString());
       });
       return task;
     }

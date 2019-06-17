@@ -138,9 +138,9 @@ class ContestConfig {
         }
         config = loadContestConfig(rawConfig, parentFolder);
       } else {
-        Logger.log(Level.SEVERE, "Failed to create raw contest config!");
-        Logger.log(Level.SEVERE, "Please modify the contest config file and try again.");
-        Logger.log(Level.SEVERE, "See config_file_documentation.txt for more details.");
+        Logger.log(Level.SEVERE, "Failed to create raw contest config!\n"
+            + "Please modify the contest config file and try again.\n"
+            + "See config_file_documentation.txt for more details.");
       }
     }
     return config;
@@ -184,8 +184,8 @@ class ContestConfig {
     } else {
       Logger.log(
           Level.SEVERE,
-          "Contest config validation failed! Please modify the contest config file and try again.");
-      Logger.log(Level.SEVERE, "See config_file_documentation.txt for more details.");
+          "Contest config validation failed! Please modify the contest config file and try again.\n"
+              + "See config_file_documentation.txt for more details.");
     }
 
     return isValid;
