@@ -1,0 +1,29 @@
+{  "outputSettings" : {
+  "contestName" : "",
+  "outputDirectory" : "dsfjk_+#$*(&@$     ",
+  "contestDate" : "",
+  "contestJurisdiction" : "",
+  "contestOffice" : "",
+  "tabulateByPrecinct" : false,
+  "generateCdfJson" : false
+},
+
+  "cvrFileSources": [],
+  "rules": {
+    "tiebreakMode": "whatever",
+    "overvoteRule": "invalidOption",
+    "numberOfWinners": 2,
+    "decimalPlacesForVoteArithmetic": -1,
+    "maxRankingsAllowed": -1,
+    "maxSkippedRanksAllowed": -3,
+    "minimumVoteThreshold": 0,
+    "batchElimination": "True",
+    "continueUntilTwoCandidatesRemain": "false",
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI",
+    "rulesDescription": "Testing our validation logic for params"
+  }
+}

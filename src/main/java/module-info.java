@@ -1,4 +1,4 @@
-module com.rcv {
+module network.brightspots.rcv {
   requires com.fasterxml.jackson.annotation;
   requires com.fasterxml.jackson.core;
   requires com.fasterxml.jackson.databind;
@@ -8,8 +8,8 @@ module com.rcv {
   requires javafx.fxml;
   requires java.xml;
   requires poi.ooxml;
-  // enable reflexive calls from com.rcv into javafx.fxml
-  opens com.rcv;
+  // enable reflexive calls from network.brightspots.rcv into javafx.fxml
+  opens network.brightspots.rcv;
   // our main module
-  exports com.rcv;
+  exports network.brightspots.rcv;
 }

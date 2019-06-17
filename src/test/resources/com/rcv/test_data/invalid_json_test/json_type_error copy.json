@@ -1,0 +1,30 @@
+{
+  "outputSettings": {
+    "contestName": "Validation test for params",
+    "outputDirectory": "output",
+    "contestDate": "2018-07-19",
+    "contestJurisdiction": "none",
+    "contestOffice": "none",
+    "tabulateByPrecinct": false
+  },
+  "cvrFileSources": [],
+  "candidates": [],
+  "rules": {
+    "tiebreakMode": 1,
+    "overvoteRule": "invalidOption",
+    "numberOfWinners": 2,
+    "decim
+    alPlacesForVoteArithmetic": -1,
+    "maxRankingsAllowed": -1,
+    "maxSkippedRanksAllowed": -3,
+    "minimumVoteThreshold": 0,
+    "batchElimination": "True",
+    "continueUntilTwoCandidatesRemain": "false",
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": null,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI",
+    "rulesDescription": "Testing our validation logic for params"
+  }
+}
