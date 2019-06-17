@@ -90,10 +90,10 @@ class Logger {
       executionHandler.setLevel(Level.INFO);
       logger.addHandler(executionHandler);
     } catch (IOException exception) {
-      log(Level.WARNING, (String.format("Failed to start system logging!\n" +
+      log(Level.WARNING, String.format("Failed to start system logging!\n" +
               "Make sure you have write access in %s\n%s.",
           System.getProperty("user.dir"),
-          exception.toString())));
+          exception.toString()));
     }
 
     // use our custom formatter for all installed handlers

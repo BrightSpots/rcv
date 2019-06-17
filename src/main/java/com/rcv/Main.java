@@ -26,14 +26,17 @@ import java.util.logging.Level;
 
 public class Main extends GuiApplication {
 
+  public static String APP_NAME = "RCVRC Universal Tabulator";
+  public static String APP_VERSION = "1.0";
+
   // function: main
   // purpose: main entry point to the rcv tabulator program
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
-    System.out.println("RCVRC Universal Tabulator version 1.0");
+    System.out.println(String.format("Launching %s version %s", APP_NAME, APP_VERSION));
     Logger.setup();
-    Logger.log(Level.INFO, "RCVRC Universal Tabulator version 1.0");
+    Logger.log(Level.INFO, String.format("Launching %s version %s", APP_NAME, APP_VERSION));
 
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;

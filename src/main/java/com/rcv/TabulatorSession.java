@@ -141,9 +141,7 @@ class TabulatorSession {
       Logger.addTabulationFileLogging(tabulationLogPath);
       success = true;
     } catch (UnableToCreateDirectoryException exception) {
-      Logger.log(Level.SEVERE, "Failed to create output directory: %s\n%s",
-          config.getOutputDirectory());
-      Logger.log(Level.SEVERE, "Check the directory name and permissions.");
+      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
     } catch (IOException exception) {
       Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
     }
