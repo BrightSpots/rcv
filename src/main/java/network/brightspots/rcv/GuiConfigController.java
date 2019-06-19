@@ -443,7 +443,8 @@ public class GuiConfigController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
-    Logger.log(Level.INFO, String.format("Welcome to the %s!", Main.APP_NAME));
+    Logger.log(Level.INFO, String.format("Opening tabulator GUI...\n"
+        + "Welcome to the %s!", Main.APP_NAME));
 
     String helpText;
     try {
