@@ -236,7 +236,7 @@ class Tabulator {
       }
     }
 
-    Logger.log(Level.INFO, "Completed tabulation for %s", this.config.getContestName());
+    Logger.log(Level.INFO, "Completed tabulation for contest '%s'.", this.config.getContestName());
     return winnerToRound.keySet();
   }
 
