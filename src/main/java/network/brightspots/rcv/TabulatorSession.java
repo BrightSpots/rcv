@@ -100,7 +100,7 @@ class TabulatorSession {
   // purpose: run tabulation
   // returns: list of winners
   void tabulate() {
-    Logger.log(Level.INFO, "Starting tabulation session.");
+    Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
       if (config.isSequentialMultiSeatEnabled()) {
