@@ -37,7 +37,7 @@ public class Main extends GuiApplication {
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
-    System.out.println(String.format("Launching %s version %s", APP_NAME, APP_VERSION));
+    System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
     Logger.setup();
     Logger.log(Level.INFO, String.format("Launching %s version %s...", APP_NAME, APP_VERSION));
 
