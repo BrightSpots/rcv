@@ -39,7 +39,7 @@ public class Main extends GuiApplication {
   public static void main(String[] args) {
     System.out.println(String.format("Launching %s version %s", APP_NAME, APP_VERSION));
     Logger.setup();
-    Logger.log(Level.INFO, String.format("Launching %s version %s", APP_NAME, APP_VERSION));
+    Logger.log(Level.INFO, String.format("Launching %s version %s...", APP_NAME, APP_VERSION));
 
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;
