@@ -181,12 +181,7 @@ class TabulatorTests {
   // purpose: runs once at the beginning of testing to setup logging
   @BeforeAll
   static void setup() {
-    try {
       Logger.setup();
-    } catch (IOException exception) {
-      // this is non-fatal
-      System.err.print(String.format("Failed to start system logging!\n%s", exception.toString()));
-    }
   }
 
   // function: invalidParamsTest

@@ -123,7 +123,8 @@ class ResultsWriter {
     try {
       jsonWriter.writeValue(outFile, json);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error writing to JSON file: %s\n%s", path, exception.toString());
+      Logger.log(Level.SEVERE, "Error writing to JSON file: %s\n%s\n"
+          + "Please check the file path and permissions!", path, exception.toString());
       throw exception;
     }
   }
@@ -305,7 +306,7 @@ class ResultsWriter {
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
-    Logger.log(Level.INFO, "Generating summary spreadsheets: %s...", csvPath);
+    Logger.log(Level.INFO, "Generating summary spreadsheets: %s", csvPath);
 
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
@@ -335,7 +336,8 @@ class ResultsWriter {
       BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error creating CSV file: %s\n%s", csvPath, exception.toString());
+      Logger.log(Level.SEVERE, "Error creating CSV file: %s\n%s\n"
+          + "Please check the file path and permissions!", csvPath, exception.toString());
       throw exception;
     }
 
@@ -801,7 +803,7 @@ class ResultsWriter {
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
       throws IOException {
     String jsonPath = outputPath + ".json";
-    Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
+    Logger.log(Level.INFO, "Generating summary JSON file: %s", jsonPath);
 
     // root outputJson dict will have two entries:
     // results - vote totals, transfers, and candidates elected / eliminated

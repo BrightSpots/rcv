@@ -22,12 +22,15 @@
 package network.brightspots.rcv;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
@@ -192,8 +195,8 @@ class TieBreak {
     String selectedCandidate = null;
     while (selectedCandidate == null || selectedCandidate.isEmpty()) {
       // TODO: Create and enable cancel option for interactive tiebreaker CLI
-      // container for user console input
-      String userInput = System.console().readLine();
+      Scanner sc = new Scanner(System.in);
+      String userInput = sc.nextLine();
       try {
         // user selected loser parsed to int
         int choice = Integer.parseInt(userInput);
@@ -206,6 +209,8 @@ class TieBreak {
       }
       if (selectedCandidate == null || selectedCandidate.isEmpty()) {
         System.out.println("Invalid selection. Please try again.");
+        System.out.println(
+            "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
       }
     }
 
@@ -238,6 +243,8 @@ class TieBreak {
       }
       if (selectedCandidate == null || selectedCandidate.isEmpty()) {
         Logger.log(Level.WARNING, "Invalid selection! Please try again.");
+        Logger.log(Level.INFO,
+            "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
       }
     }
 
@@ -305,9 +312,8 @@ class TieBreak {
       window.initModality(Modality.APPLICATION_MODAL);
       window.setTitle("RCV Tiebreaker");
       String resourcePath = "/network/brightspots/rcv/GuiTiebreakerLayout.fxml";
-      FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
-
       try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
         Parent root = loader.load();
         GuiTiebreakerController controller = loader.getController();
         controller.populateTiedCandidates(tiedCandidates);
@@ -315,10 +321,11 @@ class TieBreak {
         window.showAndWait();
         candidateToEliminate = controller.getCandidateToEliminate();
       } catch (IOException exception) {
-        Logger.log(
-            Level.SEVERE, "Failed to open: %s:\n%s", resourcePath, exception.getCause().toString());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exception.printStackTrace(pw);
+        Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath,sw.toString());
       }
-
       return candidateToEliminate;
     }
   }

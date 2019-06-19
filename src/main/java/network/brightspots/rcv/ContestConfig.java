@@ -130,10 +130,17 @@ class ContestConfig {
       Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
       // perform some additional sanity checks
       if (rawConfig.validate()) {
-        // checks passed so continue processing
-        config = loadContestConfig(rawConfig, new File(configPath).getParent());
+        // source folder will be the parent of configPath
+        String parentFolder = new File(configPath).getParent();
+        // if there is no parent folder use current working directory
+        if (parentFolder == null) {
+          parentFolder = System.getProperty("user.dir");
+        }
+        config = loadContestConfig(rawConfig, parentFolder);
       } else {
-        Logger.log(Level.SEVERE, "Failed to create contest config!");
+        Logger.log(Level.SEVERE, "Failed to create raw contest config!\n"
+            + "Please modify the contest config file and try again.\n"
+            + "See config_file_documentation.txt for more details.");
       }
     }
     return config;
@@ -177,7 +184,8 @@ class ContestConfig {
     } else {
       Logger.log(
           Level.SEVERE,
-          "Contest config validation failed! Please modify the contest config file and try again.");
+          "Contest config validation failed! Please modify the contest config file and try again.\n"
+              + "See config_file_documentation.txt for more details.");
     }
 
     return isValid;
@@ -723,10 +731,10 @@ class ContestConfig {
     candidateCodeToNameMap = new HashMap<>();
 
     for (RawContestConfig.CVRSource source : rawConfig.cvrFileSources) {
-      // cvrPath is the resolved path to this source
-      String cvrPath = resolveConfigPath(source.getFilePath());
       // for any CDF sources extract candidate names
       if (source.getProvider().equals("CDF")) {
+        // cvrPath is the resolved path to this source
+        String cvrPath = resolveConfigPath(source.getFilePath());
         CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this);
         candidateCodeToNameMap = reader.getCandidates();
         candidatePermutation.addAll(candidateCodeToNameMap.keySet());

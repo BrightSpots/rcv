@@ -22,6 +22,7 @@
 package network.brightspots.rcv;
 
 import java.io.File;
+import java.util.logging.Level;
 
 class FileUtils {
 
@@ -47,6 +48,8 @@ class FileUtils {
       // dirFile is the File object for dir
       File dirFile = new File(dir);
       if (!dirFile.exists() && !dirFile.mkdirs()) {
+        Logger.log(Level.SEVERE, "Failed to create output directory: %s\n"
+            + "Check the directory name and permissions.", dir);
         throw new UnableToCreateDirectoryException("Unable to create output directory: " + dir);
       }
     }

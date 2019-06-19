@@ -126,7 +126,7 @@ class Tabulator {
   // returns: set containing winner(s)
   Set<String> tabulate() {
     logSummaryInfo();
-    Logger.log(Level.INFO, "Starting tabulation...");
+    Logger.log(Level.INFO, "Starting tabulation for contest '%s'...", this.config.getContestName());
 
     // Loop until we've found our winner(s) unless using continueUntilTwoCandidatesRemain, in which
     // case we loop until only two candidates remain.
@@ -236,7 +236,7 @@ class Tabulator {
       }
     }
 
-    Logger.log(Level.INFO, "Tabulation completed.");
+    Logger.log(Level.INFO, "Completed tabulation for contest '%s'.", this.config.getContestName());
     return winnerToRound.keySet();
   }
 

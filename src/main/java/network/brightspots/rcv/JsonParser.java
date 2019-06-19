@@ -50,15 +50,19 @@ class JsonParser {
     } catch (JsonParseException | JsonMappingException exception) {
       if (logsEnabled) {
         Logger.log(
-            Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
-        Logger.log(
-            Level.SEVERE, "Check file formatting and values and make sure they are correct!");
+            Level.SEVERE, "Error parsing JSON file: %s\n%s\n"
+                + "Check file formatting and values and make sure they are correct!\n"
+                + "See config_file_documentation.txt for more details.",
+            jsonFilePath,
+            exception.toString());
       }
       createdObject = null;
     } catch (IOException exception) {
       if (logsEnabled) {
-        Logger.log(Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
-        Logger.log(Level.SEVERE, "Check file path and permissions and make sure they are correct!");
+        Logger.log(Level.SEVERE, "Error opening file: %s\n%\n"
+            + "Check file path and permissions and make sure they are correct!",
+            jsonFilePath,
+            exception.toString());
       }
       createdObject = null;
     }
