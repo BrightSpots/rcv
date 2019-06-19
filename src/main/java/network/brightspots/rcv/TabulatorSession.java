@@ -161,7 +161,7 @@ class TabulatorSession {
   // param: config object containing CVR file paths to parse
   // returns: set of winners from tabulation
   private Set<String> runTabulationForConfig(ContestConfig config) {
-    Logger.log(Level.INFO, "Beginning tabulation for config:%s", configPath);
+    Logger.log(Level.INFO, "Beginning tabulation for config: %s", configPath);
     Set<String> winners = new HashSet<>();
     // Read cast vote records and precinct IDs from CVR files
     List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
