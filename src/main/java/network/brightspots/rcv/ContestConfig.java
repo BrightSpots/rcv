@@ -173,7 +173,7 @@ class ContestConfig {
   // purpose: validate the correctness of the config data
   // returns any detected problems
   boolean validate() {
-    Logger.log(Level.INFO, "Validating contest config.");
+    Logger.log(Level.INFO, "Validating contest config...");
     isValid = true;
     validateOutputSettings();
     validateCvrFileSources();
