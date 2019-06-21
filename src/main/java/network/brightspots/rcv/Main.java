@@ -40,7 +40,8 @@ public class Main extends GuiApplication {
     System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
     Logger.setup();
     Logger.log(Level.INFO, String.format("Launching %s version %s...", APP_NAME, APP_VERSION));
-
+	  Main.logSystemInfo();
+	  
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;
     List<String> argsCli = new ArrayList<>();
@@ -83,4 +84,13 @@ public class Main extends GuiApplication {
 
     System.exit(0);
   }
+
+  public static void logSystemInfo() {
+    Logger.log(Level.INFO, String.format("Launching %s version %s...", APP_NAME, APP_VERSION));
+    Logger.log(Level.INFO, "Host system: %s version %s",
+        System.getProperty("os.name"),
+        System.getProperty("os.version"));
+    Logger.log(Level.INFO, "User: %s", System.getProperty("user.name"));
+  }
+
 }
