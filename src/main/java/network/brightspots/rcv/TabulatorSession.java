@@ -54,7 +54,6 @@ class TabulatorSession {
   private final Set<String> precinctIDs = new HashSet<>();
   // Visible for testing: cache output path location
   String outputPath;
-  private String tabulationLogPath;
   private final String timestampString;
 
   // function: TabulatorSession
@@ -134,10 +133,10 @@ class TabulatorSession {
     boolean success = false;
 
     // %g format is for log file naming
-    tabulationLogPath =
-        Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
-            .toAbsolutePath()
-            .toString();
+    String tabulationLogPath = Paths
+        .get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
+        .toAbsolutePath()
+        .toString();
 
     // cache outputPath for testing
     outputPath = config.getOutputDirectory();

@@ -342,8 +342,8 @@ class TieBreak {
 
   private class GuiTiebreakerPromptResponse {
 
-    boolean tabulationCancelled;
-    String candidateToEliminate;
+    final boolean tabulationCancelled;
+    final String candidateToEliminate;
 
     GuiTiebreakerPromptResponse(boolean tabulationCancelled, String candidateToEliminate) {
       this.tabulationCancelled = tabulationCancelled;

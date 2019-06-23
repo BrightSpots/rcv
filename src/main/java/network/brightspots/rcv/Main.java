@@ -30,8 +30,8 @@ import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
-  public static String APP_NAME = "RCVRC Universal Tabulator";
-  public static String APP_VERSION = "0.1.0";
+  public static final String APP_NAME = "RCVRC Universal Tabulator";
+  public static final String APP_VERSION = "0.1.0";
 
   // function: main
   // purpose: main entry point to the rcv tabulator program
