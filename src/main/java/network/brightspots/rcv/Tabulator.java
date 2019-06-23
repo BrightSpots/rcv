@@ -915,12 +915,6 @@ class Tabulator {
             continue;
           }
 
-          // handle testing in unit tests, remove this assert, and add break statement
-          // at end of this for loop
-
-          // If this fails, it means the code failed to handle an overvote with multiple
-          // continuing candidates.
-          assert selectedCandidate == null;
           // we found a continuing candidate so this cvr counts for them
           selectedCandidate = candidate;
 
@@ -934,6 +928,12 @@ class Tabulator {
               selectedCandidate,
               roundTallyByPrecinct,
               cvr.getPrecinct());
+
+          // There can be at most one continuing candidate in candidateSet; if there were more than
+          // one, we would have already flagged this as an overvote.
+          if (selectedCandidate != null) {
+            break;
+          }
         }
 
         // if we found a continuing candidate stop looking through rankings
