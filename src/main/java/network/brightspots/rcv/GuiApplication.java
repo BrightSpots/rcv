@@ -26,11 +26,15 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-@SuppressWarnings("WeakerAccess")
+
 public class GuiApplication extends Application {
+
+  private static final int STAGE_HEIGHT = 845;
+  private static final int STAGE_WIDTH = 935;
 
   @Override
   public void start(Stage window) {
@@ -51,6 +55,10 @@ public class GuiApplication extends Application {
     // workaround for https://bugs.openjdk.java.net/browse/JDK-8088859
     EventHandler<WindowEvent> onCloseHandler = event -> Platform.exit();
     window.setOnCloseRequest(onCloseHandler);
+
+    // Avoid cutting off the top bar for low resolution displays
+    window.setHeight(Math.min(STAGE_HEIGHT, Screen.getPrimary().getVisualBounds().getHeight()));
+    window.setWidth(Math.min(STAGE_WIDTH, Screen.getPrimary().getVisualBounds().getWidth()));
     window.show();
   }
 }
