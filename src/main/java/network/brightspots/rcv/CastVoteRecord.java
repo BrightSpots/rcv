@@ -139,7 +139,6 @@ class CastVoteRecord {
   void logCdfSnapshotData(int round) {
     List<Pair<String, BigDecimal>> data = new LinkedList<>();
     for (Entry<String, BigDecimal> entry : winnerToFractionalValue.entrySet()) {
-      // TODO: can we avoid duplicating this in memory?
       data.add(new Pair<>(entry.getKey(), entry.getValue()));
     }
     if (currentRecipientOfVote != null) {

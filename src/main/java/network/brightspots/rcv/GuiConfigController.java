@@ -526,7 +526,6 @@ public class GuiConfigController implements Initializable {
           checkBox
               .selectedProperty()
               .addListener((ov, old_val, new_val) -> candidate.setExcluded(new_val));
-          // TODO: Address warning here when noinspection is removed
           //noinspection unchecked
           return new SimpleObjectProperty(checkBox);
         });
