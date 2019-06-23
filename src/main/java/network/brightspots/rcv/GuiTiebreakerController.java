@@ -28,6 +28,7 @@ import javafx.stage.Stage;
 public class GuiTiebreakerController {
 
   private String candidateToEliminate = null;
+  private boolean tabulationCancelled = false;
 
   @FXML
   private ListView<String> listViewCandidates;
@@ -40,11 +41,20 @@ public class GuiTiebreakerController {
     this.candidateToEliminate = candidateToEliminate;
   }
 
+  boolean getTabulationCancelled() {
+    return tabulationCancelled;
+  }
+
+  private void setTabulationCancelled(boolean tabulationCancelled) {
+    this.tabulationCancelled = tabulationCancelled;
+  }
+
   void populateTiedCandidates(List<String> tiedCandidates) {
     listViewCandidates.setItems(FXCollections.observableArrayList(tiedCandidates));
   }
 
   public void buttonCancelClicked(ActionEvent actionEvent) {
+    setTabulationCancelled(true);
     ((Stage) ((Node) actionEvent.getSource()).getScene().getWindow()).close();
   }
 

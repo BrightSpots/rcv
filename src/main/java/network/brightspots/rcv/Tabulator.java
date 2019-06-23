@@ -124,7 +124,7 @@ class Tabulator {
   // purpose: run the main tabulation routine to determine contest results
   //  this is the high-level control of the tabulation algorithm
   // returns: set containing winner(s)
-  Set<String> tabulate() {
+  Set<String> tabulate() throws TabulationCancelledException {
     logSummaryInfo();
     Logger.log(Level.INFO, "Starting tabulation for contest '%s'...", this.config.getContestName());
 
@@ -576,7 +576,8 @@ class Tabulator {
   // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
   // returns: eliminated candidates
   private List<String> doRegularElimination(
-      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates) {
+      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
+      throws TabulationCancelledException {
     List<String> eliminated = new LinkedList<>();
     // eliminated candidate
     String eliminatedCandidate;
@@ -598,7 +599,6 @@ class Tabulator {
 
       // results of tiebreak stored here
       eliminatedCandidate = tieBreak.selectLoser();
-      // TODO: If returned eliminatedCandidate is null, infinite loop!
       Logger.log(
           Level.INFO,
           "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
@@ -1122,5 +1122,9 @@ class Tabulator {
       this.runningTotal = runningTotal;
       this.nextHighestTally = nextHighestTally;
     }
+  }
+
+  static class TabulationCancelledException extends Exception {
+
   }
 }

@@ -25,12 +25,13 @@ package network.brightspots.rcv;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
-  public static String APP_NAME = "RCVRC Universal Tabulator";
-  public static String APP_VERSION = "0.1.0";
+  public static final String APP_NAME = "RCVRC Universal Tabulator";
+  public static final String APP_VERSION = "0.1.0";
 
   // function: main
   // purpose: main entry point to the rcv tabulator program
@@ -77,7 +78,11 @@ public class Main extends GuiApplication {
       if (convertToCdf) {
         session.convertToCdf();
       } else {
-        session.tabulate();
+        try {
+          session.tabulate();
+        } catch (TabulationCancelledException e) {
+          Logger.log(Level.SEVERE, "Tabulation was cancelled!");
+        }
       }
     }
 

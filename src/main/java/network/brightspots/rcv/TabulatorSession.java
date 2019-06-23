@@ -42,6 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
+import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
@@ -53,7 +54,6 @@ class TabulatorSession {
   private final Set<String> precinctIDs = new HashSet<>();
   // Visible for testing: cache output path location
   String outputPath;
-  private String tabulationLogPath;
   private final String timestampString;
 
   // function: TabulatorSession
@@ -99,7 +99,7 @@ class TabulatorSession {
   // function: tabulate
   // purpose: run tabulation
   // returns: list of winners
-  void tabulate() {
+  void tabulate() throws TabulationCancelledException {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
@@ -133,10 +133,10 @@ class TabulatorSession {
     boolean success = false;
 
     // %g format is for log file naming
-    tabulationLogPath =
-        Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
-            .toAbsolutePath()
-            .toString();
+    String tabulationLogPath = Paths
+        .get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
+        .toAbsolutePath()
+        .toString();
 
     // cache outputPath for testing
     outputPath = config.getOutputDirectory();
@@ -144,9 +144,7 @@ class TabulatorSession {
       FileUtils.createOutputDirectory(config.getOutputDirectory());
       Logger.addTabulationFileLogging(tabulationLogPath);
       success = true;
-    } catch (UnableToCreateDirectoryException exception) {
-      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
-    } catch (IOException exception) {
+    } catch (UnableToCreateDirectoryException | IOException exception) {
       Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
     }
     if (!success) {
@@ -160,7 +158,8 @@ class TabulatorSession {
   // purpose: execute tabulation for given ContestConfig
   // param: config object containing CVR file paths to parse
   // returns: set of winners from tabulation
-  private Set<String> runTabulationForConfig(ContestConfig config) {
+  private Set<String> runTabulationForConfig(ContestConfig config)
+      throws TabulationCancelledException {
     Logger.log(Level.INFO, "Beginning tabulation for config: %s", configPath);
     Set<String> winners = new HashSet<>();
     // Read cast vote records and precinct IDs from CVR files
