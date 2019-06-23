@@ -122,7 +122,11 @@ class TabulatorTests {
     String configPath = getTestFilePath(stem, "_config.json");
     // create a session object and run the tabulation
     TabulatorSession session = new TabulatorSession(configPath);
-    session.tabulate();
+    try {
+      session.tabulate();
+    } catch (TabulationCancelledException e) {
+      e.printStackTrace();
+    }
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
