@@ -480,6 +480,17 @@ class ResultsWriter {
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
     csvPrinter.printRecord("Office", config.getContestOffice());
     csvPrinter.printRecord("Date", config.getContestDate());
+
+    List<String> winners = new LinkedList<>();
+    List<Integer> winningRounds = new ArrayList<>(roundToWinningCandidates.keySet());
+    Collections.sort(winningRounds); // make sure we list them in order of election
+    for (int round : winningRounds) {
+      for (String candidateCode : roundToWinningCandidates.get(round)) {
+        winners.add(config.getNameForCandidateCode(candidateCode));
+      }
+    }
+    csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
+
     csvPrinter.printRecord("Threshold", winningThreshold.toString());
     if (precinct != null && !precinct.isEmpty()) {
       csvPrinter.printRecord("Precinct", precinct);
