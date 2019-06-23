@@ -194,7 +194,6 @@ class TieBreak {
     // the candidate selected to lose
     String selectedCandidate = null;
     while (selectedCandidate == null || selectedCandidate.isEmpty()) {
-      // TODO: Create and enable cancel option for interactive tiebreaker CLI
       Scanner sc = new Scanner(System.in);
       String userInput = sc.nextLine();
       try {
@@ -233,7 +232,6 @@ class TieBreak {
 
     String selectedCandidate = null;
     while (selectedCandidate == null || selectedCandidate.isEmpty()) {
-      // TODO: actually enable cancel button for interactive tiebreaker GUI
       try {
         FutureTask<String> futureTask = new FutureTask<>(new GuiTiebreakerPrompt());
         Platform.runLater(futureTask);

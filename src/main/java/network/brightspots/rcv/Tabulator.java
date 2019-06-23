@@ -360,7 +360,6 @@ class Tabulator {
   // purpose: determine and store the threshold to win
   // param: currentRoundCandidateToTally map of candidateID to their tally for a particular round
   private void setWinningThreshold(Map<String, BigDecimal> currentRoundCandidateToTally) {
-    // TODO: add unit test for logic in this method
     // currentRoundTotalVotes holds total active votes in this round
     BigDecimal currentRoundTotalVotes = BigDecimal.ZERO;
     // numVotes indexes over all vote tallies in this round
@@ -598,7 +597,6 @@ class Tabulator {
 
       // results of tiebreak stored here
       eliminatedCandidate = tieBreak.selectLoser();
-      // TODO: If returned eliminatedCandidate is null, infinite loop!
       Logger.log(
           Level.INFO,
           "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
@@ -917,7 +915,6 @@ class Tabulator {
             continue;
           }
 
-          // TODO: it's weird to have this check here
           // handle testing in unit tests, remove this assert, and add break statement
           // at end of this for loop
 
