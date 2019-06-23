@@ -25,6 +25,7 @@ package network.brightspots.rcv;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {

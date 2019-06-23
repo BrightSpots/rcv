@@ -63,6 +63,7 @@ import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.OutputSettings;
+import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 
 
 @SuppressWarnings("WeakerAccess")

@@ -42,6 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
+import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 

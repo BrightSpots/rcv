@@ -1123,4 +1123,8 @@ class Tabulator {
       this.nextHighestTally = nextHighestTally;
     }
   }
+
+  static class TabulationCancelledException extends Exception {
+
+  }
 }
