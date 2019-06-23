@@ -99,7 +99,7 @@ class TabulatorSession {
   // function: tabulate
   // purpose: run tabulation
   // returns: list of winners
-  void tabulate() {
+  void tabulate() throws TabulationCancelledException {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
@@ -144,9 +144,7 @@ class TabulatorSession {
       FileUtils.createOutputDirectory(config.getOutputDirectory());
       Logger.addTabulationFileLogging(tabulationLogPath);
       success = true;
-    } catch (UnableToCreateDirectoryException exception) {
-      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
-    } catch (IOException exception) {
+    } catch (UnableToCreateDirectoryException | IOException exception) {
       Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
     }
     if (!success) {
@@ -160,7 +158,8 @@ class TabulatorSession {
   // purpose: execute tabulation for given ContestConfig
   // param: config object containing CVR file paths to parse
   // returns: set of winners from tabulation
-  private Set<String> runTabulationForConfig(ContestConfig config) {
+  private Set<String> runTabulationForConfig(ContestConfig config)
+      throws TabulationCancelledException {
     Logger.log(Level.INFO, "Beginning tabulation for config: %s", configPath);
     Set<String> winners = new HashSet<>();
     // Read cast vote records and precinct IDs from CVR files

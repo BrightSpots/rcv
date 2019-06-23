@@ -77,7 +77,11 @@ public class Main extends GuiApplication {
       if (convertToCdf) {
         session.convertToCdf();
       } else {
-        session.tabulate();
+        try {
+          session.tabulate();
+        } catch (TabulationCancelledException e) {
+          Logger.log(Level.SEVERE, "Tabulation was cancelled!");
+        }
       }
     }
 

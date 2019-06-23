@@ -126,7 +126,7 @@ class TieBreak {
   // function: breakTie
   // purpose: execute the tiebreak logic given the tiebreak rule in use
   // returns: losing candidate
-  String selectLoser() {
+  String selectLoser() throws TabulationCancelledException {
     switch (tieBreakMode) {
       case INTERACTIVE:
         loser = doInteractive();
@@ -179,7 +179,7 @@ class TieBreak {
   // function doInteractiveCli
   // purpose: interactively select the loser of this tiebreak via the command-line interface
   // return: candidateID of the selected loser
-  private String doInteractiveCli() {
+  private String doInteractiveCli() throws TabulationCancelledException {
     System.out.println(
         String.format(
             "Tie in round %d for the following candidates, each of whom has %d votes: ",
@@ -188,15 +188,21 @@ class TieBreak {
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i + 1) + ". " + tiedCandidates.get(i));
     }
-    System.out.println(
-        "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
+    final String CANCEL_COMMAND = "x";
+    final String TIEBREAKER_PROMPT =
+        "Enter the number corresponding to the candidate who should lose this tiebreaker (or "
+            + CANCEL_COMMAND + " to cancel): ";
+    System.out.println(TIEBREAKER_PROMPT);
 
     // the candidate selected to lose
     String selectedCandidate = null;
     while (selectedCandidate == null || selectedCandidate.isEmpty()) {
-      // TODO: Create and enable cancel option for interactive tiebreaker CLI
       Scanner sc = new Scanner(System.in);
       String userInput = sc.nextLine();
+      if (userInput.equals(CANCEL_COMMAND)) {
+        System.out.println("Cancelling tabulation...");
+        throw new TabulationCancelledException();
+      }
       try {
         // user selected loser parsed to int
         int choice = Integer.parseInt(userInput);
@@ -209,8 +215,7 @@ class TieBreak {
       }
       if (selectedCandidate == null || selectedCandidate.isEmpty()) {
         System.out.println("Invalid selection. Please try again.");
-        System.out.println(
-            "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
+        System.out.println(TIEBREAKER_PROMPT);
       }
     }
 
@@ -220,7 +225,7 @@ class TieBreak {
   // function doInteractiveGui
   // purpose: interactively select the loser of this tiebreak via the graphical user interface
   // return: candidateID of the selected loser
-  private String doInteractiveGui() {
+  private String doInteractiveGui() throws TabulationCancelledException {
     Logger.log(
         Level.INFO,
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
@@ -233,18 +238,21 @@ class TieBreak {
 
     String selectedCandidate = null;
     while (selectedCandidate == null || selectedCandidate.isEmpty()) {
-      // TODO: actually enable cancel button for interactive tiebreaker GUI
       try {
-        FutureTask<String> futureTask = new FutureTask<>(new GuiTiebreakerPrompt());
+        FutureTask<GuiTiebreakerPromptResponse> futureTask = new FutureTask<>(
+            new GuiTiebreakerPrompt());
         Platform.runLater(futureTask);
-        selectedCandidate = futureTask.get();
+        GuiTiebreakerPromptResponse guiTiebreakerPromptResponse = futureTask.get();
+        if (guiTiebreakerPromptResponse.tabulationCancelled) {
+          throw new TabulationCancelledException();
+        } else {
+          selectedCandidate = guiTiebreakerPromptResponse.candidateToEliminate;
+        }
       } catch (InterruptedException | ExecutionException exception) {
         Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
       }
       if (selectedCandidate == null || selectedCandidate.isEmpty()) {
         Logger.log(Level.WARNING, "Invalid selection! Please try again.");
-        Logger.log(Level.INFO,
-            "Enter the number corresponding to the candidate who should lose this tiebreaker: ");
       }
     }
 
@@ -254,7 +262,7 @@ class TieBreak {
   // function doInteractive
   // purpose: interactively select the loser of this tiebreak
   // return: candidateID of the selected loser
-  private String doInteractive() {
+  private String doInteractive() throws TabulationCancelledException {
     explanation = "The losing candidate was supplied by the operator.";
     return GuiContext.getInstance().getConfig() != null ? doInteractiveGui() : doInteractiveCli();
   }
@@ -303,11 +311,11 @@ class TieBreak {
     return loser;
   }
 
-  class GuiTiebreakerPrompt implements Callable<String> {
+  class GuiTiebreakerPrompt implements Callable<GuiTiebreakerPromptResponse> {
 
     @Override
-    public String call() {
-      String candidateToEliminate = null;
+    public GuiTiebreakerPromptResponse call() {
+      GuiTiebreakerPromptResponse guiTiebreakerPromptResponse = null;
       final Stage window = new Stage();
       window.initModality(Modality.APPLICATION_MODAL);
       window.setTitle("RCV Tiebreaker");
@@ -319,14 +327,26 @@ class TieBreak {
         controller.populateTiedCandidates(tiedCandidates);
         window.setScene(new Scene(root));
         window.showAndWait();
-        candidateToEliminate = controller.getCandidateToEliminate();
+        guiTiebreakerPromptResponse = new GuiTiebreakerPromptResponse(
+            controller.getTabulationCancelled(), controller.getCandidateToEliminate());
       } catch (IOException exception) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
         Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath,sw.toString());
       }
-      return candidateToEliminate;
+      return guiTiebreakerPromptResponse;
+    }
+  }
+
+  private class GuiTiebreakerPromptResponse {
+
+    boolean tabulationCancelled;
+    String candidateToEliminate;
+
+    GuiTiebreakerPromptResponse(boolean tabulationCancelled, String candidateToEliminate) {
+      this.tabulationCancelled = tabulationCancelled;
+      this.candidateToEliminate = candidateToEliminate;
     }
   }
 }

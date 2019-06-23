@@ -860,10 +860,8 @@ public class GuiConfigController implements Initializable {
           return null;
         }
       };
-      task.setOnFailed(arg0 -> {
-        Logger.log(Level.SEVERE, "Error during validation:\n%s\n"
-            + "Validation failed!", task.getException().toString());
-      });
+      task.setOnFailed(arg0 -> Logger.log(Level.SEVERE, "Error during validation:\n%s\n"
+          + "Validation failed!", task.getException().toString()));
       return task;
     }
   }
@@ -887,14 +885,16 @@ public class GuiConfigController implements Initializable {
         protected Void call() {
           // create session object used for tabulation
           TabulatorSession session = new TabulatorSession(configPath);
-          session.tabulate();
+          try {
+            session.tabulate();
+          } catch (TabulationCancelledException e) {
+            Logger.log(Level.SEVERE, "Tabulation was cancelled!");
+          }
           return null;
         }
       };
-      task.setOnFailed(arg0 -> {
-        Logger.log(Level.SEVERE, "Error during tabulation:\n%s\n"
-            + "Tabulation failed!", task.getException().toString());
-      });
+      task.setOnFailed(arg0 -> Logger.log(Level.SEVERE, "Error during tabulation:\n%s\n"
+          + "Tabulation failed!", task.getException().toString()));
       return task;
     }
   }
