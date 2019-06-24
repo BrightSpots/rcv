@@ -1,0 +1,62 @@
+{
+  "config" : {
+    "contest" : "One Winner per Round Test",
+    "date" : "2019-01-18",
+    "jurisdiction" : "",
+    "office" : "",
+    "threshold" : "2.5001"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "A" : "4",
+      "B" : "3",
+      "C" : "3",
+      "D" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : {
+        "B" : "1.4996"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "A" : "2.5001",
+      "B" : "4.4996",
+      "C" : "3",
+      "D" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "B",
+      "transfers" : {
+        "C" : "1.9989"
+      }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "A" : "2.5001",
+      "B" : "2.5001",
+      "C" : "4.9989",
+      "D" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "C",
+      "transfers" : {
+        "D" : "2.1654",
+        "exhausted" : "0.3328"
+      }
+    } ]
+  }, {
+    "round" : 4,
+    "tally" : {
+      "A" : "2.5001",
+      "B" : "2.5001",
+      "C" : "2.5001",
+      "D" : "2.1654"
+    },
+    "tallyResults" : [ ]
+  } ]
+}
