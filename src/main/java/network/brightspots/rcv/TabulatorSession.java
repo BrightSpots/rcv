@@ -42,6 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
+import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
@@ -103,30 +104,40 @@ class TabulatorSession {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
-      if (config.isSequentialMultiSeatEnabled()) {
-        int numWinners = config.getNumberOfWinners();
-        // temporarily set config to single-seat so we can run sequential elections
-        config.setNumberOfWinners(1);
-        while (config.getSequentialWinners().size() < numWinners) {
-          Set<String> newWinnerSet = runTabulationForConfig(config);
-          assert (newWinnerSet.size() == 1);
-          String newWinner = (String) newWinnerSet.toArray()[0];
-          config.setCandidateExclusionStatus(newWinner, true);
-          config.addSequentialWinner(newWinner);
+        if (config.isSequentialMultiSeatEnabled()) {
+          int numWinners = config.getNumberOfWinners();
+          // temporarily set config to single-seat so we can run sequential elections
+          config.setNumberOfWinners(1);
+          while (config.getSequentialWinners().size() < numWinners) {
+            // Read cast vote records and precinct IDs from CVR files
+            List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
+            if (castVoteRecords == null) {
+              Logger.log(Level.SEVERE, "Aborting tabulation due to cvr errors!");
+              break;
+            }
+            Set<String> newWinnerSet = runTabulationForConfig(config, castVoteRecords);
+            assert (newWinnerSet.size() == 1);
+            String newWinner = (String) newWinnerSet.toArray()[0];
+            config.setCandidateExclusionStatus(newWinner, true);
+            config.addSequentialWinner(newWinner);
+          }
+          // revert config to original state
+          config.setNumberOfWinners(numWinners);
+          for (String winner : config.getSequentialWinners()) {
+            config.setCandidateExclusionStatus(winner, false);
+          }
+        } else {
+          // normal operation (not sequential multi-seat)
+          // Read cast vote records and precinct IDs from CVR files
+          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
+          if (castVoteRecords == null) {
+            Logger.log(Level.SEVERE, "Aborting tabulation due to cvr errors!");
+          } else {
+            runTabulationForConfig(config, castVoteRecords);
+          }
         }
-        // revert config to original state
-        config.setNumberOfWinners(numWinners);
-        for (String winner : config.getSequentialWinners()) {
-          config.setCandidateExclusionStatus(winner, false);
-        }
-      } else {
-        // normal operation (not sequential multi-seat)
-        runTabulationForConfig(config);
+        Logger.removeTabulationFileLogging();
       }
-      Logger.removeTabulationFileLogging();
-    } else {
-      Logger.log(Level.SEVERE, "Aborting tabulation!");
-    }
   }
 
   private boolean setUpLogging(ContestConfig config) {
@@ -160,36 +171,21 @@ class TabulatorSession {
   // purpose: execute tabulation for given ContestConfig
   // param: config object containing CVR file paths to parse
   // returns: set of winners from tabulation
-  private Set<String> runTabulationForConfig(ContestConfig config) {
+  private Set<String> runTabulationForConfig(ContestConfig config,
+      List<CastVoteRecord> castVoteRecords) {
     Logger.log(Level.INFO, "Beginning tabulation for config: %s", configPath);
-    Set<String> winners = new HashSet<>();
-    // Read cast vote records and precinct IDs from CVR files
-    List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
-    // parse the cast vote records
-    if (castVoteRecords != null) {
-      if (!castVoteRecords.isEmpty()) {
-        // tabulator for tabulation logic
-        Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIDs);
-        // do the tabulation
-        winners = tabulator.tabulate();
-        // generate visualizer spreadsheet data
-        try {
-          tabulator.generateSummaryFiles(timestampString);
-        } catch (IOException e) {
-          Logger.log(Level.SEVERE, "Error writing summary files:\n%s", e.toString());
-        }
-      } else {
-        Logger.log(Level.SEVERE, "No cast vote records found!");
-      }
-    } else {
-      Logger.log(Level.SEVERE, "Skipping tabulation due to source CVR file errors!");
+    Set<String> winners;
+    // tabulator for tabulation logic
+    Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIDs);
+    // do the tabulation
+    winners = tabulator.tabulate();
+    // generate visualizer spreadsheet data
+    try {
+      tabulator.generateSummaryFiles(timestampString);
+    } catch (IOException e) {
+      Logger.log(Level.SEVERE, "Error writing summary files:\n%s", e.toString());
     }
-
-    if (winners.size() > 0) {
-      Logger.log(Level.INFO, "Tabulation session completed.  Results written to: %s", outputPath);
-    } else {
-      Logger.log(Level.SEVERE, "Unable to complete tabulation session!");
-    }
+    Logger.log(Level.INFO, "Tabulation session completed.  Results written to: %s", outputPath);
     return winners;
   }
 
@@ -197,13 +193,13 @@ class TabulatorSession {
   // purpose: parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
   // param: precinctIDs a set of precinctIDs which will be populated during cvr parsing
-  // returns: list of parsed CVRs
+  // returns: list of parsed CVRs or null if an error was encountered
   private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config, Set<String> precinctIDs) {
     Logger.log(Level.INFO, "Parsing cast vote records...");
 
     // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    // did we encounter a fatal problem for this source?
+    // did we encounter a fatal problem for any source?
     boolean encounteredSourceProblem = false;
 
     // At each iteration of the following loop, we add records from another source file.
@@ -233,19 +229,28 @@ class TabulatorSession {
         }
         encounteredSourceProblem = true;
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error opening source file %s", cvrPath);
+        Logger.log(Level.SEVERE, "Error opening cast vote record file %s", cvrPath);
+        Logger.log(Level.INFO, "Check file path and permissions and make sure they are correct!");
         encounteredSourceProblem = true;
-      } catch (ParserConfigurationException | SAXException | OpenXML4JException e) {
+      } catch (ParserConfigurationException |
+          SAXException |
+          OpenXML4JException |
+          POIXMLException e) {
         Logger.log(Level.SEVERE, "Error parsing source file %s", cvrPath);
+        Logger.log(Level.INFO, "ES&S cast vote record files must be Microsoft Excel Workbook "
+            + "format.\nStrict Open XML and Open Office are not supported." );
         encounteredSourceProblem = true;
       }
     }
 
-    if (!encounteredSourceProblem) {
-      Logger.log(Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
-    } else {
+    if (encounteredSourceProblem) {
       Logger.log(Level.SEVERE, "Parsing cast vote records failed!");
       castVoteRecords = null;
+    } else if (castVoteRecords.isEmpty()) {
+      Logger.log(Level.SEVERE, "No cast vote records round!");
+      castVoteRecords = null;
+    } else {
+      Logger.log(Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
     }
     return castVoteRecords;
   }
