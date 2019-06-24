@@ -932,9 +932,7 @@ class Tabulator {
 
           // There can be at most one continuing candidate in candidateSet; if there were more than
           // one, we would have already flagged this as an overvote.
-          if (selectedCandidate != null) {
-            break;
-          }
+          break;
         }
 
         // if we found a continuing candidate stop looking through rankings
