@@ -152,6 +152,11 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         value: true | false
         if not supplied: false
 
+      "onlyOneWinnerPerRound" optional
+        in a multi-seat contest, elect no more than one winner per round, even when there are multiple candidates exceeding the winning threshold
+        value: true | false
+        if not supplied: false
+
       "nonIntegerWinningThreshold" optional
         the vote threshold used to determine winners can be a non-integer
         if true, threshold = V/(S+1) + 10^-d

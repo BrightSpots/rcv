@@ -239,6 +239,9 @@
                 <Label text="Max Rankings Allowed *"/>
                 <TextField maxWidth="220.0" promptText="Max Rankings Allowed"
                   fx:id="textFieldMaxRankingsAllowed"/>
+                <Label text="Rules Description"/>
+                <TextField maxWidth="220.0" promptText="Rules Description"
+                  fx:id="textFieldRulesDescription"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
@@ -252,6 +255,12 @@
                 </CheckBox>
                 <CheckBox mnemonicParsing="false" text="Bottoms-Up Multi-Seat"
                   fx:id="checkBoxBottomsUpMultiSeat">
+                  <VBox.margin>
+                    <Insets top="4.0"/>
+                  </VBox.margin>
+                </CheckBox>
+                <CheckBox mnemonicParsing="false" text="Only One Winner per Round"
+                  fx:id="checkBoxOnlyOneWinnerPerRound">
                   <VBox.margin>
                     <Insets top="4.0"/>
                   </VBox.margin>
@@ -301,9 +310,6 @@
                 <Label text="Undeclared Write-in Label"/>
                 <TextField maxWidth="220.0" promptText="Undeclared Write-in Label"
                   fx:id="textFieldUndeclaredWriteInLabel"/>
-                <Label text="Rules Description"/>
-                <TextField maxWidth="220.0" promptText="Rules Description"
-                  fx:id="textFieldRulesDescription"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
