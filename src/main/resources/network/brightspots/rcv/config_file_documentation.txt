@@ -111,6 +111,12 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         how the program should handle an overvote when it encounters one
         value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
 
+      "randomSeed" optional
+        the integer seed for the application's pseudorandom number generator
+        required if tiebreakMode is random, previousRoundCountsThenRandom, or generatePermutation
+        value: [-2147483648..2147483647]
+        if not supplied: null
+
       "numberOfWinners" required
         the number of seats to be won in this contest
         note: we use fractional vote transfer to redistribute votes in multi-seat contests

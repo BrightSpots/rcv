@@ -175,6 +175,7 @@ public class RawContestConfig {
   public static class ContestRules {
     // tiebreak mode to use
     public String tiebreakMode;
+    public Integer randomSeed;
     // which overvote rule to use
     public String overvoteRule;
     // setting for number of winners

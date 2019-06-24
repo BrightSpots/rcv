@@ -355,6 +355,13 @@ class TabulatorTests {
     runTabulationTest("missing_precinct_example");
   }
 
+  // function: testTiebreakSeed
+  // purpose: tests random seed feature for tiebreaks
+  @Test
+  @DisplayName("test tiebreak seed")
+  void testTiebreakSeed() {
+    runTabulationTest("tiebreak_seed_test");
+  }
 
   // function: nistTest0
   // purpose: tests skipped first choice

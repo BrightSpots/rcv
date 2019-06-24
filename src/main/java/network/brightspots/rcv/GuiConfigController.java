@@ -146,6 +146,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
   @FXML
+  private TextField textFieldRandomSeed;
+  @FXML
   private TextField textFieldNumberOfWinners;
   @FXML
   private TextField textFieldDecimalPlacesForVoteArithmetic;
@@ -537,6 +539,7 @@ public class GuiConfigController implements Initializable {
 
     choiceTiebreakMode.setValue(null);
     choiceOvervoteRule.setValue(null);
+    textFieldRandomSeed.clear();
     textFieldNumberOfWinners.clear();
     textFieldDecimalPlacesForVoteArithmetic.clear();
     textFieldMinimumVoteThreshold.clear();
@@ -796,6 +799,7 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = rawConfig.rules;
     choiceTiebreakMode.setValue(config.getTiebreakMode());
     choiceOvervoteRule.setValue(config.getOvervoteRule());
+    setTextFieldToInteger(textFieldRandomSeed, rules.randomSeed);
     setTextFieldToInteger(textFieldNumberOfWinners, rules.numberOfWinners);
     setTextFieldToInteger(
         textFieldDecimalPlacesForVoteArithmetic, rules.decimalPlacesForVoteArithmetic);
@@ -859,6 +863,7 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, Tabulator.OvervoteRule.RULE_UNKNOWN);
+    rules.randomSeed = getIntValueOrNull(textFieldRandomSeed);
     rules.numberOfWinners = getIntValueOrNull(textFieldNumberOfWinners);
     rules.decimalPlacesForVoteArithmetic =
         getIntValueOrNull(textFieldDecimalPlacesForVoteArithmetic);
