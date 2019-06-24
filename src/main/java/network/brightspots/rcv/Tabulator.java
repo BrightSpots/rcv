@@ -476,6 +476,24 @@ class Tabulator {
       }
     }
 
+    // Edge case: if we've identified multiple winners in this round but we're only supposed to
+    // elect one winner per round, pick the top vote-getter and defer the others to subsequent
+    // rounds.
+    if (config.isOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
+      BigDecimal maxTally = BigDecimal.ZERO;
+      String candidateWithMaxTally = null;
+      for (String candidate : selectedWinners) {
+        BigDecimal tally = currentRoundCandidateToTally.get(candidate);
+        // TODO: need a non-arbitrary way of settling a tie here
+        if (tally.compareTo(maxTally) > 0) {
+          maxTally = tally;
+          candidateWithMaxTally = candidate;
+        }
+      }
+      selectedWinners = new LinkedList<>();
+      selectedWinners.add(candidateWithMaxTally);
+    }
+
     for (String winner : selectedWinners) {
       Logger.log(
           Level.INFO,

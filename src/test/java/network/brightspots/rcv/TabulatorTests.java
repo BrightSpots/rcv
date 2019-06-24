@@ -339,6 +339,14 @@ class TabulatorTests {
     runTabulationTest("2013_minneapolis_park_bottoms_up");
   }
 
+  // function: testOnlyOneWinnerPerRound
+  // purpose: tests onlyOneWinnerPerRound option
+  @Test
+  @DisplayName("test only one winner per round logic")
+  void testOnlyOneWinnerPerRound() {
+    runTabulationTest("test_set_only_one_winner_per_round");
+  }
+
   // function: precinctExample
   // purpose: tests a small election with precincts
   @Test
