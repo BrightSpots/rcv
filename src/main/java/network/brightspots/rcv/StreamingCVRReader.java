@@ -51,7 +51,7 @@ import org.xml.sax.XMLReader;
 class StreamingCVRReader {
 
   // this indicates a missing precinct Id in output files
-  private final String MISSING_PRECINCT_ID = "MISSING_PRECINCT_ID";
+  private final String MISSING_PRECINCT_ID = "missing_precinct_id";
   // config for the contest
   private final ContestConfig config;
   // path of the source file
