@@ -366,7 +366,7 @@ class ResultsWriter {
     } catch (IOException exception) {
       Logger.log(
           Level.SEVERE,
-          "Error creating CSV file: %s\n%s\n" + "Please check the file path and permissions!",
+          "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
           csvPath,
           exception.toString());
       throw exception;
