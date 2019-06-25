@@ -104,7 +104,7 @@ class CastVoteRecord {
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
-      logStringBuilder.append(" [was exhausted] ");
+      logStringBuilder.append(" [became inactive] ");
     } else {
       if (round == 1) {
         logStringBuilder.append(" [counted for] ");
