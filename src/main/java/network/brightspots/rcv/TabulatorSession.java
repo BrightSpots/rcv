@@ -41,6 +41,7 @@ import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
+import network.brightspots.rcv.StreamingCVRReader.CvrDataFormatException;
 import network.brightspots.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -227,6 +228,11 @@ class TabulatorSession {
               candidate,
               exception.candidateCounts.get(candidate));
         }
+        // various incorrect settings can lead to UnrecognizedCandidatesException so it's hard
+        // to know exactly what the problem is
+        Logger.log(Level.INFO, "Check config settings for candidate names, firstVoteRowIndex, "
+            + "firstVoteColumnIndex, and precinctColumnIndex to make sure they are correct!");
+        Logger.log(Level.INFO, "See config_file_documentation.txt for more details.");
         encounteredSourceProblem = true;
       } catch (IOException e) {
         Logger.log(Level.SEVERE, "Error opening cast vote record file %s", cvrPath);
@@ -239,6 +245,10 @@ class TabulatorSession {
         Logger.log(Level.SEVERE, "Error parsing source file %s", cvrPath);
         Logger.log(Level.INFO, "ES&S cast vote record files must be Microsoft Excel Workbook "
             + "format.\nStrict Open XML and Open Office are not supported." );
+        encounteredSourceProblem = true;
+      } catch (CvrDataFormatException e) {
+        Logger.log(Level.SEVERE, "Data format error while parsing source file %s", cvrPath);
+        Logger.log(Level.INFO, "See the log for details.");
         encounteredSourceProblem = true;
       }
     }

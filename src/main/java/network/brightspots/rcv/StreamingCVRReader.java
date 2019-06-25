@@ -50,6 +50,8 @@ import org.xml.sax.XMLReader;
 
 class StreamingCVRReader {
 
+  // this indicates a missing precinct Id in output files
+  private final String MISSING_PRECINCT_ID = "MISSING_PRECINCT_ID";
   // config for the contest
   private final ContestConfig config;
   // path of the source file
@@ -80,9 +82,10 @@ class StreamingCVRReader {
   private List<CastVoteRecord> cvrList;
   // store precinctIDs (new IDs will be added as we parse)
   private Set<String> precinctIDs;
-
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
+  // flag indicating data issues during parsing
+  public Boolean encounteredDataErrors = false;
 
   // function: StreamingCVRReader
   // purpose: class constructor
@@ -184,6 +187,24 @@ class StreamingCVRReader {
     // determine what the new cvr ID will be
     String computedCastVoteRecordID =
         String.format("%s-%d", ResultsWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
+
+    // add precinct ID if needed
+    if (precinctColumnIndex != null) {
+      if (currentPrecinct == null) {
+        // group precincts with missing Ids here
+        Logger.log(Level.WARNING, "Precinct identifier not found for Cvr: %s",
+            computedCastVoteRecordID);
+        currentPrecinct = MISSING_PRECINCT_ID;
+      }
+      precinctIDs.add(currentPrecinct);
+    }
+
+    // look for missing Cvr Id
+    if (idColumnIndex != null && currentSuppliedCVRID == null) {
+      Logger.log(Level.SEVERE, "Cvr identifier not found for Cvr: %s", computedCastVoteRecordID);
+      encounteredDataErrors = true;
+    }
+
     // create new cast vote record
     CastVoteRecord newRecord =
         new CastVoteRecord(
@@ -194,13 +215,10 @@ class StreamingCVRReader {
             currentRankings);
     // add it to overall list
     cvrList.add(newRecord);
-    // add precinct ID if one was found
-    if (currentPrecinct != null) {
-      precinctIDs.add(currentPrecinct);
-    }
+
     // provide some user feedback on the CVR count
     if (cvrList.size() % 50000 == 0) {
-      Logger.log(Level.INFO, String.format("Parsed %d cast vote records.", cvrList.size()));
+      Logger.log(Level.INFO, "Parsed %d cast vote records.", cvrList.size());
     }
   }
 
@@ -255,7 +273,7 @@ class StreamingCVRReader {
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   void parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
-      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException, ParserConfigurationException {
+      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException, ParserConfigurationException, CvrDataFormatException {
 
     // cache the cvr list so it is accessible in callbacks
     cvrList = castVoteRecords;
@@ -338,6 +356,15 @@ class StreamingCVRReader {
     if (this.unrecognizedCandidateCounts.size() > 0) {
       throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
+    // throw if there were data issues
+    if (this.encounteredDataErrors) {
+      throw new CvrDataFormatException();
+    }
+  }
+
+  // exception class for miscellaneous unexpected data errors encountered during Cvr parsing
+  // e.g. missing Cvr Id
+  static class CvrDataFormatException extends Exception {
   }
 
   // exception class used when an unrecognized candidate is encountered during cvr parsing
