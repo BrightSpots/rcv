@@ -123,8 +123,11 @@ class ResultsWriter {
     try {
       jsonWriter.writeValue(outFile, json);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error writing to JSON file: %s\n%s\n"
-          + "Please check the file path and permissions!", path, exception.toString());
+      Logger.log(
+          Level.SEVERE,
+          "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
+          path,
+          exception.toString());
       throw exception;
     }
   }
@@ -182,6 +185,35 @@ class ResultsWriter {
           return ret;
         });
     return sortedCandidatesWithRanks;
+  }
+
+  // function: getPrecinctFileString
+  // purpose: return a unique, valid string for this precinct's output spreadsheet filename
+  // param: precinct is the name of the precinct
+  // param: filenames is the set of filenames we've already generated
+  // return: the new filename
+  private static String getPrecinctFileString(String precinct, Set<String> filenames) {
+    // sanitized is the precinct name with all special characters converted to underscores
+    String sanitized = sanitizeStringForOutput(precinct);
+    // filename is the string that we'll eventually return
+    String filename = sanitized;
+    // appendNumber is used to find a unique filename (in practice this really shouldn't be
+    // necessary because different precinct names shouldn't have the same sanitized name, but we're
+    // doing it here to be safe)
+    int appendNumber = 2;
+    while (filenames.contains(filename)) {
+      filename = sanitized + "_" + appendNumber++;
+    }
+    filenames.add(filename);
+    return filename;
+  }
+
+  private String getOutputFilePath(String outputType) {
+    return getOutputFilePath(
+        config.getOutputDirectory(),
+        outputType,
+        timestampString,
+        config.isSequentialMultiSeatEnabled() ? config.getSequentialWinners().size() + 1 : null);
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
@@ -283,12 +315,8 @@ class ResultsWriter {
       // precinctFileString is a unique filesystem-safe string which can be used for creating
       // the precinct output filename
       String precinctFileString = getPrecinctFileString(precinct, filenames);
-      // filename for output
-      String outputFileName =
-          String.format("%s_%s_precinct_summary", this.timestampString, precinctFileString);
-      // full path for output
       String outputPath =
-          Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
+          getOutputFilePath(String.format("%s_precinct_summary", precinctFileString));
       generateSummarySpreadsheet(precinctRoundTallies.get(precinct), precinct, outputPath);
 
       // generate json output
@@ -336,8 +364,11 @@ class ResultsWriter {
       BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error creating CSV file: %s\n%s\n"
-          + "Please check the file path and permissions!", csvPath, exception.toString());
+      Logger.log(
+          Level.SEVERE,
+          "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
+          csvPath,
+          exception.toString());
       throw exception;
     }
 
@@ -520,40 +551,12 @@ class ResultsWriter {
     return sortedCandidates;
   }
 
-  // function: getPrecinctFileString
-  // purpose: return a unique, valid string for this precinct's output spreadsheet filename
-  // param: precinct is the name of the precinct
-  // param: filenames is the set of filenames we've already generated
-  // return: the new filename
-  private String getPrecinctFileString(String precinct, Set<String> filenames) {
-    // sanitized is the precinct name with all special characters converted to underscores
-    String sanitized = sanitizeStringForOutput(precinct);
-    // filename is the string that we'll eventually return
-    String filename = sanitized;
-    // appendNumber is used to find a unique filename (in practice this really shouldn't be
-    // necessary because different precinct names shouldn't have the same sanitized name, but we're
-    // doing it here to be safe)
-    int appendNumber = 2;
-    while (filenames.contains(filename)) {
-      filename = sanitized + "_" + appendNumber++;
-    }
-    filenames.add(filename);
-    return filename;
-  }
-
   // function: generateOverallSummaryFiles
   // purpose: creates a summary spreadsheet and JSON for the full contest
   // param: roundTallies is the round-by-round count of votes per candidate
   void generateOverallSummaryFiles(Map<Integer, Map<String, BigDecimal>> roundTallies)
       throws IOException {
-    String outputPath =
-        getOutputFilePath(
-            config.getOutputDirectory(),
-            "summary",
-            timestampString,
-            config.isSequentialMultiSeatEnabled()
-                ? config.getSequentialWinners().size() + 1
-                : null);
+    String outputPath = getOutputFilePath("summary");
     // generate the spreadsheet
     generateSummarySpreadsheet(roundTallies, null, outputPath);
 
@@ -568,15 +571,7 @@ class ResultsWriter {
     GpUnitIds = generateGpUnitIds();
 
     HashMap<String, Object> outputJson = new HashMap<>();
-    String outputPath =
-        getOutputFilePath(
-            config.getOutputDirectory(),
-            "cvr_cdf",
-            timestampString,
-            config.isSequentialMultiSeatEnabled()
-                ? config.getSequentialWinners().size() + 1
-                : null)
-            + ".json";
+    String outputPath = getOutputFilePath("cvr_cdf") + ".json";
 
     Logger.log(Level.INFO, "Generating CVR CDF JSON file: %s...", outputPath);
 
