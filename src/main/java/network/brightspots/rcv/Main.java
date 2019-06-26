@@ -62,11 +62,11 @@ public class Main extends GuiApplication {
       if (argsCli.size() == 0) {
         Logger.log(Level.SEVERE, "No config file path provided on command line!\n"
             + "Please provide a path to the config file!\n"
-            + "See UserGuide.md for more details.");
+            + "See README.md for more details.");
         System.exit(1);
       } else if (argsCli.size() > 2) {
         Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d\n"
-                + "See UserGuide.md for more details.",
+                + "See README.md for more details.",
             argsCli.size());
         System.exit(2);
       }

@@ -1,5 +1,5 @@
 This document lists the parameters that can be included in a config file suitable for input tabulation.
-Config file must be valid JSON format. Examples can be found under the test folder.
+Config file must be valid JSON format. Examples can be found in the test_data folder.
 
   "outputSettings" required
     list of output settings and their associated parameters
