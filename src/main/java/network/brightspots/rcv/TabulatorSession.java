@@ -29,6 +29,8 @@
 
 package network.brightspots.rcv;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -161,6 +163,20 @@ class TabulatorSession {
   private Set<String> runTabulationForConfig(ContestConfig config)
       throws TabulationCancelledException {
     Logger.log(Level.INFO, "Beginning tabulation for config: %s", configPath);
+    try {
+      Logger.log(Level.INFO, "Begin config file contents:");
+      BufferedReader reader = new BufferedReader(new FileReader(configPath));
+      String line = reader.readLine();
+      while(line != null) {
+        Logger.log(Level.INFO, line);
+        line = reader.readLine();
+      }
+      Logger.log(Level.INFO, "End config file contents.");
+      reader.close();
+    } catch (IOException e) {
+      Logger.log(Level.SEVERE, "Error logging config file: %s\n", configPath, e.toString());
+    }
+
     Set<String> winners = new HashSet<>();
     // Read cast vote records and precinct IDs from CVR files
     List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);

@@ -426,4 +426,11 @@ class TabulatorTests {
   void multiWinnerFractionalThresholdTest() {
     runTabulationTest("test_set_multi_winner_fractional_threshold");
   }
-}
+
+  // function: tiebreakUsingConfigPermutation
+  // purpose: tests tiebreak using config permutation setting
+  @Test
+  @DisplayName("tiebreak using config permutation")
+  void tiebreakUsingConfigPermutation() {
+    runTabulationTest("tiebreak_config_permutation_test");
+  }}
