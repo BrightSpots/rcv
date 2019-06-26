@@ -4,14 +4,15 @@
 
 The Universal Tabulator is a free, open-source application designed to quickly and accurately tabulate ranked choice voting elections using a variety of rules commonly in use in North America.
 
-The Tabulator requires as input a "contest configuration" file which specifies:
+The Tabulator requires a "contest configuration" file as input, which specifies:
 - Tabulation rule variations to use
 - List of registered candidates 
 - One or more cast vote record files
 - Output formatting options (contest name, where to write output files, etc.)
 
-The Tabulator produces as output:
+The Tabulator produces the following as output:
 - A results spreadsheet including round-by-round vote totals for each candidate and the eventual winner(s)
+- A JSON file containing the same information.
 - An audit report describing how every ballot was counted in each round over the course of the tabulation
 
 The Tabulator provides an interface for:
@@ -23,21 +24,21 @@ The Tabulator provides an interface for:
 
 #### Method 1 (Easy): Pre-Compiled Version
 
-1. Download the pre-compiled tabulator for your OS from [here](https://drive.google.com/drive/u/1/folders/1vYYJa5-oJe0lpaVnI_ELn9foZIVZ54pL).
+1. Download the pre-compiled tabulator for your OS from the Ranked Choice Voting Resource Center's Google Drive [here](https://drive.google.com/drive/u/1/folders/1vYYJa5-oJe0lpaVnI_ELn9foZIVZ54pL).
 
     **Note**: this download should be a "jlink image" which doesn't even require you to have Java installed on your machine.
 
-2. Unzip the file, navigate to the `bin` directory, and launch the GUI by running the `rcv` script if using MacOS or Linux, or `rcv.bat` if using Windows.
+2. Unzip the file, navigate to the `bin` directory, and launch the RCV Tabulator GUI by running the `rcv` script if using MacOS or Linux, or `rcv.bat` if using Windows.
 
 #### Method 2 (Less Easy): Compile and Run Using Gradle
 
-1. Install [JDK 11 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by verifying that following command returns the expected version:
+1. Install [JDK 11 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by verifying that the following command returns the expected version:
     
     `$ java -version`
     
-    If the expected version isn't getting returned, you'll need to follow the instructions [here](https://www.java.com/en/download/help/path.xml) on how to set your Java path.
+    If the expected version isn't returned, you'll need to follow the instructions [here](https://www.java.com/en/download/help/path.xml) on how to set your Java path.
 
-2. Download the [zip from GitHub](https://github.com/BrightSpots/rcv/archive/master.zip) and unzip it, or install git and use the following command at the terminal / command prompt to clone a local copy on your machine:
+2. Download the [zip of the source code from GitHub](https://github.com/BrightSpots/rcv/archive/master.zip) and unzip it, or install git and use the following command at the terminal / command prompt to clone a local copy on your machine:
     
     `$ git clone https://github.com/BrightSpots/rcv.git`
 
@@ -55,11 +56,11 @@ The Tabulator provides an interface for:
 
 The Tabulator includes several example contest configuration files and associated cast vote record files.
 
-1. Click "Load..." at the top of the window and browse into the "test_data" folder under src/test/resources.
-2. Browse into one of the folders listed here and select the corresponding file that ends with "_config.json".
+1. Click "Load..." at the top of the window and navigate to the "test_data" folder.
+2. Open one of the folders listed here and select the config file (it will have the "_config.json" suffix).
 3. Click on the configuration tabs (Output, CVR Files, Candidates, Rules) to see how this contest is configured.
-4. Click "Validate" to check if this configuration is valid. You will see the results in the console area at the bottom of the main window.
-5. Click "Tabulate" to tabulate the election. You will see the results in the console, including the location and names of output files.
+4. Click "Validate" to check if this configuration is valid. You will see the results in the console at the bottom of the main window.
+5. Click "Tabulate" to tabulate the election. You will see the results in the console, including the location of the output files.
 
 ## Command-Line Interface
 
@@ -85,8 +86,6 @@ Tabulator output file names automatically include the current date and time, e.g
 
 Look in the console window to see where the output spreadsheet was written, e.g.
 
-`2018-09-09 18:55:53 PDT INFO: Generating summary spreadsheet: /Users/Me/Documents/rcv/test_data/2018_maine_gov_primary_dem/output/2019-06-25_17-19-28_summary.csv`
+`2019-06-25 17:19:28 PDT INFO: Generating summary spreadsheet: /Users/Me/Documents/rcv/test_data/2018_maine_gov_primary_dem/output/2019-06-25_17-19-28_summary.csv...`
 
-Double-click on the summary spreadsheet to open it (you may need to install [OpenOffice](https://www.openoffice.org/download/) or some other CSV file reader first).
-
-Find the audit log file and double-click on it to open it. It is a standard text file and can be displayed with any kind of text editor.
+The summary spreadsheet (in CSV format), summary JSON, and audit logs are all readable using a basic text editor.
