@@ -29,8 +29,8 @@ import java.util.logging.Level;
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
-  public static String APP_NAME = "RCVRC Universal Tabulator";
-  public static String APP_VERSION = "0.1.0";
+  public static final String APP_NAME = "RCVRC Universal Tabulator";
+  public static final String APP_VERSION = "0.1.0";
 
   // function: main
   // purpose: main entry point to the rcv tabulator program
@@ -39,8 +39,7 @@ public class Main extends GuiApplication {
   public static void main(String[] args) {
     System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
     Logger.setup();
-    Logger.log(Level.INFO, String.format("Launching %s version %s...", APP_NAME, APP_VERSION));
-	  Main.logSystemInfo();
+	  logSystemInfo();
 	  
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;
@@ -85,7 +84,7 @@ public class Main extends GuiApplication {
     System.exit(0);
   }
 
-  public static void logSystemInfo() {
+  private static void logSystemInfo() {
     Logger.log(Level.INFO, String.format("Launching %s version %s...", APP_NAME, APP_VERSION));
     Logger.log(Level.INFO, "Host system: %s version %s",
         System.getProperty("os.name"),

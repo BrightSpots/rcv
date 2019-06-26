@@ -165,12 +165,14 @@ class TabulatorSession {
   private Set<String> runTabulationForConfig(ContestConfig config) {
     Logger.log(Level.INFO, "Beginning tabulation for config: %s", configPath);
     try {
+      Logger.log(Level.INFO, "Begin config file contents:");
       BufferedReader reader = new BufferedReader(new FileReader(configPath));
       String line = reader.readLine();
       while(line != null) {
         Logger.log(Level.INFO, line);
         line = reader.readLine();
       }
+      Logger.log(Level.INFO, "End config file contents.");
       reader.close();
     } catch (IOException e) {
       Logger.log(Level.SEVERE, "Error logging config file: %s\n", configPath, e.toString());
