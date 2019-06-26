@@ -105,40 +105,40 @@ class TabulatorSession {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
-        if (config.isSequentialMultiSeatEnabled()) {
-          int numWinners = config.getNumberOfWinners();
-          // temporarily set config to single-seat so we can run sequential elections
-          config.setNumberOfWinners(1);
-          while (config.getSequentialWinners().size() < numWinners) {
-            // Read cast vote records and precinct IDs from CVR files
-            List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
-            if (castVoteRecords == null) {
-              Logger.log(Level.SEVERE, "Aborting tabulation due to cvr errors!");
-              break;
-            }
-            Set<String> newWinnerSet = runTabulationForConfig(config, castVoteRecords);
-            assert (newWinnerSet.size() == 1);
-            String newWinner = (String) newWinnerSet.toArray()[0];
-            config.setCandidateExclusionStatus(newWinner, true);
-            config.addSequentialWinner(newWinner);
-          }
-          // revert config to original state
-          config.setNumberOfWinners(numWinners);
-          for (String winner : config.getSequentialWinners()) {
-            config.setCandidateExclusionStatus(winner, false);
-          }
-        } else {
-          // normal operation (not sequential multi-seat)
+      if (config.isSequentialMultiSeatEnabled()) {
+        int numWinners = config.getNumberOfWinners();
+        // temporarily set config to single-seat so we can run sequential elections
+        config.setNumberOfWinners(1);
+        while (config.getSequentialWinners().size() < numWinners) {
           // Read cast vote records and precinct IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
           if (castVoteRecords == null) {
             Logger.log(Level.SEVERE, "Aborting tabulation due to cvr errors!");
-          } else {
-            runTabulationForConfig(config, castVoteRecords);
+            break;
           }
+          Set<String> newWinnerSet = runTabulationForConfig(config, castVoteRecords);
+          assert newWinnerSet.size() == 1;
+          String newWinner = (String) newWinnerSet.toArray()[0];
+          config.setCandidateExclusionStatus(newWinner, true);
+          config.addSequentialWinner(newWinner);
         }
-        Logger.removeTabulationFileLogging();
+        // revert config to original state
+        config.setNumberOfWinners(numWinners);
+        for (String winner : config.getSequentialWinners()) {
+          config.setCandidateExclusionStatus(winner, false);
+        }
+      } else {
+        // normal operation (not sequential multi-seat)
+        // Read cast vote records and precinct IDs from CVR files
+        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
+        if (castVoteRecords == null) {
+          Logger.log(Level.SEVERE, "Aborting tabulation due to cvr errors!");
+        } else {
+          runTabulationForConfig(config, castVoteRecords);
+        }
       }
+      Logger.removeTabulationFileLogging();
+    }
   }
 
   private boolean setUpLogging(ContestConfig config) {
@@ -156,9 +156,7 @@ class TabulatorSession {
       FileUtils.createOutputDirectory(config.getOutputDirectory());
       Logger.addTabulationFileLogging(tabulationLogPath);
       success = true;
-    } catch (UnableToCreateDirectoryException exception) {
-      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
-    } catch (IOException exception) {
+    } catch (UnableToCreateDirectoryException | IOException exception) {
       Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
     }
     if (!success) {
@@ -244,7 +242,7 @@ class TabulatorSession {
           POIXMLException e) {
         Logger.log(Level.SEVERE, "Error parsing source file %s", cvrPath);
         Logger.log(Level.INFO, "ES&S cast vote record files must be Microsoft Excel Workbook "
-            + "format.\nStrict Open XML and Open Office are not supported." );
+            + "format.\nStrict Open XML and Open Office are not supported.");
         encounteredSourceProblem = true;
       } catch (CvrDataFormatException e) {
         Logger.log(Level.SEVERE, "Data format error while parsing source file: %s", cvrPath);
@@ -257,7 +255,7 @@ class TabulatorSession {
       Logger.log(Level.SEVERE, "Parsing cast vote records failed!");
       castVoteRecords = null;
     } else if (castVoteRecords.isEmpty()) {
-      Logger.log(Level.SEVERE, "No cast vote records round!");
+      Logger.log(Level.SEVERE, "No cast vote records found!");
       castVoteRecords = null;
     } else {
       Logger.log(Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());

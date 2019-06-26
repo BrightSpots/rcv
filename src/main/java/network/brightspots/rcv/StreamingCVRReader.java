@@ -75,7 +75,7 @@ class StreamingCVRReader {
   // list of raw strings for CVR in progress
   private LinkedList<String> currentCVRData;
   // supplied CVR ID for CVR in progress
-  private String currentSuppliedCVRID;
+  private String currentSuppliedCvrId;
   // precinct ID for CVR in progress
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
@@ -174,7 +174,7 @@ class StreamingCVRReader {
     cvrIndex++;
     currentRankings = new LinkedList<>();
     currentCVRData = new LinkedList<>();
-    currentSuppliedCVRID = null;
+    currentSuppliedCvrId = null;
     currentPrecinct = null;
     lastRankSeen = 0;
   }
@@ -192,7 +192,7 @@ class StreamingCVRReader {
     if (precinctColumnIndex != null) {
       if (currentPrecinct == null) {
         // group precincts with missing Ids here
-        Logger.log(Level.WARNING, "Precinct identifier not found for Cvr: %s",
+        Logger.log(Level.WARNING, "Precinct identifier not found for cast vote record: %s",
             computedCastVoteRecordID);
         currentPrecinct = MISSING_PRECINCT_ID;
       }
@@ -200,8 +200,9 @@ class StreamingCVRReader {
     }
 
     // look for missing Cvr Id
-    if (idColumnIndex != null && currentSuppliedCVRID == null) {
-      Logger.log(Level.SEVERE, "Cvr identifier not found for Cvr: %s", computedCastVoteRecordID);
+    if (idColumnIndex != null && currentSuppliedCvrId == null) {
+      Logger.log(Level.SEVERE, "Cast vote record identifier not found for : %s",
+          computedCastVoteRecordID);
       encounteredDataErrors = true;
     }
 
@@ -209,7 +210,7 @@ class StreamingCVRReader {
     CastVoteRecord newRecord =
         new CastVoteRecord(
             computedCastVoteRecordID,
-            currentSuppliedCVRID,
+            currentSuppliedCvrId,
             currentPrecinct,
             currentCVRData,
             currentRankings);
@@ -235,7 +236,7 @@ class StreamingCVRReader {
     if (precinctColumnIndex != null && col == precinctColumnIndex) {
       currentPrecinct = cellData;
     } else if (idColumnIndex != null && col == idColumnIndex) {
-      currentSuppliedCVRID = cellData;
+      currentSuppliedCvrId = cellData;
     }
 
     // see if this column is in the ranking range
@@ -353,11 +354,11 @@ class StreamingCVRReader {
     xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));
 
     // throw if there were any unrecognized candidates -- this is considered bad
-    if (this.unrecognizedCandidateCounts.size() > 0) {
+    if (unrecognizedCandidateCounts.size() > 0) {
       throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
     // throw if there were data issues
-    if (this.encounteredDataErrors) {
+    if (encounteredDataErrors) {
       throw new CvrDataFormatException();
     }
   }

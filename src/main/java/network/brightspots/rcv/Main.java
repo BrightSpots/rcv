@@ -65,7 +65,7 @@ public class Main extends GuiApplication {
         System.exit(1);
       } else if (argsCli.size() > 2) {
         Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d\n"
-            + "See UserGuide.txt for more details.\nSee UserGuide.txt for more details.",
+                + "See UserGuide.txt for more details.\nSee UserGuide.txt for more details.",
             argsCli.size());
         System.exit(2);
       }
