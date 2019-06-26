@@ -62,6 +62,7 @@ The Tabulator includes several example contest configuration files and associate
 5. Click "Tabulate" to tabulate the election. You will see the results in the console, including the location and names of output files.
 
 ## Command-Line Interface
+
 Alternatively, you can run the Tabulator using the command-line interface by including the flag `-cli` and then supplying a path to an existing config file, e.g.:
 
 `$ rcv -cli path/to/config`
