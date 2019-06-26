@@ -85,7 +85,7 @@ class StreamingCVRReader {
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
   // flag indicating data issues during parsing
-  public Boolean encounteredDataErrors = false;
+  private boolean encounteredDataErrors = false;
 
   // function: StreamingCVRReader
   // purpose: class constructor

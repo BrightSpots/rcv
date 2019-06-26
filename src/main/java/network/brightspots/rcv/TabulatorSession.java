@@ -186,7 +186,7 @@ class TabulatorSession {
     } catch (IOException e) {
       Logger.log(Level.SEVERE, "Error writing summary files:\n%s", e.toString());
     }
-    Logger.log(Level.INFO, "Tabulation session completed.  Results written to: %s", outputPath);
+    Logger.log(Level.INFO, "Tabulation session completed. Results written to: %s", outputPath);
     return winners;
   }
 
@@ -235,7 +235,7 @@ class TabulatorSession {
         Logger.log(Level.INFO, "See config_file_documentation.txt for more details.");
         encounteredSourceProblem = true;
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error opening cast vote record file %s", cvrPath);
+        Logger.log(Level.SEVERE, "Error opening cast vote record file: %s", cvrPath);
         Logger.log(Level.INFO, "Check file path and permissions and make sure they are correct!");
         encounteredSourceProblem = true;
       } catch (ParserConfigurationException |
@@ -247,7 +247,7 @@ class TabulatorSession {
             + "format.\nStrict Open XML and Open Office are not supported." );
         encounteredSourceProblem = true;
       } catch (CvrDataFormatException e) {
-        Logger.log(Level.SEVERE, "Data format error while parsing source file %s", cvrPath);
+        Logger.log(Level.SEVERE, "Data format error while parsing source file: %s", cvrPath);
         Logger.log(Level.INFO, "See the log for details.");
         encounteredSourceProblem = true;
       }
