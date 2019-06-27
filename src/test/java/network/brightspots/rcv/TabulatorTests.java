@@ -347,6 +347,15 @@ class TabulatorTests {
     runTabulationTest("precinct_example");
   }
 
+  // function: precinctExample
+  // purpose: tests a small election with missing precinct id
+  @Test
+  @DisplayName("missing precinct example")
+  void missingPrecinctExample() {
+    runTabulationTest("missing_precinct_example");
+  }
+
+
   // function: nistTest0
   // purpose: tests skipped first choice
   @Test
@@ -425,5 +434,13 @@ class TabulatorTests {
   @DisplayName("multi-seat fractional number threshold")
   void multiWinnerFractionalThresholdTest() {
     runTabulationTest("test_set_multi_winner_fractional_threshold");
+  }
+
+  // function: tiebreakUsingConfigPermutation
+  // purpose: tests tiebreak using config permutation setting
+  @Test
+  @DisplayName("tiebreak using config permutation")
+  void tiebreakUsingConfigPermutation() {
+    runTabulationTest("tiebreak_config_permutation_test");
   }
 }

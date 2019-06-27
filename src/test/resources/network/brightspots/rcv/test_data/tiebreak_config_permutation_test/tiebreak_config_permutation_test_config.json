@@ -5,11 +5,12 @@
     "contestDate": "2017-12-03",
     "contestJurisdiction": "Funkytown, USA",
     "contestOffice": "Sergeant-at-Arms",
-    "tabulateByPrecinct": false
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
   "cvrFileSources": [
     {
-      "filePath": "tiebreak_test_cvr.xlsx",
+      "filePath": "tiebreak_config_permutation_test_cvr.xlsx",
       "firstVoteColumnIndex": 2,
       "firstVoteRowIndex": 2,
       "provider": "ES&S"
@@ -17,26 +18,34 @@
   ],
   "candidates": [
     {
-      "name": "Mookie Blaylock"
+      "name": "Mookie Blaylock",
+      "excluded": false
     },
     {
-      "name": "Yinka Dare"
+      "name": "Yinka Dare",
+      "excluded": false
     },
     {
-      "name": "George Gervin"
+      "name": "George Gervin",
+      "excluded": false
     },
     {
-      "name": "Sedale Threatt"
+      "name": "Sedale Threatt",
+      "excluded": false
     }
   ],
   "rules": {
-    "tiebreakMode": "interactive",
+    "tiebreakMode": "usePermutationInConfig",
     "overvoteRule": "alwaysSkipToNextRank",
-    "maxRankingsAllowed": 3,
-    "maxSkippedRanksAllowed": 0,
     "numberOfWinners": 1,
     "decimalPlacesForVoteArithmetic": 4,
     "minimumVoteThreshold": 0,
+    "maxSkippedRanksAllowed": 0,
+    "maxRankingsAllowed": 3,
+    "sequentialMultiSeat": false,
+    "bottomsUpMultiSeat": false,
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
     "batchElimination": true,
     "continueUntilTwoCandidatesRemain": false,
     "exhaustOnDuplicateCandidate": false,
