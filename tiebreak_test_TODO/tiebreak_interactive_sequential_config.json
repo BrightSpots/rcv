@@ -5,7 +5,8 @@
     "contestDate": "2017-12-03",
     "contestJurisdiction": "Funkytown, USA",
     "contestOffice": "Sergeant-at-Arms",
-    "tabulateByPrecinct": false
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
   "cvrFileSources": [
     {
@@ -17,27 +18,35 @@
   ],
   "candidates": [
     {
-      "name": "Mookie Blaylock"
+      "name": "Mookie Blaylock",
+      "excluded": false
     },
     {
-      "name": "Yinka Dare"
+      "name": "Yinka Dare",
+      "excluded": false
     },
     {
-      "name": "George Gervin"
+      "name": "George Gervin",
+      "excluded": false
     },
     {
-      "name": "Sedale Threatt"
+      "name": "Sedale Threatt",
+      "excluded": false
     }
   ],
   "rules": {
     "tiebreakMode": "interactive",
     "overvoteRule": "alwaysSkipToNextRank",
-    "maxRankingsAllowed": 3,
-    "maxSkippedRanksAllowed": 0,
-    "numberOfWinners": 1,
+    "numberOfWinners": 2,
     "decimalPlacesForVoteArithmetic": 4,
     "minimumVoteThreshold": 0,
-    "batchElimination": true,
+    "maxSkippedRanksAllowed": 0,
+    "maxRankingsAllowed": 3,
+    "sequentialMultiSeat": true,
+    "bottomsUpMultiSeat": false,
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
     "continueUntilTwoCandidatesRemain": false,
     "exhaustOnDuplicateCandidate": false,
     "treatBlankAsUndeclaredWriteIn": false,
