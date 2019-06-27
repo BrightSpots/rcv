@@ -101,7 +101,7 @@ class ContestConfig {
     try {
       config.processCandidateData();
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error processing candidate data:", e.toString());
+      Logger.log(Level.SEVERE, "Error processing candidate data:\n%s", e.toString());
       config = null;
     }
     return config;
@@ -110,8 +110,6 @@ class ContestConfig {
   // function: loadContestConfig
   // purpose: factory method to create ContestConfig from configPath
   // - create rawContestConfig from file - can fail for IO issues or invalid json
-  // - validate rawContestConfig - can fail if certain elements do not exist
-  // - if the above succeed create and return ContestConfig wrapping rawContestConfig (cannot fail)
   // returns: new ContestConfig object if checks pass otherwise null
   static ContestConfig loadContestConfig(String configPath) {
     if (configPath == null) {
@@ -128,20 +126,13 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "Failed to load contest config: %s", configPath);
     } else {
       Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
-      // perform some additional sanity checks
-      if (rawConfig.validate()) {
-        // source folder will be the parent of configPath
-        String parentFolder = new File(configPath).getParent();
-        // if there is no parent folder use current working directory
-        if (parentFolder == null) {
-          parentFolder = System.getProperty("user.dir");
-        }
-        config = loadContestConfig(rawConfig, parentFolder);
-      } else {
-        Logger.log(Level.SEVERE, "Failed to create raw contest config!\n"
-            + "Please modify the contest config file and try again.\n"
-            + "See config_file_documentation.txt for more details.");
+      // source folder will be the parent of configPath
+      String parentFolder = new File(configPath).getParent();
+      // if there is no parent folder use current working directory
+      if (parentFolder == null) {
+        parentFolder = System.getProperty("user.dir");
       }
+      config = loadContestConfig(rawConfig, parentFolder);
     }
     return config;
   }

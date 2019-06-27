@@ -29,6 +29,8 @@
 
 package network.brightspots.rcv;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -44,6 +46,7 @@ import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCVRReader.CvrDataFormatException;
 import network.brightspots.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
 import org.apache.poi.ooxml.POIXMLException;
+import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
@@ -55,7 +58,6 @@ class TabulatorSession {
   private final Set<String> precinctIDs = new HashSet<>();
   // Visible for testing: cache output path location
   String outputPath;
-  private String tabulationLogPath;
   private final String timestampString;
 
   // function: TabulatorSession
@@ -101,7 +103,7 @@ class TabulatorSession {
   // function: tabulate
   // purpose: run tabulation
   // returns: list of winners
-  void tabulate() {
+  void tabulate() throws TabulationCancelledException {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
@@ -145,10 +147,10 @@ class TabulatorSession {
     boolean success = false;
 
     // %g format is for log file naming
-    tabulationLogPath =
-        Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
-            .toAbsolutePath()
-            .toString();
+    String tabulationLogPath = Paths
+        .get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
+        .toAbsolutePath()
+        .toString();
 
     // cache outputPath for testing
     outputPath = config.getOutputDirectory();
@@ -171,7 +173,7 @@ class TabulatorSession {
   // param: config object containing CVR file paths to parse
   // returns: set of winners from tabulation
   private Set<String> runTabulationForConfig(ContestConfig config,
-      List<CastVoteRecord> castVoteRecords) {
+      List<CastVoteRecord> castVoteRecords) throws TabulationCancelledException {
     Logger.log(Level.INFO, "Beginning tabulation for config: %s", configPath);
     Set<String> winners;
     // tabulator for tabulation logic

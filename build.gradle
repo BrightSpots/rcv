@@ -25,6 +25,12 @@ application {
     mainClassName = "$moduleName/network.brightspots.rcv.Main"
 }
 
+// Uncomment below to simulate running from the CLI
+//run {
+//    standardInput = System.in
+//    args = ["-cli", "path/to/config"]
+//}
+
 // ### Idea plugin settings
 idea {
     module {

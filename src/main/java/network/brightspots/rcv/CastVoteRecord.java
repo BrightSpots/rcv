@@ -104,7 +104,7 @@ class CastVoteRecord {
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
-      logStringBuilder.append(" [was exhausted] ");
+      logStringBuilder.append(" [became inactive] ");
     } else {
       if (round == 1) {
         logStringBuilder.append(" [counted for] ");
@@ -139,7 +139,6 @@ class CastVoteRecord {
   void logCdfSnapshotData(int round) {
     List<Pair<String, BigDecimal>> data = new LinkedList<>();
     for (Entry<String, BigDecimal> entry : winnerToFractionalValue.entrySet()) {
-      // TODO: can we avoid duplicating this in memory?
       data.add(new Pair<>(entry.getKey(), entry.getValue()));
     }
     if (currentRecipientOfVote != null) {

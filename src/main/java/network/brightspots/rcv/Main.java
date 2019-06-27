@@ -25,12 +25,13 @@ package network.brightspots.rcv;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
-  public static String APP_NAME = "RCVRC Universal Tabulator";
-  public static String APP_VERSION = "0.1.0";
+  public static final String APP_NAME = "RCVRC Universal Tabulator";
+  public static final String APP_VERSION = "0.1.0";
 
   // function: main
   // purpose: main entry point to the rcv tabulator program
@@ -39,8 +40,8 @@ public class Main extends GuiApplication {
   public static void main(String[] args) {
     System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
     Logger.setup();
-    Logger.log(Level.INFO, String.format("Launching %s version %s...", APP_NAME, APP_VERSION));
-
+	  logSystemInfo();
+	  
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;
     List<String> argsCli = new ArrayList<>();
@@ -77,10 +78,23 @@ public class Main extends GuiApplication {
       if (convertToCdf) {
         session.convertToCdf();
       } else {
-        session.tabulate();
+        try {
+          session.tabulate();
+        } catch (TabulationCancelledException e) {
+          Logger.log(Level.SEVERE, "Tabulation was cancelled!");
+        }
       }
     }
 
     System.exit(0);
   }
+
+  private static void logSystemInfo() {
+    Logger.log(Level.INFO, String.format("Launching %s version %s...", APP_NAME, APP_VERSION));
+    Logger.log(Level.INFO, "Host system: %s version %s",
+        System.getProperty("os.name"),
+        System.getProperty("os.version"));
+    Logger.log(Level.INFO, "User: %s", System.getProperty("user.name"));
+  }
+
 }

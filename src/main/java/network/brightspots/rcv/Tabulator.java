@@ -124,7 +124,7 @@ class Tabulator {
   // purpose: run the main tabulation routine to determine contest results
   //  this is the high-level control of the tabulation algorithm
   // returns: set containing winner(s)
-  Set<String> tabulate() {
+  Set<String> tabulate() throws TabulationCancelledException {
     logSummaryInfo();
     Logger.log(Level.INFO, "Starting tabulation for contest '%s'...", this.config.getContestName());
 
@@ -360,7 +360,6 @@ class Tabulator {
   // purpose: determine and store the threshold to win
   // param: currentRoundCandidateToTally map of candidateID to their tally for a particular round
   private void setWinningThreshold(Map<String, BigDecimal> currentRoundCandidateToTally) {
-    // TODO: add unit test for logic in this method
     // currentRoundTotalVotes holds total active votes in this round
     BigDecimal currentRoundTotalVotes = BigDecimal.ZERO;
     // numVotes indexes over all vote tallies in this round
@@ -576,7 +575,8 @@ class Tabulator {
   // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
   // returns: eliminated candidates
   private List<String> doRegularElimination(
-      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates) {
+      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
+      throws TabulationCancelledException {
     List<String> eliminated = new LinkedList<>();
     // eliminated candidate
     String eliminatedCandidate;
@@ -598,7 +598,6 @@ class Tabulator {
 
       // results of tiebreak stored here
       eliminatedCandidate = tieBreak.selectLoser();
-      // TODO: If returned eliminatedCandidate is null, infinite loop!
       Logger.log(
           Level.INFO,
           "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
@@ -917,13 +916,6 @@ class Tabulator {
             continue;
           }
 
-          // TODO: it's weird to have this check here
-          // handle testing in unit tests, remove this assert, and add break statement
-          // at end of this for loop
-
-          // If this fails, it means the code failed to handle an overvote with multiple
-          // continuing candidates.
-          assert selectedCandidate == null;
           // we found a continuing candidate so this cvr counts for them
           selectedCandidate = candidate;
 
@@ -937,6 +929,10 @@ class Tabulator {
               selectedCandidate,
               roundTallyByPrecinct,
               cvr.getPrecinct());
+
+          // There can be at most one continuing candidate in candidateSet; if there were more than
+          // one, we would have already flagged this as an overvote.
+          break;
         }
 
         // if we found a continuing candidate stop looking through rankings
@@ -1122,5 +1118,9 @@ class Tabulator {
       this.runningTotal = runningTotal;
       this.nextHighestTally = nextHighestTally;
     }
+  }
+
+  static class TabulationCancelledException extends Exception {
+
   }
 }

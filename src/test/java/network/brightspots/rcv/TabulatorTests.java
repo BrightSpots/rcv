@@ -35,6 +35,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Level;
+import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -122,7 +123,11 @@ class TabulatorTests {
     String configPath = getTestFilePath(stem, "_config.json");
     // create a session object and run the tabulation
     TabulatorSession session = new TabulatorSession(configPath);
-    session.tabulate();
+    try {
+      session.tabulate();
+    } catch (TabulationCancelledException e) {
+      e.printStackTrace();
+    }
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
@@ -430,4 +435,11 @@ class TabulatorTests {
   void multiWinnerFractionalThresholdTest() {
     runTabulationTest("test_set_multi_winner_fractional_threshold");
   }
-}
+
+  // function: tiebreakUsingConfigPermutation
+  // purpose: tests tiebreak using config permutation setting
+  @Test
+  @DisplayName("tiebreak using config permutation")
+  void tiebreakUsingConfigPermutation() {
+    runTabulationTest("tiebreak_config_permutation_test");
+  }}
