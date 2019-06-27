@@ -201,14 +201,14 @@ class ContestConfig {
   private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast Vote Record file!");
+      Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
         // perform checks on source input path
         if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
           isValid = false;
-          Logger.log(Level.SEVERE, "filePath is required for each cast Vote Record file!");
+          Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
           continue;
         }
 

@@ -113,7 +113,7 @@ class TabulatorSession {
           // Read cast vote records and precinct IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
           if (castVoteRecords == null) {
-            Logger.log(Level.SEVERE, "Aborting tabulation due to cvr errors!");
+            Logger.log(Level.SEVERE, "Aborting tabulation due to cast vote record errors!");
             break;
           }
           Set<String> newWinnerSet = runTabulationForConfig(config, castVoteRecords);
@@ -132,7 +132,7 @@ class TabulatorSession {
         // Read cast vote records and precinct IDs from CVR files
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
         if (castVoteRecords == null) {
-          Logger.log(Level.SEVERE, "Aborting tabulation due to cvr errors!");
+          Logger.log(Level.SEVERE, "Aborting tabulation due to cast vote record errors!");
         } else {
           runTabulationForConfig(config, castVoteRecords);
         }

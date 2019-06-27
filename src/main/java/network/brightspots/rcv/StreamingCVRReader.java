@@ -201,7 +201,7 @@ class StreamingCVRReader {
 
     // look for missing Cvr Id
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
-      Logger.log(Level.SEVERE, "Cast vote record identifier not found for : %s",
+      Logger.log(Level.SEVERE, "Cast vote record identifier not found for: %s",
           computedCastVoteRecordID);
       encounteredDataErrors = true;
     }
@@ -357,7 +357,7 @@ class StreamingCVRReader {
     if (unrecognizedCandidateCounts.size() > 0) {
       throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
-    // throw if there were data issues
+
     if (encounteredDataErrors) {
       throw new CvrDataFormatException();
     }
