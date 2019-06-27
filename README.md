@@ -10,23 +10,21 @@ See the `dependencies` entry in the [Gradle build file](build.gradle). Gradle sh
 
 ## Overview
 
-The Universal Tabulator is a free, open-source application designed to quickly and accurately tabulate a wide variety of ranked choice voting elections.
+The Universal Tabulator is a free, open-source application designed to quickly and accurately tabulate a wide variety of ranked choice voting elections. It allows users to:
+- Create contest configuration files using a graphical user interface (GUI)
+- Validate contest configuration files to ensure they are well-formed, and all values are within expected ranges
+- Tabulate a contest
 
-The Tabulator requires a "contest configuration" file as input, which specifies:
+A contest configuration file specifies:
 - Which tabulation rule variations to use
 - A list of registered candidates 
-- One or more cast vote record files
-- Output formatting options (contest name, where to write output files, etc.)
+- Paths to one or more cast vote record (CVR) files
+- Output formatting options (contest name, date, jurisdiction, etc.)
 
 The Tabulator produces the following as output:
-- A results spreadsheet including round-by-round vote totals for each candidate and the eventual winner(s)
-- A JSON file containing the same information
-- An audit log describing how every ballot was counted in each round over the course of the tabulation
-
-The Tabulator includes the following functionality:
-- Creating contest configuration files using a graphical user interface (GUI)
-- Validating contest configuration files to ensure they are well-formed, and all values are within expected ranges
-- Tabulating a contest
+- A summary .csv file containing round-by-round vote totals for each candidate and the eventual winner(s)
+- A summary .json file containing additional information which can be used by external tools for visualizing contest results
+- A detailed audit .log file describing how every ballot was counted in each round over the course of the tabulation
 
 ## Installing and Launching the Tabulator
 
@@ -62,13 +60,13 @@ The Tabulator includes the following functionality:
 
 ## Configuring a Contest
 
-The GUI can be used to easily create, save, and load contest configuration files (which are in JSON format). These files can lso be created manually using any basic text editor, but this method isn't recommended.
+The GUI can be used to easily create, save, and load contest configuration files (which are in .json format). These files can lso be created manually using any basic text editor, but this method isn't recommended.
 
 In either case, please reference the [config file documentation](src/main/resources/network/brightspots/rcv/config_file_documentation.txt) when configuring a contest.
 
 ## Loading and Tabulating a Contest
 
-The Tabulator includes several example contest configuration files and associated cast vote record files.
+The Tabulator includes several example contest configuration files and associated CVR files.
 
 1. Click "Load..." at the top of the window and navigate to the "test_data" folder.
 2. Open one of the folders listed here and select the config file (it will have the "_config.json" suffix).
@@ -86,7 +84,7 @@ Or, if you're compiling and running using Gradle:
 
 `$ gradlew run --args="-cli path/to/config"`
 
-Finally, you can activate a special `convert-to-cdf` function via the command line to export the CVR as a CDF JSON instead of tabulating the results, e.g.:
+Finally, you can activate a special `convert-to-cdf` function via the command line to export the CVR as a NIST common data format (CDF) .json instead of tabulating the results, e.g.:
 
 `$ rcv -cli path/to/config convert-to-cdf`
 
@@ -102,7 +100,7 @@ Look in the console window to see where the output spreadsheet was written, e.g.
 
 `2019-06-25 17:19:28 PDT INFO: Generating summary spreadsheet: /rcv/test_data/2018_maine_gov_primary_dem/output/2019-06-25_17-19-28_summary.csv...`
 
-The summary spreadsheet (in CSV format), summary JSON, and audit logs are all readable using a basic text editor.
+The summary spreadsheet (in .csv format), summary .json, and audit .log files are all readable using a basic text editor.
 
 ## Acknowledgements
 
