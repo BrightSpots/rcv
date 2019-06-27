@@ -366,6 +366,7 @@ class StreamingCVRReader {
   // exception class for miscellaneous unexpected data errors encountered during Cvr parsing
   // e.g. missing Cvr Id
   static class CvrDataFormatException extends Exception {
+
   }
 
   // exception class used when an unrecognized candidate is encountered during cvr parsing

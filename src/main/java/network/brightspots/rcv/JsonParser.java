@@ -59,7 +59,7 @@ class JsonParser {
       createdObject = null;
     } catch (IOException exception) {
       if (logsEnabled) {
-        Logger.log(Level.SEVERE, "Error opening file: %s\n%\n"
+        Logger.log(Level.SEVERE, "Error opening file: %s\n%s\n"
             + "Check file path and permissions and make sure they are correct!",
             jsonFilePath,
             exception.toString());

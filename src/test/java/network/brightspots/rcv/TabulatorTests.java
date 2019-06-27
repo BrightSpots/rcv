@@ -442,4 +442,5 @@ class TabulatorTests {
   @DisplayName("tiebreak using config permutation")
   void tiebreakUsingConfigPermutation() {
     runTabulationTest("tiebreak_config_permutation_test");
-  }}
+  }
+}

@@ -40,8 +40,8 @@ public class Main extends GuiApplication {
   public static void main(String[] args) {
     System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
     Logger.setup();
-	  logSystemInfo();
-	  
+    logSystemInfo();
+
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;
     List<String> argsCli = new ArrayList<>();
@@ -62,11 +62,11 @@ public class Main extends GuiApplication {
       if (argsCli.size() == 0) {
         Logger.log(Level.SEVERE, "No config file path provided on command line!\n"
             + "Please provide a path to the config file!\n"
-            + "See UserGuide.txt for more details.");
+            + "See README.md for more details.");
         System.exit(1);
       } else if (argsCli.size() > 2) {
         Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d\n"
-                + "See UserGuide.txt for more details.\nSee UserGuide.txt for more details.",
+                + "See README.md for more details.",
             argsCli.size());
         System.exit(2);
       }

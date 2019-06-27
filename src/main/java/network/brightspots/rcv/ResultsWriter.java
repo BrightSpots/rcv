@@ -130,6 +130,7 @@ class ResultsWriter {
           exception.toString());
       throw exception;
     }
+    Logger.log(Level.INFO, "JSON file generated successfully.");
   }
 
   private static String generateCvrSnapshotID(String cvrID, Integer round) {
@@ -334,7 +335,7 @@ class ResultsWriter {
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
-    Logger.log(Level.INFO, "Generating summary spreadsheets: %s", csvPath);
+    Logger.log(Level.INFO, "Generating summary spreadsheets: %s...", csvPath);
 
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
@@ -451,6 +452,7 @@ class ResultsWriter {
       Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
       throw exception;
     }
+    Logger.log(Level.INFO, "Summary spreadsheets generated successfully.");
   }
 
   // function: addActionRows
@@ -809,7 +811,7 @@ class ResultsWriter {
       Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
       throws IOException {
     String jsonPath = outputPath + ".json";
-    Logger.log(Level.INFO, "Generating summary JSON file: %s", jsonPath);
+    Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
 
     // root outputJson dict will have two entries:
     // results - vote totals, transfers, and candidates elected / eliminated

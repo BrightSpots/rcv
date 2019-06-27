@@ -6,7 +6,7 @@
     "contestJurisdiction": "Minneapolis, MN",
     "contestOffice": "Mayor",
     "tabulateByPrecinct": true,
-    "generateCdfJson" : false
+    "generateCdfJson": false
   },
   "cvrFileSources": [
     {

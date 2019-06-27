@@ -29,8 +29,6 @@
 
 package network.brightspots.rcv;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -45,8 +43,8 @@ import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCVRReader.CvrDataFormatException;
 import network.brightspots.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
-import org.apache.poi.ooxml.POIXMLException;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
+import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
