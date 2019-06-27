@@ -584,7 +584,7 @@ class ResultsWriter {
     HashMap<String, Object> outputJson = new HashMap<>();
     String outputPath = getOutputFilePath("cvr_cdf") + ".json";
 
-    Logger.log(Level.INFO, "Generating CVR CDF JSON file: %s...", outputPath);
+    Logger.log(Level.INFO, "Generating cast vote record CDF JSON file: %s...", outputPath);
 
     outputJson.put("CVR", generateCdfMapForCvrs(castVoteRecords));
     outputJson.put("Election", new Map[]{generateCdfMapForElection()});

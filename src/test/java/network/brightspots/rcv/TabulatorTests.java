@@ -347,6 +347,15 @@ class TabulatorTests {
     runTabulationTest("precinct_example");
   }
 
+  // function: precinctExample
+  // purpose: tests a small election with missing precinct id
+  @Test
+  @DisplayName("missing precinct example")
+  void missingPrecinctExample() {
+    runTabulationTest("missing_precinct_example");
+  }
+
+
   // function: nistTest0
   // purpose: tests skipped first choice
   @Test

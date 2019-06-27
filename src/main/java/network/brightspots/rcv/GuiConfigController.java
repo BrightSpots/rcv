@@ -307,7 +307,7 @@ public class GuiConfigController implements Initializable {
     fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
     fc.getExtensionFilters()
         .add(new ExtensionFilter("Excel and JSON files", "*.xls", "*.xlsx", "*.json"));
-    fc.setTitle("Select CVR File");
+    fc.setTitle("Select cast vote record file");
 
     File openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
     if (openFile != null) {
@@ -322,11 +322,11 @@ public class GuiConfigController implements Initializable {
     String cvrFirstVoteRow = textFieldCvrFirstVoteRow.getText().trim();
     boolean fileIsJson = cvrFilePath.toLowerCase().endsWith(".json");
     if (cvrFilePath.isEmpty()) {
-      Logger.log(Level.WARNING, "CVR file path is required!");
+      Logger.log(Level.WARNING, "Cast vote record file path is required!");
     } else if (cvrFirstVoteCol.isEmpty() && !fileIsJson) {
-      Logger.log(Level.WARNING, "CVR first vote column index is required!");
+      Logger.log(Level.WARNING, "Cast vote record first vote column index is required!");
     } else if (cvrFirstVoteRow.isEmpty() && !fileIsJson) {
-      Logger.log(Level.WARNING, "CVR first vote row index is required!");
+      Logger.log(Level.WARNING, "Cast vote record first vote row index is required!");
     } else {
       cvrSource.setFilePath(cvrFilePath);
       cvrSource.setFirstVoteColumnIndex(getIntValueOrNull(cvrFirstVoteCol));
@@ -354,7 +354,7 @@ public class GuiConfigController implements Initializable {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
     String cvrFilePath = cellEditEvent.getNewValue().toString().trim();
     if (cvrFilePath.isEmpty()) {
-      Logger.log(Level.WARNING, "CVR file path is required!");
+      Logger.log(Level.WARNING, "Cast vote record file path is required!");
     } else {
       cvrSelected.setFilePath(cvrFilePath);
     }
@@ -364,7 +364,7 @@ public class GuiConfigController implements Initializable {
   public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
     if (cellEditEvent.getNewValue() == null) {
-      Logger.log(Level.WARNING, "CVR first vote column is required!");
+      Logger.log(Level.WARNING, "Cast vote record first vote column is required!");
     } else {
       cvrSelected.setFirstVoteColumnIndex((Integer) cellEditEvent.getNewValue());
     }
@@ -374,7 +374,7 @@ public class GuiConfigController implements Initializable {
   public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
     if (cellEditEvent.getNewValue() == null) {
-      Logger.log(Level.WARNING, "CVR first vote row index is required!");
+      Logger.log(Level.WARNING, "Cast vote record first vote row index is required!");
     } else {
       cvrSelected.setFirstVoteRowIndex((Integer) cellEditEvent.getNewValue());
     }
@@ -918,6 +918,7 @@ public class GuiConfigController implements Initializable {
   }
 
   private class SimpleIntegerStringConverter extends IntegerStringConverter {
+
     @Override
     public Integer fromString(String value) {
       return getIntValueOrNull(value);

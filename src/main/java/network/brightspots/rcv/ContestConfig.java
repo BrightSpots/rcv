@@ -192,14 +192,14 @@ class ContestConfig {
   private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest config must contain at least 1 CVR file!");
+      Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
         // perform checks on source input path
         if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
           isValid = false;
-          Logger.log(Level.SEVERE, "filePath is required for each CVR file!");
+          Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
           continue;
         }
 
@@ -209,7 +209,8 @@ class ContestConfig {
         // look for duplicate paths
         if (cvrFilePathSet.contains(cvrPath)) {
           isValid = false;
-          Logger.log(Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s", cvrPath);
+          Logger.log(Level.SEVERE, "Duplicate cast Vote Record filePaths are not allowed: %s",
+              cvrPath);
         } else {
           cvrFilePathSet.add(cvrPath);
         }
@@ -217,7 +218,7 @@ class ContestConfig {
         // ensure file exists
         if (!new File(cvrPath).exists()) {
           isValid = false;
-          Logger.log(Level.SEVERE, "CVR file not found: %s", cvrPath);
+          Logger.log(Level.SEVERE, "Cast vote record file not found: %s", cvrPath);
         }
 
         // perform CDF checks
