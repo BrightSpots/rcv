@@ -60,7 +60,7 @@ The Tabulator produces the following as output:
 
 ## Configuring a Contest
 
-The GUI can be used to easily create, save, and load contest configuration files (which are in .json format). These files can lso be created manually using any basic text editor, but this method isn't recommended.
+The GUI can be used to easily create, save, and load contest configuration files (which are in .json format). These files can also be created manually using any basic text editor, but this method isn't recommended.
 
 In either case, please reference the [config file documentation](src/main/resources/network/brightspots/rcv/config_file_documentation.txt) when configuring a contest.
 
