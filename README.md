@@ -30,9 +30,9 @@ The Tabulator produces the following as output:
 
 #### Method 1 (Easy): Pre-Compiled Version
 
-1. Download the pre-compiled tabulator for your OS from the Ranked Choice Voting Resource Center's Google Drive [here](https://drive.google.com/drive/u/1/folders/1vYYJa5-oJe0lpaVnI_ELn9foZIVZ54pL).
+1. Download the pre-compiled Tabulator for your OS from the Ranked Choice Voting Resource Center's Google Drive [here](https://drive.google.com/drive/u/1/folders/1vYYJa5-oJe0lpaVnI_ELn9foZIVZ54pL).
 
-    **Note**: this download should be a "jlink image" which doesn't even require you to have Java installed on your machine.
+    **Note**: this download should be a "jlink image", which means you don't even need to have Java installed on your machine to run it!
 
 2. Unzip the file, navigate to the `bin` directory, and launch the RCV Tabulator GUI by running the `rcv` script if using MacOS or Linux, or `rcv.bat` if using Windows.
 
@@ -54,7 +54,7 @@ The Tabulator produces the following as output:
     
     `$ ./gradlew run` (or, if you're on Windows: `gradlew run`)
 
-    If you get a "Permission denied" error in Linux or MacOS, you need to mark the script as executable with:
+    If you get a "permission denied" error in Linux or MacOS, you need to mark the script as executable with:
     
     `$ chmod 777 gradlew`
 
@@ -68,8 +68,8 @@ In either case, please reference the [config file documentation](src/main/resour
 
 The Tabulator includes several example contest configuration files and associated CVR files.
 
-1. Click "Load..." at the top of the window and navigate to the "test_data" folder.
-2. Open one of the folders listed here and select the config file (it will have the "_config.json" suffix).
+1. Click "Load..." at the top of the window and navigate to the `sample_input` folder (if you used Method 2 to install the Tabulator, navigate to the `test_data` folder).
+2. Open one of the folders listed here and select the config file (it will have the `_config.json` suffix).
 3. Click on the configuration tabs (Output, CVR Files, Candidates, Rules) to see how this contest is configured.
 4. Click "Validate" to check if this configuration is valid. You will see the results in the console at the bottom of the main window.
 5. Click "Tabulate" to tabulate the election. You will see the results in the console, including the location of the output files.
