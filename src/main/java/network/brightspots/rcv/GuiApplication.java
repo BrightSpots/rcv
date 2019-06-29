@@ -21,12 +21,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Level;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -37,6 +34,9 @@ public class GuiApplication extends Application {
 
   @Override
   public void start(Stage window) {
+    GuiContext context = GuiContext.getInstance();
+    context.setMainWindow(window);
+
     String resourcePath = "/network/brightspots/rcv/GuiConfigLayout.fxml";
     try {
       Parent root = FXMLLoader.load(getClass().getResource(resourcePath));
@@ -48,37 +48,10 @@ public class GuiApplication extends Application {
       exception.printStackTrace(pw);
       Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw.toString());
     }
-    // cache main window so we can parent file choosers to it
-    GuiContext context = GuiContext.getInstance();
-    context.setMainWindow(window);
-    window.setOnCloseRequest(
-        event -> {
-          event.consume();
-          exitGui();
-        });
 
     // Avoid cutting off the top bar for low resolution displays
     window.setHeight(Math.min(STAGE_HEIGHT, Screen.getPrimary().getVisualBounds().getHeight()));
     window.setWidth(Math.min(STAGE_WIDTH, Screen.getPrimary().getVisualBounds().getWidth()));
     window.show();
-  }
-
-  private void exitGui() {
-    // TODO: should trigger the exit button procedure (check if saved) in both branches
-    if (GuiContext.getInstance().isBusy()) {
-      Alert alert =
-          new Alert(
-              Alert.AlertType.WARNING,
-              "The tabulator is currently busy. Are you sure you want to quit?",
-              ButtonType.YES,
-              ButtonType.NO);
-      alert.setHeaderText(null);
-      if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
-        Logger.log(Level.SEVERE, "User exited tabulator before it was finished!");
-        Platform.exit();
-      }
-    } else {
-      Platform.exit();
-    }
   }
 }

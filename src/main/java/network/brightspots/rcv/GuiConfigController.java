@@ -290,11 +290,32 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  public void buttonExitClicked() {
-    if (checkForSaveAndContinue()) {
+  private void exitGui() {
+    if (GuiContext.getInstance().isBusy()) {
+      Alert alert =
+          new Alert(
+              Alert.AlertType.WARNING,
+              "The tabulator is currently busy. Are you sure you want to quit?",
+              ButtonType.YES,
+              ButtonType.NO);
+      alert.setHeaderText(null);
+      if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
+        // In case the alert is still displayed when the GUI is no longer busy
+        if (GuiContext.getInstance().isBusy()) {
+          Logger.log(Level.SEVERE, "User exited tabulator before it was finished!");
+        } else {
+          Logger.log(Level.INFO, "Exiting tabulator GUI...");
+        }
+        Platform.exit();
+      }
+    } else if (checkForSaveAndContinue()) {
       Logger.log(Level.INFO, "Exiting tabulator GUI...");
       Platform.exit();
     }
+  }
+
+  public void buttonExitClicked() {
+    exitGui();
   }
 
   public void buttonOutputDirectoryClicked() {
@@ -456,6 +477,14 @@ public class GuiConfigController implements Initializable {
     Logger.log(
         Level.INFO,
         String.format("Opening tabulator GUI...\n" + "Welcome to the %s!", Main.APP_NAME));
+
+    GuiContext.getInstance()
+        .getMainWindow()
+        .setOnCloseRequest(
+            event -> {
+              event.consume();
+              exitGui();
+            });
 
     String helpText;
     try {
