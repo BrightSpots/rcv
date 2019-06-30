@@ -160,7 +160,6 @@ class TabulatorSession {
       Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
     }
     if (!success) {
-      System.out.println("Failed to configure logger!");
       Logger.log(Level.SEVERE, "Failed to configure logger!");
     }
     return success;

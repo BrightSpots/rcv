@@ -21,15 +21,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Level;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-
 
 public class GuiApplication extends Application {
 
@@ -38,6 +34,9 @@ public class GuiApplication extends Application {
 
   @Override
   public void start(Stage window) {
+    GuiContext context = GuiContext.getInstance();
+    context.setMainWindow(window);
+
     String resourcePath = "/network/brightspots/rcv/GuiConfigLayout.fxml";
     try {
       Parent root = FXMLLoader.load(getClass().getResource(resourcePath));
@@ -49,12 +48,6 @@ public class GuiApplication extends Application {
       exception.printStackTrace(pw);
       Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw.toString());
     }
-    // cache main window so we can parent file choosers to it
-    GuiContext context = GuiContext.getInstance();
-    context.setMainWindow(window);
-    // workaround for https://bugs.openjdk.java.net/browse/JDK-8088859
-    EventHandler<WindowEvent> onCloseHandler = event -> Platform.exit();
-    window.setOnCloseRequest(onCloseHandler);
 
     // Avoid cutting off the top bar for low resolution displays
     window.setHeight(Math.min(STAGE_HEIGHT, Screen.getPrimary().getVisualBounds().getHeight()));
