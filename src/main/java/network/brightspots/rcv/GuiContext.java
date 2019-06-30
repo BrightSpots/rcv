@@ -26,8 +26,6 @@ class GuiContext {
   private ContestConfig config;
   // cache for main window so we can parent file choosers to it
   private Stage mainWindow;
-  // GUI is currently validating or tabulating
-  private boolean isBusy;
 
   private GuiContext() {
   }
@@ -50,13 +48,5 @@ class GuiContext {
 
   void setMainWindow(Stage mainWindow) {
     this.mainWindow = mainWindow;
-  }
-
-  boolean isBusy() {
-    return isBusy;
-  }
-
-  void setBusy(boolean busy) {
-    isBusy = busy;
   }
 }

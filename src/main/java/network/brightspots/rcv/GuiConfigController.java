@@ -78,6 +78,8 @@ public class GuiConfigController implements Initializable {
   private String emptyConfigString;
   // File previously loaded or saved
   private File selectedFile;
+  // GUI is currently busy validating or tabulating
+  private boolean guiIsBusy;
 
   @FXML
   private TextArea textAreaStatus;
@@ -253,21 +255,21 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private void guiIsBusy(boolean isBusy) {
-    GuiContext.getInstance().setBusy(isBusy);
+  private void setGuiIsBusy(boolean isBusy) {
+    guiIsBusy = isBusy;
     buttonBar.setDisable(isBusy);
     tabPane.setDisable(isBusy);
   }
 
   // validate whatever is currently entered into the GUI - does not save data
   public void buttonValidateClicked() {
-    guiIsBusy(true);
+    setGuiIsBusy(true);
     ContestConfig config =
         ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
     ValidatorService service = new ValidatorService(config);
-    service.setOnSucceeded(event -> guiIsBusy(false));
-    service.setOnCancelled(event -> guiIsBusy(false));
-    service.setOnFailed(event -> guiIsBusy(false));
+    service.setOnSucceeded(event -> setGuiIsBusy(false));
+    service.setOnCancelled(event -> setGuiIsBusy(false));
+    service.setOnFailed(event -> setGuiIsBusy(false));
     service.start();
   }
 
@@ -277,11 +279,11 @@ public class GuiConfigController implements Initializable {
   public void buttonTabulateClicked() {
     if (checkForSaveAndTabulate()) {
       if (GuiContext.getInstance().getConfig() != null) {
-        guiIsBusy(true);
+        setGuiIsBusy(true);
         TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
-        service.setOnSucceeded(event -> guiIsBusy(false));
-        service.setOnCancelled(event -> guiIsBusy(false));
-        service.setOnFailed(event -> guiIsBusy(false));
+        service.setOnSucceeded(event -> setGuiIsBusy(false));
+        service.setOnCancelled(event -> setGuiIsBusy(false));
+        service.setOnFailed(event -> setGuiIsBusy(false));
         service.start();
       } else {
         Logger.log(
@@ -291,7 +293,7 @@ public class GuiConfigController implements Initializable {
   }
 
   private void exitGui() {
-    if (GuiContext.getInstance().isBusy()) {
+    if (guiIsBusy) {
       Alert alert =
           new Alert(
               Alert.AlertType.WARNING,
@@ -301,7 +303,7 @@ public class GuiConfigController implements Initializable {
       alert.setHeaderText(null);
       if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
         // In case the alert is still displayed when the GUI is no longer busy
-        if (GuiContext.getInstance().isBusy()) {
+        if (guiIsBusy) {
           Logger.log(Level.SEVERE, "User exited tabulator before it was finished!");
         } else {
           Logger.log(Level.INFO, "Exiting tabulator GUI...");
