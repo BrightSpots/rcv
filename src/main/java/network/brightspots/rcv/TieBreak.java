@@ -183,7 +183,7 @@ class TieBreak {
   private String doInteractiveCli() throws TabulationCancelledException {
     System.out.println(
         String.format(
-            "Tie in round %d for the following candidates, each of whom has %d votes: ",
+            "Tie in round %d for the following candidates, each of whom has %d vote(s): ",
             round, numVotes.intValue()));
     // i: index over tied candidates
     for (int i = 0; i < tiedCandidates.size(); i++) {

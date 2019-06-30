@@ -476,9 +476,8 @@ public class GuiConfigController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
-    Logger.log(
-        Level.INFO,
-        String.format("Opening tabulator GUI...\n" + "Welcome to the %s!", Main.APP_NAME));
+    Logger.log(Level.INFO, "Opening tabulator GUI...");
+    Logger.log(Level.INFO, "Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
 
     GuiContext.getInstance()
         .getMainWindow()
@@ -906,7 +905,7 @@ public class GuiConfigController implements Initializable {
           arg0 ->
               Logger.log(
                   Level.SEVERE,
-                  "Error during validation:\n%s\n" + "Validation failed!",
+                  "Error during validation:\n%s\nValidation failed!",
                   task.getException().toString()));
       return task;
     }
@@ -944,7 +943,7 @@ public class GuiConfigController implements Initializable {
           arg0 ->
               Logger.log(
                   Level.SEVERE,
-                  "Error during tabulation:\n%s\n" + "Tabulation failed!",
+                  "Error during tabulation:\n%s\nTabulation failed!",
                   task.getException().toString()));
       return task;
     }
