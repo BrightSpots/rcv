@@ -584,6 +584,16 @@ class ContestConfig {
         : getNumDeclaredCandidates();
   }
 
+  // function: getMaxSkippedRanksAllowed
+  // purpose: getter for maxSkippedRanksAllowed rule
+  // returns: max skipped ranks allowed in this config
+  // a null value here means "unlimited"
+  Integer getMaxSkippedRanksAllowed() {
+    return rawConfig.rules.maxSkippedRanksAllowed != null
+        ? rawConfig.rules.maxSkippedRanksAllowed
+        : null;
+  }
+
   // function: isBatchEliminationEnabled
   // purpose: getter for batchElimination
   // returns: true if and only if we should use batch elimination
@@ -630,13 +640,6 @@ class ContestConfig {
     return rawConfig.rules.minimumVoteThreshold != null
         ? new BigDecimal(rawConfig.rules.minimumVoteThreshold)
         : null;
-  }
-
-  // function: getMaxSkippedRanksAllowed
-  // purpose: getter for maxSkippedRanksAllowed rule
-  // returns: max skipped ranks allowed in this config (possibly null)
-  Integer getMaxSkippedRanksAllowed() {
-    return rawConfig.rules.maxSkippedRanksAllowed;
   }
 
   // function: getUndeclaredWriteInLabel

@@ -573,6 +573,7 @@ public class GuiConfigController implements Initializable {
     textField.setText(value != null ? Integer.toString(value) : "");
   }
 
+  // populate widgets with suggested default values for settings which allow them
   private void setDefaultValues() {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
@@ -799,10 +800,13 @@ public class GuiConfigController implements Initializable {
     return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
   }
 
+  // creates a new rawContestConfig object from the contents of the UI widgets
+  // used when creating a new config and to see if we need to save the currently loaded config
   private RawContestConfig createRawContestConfig() {
     RawContestConfig config = new RawContestConfig();
 
     OutputSettings outputSettings = new OutputSettings();
+    // textFields default to returning "" when no text has been set which is expected
     outputSettings.contestName = textFieldContestName.getText();
     outputSettings.outputDirectory = textFieldOutputDirectory.getText();
     outputSettings.contestDate =

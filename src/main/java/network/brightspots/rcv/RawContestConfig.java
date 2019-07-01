@@ -24,9 +24,7 @@
 package network.brightspots.rcv;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
-import java.util.logging.Level;
 
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -47,40 +45,8 @@ public class RawContestConfig {
   RawContestConfig() {
   }
 
-  // function: validate
-  // purpose: perform some basic validation checks
-  // returns: true if checks pass otherwise false
-  public boolean validate() {
-    boolean isValid = true;
-    if (outputSettings == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"outputSettings\" field specified!");
-    }
-    if (cvrFileSources == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"cvrFileSources\" field specified!");
-    } else {
-      for (CVRSource source : cvrFileSources) {
-        if (source.getFilePath() == null) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "No file specified for CVR Source");
-        }
-      }
-    }
-    if (candidates == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"candidates\" field specified!");
-    }
-    if (rules == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"rules\" field specified!");
-    }
-    return isValid;
-  }
-
   // OutputSettings: encapsulates the output settings
   @JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class OutputSettings {
     // contest name
     public String contestName;
@@ -100,7 +66,6 @@ public class RawContestConfig {
   // CVRSource: encapsulates a source cast vote record file
   @SuppressWarnings("unused")
   @JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CVRSource {
     // path to the file on disk
     private String filePath;
@@ -168,7 +133,6 @@ public class RawContestConfig {
 
   // Candidate: contains a full candidate name and optionally a candidate ID
   @JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
     // full candidate name
     private String name;
@@ -203,7 +167,6 @@ public class RawContestConfig {
 
   // ContestRules: encapsulates the set of rules required to perform contest tabulation
   @JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class ContestRules {
     // tiebreak mode to use
     public String tiebreakMode;
