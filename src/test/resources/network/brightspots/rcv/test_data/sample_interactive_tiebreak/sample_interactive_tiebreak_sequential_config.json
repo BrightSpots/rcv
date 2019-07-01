@@ -1,6 +1,6 @@
 {
   "outputSettings": {
-    "contestName": "Tiebreak test",
+    "contestName": "Sample Interactive Tiebreak Sequential",
     "outputDirectory": "output",
     "contestDate": "2017-12-03",
     "contestJurisdiction": "Funkytown, USA",
@@ -10,7 +10,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "tiebreak_test_cvr.xlsx",
+      "filePath": "sample_interactive_tiebreak_cvr.xlsx",
       "firstVoteColumnIndex": 2,
       "firstVoteRowIndex": 2,
       "provider": "ES&S"

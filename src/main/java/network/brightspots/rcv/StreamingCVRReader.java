@@ -336,7 +336,7 @@ class StreamingCVRReader {
           // param: s1 header footer data
           @Override
           public void headerFooter(String s, boolean b, String s1) {
-            Logger.log(Level.WARNING, String.format("Unexpected XML data: %s %b %s", s, b, s1));
+            Logger.log(Level.WARNING, "Unexpected XML data: %s %b %s", s, b, s1);
           }
         };
 

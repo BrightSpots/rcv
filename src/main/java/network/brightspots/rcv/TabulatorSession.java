@@ -160,7 +160,6 @@ class TabulatorSession {
       Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
     }
     if (!success) {
-      System.out.println("Failed to configure logger!");
       Logger.log(Level.SEVERE, "Failed to configure logger!");
     }
     return success;
@@ -209,7 +208,7 @@ class TabulatorSession {
 
       Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       try {
-        if (source.getProvider().equals("CDF")) {
+        if (source.isCdf()) {
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
           reader.parseCVRFile(castVoteRecords);
         } else {

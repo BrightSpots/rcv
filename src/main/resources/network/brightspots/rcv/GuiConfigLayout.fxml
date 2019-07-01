@@ -71,7 +71,7 @@
     </top>
     <center>
       <VBox BorderPane.alignment="CENTER">
-        <TabPane minHeight="450.0" tabClosingPolicy="UNAVAILABLE">
+        <TabPane minHeight="450.0" tabClosingPolicy="UNAVAILABLE" fx:id="tabPane">
           <Tab text="Output">
             <VBox spacing="8.0">
               <Label text="Contest Name *"/>

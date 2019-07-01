@@ -47,6 +47,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
@@ -65,18 +66,20 @@ import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.OutputSettings;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 
-
 @SuppressWarnings("WeakerAccess")
 public class GuiConfigController implements Initializable {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final String CONFIG_FILE_DOCUMENTATION_FILENAME = "network/brightspots/rcv/config_file_documentation.txt";
+  private static final String CONFIG_FILE_DOCUMENTATION_FILENAME =
+      "network/brightspots/rcv/config_file_documentation.txt";
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
   // File previously loaded or saved
   private File selectedFile;
+  // GUI is currently busy validating or tabulating
+  private boolean guiIsBusy;
 
   @FXML
   private TextArea textAreaStatus;
@@ -176,6 +179,8 @@ public class GuiConfigController implements Initializable {
   private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
   @FXML
   private ButtonBar buttonBar;
+  @FXML
+  private TabPane tabPane;
 
   public void buttonNewConfigClicked() {
     if (checkForSaveAndContinue()) {
@@ -250,15 +255,21 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  private void setGuiIsBusy(boolean isBusy) {
+    guiIsBusy = isBusy;
+    buttonBar.setDisable(isBusy);
+    tabPane.setDisable(isBusy);
+  }
+
   // validate whatever is currently entered into the GUI - does not save data
   public void buttonValidateClicked() {
-    buttonBar.setDisable(true);
+    setGuiIsBusy(true);
     ContestConfig config =
         ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
     ValidatorService service = new ValidatorService(config);
-    service.setOnSucceeded(event -> buttonBar.setDisable(false));
-    service.setOnCancelled(event -> buttonBar.setDisable(false));
-    service.setOnFailed(event -> buttonBar.setDisable(false));
+    service.setOnSucceeded(event -> setGuiIsBusy(false));
+    service.setOnCancelled(event -> setGuiIsBusy(false));
+    service.setOnFailed(event -> setGuiIsBusy(false));
     service.start();
   }
 
@@ -268,11 +279,11 @@ public class GuiConfigController implements Initializable {
   public void buttonTabulateClicked() {
     if (checkForSaveAndTabulate()) {
       if (GuiContext.getInstance().getConfig() != null) {
-        buttonBar.setDisable(true);
+        setGuiIsBusy(true);
         TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
-        service.setOnSucceeded(event -> buttonBar.setDisable(false));
-        service.setOnCancelled(event -> buttonBar.setDisable(false));
-        service.setOnFailed(event -> buttonBar.setDisable(false));
+        service.setOnSucceeded(event -> setGuiIsBusy(false));
+        service.setOnCancelled(event -> setGuiIsBusy(false));
+        service.setOnFailed(event -> setGuiIsBusy(false));
         service.start();
       } else {
         Logger.log(
@@ -281,11 +292,32 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  public void buttonExitClicked() {
-    if (checkForSaveAndContinue()) {
+  private void exitGui() {
+    if (guiIsBusy) {
+      Alert alert =
+          new Alert(
+              Alert.AlertType.WARNING,
+              "The tabulator is currently busy. Are you sure you want to quit?",
+              ButtonType.YES,
+              ButtonType.NO);
+      alert.setHeaderText(null);
+      if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
+        // In case the alert is still displayed when the GUI is no longer busy
+        if (guiIsBusy) {
+          Logger.log(Level.SEVERE, "User exited tabulator before it was finished!");
+        } else {
+          Logger.log(Level.INFO, "Exiting tabulator GUI...");
+        }
+        Platform.exit();
+      }
+    } else if (checkForSaveAndContinue()) {
       Logger.log(Level.INFO, "Exiting tabulator GUI...");
       Platform.exit();
     }
+  }
+
+  public void buttonExitClicked() {
+    exitGui();
   }
 
   public void buttonOutputDirectoryClicked() {
@@ -444,8 +476,16 @@ public class GuiConfigController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
-    Logger.log(Level.INFO, String.format("Opening tabulator GUI...\n"
-        + "Welcome to the %s!", Main.APP_NAME));
+    Logger.log(Level.INFO, "Opening tabulator GUI...");
+    Logger.log(Level.INFO, "Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
+
+    GuiContext.getInstance()
+        .getMainWindow()
+        .setOnCloseRequest(
+            event -> {
+              event.consume();
+              exitGui();
+            });
 
     String helpText;
     try {
@@ -857,15 +897,20 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<Void> createTask() {
-      Task<Void> task = new Task<>() {
-        @Override
-        protected Void call() {
-          contestConfig.validate();
-          return null;
-        }
-      };
-      task.setOnFailed(arg0 -> Logger.log(Level.SEVERE, "Error during validation:\n%s\n"
-          + "Validation failed!", task.getException().toString()));
+      Task<Void> task =
+          new Task<>() {
+            @Override
+            protected Void call() {
+              contestConfig.validate();
+              return null;
+            }
+          };
+      task.setOnFailed(
+          arg0 ->
+              Logger.log(
+                  Level.SEVERE,
+                  "Error during validation:\n%s\nValidation failed!",
+                  task.getException().toString()));
       return task;
     }
   }
@@ -884,21 +929,26 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<Void> createTask() {
-      Task<Void> task = new Task<>() {
-        @Override
-        protected Void call() {
-          // create session object used for tabulation
-          TabulatorSession session = new TabulatorSession(configPath);
-          try {
-            session.tabulate();
-          } catch (TabulationCancelledException e) {
-            Logger.log(Level.SEVERE, "Tabulation was cancelled!");
-          }
-          return null;
-        }
-      };
-      task.setOnFailed(arg0 -> Logger.log(Level.SEVERE, "Error during tabulation:\n%s\n"
-          + "Tabulation failed!", task.getException().toString()));
+      Task<Void> task =
+          new Task<>() {
+            @Override
+            protected Void call() {
+              // create session object used for tabulation
+              TabulatorSession session = new TabulatorSession(configPath);
+              try {
+                session.tabulate();
+              } catch (TabulationCancelledException e) {
+                Logger.log(Level.SEVERE, "Tabulation was cancelled!");
+              }
+              return null;
+            }
+          };
+      task.setOnFailed(
+          arg0 ->
+              Logger.log(
+                  Level.SEVERE,
+                  "Error during tabulation:\n%s\nTabulation failed!",
+                  task.getException().toString()));
       return task;
     }
   }

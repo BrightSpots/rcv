@@ -129,6 +129,10 @@ public class RawContestConfig {
     public void setProvider(String provider) {
       this.provider = provider;
     }
+
+    public boolean isCdf() {
+      return (provider != null && provider.toUpperCase().equals("CDF"));
+    }
   }
 
   // Candidate: contains a full candidate name and optionally a candidate ID
