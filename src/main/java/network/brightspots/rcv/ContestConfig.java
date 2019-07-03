@@ -111,7 +111,7 @@ class ContestConfig {
   // purpose: factory method to create ContestConfig from configPath
   // - create rawContestConfig from file - can fail for IO issues or invalid json
   // returns: new ContestConfig object if checks pass otherwise null
-  static ContestConfig loadContestConfig(String configPath) {
+  static ContestConfig loadContestConfig(String configPath, boolean silentMode) {
     if (configPath == null) {
       Logger.log(Level.SEVERE, "No contest config path specified!");
       return null;
@@ -125,7 +125,9 @@ class ContestConfig {
     if (rawConfig == null) {
       Logger.log(Level.SEVERE, "Failed to load contest config: %s", configPath);
     } else {
-      Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
+      if (!silentMode) {
+        Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
+      }
       // source folder will be the parent of configPath
       String parentFolder = new File(configPath).getParent();
       // if there is no parent folder use current working directory
@@ -135,6 +137,10 @@ class ContestConfig {
       config = loadContestConfig(rawConfig, parentFolder);
     }
     return config;
+  }
+
+  static ContestConfig loadContestConfig(String configPath) {
+    return loadContestConfig(configPath, false);
   }
 
   // function: resolveConfigPath
@@ -192,7 +198,7 @@ class ContestConfig {
   private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
+      Logger.log(Level.SEVERE, "Contest config must contain at least one cast vote record file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
@@ -209,8 +215,8 @@ class ContestConfig {
         // look for duplicate paths
         if (cvrFilePathSet.contains(cvrPath)) {
           isValid = false;
-          Logger.log(Level.SEVERE, "Duplicate cast Vote Record filePaths are not allowed: %s",
-              cvrPath);
+          Logger.log(
+              Level.SEVERE, "Duplicate cast vote record filePaths are not allowed: %s", cvrPath);
         } else {
           cvrFilePathSet.add(cvrPath);
         }

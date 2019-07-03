@@ -191,12 +191,12 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private void loadFile(File fileToLoad) {
+  private void loadFile(File fileToLoad, boolean silentMode) {
     // set the user dir for future loads
     FileUtils.setUserDirectory(fileToLoad.getParent());
     // load and cache the config object
     GuiContext.getInstance()
-        .setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath()));
+        .setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath(), silentMode));
     // if config loaded use it to populate the GUI
     if (GuiContext.getInstance().getConfig() != null) {
       loadConfig(GuiContext.getInstance().getConfig());
@@ -217,7 +217,7 @@ public class GuiConfigController implements Initializable {
       File fileToLoad = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       if (fileToLoad != null) {
         selectedFile = fileToLoad;
-        loadFile(fileToLoad);
+        loadFile(fileToLoad, false);
       }
     }
   }
@@ -245,7 +245,7 @@ public class GuiConfigController implements Initializable {
     // create a rawConfig object from GUI content and serialize it as json
     JsonParser.writeToFile(fileToSave, createRawContestConfig());
     // Reload to keep GUI fields updated in case invalid values are replaced during save process
-    loadFile(fileToSave);
+    loadFile(fileToSave, true);
   }
 
   public void buttonSaveClicked() {

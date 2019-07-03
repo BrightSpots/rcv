@@ -50,7 +50,8 @@ class JsonParser {
     } catch (JsonParseException | JsonMappingException exception) {
       if (logsEnabled) {
         Logger.log(
-            Level.SEVERE, "Error parsing JSON file: %s\n%s\n"
+            Level.SEVERE,
+            "Error parsing JSON file: %s\n%s\n"
                 + "Check file formatting and values and make sure they are correct!\n"
                 + "See config_file_documentation.txt for more details.",
             jsonFilePath,
@@ -59,8 +60,10 @@ class JsonParser {
       createdObject = null;
     } catch (IOException exception) {
       if (logsEnabled) {
-        Logger.log(Level.SEVERE, "Error opening file: %s\n%s\n"
-            + "Check file path and permissions and make sure they are correct!",
+        Logger.log(
+            Level.SEVERE,
+            "Error opening file: %s\n%s\n"
+                + "Check file path and permissions and make sure they are correct!",
             jsonFilePath,
             exception.toString());
       }
@@ -87,7 +90,7 @@ class JsonParser {
           .writer()
           .withDefaultPrettyPrinter()
           .writeValue(jsonFile, objectToSerialize);
-      Logger.log(Level.INFO, "Saved object to: %s", jsonFile.getAbsolutePath());
+      Logger.log(Level.INFO, "Successfully saved file: %s", jsonFile.getAbsolutePath());
     } catch (IOException exception) {
       Logger.log(
           Level.SEVERE,
