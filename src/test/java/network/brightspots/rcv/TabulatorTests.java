@@ -25,7 +25,6 @@ package network.brightspots.rcv;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
@@ -207,7 +206,8 @@ class TabulatorTests {
   void invalidSourcesTest() {
     String configPath = getTestFilePath("invalid_sources_test", "_config.json");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    assertNull(config);
+    assertNotNull(config);
+    assertFalse(config.validate());
   }
 
   // function: testPortlandMayor
@@ -347,7 +347,7 @@ class TabulatorTests {
     runTabulationTest("precinct_example");
   }
 
-  // function: precinctExample
+  // function: missingPrecinctExample
   // purpose: tests a small election with missing precinct id
   @Test
   @DisplayName("missing precinct example")
