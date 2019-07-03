@@ -536,32 +536,36 @@ class ContestConfig {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
 
+  private static String getString(String value) {
+    return value != null ? value : "";
+  }
+
   // function: getContestName
   // purpose: getter for contestName
   // returns: contest name
   String getContestName() {
-    return rawConfig.outputSettings.contestName;
+    return getString(rawConfig.outputSettings.contestName);
   }
 
   // function: getContestJurisdiction
   // purpose: getter for contestJurisdiction
   // returns: contest jurisdiction name
   String getContestJurisdiction() {
-    return rawConfig.outputSettings.contestJurisdiction;
+    return getString(rawConfig.outputSettings.contestJurisdiction);
   }
 
   // function: getContestOffice
   // purpose: getter for contestOffice
   // returns: contest office name
   String getContestOffice() {
-    return rawConfig.outputSettings.contestOffice;
+    return getString(rawConfig.outputSettings.contestOffice);
   }
 
   // function: getContestDate
   // purpose: getter for contestDate
   // returns: contest date
   String getContestDate() {
-    return rawConfig.outputSettings.contestDate;
+    return getString(rawConfig.outputSettings.contestDate);
   }
 
   // function: isTabulateByPrecinctEnabled
@@ -573,6 +577,13 @@ class ContestConfig {
 
   boolean isGenerateCdfJsonEnabled() {
     return rawConfig.outputSettings.generateCdfJson;
+  }
+
+  // function: getRulesDescription
+  // purpose: getter for rules description
+  // returns: rules description for this rules configuration
+  String getRulesDescription() {
+    return getString(rawConfig.rules.rulesDescription);
   }
 
   // function: getMaxRankingsAllowed
@@ -589,9 +600,7 @@ class ContestConfig {
   // returns: max skipped ranks allowed in this config
   // a null value here means "unlimited"
   Integer getMaxSkippedRanksAllowed() {
-    return rawConfig.rules.maxSkippedRanksAllowed != null
-        ? rawConfig.rules.maxSkippedRanksAllowed
-        : null;
+    return rawConfig.rules.maxSkippedRanksAllowed;
   }
 
   // function: isBatchEliminationEnabled
@@ -646,21 +655,21 @@ class ContestConfig {
   // purpose: getter for UWI label
   // returns: UWI label for this config
   String getUndeclaredWriteInLabel() {
-    return rawConfig.rules.undeclaredWriteInLabel;
+    return getString(rawConfig.rules.undeclaredWriteInLabel);
   }
 
   // function: getOvervoteLabel
   // purpose: getter for overvote label rule
   // returns: overvote label for this config
   String getOvervoteLabel() {
-    return rawConfig.rules.overvoteLabel;
+    return getString(rawConfig.rules.overvoteLabel);
   }
 
   // function: getUndervoteLabel
   // purpose: getter for undervote label
   // returns: undervote label for this config
   String getUndervoteLabel() {
-    return rawConfig.rules.undervoteLabel;
+    return getString(rawConfig.rules.undervoteLabel);
   }
 
   // function: getTiebreakMode
