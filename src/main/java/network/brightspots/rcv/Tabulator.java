@@ -126,7 +126,6 @@ class Tabulator {
   // returns: set containing winner(s)
   Set<String> tabulate() throws TabulationCancelledException {
     logSummaryInfo();
-    Logger.log(Level.INFO, "Starting tabulation for contest '%s'...", this.config.getContestName());
 
     // Loop until we've found our winner(s) unless using continueUntilTwoCandidatesRemain, in which
     // case we loop until only two candidates remain.
@@ -184,7 +183,7 @@ class Tabulator {
                     : BigDecimal.ZERO;
             Logger.log(
                 Level.INFO,
-                "Candidate \"%s\" won with a surplus fraction of %s.",
+                "Candidate \"%s\" was elected with a surplus fraction of %s.",
                 winner,
                 surplusFraction.toString());
             for (CastVoteRecord cvr : castVoteRecords) {
@@ -235,8 +234,6 @@ class Tabulator {
         updatePastWinnerTallies();
       }
     }
-
-    Logger.log(Level.INFO, "Completed tabulation for contest '%s'.", this.config.getContestName());
     return winnerToRound.keySet();
   }
 
@@ -476,7 +473,7 @@ class Tabulator {
     for (String winner : selectedWinners) {
       Logger.log(
           Level.INFO,
-          "Candidate \"%s\" won in round %d with %s votes.",
+          "Candidate \"%s\" was elected in round %d with %s votes.",
           winner,
           currentRound,
           currentRoundCandidateToTally.get(winner).toString());
