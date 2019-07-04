@@ -85,10 +85,14 @@ class ResultsWriter {
   private Map<Integer, BigDecimal> roundToResidualSurplus;
   private int numBallots;
 
+  // visible for testing
+  @SuppressWarnings("WeakerAccess")
   static String sequentialSuffixForOutputPath(Integer sequentialTabulationNumber) {
     return sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
   }
 
+  // visible for testing
+  @SuppressWarnings("WeakerAccess")
   static String getOutputFilePath(
       String outputDirectory,
       String outputType,

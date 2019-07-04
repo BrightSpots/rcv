@@ -68,11 +68,13 @@ class TabulatorSession {
   }
 
   // Visible for testing
+  @SuppressWarnings("unused")
   String getOutputPath() {
     return outputPath;
   }
 
   // Visible for testing
+  @SuppressWarnings("unused")
   String getTimestampString() {
     return timestampString;
   }

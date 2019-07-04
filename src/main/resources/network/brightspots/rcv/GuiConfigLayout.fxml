@@ -233,7 +233,7 @@
                 <Label text="Max Skipped Ranks Allowed"/>
                 <TextField maxWidth="220.0" promptText="Max Skipped Ranks Allowed"
                   fx:id="textFieldMaxSkippedRanksAllowed"/>
-                <Label text="Max Rankings Allowed"/>
+                <Label text="Max Rankings Allowed *"/>
                 <TextField maxWidth="220.0" promptText="Max Rankings Allowed"
                   fx:id="textFieldMaxRankingsAllowed"/>
                 <padding>

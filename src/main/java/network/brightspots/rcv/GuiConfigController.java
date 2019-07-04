@@ -589,9 +589,6 @@ public class GuiConfigController implements Initializable {
     textFieldMaxSkippedRanksAllowed
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldMaxSkippedRanksAllowed));
-    textFieldMaxRankingsAllowed
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldMaxRankingsAllowed));
 
     setDefaultValues();
 
@@ -638,6 +635,7 @@ public class GuiConfigController implements Initializable {
         String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
     textFieldMinimumVoteThreshold.setText(
         String.valueOf(ContestConfig.SUGGESTED_MINIMUM_VOTE_THRESHOLD));
+    textFieldMaxRankingsAllowed.setText(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED);
   }
 
   private void clearConfig() {
@@ -801,7 +799,7 @@ public class GuiConfigController implements Initializable {
         textFieldDecimalPlacesForVoteArithmetic, rules.decimalPlacesForVoteArithmetic);
     setTextFieldToInteger(textFieldMinimumVoteThreshold, rules.minimumVoteThreshold);
     setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, rules.maxSkippedRanksAllowed);
-    setTextFieldToInteger(textFieldMaxRankingsAllowed, rules.maxRankingsAllowed);
+    textFieldMaxRankingsAllowed.setText(rules.maxRankingsAllowed);
     textFieldOvervoteLabel.setText(rules.overvoteLabel);
     textFieldUndervoteLabel.setText(rules.undervoteLabel);
     textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
@@ -865,7 +863,7 @@ public class GuiConfigController implements Initializable {
         getIntValueOrNull(textFieldDecimalPlacesForVoteArithmetic);
     rules.minimumVoteThreshold = getIntValueOrNull(textFieldMinimumVoteThreshold);
     rules.maxSkippedRanksAllowed = getIntValueOrNull(textFieldMaxSkippedRanksAllowed);
-    rules.maxRankingsAllowed = getIntValueOrNull(textFieldMaxRankingsAllowed);
+    rules.maxRankingsAllowed = textFieldMaxRankingsAllowed.getText();
     rules.sequentialMultiSeat = checkBoxSequentialMultiSeat.isSelected();
     rules.bottomsUpMultiSeat = checkBoxBottomsUpMultiSeat.isSelected();
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();

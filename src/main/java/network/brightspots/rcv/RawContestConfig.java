@@ -186,7 +186,7 @@ public class RawContestConfig {
     // max number of skipped rankings allowed
     public Integer maxSkippedRanksAllowed;
     // max rankings allowed
-    public Integer maxRankingsAllowed;
+    public String maxRankingsAllowed;
     public boolean sequentialMultiSeat;
     public boolean bottomsUpMultiSeat;
     public boolean nonIntegerWinningThreshold;

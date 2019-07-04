@@ -57,6 +57,7 @@ class ContestConfig {
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
+  static final String SUGGESTED_MAX_RANKINGS_ALLOWED = "max";
 
   private static final int MIN_COLUMN_INDEX = 1;
   private static final int MAX_COLUMN_INDEX = 1000;
@@ -372,7 +373,11 @@ class ContestConfig {
               + "or alwaysSkipToNextRank!");
     }
 
-    if (getNumDeclaredCandidates() >= 1 && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED) {
+    if (getMaxRankingsAllowed() == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "maxRankingsAllowed must either be \"max\" or an integer!");
+    } else if (getNumDeclaredCandidates() >= 1
+        && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED) {
       isValid = false;
       Logger.log(
           Level.SEVERE, "maxRankingsAllowed must be %d or higher!", MIN_MAX_RANKINGS_ALLOWED);
@@ -587,11 +592,22 @@ class ContestConfig {
 
   // function: getMaxRankingsAllowed
   // purpose: getter for maxRankingsAllowed
-  // returns: max rankings allowed (or falls back to the number of candidates)
-  int getMaxRankingsAllowed() {
-    return rawConfig.rules.maxRankingsAllowed != null
-        ? rawConfig.rules.maxRankingsAllowed
-        : getNumDeclaredCandidates();
+  // returns: max rankings allowed
+  Integer getMaxRankingsAllowed() {
+    String rawMaxRankingsAllowed = rawConfig.rules.maxRankingsAllowed;
+    Integer maxRankingsAllowed;
+    if (rawMaxRankingsAllowed == null || rawMaxRankingsAllowed.isBlank()) {
+      maxRankingsAllowed = null;
+    } else if (rawMaxRankingsAllowed.toLowerCase().equals("max")) {
+      maxRankingsAllowed = getNumDeclaredCandidates();
+    } else {
+      try {
+        maxRankingsAllowed = Integer.parseInt(rawMaxRankingsAllowed);
+      } catch (NumberFormatException e) {
+        maxRankingsAllowed = null;
+      }
+    }
+    return maxRankingsAllowed;
   }
 
   // function: isBatchEliminationEnabled

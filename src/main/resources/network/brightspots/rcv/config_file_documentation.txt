@@ -138,11 +138,10 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         value: [0..]
         if not supplied: unlimited
 
-      "maxRankingsAllowed" optional
-        maximum number of candidates that a ballot is allowed to rank
+      "maxRankingsAllowed" required
+        maximum number of candidates that a ballot is allowed to rank; if "max" is entered, this will default to the total number of declared candidates
         example: 15
-        values: [1..]
-        if not supplied: the number of declared candidates
+        values: [max, 1..]
 
       "sequentialMultiSeat" optional
         instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats
