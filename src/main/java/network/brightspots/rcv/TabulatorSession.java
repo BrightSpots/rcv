@@ -54,8 +54,8 @@ class TabulatorSession {
   private final String configPath;
   // precinct IDs discovered during CVR parsing to support testing
   private final Set<String> precinctIDs = new HashSet<>();
-  // Visible for testing: cache output path location
-  String outputPath;
+  // cache output path location
+  private String outputPath;
   private final String timestampString;
 
   // function: TabulatorSession
@@ -67,6 +67,12 @@ class TabulatorSession {
     timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
+  // Visible for testing
+  String getOutputPath() {
+    return outputPath;
+  }
+
+  // Visible for testing
   String getTimestampString() {
     return timestampString;
   }
@@ -208,7 +214,7 @@ class TabulatorSession {
 
       Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       try {
-        if (source.isCdf()) {
+        if (ContestConfig.isCdf(source)) {
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
           reader.parseCVRFile(castVoteRecords);
         } else {

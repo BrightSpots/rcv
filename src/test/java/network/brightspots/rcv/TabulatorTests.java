@@ -141,7 +141,7 @@ class TabulatorTests {
     }
 
     // test passed so cleanup test output folder
-    File outputFolder = new File(session.outputPath);
+    File outputFolder = new File(session.getOutputPath());
     if (outputFolder.listFiles() != null) {
       //noinspection ConstantConditions
       for (File file : outputFolder.listFiles()) {

@@ -188,6 +188,10 @@ class ContestConfig {
     return isValid;
   }
 
+  static boolean isCdf(CVRSource source) {
+    return (source.getProvider() != null && source.getProvider().toUpperCase().equals("CDF"));
+  }
+
   private void validateOutputSettings() {
     if (getContestName() == null || getContestName().isEmpty()) {
       isValid = false;
@@ -228,7 +232,7 @@ class ContestConfig {
         }
 
         // perform CDF checks
-        if (source.isCdf()) {
+        if (isCdf(source)) {
           if (rawConfig.cvrFileSources.size() != 1) {
             isValid = false;
             Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
@@ -730,7 +734,7 @@ class ContestConfig {
 
     for (RawContestConfig.CVRSource source : rawConfig.cvrFileSources) {
       // for any CDF sources extract candidate names
-      if (source.isCdf()) {
+      if (isCdf(source)) {
         // cvrPath is the resolved path to this source
         String cvrPath = resolveConfigPath(source.getFilePath());
         CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this);

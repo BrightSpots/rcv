@@ -26,7 +26,6 @@ package network.brightspots.rcv;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
-import java.util.logging.Level;
 
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -45,37 +44,6 @@ public class RawContestConfig {
   // purpose: create a new RawContestConfig object
   // returns: the newly created RawContestConfig object
   RawContestConfig() {
-  }
-
-  // function: validate
-  // purpose: perform some basic validation checks
-  // returns: true if checks pass otherwise false
-  public boolean validate() {
-    boolean isValid = true;
-    if (outputSettings == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"outputSettings\" field specified!");
-    }
-    if (cvrFileSources == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"cvrFileSources\" field specified!");
-    } else {
-      for (CVRSource source : cvrFileSources) {
-        if (source.getFilePath() == null) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "No file specified for CVR Source");
-        }
-      }
-    }
-    if (candidates == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"candidates\" field specified!");
-    }
-    if (rules == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"rules\" field specified!");
-    }
-    return isValid;
   }
 
   // OutputSettings: encapsulates the output settings
@@ -163,10 +131,6 @@ public class RawContestConfig {
 
     public void setProvider(String provider) {
       this.provider = provider;
-    }
-
-    public boolean isCdf() {
-      return (provider != null && provider.toUpperCase().equals("CDF"));
     }
   }
 
