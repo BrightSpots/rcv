@@ -603,7 +603,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private void setTextFieldToInteger(TextField textField, Integer value) {
+  private static void setTextFieldToInteger(TextField textField, Integer value) {
     textField.setText(value != null ? Integer.toString(value) : "");
   }
 
@@ -811,11 +811,11 @@ public class GuiConfigController implements Initializable {
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
   }
 
-  private Integer getIntValueOrNull(TextField textField) {
-    return getIntValueOrNull(textField.getText());
+  private static Integer getIntValueOrNull(TextField textField) {
+    return getIntValueOrNull(textField.getText().trim());
   }
 
-  private Integer getIntValueOrNull(String str) {
+  private static Integer getIntValueOrNull(String str) {
     Integer returnValue = null;
     try {
       if (str != null) {
@@ -830,27 +830,41 @@ public class GuiConfigController implements Initializable {
     return returnValue;
   }
 
-  private String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
+  private static String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
     return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
+  }
+
+  private static String getTextOrEmptyString(TextField textField) {
+    return textField.getText() != null ? textField.getText().trim() : "";
   }
 
   private RawContestConfig createRawContestConfig() {
     RawContestConfig config = new RawContestConfig();
 
     OutputSettings outputSettings = new OutputSettings();
-    outputSettings.contestName = textFieldContestName.getText();
-    outputSettings.outputDirectory = textFieldOutputDirectory.getText();
+    outputSettings.contestName = getTextOrEmptyString(textFieldContestName);
+    outputSettings.outputDirectory = getTextOrEmptyString(textFieldOutputDirectory);
     outputSettings.contestDate =
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
-    outputSettings.contestJurisdiction = textFieldContestJurisdiction.getText();
-    outputSettings.contestOffice = textFieldContestOffice.getText();
+    outputSettings.contestJurisdiction = getTextOrEmptyString(textFieldContestJurisdiction);
+    outputSettings.contestOffice = getTextOrEmptyString(textFieldContestOffice);
     outputSettings.tabulateByPrecinct = checkBoxTabulateByPrecinct.isSelected();
     outputSettings.generateCdfJson = checkBoxGenerateCdfJson.isSelected();
     config.outputSettings = outputSettings;
 
-    config.cvrFileSources = new ArrayList<>(tableViewCvrFiles.getItems());
+    ArrayList<CVRSource> cvrSources = new ArrayList<>(tableViewCvrFiles.getItems());
+    for (CVRSource source : cvrSources) {
+      source.setFilePath(source.getFilePath() != null ? source.getFilePath().trim() : "");
+      source.setProvider(source.getProvider() != null ? source.getProvider().trim() : "");
+    }
+    config.cvrFileSources = cvrSources;
 
-    config.candidates = new ArrayList<>(tableViewCandidates.getItems());
+    ArrayList<Candidate> candidates = new ArrayList<>(tableViewCandidates.getItems());
+    for (Candidate candidate : candidates) {
+      candidate.setName(candidate.getName() != null ? candidate.getName().trim() : "");
+      candidate.setCode(candidate.getCode() != null ? candidate.getCode().trim() : "");
+    }
+    config.candidates = candidates;
 
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
@@ -859,8 +873,8 @@ public class GuiConfigController implements Initializable {
     rules.decimalPlacesForVoteArithmetic =
         getIntValueOrNull(textFieldDecimalPlacesForVoteArithmetic);
     rules.minimumVoteThreshold = getIntValueOrNull(textFieldMinimumVoteThreshold);
-    rules.maxSkippedRanksAllowed = textFieldMaxSkippedRanksAllowed.getText();
-    rules.maxRankingsAllowed = textFieldMaxRankingsAllowed.getText();
+    rules.maxSkippedRanksAllowed = getTextOrEmptyString(textFieldMaxSkippedRanksAllowed);
+    rules.maxRankingsAllowed = getTextOrEmptyString(textFieldMaxRankingsAllowed);
     rules.sequentialMultiSeat = checkBoxSequentialMultiSeat.isSelected();
     rules.bottomsUpMultiSeat = checkBoxBottomsUpMultiSeat.isSelected();
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
@@ -869,10 +883,10 @@ public class GuiConfigController implements Initializable {
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
     rules.treatBlankAsUndeclaredWriteIn = checkBoxTreatBlankAsUndeclaredWriteIn.isSelected();
-    rules.overvoteLabel = textFieldOvervoteLabel.getText();
-    rules.undervoteLabel = textFieldUndervoteLabel.getText();
-    rules.undeclaredWriteInLabel = textFieldUndeclaredWriteInLabel.getText();
-    rules.rulesDescription = textFieldRulesDescription.getText();
+    rules.overvoteLabel = getTextOrEmptyString(textFieldOvervoteLabel);
+    rules.undervoteLabel = getTextOrEmptyString(textFieldUndervoteLabel);
+    rules.undeclaredWriteInLabel = getTextOrEmptyString(textFieldUndeclaredWriteInLabel);
+    rules.rulesDescription = getTextOrEmptyString(textFieldRulesDescription);
     config.rules = rules;
 
     return config;
