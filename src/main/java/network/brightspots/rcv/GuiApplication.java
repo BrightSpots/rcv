@@ -27,6 +27,7 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+@SuppressWarnings("WeakerAccess")
 public class GuiApplication extends Application {
 
   private static final int STAGE_HEIGHT = 845;
