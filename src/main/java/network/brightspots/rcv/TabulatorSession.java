@@ -29,6 +29,8 @@
 
 package network.brightspots.rcv;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -105,6 +107,19 @@ class TabulatorSession {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
+      try {
+        Logger.log(Level.INFO, "Begin config file contents:");
+        BufferedReader reader = new BufferedReader(new FileReader(configPath));
+        String line = reader.readLine();
+        while(line != null) {
+          Logger.log(Level.INFO, line);
+          line = reader.readLine();
+        }
+        Logger.log(Level.INFO, "End config file contents.");
+        reader.close();
+      } catch (IOException e) {
+        Logger.log(Level.SEVERE, "Error logging config file: %s\n", configPath, e.toString());
+      }
       Logger.log(Level.INFO, "Tabulating \'%s\'...", config.getContestName());
       if (config.isSequentialMultiSeatEnabled()) {
         Logger.log(Level.INFO, "This is a sequential multi-seat contest.");
