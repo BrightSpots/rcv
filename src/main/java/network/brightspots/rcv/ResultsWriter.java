@@ -392,7 +392,7 @@ class ResultsWriter {
     csvPrinter.println();
 
     // actions don't make sense in individual precinct results
-    if (precinct == null || precinct.isEmpty()) {
+    if (precinct == null || precinct.isBlank()) {
       addActionRows(csvPrinter);
     }
 
@@ -529,7 +529,7 @@ class ResultsWriter {
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
 
     csvPrinter.printRecord("Threshold", winningThreshold.toString());
-    if (precinct != null && !precinct.isEmpty()) {
+    if (precinct != null && !precinct.isBlank()) {
       csvPrinter.printRecord("Precinct", precinct);
     }
     csvPrinter.println();
@@ -829,7 +829,7 @@ class ResultsWriter {
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
     configData.put("threshold", winningThreshold);
-    if (precinct != null && !precinct.isEmpty()) {
+    if (precinct != null && !precinct.isBlank()) {
       configData.put("precinct", precinct);
     }
     // results will be a list of round data objects
@@ -841,7 +841,7 @@ class ResultsWriter {
       // add round number (this is implied by the ordering but for debugging we are explicit)
       roundData.put("round", round);
       // add actions if this is not a precinct summary
-      if (precinct == null || precinct.isEmpty()) {
+      if (precinct == null || precinct.isBlank()) {
         // actions is a list of one or more action objects
         ArrayList<Object> actions = new ArrayList<>();
         addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);

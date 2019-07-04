@@ -194,7 +194,7 @@ class ContestConfig {
   }
 
   private void validateOutputSettings() {
-    if (getContestName() == null || getContestName().isEmpty()) {
+    if (getContestName() == null || getContestName().isBlank()) {
       isValid = false;
       Logger.log(Level.SEVERE, "Contest name is required!");
     }
@@ -208,7 +208,7 @@ class ContestConfig {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
         // perform checks on source input path
-        if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
+        if (source.getFilePath() == null || source.getFilePath().isBlank()) {
           isValid = false;
           Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
           continue;
@@ -316,7 +316,7 @@ class ContestConfig {
     HashSet<String> candidateNameSet = new HashSet<>();
     HashSet<String> candidateCodeSet = new HashSet<>();
     for (Candidate candidate : rawConfig.candidates) {
-      if (candidate.getName() == null || candidate.getName().isEmpty()) {
+      if (candidate.getName() == null || candidate.getName().isBlank()) {
         isValid = false;
         Logger.log(Level.SEVERE, "Name is required for each candidate!");
       } else if (candidateNameSet.contains(candidate.getName())) {
@@ -327,7 +327,7 @@ class ContestConfig {
         candidateNameSet.add(candidate.getName());
       }
 
-      if (candidate.getCode() != null && !candidate.getCode().isEmpty()) {
+      if (candidate.getCode() != null && !candidate.getCode().isBlank()) {
         if (candidateCodeSet.contains(candidate.getCode())) {
           isValid = false;
           Logger.log(
@@ -363,7 +363,7 @@ class ContestConfig {
     if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
       Logger.log(Level.SEVERE, "Invalid overvote rule!");
-    } else if ((getOvervoteLabel() != null && !getOvervoteLabel().isEmpty())
+    } else if ((getOvervoteLabel() != null && !getOvervoteLabel().isBlank())
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       isValid = false;
@@ -531,7 +531,7 @@ class ContestConfig {
   String getOutputDirectoryRaw() {
     // outputDirectory is where output files should be written
     return (rawConfig.outputSettings.outputDirectory != null
-        && !rawConfig.outputSettings.outputDirectory.isEmpty())
+        && !rawConfig.outputSettings.outputDirectory.isBlank())
         ? rawConfig.outputSettings.outputDirectory
         : FileUtils.getUserDirectory();
   }
@@ -623,7 +623,7 @@ class ContestConfig {
   int getNumDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = getCandidateCodeList().size();
-    if ((getUndeclaredWriteInLabel() != null && !getUndeclaredWriteInLabel().isEmpty())
+    if ((getUndeclaredWriteInLabel() != null && !getUndeclaredWriteInLabel().isBlank())
         && getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
       num--;
     }
@@ -763,7 +763,7 @@ class ContestConfig {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
         String code = candidate.getCode();
         String name = candidate.getName();
-        if (code == null || code.isEmpty()) {
+        if (code == null || code.isBlank()) {
           code = name;
         }
 
@@ -781,7 +781,7 @@ class ContestConfig {
     }
 
     String uwiLabel = getUndeclaredWriteInLabel();
-    if (uwiLabel != null && !uwiLabel.isEmpty()) {
+    if (uwiLabel != null && !uwiLabel.isBlank()) {
       candidateCodeToNameMap.put(uwiLabel, uwiLabel);
     }
   }

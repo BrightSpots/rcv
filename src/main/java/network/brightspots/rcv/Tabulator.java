@@ -496,7 +496,7 @@ class Tabulator {
     String label = config.getUndeclaredWriteInLabel();
     if (currentRound == 1
         && label != null
-        && !label.isEmpty()
+        && !label.isBlank()
         && candidateIDs.contains(label)
         && currentRoundCandidateToTally.get(label).signum() == 1) {
       eliminated.add(label);
@@ -887,7 +887,7 @@ class Tabulator {
             candidatesSeen.add(candidate);
           }
           // if duplicate was found, exhaust cvr
-          if (duplicateCandidate != null && !duplicateCandidate.isEmpty()) {
+          if (duplicateCandidate != null && !duplicateCandidate.isBlank()) {
             recordSelectionForCastVoteRecord(
                 cvr, currentRound, null, "duplicate candidate: " + duplicateCandidate);
             break;
@@ -1011,7 +1011,7 @@ class Tabulator {
     // transfer vote value to round tally
     incrementTally(roundTally, fractionalTransferValue, selectedCandidate);
     // if enabled and there is a valid precinct string transfer vote value to precinct tally
-    if (config.isTabulateByPrecinctEnabled() && precinct != null && !precinct.isEmpty()) {
+    if (config.isTabulateByPrecinctEnabled() && precinct != null && !precinct.isBlank()) {
       incrementTally(
           roundTallyByPrecinct.get(precinct), fractionalTransferValue, selectedCandidate);
     }
@@ -1022,7 +1022,7 @@ class Tabulator {
   private void initPrecinctRoundTallies() {
     for (String precinctName : precinctNames) {
       precinctRoundTallies.put(precinctName, new HashMap<>());
-      assert precinctName != null && !precinctName.isEmpty();
+      assert precinctName != null && !precinctName.isBlank();
     }
   }
 

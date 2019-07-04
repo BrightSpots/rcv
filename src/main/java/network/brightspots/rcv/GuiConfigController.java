@@ -353,11 +353,11 @@ public class GuiConfigController implements Initializable {
     String cvrFirstVoteCol = textFieldCvrFirstVoteCol.getText().trim();
     String cvrFirstVoteRow = textFieldCvrFirstVoteRow.getText().trim();
     boolean fileIsJson = cvrFilePath.toLowerCase().endsWith(".json");
-    if (cvrFilePath.isEmpty()) {
+    if (cvrFilePath.isBlank()) {
       Logger.log(Level.WARNING, "Cast vote record file path is required!");
-    } else if (cvrFirstVoteCol.isEmpty() && !fileIsJson) {
+    } else if (cvrFirstVoteCol.isBlank() && !fileIsJson) {
       Logger.log(Level.WARNING, "Cast vote record first vote column index is required!");
-    } else if (cvrFirstVoteRow.isEmpty() && !fileIsJson) {
+    } else if (cvrFirstVoteRow.isBlank() && !fileIsJson) {
       Logger.log(Level.WARNING, "Cast vote record first vote row index is required!");
     } else {
       cvrSource.setFilePath(cvrFilePath);
@@ -385,7 +385,7 @@ public class GuiConfigController implements Initializable {
   public void changeCvrFilePath(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
     String cvrFilePath = cellEditEvent.getNewValue().toString().trim();
-    if (cvrFilePath.isEmpty()) {
+    if (cvrFilePath.isBlank()) {
       Logger.log(Level.WARNING, "Cast vote record file path is required!");
     } else {
       cvrSelected.setFilePath(cvrFilePath);
@@ -438,7 +438,7 @@ public class GuiConfigController implements Initializable {
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
     String candidateName = textFieldCandidateName.getText().trim();
-    if (candidateName.isEmpty()) {
+    if (candidateName.isBlank()) {
       Logger.log(Level.WARNING, "Candidate name is required!");
     } else {
       candidate.setName(candidateName);
@@ -459,7 +459,7 @@ public class GuiConfigController implements Initializable {
   public void changeCandidateName(CellEditEvent cellEditEvent) {
     Candidate candidateSelected = tableViewCandidates.getSelectionModel().getSelectedItem();
     String candidateName = cellEditEvent.getNewValue().toString().trim();
-    if (candidateName.isEmpty()) {
+    if (candidateName.isBlank()) {
       Logger.log(Level.WARNING, "Candidate name is required!");
     } else {
       candidateSelected.setName(candidateName);
@@ -517,7 +517,7 @@ public class GuiConfigController implements Initializable {
 
           @Override
           public LocalDate fromString(String string) {
-            return string != null && !string.isEmpty()
+            return string != null && !string.isBlank()
                 ? LocalDate.parse(string, DATE_TIME_FORMATTER)
                 : null;
           }
@@ -774,7 +774,7 @@ public class GuiConfigController implements Initializable {
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
-    if (outputSettings.contestDate != null && !outputSettings.contestDate.isEmpty()) {
+    if (outputSettings.contestDate != null && !outputSettings.contestDate.isBlank()) {
       datePickerContestDate.setValue(
           LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
     }
@@ -823,7 +823,7 @@ public class GuiConfigController implements Initializable {
     try {
       if (str != null) {
         str = str.trim();
-        if (!str.isEmpty()) {
+        if (!str.isBlank()) {
           returnValue = Integer.valueOf(str);
         }
       }

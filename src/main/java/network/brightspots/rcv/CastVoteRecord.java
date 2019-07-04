@@ -95,7 +95,7 @@ class CastVoteRecord {
     StringBuilder logStringBuilder = new StringBuilder();
     // add round and ID
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (suppliedID != null && !suppliedID.isEmpty()) {
+    if (suppliedID != null && !suppliedID.isBlank()) {
       logStringBuilder.append(suppliedID);
     } else {
       logStringBuilder.append(computedID);
