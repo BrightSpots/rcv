@@ -383,12 +383,15 @@ class ContestConfig {
           Level.SEVERE, "maxRankingsAllowed must be %d or higher!", MIN_MAX_RANKINGS_ALLOWED);
     }
 
-    if (getMaxSkippedRanksAllowed() != null
-        && getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
+    if (getMaxSkippedRanksAllowed() == null) {
+      isValid = false;
+      Logger
+          .log(Level.SEVERE, "maxSkippedRanksAllowed must either be \"unlimited\" or an integer!");
+    } else if (getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "maxSkippedRanksAllowed must be %d or higher if it's supplied!",
+          "maxSkippedRanksAllowed must be %d or higher!",
           MIN_MAX_SKIPPED_RANKS_ALLOWED);
     }
 
@@ -660,9 +663,22 @@ class ContestConfig {
 
   // function: getMaxSkippedRanksAllowed
   // purpose: getter for maxSkippedRanksAllowed rule
-  // returns: max skipped ranks allowed in this config (possibly null)
+  // returns: max skipped ranks allowed in this config
   Integer getMaxSkippedRanksAllowed() {
-    return rawConfig.rules.maxSkippedRanksAllowed;
+    String rawMaxSkippedRanksAllowed = rawConfig.rules.maxSkippedRanksAllowed;
+    Integer maxSkippedRanksAllowed;
+    if (rawMaxSkippedRanksAllowed == null || rawMaxSkippedRanksAllowed.isBlank()) {
+      maxSkippedRanksAllowed = null;
+    } else if (rawMaxSkippedRanksAllowed.toLowerCase().equals("unlimited")) {
+      maxSkippedRanksAllowed = Integer.MAX_VALUE;
+    } else {
+      try {
+        maxSkippedRanksAllowed = Integer.parseInt(rawMaxSkippedRanksAllowed);
+      } catch (NumberFormatException e) {
+        maxSkippedRanksAllowed = null;
+      }
+    }
+    return maxSkippedRanksAllowed;
   }
 
   // function: getUndeclaredWriteInLabel

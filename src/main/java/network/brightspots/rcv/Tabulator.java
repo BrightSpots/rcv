@@ -863,7 +863,7 @@ class Tabulator {
       // rank iterates over all ranks in this cvr from most preferred to least
       for (int rank : cvr.rankToCandidateIDs.keySet()) {
         // check for undervote exhaustion from too many consecutive skipped ranks
-        if (config.getMaxSkippedRanksAllowed() != null
+        if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
           recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
           break;
@@ -943,7 +943,7 @@ class Tabulator {
         // if this is the last ranking we are out of rankings and must exhaust this cvr
         // determine if the reason is skipping too many ranks, or no continuing candidates
         if (rank == cvr.rankToCandidateIDs.lastKey()) {
-          if (config.getMaxSkippedRanksAllowed() != null
+          if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
               && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
             recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
           } else {

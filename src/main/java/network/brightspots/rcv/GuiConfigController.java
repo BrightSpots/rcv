@@ -586,9 +586,6 @@ public class GuiConfigController implements Initializable {
     textFieldMinimumVoteThreshold
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
-    textFieldMaxSkippedRanksAllowed
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldMaxSkippedRanksAllowed));
 
     setDefaultValues();
 
@@ -798,7 +795,7 @@ public class GuiConfigController implements Initializable {
     setTextFieldToInteger(
         textFieldDecimalPlacesForVoteArithmetic, rules.decimalPlacesForVoteArithmetic);
     setTextFieldToInteger(textFieldMinimumVoteThreshold, rules.minimumVoteThreshold);
-    setTextFieldToInteger(textFieldMaxSkippedRanksAllowed, rules.maxSkippedRanksAllowed);
+    textFieldMaxSkippedRanksAllowed.setText(rules.maxSkippedRanksAllowed);
     textFieldMaxRankingsAllowed.setText(rules.maxRankingsAllowed);
     textFieldOvervoteLabel.setText(rules.overvoteLabel);
     textFieldUndervoteLabel.setText(rules.undervoteLabel);
@@ -862,7 +859,7 @@ public class GuiConfigController implements Initializable {
     rules.decimalPlacesForVoteArithmetic =
         getIntValueOrNull(textFieldDecimalPlacesForVoteArithmetic);
     rules.minimumVoteThreshold = getIntValueOrNull(textFieldMinimumVoteThreshold);
-    rules.maxSkippedRanksAllowed = getIntValueOrNull(textFieldMaxSkippedRanksAllowed);
+    rules.maxSkippedRanksAllowed = textFieldMaxSkippedRanksAllowed.getText();
     rules.maxRankingsAllowed = textFieldMaxRankingsAllowed.getText();
     rules.sequentialMultiSeat = checkBoxSequentialMultiSeat.isSelected();
     rules.bottomsUpMultiSeat = checkBoxBottomsUpMultiSeat.isSelected();

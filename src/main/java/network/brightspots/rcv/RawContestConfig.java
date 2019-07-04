@@ -184,7 +184,7 @@ public class RawContestConfig {
     // minimum votes needed to continue
     public Integer minimumVoteThreshold;
     // max number of skipped rankings allowed
-    public Integer maxSkippedRanksAllowed;
+    public String maxSkippedRanksAllowed;
     // max rankings allowed
     public String maxRankingsAllowed;
     public boolean sequentialMultiSeat;
