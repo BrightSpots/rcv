@@ -600,7 +600,7 @@ class ResultsWriter {
             Map.ofEntries(
                 entry("@id", CDF_REPORTING_DEVICE_ID),
                 entry("@type", "CVR.ReportingDevice"),
-                entry("Application", "RCVRC Tabulator"),
+                entry("Application", Main.APP_NAME),
                 entry("Manufacturer", "Bright Spots"))
         });
     outputJson.put("Version", "1.0.0");

@@ -1893,7 +1893,7 @@
   "ReportingDevice" : [ {
     "@id" : "rd-001",
     "@type" : "CVR.ReportingDevice",
-    "Application" : "RCVRC Tabulator",
+    "Application" : "Universal RCV Tabulator",
     "Manufacturer" : "Bright Spots"
   } ],
   "Version" : "1.0.0"
