@@ -126,7 +126,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         value: [0..1000000]
 
       "maxSkippedRanksAllowed" required
-        maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted; if "unlimited" is entered, a ballot will never be considered exhausted
+        maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted; if "unlimited" is entered, a ballot will never be considered exhausted due to skipped ranks
         example: 1
         value: [unlimited, 0..]
 

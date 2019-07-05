@@ -100,10 +100,13 @@ class StreamingCVRReader {
     // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
     this.firstVoteColumnIndex = source.getFirstVoteColumnIndex() - 1;
     this.firstVoteRowIndex = source.getFirstVoteRowIndex() - 1;
-    this.idColumnIndex = source.getIdColumnIndex() != null && !source.getIdColumnIndex().isBlank() ?
-        Integer.parseInt(source.getIdColumnIndex()) - 1 : null;
+    this.idColumnIndex =
+        source.getIdColumnIndex() != null && !source.getIdColumnIndex().isBlank()
+            ? Integer.parseInt(source.getIdColumnIndex()) - 1
+            : null;
     this.precinctColumnIndex =
-        config.isTabulateByPrecinctEnabled() ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
+        source.getPrecinctColumnIndex() != null && !source.getPrecinctColumnIndex().isBlank()
+            ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
             : null;
   }
 
@@ -194,7 +197,9 @@ class StreamingCVRReader {
     if (precinctColumnIndex != null) {
       if (currentPrecinct == null) {
         // group precincts with missing Ids here
-        Logger.log(Level.WARNING, "Precinct identifier not found for cast vote record: %s",
+        Logger.log(
+            Level.WARNING,
+            "Precinct identifier not found for cast vote record: %s",
             computedCastVoteRecordID);
         currentPrecinct = MISSING_PRECINCT_ID;
       }
@@ -203,8 +208,8 @@ class StreamingCVRReader {
 
     // look for missing Cvr Id
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
-      Logger.log(Level.SEVERE, "Cast vote record identifier not found for: %s",
-          computedCastVoteRecordID);
+      Logger.log(
+          Level.SEVERE, "Cast vote record identifier not found for: %s", computedCastVoteRecordID);
       encounteredDataErrors = true;
     }
 
@@ -276,7 +281,8 @@ class StreamingCVRReader {
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   void parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
-      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException, ParserConfigurationException, CvrDataFormatException {
+      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException,
+      ParserConfigurationException, CvrDataFormatException {
 
     // cache the cvr list so it is accessible in callbacks
     cvrList = castVoteRecords;
