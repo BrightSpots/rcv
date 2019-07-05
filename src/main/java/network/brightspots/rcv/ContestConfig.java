@@ -824,8 +824,9 @@ class ContestConfig {
     }
 
     if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      // If the random seed is null, validation will fail anyway, so let's not throw an exception
-      // here.
+      // It's not valid to have a null random seed with this tie-break mode; the validation will
+      // catch that and report a helpful error. Validation also hits this code path, though, so we
+      // need to prevent a NullPointerException here.
       if (getRandomSeed() != null) {
         Collections.shuffle(candidatePermutation, new Random(getRandomSeed()));
       }

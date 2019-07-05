@@ -746,6 +746,9 @@ public class GuiConfigController implements Initializable {
     choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
 
+    textFieldRandomSeed
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldRandomSeed));
     textFieldNumberOfWinners
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
