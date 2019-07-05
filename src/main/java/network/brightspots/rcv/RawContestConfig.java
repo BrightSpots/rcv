@@ -190,7 +190,7 @@ public class RawContestConfig {
     public String maxRankingsAllowed;
     public boolean sequentialMultiSeat;
     public boolean bottomsUpMultiSeat;
-    public boolean onlyOneWinnerPerRound;
+    public boolean allowOnlyOneWinnerPerRound;
     public boolean nonIntegerWinningThreshold;
     public boolean hareQuota;
     // are we using batch elimination?

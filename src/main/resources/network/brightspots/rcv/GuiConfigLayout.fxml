@@ -259,8 +259,8 @@
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Only One Winner per Round"
-                  fx:id="checkBoxOnlyOneWinnerPerRound">
+                <CheckBox mnemonicParsing="false" text="Allow Only One Winner per Round"
+                  fx:id="checkBoxAllowOnlyOneWinnerPerRound">
                   <VBox.margin>
                     <Insets top="4.0"/>
                   </VBox.margin>

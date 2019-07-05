@@ -42,7 +42,8 @@ import org.junit.jupiter.api.Test;
 class TabulatorTests {
 
   // folder where we store test inputs
-  private static final String TEST_ASSET_FOLDER = "src/test/resources/network/brightspots/rcv/test_data";
+  private static final String TEST_ASSET_FOLDER =
+      "src/test/resources/network/brightspots/rcv/test_data";
   // limit log output to avoid spam
   private static final Integer MAX_LOG_ERRORS = 10;
 
@@ -185,7 +186,7 @@ class TabulatorTests {
   // purpose: runs once at the beginning of testing to setup logging
   @BeforeAll
   static void setup() {
-      Logger.setup();
+    Logger.setup();
   }
 
   // function: invalidParamsTest
@@ -339,12 +340,12 @@ class TabulatorTests {
     runTabulationTest("2013_minneapolis_park_bottoms_up");
   }
 
-  // function: testOnlyOneWinnerPerRound
-  // purpose: tests onlyOneWinnerPerRound option
+  // function: testAllowOnlyOneWinnerPerRound
+  // purpose: tests allowOnlyOneWinnerPerRound option
   @Test
-  @DisplayName("test only one winner per round logic")
-  void testOnlyOneWinnerPerRound() {
-    runTabulationTest("test_set_only_one_winner_per_round");
+  @DisplayName("test allow only one winner per round logic")
+  void testAllowOnlyOneWinnerPerRound() {
+    runTabulationTest("test_set_allow_only_one_winner_per_round");
   }
 
   // function: precinctExample

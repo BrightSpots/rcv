@@ -479,7 +479,7 @@ class Tabulator {
     // Edge case: if we've identified multiple winners in this round but we're only supposed to
     // elect one winner per round, pick the top vote-getter and defer the others to subsequent
     // rounds.
-    if (config.isOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
+    if (config.isAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
       BigDecimal maxTally = BigDecimal.ZERO;
       String candidateWithMaxTally = null;
       for (String candidate : selectedWinners) {
