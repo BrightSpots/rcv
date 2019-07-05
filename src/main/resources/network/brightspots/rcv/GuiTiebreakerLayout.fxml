@@ -25,22 +25,21 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="300.0" prefWidth="300.0"
   xmlns="http://javafx.com/javafx/8.0.121"
   fx:controller="network.brightspots.rcv.GuiTiebreakerController">
-  <top>
-    <Label BorderPane.alignment="CENTER" text="Please select a candidate to eliminate:"/>
-  </top>
-  <center>
-    <ListView BorderPane.alignment="CENTER" fx:id="listViewCandidates"/>
-  </center>
   <bottom>
     <ButtonBar maxHeight="50.0" prefHeight="50.0">
       <buttons>
         <Button mnemonicParsing="false" onAction="#buttonCancelClicked" text="Cancel"/>
-        <Button mnemonicParsing="false" onAction="#buttonEliminateClicked"
-          text="Eliminate Candidate"/>
+        <Button mnemonicParsing="false" onAction="#buttonSelectClicked" fx:id="buttonSelect"/>
       </buttons>
       <padding>
         <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
       </padding>
     </ButtonBar>
   </bottom>
+  <center>
+    <ListView BorderPane.alignment="CENTER" fx:id="listViewCandidates"/>
+  </center>
+  <top>
+    <Label BorderPane.alignment="CENTER" fx:id="labelSelectionPrompt"/>
+  </top>
 </BorderPane>

@@ -21,13 +21,12 @@
 
 package network.brightspots.rcv;
 
-import static network.brightspots.rcv.Utils.isNullOrBlank;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,26 +64,30 @@ class TieBreak {
   // roundTallies: map from round number to map of candidate ID to vote total (for that round)
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
   private final Map<Integer, Map<String, BigDecimal>> roundTallies;
-  // candidate ID selected to lose the tiebreak
-  private String loser;
+  private boolean selectingAWinner;
+  // candidate ID selected to lose/win the tiebreak
+  private String selectedCandidate;
   // reason for the selection
   private String explanation;
 
   // function: TieBreak
-  // purpose: TieBreak constructor stores member data and selects the loser
+  // purpose: TieBreak constructor stores member data
+  // param: selectingAWinner whether we're determining a winner (as opposed to a loser)
   // param: tiedCandidates list of all candidate IDs tied at this vote total
-  // param: tieBreakMode rule to use for selecting the loser
+  // param: tieBreakMode rule to use for selecting the loser/winner
   // param: round in which this tie occurs
   // param: numVotes tally of votes for tying candidates
   // param: roundTallies map from round number to map of candidate ID to vote total (for that round)
   // return newly constructed TieBreak object
   TieBreak(
+      boolean selectingAWinner,
       List<String> tiedCandidates,
       Tabulator.TieBreakMode tieBreakMode,
       int round,
       BigDecimal numVotes,
       Map<Integer, Map<String, BigDecimal>> roundTallies,
       ArrayList<String> candidatePermutation) {
+    this.selectingAWinner = selectingAWinner;
     this.tiedCandidates = tiedCandidates;
     this.tieBreakMode = tieBreakMode;
     this.round = round;
@@ -97,15 +100,15 @@ class TieBreak {
     random = new Random(randomSeed);
   }
 
-  // function: nonLosingCandidateDescription
-  // purpose: generate a string listing candidate(s) not selected to lose this tiebreak
-  // return: string listing candidate(s) not selected to lose
-  String nonLosingCandidateDescription() {
+  // function: nonSelectedCandidateDescription
+  // purpose: generate a string listing candidate(s) not selected by this tiebreak
+  // return: string listing candidate(s) not selected
+  String nonSelectedCandidateDescription() {
     // options: container for non selected candidate IDs
     ArrayList<String> options = new ArrayList<>();
     // contestOptionId indexes over tied candidates
     for (String contestOptionId : tiedCandidates) {
-      if (!contestOptionId.equals(loser)) {
+      if (!contestOptionId.equals(selectedCandidate)) {
         options.add(contestOptionId);
       }
     }
@@ -135,61 +138,64 @@ class TieBreak {
 
   // function: breakTie
   // purpose: execute the tiebreak logic given the tiebreak rule in use
-  // returns: losing candidate
-  String selectLoser() throws TabulationCancelledException {
+  // returns: selected candidate
+  String selectCandidate() throws TabulationCancelledException {
     switch (tieBreakMode) {
       case INTERACTIVE:
-        loser = doInteractive();
+        doInteractive();
         break;
       case RANDOM:
-        loser = doRandom();
+        doRandom();
         break;
       case GENERATE_PERMUTATION:
       case USE_PERMUTATION_IN_CONFIG:
-        loser = doPermutationSelection();
+        doPermutationSelection();
         break;
       default:
-        // handle tiebreaks which involve previous round tallies
-        // loser: will be set if there is a previous round count loser
-        // it will be null if candidates were still tied at first round
-        String previousRoundsLoser = doPreviousRounds();
-        if (!isNullOrBlank(previousRoundsLoser)) {
-          loser = previousRoundsLoser;
-        } else if (tieBreakMode == Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
-          loser = doInteractive();
-        } else {
-          loser = doRandom();
+        // handle tiebreaks that involve previous round tallies
+        // selectedCandidate will be set if there is a previous round count winner/loser
+        // it will be null if candidates are still tied all the way back to the first round
+        doPreviousRounds();
+        if (selectedCandidate == null) {
+          if (tieBreakMode == Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
+            doInteractive();
+          } else {
+            doRandom();
+          }
         }
     }
-    return loser;
+    return selectedCandidate;
   }
 
   // function: doPermutationSelection
-  // purpose: select the loser based on the provided permutation order
-  // returns: selected loser
-  private String doPermutationSelection() {
-    // loser to return
-    String selectedCandidate = null;
+  // purpose: select the candidate based on the provided permutation order
+  private void doPermutationSelection() {
     // create a set to simplify matching logic
     Set<String> tiedCandidatesSet = new HashSet<>(tiedCandidates);
 
-    // start from end of list and look for a matching candidate
-    for (int i = candidatePermutation.size() - 1; i >= 0; i--) {
-      // the current candidate we're considering from the permutation
-      String candidate = candidatePermutation.get(i);
+    List<String> permutationToSearch = candidatePermutation;
+    if (!selectingAWinner) {
+      // If we're selecting a loser, we should search the list in reverse.
+      permutationToSearch = new ArrayList<>(candidatePermutation);
+      Collections.reverse(permutationToSearch);
+    }
+    // start from beginning of list and look for a matching candidate
+    for (int i = 0; i < permutationToSearch.size(); i++) {
+      String candidate = permutationToSearch.get(i);
       if (tiedCandidatesSet.contains(candidate)) {
         selectedCandidate = candidate;
         break;
       }
     }
-    explanation = "The losing candidate appeared latest in the tie-breaking permutation list.";
-    return selectedCandidate;
+    explanation =
+        "The selected candidate appeared "
+            + (selectingAWinner ? "earliest" : "latest")
+            + " in the tie-breaking permutation list.";
   }
 
   // function doInteractiveCli
-  // purpose: interactively select the loser of this tiebreak via the command-line interface
-  // return: candidateID of the selected loser
-  private String doInteractiveCli() throws TabulationCancelledException {
+  // purpose: interactively select the winner/loser of this tiebreak via the command-line interface
+  private void doInteractiveCli() throws TabulationCancelledException {
     System.out.println(
         String.format(
             "Tie in round %d for the following candidates, each of whom has %d vote(s): ",
@@ -200,13 +206,14 @@ class TieBreak {
     }
     final String CANCEL_COMMAND = "x";
     final String TIEBREAKER_PROMPT =
-        "Enter the number corresponding to the candidate who should lose this tiebreaker (or "
-            + CANCEL_COMMAND + " to cancel): ";
+        "Enter the number corresponding to the candidate who should "
+            + (selectingAWinner ? "win" : "lose")
+            + " this tiebreaker (or "
+            + CANCEL_COMMAND
+            + " to cancel): ";
     System.out.println(TIEBREAKER_PROMPT);
 
-    // the candidate selected to lose
-    String selectedCandidate = null;
-    while (isNullOrBlank(selectedCandidate)) {
+    while (selectedCandidate == null) {
       Scanner sc = new Scanner(System.in);
       String userInput = sc.nextLine();
       if (userInput.equals(CANCEL_COMMAND)) {
@@ -214,7 +221,7 @@ class TieBreak {
         throw new TabulationCancelledException();
       }
       try {
-        // user selected loser parsed to int
+        // user selected candidate parsed to int
         int choice = Integer.parseInt(userInput);
         if (choice >= 1 && choice <= tiedCandidates.size()) {
           // Convert from 1-indexed list back to 0-indexed list.
@@ -223,19 +230,16 @@ class TieBreak {
       } catch (NumberFormatException exception) {
         // if parseInt failed selectedCandidate will be null and we will retry
       }
-      if (isNullOrBlank(selectedCandidate)) {
+      if (selectedCandidate == null) {
         System.out.println("Invalid selection. Please try again.");
         System.out.println(TIEBREAKER_PROMPT);
       }
     }
-
-    return selectedCandidate;
   }
 
   // function doInteractiveGui
   // purpose: interactively select the loser of this tiebreak via the graphical user interface
-  // return: candidateID of the selected loser
-  private String doInteractiveGui() throws TabulationCancelledException {
+  private void doInteractiveGui() throws TabulationCancelledException {
     Logger.log(
         Level.INFO,
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
@@ -244,81 +248,80 @@ class TieBreak {
         String.join(", ", tiedCandidates));
     Logger.log(
         Level.INFO,
-        "Please use the pop-up window to select the candidate who should lose this tiebreaker.");
+        "Please use the pop-up window to select the candidate who should "
+            + (selectingAWinner ? "win" : "lose")
+            + " this tiebreaker.");
 
-    String selectedCandidate = null;
-    while (isNullOrBlank(selectedCandidate)) {
+    while (selectedCandidate == null) {
       try {
-        FutureTask<GuiTiebreakerPromptResponse> futureTask = new FutureTask<>(
-            new GuiTiebreakerPrompt());
+        FutureTask<GuiTiebreakerPromptResponse> futureTask =
+            new FutureTask<>(new GuiTiebreakerPrompt());
         Platform.runLater(futureTask);
         GuiTiebreakerPromptResponse guiTiebreakerPromptResponse = futureTask.get();
         if (guiTiebreakerPromptResponse.tabulationCancelled) {
           throw new TabulationCancelledException();
         } else {
-          selectedCandidate = guiTiebreakerPromptResponse.candidateToEliminate;
+          selectedCandidate = guiTiebreakerPromptResponse.selectedCandidate;
         }
       } catch (InterruptedException | ExecutionException exception) {
         Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
       }
-      if (isNullOrBlank(selectedCandidate)) {
+      if (selectedCandidate == null) {
         Logger.log(Level.WARNING, "Invalid selection! Please try again.");
       }
     }
-
-    return selectedCandidate;
   }
 
   // function doInteractive
-  // purpose: interactively select the loser of this tiebreak
-  // return: candidateID of the selected loser
-  private String doInteractive() throws TabulationCancelledException {
-    explanation = "The losing candidate was supplied by the operator.";
-    return GuiContext.getInstance().getConfig() != null ? doInteractiveGui() : doInteractiveCli();
+  // purpose: interactively select the winner/loser of this tiebreak
+  private void doInteractive() throws TabulationCancelledException {
+    explanation = "The selected candidate was supplied by the operator.";
+    if (GuiContext.getInstance().getConfig() != null) {
+      doInteractiveGui();
+    } else {
+      doInteractiveCli();
+    }
   }
 
   // function doRandom
-  // purpose: randomly select the loser for this tiebreak
-  // return: candidateID of the selected loser
-  private String doRandom() {
-    // random number used for random candidate ID loser
+  // purpose: randomly select the winner/loser for this tiebreak
+  private void doRandom() {
+    // random number used for random candidate selection
     double randomDouble = random.nextDouble();
     // index of randomly selected candidate
     int randomCandidateIndex = (int) Math.floor(randomDouble * (double) tiedCandidates.size());
-    explanation = "The loser was randomly selected.";
-    return tiedCandidates.get(randomCandidateIndex);
+    explanation = "The candidate was randomly selected.";
+    selectedCandidate = tiedCandidates.get(randomCandidateIndex);
   }
 
   // function doPreviousRounds
-  // purpose: select loser based on previous round tallies
-  // return: candidateID of the selected loser
-  private String doPreviousRounds() {
+  // purpose: select candidate based on previous round tallies
+  private void doPreviousRounds() {
     // stores candidates still in contention while we iterate through previous rounds to determine
-    // the loser
+    // the selection
     Set<String> candidatesInContention = new HashSet<>(tiedCandidates);
-    // the candidate selected to lose
-    String loser = null;
-    // round indexes from the previous round back to round 1
     for (int round = this.round - 1; round > 0; round--) {
       // map of tally to candidate IDs for round under consideration
       SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates =
           Tabulator.buildTallyToCandidates(roundTallies.get(round), candidatesInContention, false);
-      // lowest tally for this round
-      BigDecimal minVotes = tallyToCandidates.firstKey();
-      // candidates receiving the lowest tally
-      LinkedList<String> candidatesWithLowestTotal = tallyToCandidates.get(minVotes);
-      if (candidatesWithLowestTotal.size() == 1) {
-        loser = candidatesWithLowestTotal.getFirst();
+      BigDecimal voteTotalForSelection =
+          selectingAWinner ? tallyToCandidates.lastKey() : tallyToCandidates.firstKey();
+      LinkedList<String> candidatesWithVoteTotal = tallyToCandidates.get(voteTotalForSelection);
+      if (candidatesWithVoteTotal.size() == 1) {
+        selectedCandidate = candidatesWithVoteTotal.getFirst();
         explanation =
             String.format(
-                "%s had the fewest votes (%s) in round %d.", loser, minVotes.toString(), round);
+                "%s had the %s votes (%s) in round %d.",
+                selectedCandidate,
+                selectingAWinner ? "most" : "fewest",
+                voteTotalForSelection.toString(),
+                round);
         break;
       } else {
         // update candidatesInContention and check the previous round
-        candidatesInContention = new HashSet<>(candidatesWithLowestTotal);
+        candidatesInContention = new HashSet<>(candidatesWithVoteTotal);
       }
     }
-    return loser;
   }
 
   class GuiTiebreakerPrompt implements Callable<GuiTiebreakerPromptResponse> {
@@ -335,15 +338,17 @@ class TieBreak {
         Parent root = loader.load();
         GuiTiebreakerController controller = loader.getController();
         controller.populateTiedCandidates(tiedCandidates);
+        controller.populateText(selectingAWinner);
         window.setScene(new Scene(root));
         window.showAndWait();
-        guiTiebreakerPromptResponse = new GuiTiebreakerPromptResponse(
-            controller.getTabulationCancelled(), controller.getCandidateToEliminate());
+        guiTiebreakerPromptResponse =
+            new GuiTiebreakerPromptResponse(
+                controller.getTabulationCancelled(), controller.getSelectedCandidate());
       } catch (IOException exception) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
-        Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath,sw.toString());
+        Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw.toString());
       }
       return guiTiebreakerPromptResponse;
     }
@@ -352,11 +357,11 @@ class TieBreak {
   private class GuiTiebreakerPromptResponse {
 
     final boolean tabulationCancelled;
-    final String candidateToEliminate;
+    final String selectedCandidate;
 
-    GuiTiebreakerPromptResponse(boolean tabulationCancelled, String candidateToEliminate) {
+    GuiTiebreakerPromptResponse(boolean tabulationCancelled, String selectedCandidate) {
       this.tabulationCancelled = tabulationCancelled;
-      this.candidateToEliminate = candidateToEliminate;
+      this.selectedCandidate = selectedCandidate;
     }
   }
 }
