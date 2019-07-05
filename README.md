@@ -1,4 +1,4 @@
-# Ranked Choice Voting Universal Tabulator
+# Universal RCV Tabulator
 
 ## Dependencies
 
@@ -10,7 +10,7 @@ See the `dependencies` entry in the [Gradle build file](build.gradle). Gradle sh
 
 ## Overview
 
-The Universal Tabulator is a free, open-source application designed to quickly and accurately tabulate a wide variety of ranked choice voting elections. It allows users to:
+The Universal RCV Tabulator is a free, open-source application designed to quickly and accurately tabulate a wide variety of ranked choice voting (RCV) elections. It allows users to:
 - Create contest configuration files using a graphical user interface (GUI)
 - Validate contest configuration files to ensure they are well-formed, and all values are within expected ranges
 - Tabulate a contest
