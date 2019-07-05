@@ -33,7 +33,7 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode" : "interactive",
+    "tiebreakMode" : "usePermutationInConfig",
     "overvoteRule" : "alwaysSkipToNextRank",
     "numberOfWinners" : 3,
     "decimalPlacesForVoteArithmetic" : 4,
