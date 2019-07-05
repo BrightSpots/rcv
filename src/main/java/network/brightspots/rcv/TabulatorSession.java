@@ -111,7 +111,7 @@ class TabulatorSession {
         Logger.log(Level.INFO, "Begin config file contents:");
         BufferedReader reader = new BufferedReader(new FileReader(configPath));
         String line = reader.readLine();
-        while(line != null) {
+        while (line != null) {
           Logger.log(Level.INFO, line);
           line = reader.readLine();
         }
@@ -127,7 +127,7 @@ class TabulatorSession {
         // temporarily set config to single-seat so we can run sequential elections
         config.setNumberOfWinners(1);
         while (config.getSequentialWinners().size() < numWinners) {
-          Logger.log(Level.INFO, "Beginning sequence: %d...",
+          Logger.log(Level.INFO, "Beginning tabulation for seat #%d...",
               config.getSequentialWinners().size() + 1);
           // Read cast vote records and precinct IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
@@ -140,9 +140,9 @@ class TabulatorSession {
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
-          Logger.log(Level.INFO, "Sequence: %d complete.", config.getSequentialWinners().size());
+          Logger.log(Level.INFO, "Tabulation for seat #%d complete.", config.getSequentialWinners().size());
           if (config.getSequentialWinners().size() < numWinners) {
-            Logger.log(Level.INFO, "Excluding %s from the next sequence.", newWinner);
+            Logger.log(Level.INFO, "Excluding %s from the remaining tabulations.", newWinner);
           }
         }
         // revert config to original state
