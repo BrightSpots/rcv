@@ -15,6 +15,7 @@
   "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "random",
+    "randomSeed" : 0,
     "overvoteRule" : "alwaysSkipToNextRank",
     "numberOfWinners" : 1,
     "decimalPlacesForVoteArithmetic" : 1,
