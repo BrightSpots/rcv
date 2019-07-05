@@ -244,8 +244,6 @@ public class GuiConfigController implements Initializable {
     FileUtils.setUserDirectory(fileToSave.getParent());
     // create a rawConfig object from GUI content and serialize it as json
     JsonParser.writeToFile(fileToSave, createRawContestConfig());
-    // Reload to keep GUI fields updated in case invalid values are replaced during save process
-    loadFile(fileToSave, true);
   }
 
   public void buttonSaveClicked() {
@@ -767,7 +765,12 @@ public class GuiConfigController implements Initializable {
   private void loadConfig(ContestConfig config) {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
-
+    if (config.rawConfig.tabulatorVersion != Main.APP_VERSION) {
+      // future version migration logic goes here
+      Logger.log(Level.INFO, "Updating config tabulatorVersion from %s to %s.",
+        config.rawConfig.tabulatorVersion, Main.APP_VERSION);
+      config.rawConfig.tabulatorVersion = Main.APP_VERSION;
+    }
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
@@ -840,7 +843,7 @@ public class GuiConfigController implements Initializable {
 
   private RawContestConfig createRawContestConfig() {
     RawContestConfig config = new RawContestConfig();
-
+    config.tabulatorVersion = Main.APP_VERSION;
     OutputSettings outputSettings = new OutputSettings();
     outputSettings.contestName = getTextOrEmptyString(textFieldContestName);
     outputSettings.outputDirectory = getTextOrEmptyString(textFieldOutputDirectory);

@@ -31,6 +31,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
 
+  // tabulator version which created this file
+  public String tabulatorVersion;
   // output settings object
   public OutputSettings outputSettings;
   // list of all cast vote record source files
