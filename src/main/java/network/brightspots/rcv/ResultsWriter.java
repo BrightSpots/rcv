@@ -24,6 +24,7 @@
 package network.brightspots.rcv;
 
 import static java.util.Map.entry;
+import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,10 +86,14 @@ class ResultsWriter {
   private Map<Integer, BigDecimal> roundToResidualSurplus;
   private int numBallots;
 
+  // visible for testing
+  @SuppressWarnings("WeakerAccess")
   static String sequentialSuffixForOutputPath(Integer sequentialTabulationNumber) {
     return sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
   }
 
+  // visible for testing
+  @SuppressWarnings("WeakerAccess")
   static String getOutputFilePath(
       String outputDirectory,
       String outputType,
@@ -388,7 +393,7 @@ class ResultsWriter {
     csvPrinter.println();
 
     // actions don't make sense in individual precinct results
-    if (precinct == null || precinct.isEmpty()) {
+    if (isNullOrBlank(precinct)) {
       addActionRows(csvPrinter);
     }
 
@@ -525,7 +530,7 @@ class ResultsWriter {
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
 
     csvPrinter.printRecord("Threshold", winningThreshold.toString());
-    if (precinct != null && !precinct.isEmpty()) {
+    if (!isNullOrBlank(precinct)) {
       csvPrinter.printRecord("Precinct", precinct);
     }
     csvPrinter.println();
@@ -825,7 +830,7 @@ class ResultsWriter {
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
     configData.put("threshold", winningThreshold);
-    if (precinct != null && !precinct.isEmpty()) {
+    if (!isNullOrBlank(precinct)) {
       configData.put("precinct", precinct);
     }
     // results will be a list of round data objects
@@ -837,7 +842,7 @@ class ResultsWriter {
       // add round number (this is implied by the ordering but for debugging we are explicit)
       roundData.put("round", round);
       // add actions if this is not a precinct summary
-      if (precinct == null || precinct.isEmpty()) {
+      if (isNullOrBlank(precinct)) {
         // actions is a list of one or more action objects
         ArrayList<Object> actions = new ArrayList<>();
         addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);

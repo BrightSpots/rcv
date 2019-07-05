@@ -53,6 +53,7 @@ class JsonParser {
             Level.SEVERE,
             "Error parsing JSON file: %s\n%s\n"
                 + "Check file formatting and values and make sure they are correct!\n"
+                + "It might help to try surrounding values causing problems with quotes (e.g. \"value\").\n"
                 + "See config_file_documentation.txt for more details.",
             jsonFilePath,
             exception.toString());

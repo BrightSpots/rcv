@@ -21,6 +21,8 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import java.io.File;
 import java.util.logging.Level;
 
@@ -44,7 +46,7 @@ class FileUtils {
   }
 
   static void createOutputDirectory(String dir) throws UnableToCreateDirectoryException {
-    if (dir != null && !dir.isEmpty()) {
+    if (!isNullOrBlank(dir)) {
       // dirFile is the File object for dir
       File dirFile = new File(dir);
       if (!dirFile.exists() && !dirFile.mkdirs()) {

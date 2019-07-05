@@ -26,7 +26,6 @@ package network.brightspots.rcv;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
-import java.util.logging.Level;
 
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -45,37 +44,6 @@ public class RawContestConfig {
   // purpose: create a new RawContestConfig object
   // returns: the newly created RawContestConfig object
   RawContestConfig() {
-  }
-
-  // function: validate
-  // purpose: perform some basic validation checks
-  // returns: true if checks pass otherwise false
-  public boolean validate() {
-    boolean isValid = true;
-    if (outputSettings == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"outputSettings\" field specified!");
-    }
-    if (cvrFileSources == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"cvrFileSources\" field specified!");
-    } else {
-      for (CVRSource source : cvrFileSources) {
-        if (source.getFilePath() == null) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "No file specified for CVR Source");
-        }
-      }
-    }
-    if (candidates == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"candidates\" field specified!");
-    }
-    if (rules == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"rules\" field specified!");
-    }
-    return isValid;
   }
 
   // OutputSettings: encapsulates the output settings
@@ -109,9 +77,9 @@ public class RawContestConfig {
     // 1-indexed row where first CVR appears
     private Integer firstVoteRowIndex;
     // 1-indexed column containing CVR ID (if any)
-    private Integer idColumnIndex;
+    private String idColumnIndex;
     // 1-indexed column containing precinct (if any)
-    private Integer precinctColumnIndex;
+    private String precinctColumnIndex;
     // provider for this source e.g. "ES&S"
     private String provider;
 
@@ -141,19 +109,19 @@ public class RawContestConfig {
       this.firstVoteRowIndex = firstVoteRowIndex;
     }
 
-    public Integer getIdColumnIndex() {
+    public String getIdColumnIndex() {
       return idColumnIndex;
     }
 
-    public void setIdColumnIndex(Integer idColumnIndex) {
+    public void setIdColumnIndex(String idColumnIndex) {
       this.idColumnIndex = idColumnIndex;
     }
 
-    public Integer getPrecinctColumnIndex() {
+    public String getPrecinctColumnIndex() {
       return precinctColumnIndex;
     }
 
-    public void setPrecinctColumnIndex(Integer precinctColumnIndex) {
+    public void setPrecinctColumnIndex(String precinctColumnIndex) {
       this.precinctColumnIndex = precinctColumnIndex;
     }
 
@@ -163,10 +131,6 @@ public class RawContestConfig {
 
     public void setProvider(String provider) {
       this.provider = provider;
-    }
-
-    public boolean isCdf() {
-      return (provider != null && provider.toUpperCase().equals("CDF"));
     }
   }
 
@@ -220,9 +184,9 @@ public class RawContestConfig {
     // minimum votes needed to continue
     public Integer minimumVoteThreshold;
     // max number of skipped rankings allowed
-    public Integer maxSkippedRanksAllowed;
+    public String maxSkippedRanksAllowed;
     // max rankings allowed
-    public Integer maxRankingsAllowed;
+    public String maxRankingsAllowed;
     public boolean sequentialMultiSeat;
     public boolean bottomsUpMultiSeat;
     public boolean nonIntegerWinningThreshold;

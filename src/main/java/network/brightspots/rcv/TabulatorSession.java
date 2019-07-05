@@ -29,6 +29,8 @@
 
 package network.brightspots.rcv;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -54,8 +56,8 @@ class TabulatorSession {
   private final String configPath;
   // precinct IDs discovered during CVR parsing to support testing
   private final Set<String> precinctIDs = new HashSet<>();
-  // Visible for testing: cache output path location
-  String outputPath;
+  // cache output path location
+  private String outputPath;
   private final String timestampString;
 
   // function: TabulatorSession
@@ -67,6 +69,14 @@ class TabulatorSession {
     timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
+  // Visible for testing
+  @SuppressWarnings("unused")
+  String getOutputPath() {
+    return outputPath;
+  }
+
+  // Visible for testing
+  @SuppressWarnings("unused")
   String getTimestampString() {
     return timestampString;
   }
@@ -105,11 +115,28 @@ class TabulatorSession {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate() && setUpLogging(config)) {
+      try {
+        Logger.log(Level.INFO, "Begin config file contents:");
+        BufferedReader reader = new BufferedReader(new FileReader(configPath));
+        String line = reader.readLine();
+        while (line != null) {
+          Logger.log(Level.INFO, line);
+          line = reader.readLine();
+        }
+        Logger.log(Level.INFO, "End config file contents.");
+        reader.close();
+      } catch (IOException e) {
+        Logger.log(Level.SEVERE, "Error logging config file: %s\n", configPath, e.toString());
+      }
+      Logger.log(Level.INFO, "Tabulating \'%s\'...", config.getContestName());
       if (config.isSequentialMultiSeatEnabled()) {
+        Logger.log(Level.INFO, "This is a sequential multi-seat contest.");
         int numWinners = config.getNumberOfWinners();
         // temporarily set config to single-seat so we can run sequential elections
         config.setNumberOfWinners(1);
         while (config.getSequentialWinners().size() < numWinners) {
+          Logger.log(Level.INFO, "Beginning tabulation for seat #%d...",
+              config.getSequentialWinners().size() + 1);
           // Read cast vote records and precinct IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
           if (castVoteRecords == null) {
@@ -121,6 +148,10 @@ class TabulatorSession {
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
+          Logger.log(Level.INFO, "Tabulation for seat #%d complete.", config.getSequentialWinners().size());
+          if (config.getSequentialWinners().size() < numWinners) {
+            Logger.log(Level.INFO, "Excluding %s from the remaining tabulations.", newWinner);
+          }
         }
         // revert config to original state
         config.setNumberOfWinners(numWinners);
@@ -137,6 +168,7 @@ class TabulatorSession {
           runTabulationForConfig(config, castVoteRecords);
         }
       }
+      Logger.log(Level.INFO, "Tabulation session complete.  Results written to: %s", outputPath);
       Logger.removeTabulationFileLogging();
     }
   }
@@ -171,7 +203,6 @@ class TabulatorSession {
   // returns: set of winners from tabulation
   private Set<String> runTabulationForConfig(ContestConfig config,
       List<CastVoteRecord> castVoteRecords) throws TabulationCancelledException {
-    Logger.log(Level.INFO, "Beginning tabulation for config: %s", configPath);
     Set<String> winners;
     // tabulator for tabulation logic
     Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIDs);
@@ -183,7 +214,6 @@ class TabulatorSession {
     } catch (IOException e) {
       Logger.log(Level.SEVERE, "Error writing summary files:\n%s", e.toString());
     }
-    Logger.log(Level.INFO, "Tabulation session completed. Results written to: %s", outputPath);
     return winners;
   }
 
@@ -208,7 +238,7 @@ class TabulatorSession {
 
       Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       try {
-        if (source.isCdf()) {
+        if (ContestConfig.isCdf(source)) {
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
           reader.parseCVRFile(castVoteRecords);
         } else {

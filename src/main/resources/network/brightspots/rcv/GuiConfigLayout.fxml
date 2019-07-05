@@ -168,7 +168,7 @@
                   <TableColumn minWidth="20.0" onEditCommit="#changeCvrIdColIndex"
                     prefWidth="70.0" text="ID&#10;Column&#10;Index"
                     fx:id="tableColumnCvrIdCol"/>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrPrecinctCol"
+                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrPrecinctColIndex"
                     prefWidth="70.0" text="Precinct&#10;Column&#10;Index"
                     fx:id="tableColumnCvrPrecinctCol"/>
                   <TableColumn minWidth="20.0" onEditCommit="#changeCvrProvider"
@@ -230,10 +230,10 @@
                 <Label text="Minimum Vote Threshold *"/>
                 <TextField maxWidth="220.0" promptText="Minimum Vote Threshold"
                   fx:id="textFieldMinimumVoteThreshold"/>
-                <Label text="Max Skipped Ranks Allowed"/>
+                <Label text="Max Skipped Ranks Allowed *"/>
                 <TextField maxWidth="220.0" promptText="Max Skipped Ranks Allowed"
                   fx:id="textFieldMaxSkippedRanksAllowed"/>
-                <Label text="Max Rankings Allowed"/>
+                <Label text="Max Rankings Allowed *"/>
                 <TextField maxWidth="220.0" promptText="Max Rankings Allowed"
                   fx:id="textFieldMaxRankingsAllowed"/>
                 <padding>
