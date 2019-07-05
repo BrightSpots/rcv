@@ -181,6 +181,7 @@ class ContestConfig {
   boolean validate() {
     Logger.log(Level.INFO, "Validating contest config...");
     isValid = true;
+    validateTabulatorVersion();
     validateOutputSettings();
     validateCvrFileSources();
     validateCandidates();
@@ -215,6 +216,21 @@ class ContestConfig {
     } catch (NumberFormatException e) {
       isValid = false;
       Logger.log(Level.SEVERE, "%s must be an integer if supplied: %s", inputName, inputLocation);
+    }
+  }
+
+  // version validation and migration logic goes here
+  // e.g. unsupported versions would fail or be migrated
+  // in this release we support only the current app version
+  private void validateTabulatorVersion() {
+    if (isNullOrBlank(getTabulatorVersion())) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "Tabulator version is required!");
+    } else {
+      if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "Tabulator version %s not supported!", getTabulatorVersion());
+      }
     }
   }
 
@@ -565,6 +581,10 @@ class ContestConfig {
   // returns: whether to keep tabulating until two candidates remain
   boolean willContinueUntilTwoCandidatesRemain() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
+  }
+
+  String getTabulatorVersion() {
+    return rawConfig.tabulatorVersion;
   }
 
   // function: getContestName

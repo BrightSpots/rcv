@@ -771,8 +771,8 @@ public class GuiConfigController implements Initializable {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
     if (config.rawConfig.tabulatorVersion != Main.APP_VERSION) {
-      // future version migration logic goes here
-      Logger.log(Level.INFO, "Updating config tabulatorVersion from %s to %s.",
+      // version migration logic goes here
+      Logger.log(Level.INFO, "Updating tabulator version from %s to %s.",
         config.rawConfig.tabulatorVersion, Main.APP_VERSION);
       config.rawConfig.tabulatorVersion = Main.APP_VERSION;
     }
