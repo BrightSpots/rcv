@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -20,6 +20,8 @@
  */
 
 package network.brightspots.rcv;
+
+import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,9 +102,11 @@ class StreamingCVRReader {
     // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
     this.firstVoteColumnIndex = source.getFirstVoteColumnIndex() - 1;
     this.firstVoteRowIndex = source.getFirstVoteRowIndex() - 1;
-    this.idColumnIndex = source.getIdColumnIndex() != null ? source.getIdColumnIndex() - 1 : null;
-    this.precinctColumnIndex =
-        source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex() - 1 : null;
+    this.idColumnIndex =
+        !isNullOrBlank(source.getIdColumnIndex()) ? Integer.parseInt(source.getIdColumnIndex()) - 1
+            : null;
+    this.precinctColumnIndex = !isNullOrBlank(source.getPrecinctColumnIndex()) ?
+        Integer.parseInt(source.getPrecinctColumnIndex()) - 1 : null;
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -192,7 +196,9 @@ class StreamingCVRReader {
     if (precinctColumnIndex != null) {
       if (currentPrecinct == null) {
         // group precincts with missing Ids here
-        Logger.log(Level.WARNING, "Precinct identifier not found for cast vote record: %s",
+        Logger.log(
+            Level.WARNING,
+            "Precinct identifier not found for cast vote record: %s",
             computedCastVoteRecordID);
         currentPrecinct = MISSING_PRECINCT_ID;
       }
@@ -201,8 +207,8 @@ class StreamingCVRReader {
 
     // look for missing Cvr Id
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
-      Logger.log(Level.SEVERE, "Cast vote record identifier not found for: %s",
-          computedCastVoteRecordID);
+      Logger.log(
+          Level.SEVERE, "Cast vote record identifier not found for: %s", computedCastVoteRecordID);
       encounteredDataErrors = true;
     }
 
@@ -274,7 +280,8 @@ class StreamingCVRReader {
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   void parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
-      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException, ParserConfigurationException, CvrDataFormatException {
+      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException,
+      ParserConfigurationException, CvrDataFormatException {
 
     // cache the cvr list so it is accessible in callbacks
     cvrList = castVoteRecords;

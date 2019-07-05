@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -24,6 +24,7 @@
 package network.brightspots.rcv;
 
 import static java.util.Map.entry;
+import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -392,7 +393,7 @@ class ResultsWriter {
     csvPrinter.println();
 
     // actions don't make sense in individual precinct results
-    if (precinct == null || precinct.isBlank()) {
+    if (isNullOrBlank(precinct)) {
       addActionRows(csvPrinter);
     }
 
@@ -529,7 +530,7 @@ class ResultsWriter {
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
 
     csvPrinter.printRecord("Threshold", winningThreshold.toString());
-    if (precinct != null && !precinct.isBlank()) {
+    if (!isNullOrBlank(precinct)) {
       csvPrinter.printRecord("Precinct", precinct);
     }
     csvPrinter.println();
@@ -604,7 +605,7 @@ class ResultsWriter {
             Map.ofEntries(
                 entry("@id", CDF_REPORTING_DEVICE_ID),
                 entry("@type", "CVR.ReportingDevice"),
-                entry("Application", "RCVRC Tabulator"),
+                entry("Application", Main.APP_NAME),
                 entry("Manufacturer", "Bright Spots"))
         });
     outputJson.put("Version", "1.0.0");
@@ -829,7 +830,7 @@ class ResultsWriter {
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
     configData.put("threshold", winningThreshold);
-    if (precinct != null && !precinct.isBlank()) {
+    if (!isNullOrBlank(precinct)) {
       configData.put("precinct", precinct);
     }
     // results will be a list of round data objects
@@ -841,7 +842,7 @@ class ResultsWriter {
       // add round number (this is implied by the ordering but for debugging we are explicit)
       roundData.put("round", round);
       // add actions if this is not a precinct summary
-      if (precinct == null || precinct.isBlank()) {
+      if (isNullOrBlank(precinct)) {
         // actions is a list of one or more action objects
         ArrayList<Object> actions = new ArrayList<>();
         addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);

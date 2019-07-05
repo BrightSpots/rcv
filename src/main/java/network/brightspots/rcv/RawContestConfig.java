@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -79,9 +79,9 @@ public class RawContestConfig {
     // 1-indexed row where first CVR appears
     private Integer firstVoteRowIndex;
     // 1-indexed column containing CVR ID (if any)
-    private Integer idColumnIndex;
+    private String idColumnIndex;
     // 1-indexed column containing precinct (if any)
-    private Integer precinctColumnIndex;
+    private String precinctColumnIndex;
     // provider for this source e.g. "ES&S"
     private String provider;
 
@@ -111,19 +111,19 @@ public class RawContestConfig {
       this.firstVoteRowIndex = firstVoteRowIndex;
     }
 
-    public Integer getIdColumnIndex() {
+    public String getIdColumnIndex() {
       return idColumnIndex;
     }
 
-    public void setIdColumnIndex(Integer idColumnIndex) {
+    public void setIdColumnIndex(String idColumnIndex) {
       this.idColumnIndex = idColumnIndex;
     }
 
-    public Integer getPrecinctColumnIndex() {
+    public String getPrecinctColumnIndex() {
       return precinctColumnIndex;
     }
 
-    public void setPrecinctColumnIndex(Integer precinctColumnIndex) {
+    public void setPrecinctColumnIndex(String precinctColumnIndex) {
       this.precinctColumnIndex = precinctColumnIndex;
     }
 

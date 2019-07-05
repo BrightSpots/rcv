@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Ranked Choice Voting Universal Tabulator
+  ~ Universal RCV Tabulator
   ~ Copyright (c) 2017-2019 Bright Spots Developers.
   ~
   ~ This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -168,7 +168,7 @@
                   <TableColumn minWidth="20.0" onEditCommit="#changeCvrIdColIndex"
                     prefWidth="70.0" text="ID&#10;Column&#10;Index"
                     fx:id="tableColumnCvrIdCol"/>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrPrecinctCol"
+                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrPrecinctColIndex"
                     prefWidth="70.0" text="Precinct&#10;Column&#10;Index"
                     fx:id="tableColumnCvrPrecinctCol"/>
                   <TableColumn minWidth="20.0" onEditCommit="#changeCvrProvider"

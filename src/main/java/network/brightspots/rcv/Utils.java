@@ -16,37 +16,9 @@
 
 package network.brightspots.rcv;
 
-import javafx.stage.Stage;
+class Utils {
 
-class GuiContext {
-
-  // context instance
-  private static final GuiContext INSTANCE = new GuiContext();
-  // currently-loaded tabulator config
-  private ContestConfig config;
-  // cache for main window so we can parent file choosers to it
-  private Stage mainWindow;
-
-  private GuiContext() {
-  }
-
-  static GuiContext getInstance() {
-    return INSTANCE;
-  }
-
-  ContestConfig getConfig() {
-    return config;
-  }
-
-  void setConfig(ContestConfig config) {
-    this.config = config;
-  }
-
-  Stage getMainWindow() {
-    return mainWindow;
-  }
-
-  void setMainWindow(Stage mainWindow) {
-    this.mainWindow = mainWindow;
+  static boolean isNullOrBlank(String s) {
+    return s == null || s.isBlank();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -30,7 +30,7 @@ import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
-  public static final String APP_NAME = "RCVRC Universal Tabulator";
+  public static final String APP_NAME = "Universal RCV Tabulator";
   public static final String APP_VERSION = "0.1.0";
 
   // function: main

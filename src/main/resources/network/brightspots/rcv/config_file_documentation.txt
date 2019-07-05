@@ -23,21 +23,18 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         used for visualizer output only (not used in tabulation)
         example: "2015-11-03"
         value: text string of length [1..1000]
-        if not supplied: none
 
       "contestJurisdiction" optional
         text description of the jurisdiction of this contest
         used for visualizer output only (not used in tabulation)
         example: "Portland, ME"
         value: text string of length [1..1000]
-        if not supplied: none
 
       "contestOffice" optional
         text description of the office being contested
         used for visualizer output only (not used in tabulation)
         example: "Mayor"
         value: text string of length [1..1000]
-        if not supplied: none
 
       "tabulateByPrecinct" optional
         tabulator will generate a results spreadsheet for each precinct
@@ -72,19 +69,16 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         index of the column (starting from 1) that contains the unique ID for each CVR
         example: 1
         value: [1..1000]
-        if not supplied: none
 
-      "precinctColumnIndex" required when "tabulateByPrecinct" is enabled unless source is JSON
+      "precinctColumnIndex" required when "tabulateByPrecinct" is enabled
         index of the column (starting from 1) that contains the precinct name for each CVR
         example: 2
         value: [1..1000]
-        if not supplied: none
 
       "provider" optional
         text description of the vendor / machine which generated this file -- not used by the tabulator
         example: "ES&S"
         value: text string of length [1..1000]
-        if not supplied: none
 
   "candidates" required
     list of registered candidate names and associated candidate code (note: leave empty when CVR is in Common Data Format)
@@ -99,7 +93,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
       candidate code which may appear in CVRs in lieu of full candidate name
       example: "JCD"
       value: string of length [1..1000]
-      if not supplied: none
 
     "excluded" optional
       candidate should be ignored during tabulation
@@ -133,7 +126,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         value: [0..1000000]
 
       "maxSkippedRanksAllowed" required
-        maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted; if "unlimited" is entered, a ballot will never be considered exhausted
+        maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted; if "unlimited" is entered, a ballot will never be considered exhausted due to skipped ranks
         example: 1
         value: [unlimited, 0..]
 
@@ -193,22 +186,18 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately" (because the other option, exhaustIfMultipleContinuing, relies on knowing which specific candidates were involved in each overvote)
         example: "OVERVOTE"
         value: string of length [1..1000]
-        if not supplied: none
 
       "undervoteLabel" optional
         the special label used in the cast vote records to denote an undervote
         example: "UNDERVOTE"
         value: string of length [1..1000]
-        if not supplied: none
 
       "undeclaredWriteInLabel" optional
         the special label used in the cast vote records to denote a vote for an undeclared write-in
         example: "UWI"
         value: string of length [1..1000]
-        if not supplied: none
 
       "rulesDescription" optional
         text description of this rules configuration for organizing your config files -- not used by the tabulator
         Example "Maine Rules"
         value: string of length [1..1000]
-        if not supplied: none

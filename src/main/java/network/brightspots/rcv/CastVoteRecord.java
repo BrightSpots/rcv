@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -21,6 +21,8 @@
  */
 
 package network.brightspots.rcv;
+
+import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -95,7 +97,7 @@ class CastVoteRecord {
     StringBuilder logStringBuilder = new StringBuilder();
     // add round and ID
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (suppliedID != null && !suppliedID.isBlank()) {
+    if (!isNullOrBlank(suppliedID)) {
       logStringBuilder.append(suppliedID);
     } else {
       logStringBuilder.append(computedID);
