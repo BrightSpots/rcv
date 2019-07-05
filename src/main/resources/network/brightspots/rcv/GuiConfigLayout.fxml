@@ -35,11 +35,11 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-  prefHeight="800.0" prefWidth="900.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
+  prefHeight="810.0" prefWidth="900.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
   xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="network.brightspots.rcv.GuiConfigController">
   <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    prefHeight="800.0" prefWidth="900.0">
+    prefHeight="810.0" prefWidth="900.0">
     <top>
       <VBox BorderPane.alignment="TOP_LEFT">
         <ButtonBar maxHeight="50.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0"
@@ -239,9 +239,6 @@
                 <Label text="Max Rankings Allowed *"/>
                 <TextField maxWidth="220.0" promptText="Max Rankings Allowed"
                   fx:id="textFieldMaxRankingsAllowed"/>
-                <Label text="Rules Description"/>
-                <TextField maxWidth="220.0" promptText="Rules Description"
-                  fx:id="textFieldRulesDescription"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
@@ -310,6 +307,9 @@
                 <Label text="Undeclared Write-in Label"/>
                 <TextField maxWidth="220.0" promptText="Undeclared Write-in Label"
                   fx:id="textFieldUndeclaredWriteInLabel"/>
+                <Label text="Rules Description"/>
+                <TextField maxWidth="220.0" promptText="Rules Description"
+                  fx:id="textFieldRulesDescription"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
