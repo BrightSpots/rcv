@@ -111,6 +111,11 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         how the program should handle an overvote when it encounters one
         value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
 
+      "randomSeed" required when tiebreakMode is random, previousRoundCountsThenRandom, or generatePermutation
+        the integer seed for the application's pseudorandom number generator
+        value: [0..2147483647]
+        if not supplied: null
+
       "numberOfWinners" required
         the number of seats to be won in this contest
         note: we use fractional vote transfer to redistribute votes in multi-seat contests
@@ -128,12 +133,12 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
       "maxSkippedRanksAllowed" required
         maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted; if "unlimited" is entered, a ballot will never be considered exhausted due to skipped ranks
         example: 1
-        value: [unlimited, 0..]
+        value: [unlimited, 0..2147483647]
 
       "maxRankingsAllowed" required
         maximum number of candidates that a ballot is allowed to rank; if "max" is entered, this will default to the total number of declared candidates
         example: 15
-        values: [max, 1..]
+        values: [max, 1..2147483647]
 
       "sequentialMultiSeat" optional
         instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats

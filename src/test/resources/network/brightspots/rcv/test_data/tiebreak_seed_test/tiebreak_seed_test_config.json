@@ -1,0 +1,49 @@
+{
+  "outputSettings" : {
+    "contestName" : "Tiebreak test",
+    "outputDirectory" : "output",
+    "contestDate" : "2017-12-03",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Sergeant-at-Arms",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "tiebreak_seed_test_cvr.xlsx",
+    "firstVoteColumnIndex" : 2,
+    "firstVoteRowIndex" : 2,
+    "idColumnIndex" : 1,
+    "provider" : "ES&S"
+  } ],
+  "candidates" : [ {
+    "name" : "Mookie Blaylock",
+    "excluded" : false
+  }, {
+    "name" : "Yinka Dare",
+    "excluded" : false
+  }, {
+    "name" : "George Gervin",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "randomSeed" : 1,
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "numberOfWinners" : 1,
+    "decimalPlacesForVoteArithmetic" : 4,
+    "minimumVoteThreshold" : 0,
+    "maxSkippedRanksAllowed" : 0,
+    "maxRankingsAllowed" : 3,
+    "sequentialMultiSeat" : false,
+    "bottomsUpMultiSeat" : false,
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "rulesDescription" : "Doyle Rules"
+  }
+}

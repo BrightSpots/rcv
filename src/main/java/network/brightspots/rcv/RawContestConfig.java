@@ -177,6 +177,7 @@ public class RawContestConfig {
     public String tiebreakMode;
     // which overvote rule to use
     public String overvoteRule;
+    public Integer randomSeed;
     // setting for number of winners
     public Integer numberOfWinners;
     // how far to round vote values when performing arithmetic

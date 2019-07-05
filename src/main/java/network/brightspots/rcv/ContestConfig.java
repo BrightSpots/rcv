@@ -35,10 +35,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
+import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 
 class ContestConfig {
@@ -53,6 +55,7 @@ class ContestConfig {
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
   private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
+  private static final int MIN_RANDOM_SEED = 0;
   private static final String CDF_PROVIDER = "CDF";
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
@@ -364,12 +367,21 @@ class ContestConfig {
   }
 
   private void validateRules() {
-    if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
+    if (getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
       Logger.log(Level.SEVERE, "Invalid tie-break mode!");
     }
 
-    if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
+    if ((getTiebreakMode() == TieBreakMode.RANDOM ||
+        getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM ||
+        getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) &&
+        getRandomSeed() == null) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "When tiebreakMode involves a random element, randomSeed must be "
+          + "supplied.");
+    }
+
+    if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
       Logger.log(Level.SEVERE, "Invalid overvote rule!");
     } else if (!isNullOrBlank(getOvervoteLabel())
@@ -482,6 +494,11 @@ class ContestConfig {
         isValid = false;
         Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a bottoms-up contest!");
       }
+    }
+
+    if (getRandomSeed() != null && getRandomSeed() < MIN_RANDOM_SEED) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "randomSeed can't be less than %d!", MIN_RANDOM_SEED);
     }
   }
 
@@ -667,9 +684,9 @@ class ContestConfig {
   // function: getOvervoteRule
   // purpose: return overvote rule enum to use
   // returns: overvote rule to use for this config
-  Tabulator.OvervoteRule getOvervoteRule() {
-    Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.getByLabel(rawConfig.rules.overvoteRule);
-    return rule == null ? Tabulator.OvervoteRule.RULE_UNKNOWN : rule;
+  OvervoteRule getOvervoteRule() {
+    OvervoteRule rule = OvervoteRule.getByLabel(rawConfig.rules.overvoteRule);
+    return rule == null ? OvervoteRule.RULE_UNKNOWN : rule;
   }
 
   // function: getMinimumVoteThreshold
@@ -715,9 +732,13 @@ class ContestConfig {
   // function: getTiebreakMode
   // purpose: return tiebreak mode to use
   // returns: tiebreak mode to use for this config
-  Tabulator.TieBreakMode getTiebreakMode() {
-    Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.getByLabel(rawConfig.rules.tiebreakMode);
-    return mode == null ? Tabulator.TieBreakMode.MODE_UNKNOWN : mode;
+  TieBreakMode getTiebreakMode() {
+    TieBreakMode mode = TieBreakMode.getByLabel(rawConfig.rules.tiebreakMode);
+    return mode == null ? TieBreakMode.MODE_UNKNOWN : mode;
+  }
+
+  Integer getRandomSeed() {
+    return rawConfig.rules.randomSeed;
   }
 
   // function: isTreatBlankAsUndeclaredWriteInEnabled
@@ -803,7 +824,12 @@ class ContestConfig {
     }
 
     if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      Collections.shuffle(candidatePermutation);
+      // It's not valid to have a null random seed with this tie-break mode; the validation will
+      // catch that and report a helpful error. Validation also hits this code path, though, so we
+      // need to prevent a NullPointerException here.
+      if (getRandomSeed() != null) {
+        Collections.shuffle(candidatePermutation, new Random(getRandomSeed()));
+      }
     }
 
     String uwiLabel = getUndeclaredWriteInLabel();

@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.SortedMap;
@@ -48,6 +49,8 @@ import javafx.stage.Stage;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 
 class TieBreak {
+
+  private static Random random;
 
   // list of candidates who are tied
   private final List<String> tiedCandidates;
@@ -88,6 +91,10 @@ class TieBreak {
     this.numVotes = numVotes;
     this.roundTallies = roundTallies;
     this.candidatePermutation = candidatePermutation;
+  }
+
+  static void setRandomSeed(int randomSeed) {
+    random = new Random(randomSeed);
   }
 
   // function: nonLosingCandidateDescription
@@ -275,9 +282,9 @@ class TieBreak {
   // return: candidateID of the selected loser
   private String doRandom() {
     // random number used for random candidate ID loser
-    double randomNormalFloat = Math.random();
+    double randomDouble = random.nextDouble();
     // index of randomly selected candidate
-    int randomCandidateIndex = (int) Math.floor(randomNormalFloat * (double) tiedCandidates.size());
+    int randomCandidateIndex = (int) Math.floor(randomDouble * (double) tiedCandidates.size());
     explanation = "The loser was randomly selected.";
     return tiedCandidates.get(randomCandidateIndex);
   }

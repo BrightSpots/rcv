@@ -129,6 +129,10 @@ class Tabulator {
   Set<String> tabulate() throws TabulationCancelledException {
     logSummaryInfo();
 
+    if (config.getRandomSeed() != null) {
+      TieBreak.setRandomSeed(config.getRandomSeed());
+    }
+
     // Loop until we've found our winner(s) unless using continueUntilTwoCandidatesRemain, in which
     // case we loop until only two candidates remain.
     // At each iteration, we'll either a) identify one or more
