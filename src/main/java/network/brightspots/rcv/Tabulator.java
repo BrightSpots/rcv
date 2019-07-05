@@ -23,6 +23,8 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -495,8 +497,7 @@ class Tabulator {
     // undeclared label
     String label = config.getUndeclaredWriteInLabel();
     if (currentRound == 1
-        && label != null
-        && !label.isEmpty()
+        && !isNullOrBlank(label)
         && candidateIDs.contains(label)
         && currentRoundCandidateToTally.get(label).signum() == 1) {
       eliminated.add(label);
@@ -863,7 +864,7 @@ class Tabulator {
       // rank iterates over all ranks in this cvr from most preferred to least
       for (int rank : cvr.rankToCandidateIDs.keySet()) {
         // check for undervote exhaustion from too many consecutive skipped ranks
-        if (config.getMaxSkippedRanksAllowed() != null
+        if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
           recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
           break;
@@ -887,7 +888,7 @@ class Tabulator {
             candidatesSeen.add(candidate);
           }
           // if duplicate was found, exhaust cvr
-          if (duplicateCandidate != null && !duplicateCandidate.isEmpty()) {
+          if (!isNullOrBlank(duplicateCandidate)) {
             recordSelectionForCastVoteRecord(
                 cvr, currentRound, null, "duplicate candidate: " + duplicateCandidate);
             break;
@@ -943,7 +944,7 @@ class Tabulator {
         // if this is the last ranking we are out of rankings and must exhaust this cvr
         // determine if the reason is skipping too many ranks, or no continuing candidates
         if (rank == cvr.rankToCandidateIDs.lastKey()) {
-          if (config.getMaxSkippedRanksAllowed() != null
+          if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
               && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
             recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
           } else {
@@ -1011,7 +1012,7 @@ class Tabulator {
     // transfer vote value to round tally
     incrementTally(roundTally, fractionalTransferValue, selectedCandidate);
     // if enabled and there is a valid precinct string transfer vote value to precinct tally
-    if (config.isTabulateByPrecinctEnabled() && precinct != null && !precinct.isEmpty()) {
+    if (config.isTabulateByPrecinctEnabled() && !isNullOrBlank(precinct)) {
       incrementTally(
           roundTallyByPrecinct.get(precinct), fractionalTransferValue, selectedCandidate);
     }
@@ -1022,7 +1023,7 @@ class Tabulator {
   private void initPrecinctRoundTallies() {
     for (String precinctName : precinctNames) {
       precinctRoundTallies.put(precinctName, new HashMap<>());
-      assert precinctName != null && !precinctName.isEmpty();
+      assert !isNullOrBlank(precinctName);
     }
   }
 
