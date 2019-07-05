@@ -42,7 +42,6 @@ import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 
 class ContestConfig {
-
   private static final int MIN_COLUMN_INDEX = 1;
   private static final int MAX_COLUMN_INDEX = 1000;
   private static final int MIN_ROW_INDEX = 1;
@@ -55,8 +54,8 @@ class ContestConfig {
   private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
   private static final String CDF_PROVIDER = "CDF";
+  private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
-  static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
 
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
@@ -74,7 +73,7 @@ class ContestConfig {
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
-  private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
+  static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
 
   // underlying rawConfig object data
   final RawContestConfig rawConfig;
@@ -149,6 +148,10 @@ class ContestConfig {
     return loadContestConfig(configPath, false);
   }
 
+  static boolean isCdf(CVRSource source) {
+    return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER);
+  }
+
   // function: resolveConfigPath
   // purpose: given a path returns absolute path for use in File IO
   // param: path from this config file (cvr or output folder)
@@ -170,10 +173,6 @@ class ContestConfig {
 
   RawContestConfig getRawConfig() {
     return rawConfig;
-  }
-
-  static boolean isCdf(CVRSource source) {
-    return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER);
   }
 
   // function: validate
@@ -199,14 +198,19 @@ class ContestConfig {
   }
 
   // Makes sure String input can be converted to an int, and checks that int against boundaries
-  private void checkStringToIntWithBoundaries(String input, String inputName,
-      String inputLocation) {
+  private void checkStringToIntWithBoundaries(
+      String input, String inputName, String inputLocation) {
     try {
       int columnIndex = Integer.parseInt(input);
       if (columnIndex < MIN_COLUMN_INDEX || columnIndex > MAX_COLUMN_INDEX) {
         isValid = false;
-        Logger.log(Level.SEVERE, "%s must be from %d to %d if supplied: %s", inputName,
-            MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, inputLocation);
+        Logger.log(
+            Level.SEVERE,
+            "%s must be from %d to %d if supplied: %s",
+            inputName,
+            MIN_COLUMN_INDEX,
+            MAX_COLUMN_INDEX,
+            inputLocation);
       }
     } catch (NumberFormatException e) {
       isValid = false;
@@ -303,8 +307,8 @@ class ContestConfig {
 
           // ensure valid precinct column value
           if (!isNullOrBlank(source.getPrecinctColumnIndex())) {
-            checkStringToIntWithBoundaries(source.getPrecinctColumnIndex(), "precinctColumnIndex",
-                cvrPath);
+            checkStringToIntWithBoundaries(
+                source.getPrecinctColumnIndex(), "precinctColumnIndex", cvrPath);
           } else if (isTabulateByPrecinctEnabled()) {
             isValid = false;
             Logger.log(
@@ -380,7 +384,9 @@ class ContestConfig {
 
     if (getMaxRankingsAllowed() == null) {
       isValid = false;
-      Logger.log(Level.SEVERE, "maxRankingsAllowed must either be \"%s\" or an integer!",
+      Logger.log(
+          Level.SEVERE,
+          "maxRankingsAllowed must either be \"%s\" or an integer!",
           MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION);
     } else if (getNumDeclaredCandidates() >= 1
         && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED) {
@@ -391,7 +397,9 @@ class ContestConfig {
 
     if (getMaxSkippedRanksAllowed() == null) {
       isValid = false;
-      Logger.log(Level.SEVERE, "maxSkippedRanksAllowed must either be \"%s\" or an integer!",
+      Logger.log(
+          Level.SEVERE,
+          "maxSkippedRanksAllowed must either be \"%s\" or an integer!",
           MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION);
     } else if (getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
       isValid = false;
@@ -619,8 +627,10 @@ class ContestConfig {
   // purpose: getter for maxRankingsAllowed
   // returns: max rankings allowed
   Integer getMaxRankingsAllowed() {
-    return stringToIntWithOption(rawConfig.rules.maxRankingsAllowed,
-        MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION, getNumDeclaredCandidates());
+    return stringToIntWithOption(
+        rawConfig.rules.maxRankingsAllowed,
+        MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION,
+        getNumDeclaredCandidates());
   }
 
   // function: isBatchEliminationEnabled
@@ -675,8 +685,10 @@ class ContestConfig {
   // purpose: getter for maxSkippedRanksAllowed rule
   // returns: max skipped ranks allowed in this config
   Integer getMaxSkippedRanksAllowed() {
-    return stringToIntWithOption(rawConfig.rules.maxSkippedRanksAllowed,
-        MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION, Integer.MAX_VALUE);
+    return stringToIntWithOption(
+        rawConfig.rules.maxSkippedRanksAllowed,
+        MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION,
+        Integer.MAX_VALUE);
   }
 
   // function: getUndeclaredWriteInLabel
