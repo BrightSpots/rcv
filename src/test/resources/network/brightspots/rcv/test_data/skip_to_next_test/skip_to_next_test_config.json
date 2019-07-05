@@ -32,6 +32,7 @@
   ],
   "rules": {
     "tiebreakMode": "random",
+    "randomSeed" : 0,
     "overvoteRule": "alwaysSkipToNextRank",
     "maxRankingsAllowed": 4,
     "maxSkippedRanksAllowed": 1,

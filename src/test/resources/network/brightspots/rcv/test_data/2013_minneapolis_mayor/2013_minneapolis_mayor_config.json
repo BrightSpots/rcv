@@ -1,143 +1,147 @@
 {
-  "outputSettings": {
-    "contestName": "2013 Minneapolis Mayor",
-    "outputDirectory": "output",
-    "contestDate": "",
-    "contestJurisdiction": "Minneapolis",
-    "contestOffice": "Mayor",
-    "tabulateByPrecinct": true
+  "outputSettings" : {
+    "contestName" : "2013 Minneapolis Mayor",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "Minneapolis",
+    "contestOffice" : "Mayor",
+    "tabulateByPrecinct" : true,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "2013_minneapolis_mayor_cvr.xlsx",
-      "firstVoteColumnIndex": 2,
-      "firstVoteRowIndex": 2,
-      "precinctColumnIndex": 1,
-      "provider": "ES&S"
-    }
-  ],
-  "candidates": [
-    {
-      "name": "TROY BENJEGERDES"
-    },
-    {
-      "name": "TONY LANE"
-    },
-    {
-      "name": "STEPHANIE WOODRUFF"
-    },
-    {
-      "name": "RAHN V. WORKCUFF"
-    },
-    {
-      "name": "OLE SAVIOR"
-    },
-    {
-      "name": "NEAL BAXTER"
-    },
-    {
-      "name": "MIKE GOULD"
-    },
-    {
-      "name": "MERRILL ANDERSON"
-    },
-    {
-      "name": "MARK V ANDERSON"
-    },
-    {
-      "name": "MARK ANDREW"
-    },
-    {
-      "name": "KURTIS W. HANNA"
-    },
-    {
-      "name": "JOSHUA REA"
-    },
-    {
-      "name": "JOHN LESLIE HARTWIG"
-    },
-    {
-      "name": "JOHN CHARLES WILSON"
-    },
-    {
-      "name": "JEFFREY ALAN WAGNER"
-    },
-    {
-      "name": "JAYMIE KELLY"
-    },
-    {
-      "name": "JAMES EVERETT"
-    },
-    {
-      "name": "JAMES JIMMY L. STROUD, JR."
-    },
-    {
-      "name": "JACKIE CHERRYHOMES"
-    },
-    {
-      "name": "GREGG A. IVERSON"
-    },
-    {
-      "name": "EDMUND BERNARD BRUYERE"
-    },
-    {
-      "name": "DOUG MANN"
-    },
-    {
-      "name": "DON SAMUELS"
-    },
-    {
-      "name": "DAN COHEN"
-    },
-    {
-      "name": "CYD GORMAN"
-    },
-    {
-      "name": "CHRISTOPHER ROBIN ZIMMERMAN"
-    },
-    {
-      "name": "CHRISTOPHER CLARK"
-    },
-    {
-      "name": "CAPTAIN JACK SPARROW"
-    },
-    {
-      "name": "CAM WINTON"
-    },
-    {
-      "name": "BOB FINE"
-    },
-    {
-      "name": "BOB AGAIN CARNEY JR"
-    },
-    {
-      "name": "BILL KAHN"
-    },
-    {
-      "name": "BETSY HODGES"
-    },
-    {
-      "name": "ALICIA K. BENNETT"
-    },
-    {
-      "name": "ABDUL M RAHAMAN THE ROCK"
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "random",
-    "overvoteRule": "exhaustImmediately",
-    "maxRankingsAllowed": 3,
-    "maxSkippedRanksAllowed": 1,
-    "numberOfWinners": 1,
-    "decimalPlacesForVoteArithmetic": 4,
-    "minimumVoteThreshold": 0,
-    "batchElimination": true,
-    "continueUntilTwoCandidatesRemain": false,
-    "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI",
-    "rulesDescription": "Maine Rules"
+  "cvrFileSources" : [ {
+    "filePath" : "2013_minneapolis_mayor_cvr.xlsx",
+    "firstVoteColumnIndex" : 2,
+    "firstVoteRowIndex" : 2,
+    "precinctColumnIndex" : 1,
+    "provider" : "ES&S",
+    "cdf" : false
+  } ],
+  "candidates" : [ {
+    "name" : "TROY BENJEGERDES",
+    "excluded" : false
+  }, {
+    "name" : "TONY LANE",
+    "excluded" : false
+  }, {
+    "name" : "STEPHANIE WOODRUFF",
+    "excluded" : false
+  }, {
+    "name" : "RAHN V. WORKCUFF",
+    "excluded" : false
+  }, {
+    "name" : "OLE SAVIOR",
+    "excluded" : false
+  }, {
+    "name" : "NEAL BAXTER",
+    "excluded" : false
+  }, {
+    "name" : "MIKE GOULD",
+    "excluded" : false
+  }, {
+    "name" : "MERRILL ANDERSON",
+    "excluded" : false
+  }, {
+    "name" : "MARK V ANDERSON",
+    "excluded" : false
+  }, {
+    "name" : "MARK ANDREW",
+    "excluded" : false
+  }, {
+    "name" : "KURTIS W. HANNA",
+    "excluded" : false
+  }, {
+    "name" : "JOSHUA REA",
+    "excluded" : false
+  }, {
+    "name" : "JOHN LESLIE HARTWIG",
+    "excluded" : false
+  }, {
+    "name" : "JOHN CHARLES WILSON",
+    "excluded" : false
+  }, {
+    "name" : "JEFFREY ALAN WAGNER",
+    "excluded" : false
+  }, {
+    "name" : "JAYMIE KELLY",
+    "excluded" : false
+  }, {
+    "name" : "JAMES EVERETT",
+    "excluded" : false
+  }, {
+    "name" : "JAMES JIMMY L. STROUD, JR.",
+    "excluded" : false
+  }, {
+    "name" : "JACKIE CHERRYHOMES",
+    "excluded" : false
+  }, {
+    "name" : "GREGG A. IVERSON",
+    "excluded" : false
+  }, {
+    "name" : "EDMUND BERNARD BRUYERE",
+    "excluded" : false
+  }, {
+    "name" : "DOUG MANN",
+    "excluded" : false
+  }, {
+    "name" : "DON SAMUELS",
+    "excluded" : false
+  }, {
+    "name" : "DAN COHEN",
+    "excluded" : false
+  }, {
+    "name" : "CYD GORMAN",
+    "excluded" : false
+  }, {
+    "name" : "CHRISTOPHER ROBIN ZIMMERMAN",
+    "excluded" : false
+  }, {
+    "name" : "CHRISTOPHER CLARK",
+    "excluded" : false
+  }, {
+    "name" : "CAPTAIN JACK SPARROW",
+    "excluded" : false
+  }, {
+    "name" : "CAM WINTON",
+    "excluded" : false
+  }, {
+    "name" : "BOB FINE",
+    "excluded" : false
+  }, {
+    "name" : "BOB AGAIN CARNEY JR",
+    "excluded" : false
+  }, {
+    "name" : "BILL KAHN",
+    "excluded" : false
+  }, {
+    "name" : "BETSY HODGES",
+    "excluded" : false
+  }, {
+    "name" : "ALICIA K. BENNETT",
+    "excluded" : false
+  }, {
+    "name" : "ABDUL M RAHAMAN THE ROCK",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "randomSeed" : 0,
+    "overvoteRule" : "exhaustImmediately",
+    "numberOfWinners" : 1,
+    "decimalPlacesForVoteArithmetic" : 4,
+    "minimumVoteThreshold" : 0,
+    "maxSkippedRanksAllowed" : 1,
+    "maxRankingsAllowed" : 3,
+    "sequentialMultiSeat" : false,
+    "bottomsUpMultiSeat" : false,
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "rulesDescription" : "Maine Rules"
   }
 }

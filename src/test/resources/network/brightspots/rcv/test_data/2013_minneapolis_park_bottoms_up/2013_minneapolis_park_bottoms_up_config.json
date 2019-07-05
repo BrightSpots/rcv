@@ -48,6 +48,7 @@
   } ],
   "rules" : {
     "tiebreakMode" : "random",
+    "randomSeed" : 0,
     "overvoteRule" : "alwaysSkipToNextRank",
     "numberOfWinners" : 3,
     "decimalPlacesForVoteArithmetic" : 4,
