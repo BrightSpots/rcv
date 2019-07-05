@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -605,7 +605,7 @@ class ResultsWriter {
             Map.ofEntries(
                 entry("@id", CDF_REPORTING_DEVICE_ID),
                 entry("@type", "CVR.ReportingDevice"),
-                entry("Application", "RCVRC Tabulator"),
+                entry("Application", Main.APP_NAME),
                 entry("Manufacturer", "Bright Spots"))
         });
     outputJson.put("Version", "1.0.0");
