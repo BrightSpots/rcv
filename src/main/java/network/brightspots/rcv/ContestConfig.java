@@ -55,6 +55,7 @@ class ContestConfig {
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
   private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
+  private static final int MIN_RANDOM_SEED = 0;
   private static final String CDF_PROVIDER = "CDF";
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
@@ -494,6 +495,11 @@ class ContestConfig {
         Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a bottoms-up contest!");
       }
     }
+
+    if (getRandomSeed() != null && getRandomSeed() < MIN_RANDOM_SEED) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "randomSeed can't be less than %d!", MIN_RANDOM_SEED);
+    }
   }
 
   // function: getNumberWinners
@@ -818,8 +824,11 @@ class ContestConfig {
     }
 
     if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      assert getRandomSeed() != null;
-      Collections.shuffle(candidatePermutation, new Random(getRandomSeed()));
+      // If the random seed is null, validation will fail anyway, so let's not throw an exception
+      // here.
+      if (getRandomSeed() != null) {
+        Collections.shuffle(candidatePermutation, new Random(getRandomSeed()));
+      }
     }
 
     String uwiLabel = getUndeclaredWriteInLabel();

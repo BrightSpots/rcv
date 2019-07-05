@@ -221,8 +221,8 @@
                 <ChoiceBox prefWidth="220.0" fx:id="choiceTiebreakMode"/>
                 <Label text="Overvote Rule *"/>
                 <ChoiceBox prefWidth="220.0" fx:id="choiceOvervoteRule"/>
-                <Label text="Random Seed Integer"/>
-                <TextField maxWidth="220.0" promptText="Random Seed Integer"
+                <Label text="Random Seed"/>
+                <TextField maxWidth="220.0" promptText="Random Seed"
                   fx:id="textFieldRandomSeed"/>
                 <Label text="Number of Winners *"/>
                 <TextField maxWidth="220.0" promptText="Number of Winners"
