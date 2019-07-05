@@ -21,6 +21,8 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -144,7 +146,7 @@ class TieBreak {
         // loser: will be set if there is a previous round count loser
         // it will be null if candidates were still tied at first round
         String previousRoundsLoser = doPreviousRounds();
-        if (previousRoundsLoser != null && !previousRoundsLoser.isBlank()) {
+        if (!isNullOrBlank(previousRoundsLoser)) {
           loser = previousRoundsLoser;
         } else if (tieBreakMode == Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
           loser = doInteractive();
@@ -197,7 +199,7 @@ class TieBreak {
 
     // the candidate selected to lose
     String selectedCandidate = null;
-    while (selectedCandidate == null || selectedCandidate.isBlank()) {
+    while (isNullOrBlank(selectedCandidate)) {
       Scanner sc = new Scanner(System.in);
       String userInput = sc.nextLine();
       if (userInput.equals(CANCEL_COMMAND)) {
@@ -214,7 +216,7 @@ class TieBreak {
       } catch (NumberFormatException exception) {
         // if parseInt failed selectedCandidate will be null and we will retry
       }
-      if (selectedCandidate == null || selectedCandidate.isBlank()) {
+      if (isNullOrBlank(selectedCandidate)) {
         System.out.println("Invalid selection. Please try again.");
         System.out.println(TIEBREAKER_PROMPT);
       }
@@ -238,7 +240,7 @@ class TieBreak {
         "Please use the pop-up window to select the candidate who should lose this tiebreaker.");
 
     String selectedCandidate = null;
-    while (selectedCandidate == null || selectedCandidate.isBlank()) {
+    while (isNullOrBlank(selectedCandidate)) {
       try {
         FutureTask<GuiTiebreakerPromptResponse> futureTask = new FutureTask<>(
             new GuiTiebreakerPrompt());
@@ -252,7 +254,7 @@ class TieBreak {
       } catch (InterruptedException | ExecutionException exception) {
         Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
       }
-      if (selectedCandidate == null || selectedCandidate.isBlank()) {
+      if (isNullOrBlank(selectedCandidate)) {
         Logger.log(Level.WARNING, "Invalid selection! Please try again.");
       }
     }

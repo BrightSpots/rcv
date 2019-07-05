@@ -22,6 +22,8 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,7 +97,7 @@ class CastVoteRecord {
     StringBuilder logStringBuilder = new StringBuilder();
     // add round and ID
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (suppliedID != null && !suppliedID.isBlank()) {
+    if (!isNullOrBlank(suppliedID)) {
       logStringBuilder.append(suppliedID);
     } else {
       logStringBuilder.append(computedID);

@@ -16,6 +16,8 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
@@ -468,128 +470,16 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.refresh();
   }
 
-  @Override
-  public void initialize(URL location, ResourceBundle resources) {
-    Logger.addGuiLogging(this.textAreaStatus);
-    Logger.log(Level.INFO, "Opening tabulator GUI...");
-    Logger.log(Level.INFO, "Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
-
-    GuiContext.getInstance()
-        .getMainWindow()
-        .setOnCloseRequest(
-            event -> {
-              event.consume();
-              exitGui();
-            });
-
-    String helpText;
+  private static Integer getIntValueOrNull(String str) {
+    Integer returnValue = null;
     try {
-      //noinspection ConstantConditions
-      helpText =
-          new BufferedReader(
-              new InputStreamReader(
-                  ClassLoader.getSystemResourceAsStream(CONFIG_FILE_DOCUMENTATION_FILENAME)))
-              .lines()
-              .collect(Collectors.joining("\n"));
+      if (!isNullOrBlank(str)) {
+        returnValue = Integer.valueOf(str);
+      }
     } catch (Exception exception) {
-      Logger.log(
-          Level.SEVERE,
-          "Error loading config file documentation: %s\n%s",
-          CONFIG_FILE_DOCUMENTATION_FILENAME,
-          exception.toString());
-      helpText =
-          String.format(
-              "<Error loading config file documentation: %s>", CONFIG_FILE_DOCUMENTATION_FILENAME);
+      Logger.log(Level.WARNING, "Integer required! Illegal value \"%s\" found.", str);
     }
-    textAreaHelp.setText(helpText);
-
-    datePickerContestDate.setConverter(
-        new StringConverter<>() {
-          @Override
-          public String toString(LocalDate date) {
-            return date != null ? DATE_TIME_FORMATTER.format(date) : "";
-          }
-
-          @Override
-          public LocalDate fromString(String string) {
-            return string != null && !string.isBlank()
-                ? LocalDate.parse(string, DATE_TIME_FORMATTER)
-                : null;
-          }
-        });
-
-    textFieldCvrFirstVoteCol
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteCol));
-    textFieldCvrFirstVoteRow
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteRow));
-    tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
-    tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCvrFirstVoteCol.setCellValueFactory(
-        new PropertyValueFactory<>("firstVoteColumnIndex"));
-    tableColumnCvrFirstVoteCol.setCellFactory(
-        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
-    tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
-    tableColumnCvrFirstVoteRow.setCellFactory(
-        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
-    tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
-    tableColumnCvrIdCol.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCvrPrecinctCol.setCellValueFactory(
-        new PropertyValueFactory<>("precinctColumnIndex"));
-    tableColumnCvrPrecinctCol.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
-    tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    tableViewCvrFiles.setEditable(true);
-
-    tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
-    tableColumnCandidateName.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
-    tableColumnCandidateCode.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCandidateExcluded.setCellValueFactory(
-        c -> {
-          Candidate candidate = c.getValue();
-          CheckBox checkBox = new CheckBox();
-          checkBox.selectedProperty().setValue(candidate.isExcluded());
-          checkBox
-              .selectedProperty()
-              .addListener((ov, old_val, new_val) -> candidate.setExcluded(new_val));
-          //noinspection unchecked
-          return new SimpleObjectProperty(checkBox);
-        });
-    tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    tableViewCandidates.setEditable(true);
-
-    choiceTiebreakMode.getItems().addAll(Tabulator.TieBreakMode.values());
-    choiceTiebreakMode.getItems().remove(Tabulator.TieBreakMode.MODE_UNKNOWN);
-    choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
-    choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
-
-    textFieldNumberOfWinners
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
-    textFieldDecimalPlacesForVoteArithmetic
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldDecimalPlacesForVoteArithmetic));
-    textFieldMinimumVoteThreshold
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
-
-    setDefaultValues();
-
-    try {
-      emptyConfigString =
-          new ObjectMapper()
-              .writer()
-              .withDefaultPrettyPrinter()
-              .writeValueAsString(createRawContestConfig());
-    } catch (JsonProcessingException exception) {
-      Logger.log(
-          Level.WARNING,
-          "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
-          exception.toString());
-    }
+    return returnValue;
   }
 
   private static void setTextFieldToInteger(TextField textField, Integer value) {
@@ -753,6 +643,132 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
+  private static Integer getIntValueOrNull(TextField textField) {
+    return getIntValueOrNull(textField.getText().trim());
+  }
+
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
+    Logger.addGuiLogging(this.textAreaStatus);
+    Logger.log(Level.INFO, "Opening tabulator GUI...");
+    Logger.log(Level.INFO, "Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
+
+    GuiContext.getInstance()
+        .getMainWindow()
+        .setOnCloseRequest(
+            event -> {
+              event.consume();
+              exitGui();
+            });
+
+    String helpText;
+    try {
+      //noinspection ConstantConditions
+      helpText =
+          new BufferedReader(
+              new InputStreamReader(
+                  ClassLoader.getSystemResourceAsStream(CONFIG_FILE_DOCUMENTATION_FILENAME)))
+              .lines()
+              .collect(Collectors.joining("\n"));
+    } catch (Exception exception) {
+      Logger.log(
+          Level.SEVERE,
+          "Error loading config file documentation: %s\n%s",
+          CONFIG_FILE_DOCUMENTATION_FILENAME,
+          exception.toString());
+      helpText =
+          String.format(
+              "<Error loading config file documentation: %s>", CONFIG_FILE_DOCUMENTATION_FILENAME);
+    }
+    textAreaHelp.setText(helpText);
+
+    datePickerContestDate.setConverter(
+        new StringConverter<>() {
+          @Override
+          public String toString(LocalDate date) {
+            return date != null ? DATE_TIME_FORMATTER.format(date) : "";
+          }
+
+          @Override
+          public LocalDate fromString(String string) {
+            return !isNullOrBlank(string) ? LocalDate.parse(string, DATE_TIME_FORMATTER) : null;
+          }
+        });
+
+    textFieldCvrFirstVoteCol
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteCol));
+    textFieldCvrFirstVoteRow
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteRow));
+    tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
+    tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCvrFirstVoteCol.setCellValueFactory(
+        new PropertyValueFactory<>("firstVoteColumnIndex"));
+    tableColumnCvrFirstVoteCol.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
+    tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
+    tableColumnCvrFirstVoteRow.setCellFactory(
+        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
+    tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
+    tableColumnCvrIdCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCvrPrecinctCol.setCellValueFactory(
+        new PropertyValueFactory<>("precinctColumnIndex"));
+    tableColumnCvrPrecinctCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
+    tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    tableViewCvrFiles.setEditable(true);
+
+    tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
+    tableColumnCandidateName.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+    tableColumnCandidateCode.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCandidateExcluded.setCellValueFactory(
+        c -> {
+          Candidate candidate = c.getValue();
+          CheckBox checkBox = new CheckBox();
+          checkBox.selectedProperty().setValue(candidate.isExcluded());
+          checkBox
+              .selectedProperty()
+              .addListener((ov, old_val, new_val) -> candidate.setExcluded(new_val));
+          //noinspection unchecked
+          return new SimpleObjectProperty(checkBox);
+        });
+    tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    tableViewCandidates.setEditable(true);
+
+    choiceTiebreakMode.getItems().addAll(Tabulator.TieBreakMode.values());
+    choiceTiebreakMode.getItems().remove(Tabulator.TieBreakMode.MODE_UNKNOWN);
+    choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
+    choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
+
+    textFieldNumberOfWinners
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
+    textFieldDecimalPlacesForVoteArithmetic
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldDecimalPlacesForVoteArithmetic));
+    textFieldMinimumVoteThreshold
+        .textProperty()
+        .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
+
+    setDefaultValues();
+
+    try {
+      emptyConfigString =
+          new ObjectMapper()
+              .writer()
+              .withDefaultPrettyPrinter()
+              .writeValueAsString(createRawContestConfig());
+    } catch (JsonProcessingException exception) {
+      Logger.log(
+          Level.WARNING,
+          "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
+          exception.toString());
+    }
+  }
+
   private void loadConfig(ContestConfig config) {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
@@ -760,7 +776,7 @@ public class GuiConfigController implements Initializable {
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
-    if (outputSettings.contestDate != null && !outputSettings.contestDate.isBlank()) {
+    if (!isNullOrBlank(outputSettings.contestDate)) {
       datePickerContestDate.setValue(
           LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
     }
@@ -798,25 +814,6 @@ public class GuiConfigController implements Initializable {
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
-  }
-
-  private static Integer getIntValueOrNull(TextField textField) {
-    return getIntValueOrNull(textField.getText().trim());
-  }
-
-  private static Integer getIntValueOrNull(String str) {
-    Integer returnValue = null;
-    try {
-      if (str != null) {
-        str = str.trim();
-        if (!str.isBlank()) {
-          returnValue = Integer.valueOf(str);
-        }
-      }
-    } catch (Exception exception) {
-      Logger.log(Level.WARNING, "Integer required! Illegal value \"%s\" found.", str);
-    }
-    return returnValue;
   }
 
   private static String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {

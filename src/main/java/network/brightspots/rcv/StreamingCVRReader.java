@@ -21,6 +21,8 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -101,13 +103,10 @@ class StreamingCVRReader {
     this.firstVoteColumnIndex = source.getFirstVoteColumnIndex() - 1;
     this.firstVoteRowIndex = source.getFirstVoteRowIndex() - 1;
     this.idColumnIndex =
-        source.getIdColumnIndex() != null && !source.getIdColumnIndex().isBlank()
-            ? Integer.parseInt(source.getIdColumnIndex()) - 1
+        !isNullOrBlank(source.getIdColumnIndex()) ? Integer.parseInt(source.getIdColumnIndex()) - 1
             : null;
-    this.precinctColumnIndex =
-        source.getPrecinctColumnIndex() != null && !source.getPrecinctColumnIndex().isBlank()
-            ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
-            : null;
+    this.precinctColumnIndex = !isNullOrBlank(source.getPrecinctColumnIndex()) ?
+        Integer.parseInt(source.getPrecinctColumnIndex()) - 1 : null;
   }
 
   // given Excel-style address string return the cell address as a pair of Integers

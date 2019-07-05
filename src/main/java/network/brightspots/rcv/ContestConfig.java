@@ -22,6 +22,8 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -213,7 +215,7 @@ class ContestConfig {
   }
 
   private void validateOutputSettings() {
-    if (getContestName() == null || getContestName().isBlank()) {
+    if (isNullOrBlank(getContestName())) {
       isValid = false;
       Logger.log(Level.SEVERE, "Contest name is required!");
     }
@@ -227,7 +229,7 @@ class ContestConfig {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
         // perform checks on source input path
-        if (source.getFilePath() == null || source.getFilePath().isBlank()) {
+        if (isNullOrBlank(source.getFilePath())) {
           isValid = false;
           Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
           continue;
@@ -295,13 +297,12 @@ class ContestConfig {
           }
 
           // ensure valid id column value
-          if (source.getIdColumnIndex() != null && !source.getIdColumnIndex().isBlank()) {
+          if (!isNullOrBlank(source.getIdColumnIndex())) {
             checkStringToIntWithBoundaries(source.getIdColumnIndex(), "idColumnIndex", cvrPath);
           }
 
           // ensure valid precinct column value
-          if (source.getPrecinctColumnIndex() != null && !source.getPrecinctColumnIndex()
-              .isBlank()) {
+          if (!isNullOrBlank(source.getPrecinctColumnIndex())) {
             checkStringToIntWithBoundaries(source.getPrecinctColumnIndex(), "precinctColumnIndex",
                 cvrPath);
           } else if (isTabulateByPrecinctEnabled()) {
@@ -320,7 +321,7 @@ class ContestConfig {
     HashSet<String> candidateNameSet = new HashSet<>();
     HashSet<String> candidateCodeSet = new HashSet<>();
     for (Candidate candidate : rawConfig.candidates) {
-      if (candidate.getName() == null || candidate.getName().isBlank()) {
+      if (isNullOrBlank(candidate.getName())) {
         isValid = false;
         Logger.log(Level.SEVERE, "Name is required for each candidate!");
       } else if (candidateNameSet.contains(candidate.getName())) {
@@ -331,7 +332,7 @@ class ContestConfig {
         candidateNameSet.add(candidate.getName());
       }
 
-      if (candidate.getCode() != null && !candidate.getCode().isBlank()) {
+      if (!isNullOrBlank(candidate.getCode())) {
         if (candidateCodeSet.contains(candidate.getCode())) {
           isValid = false;
           Logger.log(
@@ -367,7 +368,7 @@ class ContestConfig {
     if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
       Logger.log(Level.SEVERE, "Invalid overvote rule!");
-    } else if ((getOvervoteLabel() != null && !getOvervoteLabel().isBlank())
+    } else if (!isNullOrBlank(getOvervoteLabel())
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       isValid = false;
@@ -538,8 +539,7 @@ class ContestConfig {
   // returns: raw string from config or falls back to user folder if none is set
   String getOutputDirectoryRaw() {
     // outputDirectory is where output files should be written
-    return (rawConfig.outputSettings.outputDirectory != null
-        && !rawConfig.outputSettings.outputDirectory.isBlank())
+    return !isNullOrBlank(rawConfig.outputSettings.outputDirectory)
         ? rawConfig.outputSettings.outputDirectory
         : FileUtils.getUserDirectory();
   }
@@ -601,7 +601,7 @@ class ContestConfig {
   // Converts a String to an Integer and also allows for an additional option as valid input
   private Integer stringToIntWithOption(String rawInput, String optionFlag, Integer optionResult) {
     Integer intValue;
-    if (rawInput == null || rawInput.isBlank()) {
+    if (isNullOrBlank(rawInput)) {
       intValue = null;
     } else if (rawInput.toLowerCase().equals(optionFlag)) {
       intValue = optionResult;
@@ -636,7 +636,7 @@ class ContestConfig {
   int getNumDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = getCandidateCodeList().size();
-    if ((getUndeclaredWriteInLabel() != null && !getUndeclaredWriteInLabel().isBlank())
+    if (!isNullOrBlank(getUndeclaredWriteInLabel())
         && getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
       num--;
     }
@@ -777,7 +777,7 @@ class ContestConfig {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
         String code = candidate.getCode();
         String name = candidate.getName();
-        if (code == null || code.isBlank()) {
+        if (isNullOrBlank(code)) {
           code = name;
         }
 
@@ -795,7 +795,7 @@ class ContestConfig {
     }
 
     String uwiLabel = getUndeclaredWriteInLabel();
-    if (uwiLabel != null && !uwiLabel.isBlank()) {
+    if (!isNullOrBlank(uwiLabel)) {
       candidateCodeToNameMap.put(uwiLabel, uwiLabel);
     }
   }
