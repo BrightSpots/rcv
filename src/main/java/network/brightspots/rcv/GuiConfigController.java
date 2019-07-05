@@ -110,9 +110,9 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CVRSource, Integer> tableColumnCvrFirstVoteRow;
   @FXML
-  private TableColumn<CVRSource, Integer> tableColumnCvrIdCol;
+  private TableColumn<CVRSource, String> tableColumnCvrIdCol;
   @FXML
-  private TableColumn<CVRSource, Integer> tableColumnCvrPrecinctCol;
+  private TableColumn<CVRSource, String> tableColumnCvrPrecinctCol;
   @FXML
   private TableColumn<CVRSource, String> tableColumnCvrProvider;
   @FXML
@@ -349,9 +349,9 @@ public class GuiConfigController implements Initializable {
 
   public void buttonAddCvrFileClicked() {
     CVRSource cvrSource = new CVRSource();
-    String cvrFilePath = textFieldCvrFilePath.getText().trim();
-    String cvrFirstVoteCol = textFieldCvrFirstVoteCol.getText().trim();
-    String cvrFirstVoteRow = textFieldCvrFirstVoteRow.getText().trim();
+    String cvrFilePath = getTextOrEmptyString(textFieldCvrFilePath);
+    String cvrFirstVoteCol = getTextOrEmptyString(textFieldCvrFirstVoteCol);
+    String cvrFirstVoteRow = getTextOrEmptyString(textFieldCvrFirstVoteRow);
     boolean fileIsJson = cvrFilePath.toLowerCase().endsWith(".json");
     if (cvrFilePath.isBlank()) {
       Logger.log(Level.WARNING, "Cast vote record file path is required!");
@@ -363,9 +363,9 @@ public class GuiConfigController implements Initializable {
       cvrSource.setFilePath(cvrFilePath);
       cvrSource.setFirstVoteColumnIndex(getIntValueOrNull(cvrFirstVoteCol));
       cvrSource.setFirstVoteRowIndex(getIntValueOrNull(cvrFirstVoteRow));
-      cvrSource.setIdColumnIndex(getIntValueOrNull(textFieldCvrIdCol));
-      cvrSource.setPrecinctColumnIndex(getIntValueOrNull(textFieldCvrPrecinctCol));
-      cvrSource.setProvider(textFieldCvrProvider.getText().trim());
+      cvrSource.setIdColumnIndex(getTextOrEmptyString(textFieldCvrIdCol));
+      cvrSource.setPrecinctColumnIndex(getTextOrEmptyString(textFieldCvrPrecinctCol));
+      cvrSource.setProvider(getTextOrEmptyString(textFieldCvrProvider));
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
@@ -414,35 +414,31 @@ public class GuiConfigController implements Initializable {
   }
 
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
-    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    // FIXME: If user enters bad data, value is nulled out instead of reverting to previous value
-    cvrSelected.setIdColumnIndex(
-        cellEditEvent.getNewValue() == null ? null : (Integer) cellEditEvent.getNewValue());
+    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+        .setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  public void changeCvrPrecinctCol(CellEditEvent cellEditEvent) {
-    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    // FIXME: If user enters bad data, value is nulled out instead of reverting to previous value
-    cvrSelected.setPrecinctColumnIndex(
-        cellEditEvent.getNewValue() == null ? null : (Integer) cellEditEvent.getNewValue());
+  public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
+    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+        .setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
-    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    cvrSelected.setProvider(cellEditEvent.getNewValue().toString().trim());
+    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+        .setProvider(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate();
-    String candidateName = textFieldCandidateName.getText().trim();
+    String candidateName = getTextOrEmptyString(textFieldCandidateName);
     if (candidateName.isBlank()) {
       Logger.log(Level.WARNING, "Candidate name is required!");
     } else {
       candidate.setName(candidateName);
-      candidate.setCode(textFieldCandidateCode.getText().trim());
+      candidate.setCode(getTextOrEmptyString(textFieldCandidateCode));
       candidate.setExcluded(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
@@ -457,19 +453,18 @@ public class GuiConfigController implements Initializable {
   }
 
   public void changeCandidateName(CellEditEvent cellEditEvent) {
-    Candidate candidateSelected = tableViewCandidates.getSelectionModel().getSelectedItem();
     String candidateName = cellEditEvent.getNewValue().toString().trim();
     if (candidateName.isBlank()) {
       Logger.log(Level.WARNING, "Candidate name is required!");
     } else {
-      candidateSelected.setName(candidateName);
+      tableViewCandidates.getSelectionModel().getSelectedItem().setName(candidateName);
     }
     tableViewCandidates.refresh();
   }
 
   public void changeCandidateCode(CellEditEvent cellEditEvent) {
-    Candidate candidateSelected = tableViewCandidates.getSelectionModel().getSelectedItem();
-    candidateSelected.setCode(cellEditEvent.getNewValue().toString().trim());
+    tableViewCandidates.getSelectionModel().getSelectedItem()
+        .setCode(cellEditEvent.getNewValue().toString().trim());
     tableViewCandidates.refresh();
   }
 
@@ -529,10 +524,6 @@ public class GuiConfigController implements Initializable {
     textFieldCvrFirstVoteRow
         .textProperty()
         .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteRow));
-    textFieldCvrIdCol.textProperty().addListener(new TextFieldListenerNonNegInt(textFieldCvrIdCol));
-    textFieldCvrPrecinctCol
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldCvrPrecinctCol));
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
     tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
@@ -543,12 +534,10 @@ public class GuiConfigController implements Initializable {
     tableColumnCvrFirstVoteRow.setCellFactory(
         TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
     tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
-    tableColumnCvrIdCol.setCellFactory(
-        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
+    tableColumnCvrIdCol.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrPrecinctCol.setCellValueFactory(
         new PropertyValueFactory<>("precinctColumnIndex"));
-    tableColumnCvrPrecinctCol.setCellFactory(
-        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
+    tableColumnCvrPrecinctCol.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
     tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -855,6 +844,10 @@ public class GuiConfigController implements Initializable {
     ArrayList<CVRSource> cvrSources = new ArrayList<>(tableViewCvrFiles.getItems());
     for (CVRSource source : cvrSources) {
       source.setFilePath(source.getFilePath() != null ? source.getFilePath().trim() : "");
+      source.setIdColumnIndex(
+          source.getIdColumnIndex() != null ? source.getIdColumnIndex().trim() : "");
+      source.setPrecinctColumnIndex(
+          source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex().trim() : "");
       source.setProvider(source.getProvider() != null ? source.getProvider().trim() : "");
     }
     config.cvrFileSources = cvrSources;

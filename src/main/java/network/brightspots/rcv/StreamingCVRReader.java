@@ -100,9 +100,11 @@ class StreamingCVRReader {
     // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
     this.firstVoteColumnIndex = source.getFirstVoteColumnIndex() - 1;
     this.firstVoteRowIndex = source.getFirstVoteRowIndex() - 1;
-    this.idColumnIndex = source.getIdColumnIndex() != null ? source.getIdColumnIndex() - 1 : null;
+    this.idColumnIndex = source.getIdColumnIndex() != null && !source.getIdColumnIndex().isBlank() ?
+        Integer.parseInt(source.getIdColumnIndex()) - 1 : null;
     this.precinctColumnIndex =
-        source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex() - 1 : null;
+        config.isTabulateByPrecinctEnabled() ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
+            : null;
   }
 
   // given Excel-style address string return the cell address as a pair of Integers

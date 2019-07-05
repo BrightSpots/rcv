@@ -276,35 +276,51 @@ class ContestConfig {
           }
 
           // ensure valid id column value
-          if (source.getIdColumnIndex() != null
-              && (source.getIdColumnIndex() < MIN_COLUMN_INDEX
-              || source.getIdColumnIndex() > MAX_COLUMN_INDEX)) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "idColumnIndex must be from %d to %d: %s",
-                MIN_COLUMN_INDEX,
-                MAX_COLUMN_INDEX,
-                cvrPath);
+          if (source.getIdColumnIndex() != null && !source.getIdColumnIndex().isBlank()) {
+            try {
+              int idColumnIndex = Integer.parseInt(source.getIdColumnIndex());
+              if (idColumnIndex < MIN_COLUMN_INDEX || idColumnIndex > MAX_COLUMN_INDEX) {
+                isValid = false;
+                Logger.log(
+                    Level.SEVERE,
+                    "idColumnIndex must be from %d to %d if supplied: %s",
+                    MIN_COLUMN_INDEX,
+                    MAX_COLUMN_INDEX,
+                    cvrPath);
+              }
+            } catch (NumberFormatException e) {
+              isValid = false;
+              Logger.log(Level.SEVERE, "idColumnIndex must be an integer if supplied: %s", cvrPath);
+            }
           }
 
           // ensure valid precinct column value
           if (isTabulateByPrecinctEnabled()) {
-            if (source.getPrecinctColumnIndex() == null) {
+            if (source.getPrecinctColumnIndex() == null || source.getPrecinctColumnIndex()
+                .isBlank()) {
               isValid = false;
               Logger.log(
                   Level.SEVERE,
                   "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
                   cvrPath);
-            } else if (source.getPrecinctColumnIndex() < MIN_COLUMN_INDEX
-                || source.getPrecinctColumnIndex() > MAX_COLUMN_INDEX) {
-              isValid = false;
-              Logger.log(
-                  Level.SEVERE,
-                  "precinctColumnIndex must be from %d to %d: %s",
-                  MIN_COLUMN_INDEX,
-                  MAX_COLUMN_INDEX,
-                  cvrPath);
+            } else {
+              try {
+                int precinctColumnIndex = Integer.parseInt(source.getPrecinctColumnIndex());
+                if (precinctColumnIndex < MIN_COLUMN_INDEX
+                    || precinctColumnIndex > MAX_COLUMN_INDEX) {
+                  isValid = false;
+                  Logger.log(
+                      Level.SEVERE,
+                      "precinctColumnIndex must be from %d to %d if supplied: %s",
+                      MIN_COLUMN_INDEX,
+                      MAX_COLUMN_INDEX,
+                      cvrPath);
+                }
+              } catch (NumberFormatException e) {
+                isValid = false;
+                Logger.log(Level.SEVERE, "precinctColumnIndex must be an integer if supplied: %s",
+                    cvrPath);
+              }
             }
           }
         }
