@@ -25,7 +25,6 @@ package network.brightspots.rcv;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
@@ -78,11 +77,7 @@ public class Main extends GuiApplication {
       if (convertToCdf) {
         session.convertToCdf();
       } else {
-        try {
-          session.tabulate();
-        } catch (TabulationCancelledException e) {
-          Logger.log(Level.SEVERE, "Tabulation was cancelled!");
-        }
+        session.tabulate();
       }
     }
 
@@ -93,7 +88,6 @@ public class Main extends GuiApplication {
     Logger.log(Level.INFO, "Launching %s version %s...", APP_NAME, APP_VERSION);
     Logger.log(Level.INFO, "Host system: %s version %s", System.getProperty("os.name"),
         System.getProperty("os.version"));
-    Logger.log(Level.INFO, "User: %s", System.getProperty("user.name"));
   }
 
 }

@@ -111,9 +111,10 @@ class TabulatorSession {
   // function: tabulate
   // purpose: run tabulation
   // returns: list of winners
-  void tabulate() throws TabulationCancelledException {
+  void tabulate() {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    Boolean tabulationSuccess = false;
     if (config != null && config.validate() && setUpLogging(config)) {
       try {
         Logger.log(Level.INFO, "Begin config file contents:");
@@ -143,7 +144,13 @@ class TabulatorSession {
             Logger.log(Level.SEVERE, "Aborting tabulation due to cast vote record errors!");
             break;
           }
-          Set<String> newWinnerSet = runTabulationForConfig(config, castVoteRecords);
+          Set<String> newWinnerSet;
+          try {
+            newWinnerSet = runTabulationForConfig(config, castVoteRecords);
+          } catch (TabulationCancelledException e) {
+              Logger.log(Level.SEVERE, "Tabulation was cancelled by the user!");
+              break;
+          }
           assert newWinnerSet.size() == 1;
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
@@ -158,6 +165,7 @@ class TabulatorSession {
         for (String winner : config.getSequentialWinners()) {
           config.setCandidateExclusionStatus(winner, false);
         }
+        tabulationSuccess = true;
       } else {
         // normal operation (not sequential multi-seat)
         // Read cast vote records and precinct IDs from CVR files
@@ -165,10 +173,18 @@ class TabulatorSession {
         if (castVoteRecords == null) {
           Logger.log(Level.SEVERE, "Aborting tabulation due to cast vote record errors!");
         } else {
-          runTabulationForConfig(config, castVoteRecords);
+          try {
+            runTabulationForConfig(config, castVoteRecords);
+            tabulationSuccess = true;
+          } catch (TabulationCancelledException e) {
+            Logger.log(Level.SEVERE, "Tabulation was cancelled by the user!");
+          }
         }
       }
-      Logger.log(Level.INFO, "Tabulation session complete.  Results written to: %s", outputPath);
+      Logger.log(Level.INFO, "Tabulation session complete.");
+      if (tabulationSuccess) {
+        Logger.log(Level.INFO, "Results written to: %s", outputPath);
+      }
       Logger.removeTabulationFileLogging();
     }
   }
