@@ -154,6 +154,23 @@ class ContestConfig {
     return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER);
   }
 
+  private static boolean candidateStringMatchesLabel(
+      String candidateString, String field, String label, String labelField) {
+    boolean match = false;
+
+    if (!isNullOrBlank(label) && label.equals(candidateString)) {
+      match = true;
+      Logger.log(
+          Level.SEVERE,
+          "\"%s\" can't be used as a candidate %s if it's also being used as the %s!",
+          candidateString,
+          field,
+          labelField);
+    }
+
+    return match;
+  }
+
   // function: resolveConfigPath
   // purpose: given a path returns absolute path for use in File IO
   // param: path from this config file (cvr or output folder)
@@ -323,38 +340,50 @@ class ContestConfig {
     }
   }
 
+  private boolean candidateStringIsAlreadyInUseElsewhere(
+      String candidateString, String field, Set<String> candidateStringsSeen) {
+    boolean foundError = false;
+
+    if (candidateStringsSeen.contains(candidateString)) {
+      isValid = false;
+      Logger.log(
+          Level.SEVERE, "Duplicate candidate %ss are not allowed: %s", field, candidateString);
+    } else if (TallyTransfers.candidateStringIsReserved(candidateString)) {
+      foundError = true;
+      Logger.log(
+          Level.SEVERE,
+          "\"%s\" is a reserved term and can't be used as a candidate %s!",
+          candidateString,
+          field);
+    } else if (candidateStringMatchesLabel(
+        candidateString, field, getUndeclaredWriteInLabel(), "undeclaredWriteInLabel")
+        || candidateStringMatchesLabel(candidateString, field, getOvervoteLabel(), "overvoteLabel")
+        || candidateStringMatchesLabel(
+        candidateString, field, getUndervoteLabel(), "undervoteLabel")) {
+      foundError = true;
+    }
+
+    return foundError;
+  }
+
   private void validateCandidates() {
-    HashSet<String> candidateNameSet = new HashSet<>();
-    HashSet<String> candidateCodeSet = new HashSet<>();
+    Set<String> candidateNameSet = new HashSet<>();
+    Set<String> candidateCodeSet = new HashSet<>();
+
     for (Candidate candidate : rawConfig.candidates) {
       if (isNullOrBlank(candidate.getName())) {
         isValid = false;
         Logger.log(Level.SEVERE, "Name is required for each candidate!");
-      } else if (candidateNameSet.contains(candidate.getName())) {
+      } else if (candidateStringIsAlreadyInUseElsewhere(
+          candidate.getName(), "name", candidateNameSet)) {
         isValid = false;
-        Logger.log(
-            Level.SEVERE, "Duplicate candidate names are not allowed: %s", candidate.getName());
-      } else if (TallyTransfers.candidateStringIsReserved(candidate.getName())) {
-        isValid = false;
-        Logger.log(
-            Level.SEVERE,
-            "\"%s\" is a reserved term and can't be used as a candidate name!",
-            candidate.getName());
-      } else if (TallyTransfers.candidateStringIsReserved(candidate.getCode())) {
-        isValid = false;
-        Logger.log(
-            Level.SEVERE,
-            "\"%s\" is a reserved term and can't be used as a candidate code!",
-            candidate.getCode());
       } else {
         candidateNameSet.add(candidate.getName());
       }
 
       if (!isNullOrBlank(candidate.getCode())) {
-        if (candidateCodeSet.contains(candidate.getCode())) {
+        if (candidateStringIsAlreadyInUseElsewhere(candidate.getCode(), "code", candidateCodeSet)) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE, "Duplicate candidate codes are not allowed: %s", candidate.getCode());
         } else {
           candidateCodeSet.add(candidate.getCode());
         }
