@@ -24,8 +24,6 @@
 
 package network.brightspots.rcv;
 
-import static network.brightspots.rcv.Utils.isNullOrBlank;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,9 +32,9 @@ import java.util.Map;
 // used primarily as visualizer input to help build Sankey plots
 class TallyTransfers {
 
-  static final String EXHAUSTED = "exhausted";
   static final String RESIDUAL_TARGET = "residual surplus";
-  static final String UNCOUNTED = "uncounted";
+  private static final String EXHAUSTED = "exhausted";
+  private static final String UNCOUNTED = "uncounted";
   static final String[] RESERVED_STRINGS = {EXHAUSTED, RESIDUAL_TARGET, UNCOUNTED};
 
   // Map of round number to vote transfers which occurred in that round
@@ -44,19 +42,6 @@ class TallyTransfers {
   // For each target candidate the map value is total vote values received from that source.
   // For round 1 source candidate is marked "uncounted" since the votes had no prior recipient.
   private final Map<Integer, Map<String, Map<String, BigDecimal>>> tallyTransfers = new HashMap<>();
-
-  static boolean candidateStringIsReserved(String candidateString) {
-    boolean found = false;
-    if (!isNullOrBlank(candidateString)) {
-      for (String s : RESERVED_STRINGS) {
-        if (s.equalsIgnoreCase(candidateString)) {
-          found = true;
-          break;
-        }
-      }
-    }
-    return found;
-  }
 
   // function: getTransfersForRound
   // purpose: getter for tallyTransfers object

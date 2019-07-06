@@ -154,6 +154,13 @@ class ContestConfig {
     return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER);
   }
 
+  // function: candidateStringMatchesLabel
+  // purpose: Detects if a candidate name or code conflicts with one of the other user-supplied
+  //   strings (labels) that might be present in a cast vote record source file.
+  // param: candidateString is a candidate name or code
+  // param: field is either "name" or "code"
+  // param: label is a user-supplied string
+  // param: labelField is the field name for that user-supplied string
   private static boolean candidateStringMatchesLabel(
       String candidateString, String field, String label, String labelField) {
     boolean match = false;
@@ -169,6 +176,19 @@ class ContestConfig {
     }
 
     return match;
+  }
+
+  private static boolean candidateStringIsReservedForTallyTransfers(String candidateString) {
+    boolean found = false;
+    if (!isNullOrBlank(candidateString)) {
+      for (String s : TallyTransfers.RESERVED_STRINGS) {
+        if (s.equalsIgnoreCase(candidateString)) {
+          found = true;
+          break;
+        }
+      }
+    }
+    return found;
   }
 
   // function: resolveConfigPath
@@ -340,15 +360,21 @@ class ContestConfig {
     }
   }
 
+  // function: candidateStringIsAlreadyInUseElsewhere
+  // purpose: Takes a candidate name or code and checks for conflicts with other name/codes or other
+  //   strings that are already being used in some other way.
+  // param: candidateString is a candidate name or code
+  // param: field is either "name" or "code"
+  // param: candidateStringsSeen is a running set of names/codes we've already encountered
   private boolean candidateStringIsAlreadyInUseElsewhere(
       String candidateString, String field, Set<String> candidateStringsSeen) {
     boolean foundError = false;
 
     if (candidateStringsSeen.contains(candidateString)) {
-      isValid = false;
+      foundError = true;
       Logger.log(
           Level.SEVERE, "Duplicate candidate %ss are not allowed: %s", field, candidateString);
-    } else if (TallyTransfers.candidateStringIsReserved(candidateString)) {
+    } else if (candidateStringIsReservedForTallyTransfers(candidateString)) {
       foundError = true;
       Logger.log(
           Level.SEVERE,
