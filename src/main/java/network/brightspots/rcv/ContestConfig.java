@@ -155,27 +155,26 @@ class ContestConfig {
     return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER);
   }
 
-  // function: candidateStringMatchesLabel
-  // purpose: Detects if a candidate name or code conflicts with one of the other user-supplied
+  // TODO: update doc and parameter names
+  // function: stringMatchesLabel
+  // purpose: Detects if a string conflicts with one of the other user-supplied
   //   strings (labels) that might be present in a cast vote record source file.
-  // param: candidateString is a candidate name or code
-  // param: field is either "name" or "code"
+  // param:
+  // param:
   // param: label is a user-supplied string
   // param: labelField is the field name for that user-supplied string
-  private static boolean candidateStringMatchesLabel(
+  private static boolean stringMatchesLabel(
       String candidateString, String field, String label, String labelField) {
     boolean match = false;
-
     if (!isNullOrBlank(label) && label.equals(candidateString)) {
       match = true;
       Logger.log(
           Level.SEVERE,
-          "\"%s\" can't be used as a candidate %s if it's also being used as the %s!",
+          "\"%s\" can't be used as %s if it's also being used as %s!",
           candidateString,
           field,
           labelField);
     }
-
     return match;
   }
 
@@ -348,37 +347,52 @@ class ContestConfig {
     }
   }
 
-  // function: candidateStringIsAlreadyInUseElsewhere
+  // TODO update doc and param names
+  // function: stringAlreadyInUseElsewhere
   // purpose: Takes a candidate name or code and checks for conflicts with other name/codes or other
   //   strings that are already being used in some other way.
   // param: candidateString is a candidate name or code
   // param: field is either "name" or "code"
   // param: candidateStringsSeen is a running set of names/codes we've already encountered
-  private boolean candidateStringIsAlreadyInUseElsewhere(
-      String candidateString, String field, Set<String> candidateStringsSeen) {
-    boolean foundError = false;
+  private boolean stringAlreadyInUseElsewhere(String candidateString, String field) {
+    boolean inUse = false;
+    if (TallyTransfers.RESERVED_STRINGS.contains(candidateString)) {
+      inUse = true;
+      Logger
+          .log(Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", candidateString,
+              field);
+    } else {
+      if (!field.equals("overvoteLabel")) {
+        inUse = stringMatchesLabel(candidateString, field, getOvervoteLabel(), "overvoteLabel");
+      }
+      if (!field.equals("undervoteLabel")) {
+        inUse = stringMatchesLabel(candidateString, field, getUndervoteLabel(), "undervoteLabel");
+      }
+      if (!field.equals("undeclaredWriteInLabel")) {
+        inUse = stringMatchesLabel(candidateString, field, getUndeclaredWriteInLabel(),
+            "undeclaredWriteInLabel");
+      }
+    }
+    return inUse;
+  }
 
+  // function: candidateStringAlreadyInUseElsewhere
+  // purpose: Takes a candidate name or code and checks for conflicts with other name/codes or other
+  //   strings that are already being used in some other way.
+  // param: candidateString is a candidate name or code
+  // param: field is either "name" or "code"
+  // param: candidateStringsSeen is a running set of names/codes we've already encountered
+  private boolean candidateStringAlreadyInUseElsewhere(
+      String candidateString, String field, Set<String> candidateStringsSeen) {
+    boolean inUse;
     if (candidateStringsSeen.contains(candidateString)) {
-      foundError = true;
+      inUse = true;
       Logger.log(
           Level.SEVERE, "Duplicate candidate %ss are not allowed: %s", field, candidateString);
-    } else if (TallyTransfers.RESERVED_STRINGS.contains(candidateString)) {
-      foundError = true;
-      Logger.log(
-          Level.SEVERE,
-          "\"%s\" is a reserved term and can't be used as a candidate %s!",
-          candidateString,
-          field);
-    } else if (
-        candidateStringMatchesLabel(candidateString, field, getOvervoteLabel(), "overvoteLabel")
-            || candidateStringMatchesLabel(candidateString, field, getUndervoteLabel(),
-            "undervoteLabel")
-            || candidateStringMatchesLabel(candidateString, field, getUndeclaredWriteInLabel(),
-            "undeclaredWriteInLabel")) {
-      foundError = true;
+    } else {
+      inUse = stringAlreadyInUseElsewhere(candidateString, "candidate " + field);
     }
-
-    return foundError;
+    return inUse;
   }
 
   private void validateCandidates() {
@@ -389,7 +403,7 @@ class ContestConfig {
       if (isNullOrBlank(candidate.getName())) {
         isValid = false;
         Logger.log(Level.SEVERE, "Name is required for each candidate!");
-      } else if (candidateStringIsAlreadyInUseElsewhere(
+      } else if (candidateStringAlreadyInUseElsewhere(
           candidate.getName(), "name", candidateNameSet)) {
         isValid = false;
       } else {
@@ -397,7 +411,7 @@ class ContestConfig {
       }
 
       if (!isNullOrBlank(candidate.getCode())) {
-        if (candidateStringIsAlreadyInUseElsewhere(candidate.getCode(), "code", candidateCodeSet)) {
+        if (candidateStringAlreadyInUseElsewhere(candidate.getCode(), "code", candidateCodeSet)) {
           isValid = false;
         } else {
           candidateCodeSet.add(candidate.getCode());
@@ -555,6 +569,20 @@ class ContestConfig {
     if (getRandomSeed() != null && getRandomSeed() < MIN_RANDOM_SEED) {
       isValid = false;
       Logger.log(Level.SEVERE, "randomSeed can't be less than %d!", MIN_RANDOM_SEED);
+    }
+
+    // TODO: Fix so they don't check each other
+    if (!isNullOrBlank(getOvervoteLabel()) && stringAlreadyInUseElsewhere(getOvervoteLabel(),
+        "overvoteLabel")) {
+      isValid = false;
+    }
+    if (!isNullOrBlank(getUndervoteLabel()) && stringAlreadyInUseElsewhere(getUndervoteLabel(),
+        "undervoteLabel")) {
+      isValid = false;
+    }
+    if (!isNullOrBlank(getUndeclaredWriteInLabel()) && stringAlreadyInUseElsewhere(
+        getUndeclaredWriteInLabel(), "undeclaredWriteInLabel")) {
+      isValid = false;
     }
   }
 
@@ -827,6 +855,7 @@ class ContestConfig {
   // param: code the code of the candidate whose name we want to look up
   // returns: the full name for the given candidateID
   String getNameForCandidateCode(String code) {
+    // TODO pull "Undeclared" into constant and add to reserved terms check?
     return getUndeclaredWriteInLabel() != null && getUndeclaredWriteInLabel().equals(code)
         ? "Undeclared"
         : candidateCodeToNameMap.get(code);
