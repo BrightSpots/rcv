@@ -779,10 +779,20 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  // version migration logic goes here
+  private void migrateConfigVersion(ContestConfig config) {
+    if (config.rawConfig.tabulatorVersion == null || !config.rawConfig.tabulatorVersion
+        .equals(Main.APP_VERSION)) {
+      config.rawConfig.tabulatorVersion = Main.APP_VERSION;
+      Logger.log(Level.INFO, "Migrated tabulator version from %s to %s.",
+          config.rawConfig.tabulatorVersion, Main.APP_VERSION);
+    }
+  }
+
   private void loadConfig(ContestConfig config) {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
-
+    migrateConfigVersion(config);
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
@@ -838,7 +848,7 @@ public class GuiConfigController implements Initializable {
 
   private RawContestConfig createRawContestConfig() {
     RawContestConfig config = new RawContestConfig();
-
+    config.tabulatorVersion = Main.APP_VERSION;
     OutputSettings outputSettings = new OutputSettings();
     outputSettings.contestName = getTextOrEmptyString(textFieldContestName);
     outputSettings.outputDirectory = getTextOrEmptyString(textFieldOutputDirectory);
