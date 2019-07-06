@@ -213,7 +213,8 @@
     }, {
       "elected" : "JOHN ERWIN",
       "transfers" : {
-        "exhausted" : "1827.2600"
+        "exhausted" : "1827.2600",
+        "residual surplus" : "0.7400"
       }
     }, {
       "elected" : "MEG FORNEY",

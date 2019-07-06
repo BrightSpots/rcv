@@ -229,7 +229,8 @@
     "tallyResults" : [ {
       "elected" : "ANNIE YOUNG",
       "transfers" : {
-        "exhausted" : "177.5192"
+        "exhausted" : "177.5192",
+        "residual surplus" : "0.4808"
       }
     }, {
       "elected" : "MEG FORNEY",
