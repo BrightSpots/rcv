@@ -359,6 +359,8 @@ class StreamingCVRReader {
     xmlReader.setContentHandler(handler);
     // trigger parsing
     xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));
+    // close zip file
+    pkg.close();
 
     // throw if there were any unrecognized candidates -- this is considered bad
     if (unrecognizedCandidateCounts.size() > 0) {
