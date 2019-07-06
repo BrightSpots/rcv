@@ -10,7 +10,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "tiebreak_config_permutation_test_cvr.xlsx",
+      "filePath": "tiebreak_use_permutation_in_config_test_cvr.xlsx",
       "firstVoteColumnIndex": 2,
       "firstVoteRowIndex": 2,
       "provider": "ES&S"
