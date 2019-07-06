@@ -354,6 +354,8 @@ class Tabulator {
           roundToResidualSurplus.put(
               currentRound, roundToResidualSurplus.get(currentRound).add(winnerResidual));
           roundTally.put(winner, winningThreshold);
+          tallyTransfers.addTransfer(
+              currentRound, winner, TallyTransfers.RESIDUAL_TARGET, winnerResidual);
         }
       }
     }

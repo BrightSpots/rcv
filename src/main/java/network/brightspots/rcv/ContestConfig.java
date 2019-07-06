@@ -44,22 +44,6 @@ import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 
 class ContestConfig {
-  private static final int MIN_COLUMN_INDEX = 1;
-  private static final int MAX_COLUMN_INDEX = 1000;
-  private static final int MIN_ROW_INDEX = 1;
-  private static final int MAX_ROW_INDEX = 100000;
-  private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
-  private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
-  private static final int MIN_NUMBER_OF_WINNERS = 1;
-  private static final int MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 1;
-  private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
-  private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
-  private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
-  private static final int MIN_RANDOM_SEED = 0;
-  private static final String CDF_PROVIDER = "CDF";
-  private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
-  private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
-
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
@@ -77,6 +61,21 @@ class ContestConfig {
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
+  private static final int MIN_COLUMN_INDEX = 1;
+  private static final int MAX_COLUMN_INDEX = 1000;
+  private static final int MIN_ROW_INDEX = 1;
+  private static final int MAX_ROW_INDEX = 100000;
+  private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
+  private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
+  private static final int MIN_NUMBER_OF_WINNERS = 1;
+  private static final int MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 1;
+  private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
+  private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
+  private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
+  private static final int MIN_RANDOM_SEED = 0;
+  private static final String CDF_PROVIDER = "CDF";
+  private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
+  private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
 
   // underlying rawConfig object data
@@ -154,6 +153,43 @@ class ContestConfig {
 
   static boolean isCdf(CVRSource source) {
     return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER);
+  }
+
+  // function: candidateStringMatchesLabel
+  // purpose: Detects if a candidate name or code conflicts with one of the other user-supplied
+  //   strings (labels) that might be present in a cast vote record source file.
+  // param: candidateString is a candidate name or code
+  // param: field is either "name" or "code"
+  // param: label is a user-supplied string
+  // param: labelField is the field name for that user-supplied string
+  private static boolean candidateStringMatchesLabel(
+      String candidateString, String field, String label, String labelField) {
+    boolean match = false;
+
+    if (!isNullOrBlank(label) && label.equals(candidateString)) {
+      match = true;
+      Logger.log(
+          Level.SEVERE,
+          "\"%s\" can't be used as a candidate %s if it's also being used as the %s!",
+          candidateString,
+          field,
+          labelField);
+    }
+
+    return match;
+  }
+
+  private static boolean candidateStringIsReservedForTallyTransfers(String candidateString) {
+    boolean found = false;
+    if (!isNullOrBlank(candidateString)) {
+      for (String s : TallyTransfers.RESERVED_STRINGS) {
+        if (s.equalsIgnoreCase(candidateString)) {
+          found = true;
+          break;
+        }
+      }
+    }
+    return found;
   }
 
   // function: resolveConfigPath
@@ -325,26 +361,56 @@ class ContestConfig {
     }
   }
 
+  // function: candidateStringIsAlreadyInUseElsewhere
+  // purpose: Takes a candidate name or code and checks for conflicts with other name/codes or other
+  //   strings that are already being used in some other way.
+  // param: candidateString is a candidate name or code
+  // param: field is either "name" or "code"
+  // param: candidateStringsSeen is a running set of names/codes we've already encountered
+  private boolean candidateStringIsAlreadyInUseElsewhere(
+      String candidateString, String field, Set<String> candidateStringsSeen) {
+    boolean foundError = false;
+
+    if (candidateStringsSeen.contains(candidateString)) {
+      foundError = true;
+      Logger.log(
+          Level.SEVERE, "Duplicate candidate %ss are not allowed: %s", field, candidateString);
+    } else if (candidateStringIsReservedForTallyTransfers(candidateString)) {
+      foundError = true;
+      Logger.log(
+          Level.SEVERE,
+          "\"%s\" is a reserved term and can't be used as a candidate %s!",
+          candidateString,
+          field);
+    } else if (candidateStringMatchesLabel(
+        candidateString, field, getUndeclaredWriteInLabel(), "undeclaredWriteInLabel")
+        || candidateStringMatchesLabel(candidateString, field, getOvervoteLabel(), "overvoteLabel")
+        || candidateStringMatchesLabel(
+        candidateString, field, getUndervoteLabel(), "undervoteLabel")) {
+      foundError = true;
+    }
+
+    return foundError;
+  }
+
   private void validateCandidates() {
-    HashSet<String> candidateNameSet = new HashSet<>();
-    HashSet<String> candidateCodeSet = new HashSet<>();
+    Set<String> candidateNameSet = new HashSet<>();
+    Set<String> candidateCodeSet = new HashSet<>();
+
     for (Candidate candidate : rawConfig.candidates) {
       if (isNullOrBlank(candidate.getName())) {
         isValid = false;
         Logger.log(Level.SEVERE, "Name is required for each candidate!");
-      } else if (candidateNameSet.contains(candidate.getName())) {
+      } else if (candidateStringIsAlreadyInUseElsewhere(
+          candidate.getName(), "name", candidateNameSet)) {
         isValid = false;
-        Logger.log(
-            Level.SEVERE, "Duplicate candidate names are not allowed: %s", candidate.getName());
       } else {
         candidateNameSet.add(candidate.getName());
       }
 
       if (!isNullOrBlank(candidate.getCode())) {
-        if (candidateCodeSet.contains(candidate.getCode())) {
+        if (candidateStringIsAlreadyInUseElsewhere(candidate.getCode(), "code", candidateCodeSet)) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE, "Duplicate candidate codes are not allowed: %s", candidate.getCode());
         } else {
           candidateCodeSet.add(candidate.getCode());
         }
@@ -373,13 +439,14 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "Invalid tie-break mode!");
     }
 
-    if ((getTiebreakMode() == TieBreakMode.RANDOM ||
-        getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM ||
-        getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) &&
-        getRandomSeed() == null) {
+    if ((getTiebreakMode() == TieBreakMode.RANDOM
+        || getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
+        || getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION)
+        && getRandomSeed() == null) {
       isValid = false;
-      Logger.log(Level.SEVERE, "When tiebreakMode involves a random element, randomSeed must be "
-          + "supplied.");
+      Logger.log(
+          Level.SEVERE,
+          "When tiebreakMode involves a random element, randomSeed must be " + "supplied.");
     }
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {

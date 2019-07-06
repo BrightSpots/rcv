@@ -29,8 +29,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 // TallyTransfers class stores summary info on vote transfers
-// used primary as visualizer input to help build Sankey plots
+// used primarily as visualizer input to help build Sankey plots
 class TallyTransfers {
+
+  static final String RESIDUAL_TARGET = "residual surplus";
+  private static final String EXHAUSTED = "exhausted";
+  private static final String UNCOUNTED = "uncounted";
+  static final String[] RESERVED_STRINGS = {EXHAUSTED, RESIDUAL_TARGET, UNCOUNTED};
 
   // Map of round number to vote transfers which occurred in that round
   // transfers for a round are a map of SOURCE candidate(s) to one or more TARGET candidates.
@@ -55,11 +60,11 @@ class TallyTransfers {
   void addTransfer(int round, String sourceCandidate, String targetCandidate, BigDecimal value) {
     // null source means we are transferring the initial count
     if (sourceCandidate == null) {
-      sourceCandidate = "uncounted";
+      sourceCandidate = UNCOUNTED;
     }
     // null target means exhausted
     if (targetCandidate == null) {
-      targetCandidate = "exhausted";
+      targetCandidate = EXHAUSTED;
     }
 
     // lookup or create transfer entries for specified round
