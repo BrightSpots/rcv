@@ -63,14 +63,14 @@ class Tabulator {
   private final Map<String, Integer> winnerToRound = new HashMap<>();
   // tracks vote transfer summaries for visualizer
   private final TallyTransfers tallyTransfers = new TallyTransfers();
-  // tracks the current round (and when tabulation is complete, the total number of rounds)
-  private int currentRound = 0;
-  // tracks required winning threshold
-  private BigDecimal winningThreshold;
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // precincts which may appear in the cast vote records
   private final Set<String> precinctNames;
+  // tracks the current round (and when tabulation is complete, the total number of rounds)
+  private int currentRound = 0;
+  // tracks required winning threshold
+  private BigDecimal winningThreshold;
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
@@ -354,6 +354,8 @@ class Tabulator {
           roundToResidualSurplus.put(
               currentRound, roundToResidualSurplus.get(currentRound).add(winnerResidual));
           roundTally.put(winner, winningThreshold);
+          tallyTransfers.addTransfer(
+              currentRound, winner, TallyTransfers.RESIDUAL_TARGET, winnerResidual);
         }
       }
     }

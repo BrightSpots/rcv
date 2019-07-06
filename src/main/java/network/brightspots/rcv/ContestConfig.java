@@ -44,22 +44,6 @@ import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 
 class ContestConfig {
-  private static final int MIN_COLUMN_INDEX = 1;
-  private static final int MAX_COLUMN_INDEX = 1000;
-  private static final int MIN_ROW_INDEX = 1;
-  private static final int MAX_ROW_INDEX = 100000;
-  private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
-  private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
-  private static final int MIN_NUMBER_OF_WINNERS = 1;
-  private static final int MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 1;
-  private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
-  private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
-  private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
-  private static final int MIN_RANDOM_SEED = 0;
-  private static final String CDF_PROVIDER = "CDF";
-  private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
-  private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
-
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
@@ -76,6 +60,21 @@ class ContestConfig {
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
+  private static final int MIN_COLUMN_INDEX = 1;
+  private static final int MAX_COLUMN_INDEX = 1000;
+  private static final int MIN_ROW_INDEX = 1;
+  private static final int MAX_ROW_INDEX = 100000;
+  private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
+  private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
+  private static final int MIN_NUMBER_OF_WINNERS = 1;
+  private static final int MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 1;
+  private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
+  private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
+  private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
+  private static final int MIN_RANDOM_SEED = 0;
+  private static final String CDF_PROVIDER = "CDF";
+  private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
+  private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
 
   // underlying rawConfig object data
@@ -335,6 +334,18 @@ class ContestConfig {
         isValid = false;
         Logger.log(
             Level.SEVERE, "Duplicate candidate names are not allowed: %s", candidate.getName());
+      } else if (TallyTransfers.candidateStringIsReserved(candidate.getName())) {
+        isValid = false;
+        Logger.log(
+            Level.SEVERE,
+            "\"%s\" is a reserved term and can't be used as a candidate name!",
+            candidate.getName());
+      } else if (TallyTransfers.candidateStringIsReserved(candidate.getCode())) {
+        isValid = false;
+        Logger.log(
+            Level.SEVERE,
+            "\"%s\" is a reserved term and can't be used as a candidate code!",
+            candidate.getCode());
       } else {
         candidateNameSet.add(candidate.getName());
       }
@@ -372,13 +383,14 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "Invalid tie-break mode!");
     }
 
-    if ((getTiebreakMode() == TieBreakMode.RANDOM ||
-        getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM ||
-        getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) &&
-        getRandomSeed() == null) {
+    if ((getTiebreakMode() == TieBreakMode.RANDOM
+        || getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
+        || getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION)
+        && getRandomSeed() == null) {
       isValid = false;
-      Logger.log(Level.SEVERE, "When tiebreakMode involves a random element, randomSeed must be "
-          + "supplied.");
+      Logger.log(
+          Level.SEVERE,
+          "When tiebreakMode involves a random element, randomSeed must be " + "supplied.");
     }
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {

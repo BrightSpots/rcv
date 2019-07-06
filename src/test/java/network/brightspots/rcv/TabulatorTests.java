@@ -147,7 +147,7 @@ class TabulatorTests {
       for (File file : outputFolder.listFiles()) {
         if (!file.isDirectory()) {
           //noinspection ResultOfMethodCallIgnored
-          file.delete();
+          //file.delete();
         }
       }
     }
