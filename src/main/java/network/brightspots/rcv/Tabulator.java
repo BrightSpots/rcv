@@ -200,7 +200,7 @@ class Tabulator {
           }
         }
       } else if (winnerToRound.size() < config.getNumberOfWinners()
-          || (config.willContinueUntilTwoCandidatesRemain()
+          || (config.isContinueUntilTwoCandidatesRemainEnabled()
           && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)) {
         // We need to make more eliminations if
         // a) we haven't found all the winners yet, or
@@ -401,7 +401,7 @@ class Tabulator {
     // how many winners have been selected
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
-    if (config.willContinueUntilTwoCandidatesRemain()) {
+    if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
@@ -426,7 +426,7 @@ class Tabulator {
   private boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING
-        || (status == CandidateStatus.WINNER && config.willContinueUntilTwoCandidatesRemain());
+        || (status == CandidateStatus.WINNER && config.isContinueUntilTwoCandidatesRemainEnabled());
   }
 
   // function: getCandidateStatus

@@ -12,7 +12,9 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         value: text string of length [1..1000]
 
       "outputDirectory" optional
-        directory for visualizer and audit output files (absolute or relative path)
+        directory for visualizer and audit output files
+        if a relative path is supplied it will be appended to the current working directory
+        if an absolute path is supplied it will be used as is
         example: /Path/To/TabulatorResults
         example: output_data/contest1
         value: string of length [1..1000]
@@ -76,8 +78,10 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         value: [1..1000]
 
       "provider" optional
-        text description of the vendor / machine which generated this file -- not used by the tabulator
+        text description of the vendor / machine which generated this file
         example: "ES&S"
+        if set to "CDF" the CVR file will be read as NIST Common Data Format
+        if not supplied: file will be read as ES&S format
         value: text string of length [1..1000]
 
   "candidates" required
@@ -133,12 +137,12 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
       "maxSkippedRanksAllowed" required
         maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted; if "unlimited" is entered, a ballot will never be considered exhausted due to skipped ranks
         example: 1
-        value: [unlimited, 0..2147483647]
+        value: [unlimited, 0..1000000]
 
       "maxRankingsAllowed" required
         maximum number of candidates that a ballot is allowed to rank; if "max" is entered, this will default to the total number of declared candidates
         example: 15
-        values: [max, 1..2147483647]
+        values: [max, 1..1000000]
 
       "sequentialMultiSeat" optional
         instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats
