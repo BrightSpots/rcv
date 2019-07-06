@@ -443,11 +443,19 @@ class TabulatorTests {
     runTabulationTest("test_set_multi_winner_fractional_threshold");
   }
 
-  // function: tiebreakUsingConfigPermutation
+  // function: tiebreakUsePermutationInConfigTest
   // purpose: tests tiebreak using config permutation setting
   @Test
-  @DisplayName("tiebreak using config permutation")
-  void tiebreakUsingConfigPermutation() {
-    runTabulationTest("tiebreak_config_permutation_test");
+  @DisplayName("tiebreak using permutation in config")
+  void tiebreakUsePermutationInConfigTest() {
+    runTabulationTest("tiebreak_use_permutation_in_config_test");
+  }
+
+  // function: tiebreakGeneratePermutationTest
+  // purpose: tests tiebreak using generated permutation
+  @Test
+  @DisplayName("tiebreak using generated permutation")
+  void tiebreakGeneratePermutationTest() {
+    runTabulationTest("tiebreak_generate_permutation_test");
   }
 }
