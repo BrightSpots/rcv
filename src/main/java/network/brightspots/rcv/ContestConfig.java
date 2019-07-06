@@ -179,19 +179,6 @@ class ContestConfig {
     return match;
   }
 
-  private static boolean candidateStringIsReservedForTallyTransfers(String candidateString) {
-    boolean found = false;
-    if (!isNullOrBlank(candidateString)) {
-      for (String s : TallyTransfers.RESERVED_STRINGS) {
-        if (s.equalsIgnoreCase(candidateString)) {
-          found = true;
-          break;
-        }
-      }
-    }
-    return found;
-  }
-
   // function: resolveConfigPath
   // purpose: given a path returns absolute path for use in File IO
   // param: path from this config file (cvr or output folder)
@@ -375,18 +362,19 @@ class ContestConfig {
       foundError = true;
       Logger.log(
           Level.SEVERE, "Duplicate candidate %ss are not allowed: %s", field, candidateString);
-    } else if (candidateStringIsReservedForTallyTransfers(candidateString)) {
+    } else if (TallyTransfers.RESERVED_STRINGS.contains(candidateString)) {
       foundError = true;
       Logger.log(
           Level.SEVERE,
           "\"%s\" is a reserved term and can't be used as a candidate %s!",
           candidateString,
           field);
-    } else if (candidateStringMatchesLabel(
-        candidateString, field, getUndeclaredWriteInLabel(), "undeclaredWriteInLabel")
-        || candidateStringMatchesLabel(candidateString, field, getOvervoteLabel(), "overvoteLabel")
-        || candidateStringMatchesLabel(
-        candidateString, field, getUndervoteLabel(), "undervoteLabel")) {
+    } else if (
+        candidateStringMatchesLabel(candidateString, field, getOvervoteLabel(), "overvoteLabel")
+            || candidateStringMatchesLabel(candidateString, field, getUndervoteLabel(),
+            "undervoteLabel")
+            || candidateStringMatchesLabel(candidateString, field, getUndeclaredWriteInLabel(),
+            "undeclaredWriteInLabel")) {
       foundError = true;
     }
 
