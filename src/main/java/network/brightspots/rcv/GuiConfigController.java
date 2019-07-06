@@ -170,6 +170,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxBottomsUpMultiSeat;
   @FXML
+  private CheckBox checkBoxAllowOnlyOneWinnerPerRound;
+  @FXML
   private CheckBox checkBoxNonIntegerWinningThreshold;
   @FXML
   private CheckBox checkBoxHareQuota;
@@ -495,6 +497,7 @@ public class GuiConfigController implements Initializable {
     checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
     checkBoxSequentialMultiSeat.setSelected(ContestConfig.SUGGESTED_SEQUENTIAL_MULTI_SEAT);
     checkBoxBottomsUpMultiSeat.setSelected(ContestConfig.SUGGESTED_BOTTOMS_UP_MULTI_SEAT);
+    checkBoxAllowOnlyOneWinnerPerRound.setSelected(ContestConfig.SUGGESTED_ALLOW_ONLY_ONE_WINNER_PER_ROUND);
     checkBoxNonIntegerWinningThreshold.setSelected(
         ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
     checkBoxHareQuota.setSelected(ContestConfig.SUGGESTED_HARE_QUOTA);
@@ -551,6 +554,7 @@ public class GuiConfigController implements Initializable {
     textFieldRulesDescription.clear();
     checkBoxSequentialMultiSeat.setSelected(false);
     checkBoxBottomsUpMultiSeat.setSelected(false);
+    checkBoxAllowOnlyOneWinnerPerRound.setSelected(false);
     checkBoxNonIntegerWinningThreshold.setSelected(false);
     checkBoxHareQuota.setSelected(false);
     checkBoxBatchElimination.setSelected(false);
@@ -815,6 +819,7 @@ public class GuiConfigController implements Initializable {
     textFieldRulesDescription.setText(rules.rulesDescription);
     checkBoxSequentialMultiSeat.setSelected(rules.sequentialMultiSeat);
     checkBoxBottomsUpMultiSeat.setSelected(rules.bottomsUpMultiSeat);
+    checkBoxAllowOnlyOneWinnerPerRound.setSelected(rules.allowOnlyOneWinnerPerRound);
     checkBoxNonIntegerWinningThreshold.setSelected(rules.nonIntegerWinningThreshold);
     checkBoxHareQuota.setSelected(rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
@@ -875,6 +880,7 @@ public class GuiConfigController implements Initializable {
     rules.maxRankingsAllowed = getTextOrEmptyString(textFieldMaxRankingsAllowed);
     rules.sequentialMultiSeat = checkBoxSequentialMultiSeat.isSelected();
     rules.bottomsUpMultiSeat = checkBoxBottomsUpMultiSeat.isSelected();
+    rules.allowOnlyOneWinnerPerRound = checkBoxAllowOnlyOneWinnerPerRound.isSelected();
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
     rules.hareQuota = checkBoxHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();

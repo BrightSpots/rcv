@@ -14,6 +14,9 @@ build
 out
 tmp
 
+# Excel temp files
+~$*.xlsx
+
 ### JetBrains IntelliJ exclusions
 .idea/**/workspace*.xml
 

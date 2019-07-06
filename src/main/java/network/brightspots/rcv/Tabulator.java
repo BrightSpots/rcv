@@ -63,14 +63,14 @@ class Tabulator {
   private final Map<String, Integer> winnerToRound = new HashMap<>();
   // tracks vote transfer summaries for visualizer
   private final TallyTransfers tallyTransfers = new TallyTransfers();
-  // tracks the current round (and when tabulation is complete, the total number of rounds)
-  private int currentRound = 0;
-  // tracks required winning threshold
-  private BigDecimal winningThreshold;
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // precincts which may appear in the cast vote records
   private final Set<String> precinctNames;
+  // tracks the current round (and when tabulation is complete, the total number of rounds)
+  private int currentRound = 0;
+  // tracks required winning threshold
+  private BigDecimal winningThreshold;
 
   // function: Tabulator constructor
   // purpose: assigns input params to member variables and caches the candidateID list
@@ -451,7 +451,8 @@ class Tabulator {
   // return: list of winning candidates in this round (if any)
   private List<String> identifyWinners(
       Map<String, BigDecimal> currentRoundCandidateToTally,
-      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates) {
+      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
+      throws TabulationCancelledException {
     // store result here
     List<String> selectedWinners = new LinkedList<>();
 
@@ -473,6 +474,39 @@ class Tabulator {
             selectedWinners.addAll(winningCandidates);
           }
         }
+      }
+    }
+
+    // Edge case: if we've identified multiple winners in this round but we're only supposed to
+    // elect one winner per round, pick the top vote-getter and defer the others to subsequent
+    // rounds.
+    if (config.isAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
+      // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
+      BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
+      selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
+      // But if there are multiple candidates tied for the max tally, we need to break the tie.
+      if (selectedWinners.size() > 1) {
+        TieBreak tieBreak =
+            new TieBreak(
+                true,
+                selectedWinners,
+                config.getTiebreakMode(),
+                currentRound,
+                maxVotes,
+                roundTallies,
+                config.getCandidatePermutation());
+        String winner = tieBreak.selectCandidate();
+        // replace the list of tied candidates with our single tie-break winner
+        selectedWinners = new LinkedList<>();
+        selectedWinners.add(winner);
+        Logger.log(
+            Level.INFO,
+            "Candidate \"%s\" won a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
+            winner,
+            currentRound,
+            tieBreak.nonSelectedCandidateDescription(),
+            maxVotes.toString(),
+            tieBreak.getExplanation());
       }
     }
 
@@ -591,6 +625,7 @@ class Tabulator {
       // create new TieBreak object to pick a loser
       TieBreak tieBreak =
           new TieBreak(
+              false,
               lastPlaceCandidates,
               config.getTiebreakMode(),
               currentRound,
@@ -599,13 +634,13 @@ class Tabulator {
               config.getCandidatePermutation());
 
       // results of tiebreak stored here
-      eliminatedCandidate = tieBreak.selectLoser();
+      eliminatedCandidate = tieBreak.selectCandidate();
       Logger.log(
           Level.INFO,
           "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
           eliminatedCandidate,
           currentRound,
-          tieBreak.nonLosingCandidateDescription(),
+          tieBreak.nonSelectedCandidateDescription(),
           minVotes.toString(),
           tieBreak.getExplanation());
     } else {
