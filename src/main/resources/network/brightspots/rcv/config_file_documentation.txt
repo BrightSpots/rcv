@@ -5,7 +5,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
     version of the application which created this file
     used for migrating config data between different application versions
     example: "1.0.0"
-    value: text string
+    value: text string of length [1..1000]
 
   "outputSettings" required
     list of output settings and their associated parameters

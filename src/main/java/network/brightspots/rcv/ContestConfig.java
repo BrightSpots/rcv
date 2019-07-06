@@ -225,19 +225,23 @@ class ContestConfig {
   private void validateTabulatorVersion() {
     if (isNullOrBlank(getTabulatorVersion())) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Tabulator version is required!");
+      Logger.log(Level.SEVERE, "tabulatorVersion is required!");
     } else {
       if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
         isValid = false;
-        Logger.log(Level.SEVERE, "Tabulator version %s not supported!", getTabulatorVersion());
+        Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!.", getTabulatorVersion(),
+            Main.APP_VERSION);
       }
+    }
+    if (!isValid) {
+      Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s.", Main.APP_VERSION);
     }
   }
 
   private void validateOutputSettings() {
     if (isNullOrBlank(getContestName())) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest name is required!");
+      Logger.log(Level.SEVERE, "contestName is required!");
     }
   }
 
