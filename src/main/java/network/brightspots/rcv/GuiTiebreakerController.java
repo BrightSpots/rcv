@@ -59,7 +59,7 @@ public class GuiTiebreakerController {
     listViewCandidates.setItems(FXCollections.observableArrayList(tiedCandidates));
   }
 
-  void populateText(boolean selectingAWinner) {
+  void populateLabelAndButtonText(boolean selectingAWinner) {
     labelSelectionPrompt.setText(
         "Please select a candidate to " + (selectingAWinner ? "elect" : "eliminate") + ":");
     buttonSelect.setText((selectingAWinner ? "Elect" : "Eliminate") + " Candidate");

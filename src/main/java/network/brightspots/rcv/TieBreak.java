@@ -142,25 +142,25 @@ class TieBreak {
   String selectCandidate() throws TabulationCancelledException {
     switch (tieBreakMode) {
       case INTERACTIVE:
-        doInteractive();
+        selectedCandidate = doInteractive();
         break;
       case RANDOM:
-        doRandom();
+        selectedCandidate = doRandom();
         break;
       case GENERATE_PERMUTATION:
       case USE_PERMUTATION_IN_CONFIG:
-        doPermutationSelection();
+        selectedCandidate = doPermutationSelection();
         break;
       default:
         // handle tiebreaks that involve previous round tallies
         // selectedCandidate will be set if there is a previous round count winner/loser
         // it will be null if candidates are still tied all the way back to the first round
-        doPreviousRounds();
+        selectedCandidate = doPreviousRounds();
         if (selectedCandidate == null) {
           if (tieBreakMode == Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
-            doInteractive();
+            selectedCandidate = doInteractive();
           } else {
-            doRandom();
+            selectedCandidate = doRandom();
           }
         }
     }
@@ -169,7 +169,9 @@ class TieBreak {
 
   // function: doPermutationSelection
   // purpose: select the candidate based on the provided permutation order
-  private void doPermutationSelection() {
+  // returns: selected candidate
+  private String doPermutationSelection() {
+    String selection = null;
     // create a set to simplify matching logic
     Set<String> tiedCandidatesSet = new HashSet<>(tiedCandidates);
 
@@ -183,7 +185,7 @@ class TieBreak {
     for (int i = 0; i < permutationToSearch.size(); i++) {
       String candidate = permutationToSearch.get(i);
       if (tiedCandidatesSet.contains(candidate)) {
-        selectedCandidate = candidate;
+        selection = candidate;
         break;
       }
     }
@@ -191,11 +193,13 @@ class TieBreak {
         "The selected candidate appeared "
             + (selectingAWinner ? "earliest" : "latest")
             + " in the tie-breaking permutation list.";
+    return selection;
   }
 
   // function doInteractiveCli
   // purpose: interactively select the winner/loser of this tiebreak via the command-line interface
-  private void doInteractiveCli() throws TabulationCancelledException {
+  // returns: selected candidate
+  private String doInteractiveCli() throws TabulationCancelledException {
     System.out.println(
         String.format(
             "Tie in round %d for the following candidates, each of whom has %d vote(s): ",
@@ -213,7 +217,9 @@ class TieBreak {
             + " to cancel): ";
     System.out.println(TIEBREAKER_PROMPT);
 
-    while (selectedCandidate == null) {
+    String selection = null;
+
+    while (selection == null) {
       Scanner sc = new Scanner(System.in);
       String userInput = sc.nextLine();
       if (userInput.equals(CANCEL_COMMAND)) {
@@ -225,21 +231,24 @@ class TieBreak {
         int choice = Integer.parseInt(userInput);
         if (choice >= 1 && choice <= tiedCandidates.size()) {
           // Convert from 1-indexed list back to 0-indexed list.
-          selectedCandidate = tiedCandidates.get(choice - 1);
+          selection = tiedCandidates.get(choice - 1);
         }
       } catch (NumberFormatException exception) {
         // if parseInt failed selectedCandidate will be null and we will retry
       }
-      if (selectedCandidate == null) {
+      if (selection == null) {
         System.out.println("Invalid selection. Please try again.");
         System.out.println(TIEBREAKER_PROMPT);
       }
     }
+
+    return selection;
   }
 
   // function doInteractiveGui
   // purpose: interactively select the loser of this tiebreak via the graphical user interface
-  private void doInteractiveGui() throws TabulationCancelledException {
+  // returns: selected candidate
+  private String doInteractiveGui() throws TabulationCancelledException {
     Logger.log(
         Level.INFO,
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
@@ -252,7 +261,9 @@ class TieBreak {
             + (selectingAWinner ? "win" : "lose")
             + " this tiebreaker.");
 
-    while (selectedCandidate == null) {
+    String selection = null;
+
+    while (selection == null) {
       try {
         FutureTask<GuiTiebreakerPromptResponse> futureTask =
             new FutureTask<>(new GuiTiebreakerPrompt());
@@ -261,45 +272,54 @@ class TieBreak {
         if (guiTiebreakerPromptResponse.tabulationCancelled) {
           throw new TabulationCancelledException();
         } else {
-          selectedCandidate = guiTiebreakerPromptResponse.selectedCandidate;
+          selection = guiTiebreakerPromptResponse.selectedCandidate;
         }
       } catch (InterruptedException | ExecutionException exception) {
         Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
       }
-      if (selectedCandidate == null) {
+      if (selection == null) {
         Logger.log(Level.WARNING, "Invalid selection! Please try again.");
       }
     }
+
+    return selection;
   }
 
   // function doInteractive
   // purpose: interactively select the winner/loser of this tiebreak
-  private void doInteractive() throws TabulationCancelledException {
-    explanation = "The selected candidate was supplied by the operator.";
+  // returns: selected candidate
+  private String doInteractive() throws TabulationCancelledException {
+    String selection;
     if (GuiContext.getInstance().getConfig() != null) {
-      doInteractiveGui();
+      selection = doInteractiveGui();
     } else {
-      doInteractiveCli();
+      selection = doInteractiveCli();
     }
+    explanation = "The selected candidate was supplied by the operator.";
+    return selection;
   }
 
   // function doRandom
   // purpose: randomly select the winner/loser for this tiebreak
-  private void doRandom() {
+  // returns: selected candidate
+  private String doRandom() {
     // random number used for random candidate selection
     double randomDouble = random.nextDouble();
     // index of randomly selected candidate
     int randomCandidateIndex = (int) Math.floor(randomDouble * (double) tiedCandidates.size());
     explanation = "The candidate was randomly selected.";
-    selectedCandidate = tiedCandidates.get(randomCandidateIndex);
+    return tiedCandidates.get(randomCandidateIndex);
   }
 
   // function doPreviousRounds
   // purpose: select candidate based on previous round tallies
-  private void doPreviousRounds() {
+  // returns: selected candidate
+  private String doPreviousRounds() {
+    String selection = null;
     // stores candidates still in contention while we iterate through previous rounds to determine
     // the selection
     Set<String> candidatesInContention = new HashSet<>(tiedCandidates);
+
     for (int round = this.round - 1; round > 0; round--) {
       // map of tally to candidate IDs for round under consideration
       SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates =
@@ -308,7 +328,7 @@ class TieBreak {
           selectingAWinner ? tallyToCandidates.lastKey() : tallyToCandidates.firstKey();
       LinkedList<String> candidatesWithVoteTotal = tallyToCandidates.get(voteTotalForSelection);
       if (candidatesWithVoteTotal.size() == 1) {
-        selectedCandidate = candidatesWithVoteTotal.getFirst();
+        selection = candidatesWithVoteTotal.getFirst();
         explanation =
             String.format(
                 "%s had the %s votes (%s) in round %d.",
@@ -322,6 +342,8 @@ class TieBreak {
         candidatesInContention = new HashSet<>(candidatesWithVoteTotal);
       }
     }
+
+    return selection;
   }
 
   class GuiTiebreakerPrompt implements Callable<GuiTiebreakerPromptResponse> {
@@ -338,7 +360,7 @@ class TieBreak {
         Parent root = loader.load();
         GuiTiebreakerController controller = loader.getController();
         controller.populateTiedCandidates(tiedCandidates);
-        controller.populateText(selectingAWinner);
+        controller.populateLabelAndButtonText(selectingAWinner);
         window.setScene(new Scene(root));
         window.showAndWait();
         guiTiebreakerPromptResponse =
