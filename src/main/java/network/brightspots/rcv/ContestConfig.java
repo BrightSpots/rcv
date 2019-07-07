@@ -257,7 +257,7 @@ class ContestConfig {
         isValid = false;
         Logger.log(
             Level.SEVERE,
-            "tabulatorVersion %s not supported!.",
+            "tabulatorVersion %s not supported!",
             getTabulatorVersion(),
             Main.APP_VERSION);
       }
