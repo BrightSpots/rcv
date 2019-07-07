@@ -841,7 +841,7 @@ class Tabulator {
     }
     // determine outcome type
     VoteOutcomeType outcomeType =
-        (selectedCandidate == null) ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
+        selectedCandidate == null ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
     // log the vote outcome
     cvr.logRoundOutcome(
         currentRound, outcomeType, outcomeDescription, cvr.getFractionalTransferValue());
