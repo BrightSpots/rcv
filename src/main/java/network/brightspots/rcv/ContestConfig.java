@@ -463,7 +463,7 @@ class ContestConfig {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "When tiebreakMode involves a random element, randomSeed must be " + "supplied.");
+          "When tiebreakMode involves a random element, randomSeed must be supplied.");
     }
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {

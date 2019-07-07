@@ -68,7 +68,7 @@ class Tabulator {
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // precincts which may appear in the cast vote records
   private final Set<String> precinctNames;
-  // tracks the current round (and when tabulation is complete, the total number of rounds)
+  // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
   // tracks required winning threshold
   private BigDecimal winningThreshold;

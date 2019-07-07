@@ -155,7 +155,7 @@ class TabulatorSession {
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
-          Logger.log(Level.INFO, "Tabulation for seat #%d complete.",
+          Logger.log(Level.INFO, "Tabulation for seat #%d completed.",
               config.getSequentialWinners().size());
           if (config.getSequentialWinners().size() < numWinners) {
             Logger.log(Level.INFO, "Excluding %s from the remaining tabulations.", newWinner);
@@ -182,7 +182,7 @@ class TabulatorSession {
           }
         }
       }
-      Logger.log(Level.INFO, "Tabulation session complete.");
+      Logger.log(Level.INFO, "Tabulation session completed.");
       if (tabulationSuccess) {
         Logger.log(Level.INFO, "Results written to: %s", outputPath);
       }
