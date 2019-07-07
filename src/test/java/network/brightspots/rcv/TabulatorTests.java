@@ -34,7 +34,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Level;
-import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -464,6 +463,14 @@ class TabulatorTests {
     runTabulationTest("tiebreak_generate_permutation_test");
   }
 
+  // function: tiebreakPreviousRoundCountsThenRandomTest
+  // purpose: tests tiebreak using previousRoundCountsThenRandom setting
+  @Test
+  @DisplayName("tiebreak using previousRoundCountsThenRandom")
+  void tiebreakPreviousRoundCountsThenRandomTest() {
+    runTabulationTest("tiebreak_previous_round_counts_then_random_test");
+  }
+
   // function: treatBlankAsUndeclaredWriteInTest
   // purpose: tests treatBlankAsUndeclaredWriteIn setting
   @Test
@@ -471,5 +478,4 @@ class TabulatorTests {
   void treatBlankAsUndeclaredWriteInTest() {
     runTabulationTest("test_set_treat_blank_as_undeclared_write_in");
   }
-
 }
