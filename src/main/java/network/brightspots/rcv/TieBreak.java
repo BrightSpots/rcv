@@ -113,23 +113,23 @@ class TieBreak {
       }
     }
     // container for results
-    String nonselected;
+    String nonSelected;
     if (options.size() == 1) {
-      nonselected = options.get(0);
+      nonSelected = String.format("\"%s\"", options.get(0));
     } else if (options.size() == 2) {
       // if there are only 2 candidates don't use a comma
-      nonselected = '"' + options.get(0) + "\" and \"" + options.get(1) + '"';
+      nonSelected = String.format("\"%s\" and \"%s\"", options.get(0), options.get(1));
     } else {
       // StringBuilder for faster string construction
       StringBuilder stringBuilder = new StringBuilder();
       // i indexes over all candidates
       for (int i = 0; i < options.size() - 1; i++) {
-        stringBuilder.append('"').append(options.get(i)).append("\", ");
+        stringBuilder.append("\"").append(options.get(i)).append("\", ");
       }
-      stringBuilder.append("and \"").append(options.get(options.size() - 1)).append('"');
-      nonselected = stringBuilder.toString();
+      stringBuilder.append("and \"").append(options.get(options.size() - 1)).append("\"");
+      nonSelected = stringBuilder.toString();
     }
-    return nonselected;
+    return nonSelected;
   }
 
   String getExplanation() {
