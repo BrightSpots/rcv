@@ -202,7 +202,7 @@ class Tabulator {
         }
       } else if (winnerToRound.size() < config.getNumberOfWinners()
           || (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()
-          && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)) {
+              && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)) {
         // We need to make more eliminations if
         // a) we haven't found all the winners yet, or
         // b) we've found our winner, but we're continuing until we have only two candidates
@@ -416,8 +416,8 @@ class Tabulator {
       // bottoms-up is enabled, in which case we can stop as soon as we've declared the winners.
       return numWinnersDeclared < config.getNumberOfWinners()
           || (config.getNumberOfWinners() > 1
-          && winnerToRound.values().contains(currentRound)
-          && !config.isMultiSeatBottomsUpEnabled());
+              && winnerToRound.values().contains(currentRound)
+              && !config.isMultiSeatBottomsUpEnabled());
     }
   }
 
@@ -430,7 +430,7 @@ class Tabulator {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING
         || (status == CandidateStatus.WINNER
-        && config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled());
+            && config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled());
   }
 
   // function: getCandidateStatus
@@ -691,7 +691,8 @@ class Tabulator {
           numBallotsByPrecinct.put(precinct, currentTally + 1);
         }
       }
-      writer.generatePrecinctSummaryFiles(precinctRoundTallies, precinctTallyTransfers, numBallotsByPrecinct);
+      writer.generatePrecinctSummaryFiles(
+          precinctRoundTallies, precinctTallyTransfers, numBallotsByPrecinct);
     }
 
     if (config.isGenerateCdfJsonEnabled()) {
@@ -819,18 +820,23 @@ class Tabulator {
   //  update tallyTransfers counts
   private void recordSelectionForCastVoteRecord(
       CastVoteRecord cvr, int currentRound, String selectedCandidate, String outcomeDescription) {
-    // update transfer counts
-    tallyTransfers.addTransfer(
-        currentRound,
-        cvr.getCurrentRecipientOfVote(),
-        selectedCandidate,
-        cvr.getFractionalTransferValue());
-    if (config.isTabulateByPrecinctEnabled()) {
-      precinctTallyTransfers.get(cvr.getPrecinct()).addTransfer(
+    // update transfer counts (unless there's no value to transfer, which can happen if someone
+    // wins with a tally that exactly matches the winning threshold)
+    if (cvr.getFractionalTransferValue().signum() == 1) {
+      tallyTransfers.addTransfer(
           currentRound,
           cvr.getCurrentRecipientOfVote(),
           selectedCandidate,
           cvr.getFractionalTransferValue());
+      if (config.isTabulateByPrecinctEnabled()) {
+        precinctTallyTransfers
+            .get(cvr.getPrecinct())
+            .addTransfer(
+                currentRound,
+                cvr.getCurrentRecipientOfVote(),
+                selectedCandidate,
+                cvr.getFractionalTransferValue());
+      }
     }
 
     // update cvr recipient
@@ -1205,7 +1211,5 @@ class Tabulator {
     }
   }
 
-  static class TabulationCancelledException extends Exception {
-
-  }
+  static class TabulationCancelledException extends Exception {}
 }
