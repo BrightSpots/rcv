@@ -177,8 +177,7 @@ class Tabulator {
         }
         // In multi-seat contests, we always redistribute the surplus (if any) unless bottoms-up
         // is enabled.
-        if (config.getNumberOfWinners() > 1
-            && config.getWinnerElectionMode() != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP) {
+        if (config.getNumberOfWinners() > 1 && !config.isMultiSeatBottomsUpEnabled()) {
           for (String winner : winners) {
             // number of votes the candidate got this round
             BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
@@ -202,8 +201,7 @@ class Tabulator {
           }
         }
       } else if (winnerToRound.size() < config.getNumberOfWinners()
-          || (config.getWinnerElectionMode()
-          == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN
+          || (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()
           && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)) {
         // We need to make more eliminations if
         // a) we haven't found all the winners yet, or
@@ -406,8 +404,7 @@ class Tabulator {
     // how many winners have been selected
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
-    if (config.getWinnerElectionMode()
-        == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN) {
+    if (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
@@ -420,7 +417,7 @@ class Tabulator {
       return numWinnersDeclared < config.getNumberOfWinners()
           || (config.getNumberOfWinners() > 1
           && winnerToRound.values().contains(currentRound)
-          && config.getWinnerElectionMode() != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP);
+          && !config.isMultiSeatBottomsUpEnabled());
     }
   }
 
@@ -433,8 +430,7 @@ class Tabulator {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING
         || (status == CandidateStatus.WINNER
-        && config.getWinnerElectionMode()
-        == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
+        && config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled());
   }
 
   // function: getCandidateStatus
@@ -472,7 +468,7 @@ class Tabulator {
       if (currentRoundCandidateToTally.size()
           == config.getNumberOfWinners() - winnerToRound.size()) {
         selectedWinners.addAll(currentRoundCandidateToTally.keySet());
-      } else if (config.getWinnerElectionMode() != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP) {
+      } else if (!config.isMultiSeatBottomsUpEnabled()) {
         // We see if anyone has met/exceeded the threshold (unless bottoms-up is enabled, in which
         // case we just wait until there are numWinners candidates remaining and then declare all of
         // them as winners simultaneously).
@@ -490,9 +486,7 @@ class Tabulator {
     // Edge case: if we've identified multiple winners in this round but we're only supposed to
     // elect one winner per round, pick the top vote-getter and defer the others to subsequent
     // rounds.
-    if (config.getWinnerElectionMode()
-        == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND
-        && selectedWinners.size() > 1) {
+    if (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
       // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
       BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
       selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
@@ -1147,10 +1141,10 @@ class Tabulator {
 
   enum WinnerElectionMode {
     STANDARD("standard"),
+    SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN("singleSeatContinueUntilTwoCandidatesRemain"),
     MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("multiSeatAllowOnlyOneWinnerPerRound"),
     MULTI_SEAT_BOTTOMS_UP("multiSeatBottomsUp"),
-    MULTI_SEAT_SEQUENTIAL_WINNER_TAKE_ALL("multiSeatSequentialWinnerTakeAll"),
-    SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN("singleSeatContinueUntilTwoCandidatesRemain"),
+    MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("multiSeatSequentialWinnerTakesAll"),
     MODE_UNKNOWN("modeUnknown");
 
     private final String label;

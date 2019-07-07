@@ -58,6 +58,7 @@ class ContestConfig {
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
+  static final WinnerElectionMode SUGGESTED_WINNER_ELECTION_MODE = WinnerElectionMode.STANDARD;
   private static final int MIN_COLUMN_INDEX = 1;
   private static final int MAX_COLUMN_INDEX = 1000;
   private static final int MIN_ROW_INDEX = 1;
@@ -542,8 +543,7 @@ class ContestConfig {
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
     if (getNumberOfWinners() != null && getNumberOfWinners() > 1) {
-      if (getWinnerElectionMode()
-          == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN) {
+      if (isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
         isValid = false;
         Logger.log(
             Level.SEVERE,
@@ -556,19 +556,18 @@ class ContestConfig {
         Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
       }
     } else {
-      if (getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKE_ALL) {
+      if (isMultiSeatSequentialWinnerTakesAllEnabled()) {
         isValid = false;
         Logger.log(
             Level.SEVERE,
-            "winnerElectionMode can't be multiSeatSequentialWinnerTakeAll "
-                + "in a single-seat contest!");
-      } else if (getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP) {
+            "winnerElectionMode can't be multiSeatSequentialWinnerTakesAll in a single-seat " +
+                "contest!");
+      } else if (isMultiSeatBottomsUpEnabled()) {
         isValid = false;
         Logger.log(
             Level.SEVERE,
-            "winnerElectionMode can't be multiSeatBottomsUp in a " + "single-seat contest!");
-      } else if (getWinnerElectionMode()
-          == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND) {
+            "winnerElectionMode can't be multiSeatBottomsUp in a single-seat contest!");
+      } else if (isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()) {
         isValid = false;
         Logger.log(
             Level.SEVERE,
@@ -582,8 +581,7 @@ class ContestConfig {
       }
     }
 
-    if (getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP
-        && isBatchEliminationEnabled()) {
+    if (isMultiSeatBottomsUpEnabled() && isBatchEliminationEnabled()) {
       isValid = false;
       Logger.log(
           Level.SEVERE,
@@ -645,6 +643,23 @@ class ContestConfig {
   WinnerElectionMode getWinnerElectionMode() {
     WinnerElectionMode mode = WinnerElectionMode.getByLabel(rawConfig.rules.winnerElectionMode);
     return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
+  }
+
+  boolean isSingleSeatContinueUntilTwoCandidatesRemainEnabled() {
+    return getWinnerElectionMode()
+        == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN;
+  }
+
+  boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND;
+  }
+
+  boolean isMultiSeatBottomsUpEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP;
+  }
+
+  boolean isMultiSeatSequentialWinnerTakesAllEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL;
   }
 
   boolean isNonIntegerWinningThresholdEnabled() {

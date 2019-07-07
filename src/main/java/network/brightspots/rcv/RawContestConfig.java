@@ -179,6 +179,7 @@ public class RawContestConfig {
     public String tiebreakMode;
     // which overvote rule to use
     public String overvoteRule;
+    public String winnerElectionMode;
     public Integer randomSeed;
     // setting for number of winners
     public Integer numberOfWinners;
@@ -190,7 +191,6 @@ public class RawContestConfig {
     public String maxSkippedRanksAllowed;
     // max rankings allowed
     public String maxRankingsAllowed;
-    public String winnerElectionMode;
     public boolean nonIntegerWinningThreshold;
     public boolean hareQuota;
     // are we using batch elimination?

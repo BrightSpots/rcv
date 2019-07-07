@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
-import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -130,8 +129,7 @@ class TabulatorTests {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
 
-    if (config.getWinnerElectionMode()
-        == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKE_ALL) {
+    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
         compareJsons(config, stem, timestampString, i);
       }

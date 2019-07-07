@@ -489,6 +489,8 @@ public class GuiConfigController implements Initializable {
   private void setDefaultValues() {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
+    choiceWinnerElectionMode.setValue(ContestConfig.SUGGESTED_WINNER_ELECTION_MODE);
+
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
     checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
     checkBoxNonIntegerWinningThreshold.setSelected(
@@ -806,7 +808,9 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = rawConfig.rules;
     choiceTiebreakMode.setValue(config.getTiebreakMode());
     choiceOvervoteRule.setValue(config.getOvervoteRule());
-    choiceWinnerElectionMode.setValue(config.getWinnerElectionMode());
+    if (config.getWinnerElectionMode() != WinnerElectionMode.MODE_UNKNOWN) {
+      choiceWinnerElectionMode.setValue(config.getWinnerElectionMode());
+    }
     setTextFieldToInteger(textFieldRandomSeed, rules.randomSeed);
     setTextFieldToInteger(textFieldNumberOfWinners, rules.numberOfWinners);
     setTextFieldToInteger(

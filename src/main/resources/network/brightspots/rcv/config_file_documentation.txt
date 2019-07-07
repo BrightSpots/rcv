@@ -124,11 +124,11 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
       "winnerElectionMode" required
         whether the program should apply a special process for selecting the winner(s)
         "standard": no special process
+        "singleSeatContinueUntilTwoCandidatesRemain": keep tabulating after the winning round until only two candidates remain (only valid when numberOfWinners = 1)
         "multiSeatAllowOnlyOneWinnerPerRound": elect no more than one winner per round, even when there are multiple candidates exceeding the winning threshold (only valid when numberOfWinners > 1)
         "multiSeatBottomsUp": instead of running a standard multi-seat contest with single transferable votes, just eliminate candidates until there are numWinners remaining, then stop (only valid when numberOfWinners > 1)
-        "multiSeatSequentialWinnerTakeAll": instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats (only valid when numberOfWinners > 1)
-        "singleSeatContinueUntilTwoCandidatesRemain": keep tabulating after the winning round until only two candidates remain (only valid when numberOfWinners = 1)
-        value: "standard" | "multiSeatAllowOnlyOneWinnerPerRound" | "multiSeatBottomsUp" | "multiSeatSequentialWinnerTakeAll" | "singleSeatContinueUntilTwoCandidatesRemain"
+        "multiSeatSequentialWinnerTakesAll": instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats (only valid when numberOfWinners > 1)
+        value: "standard" | "singleSeatContinueUntilTwoCandidatesRemain" | "multiSeatAllowOnlyOneWinnerPerRound" | "multiSeatBottomsUp" | "multiSeatSequentialWinnerTakesAll"
 
       "randomSeed" required when tiebreakMode is random, previousRoundCountsThenRandom, or generatePermutation
         the integer seed for the application's pseudorandom number generator
@@ -176,11 +176,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
       "batchElimination" optional
         tabulator will use batch elimination (only valid for single-winner contests)
-        value: true | false
-        if not supplied: false
-
-      "continueUntilTwoCandidatesRemain" optional
-        tabulator will keep tabulating (beyond winning round) until only two candidates remain (only valid for single-winner contests)
         value: true | false
         if not supplied: false
 
