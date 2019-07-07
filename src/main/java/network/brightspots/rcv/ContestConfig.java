@@ -463,7 +463,7 @@ class ContestConfig {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "When tiebreakMode involves a random element, randomSeed must be " + "supplied.");
+          "When tiebreakMode involves a random element, randomSeed must be supplied.");
     }
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
@@ -693,9 +693,8 @@ class ContestConfig {
   // returns: raw string from config or falls back to user folder if none is set
   String getOutputDirectoryRaw() {
     // outputDirectory is where output files should be written
-    return !isNullOrBlank(rawConfig.outputSettings.outputDirectory)
-        ? rawConfig.outputSettings.outputDirectory
-        : FileUtils.getUserDirectory();
+    return isNullOrBlank(rawConfig.outputSettings.outputDirectory) ? FileUtils.getUserDirectory()
+        : rawConfig.outputSettings.outputDirectory;
   }
 
   // function: getOutputDirectory

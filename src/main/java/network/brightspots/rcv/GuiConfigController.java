@@ -688,7 +688,7 @@ public class GuiConfigController implements Initializable {
 
           @Override
           public LocalDate fromString(String string) {
-            return !isNullOrBlank(string) ? LocalDate.parse(string, DATE_TIME_FORMATTER) : null;
+            return isNullOrBlank(string) ? null : LocalDate.parse(string, DATE_TIME_FORMATTER);
           }
         });
 

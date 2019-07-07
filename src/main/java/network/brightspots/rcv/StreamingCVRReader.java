@@ -103,8 +103,8 @@ class StreamingCVRReader {
     this.firstVoteColumnIndex = source.getFirstVoteColumnIndex() - 1;
     this.firstVoteRowIndex = source.getFirstVoteRowIndex() - 1;
     this.idColumnIndex =
-        !isNullOrBlank(source.getIdColumnIndex()) ? Integer.parseInt(source.getIdColumnIndex()) - 1
-            : null;
+        isNullOrBlank(source.getIdColumnIndex()) ? null
+            : Integer.parseInt(source.getIdColumnIndex()) - 1;
     this.precinctColumnIndex = !isNullOrBlank(source.getPrecinctColumnIndex()) ?
         Integer.parseInt(source.getPrecinctColumnIndex()) - 1 : null;
   }
