@@ -164,7 +164,6 @@ class StreamingCVRReader {
       currentCVRData.add("empty cell");
       // add UWI ranking if required by settings
       if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
-        Logger.log(Level.WARNING, "Empty cell! Treating as UWI.");
         // add the new ranking
         currentRankings.add(new Pair<>(rank, config.getUndeclaredWriteInLabel()));
       }

@@ -255,7 +255,10 @@ class ContestConfig {
     } else {
       if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
         isValid = false;
-        Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!.", getTabulatorVersion(),
+        Logger.log(
+            Level.SEVERE,
+            "tabulatorVersion %s not supported!.",
+            getTabulatorVersion(),
             Main.APP_VERSION);
       }
     }
@@ -590,9 +593,16 @@ class ContestConfig {
         "undervoteLabel")) {
       isValid = false;
     }
-    if (!isNullOrBlank(getUndeclaredWriteInLabel()) && stringAlreadyInUseElsewhere(
-        getUndeclaredWriteInLabel(), "undeclaredWriteInLabel")) {
+    if (!isNullOrBlank(getUndeclaredWriteInLabel())
+        && stringAlreadyInUseElsewhere(getUndeclaredWriteInLabel(), "undeclaredWriteInLabel")) {
       isValid = false;
+    }
+
+    if (isTreatBlankAsUndeclaredWriteInEnabled() && isNullOrBlank(getUndeclaredWriteInLabel())) {
+      isValid = false;
+      Logger.log(
+          Level.SEVERE,
+          "undeclaredWriteInLabel must be supplied if treatBlankAsUndeclaredWriteIn is true!");
     }
   }
 

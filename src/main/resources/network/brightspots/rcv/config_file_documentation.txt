@@ -212,8 +212,9 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         example: "UNDERVOTE"
         value: string of length [1..1000]
 
-      "undeclaredWriteInLabel" optional
+      "undeclaredWriteInLabel" required if treatBlankAsUndeclaredWriteIn is enabled
         the special label used in the cast vote records to denote a vote for an undeclared write-in
+        also used to represent undeclared write-ins in the results output
         example: "UWI"
         value: string of length [1..1000]
 
