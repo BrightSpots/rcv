@@ -130,7 +130,7 @@ class TabulatorSession {
         Logger.log(Level.SEVERE, "Error logging config file: %s\n", configPath, e.toString());
       }
       Logger.log(Level.INFO, "Tabulating \'%s\'...", config.getContestName());
-      if (config.isSequentialMultiSeatEnabled()) {
+      if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         Logger.log(Level.INFO, "This is a sequential multi-seat contest.");
         int numWinners = config.getNumberOfWinners();
         // temporarily set config to single-seat so we can run sequential elections

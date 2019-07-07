@@ -42,25 +42,23 @@ import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
+import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 class ContestConfig {
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
-  static final boolean SUGGESTED_SEQUENTIAL_MULTI_SEAT = false;
-  static final boolean SUGGESTED_BOTTOMS_UP_MULTI_SEAT = false;
-  static final boolean SUGGESTED_ALLOW_ONLY_ONE_WINNER_PER_ROUND = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
-  static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_NUMBER_OF_WINNERS = 1;
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
+  static final WinnerElectionMode SUGGESTED_WINNER_ELECTION_MODE = WinnerElectionMode.STANDARD;
   private static final int MIN_COLUMN_INDEX = 1;
   private static final int MAX_COLUMN_INDEX = 1000;
   private static final int MIN_ROW_INDEX = 1;
@@ -452,7 +450,7 @@ class ContestConfig {
   private void validateRules() {
     if (getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Invalid tie-break mode!");
+      Logger.log(Level.SEVERE, "Invalid tiebreakMode!");
     }
 
     if ((getTiebreakMode() == TieBreakMode.RANDOM
@@ -467,7 +465,7 @@ class ContestConfig {
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Invalid overvote rule!");
+      Logger.log(Level.SEVERE, "Invalid overvoteRule!");
     } else if (!isNullOrBlank(getOvervoteLabel())
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
@@ -476,6 +474,11 @@ class ContestConfig {
           Level.SEVERE,
           "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately "
               + "or alwaysSkipToNextRank!");
+    }
+
+    if (getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "Invalid winnerElectionMode!");
     }
 
     if (getMaxRankingsAllowed() == null) {
@@ -540,11 +543,12 @@ class ContestConfig {
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
     if (getNumberOfWinners() != null && getNumberOfWinners() > 1) {
-      if (isContinueUntilTwoCandidatesRemainEnabled()) {
+      if (isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
         isValid = false;
         Logger.log(
             Level.SEVERE,
-            "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest!");
+            "winnerElectionMode can't be singleSeatContinueUntilTwoCandidatesRemain in a "
+                + "multi-seat contest!");
       }
 
       if (isBatchEliminationEnabled()) {
@@ -552,14 +556,23 @@ class ContestConfig {
         Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
       }
     } else {
-      if (isSequentialMultiSeatEnabled()) {
+      if (isMultiSeatSequentialWinnerTakesAllEnabled()) {
         isValid = false;
-        Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a single-seat contest!");
-      }
-
-      if (isBottomsUpMultiSeatEnabled()) {
+        Logger.log(
+            Level.SEVERE,
+            "winnerElectionMode can't be multiSeatSequentialWinnerTakesAll in a single-seat " +
+                "contest!");
+      } else if (isMultiSeatBottomsUpEnabled()) {
         isValid = false;
-        Logger.log(Level.SEVERE, "bottomsUpMultiSeat can't be true in a single-seat contest!");
+        Logger.log(
+            Level.SEVERE,
+            "winnerElectionMode can't be multiSeatBottomsUp in a single-seat contest!");
+      } else if (isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()) {
+        isValid = false;
+        Logger.log(
+            Level.SEVERE,
+            "winnerElectionMode can't be multiSeatAllowOnlyOneWinnerPerRound in a single-seat "
+                + "contest!");
       }
 
       if (isHareQuotaEnabled()) {
@@ -568,16 +581,11 @@ class ContestConfig {
       }
     }
 
-    if (isBottomsUpMultiSeatEnabled()) {
-      if (isBatchEliminationEnabled()) {
-        isValid = false;
-        Logger.log(Level.SEVERE, "batchElimination can't be true in a bottoms-up contest!");
-      }
-
-      if (isSequentialMultiSeatEnabled()) {
-        isValid = false;
-        Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a bottoms-up contest!");
-      }
+    if (isMultiSeatBottomsUpEnabled() && isBatchEliminationEnabled()) {
+      isValid = false;
+      Logger.log(
+          Level.SEVERE,
+          "batchElimination can't be true when winnerElectionMode is multiSeatBottomsUp!");
     }
 
     if (getRandomSeed() != null && getRandomSeed() < MIN_RANDOM_SEED) {
@@ -632,16 +640,26 @@ class ContestConfig {
     return rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
-  boolean isSequentialMultiSeatEnabled() {
-    return rawConfig.rules.sequentialMultiSeat;
+  WinnerElectionMode getWinnerElectionMode() {
+    WinnerElectionMode mode = WinnerElectionMode.getByLabel(rawConfig.rules.winnerElectionMode);
+    return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
   }
 
-  boolean isBottomsUpMultiSeatEnabled() {
-    return rawConfig.rules.bottomsUpMultiSeat;
+  boolean isSingleSeatContinueUntilTwoCandidatesRemainEnabled() {
+    return getWinnerElectionMode()
+        == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN;
   }
 
-  boolean isAllowOnlyOneWinnerPerRoundEnabled() {
-    return rawConfig.rules.allowOnlyOneWinnerPerRound;
+  boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND;
+  }
+
+  boolean isMultiSeatBottomsUpEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP;
+  }
+
+  boolean isMultiSeatSequentialWinnerTakesAllEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL;
   }
 
   boolean isNonIntegerWinningThresholdEnabled() {
@@ -682,14 +700,6 @@ class ContestConfig {
   // returns: path to directory where output files should be written
   String getOutputDirectory() {
     return resolveConfigPath(getOutputDirectoryRaw());
-  }
-
-  // function: isContinueUntilTwoCandidatesRemainEnabled
-  // purpose: getter for setting to keep tabulating beyond selecting winner until two candidates
-  // remain
-  // returns: whether to keep tabulating until two candidates remain
-  boolean isContinueUntilTwoCandidatesRemainEnabled() {
-    return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
 
   String getTabulatorVersion() {

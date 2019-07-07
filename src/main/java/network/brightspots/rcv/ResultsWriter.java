@@ -217,7 +217,9 @@ class ResultsWriter {
         config.getOutputDirectory(),
         outputType,
         timestampString,
-        config.isSequentialMultiSeatEnabled() ? config.getSequentialWinners().size() + 1 : null);
+        config.isMultiSeatSequentialWinnerTakesAllEnabled()
+            ? config.getSequentialWinners().size() + 1
+            : null);
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
