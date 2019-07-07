@@ -221,9 +221,8 @@
                 <ChoiceBox prefWidth="220.0" fx:id="choiceTiebreakMode"/>
                 <Label text="Overvote Rule *"/>
                 <ChoiceBox prefWidth="220.0" fx:id="choiceOvervoteRule"/>
-                <Label text="Random Seed"/>
-                <TextField maxWidth="220.0" promptText="Random Seed"
-                  fx:id="textFieldRandomSeed"/>
+                <ChoiceBox prefWidth="220.0" fx:id="choiceWinnerElectionMode"/>
+                <Label text="Winner Election Mode *"/>
                 <Label text="Number of Winners *"/>
                 <TextField maxWidth="220.0" promptText="Number of Winners"
                   fx:id="textFieldNumberOfWinners"/>
@@ -244,24 +243,6 @@
                 </padding>
               </VBox>
               <VBox spacing="8.0">
-                <CheckBox mnemonicParsing="false" text="Sequential Multi-Seat"
-                  fx:id="checkBoxSequentialMultiSeat">
-                  <VBox.margin>
-                    <Insets top="4.0"/>
-                  </VBox.margin>
-                </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Bottoms-Up Multi-Seat"
-                  fx:id="checkBoxBottomsUpMultiSeat">
-                  <VBox.margin>
-                    <Insets top="4.0"/>
-                  </VBox.margin>
-                </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Allow Only One Winner per Round"
-                  fx:id="checkBoxAllowOnlyOneWinnerPerRound">
-                  <VBox.margin>
-                    <Insets top="4.0"/>
-                  </VBox.margin>
-                </CheckBox>
                 <CheckBox mnemonicParsing="false" text="Non-Integer Winning Threshold"
                   fx:id="checkBoxNonIntegerWinningThreshold">
                   <VBox.margin>
@@ -280,12 +261,6 @@
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Continue until Two Candidates Remain"
-                  fx:id="checkBoxContinueUntilTwoCandidatesRemain">
-                  <VBox.margin>
-                    <Insets top="4.0"/>
-                  </VBox.margin>
-                </CheckBox>
                 <CheckBox mnemonicParsing="false" text="Exhaust on Duplicate Candidate"
                   fx:id="checkBoxExhaustOnDuplicateCandidate">
                   <VBox.margin>
@@ -298,6 +273,9 @@
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
+                <Label text="Random Seed"/>
+                <TextField maxWidth="220.0" promptText="Random Seed"
+                  fx:id="textFieldRandomSeed"/>
                 <Label text="Overvote Label"/>
                 <TextField maxWidth="220.0" promptText="Overvote Label"
                   fx:id="textFieldOvervoteLabel"/>

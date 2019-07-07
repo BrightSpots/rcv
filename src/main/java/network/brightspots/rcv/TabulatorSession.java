@@ -46,6 +46,7 @@ import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCVRReader.CvrDataFormatException;
 import network.brightspots.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
+import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
@@ -130,7 +131,8 @@ class TabulatorSession {
         Logger.log(Level.SEVERE, "Error logging config file: %s\n", configPath, e.toString());
       }
       Logger.log(Level.INFO, "Tabulating \'%s\'...", config.getContestName());
-      if (config.isSequentialMultiSeatEnabled()) {
+      if (config.getWinnerElectionMode()
+          == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKE_ALL) {
         Logger.log(Level.INFO, "This is a sequential multi-seat contest.");
         int numWinners = config.getNumberOfWinners();
         // temporarily set config to single-seat so we can run sequential elections

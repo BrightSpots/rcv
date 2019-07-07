@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
+import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -123,17 +124,14 @@ class TabulatorTests {
     String configPath = getTestFilePath(stem, "_config.json");
     // create a session object and run the tabulation
     TabulatorSession session = new TabulatorSession(configPath);
-    try {
-      session.tabulate();
-    } catch (TabulationCancelledException e) {
-      e.printStackTrace();
-    }
+    session.tabulate();
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
 
-    if (config.isSequentialMultiSeatEnabled()) {
+    if (config.getWinnerElectionMode()
+        == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKE_ALL) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
         compareJsons(config, stem, timestampString, i);
       }

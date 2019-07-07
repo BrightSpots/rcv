@@ -121,6 +121,15 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         how the program should handle an overvote when it encounters one
         value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
 
+      "winnerElectionMode" required
+        whether the program should apply a special process for selecting the winner(s)
+        "standard": no special process
+        "multiSeatAllowOnlyOneWinnerPerRound": elect no more than one winner per round, even when there are multiple candidates exceeding the winning threshold (only valid when numberOfWinners > 1)
+        "multiSeatBottomsUp": instead of running a standard multi-seat contest with single transferable votes, just eliminate candidates until there are numWinners remaining, then stop (only valid when numberOfWinners > 1)
+        "multiSeatSequentialWinnerTakeAll": instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats (only valid when numberOfWinners > 1)
+        "singleSeatContinueUntilTwoCandidatesRemain": keep tabulating after the winning round until only two candidates remain (only valid when numberOfWinners = 1)
+        value: "standard" | "multiSeatAllowOnlyOneWinnerPerRound" | "multiSeatBottomsUp" | "multiSeatSequentialWinnerTakeAll" | "singleSeatContinueUntilTwoCandidatesRemain"
+
       "randomSeed" required when tiebreakMode is random, previousRoundCountsThenRandom, or generatePermutation
         the integer seed for the application's pseudorandom number generator
         value: [0..2147483647]
@@ -149,23 +158,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         maximum number of candidates that a ballot is allowed to rank; if "max" is entered, this will default to the total number of declared candidates
         example: 15
         values: [max, 1..1000000]
-
-      "sequentialMultiSeat" optional
-        instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats
-        can't be true if numberOfWinners = 1
-        value: true | false
-        if not supplied: false
-
-      "bottomsUpMultiSeat" optional
-        instead of running a normal multi-seat contest with single transferable votes, just eliminate candidates until there are numWinners remaining, then stop
-        can't be true if numberOfWinners = 1
-        value: true | false
-        if not supplied: false
-
-      "allowOnlyOneWinnerPerRound" optional
-        in a multi-seat contest, elect no more than one winner per round, even when there are multiple candidates exceeding the winning threshold
-        value: true | false
-        if not supplied: false
 
       "nonIntegerWinningThreshold" optional
         the vote threshold used to determine winners can be a non-integer

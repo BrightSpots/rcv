@@ -134,8 +134,8 @@ class Tabulator {
       TieBreak.setRandomSeed(config.getRandomSeed());
     }
 
-    // Loop until we've found our winner(s) unless using continueUntilTwoCandidatesRemain, in which
-    // case we loop until only two candidates remain.
+    // Loop until we've found our winner(s), unless singleSeatContinueUntilTwoCandidatesRemain mode
+    // is active -- in which case we loop until only two candidates remain.
     // At each iteration, we'll either a) identify one or more
     // winners and transfer their votes to the remaining candidates (if we still need to find more
     // winners), or b) eliminate one or more candidates and gradually transfer votes to the
@@ -177,7 +177,8 @@ class Tabulator {
         }
         // In multi-seat contests, we always redistribute the surplus (if any) unless bottoms-up
         // is enabled.
-        if (config.getNumberOfWinners() > 1 && !config.isBottomsUpMultiSeatEnabled()) {
+        if (config.getNumberOfWinners() > 1
+            && config.getWinnerElectionMode() != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP) {
           for (String winner : winners) {
             // number of votes the candidate got this round
             BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
@@ -201,7 +202,8 @@ class Tabulator {
           }
         }
       } else if (winnerToRound.size() < config.getNumberOfWinners()
-          || (config.isContinueUntilTwoCandidatesRemainEnabled()
+          || (config.getWinnerElectionMode()
+          == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN
           && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)) {
         // We need to make more eliminations if
         // a) we haven't found all the winners yet, or
@@ -396,7 +398,7 @@ class Tabulator {
   }
 
   // purpose: determine if we should continue tabulating based on how many winners have been
-  // selected and if continueUntilTwoCandidatesRemain flag is in use.
+  // selected and if singleSeatContinueUntilTwoCandidatesRemain mode is enabled.
   // return: true if we should continue tabulating
   private boolean shouldContinueTabulating() {
     // how many candidates have already been eliminated
@@ -404,7 +406,8 @@ class Tabulator {
     // how many winners have been selected
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
-    if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
+    if (config.getWinnerElectionMode()
+        == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
@@ -417,19 +420,21 @@ class Tabulator {
       return numWinnersDeclared < config.getNumberOfWinners()
           || (config.getNumberOfWinners() > 1
           && winnerToRound.values().contains(currentRound)
-          && !config.isBottomsUpMultiSeatEnabled());
+          && config.getWinnerElectionMode() != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP);
     }
   }
 
   // function: isCandidateContinuing
-  // purpose: returns true if candidate is continuing with respect to tabulation
-  // this handles continued tabulation after a winner has been chosen for the
-  // continueUntilTwoCandidatesRemain setting
+  // purpose: returns true if candidate is continuing with respect to tabulation.
+  // This handles continued tabulation after a winner has been chosen when
+  // singleSeatContinueUntilTwoCandidatesRemain mode is enabled.
   // returns: true if we should continue tabulating
   private boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING
-        || (status == CandidateStatus.WINNER && config.isContinueUntilTwoCandidatesRemainEnabled());
+        || (status == CandidateStatus.WINNER
+        && config.getWinnerElectionMode()
+        == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
   }
 
   // function: getCandidateStatus
@@ -467,7 +472,7 @@ class Tabulator {
       if (currentRoundCandidateToTally.size()
           == config.getNumberOfWinners() - winnerToRound.size()) {
         selectedWinners.addAll(currentRoundCandidateToTally.keySet());
-      } else if (!config.isBottomsUpMultiSeatEnabled()) {
+      } else if (config.getWinnerElectionMode() != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP) {
         // We see if anyone has met/exceeded the threshold (unless bottoms-up is enabled, in which
         // case we just wait until there are numWinners candidates remaining and then declare all of
         // them as winners simultaneously).
@@ -485,7 +490,9 @@ class Tabulator {
     // Edge case: if we've identified multiple winners in this round but we're only supposed to
     // elect one winner per round, pick the top vote-getter and defer the others to subsequent
     // rounds.
-    if (config.isAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
+    if (config.getWinnerElectionMode()
+        == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND
+        && selectedWinners.size() > 1) {
       // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
       BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
       selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
@@ -1127,6 +1134,33 @@ class Tabulator {
 
     static TieBreakMode getByLabel(String labelLookup) {
       return Arrays.stream(TieBreakMode.values())
+          .filter(v -> v.label.equals(labelLookup))
+          .findAny()
+          .orElse(null);
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
+  }
+
+  enum WinnerElectionMode {
+    STANDARD("standard"),
+    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("multiSeatAllowOnlyOneWinnerPerRound"),
+    MULTI_SEAT_BOTTOMS_UP("multiSeatBottomsUp"),
+    MULTI_SEAT_SEQUENTIAL_WINNER_TAKE_ALL("multiSeatSequentialWinnerTakeAll"),
+    SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN("singleSeatContinueUntilTwoCandidatesRemain"),
+    MODE_UNKNOWN("modeUnknown");
+
+    private final String label;
+
+    WinnerElectionMode(String label) {
+      this.label = label;
+    }
+
+    static WinnerElectionMode getByLabel(String labelLookup) {
+      return Arrays.stream(WinnerElectionMode.values())
           .filter(v -> v.label.equals(labelLookup))
           .findAny()
           .orElse(null);

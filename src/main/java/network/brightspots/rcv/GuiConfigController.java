@@ -66,6 +66,9 @@ import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.OutputSettings;
+import network.brightspots.rcv.Tabulator.OvervoteRule;
+import network.brightspots.rcv.Tabulator.TieBreakMode;
+import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 @SuppressWarnings("WeakerAccess")
 public class GuiConfigController implements Initializable {
@@ -141,9 +144,11 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCandidateCode;
   @FXML
-  private ChoiceBox<Tabulator.TieBreakMode> choiceTiebreakMode;
+  private ChoiceBox<TieBreakMode> choiceTiebreakMode;
   @FXML
-  private ChoiceBox<Tabulator.OvervoteRule> choiceOvervoteRule;
+  private ChoiceBox<OvervoteRule> choiceOvervoteRule;
+  @FXML
+  private ChoiceBox<WinnerElectionMode> choiceWinnerElectionMode;
   @FXML
   private TextField textFieldRandomSeed;
   @FXML
@@ -165,19 +170,11 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldRulesDescription;
   @FXML
-  private CheckBox checkBoxSequentialMultiSeat;
-  @FXML
-  private CheckBox checkBoxBottomsUpMultiSeat;
-  @FXML
-  private CheckBox checkBoxAllowOnlyOneWinnerPerRound;
-  @FXML
   private CheckBox checkBoxNonIntegerWinningThreshold;
   @FXML
   private CheckBox checkBoxHareQuota;
   @FXML
   private CheckBox checkBoxBatchElimination;
-  @FXML
-  private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
   @FXML
   private CheckBox checkBoxExhaustOnDuplicateCandidate;
   @FXML
@@ -494,15 +491,10 @@ public class GuiConfigController implements Initializable {
 
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
     checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
-    checkBoxSequentialMultiSeat.setSelected(ContestConfig.SUGGESTED_SEQUENTIAL_MULTI_SEAT);
-    checkBoxBottomsUpMultiSeat.setSelected(ContestConfig.SUGGESTED_BOTTOMS_UP_MULTI_SEAT);
-    checkBoxAllowOnlyOneWinnerPerRound.setSelected(ContestConfig.SUGGESTED_ALLOW_ONLY_ONE_WINNER_PER_ROUND);
     checkBoxNonIntegerWinningThreshold.setSelected(
         ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
     checkBoxHareQuota.setSelected(ContestConfig.SUGGESTED_HARE_QUOTA);
     checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
-    checkBoxContinueUntilTwoCandidatesRemain.setSelected(
-        ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
     checkBoxExhaustOnDuplicateCandidate.setSelected(
         ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
@@ -541,6 +533,7 @@ public class GuiConfigController implements Initializable {
 
     choiceTiebreakMode.setValue(null);
     choiceOvervoteRule.setValue(null);
+    choiceWinnerElectionMode.setValue(null);
     textFieldRandomSeed.clear();
     textFieldNumberOfWinners.clear();
     textFieldDecimalPlacesForVoteArithmetic.clear();
@@ -551,13 +544,9 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.clear();
     textFieldUndeclaredWriteInLabel.clear();
     textFieldRulesDescription.clear();
-    checkBoxSequentialMultiSeat.setSelected(false);
-    checkBoxBottomsUpMultiSeat.setSelected(false);
-    checkBoxAllowOnlyOneWinnerPerRound.setSelected(false);
     checkBoxNonIntegerWinningThreshold.setSelected(false);
     checkBoxHareQuota.setSelected(false);
     checkBoxBatchElimination.setSelected(false);
-    checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
     checkBoxExhaustOnDuplicateCandidate.setSelected(false);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(false);
 
@@ -744,10 +733,12 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
 
-    choiceTiebreakMode.getItems().addAll(Tabulator.TieBreakMode.values());
-    choiceTiebreakMode.getItems().remove(Tabulator.TieBreakMode.MODE_UNKNOWN);
-    choiceOvervoteRule.getItems().addAll(Tabulator.OvervoteRule.values());
-    choiceOvervoteRule.getItems().remove(Tabulator.OvervoteRule.RULE_UNKNOWN);
+    choiceTiebreakMode.getItems().addAll(TieBreakMode.values());
+    choiceTiebreakMode.getItems().remove(TieBreakMode.MODE_UNKNOWN);
+    choiceOvervoteRule.getItems().addAll(OvervoteRule.values());
+    choiceOvervoteRule.getItems().remove(OvervoteRule.RULE_UNKNOWN);
+    choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
+    choiceWinnerElectionMode.getItems().remove(WinnerElectionMode.MODE_UNKNOWN);
 
     textFieldRandomSeed
         .textProperty()
@@ -815,6 +806,7 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = rawConfig.rules;
     choiceTiebreakMode.setValue(config.getTiebreakMode());
     choiceOvervoteRule.setValue(config.getOvervoteRule());
+    choiceWinnerElectionMode.setValue(config.getWinnerElectionMode());
     setTextFieldToInteger(textFieldRandomSeed, rules.randomSeed);
     setTextFieldToInteger(textFieldNumberOfWinners, rules.numberOfWinners);
     setTextFieldToInteger(
@@ -826,13 +818,9 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.setText(rules.undervoteLabel);
     textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
     textFieldRulesDescription.setText(rules.rulesDescription);
-    checkBoxSequentialMultiSeat.setSelected(rules.sequentialMultiSeat);
-    checkBoxBottomsUpMultiSeat.setSelected(rules.bottomsUpMultiSeat);
-    checkBoxAllowOnlyOneWinnerPerRound.setSelected(rules.allowOnlyOneWinnerPerRound);
     checkBoxNonIntegerWinningThreshold.setSelected(rules.nonIntegerWinningThreshold);
     checkBoxHareQuota.setSelected(rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
-    checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
   }
@@ -878,8 +866,10 @@ public class GuiConfigController implements Initializable {
     config.candidates = candidates;
 
     ContestRules rules = new ContestRules();
-    rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, Tabulator.TieBreakMode.MODE_UNKNOWN);
-    rules.overvoteRule = getChoiceElse(choiceOvervoteRule, Tabulator.OvervoteRule.RULE_UNKNOWN);
+    rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
+    rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
+    rules.winnerElectionMode = getChoiceElse(choiceWinnerElectionMode,
+        WinnerElectionMode.MODE_UNKNOWN);
     rules.randomSeed = getIntValueOrNull(textFieldRandomSeed);
     rules.numberOfWinners = getIntValueOrNull(textFieldNumberOfWinners);
     rules.decimalPlacesForVoteArithmetic =
@@ -887,13 +877,9 @@ public class GuiConfigController implements Initializable {
     rules.minimumVoteThreshold = getIntValueOrNull(textFieldMinimumVoteThreshold);
     rules.maxSkippedRanksAllowed = getTextOrEmptyString(textFieldMaxSkippedRanksAllowed);
     rules.maxRankingsAllowed = getTextOrEmptyString(textFieldMaxRankingsAllowed);
-    rules.sequentialMultiSeat = checkBoxSequentialMultiSeat.isSelected();
-    rules.bottomsUpMultiSeat = checkBoxBottomsUpMultiSeat.isSelected();
-    rules.allowOnlyOneWinnerPerRound = checkBoxAllowOnlyOneWinnerPerRound.isSelected();
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
     rules.hareQuota = checkBoxHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
-    rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
     rules.treatBlankAsUndeclaredWriteIn = checkBoxTreatBlankAsUndeclaredWriteIn.isSelected();
     rules.overvoteLabel = getTextOrEmptyString(textFieldOvervoteLabel);

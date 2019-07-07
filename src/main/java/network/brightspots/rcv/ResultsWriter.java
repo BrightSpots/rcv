@@ -51,6 +51,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
+import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -217,7 +218,9 @@ class ResultsWriter {
         config.getOutputDirectory(),
         outputType,
         timestampString,
-        config.isSequentialMultiSeatEnabled() ? config.getSequentialWinners().size() + 1 : null);
+        config.getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKE_ALL
+            ? config.getSequentialWinners().size() + 1
+            : null);
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
