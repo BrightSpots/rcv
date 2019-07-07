@@ -27,6 +27,7 @@ package network.brightspots.rcv;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 // TallyTransfers class stores summary info on vote transfers
 // used primarily as visualizer input to help build Sankey plots
@@ -35,7 +36,7 @@ class TallyTransfers {
   static final String RESIDUAL_TARGET = "residual surplus";
   private static final String EXHAUSTED = "exhausted";
   private static final String UNCOUNTED = "uncounted";
-  static final String[] RESERVED_STRINGS = {EXHAUSTED, RESIDUAL_TARGET, UNCOUNTED};
+  static final Set<String> RESERVED_STRINGS = Set.of(RESIDUAL_TARGET, EXHAUSTED, UNCOUNTED);
 
   // Map of round number to vote transfers which occurred in that round
   // transfers for a round are a map of SOURCE candidate(s) to one or more TARGET candidates.

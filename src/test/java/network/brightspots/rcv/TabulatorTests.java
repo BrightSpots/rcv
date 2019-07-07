@@ -467,4 +467,13 @@ class TabulatorTests {
   void tiebreakGeneratePermutationTest() {
     runTabulationTest("tiebreak_generate_permutation_test");
   }
+
+  // function: treatBlankAsUndeclaredWriteInTest
+  // purpose: tests treatBlankAsUndeclaredWriteIn setting
+  @Test
+  @DisplayName("treat blank as undeclared write-in")
+  void treatBlankAsUndeclaredWriteInTest() {
+    runTabulationTest("test_set_treat_blank_as_undeclared_write_in");
+  }
+
 }

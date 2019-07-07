@@ -1,0 +1,60 @@
+{
+  "tabulatorVersion" : "0.1.0",
+  "outputSettings" : {
+    "contestName" : "treatBlankAsUndeclaredWriteIn test",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-03-06",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "/Users/leisenberg/code/rcv/src/test/resources/network/brightspots/rcv/test_data/test_set_treat_blank_as_undeclared_write_in/test_set_treat_blank_as_undeclared_write_in_cvr.xlsx",
+    "firstVoteColumnIndex" : 2,
+    "firstVoteRowIndex" : 2,
+    "idColumnIndex" : "1",
+    "precinctColumnIndex" : "",
+    "provider" : ""
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "B",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "C",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "D",
+    "code" : "",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "randomSeed" : 0,
+    "numberOfWinners" : 1,
+    "decimalPlacesForVoteArithmetic" : 1,
+    "minimumVoteThreshold" : 0,
+    "maxSkippedRanksAllowed" : "4",
+    "maxRankingsAllowed" : "4",
+    "sequentialMultiSeat" : false,
+    "bottomsUpMultiSeat" : false,
+    "allowOnlyOneWinnerPerRound" : false,
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : true,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "rulesDescription" : "test"
+  }
+}
