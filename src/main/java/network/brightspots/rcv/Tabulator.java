@@ -252,11 +252,13 @@ class Tabulator {
         config.getNumDeclaredCandidates());
     // candidate indexes over all candidate IDs to log them
     for (String candidate : candidateIDs) {
-      Logger.log(
-          Level.INFO,
-          "%s%s",
-          candidate,
-          config.candidateIsExcluded(candidate) ? " (excluded from tabulation)" : "");
+      if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
+        Logger.log(
+            Level.INFO,
+            "%s%s",
+            candidate,
+            config.candidateIsExcluded(candidate) ? " (excluded from tabulation)" : "");
+      }
     }
 
     if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
