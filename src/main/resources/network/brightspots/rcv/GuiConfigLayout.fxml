@@ -35,25 +35,22 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-  prefHeight="810.0" prefWidth="900.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
+  prefHeight="790.0" prefWidth="900.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
   xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="network.brightspots.rcv.GuiConfigController">
   <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    prefHeight="810.0" prefWidth="900.0">
+    prefHeight="790.0" prefWidth="900.0">
     <top>
       <VBox BorderPane.alignment="TOP_LEFT">
-        <ButtonBar maxHeight="50.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="50.0"
-          fx:id="buttonBar">
+        <ButtonBar fx:id="buttonBar" maxHeight="50.0" nodeOrientation="LEFT_TO_RIGHT"
+          prefHeight="50.0">
           <buttons>
-            <Button ButtonBar.buttonData="LEFT" mnemonicParsing="false"
-              onAction="#buttonNewConfigClicked"
-              text="New"/>
-            <Button ButtonBar.buttonData="LEFT" mnemonicParsing="false"
-              onAction="#buttonLoadConfigClicked"
-              text="Load..."/>
-            <Button ButtonBar.buttonData="LEFT" mnemonicParsing="false"
-              onAction="#buttonSaveClicked"
-              text="Save..."/>
+            <Button mnemonicParsing="false" onAction="#buttonNewConfigClicked" text="New"
+              ButtonBar.buttonData="LEFT"/>
+            <Button mnemonicParsing="false" onAction="#buttonLoadConfigClicked" text="Load..."
+              ButtonBar.buttonData="LEFT"/>
+            <Button mnemonicParsing="false" onAction="#buttonSaveClicked" text="Save..."
+              ButtonBar.buttonData="LEFT"/>
             <Button mnemonicParsing="false" onAction="#buttonValidateClicked" text="Validate"/>
             <Button mnemonicParsing="false" onAction="#buttonTabulateClicked" text="Tabulate"/>
             <Button mnemonicParsing="false" onAction="#buttonExitClicked" text="Exit"/>
@@ -71,38 +68,38 @@
     </top>
     <center>
       <VBox BorderPane.alignment="CENTER">
-        <TabPane minHeight="450.0" tabClosingPolicy="UNAVAILABLE" fx:id="tabPane">
+        <TabPane fx:id="tabPane" minHeight="450.0" tabClosingPolicy="UNAVAILABLE">
           <Tab text="Output">
             <VBox spacing="8.0">
               <Label text="Contest Name *"/>
-              <TextField maxWidth="220.0" promptText="Contest Name *" fx:id="textFieldContestName"/>
+              <TextField fx:id="textFieldContestName" maxWidth="220.0" promptText="Contest Name *"/>
               <Label text="Output Directory"/>
               <HBox alignment="CENTER_LEFT" spacing="8.0">
-                <TextField prefWidth="400.0" promptText="Output Directory"
-                  fx:id="textFieldOutputDirectory"/>
+                <TextField fx:id="textFieldOutputDirectory" prefWidth="400.0"
+                  promptText="Output Directory"/>
                 <Button mnemonicParsing="false" onAction="#buttonOutputDirectoryClicked"
                   text="Select"/>
               </HBox>
               <Label text="Contest Date"/>
               <HBox spacing="8.0">
-                <DatePicker editable="false" prefWidth="150.0" fx:id="datePickerContestDate"/>
+                <DatePicker fx:id="datePickerContestDate" editable="false" prefWidth="150.0"/>
                 <Button mnemonicParsing="false" onAction="#buttonClearDatePickerContestDateClicked"
                   text="Clear"/>
               </HBox>
               <Label text="Contest Jurisdiction"/>
-              <TextField maxWidth="220.0" promptText="Contest Jurisdiction"
-                fx:id="textFieldContestJurisdiction"/>
+              <TextField fx:id="textFieldContestJurisdiction" maxWidth="220.0"
+                promptText="Contest Jurisdiction"/>
               <Label text="Contest Office"/>
-              <TextField maxWidth="220.0" promptText="Contest Office"
-                fx:id="textFieldContestOffice"/>
-              <CheckBox mnemonicParsing="false" text="Tabulate by Precinct"
-                fx:id="checkBoxTabulateByPrecinct">
+              <TextField fx:id="textFieldContestOffice" maxWidth="220.0"
+                promptText="Contest Office"/>
+              <CheckBox fx:id="checkBoxTabulateByPrecinct" mnemonicParsing="false"
+                text="Tabulate by Precinct">
                 <VBox.margin>
                   <Insets top="10.0"/>
                 </VBox.margin>
               </CheckBox>
-              <CheckBox mnemonicParsing="false" text="Generate CDF JSON"
-                fx:id="checkBoxGenerateCdfJson">
+              <CheckBox fx:id="checkBoxGenerateCdfJson" mnemonicParsing="false"
+                text="Generate CDF JSON">
                 <VBox.margin>
                   <Insets top="10.0"/>
                 </VBox.margin>
@@ -117,24 +114,24 @@
               <HBox alignment="CENTER_LEFT" spacing="4.0">
                 <VBox spacing="4.0">
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <TextField prefHeight="25.0" prefWidth="396.0" promptText="File Path *"
-                      fx:id="textFieldCvrFilePath"/>
+                    <TextField fx:id="textFieldCvrFilePath" prefHeight="25.0" prefWidth="396.0"
+                      promptText="File Path *"/>
                     <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
                       text="Select"/>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Col Index"
-                      fx:id="textFieldCvrFirstVoteCol"/>
-                    <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Row Index"
-                      fx:id="textFieldCvrFirstVoteRow"/>
-                    <TextField prefHeight="25.0" prefWidth="120.0" promptText="ID Col Index"
-                      fx:id="textFieldCvrIdCol"/>
+                    <TextField fx:id="textFieldCvrFirstVoteCol" prefHeight="25.0" prefWidth="160.0"
+                      promptText="First Vote Col Index"/>
+                    <TextField fx:id="textFieldCvrFirstVoteRow" prefHeight="25.0" prefWidth="160.0"
+                      promptText="First Vote Row Index"/>
+                    <TextField fx:id="textFieldCvrIdCol" prefHeight="25.0" prefWidth="120.0"
+                      promptText="ID Col Index"/>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <TextField prefHeight="25.0" prefWidth="175.0" promptText="Precinct Col Index"
-                      fx:id="textFieldCvrPrecinctCol"/>
-                    <TextField maxWidth="250.0" prefHeight="25.0" prefWidth="175.0"
-                      promptText="Provider" fx:id="textFieldCvrProvider"/>
+                    <TextField fx:id="textFieldCvrPrecinctCol" prefHeight="25.0" prefWidth="175.0"
+                      promptText="Precinct Col Index"/>
+                    <TextField fx:id="textFieldCvrProvider" maxWidth="250.0" prefHeight="25.0"
+                      prefWidth="175.0" promptText="Provider"/>
                   </HBox>
                   <Label
                     text="Note: double-click existing entries below to edit and press Enter to save changes.">
@@ -157,22 +154,22 @@
               </HBox>
               <TableView fx:id="tableViewCvrFiles">
                 <columns>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrFilePath"
-                    prefWidth="210.0" text="File Path" fx:id="tableColumnCvrFilePath"/>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrFirstVoteCol"
-                    prefWidth="70.0" text="First Vote&#10;Column&#10;Index"
-                    fx:id="tableColumnCvrFirstVoteCol"/>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrFirstVoteRow"
-                    prefWidth="70.0" text="First Vote&#10;Row&#10;Index"
-                    fx:id="tableColumnCvrFirstVoteRow"/>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrIdColIndex"
-                    prefWidth="70.0" text="ID&#10;Column&#10;Index"
-                    fx:id="tableColumnCvrIdCol"/>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrPrecinctColIndex"
-                    prefWidth="70.0" text="Precinct&#10;Column&#10;Index"
-                    fx:id="tableColumnCvrPrecinctCol"/>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCvrProvider"
-                    prefWidth="110.0" text="Provider" fx:id="tableColumnCvrProvider"/>
+                  <TableColumn fx:id="tableColumnCvrFilePath" minWidth="20.0"
+                    onEditCommit="#changeCvrFilePath" prefWidth="210.0" text="File Path"/>
+                  <TableColumn fx:id="tableColumnCvrFirstVoteCol" minWidth="20.0"
+                    onEditCommit="#changeCvrFirstVoteCol" prefWidth="70.0"
+                    text="First Vote&#10;Column&#10;Index"/>
+                  <TableColumn fx:id="tableColumnCvrFirstVoteRow" minWidth="20.0"
+                    onEditCommit="#changeCvrFirstVoteRow" prefWidth="70.0"
+                    text="First Vote&#10;Row&#10;Index"/>
+                  <TableColumn fx:id="tableColumnCvrIdCol" minWidth="20.0"
+                    onEditCommit="#changeCvrIdColIndex" prefWidth="70.0"
+                    text="ID&#10;Column&#10;Index"/>
+                  <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0"
+                    onEditCommit="#changeCvrPrecinctColIndex" prefWidth="70.0"
+                    text="Precinct&#10;Column&#10;Index"/>
+                  <TableColumn fx:id="tableColumnCvrProvider" minWidth="20.0"
+                    onEditCommit="#changeCvrProvider" prefWidth="110.0" text="Provider"/>
                 </columns>
               </TableView>
               <padding>
@@ -183,8 +180,8 @@
           <Tab text="Candidates">
             <VBox>
               <HBox alignment="CENTER_LEFT" spacing="4.0">
-                <TextField promptText="Name *" fx:id="textFieldCandidateName"/>
-                <TextField maxWidth="100.0" promptText="Code" fx:id="textFieldCandidateCode"/>
+                <TextField fx:id="textFieldCandidateName" promptText="Name *"/>
+                <TextField fx:id="textFieldCandidateCode" maxWidth="100.0" promptText="Code"/>
                 <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>
                 <Region prefHeight="25.0" prefWidth="39.0"/>
                 <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
@@ -199,14 +196,14 @@
                   <Insets bottom="2.0" left="6.0"/>
                 </padding>
               </Label>
-              <TableView fx:id="tableViewCandidates">
+              <TableView fx:id="tableViewCandidates" prefHeight="414.0" prefWidth="600.0">
                 <columns>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCandidateName"
-                    prefWidth="230.0" text="Name" fx:id="tableColumnCandidateName"/>
-                  <TableColumn minWidth="20.0" onEditCommit="#changeCandidateCode"
-                    prefWidth="100.0" text="Code" fx:id="tableColumnCandidateCode"/>
-                  <TableColumn minWidth="20.0" prefWidth="100.0" text="Excluded"
-                    fx:id="tableColumnCandidateExcluded"/>
+                  <TableColumn fx:id="tableColumnCandidateName" minWidth="20.0"
+                    onEditCommit="#changeCandidateName" prefWidth="230.0" text="Name"/>
+                  <TableColumn fx:id="tableColumnCandidateCode" minWidth="20.0"
+                    onEditCommit="#changeCandidateCode" prefWidth="100.0" text="Code"/>
+                  <TableColumn fx:id="tableColumnCandidateExcluded" minWidth="20.0"
+                    prefWidth="100.0" text="Excluded"/>
                 </columns>
               </TableView>
               <padding>
@@ -218,76 +215,74 @@
             <HBox>
               <VBox spacing="8.0">
                 <Label text="Tiebreak Mode *"/>
-                <ChoiceBox prefWidth="220.0" fx:id="choiceTiebreakMode"/>
+                <ChoiceBox fx:id="choiceTiebreakMode" prefWidth="220.0"/>
                 <Label text="Overvote Rule *"/>
-                <ChoiceBox prefWidth="220.0" fx:id="choiceOvervoteRule"/>
+                <ChoiceBox fx:id="choiceOvervoteRule" prefWidth="220.0"/>
                 <Label text="Winner Election Mode *"/>
-                <ChoiceBox prefWidth="220.0" fx:id="choiceWinnerElectionMode"/>
+                <ChoiceBox fx:id="choiceWinnerElectionMode" prefWidth="220.0"/>
                 <Label text="Number of Winners *"/>
-                <TextField maxWidth="220.0" promptText="Number of Winners"
-                  fx:id="textFieldNumberOfWinners"/>
+                <TextField fx:id="textFieldNumberOfWinners" maxWidth="220.0"
+                  promptText="Number of Winners"/>
                 <Label text="Decimal Places for Vote Arithmetic *"/>
-                <TextField maxWidth="220.0" promptText="Decimal Places for Vote Arithmetic"
-                  fx:id="textFieldDecimalPlacesForVoteArithmetic"/>
+                <TextField fx:id="textFieldDecimalPlacesForVoteArithmetic" maxWidth="220.0"
+                  promptText="Decimal Places for Vote Arithmetic"/>
                 <Label text="Minimum Vote Threshold *"/>
-                <TextField maxWidth="220.0" promptText="Minimum Vote Threshold"
-                  fx:id="textFieldMinimumVoteThreshold"/>
+                <TextField fx:id="textFieldMinimumVoteThreshold" maxWidth="220.0"
+                  promptText="Minimum Vote Threshold"/>
                 <Label text="Max Skipped Ranks Allowed *"/>
-                <TextField maxWidth="220.0" promptText="Max Skipped Ranks Allowed"
-                  fx:id="textFieldMaxSkippedRanksAllowed"/>
+                <TextField fx:id="textFieldMaxSkippedRanksAllowed" maxWidth="220.0"
+                  promptText="Max Skipped Ranks Allowed"/>
                 <Label text="Max Rankings Allowed *"/>
-                <TextField maxWidth="220.0" promptText="Max Rankings Allowed"
-                  fx:id="textFieldMaxRankingsAllowed"/>
+                <TextField fx:id="textFieldMaxRankingsAllowed" maxWidth="220.0"
+                  promptText="Max Rankings Allowed"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
               </VBox>
               <VBox spacing="8.0">
-                <CheckBox mnemonicParsing="false" text="Non-Integer Winning Threshold"
-                  fx:id="checkBoxNonIntegerWinningThreshold">
+                <CheckBox fx:id="checkBoxNonIntegerWinningThreshold" mnemonicParsing="false"
+                  text="Non-Integer Winning Threshold">
                   <VBox.margin>
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Hare Quota"
-                  fx:id="checkBoxHareQuota">
+                <CheckBox fx:id="checkBoxHareQuota" mnemonicParsing="false" text="Hare Quota">
                   <VBox.margin>
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Batch Elimination"
-                  fx:id="checkBoxBatchElimination">
+                <CheckBox fx:id="checkBoxBatchElimination" mnemonicParsing="false"
+                  text="Batch Elimination">
                   <VBox.margin>
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Exhaust on Duplicate Candidate"
-                  fx:id="checkBoxExhaustOnDuplicateCandidate">
+                <CheckBox fx:id="checkBoxExhaustOnDuplicateCandidate" mnemonicParsing="false"
+                  text="Exhaust on Duplicate Candidate">
                   <VBox.margin>
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
-                <CheckBox mnemonicParsing="false" text="Treat Blank as Undeclared Write-in"
-                  fx:id="checkBoxTreatBlankAsUndeclaredWriteIn">
+                <CheckBox fx:id="checkBoxTreatBlankAsUndeclaredWriteIn" mnemonicParsing="false"
+                  text="Treat Blank as Undeclared Write-in">
                   <VBox.margin>
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
                 <Label text="Random Seed"/>
-                <TextField maxWidth="220.0" promptText="Random Seed"
-                  fx:id="textFieldRandomSeed"/>
+                <TextField fx:id="textFieldRandomSeed" maxWidth="220.0" promptText="Random Seed"/>
                 <Label text="Overvote Label"/>
-                <TextField maxWidth="220.0" promptText="Overvote Label"
-                  fx:id="textFieldOvervoteLabel"/>
+                <TextField fx:id="textFieldOvervoteLabel" maxWidth="220.0"
+                  promptText="Overvote Label"/>
                 <Label text="Undervote Label"/>
-                <TextField maxWidth="220.0" promptText="Undervote Label"
-                  fx:id="textFieldUndervoteLabel"/>
+                <TextField fx:id="textFieldUndervoteLabel" maxWidth="220.0"
+                  promptText="Undervote Label"/>
                 <Label text="Undeclared Write-in Label"/>
-                <TextField maxWidth="220.0" promptText="Undeclared Write-in Label"
-                  fx:id="textFieldUndeclaredWriteInLabel"/>
+                <TextField fx:id="textFieldUndeclaredWriteInLabel" maxWidth="220.0"
+                  promptText="Undeclared Write-in Label"/>
                 <Label text="Rules Description"/>
-                <TextField maxWidth="220.0" promptText="Rules Description"
-                  fx:id="textFieldRulesDescription"/>
+                <TextField fx:id="textFieldRulesDescription" maxWidth="220.0"
+                  promptText="Rules Description"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
@@ -299,13 +294,13 @@
       </VBox>
     </center>
     <right>
-      <TextArea BorderPane.alignment="TOP_LEFT" editable="false" minWidth="300.0" prefWidth="300.0"
-        styleClass="help-text-area" wrapText="true" fx:id="textAreaHelp"/>
+      <TextArea fx:id="textAreaHelp" editable="false" minWidth="300.0" prefWidth="300.0"
+        styleClass="help-text-area" wrapText="true" BorderPane.alignment="TOP_LEFT"/>
     </right>
     <bottom>
-      <TextArea BorderPane.alignment="TOP_LEFT" editable="false" id="textStatus" prefHeight="200.0"
+      <TextArea id="textStatus" fx:id="textAreaStatus" editable="false" prefHeight="200.0"
         prefWidth="200.0" styleClass="console-text-area" wrapText="true"
-        fx:id="textAreaStatus">
+        BorderPane.alignment="TOP_LEFT">
         <BorderPane.margin>
           <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
         </BorderPane.margin>
