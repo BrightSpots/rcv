@@ -66,7 +66,6 @@ import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.OutputSettings;
-import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 
 @SuppressWarnings("WeakerAccess")
 public class GuiConfigController implements Initializable {
@@ -954,11 +953,7 @@ public class GuiConfigController implements Initializable {
             protected Void call() {
               // create session object used for tabulation
               TabulatorSession session = new TabulatorSession(configPath);
-              try {
-                session.tabulate();
-              } catch (TabulationCancelledException e) {
-                Logger.log(Level.SEVERE, "Tabulation was cancelled!");
-              }
+              session.tabulate();
               return null;
             }
           };
