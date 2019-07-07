@@ -1,29 +1,36 @@
 {
-  "outputSettings": {
-    "contestName": "Validation test for params",
-    "outputDirectory": "output",
-    "contestDate": "2018-07-19",
-    "contestJurisdiction": "none",
-    "contestOffice": "none",
-    "tabulateByPrecinct": false
+  "tabulatorVersion" : "0.1.0",
+  "outputSettings" : {
+    "contestName" : "Validation test for params",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-07-19",
+    "contestJurisdiction" : "none",
+    "contestOffice" : "none",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [],
-  "candidates": [],
-  "rules": {
-    "tiebreakMode": "whatever",
-    "overvoteRule": "invalidOption",
-    "numberOfWinners": 2,
-    "decimalPlacesForVoteArithmetic": -1,
-    "maxRankingsAllowed": -1,
-    "maxSkippedRanksAllowed": -3,
-    "minimumVoteThreshold": 0,
-    "batchElimination": "True",
-    "continueUntilTwoCandidatesRemain": "false",
-    "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI",
-    "rulesDescription": "Testing our validation logic for params"
+  "cvrFileSources" : [ ],
+  "candidates" : [ ],
+  "rules" : {
+    "tiebreakMode" : "modeUnknown",
+    "overvoteRule" : "ruleUnknown",
+    "numberOfWinners" : 2,
+    "decimalPlacesForVoteArithmetic" : 4,
+    "minimumVoteThreshold" : 0,
+    "maxSkippedRanksAllowed" : "-3",
+    "maxRankingsAllowed" : "-1",
+    "sequentialMultiSeat" : false,
+    "bottomsUpMultiSeat" : false,
+    "allowOnlyOneWinnerPerRound" : false,
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "rulesDescription" : "Testing our validation logic for params"
   }
 }
