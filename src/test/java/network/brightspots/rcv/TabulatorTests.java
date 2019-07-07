@@ -123,17 +123,13 @@ class TabulatorTests {
     String configPath = getTestFilePath(stem, "_config.json");
     // create a session object and run the tabulation
     TabulatorSession session = new TabulatorSession(configPath);
-    try {
-      session.tabulate();
-    } catch (TabulationCancelledException e) {
-      e.printStackTrace();
-    }
+    session.tabulate();
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
 
-    if (config.isSequentialMultiSeatEnabled()) {
+    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
         compareJsons(config, stem, timestampString, i);
       }

@@ -82,7 +82,6 @@ class ResultsWriter {
   // timestampString string to use when generating output file names
   private String timestampString;
   private Map<Integer, BigDecimal> roundToResidualSurplus;
-  private int numBallots;
 
   // visible for testing
   @SuppressWarnings("WeakerAccess")
@@ -217,16 +216,13 @@ class ResultsWriter {
         config.getOutputDirectory(),
         outputType,
         timestampString,
-        config.isSequentialMultiSeatEnabled() ? config.getSequentialWinners().size() + 1 : null);
+        config.isMultiSeatSequentialWinnerTakesAllEnabled()
+            ? config.getSequentialWinners().size() + 1
+            : null);
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
     this.roundToResidualSurplus = roundToResidualSurplus;
-    return this;
-  }
-
-  ResultsWriter setNumBallots(int numBallots) {
-    this.numBallots = numBallots;
     return this;
   }
 
@@ -305,9 +301,11 @@ class ResultsWriter {
   // purpose: creates summary files for the votes in each precinct
   // param: roundTallies is map from precinct to the round-by-round vote count in the precinct
   // param: precinctTallyTransfers is a map from precinct to tally transfers
+  // param: numBallotsByPrecinct is the total count of ballots per precinct
   void generatePrecinctSummaryFiles(
       Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies,
-      Map<String, TallyTransfers> precinctTallyTransfers)
+      Map<String, TallyTransfers> precinctTallyTransfers,
+      Map<String, Integer> numBallotsByPrecinct)
       throws IOException {
     Set<String> filenames = new HashSet<>();
     for (String precinct : precinctRoundTallies.keySet()) {
@@ -316,7 +314,9 @@ class ResultsWriter {
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
           getOutputFilePath(String.format("%s_precinct_summary", precinctFileString));
-      generateSummarySpreadsheet(precinctRoundTallies.get(precinct), precinct, outputPath);
+      int numBallots = numBallotsByPrecinct.get(precinct);
+      generateSummarySpreadsheet(
+          precinctRoundTallies.get(precinct), numBallots, precinct, outputPath);
 
       // generate json output
       generateSummaryJson(
@@ -334,10 +334,13 @@ class ResultsWriter {
   // param: outputPath is the full path of the file to save
   // file access: write / create
   private void generateSummarySpreadsheet(
-      Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
+      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      int numBallots,
+      String precinct,
+      String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
-    Logger.log(Level.INFO, "Generating summary spreadsheets: %s...", csvPath);
+    Logger.log(Level.INFO, "Generating summary spreadsheet: %s...", csvPath);
 
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
@@ -427,8 +430,13 @@ class ResultsWriter {
       // still active or counting as residual surplus votes in the current round.
       BigDecimal thisRoundInactive =
           new BigDecimal(numBallots)
-              .subtract(totalActiveVotesPerRound.get(round))
-              .subtract(roundToResidualSurplus.get(round));
+              .subtract(totalActiveVotesPerRound.get(round));
+
+      if (precinct == null) {
+        // We don't have the concept of residual surplus at the precinct level (see comment below),
+        // so we'll just incorporate that part (if any) into the inactive count.
+        thisRoundInactive = thisRoundInactive.subtract(roundToResidualSurplus.get(round));
+      }
       // total votes cell
       csvPrinter.print(thisRoundInactive.toString());
     }
@@ -437,7 +445,9 @@ class ResultsWriter {
     // row for residual surplus (if needed)
     // We check if we accumulated any residual surplus over the course of the tabulation by testing
     // whether the value in the final round is positive.
-    if (roundToResidualSurplus.get(numRounds).signum() == 1) {
+    // Note that this concept only makes sense when we're reporting the overall tabulation, so we
+    // omit it when generating results at the individual precinct level.
+    if (precinct == null && roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round).toString());
@@ -454,7 +464,7 @@ class ResultsWriter {
       Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
       throw exception;
     }
-    Logger.log(Level.INFO, "Summary spreadsheets generated successfully.");
+    Logger.log(Level.INFO, "Summary spreadsheet generated successfully.");
   }
 
   // function: addActionRows
@@ -570,12 +580,12 @@ class ResultsWriter {
   // purpose: creates a summary spreadsheet and JSON for the full contest
   // param: roundTallies is the round-by-round count of votes per candidate
   // param: tallyTransfers is a record of vote transfers for each election/elimination
+  // param: numBallots total number of ballots in this contest
   void generateOverallSummaryFiles(
-      Map<Integer, Map<String, BigDecimal>> roundTallies, TallyTransfers tallyTransfers)
-      throws IOException {
+      Map<Integer, Map<String, BigDecimal>> roundTallies, TallyTransfers tallyTransfers, int numBallots) throws IOException {
     String outputPath = getOutputFilePath("summary");
     // generate the spreadsheet
-    generateSummarySpreadsheet(roundTallies, null, outputPath);
+    generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
 
     // generate json output
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
