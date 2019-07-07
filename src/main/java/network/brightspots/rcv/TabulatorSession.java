@@ -114,7 +114,7 @@ class TabulatorSession {
   void tabulate() {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    Boolean tabulationSuccess = false;
+    boolean tabulationSuccess = false;
     if (config != null && config.validate() && setUpLogging(config)) {
       try {
         Logger.log(Level.INFO, "Begin config file contents:");
@@ -148,14 +148,15 @@ class TabulatorSession {
           try {
             newWinnerSet = runTabulationForConfig(config, castVoteRecords);
           } catch (TabulationCancelledException e) {
-              Logger.log(Level.SEVERE, "Tabulation was cancelled by the user!");
-              break;
+            Logger.log(Level.SEVERE, "Tabulation was cancelled by the user!");
+            break;
           }
           assert newWinnerSet.size() == 1;
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
-          Logger.log(Level.INFO, "Tabulation for seat #%d complete.", config.getSequentialWinners().size());
+          Logger.log(Level.INFO, "Tabulation for seat #%d complete.",
+              config.getSequentialWinners().size());
           if (config.getSequentialWinners().size() < numWinners) {
             Logger.log(Level.INFO, "Excluding %s from the remaining tabulations.", newWinner);
           }
