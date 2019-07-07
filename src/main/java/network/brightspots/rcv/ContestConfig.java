@@ -879,9 +879,7 @@ class ContestConfig {
   // param: code the code of the candidate whose name we want to look up
   // returns: the full candidate name for the given candidate code
   String getNameForCandidateCode(String code) {
-    return getUndeclaredWriteInLabel() != null && getUndeclaredWriteInLabel().equals(code)
-        ? "Undeclared"
-        : candidateCodeToNameMap.get(code);
+    return candidateCodeToNameMap.get(code);
   }
 
   // function: getCandidatePermutation
