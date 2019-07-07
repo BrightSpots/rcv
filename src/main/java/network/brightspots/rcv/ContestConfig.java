@@ -163,7 +163,7 @@ class ContestConfig {
       String string, String field, String otherFieldValue, String otherField) {
     boolean match = false;
     if (!field.equals(otherField)) {
-      if (!isNullOrBlank(otherFieldValue) && otherFieldValue.equals(string)) {
+      if (!isNullOrBlank(otherFieldValue) && otherFieldValue.equalsIgnoreCase(string)) {
         match = true;
         Logger.log(
             Level.SEVERE,
@@ -373,13 +373,16 @@ class ContestConfig {
   // param: string string to check
   // param: field field name of provided string
   private boolean stringAlreadyInUseElsewhere(String string, String field) {
-    boolean inUse;
-    if (TallyTransfers.RESERVED_STRINGS.contains(string)) {
-      inUse = true;
-      Logger
-          .log(Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", string,
-              field);
-    } else {
+    boolean inUse = false;
+    for (String reservedString : TallyTransfers.RESERVED_STRINGS) {
+      if (string.equalsIgnoreCase(reservedString)) {
+        inUse = true;
+        Logger.log(Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", string,
+            field);
+        break;
+      }
+    }
+    if (!inUse) {
       inUse = stringMatchesAnotherFieldValue(string, field, getOvervoteLabel(), "overvoteLabel")
           || stringMatchesAnotherFieldValue(string, field, getUndervoteLabel(), "undervoteLabel")
           || stringMatchesAnotherFieldValue(string, field, getUndeclaredWriteInLabel(),
@@ -702,7 +705,7 @@ class ContestConfig {
     return resolveConfigPath(getOutputDirectoryRaw());
   }
 
-  String getTabulatorVersion() {
+  private String getTabulatorVersion() {
     return rawConfig.tabulatorVersion;
   }
 
@@ -750,7 +753,7 @@ class ContestConfig {
     Integer intValue;
     if (isNullOrBlank(rawInput)) {
       intValue = null;
-    } else if (rawInput.toLowerCase().equals(optionFlag)) {
+    } else if (rawInput.equalsIgnoreCase(optionFlag)) {
       intValue = optionResult;
     } else {
       try {
