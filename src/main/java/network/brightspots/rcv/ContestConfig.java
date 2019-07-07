@@ -207,6 +207,7 @@ class ContestConfig {
   boolean validate() {
     Logger.log(Level.INFO, "Validating contest config...");
     isValid = true;
+    validateTabulatorVersion();
     validateOutputSettings();
     validateCvrFileSources();
     validateCandidates();
@@ -244,10 +245,29 @@ class ContestConfig {
     }
   }
 
+  // version validation and migration logic goes here
+  // e.g. unsupported versions would fail or be migrated
+  // in this release we support only the current app version
+  private void validateTabulatorVersion() {
+    if (isNullOrBlank(getTabulatorVersion())) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "tabulatorVersion is required!");
+    } else {
+      if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!.", getTabulatorVersion(),
+            Main.APP_VERSION);
+      }
+    }
+    if (!isValid) {
+      Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s.", Main.APP_VERSION);
+    }
+  }
+
   private void validateOutputSettings() {
     if (isNullOrBlank(getContestName())) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest name is required!");
+      Logger.log(Level.SEVERE, "contestName is required!");
     }
   }
 
@@ -517,7 +537,7 @@ class ContestConfig {
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
     if (getNumberOfWinners() != null && getNumberOfWinners() > 1) {
-      if (willContinueUntilTwoCandidatesRemain()) {
+      if (isContinueUntilTwoCandidatesRemainEnabled()) {
         isValid = false;
         Logger.log(
             Level.SEVERE,
@@ -654,12 +674,16 @@ class ContestConfig {
     return resolveConfigPath(getOutputDirectoryRaw());
   }
 
-  // function: willContinueUntilTwoCandidatesRemain
+  // function: isContinueUntilTwoCandidatesRemainEnabled
   // purpose: getter for setting to keep tabulating beyond selecting winner until two candidates
   // remain
   // returns: whether to keep tabulating until two candidates remain
-  boolean willContinueUntilTwoCandidatesRemain() {
+  boolean isContinueUntilTwoCandidatesRemainEnabled() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
+  }
+
+  String getTabulatorVersion() {
+    return rawConfig.tabulatorVersion;
   }
 
   // function: getContestName
