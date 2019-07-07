@@ -31,7 +31,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
 
-  // tabulator version which created this file
+  // tabulator version that created this file
   public String tabulatorVersion;
   // output settings object
   public OutputSettings outputSettings;

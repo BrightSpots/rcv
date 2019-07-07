@@ -63,6 +63,7 @@ class Tabulator {
   private final Map<String, Integer> winnerToRound = new HashMap<>();
   // tracks vote transfer summaries for visualizer
   private final TallyTransfers tallyTransfers = new TallyTransfers();
+  private final Map<String, TallyTransfers> precinctTallyTransfers = new HashMap<>();
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // precincts which may appear in the cast vote records
@@ -672,16 +673,15 @@ class Tabulator {
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
             .setTimestampString(timestamp)
-            .setTallyTransfers(tallyTransfers)
             .setNumBallots(castVoteRecords.size())
             .setWinningThreshold(winningThreshold)
             .setPrecinctIds(precinctNames)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
-    writer.generateOverallSummaryFiles(roundTallies);
+    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers);
 
     if (config.isTabulateByPrecinctEnabled()) {
-      writer.generatePrecinctSummarySpreadsheets(precinctRoundTallies);
+      writer.generatePrecinctSummaryFiles(precinctRoundTallies, precinctTallyTransfers);
     }
 
     if (config.isGenerateCdfJsonEnabled()) {
@@ -815,6 +815,14 @@ class Tabulator {
         cvr.getCurrentRecipientOfVote(),
         selectedCandidate,
         cvr.getFractionalTransferValue());
+    if (config.isTabulateByPrecinctEnabled()) {
+      precinctTallyTransfers.get(cvr.getPrecinct()).addTransfer(
+          currentRound,
+          cvr.getCurrentRecipientOfVote(),
+          selectedCandidate,
+          cvr.getFractionalTransferValue());
+    }
+
     // update cvr recipient
     cvr.setCurrentRecipientOfVote(selectedCandidate);
     // exhaust if needed
@@ -1061,6 +1069,7 @@ class Tabulator {
   private void initPrecinctRoundTallies() {
     for (String precinctName : precinctNames) {
       precinctRoundTallies.put(precinctName, new HashMap<>());
+      precinctTallyTransfers.put(precinctName, new TallyTransfers());
       assert !isNullOrBlank(precinctName);
     }
   }

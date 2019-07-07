@@ -2,7 +2,7 @@ This document lists the parameters that can be included in a config file suitabl
 Config file must be valid JSON format. Examples can be found in the test_data folder.
 
   "tabulatorVersion" required
-    version of the application which created this file
+    version of the application that created this file
     used for migrating config data between different application versions
     example: "1.0.0"
     value: text string of length [1..1000]

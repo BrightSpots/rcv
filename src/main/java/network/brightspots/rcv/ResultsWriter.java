@@ -81,8 +81,6 @@ class ResultsWriter {
   private ContestConfig config;
   // timestampString string to use when generating output file names
   private String timestampString;
-  // TallyTransfer object contains totals votes transferred each round
-  private TallyTransfers tallyTransfers;
   private Map<Integer, BigDecimal> roundToResidualSurplus;
   private int numBallots;
 
@@ -227,14 +225,6 @@ class ResultsWriter {
     return this;
   }
 
-  // function: setTallyTransfers
-  // purpose: setter for tally transfer object used when generating json summary output
-  // param: TallyTransfer object
-  ResultsWriter setTallyTransfers(TallyTransfers tallyTransfers) {
-    this.tallyTransfers = tallyTransfers;
-    return this;
-  }
-
   ResultsWriter setNumBallots(int numBallots) {
     this.numBallots = numBallots;
     return this;
@@ -311,11 +301,14 @@ class ResultsWriter {
     return this;
   }
 
-  // function: generatePrecinctSummarySpreadsheet
-  // purpose: creates a summary spreadsheet for the votes in a particular precinct
+  // function: generatePrecinctSummaryFiles
+  // purpose: creates summary files for the votes in each precinct
   // param: roundTallies is map from precinct to the round-by-round vote count in the precinct
-  void generatePrecinctSummarySpreadsheets(
-      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies) throws IOException {
+  // param: precinctTallyTransfers is a map from precinct to tally transfers
+  void generatePrecinctSummaryFiles(
+      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies,
+      Map<String, TallyTransfers> precinctTallyTransfers)
+      throws IOException {
     Set<String> filenames = new HashSet<>();
     for (String precinct : precinctRoundTallies.keySet()) {
       // precinctFileString is a unique filesystem-safe string which can be used for creating
@@ -326,7 +319,11 @@ class ResultsWriter {
       generateSummarySpreadsheet(precinctRoundTallies.get(precinct), precinct, outputPath);
 
       // generate json output
-      generateSummaryJson(precinctRoundTallies.get(precinct), precinct, outputPath);
+      generateSummaryJson(
+          precinctRoundTallies.get(precinct),
+          precinctTallyTransfers.get(precinct),
+          precinct,
+          outputPath);
     }
   }
 
@@ -572,14 +569,16 @@ class ResultsWriter {
   // function: generateOverallSummaryFiles
   // purpose: creates a summary spreadsheet and JSON for the full contest
   // param: roundTallies is the round-by-round count of votes per candidate
-  void generateOverallSummaryFiles(Map<Integer, Map<String, BigDecimal>> roundTallies)
+  // param: tallyTransfers is a record of vote transfers for each election/elimination
+  void generateOverallSummaryFiles(
+      Map<Integer, Map<String, BigDecimal>> roundTallies, TallyTransfers tallyTransfers)
       throws IOException {
     String outputPath = getOutputFilePath("summary");
     // generate the spreadsheet
     generateSummarySpreadsheet(roundTallies, null, outputPath);
 
     // generate json output
-    generateSummaryJson(roundTallies, null, outputPath);
+    generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
   // create NIST Common Data Format CVR json
@@ -809,11 +808,16 @@ class ResultsWriter {
 
   // function: generateSummaryJson
   // purpose: create summary json data for use in visualizer, unit tests and other tools
-  // param: outputPath where to write json file
   // param: roundTallies all tally information
+  // param: tallyTransfers record of vote transfers
+  // param: precinct the precinct name, if applicable
+  // param: outputPath where to write json file
   // file access: write to outputPath
   private void generateSummaryJson(
-      Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
+      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      TallyTransfers tallyTransfers,
+      String precinct,
+      String outputPath)
       throws IOException {
     String jsonPath = outputPath + ".json";
     Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
@@ -841,16 +845,17 @@ class ResultsWriter {
       HashMap<String, Object> roundData = new HashMap<>();
       // add round number (this is implied by the ordering but for debugging we are explicit)
       roundData.put("round", round);
-      // add actions if this is not a precinct summary
-      if (isNullOrBlank(precinct)) {
-        // actions is a list of one or more action objects
-        ArrayList<Object> actions = new ArrayList<>();
-        addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);
-        // add any elimination actions
-        addActionObjects("eliminated", roundToEliminatedCandidates.get(round), round, actions);
-        // add action objects
-        roundData.put("tallyResults", actions);
-      }
+
+      // actions is a list of one or more action objects
+      ArrayList<Object> actions = new ArrayList<>();
+      addActionObjects(
+          "elected", roundToWinningCandidates.get(round), round, actions, tallyTransfers);
+      // add any elimination actions
+      addActionObjects(
+          "eliminated", roundToEliminatedCandidates.get(round), round, actions, tallyTransfers);
+      // add action objects
+      roundData.put("tallyResults", actions);
+
       // add tally object
       roundData.put("tally", updateCandidateNamesInTally(roundTallies.get(round)));
       // add roundData to results list
@@ -881,8 +886,13 @@ class ResultsWriter {
   // param: candidates list of all candidates action is applied to
   // param: round which this action occurred
   // param: actions list to add new action objects to
+  // param: tallyTransfers record of vote transfers
   private void addActionObjects(
-      String actionType, List<String> candidates, int round, ArrayList<Object> actions) {
+      String actionType,
+      List<String> candidates,
+      int round,
+      ArrayList<Object> actions,
+      TallyTransfers tallyTransfers) {
     // check for valid candidates:
     // "drop undeclared write-in" may result in no one actually being eliminated
     if (candidates != null && candidates.size() > 0) {
