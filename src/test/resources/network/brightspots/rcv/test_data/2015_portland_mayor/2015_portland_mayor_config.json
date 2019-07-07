@@ -79,13 +79,14 @@
     "excluded" : false
   } ],
   "rules" : {
+    "tiebreakMode" : "usePermutationInConfig",
     "overvoteRule" : "exhaustImmediately",
     "numberOfWinners" : 1,
     "decimalPlacesForVoteArithmetic" : 4,
     "minimumVoteThreshold" : 0,
     "maxSkippedRanksAllowed" : "1",
     "maxRankingsAllowed" : "15",
-    "winnerElectionMode" : "modeUnknown",
+    "winnerElectionMode" : "standard",
     "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : true,

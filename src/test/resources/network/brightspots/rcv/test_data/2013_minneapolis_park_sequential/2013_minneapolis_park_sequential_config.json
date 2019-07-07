@@ -67,7 +67,7 @@
     "minimumVoteThreshold" : 0,
     "maxSkippedRanksAllowed" : "2",
     "maxRankingsAllowed" : "3",
-    "winnerElectionMode" : "multiSeatSequentialWinnerTakeAll",
+    "winnerElectionMode" : "multiSeatSequentialWinnerTakesAll",
     "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
