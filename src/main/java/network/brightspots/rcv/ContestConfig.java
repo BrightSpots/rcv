@@ -544,7 +544,7 @@ class ContestConfig {
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
     if (getNumberOfWinners() != null && getNumberOfWinners() > 1) {
-      if (willContinueUntilTwoCandidatesRemain()) {
+      if (isContinueUntilTwoCandidatesRemainEnabled()) {
         isValid = false;
         Logger.log(
             Level.SEVERE,
@@ -668,11 +668,11 @@ class ContestConfig {
     return resolveConfigPath(getOutputDirectoryRaw());
   }
 
-  // function: willContinueUntilTwoCandidatesRemain
+  // function: isContinueUntilTwoCandidatesRemainEnabled
   // purpose: getter for setting to keep tabulating beyond selecting winner until two candidates
   // remain
   // returns: whether to keep tabulating until two candidates remain
-  boolean willContinueUntilTwoCandidatesRemain() {
+  boolean isContinueUntilTwoCandidatesRemainEnabled() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
 
