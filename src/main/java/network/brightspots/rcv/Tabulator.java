@@ -676,15 +676,22 @@ class Tabulator {
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
             .setTimestampString(timestamp)
-            .setNumBallots(castVoteRecords.size())
             .setWinningThreshold(winningThreshold)
             .setPrecinctIds(precinctNames)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
-    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers);
+    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, castVoteRecords.size());
 
     if (config.isTabulateByPrecinctEnabled()) {
-      writer.generatePrecinctSummaryFiles(precinctRoundTallies, precinctTallyTransfers);
+      Map<String, Integer> numBallotsByPrecinct = new HashMap<>();
+      for (CastVoteRecord cvr : castVoteRecords) {
+        String precinct = cvr.getPrecinct();
+        if (!isNullOrBlank(precinct)) {
+          int currentTally = numBallotsByPrecinct.getOrDefault(precinct, 0);
+          numBallotsByPrecinct.put(precinct, currentTally + 1);
+        }
+      }
+      writer.generatePrecinctSummaryFiles(precinctRoundTallies, precinctTallyTransfers, numBallotsByPrecinct);
     }
 
     if (config.isGenerateCdfJsonEnabled()) {
