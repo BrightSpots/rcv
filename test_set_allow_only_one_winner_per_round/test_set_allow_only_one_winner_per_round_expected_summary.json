@@ -17,7 +17,8 @@
     "tallyResults" : [ {
       "elected" : "A",
       "transfers" : {
-        "B" : "0.7497"
+        "B" : "0.7497",
+        "residual surplus" : "0.0002"
       }
     } ]
   }, {
@@ -31,7 +32,8 @@
     "tallyResults" : [ {
       "elected" : "B",
       "transfers" : {
-        "C" : "1.4994"
+        "C" : "1.4994",
+        "residual surplus" : "0.0002"
       }
     } ]
   }, {
@@ -46,7 +48,8 @@
       "elected" : "C",
       "transfers" : {
         "D" : "2.0994",
-        "exhausted" : "0.1497"
+        "exhausted" : "0.1497",
+        "residual surplus" : "0.0002"
       }
     } ]
   }, {
