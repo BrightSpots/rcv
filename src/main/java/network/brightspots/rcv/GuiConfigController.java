@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -762,8 +763,13 @@ public class GuiConfigController implements Initializable {
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
     if (!isNullOrBlank(outputSettings.contestDate)) {
-      datePickerContestDate.setValue(
-          LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
+      try {
+        datePickerContestDate.setValue(
+            LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
+      } catch (DateTimeParseException exception) {
+        Logger.log(Level.SEVERE, "Invalid contestDate: %s!", outputSettings.contestDate);
+        datePickerContestDate.setValue(null);
+      }
     }
     textFieldContestJurisdiction.setText(outputSettings.contestJurisdiction);
     textFieldContestOffice.setText(outputSettings.contestOffice);
