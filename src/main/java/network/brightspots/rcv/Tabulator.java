@@ -130,7 +130,7 @@ class Tabulator {
   Set<String> tabulate() throws TabulationCancelledException {
     logSummaryInfo();
 
-    if (config.getRandomSeed() != null) {
+    if (config.needsRandomSeed()) {
       TieBreak.setRandomSeed(config.getRandomSeed());
     }
 

@@ -35,11 +35,11 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-  prefHeight="790.0" prefWidth="900.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
+  prefHeight="810.0" prefWidth="900.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
   xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="network.brightspots.rcv.GuiConfigController">
   <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    prefHeight="790.0" prefWidth="900.0">
+    prefHeight="810.0" prefWidth="900.0">
     <top>
       <VBox BorderPane.alignment="TOP_LEFT">
         <ButtonBar fx:id="buttonBar" maxHeight="50.0" nodeOrientation="LEFT_TO_RIGHT"

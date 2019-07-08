@@ -1,4 +1,5 @@
 {
+  "tabulatorVersion" : "0.1.0",
   "outputSettings" : {
     "contestName" : "Multi_winner2",
     "outputDirectory" : "output",
@@ -10,23 +11,24 @@
   },
   "cvrFileSources" : [ {
     "filePath" : "test_set_multi_winner_fractional_threshold_cvr.json",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
     "provider" : "CDF"
   } ],
   "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "interactive",
     "overvoteRule" : "alwaysSkipToNextRank",
-    "numberOfWinners" : 3,
-    "decimalPlacesForVoteArithmetic" : 4,
-    "minimumVoteThreshold" : 0,
-    "maxSkippedRanksAllowed" : 1,
-    "maxRankingsAllowed" : 6,
-    "sequentialMultiSeat" : false,
-    "bottomsUpMultiSeat" : false,
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "1",
+    "numberOfWinners" : "3",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "6",
     "nonIntegerWinningThreshold" : true,
     "hareQuota" : false,
     "batchElimination" : false,
-    "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
     "overvoteLabel" : "",

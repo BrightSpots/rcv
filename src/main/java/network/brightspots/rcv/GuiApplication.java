@@ -30,7 +30,7 @@ import javafx.stage.Stage;
 @SuppressWarnings("WeakerAccess")
 public class GuiApplication extends Application {
 
-  private static final int STAGE_HEIGHT = 835;
+  private static final int STAGE_HEIGHT = 855;
   private static final int STAGE_WIDTH = 935;
 
   @Override

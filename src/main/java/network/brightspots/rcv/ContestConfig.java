@@ -478,10 +478,7 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "Invalid tiebreakMode!");
     }
 
-    if ((getTiebreakMode() == TieBreakMode.RANDOM
-        || getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
-        || getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION)
-        && isNullOrBlank(getRandomSeedRaw())) {
+    if (needsRandomSeed() && isNullOrBlank(getRandomSeedRaw())) {
       isValid = false;
       Logger.log(
           Level.SEVERE,
@@ -876,6 +873,12 @@ class ContestConfig {
     return Integer.parseInt(getRandomSeedRaw());
   }
 
+  boolean needsRandomSeed() {
+    return getTiebreakMode() == TieBreakMode.RANDOM ||
+        getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM ||
+        getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION;
+  }
+
   // function: isTreatBlankAsUndeclaredWriteInEnabled
   // purpose: getter for treatBlankAsUndeclaredWriteIn rule
   // returns: true if we are to treat blank cell as UWI
@@ -963,7 +966,6 @@ class ContestConfig {
       if (!isNullOrBlank(getRandomSeedRaw()) && isInt(getRandomSeedRaw())) {
         // sort candidate permutation for reproducibility
         Collections.sort(candidatePermutation);
-        Logger.log(Level.INFO, "Shuffling!");
         Collections.shuffle(candidatePermutation, new Random(getRandomSeed()));
       }
     }

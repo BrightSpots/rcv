@@ -1,62 +1,73 @@
 {
-  "outputSettings": {
-    "contestName": "Maine 2018 Democratic Governor Primary race",
-    "outputDirectory": "output",
-    "contestDate": "2018-06-12",
-    "contestJurisdiction": "Maine",
-    "contestOffice": "Governor",
-    "tabulateByPrecinct": false
+  "tabulatorVersion" : "0.1.0",
+  "outputSettings" : {
+    "contestName" : "Maine 2018 Democratic Governor Primary race",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-06-12",
+    "contestJurisdiction" : "Maine",
+    "contestOffice" : "Governor",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "2018_maine_governor_primary_cvr.xlsx",
-      "firstVoteColumnIndex": 4,
-      "firstVoteRowIndex": 2,
-      "idColumnIndex": 1,
-      "precinctColumnIndex": 2,
-      "provider": "ES&S"
-    }
-  ],
-  "candidates": [
-    {
-      "name": "Mills, Janet T."
-    },
-    {
-      "name": "Cote, Adam Roland"
-    },
-    {
-      "name": "Sweet, Elizabeth A."
-    },
-    {
-      "name": "Eves, Mark W."
-    },
-    {
-      "name": "Dion, Mark N."
-    },
-    {
-      "name": "Russell, Diane Marie"
-    },
-    {
-      "name": "Dion, Donna J."
-    },
-    {
-      "name": "Write-in"
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "interactive",
-    "overvoteRule": "exhaustImmediately",
-    "maxRankingsAllowed": 8,
-    "maxSkippedRanksAllowed": 1,
-    "numberOfWinners": 1,
-    "decimalPlacesForVoteArithmetic": 4,
-    "minimumVoteThreshold": 0,
-    "batchElimination": true,
-    "continueUntilTwoCandidatesRemain": false,
-    "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "rulesDescription": "Maine Rules"
+  "cvrFileSources" : [ {
+    "filePath" : "2018_maine_governor_primary_cvr.xlsx",
+    "firstVoteColumnIndex" : "4",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "1",
+    "precinctColumnIndex" : "2",
+    "provider" : "ES&S"
+  } ],
+  "candidates" : [ {
+    "name" : "Mills, Janet T.",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Cote, Adam Roland",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Sweet, Elizabeth A.",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Eves, Mark W.",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Dion, Mark N.",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Russell, Diane Marie",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Dion, Donna J.",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Write-in",
+    "code" : "",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "interactive",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "8",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : "Maine Rules"
   }
 }
