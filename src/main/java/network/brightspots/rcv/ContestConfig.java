@@ -623,7 +623,7 @@ class ContestConfig {
   // purpose: how many winners for this contest
   // returns: number of winners
   Integer getNumberOfWinners() {
-    return Integer.parseInt(rawConfig.rules.numberOfWinners);
+    return Integer.parseInt(getNumberOfWinnersRaw());
   }
 
   void setNumberOfWinners(int numberOfWinners) {
@@ -646,7 +646,7 @@ class ContestConfig {
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to
   Integer getDecimalPlacesForVoteArithmetic() {
-    return Integer.parseInt(rawConfig.rules.decimalPlacesForVoteArithmetic);
+    return Integer.parseInt(getDecimalPlacesForVoteArithmeticRaw());
   }
 
   WinnerElectionMode getWinnerElectionMode() {
@@ -826,7 +826,7 @@ class ContestConfig {
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use or default value if it's not specified
   BigDecimal getMinimumVoteThreshold() {
-    return new BigDecimal(rawConfig.rules.minimumVoteThreshold);
+    return new BigDecimal(getMinimumVoteThresholdRaw());
   }
 
   // function: getMaxSkippedRanksAllowed
@@ -873,7 +873,7 @@ class ContestConfig {
   }
 
   Integer getRandomSeed() {
-    return Integer.parseInt(rawConfig.rules.randomSeed);
+    return Integer.parseInt(getRandomSeedRaw());
   }
 
   // function: isTreatBlankAsUndeclaredWriteInEnabled

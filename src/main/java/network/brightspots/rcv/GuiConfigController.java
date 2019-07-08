@@ -388,6 +388,7 @@ public class GuiConfigController implements Initializable {
 
   public void changeCvrFilePath(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // Cache the original value to revert back to in case the change fails
     String oldFilePath = cvrSelected.getFilePath();
     cvrSelected.setFilePath(cellEditEvent.getNewValue().toString().trim());
     if (!cvrSourceHasRequiredFields(cvrSelected)) {
@@ -398,6 +399,7 @@ public class GuiConfigController implements Initializable {
 
   public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // Cache the original value to revert back to in case the change fails
     String oldFirstVoteCol = cvrSelected.getFirstVoteColumnIndex();
     cvrSelected.setFirstVoteColumnIndex(cellEditEvent.getNewValue().toString().trim());
     if (!cvrSourceHasRequiredFields(cvrSelected)) {
@@ -408,6 +410,7 @@ public class GuiConfigController implements Initializable {
 
   public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // Cache the original value to revert back to in case the change fails
     String oldFirstVoteRow = cvrSelected.getFirstVoteRowIndex();
     cvrSelected.setFirstVoteRowIndex(cellEditEvent.getNewValue().toString().trim());
     if (!cvrSourceHasRequiredFields(cvrSelected)) {
@@ -418,6 +421,7 @@ public class GuiConfigController implements Initializable {
 
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // Cache the original value to revert back to in case the change fails
     String oldIdColIndex = cvrSelected.getIdColumnIndex();
     cvrSelected.setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
     if (!cvrSourceHasRequiredFields(cvrSelected)) {
@@ -428,6 +432,7 @@ public class GuiConfigController implements Initializable {
 
   public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // Cache the original value to revert back to in case the change fails
     String oldPrecinctColIndex = cvrSelected.getPrecinctColumnIndex();
     cvrSelected.setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
     if (!cvrSourceHasRequiredFields(cvrSelected)) {
@@ -438,6 +443,7 @@ public class GuiConfigController implements Initializable {
 
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // Cache the original value to revert back to in case the change fails
     String oldProvider = cvrSelected.getProvider();
     cvrSelected.setProvider(cellEditEvent.getNewValue().toString().trim());
     if (!cvrSourceHasRequiredFields(cvrSelected)) {
