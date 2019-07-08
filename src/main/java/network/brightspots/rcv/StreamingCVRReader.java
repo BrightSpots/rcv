@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -20,6 +20,8 @@
  */
 
 package network.brightspots.rcv;
+
+import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +52,8 @@ import org.xml.sax.XMLReader;
 
 class StreamingCVRReader {
 
+  // this indicates a missing precinct Id in output files
+  private final String MISSING_PRECINCT_ID = "missing_precinct_id";
   // config for the contest
   private final ContestConfig config;
   // path of the source file
@@ -73,16 +77,17 @@ class StreamingCVRReader {
   // list of raw strings for CVR in progress
   private LinkedList<String> currentCVRData;
   // supplied CVR ID for CVR in progress
-  private String currentSuppliedCVRID;
+  private String currentSuppliedCvrId;
   // precinct ID for CVR in progress
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
   private List<CastVoteRecord> cvrList;
   // store precinctIDs (new IDs will be added as we parse)
   private Set<String> precinctIDs;
-
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
+  // flag indicating data issues during parsing
+  private boolean encounteredDataErrors = false;
 
   // function: StreamingCVRReader
   // purpose: class constructor
@@ -95,11 +100,13 @@ class StreamingCVRReader {
     this.excelFileName = new File(excelFilePath).getName();
 
     // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
-    this.firstVoteColumnIndex = source.getFirstVoteColumnIndex() - 1;
-    this.firstVoteRowIndex = source.getFirstVoteRowIndex() - 1;
-    this.idColumnIndex = source.getIdColumnIndex() != null ? source.getIdColumnIndex() - 1 : null;
-    this.precinctColumnIndex =
-        source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex() - 1 : null;
+    this.firstVoteColumnIndex = Integer.parseInt(source.getFirstVoteColumnIndex()) - 1;
+    this.firstVoteRowIndex = Integer.parseInt(source.getFirstVoteRowIndex()) - 1;
+    this.idColumnIndex =
+        isNullOrBlank(source.getIdColumnIndex()) ? null
+            : Integer.parseInt(source.getIdColumnIndex()) - 1;
+    this.precinctColumnIndex = !isNullOrBlank(source.getPrecinctColumnIndex()) ?
+        Integer.parseInt(source.getPrecinctColumnIndex()) - 1 : null;
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -157,7 +164,6 @@ class StreamingCVRReader {
       currentCVRData.add("empty cell");
       // add UWI ranking if required by settings
       if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
-        Logger.log(Level.WARNING, "Empty cell! Treating as UWI.");
         // add the new ranking
         currentRankings.add(new Pair<>(rank, config.getUndeclaredWriteInLabel()));
       }
@@ -171,7 +177,7 @@ class StreamingCVRReader {
     cvrIndex++;
     currentRankings = new LinkedList<>();
     currentCVRData = new LinkedList<>();
-    currentSuppliedCVRID = null;
+    currentSuppliedCvrId = null;
     currentPrecinct = null;
     lastRankSeen = 0;
   }
@@ -184,23 +190,41 @@ class StreamingCVRReader {
     // determine what the new cvr ID will be
     String computedCastVoteRecordID =
         String.format("%s-%d", ResultsWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
+
+    // add precinct ID if needed
+    if (precinctColumnIndex != null) {
+      if (currentPrecinct == null) {
+        // group precincts with missing Ids here
+        Logger.log(
+            Level.WARNING,
+            "Precinct identifier not found for cast vote record: %s",
+            computedCastVoteRecordID);
+        currentPrecinct = MISSING_PRECINCT_ID;
+      }
+      precinctIDs.add(currentPrecinct);
+    }
+
+    // look for missing Cvr Id
+    if (idColumnIndex != null && currentSuppliedCvrId == null) {
+      Logger.log(
+          Level.SEVERE, "Cast vote record identifier not found for: %s", computedCastVoteRecordID);
+      encounteredDataErrors = true;
+    }
+
     // create new cast vote record
     CastVoteRecord newRecord =
         new CastVoteRecord(
             computedCastVoteRecordID,
-            currentSuppliedCVRID,
+            currentSuppliedCvrId,
             currentPrecinct,
             currentCVRData,
             currentRankings);
     // add it to overall list
     cvrList.add(newRecord);
-    // add precinct ID if one was found
-    if (currentPrecinct != null) {
-      precinctIDs.add(currentPrecinct);
-    }
+
     // provide some user feedback on the CVR count
     if (cvrList.size() % 50000 == 0) {
-      Logger.log(Level.INFO, String.format("Parsed %d cast vote records.", cvrList.size()));
+      Logger.log(Level.INFO, "Parsed %d cast vote records.", cvrList.size());
     }
   }
 
@@ -217,7 +241,7 @@ class StreamingCVRReader {
     if (precinctColumnIndex != null && col == precinctColumnIndex) {
       currentPrecinct = cellData;
     } else if (idColumnIndex != null && col == idColumnIndex) {
-      currentSuppliedCVRID = cellData;
+      currentSuppliedCvrId = cellData;
     }
 
     // see if this column is in the ranking range
@@ -255,7 +279,8 @@ class StreamingCVRReader {
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   void parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
-      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException, ParserConfigurationException {
+      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException,
+      ParserConfigurationException, CvrDataFormatException {
 
     // cache the cvr list so it is accessible in callbacks
     cvrList = castVoteRecords;
@@ -317,7 +342,7 @@ class StreamingCVRReader {
           // param: s1 header footer data
           @Override
           public void headerFooter(String s, boolean b, String s1) {
-            Logger.log(Level.WARNING, String.format("Unexpected XML data: %s %b %s", s, b, s1));
+            Logger.log(Level.WARNING, "Unexpected XML data: %s %b %s", s, b, s1);
           }
         };
 
@@ -333,11 +358,23 @@ class StreamingCVRReader {
     xmlReader.setContentHandler(handler);
     // trigger parsing
     xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));
+    // close zip file without saving
+    pkg.revert();
 
     // throw if there were any unrecognized candidates -- this is considered bad
-    if (this.unrecognizedCandidateCounts.size() > 0) {
+    if (unrecognizedCandidateCounts.size() > 0) {
       throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
+
+    if (encounteredDataErrors) {
+      throw new CvrDataFormatException();
+    }
+  }
+
+  // exception class for miscellaneous unexpected data errors encountered during Cvr parsing
+  // e.g. missing Cvr Id
+  static class CvrDataFormatException extends Exception {
+
   }
 
   // exception class used when an unrecognized candidate is encountered during cvr parsing

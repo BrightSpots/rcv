@@ -1,16 +1,20 @@
 {
+  "tabulatorVersion" : "0.1.0",
   "outputSettings" : {
     "contestName" : "Tiebreak test",
     "outputDirectory" : "output",
     "contestDate" : "2017-12-03",
     "contestJurisdiction" : "Funkytown, USA",
     "contestOffice" : "Sergeant-at-Arms",
-    "tabulateByPrecinct" : false
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
     "filePath" : "excluded_test_cvr.xlsx",
-    "firstVoteColumnIndex" : 2,
-    "firstVoteRowIndex": 2,
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
     "provider" : "ES&S"
   } ],
   "candidates" : [ {
@@ -33,17 +37,21 @@
   "rules" : {
     "tiebreakMode" : "interactive",
     "overvoteRule" : "alwaysSkipToNextRank",
-    "maxRankingsAllowed" : 3,
-    "maxSkippedRanksAllowed" : 0,
-    "numberOfWinners" : 1,
-    "decimalPlacesForVoteArithmetic" : 4,
-    "minimumVoteThreshold" : 0,
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "0",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
     "batchElimination" : true,
-    "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
     "overvoteLabel" : "overvote",
     "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
     "rulesDescription" : "Doyle Rules"
   }
 }

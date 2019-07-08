@@ -2,8 +2,8 @@
   "config" : {
     "contest" : "2013 Minneapolis Mayor",
     "date" : "",
-    "jurisdiction" : null,
-    "office" : null,
+    "jurisdiction" : "",
+    "office" : "",
     "threshold" : "414662"
   },
   "results" : [ {
@@ -44,10 +44,10 @@
       "STEPHANIE WOODRUFF" : "13156",
       "TONY LANE" : "2847",
       "TROY BENJEGERDES" : "1937",
-      "Undeclared" : "1521"
+      "UWI" : "1521"
     },
     "tallyResults" : [ {
-      "eliminated" : "Undeclared",
+      "eliminated" : "UWI",
       "transfers" : {
         "ABDUL M RAHAMAN THE ROCK" : "13",
         "ALICIA K. BENNETT" : "13",

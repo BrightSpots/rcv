@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -21,6 +21,8 @@
  */
 
 package network.brightspots.rcv;
+
+import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -95,7 +97,7 @@ class CastVoteRecord {
     StringBuilder logStringBuilder = new StringBuilder();
     // add round and ID
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (suppliedID != null && !suppliedID.isEmpty()) {
+    if (!isNullOrBlank(suppliedID)) {
       logStringBuilder.append(suppliedID);
     } else {
       logStringBuilder.append(computedID);
@@ -104,7 +106,7 @@ class CastVoteRecord {
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
-      logStringBuilder.append(" [was exhausted] ");
+      logStringBuilder.append(" [became inactive] ");
     } else {
       if (round == 1) {
         logStringBuilder.append(" [counted for] ");
@@ -139,7 +141,6 @@ class CastVoteRecord {
   void logCdfSnapshotData(int round) {
     List<Pair<String, BigDecimal>> data = new LinkedList<>();
     for (Entry<String, BigDecimal> entry : winnerToFractionalValue.entrySet()) {
-      // TODO: can we avoid duplicating this in memory?
       data.add(new Pair<>(entry.getKey(), entry.getValue()));
     }
     if (currentRecipientOfVote != null) {

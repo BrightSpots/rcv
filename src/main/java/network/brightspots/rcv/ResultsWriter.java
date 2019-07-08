@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -24,6 +24,7 @@
 package network.brightspots.rcv;
 
 import static java.util.Map.entry;
+import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,15 +81,16 @@ class ResultsWriter {
   private ContestConfig config;
   // timestampString string to use when generating output file names
   private String timestampString;
-  // TallyTransfer object contains totals votes transferred each round
-  private TallyTransfers tallyTransfers;
   private Map<Integer, BigDecimal> roundToResidualSurplus;
-  private int numBallots;
 
+  // visible for testing
+  @SuppressWarnings("WeakerAccess")
   static String sequentialSuffixForOutputPath(Integer sequentialTabulationNumber) {
     return sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
   }
 
+  // visible for testing
+  @SuppressWarnings("WeakerAccess")
   static String getOutputFilePath(
       String outputDirectory,
       String outputType,
@@ -123,9 +125,14 @@ class ResultsWriter {
     try {
       jsonWriter.writeValue(outFile, json);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error writing to JSON file: %s\n%s", path, exception.toString());
+      Logger.log(
+          Level.SEVERE,
+          "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
+          path,
+          exception.toString());
       throw exception;
     }
+    Logger.log(Level.INFO, "JSON file generated successfully.");
   }
 
   private static String generateCvrSnapshotID(String cvrID, Integer round) {
@@ -183,21 +190,39 @@ class ResultsWriter {
     return sortedCandidatesWithRanks;
   }
 
+  // function: getPrecinctFileString
+  // purpose: return a unique, valid string for this precinct's output spreadsheet filename
+  // param: precinct is the name of the precinct
+  // param: filenames is the set of filenames we've already generated
+  // return: the new filename
+  private static String getPrecinctFileString(String precinct, Set<String> filenames) {
+    // sanitized is the precinct name with all special characters converted to underscores
+    String sanitized = sanitizeStringForOutput(precinct);
+    // filename is the string that we'll eventually return
+    String filename = sanitized;
+    // appendNumber is used to find a unique filename (in practice this really shouldn't be
+    // necessary because different precinct names shouldn't have the same sanitized name, but we're
+    // doing it here to be safe)
+    int appendNumber = 2;
+    while (filenames.contains(filename)) {
+      filename = sanitized + "_" + appendNumber++;
+    }
+    filenames.add(filename);
+    return filename;
+  }
+
+  private String getOutputFilePath(String outputType) {
+    return getOutputFilePath(
+        config.getOutputDirectory(),
+        outputType,
+        timestampString,
+        config.isMultiSeatSequentialWinnerTakesAllEnabled()
+            ? config.getSequentialWinners().size() + 1
+            : null);
+  }
+
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
     this.roundToResidualSurplus = roundToResidualSurplus;
-    return this;
-  }
-
-  // function: setTallyTransfers
-  // purpose: setter for tally transfer object used when generating json summary output
-  // param: TallyTransfer object
-  ResultsWriter setTallyTransfers(TallyTransfers tallyTransfers) {
-    this.tallyTransfers = tallyTransfers;
-    return this;
-  }
-
-  ResultsWriter setNumBallots(int numBallots) {
-    this.numBallots = numBallots;
     return this;
   }
 
@@ -272,26 +297,33 @@ class ResultsWriter {
     return this;
   }
 
-  // function: generatePrecinctSummarySpreadsheet
-  // purpose: creates a summary spreadsheet for the votes in a particular precinct
+  // function: generatePrecinctSummaryFiles
+  // purpose: creates summary files for the votes in each precinct
   // param: roundTallies is map from precinct to the round-by-round vote count in the precinct
-  void generatePrecinctSummarySpreadsheets(
-      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies) throws IOException {
+  // param: precinctTallyTransfers is a map from precinct to tally transfers
+  // param: numBallotsByPrecinct is the total count of ballots per precinct
+  void generatePrecinctSummaryFiles(
+      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies,
+      Map<String, TallyTransfers> precinctTallyTransfers,
+      Map<String, Integer> numBallotsByPrecinct)
+      throws IOException {
     Set<String> filenames = new HashSet<>();
     for (String precinct : precinctRoundTallies.keySet()) {
       // precinctFileString is a unique filesystem-safe string which can be used for creating
       // the precinct output filename
       String precinctFileString = getPrecinctFileString(precinct, filenames);
-      // filename for output
-      String outputFileName =
-          String.format("%s_%s_precinct_summary", this.timestampString, precinctFileString);
-      // full path for output
       String outputPath =
-          Paths.get(config.getOutputDirectory(), outputFileName).toAbsolutePath().toString();
-      generateSummarySpreadsheet(precinctRoundTallies.get(precinct), precinct, outputPath);
+          getOutputFilePath(String.format("%s_precinct_summary", precinctFileString));
+      int numBallots = numBallotsByPrecinct.get(precinct);
+      generateSummarySpreadsheet(
+          precinctRoundTallies.get(precinct), numBallots, precinct, outputPath);
 
       // generate json output
-      generateSummaryJson(precinctRoundTallies.get(precinct), precinct, outputPath);
+      generateSummaryJson(
+          precinctRoundTallies.get(precinct),
+          precinctTallyTransfers.get(precinct),
+          precinct,
+          outputPath);
     }
   }
 
@@ -302,10 +334,13 @@ class ResultsWriter {
   // param: outputPath is the full path of the file to save
   // file access: write / create
   private void generateSummarySpreadsheet(
-      Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
+      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      int numBallots,
+      String precinct,
+      String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
-    Logger.log(Level.INFO, "Generating summary spreadsheets: %s...", csvPath);
+    Logger.log(Level.INFO, "Generating summary spreadsheet: %s...", csvPath);
 
     // Get all candidates sorted by their first round tally. This determines the display order.
     // container for firstRoundTally
@@ -335,7 +370,11 @@ class ResultsWriter {
       BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error creating CSV file: %s\n%s", csvPath, exception.toString());
+      Logger.log(
+          Level.SEVERE,
+          "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
+          csvPath,
+          exception.toString());
       throw exception;
     }
 
@@ -354,7 +393,7 @@ class ResultsWriter {
     csvPrinter.println();
 
     // actions don't make sense in individual precinct results
-    if (precinct == null || precinct.isEmpty()) {
+    if (isNullOrBlank(precinct)) {
       addActionRows(csvPrinter);
     }
 
@@ -391,8 +430,13 @@ class ResultsWriter {
       // still active or counting as residual surplus votes in the current round.
       BigDecimal thisRoundInactive =
           new BigDecimal(numBallots)
-              .subtract(totalActiveVotesPerRound.get(round))
-              .subtract(roundToResidualSurplus.get(round));
+              .subtract(totalActiveVotesPerRound.get(round));
+
+      if (precinct == null) {
+        // We don't have the concept of residual surplus at the precinct level (see comment below),
+        // so we'll just incorporate that part (if any) into the inactive count.
+        thisRoundInactive = thisRoundInactive.subtract(roundToResidualSurplus.get(round));
+      }
       // total votes cell
       csvPrinter.print(thisRoundInactive.toString());
     }
@@ -401,7 +445,9 @@ class ResultsWriter {
     // row for residual surplus (if needed)
     // We check if we accumulated any residual surplus over the course of the tabulation by testing
     // whether the value in the final round is positive.
-    if (roundToResidualSurplus.get(numRounds).signum() == 1) {
+    // Note that this concept only makes sense when we're reporting the overall tabulation, so we
+    // omit it when generating results at the individual precinct level.
+    if (precinct == null && roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round).toString());
@@ -418,6 +464,7 @@ class ResultsWriter {
       Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
       throw exception;
     }
+    Logger.log(Level.INFO, "Summary spreadsheet generated successfully.");
   }
 
   // function: addActionRows
@@ -478,8 +525,19 @@ class ResultsWriter {
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
     csvPrinter.printRecord("Office", config.getContestOffice());
     csvPrinter.printRecord("Date", config.getContestDate());
+
+    List<String> winners = new LinkedList<>();
+    List<Integer> winningRounds = new ArrayList<>(roundToWinningCandidates.keySet());
+    Collections.sort(winningRounds); // make sure we list them in order of election
+    for (int round : winningRounds) {
+      for (String candidateCode : roundToWinningCandidates.get(round)) {
+        winners.add(config.getNameForCandidateCode(candidateCode));
+      }
+    }
+    csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
+
     csvPrinter.printRecord("Threshold", winningThreshold.toString());
-    if (precinct != null && !precinct.isEmpty()) {
+    if (!isNullOrBlank(precinct)) {
       csvPrinter.printRecord("Precinct", precinct);
     }
     csvPrinter.println();
@@ -518,45 +576,19 @@ class ResultsWriter {
     return sortedCandidates;
   }
 
-  // function: getPrecinctFileString
-  // purpose: return a unique, valid string for this precinct's output spreadsheet filename
-  // param: precinct is the name of the precinct
-  // param: filenames is the set of filenames we've already generated
-  // return: the new filename
-  private String getPrecinctFileString(String precinct, Set<String> filenames) {
-    // sanitized is the precinct name with all special characters converted to underscores
-    String sanitized = sanitizeStringForOutput(precinct);
-    // filename is the string that we'll eventually return
-    String filename = sanitized;
-    // appendNumber is used to find a unique filename (in practice this really shouldn't be
-    // necessary because different precinct names shouldn't have the same sanitized name, but we're
-    // doing it here to be safe)
-    int appendNumber = 2;
-    while (filenames.contains(filename)) {
-      filename = sanitized + "_" + appendNumber++;
-    }
-    filenames.add(filename);
-    return filename;
-  }
-
   // function: generateOverallSummaryFiles
   // purpose: creates a summary spreadsheet and JSON for the full contest
   // param: roundTallies is the round-by-round count of votes per candidate
-  void generateOverallSummaryFiles(Map<Integer, Map<String, BigDecimal>> roundTallies)
-      throws IOException {
-    String outputPath =
-        getOutputFilePath(
-            config.getOutputDirectory(),
-            "summary",
-            timestampString,
-            config.isSequentialMultiSeatEnabled()
-                ? config.getSequentialWinners().size() + 1
-                : null);
+  // param: tallyTransfers is a record of vote transfers for each election/elimination
+  // param: numBallots total number of ballots in this contest
+  void generateOverallSummaryFiles(
+      Map<Integer, Map<String, BigDecimal>> roundTallies, TallyTransfers tallyTransfers, int numBallots) throws IOException {
+    String outputPath = getOutputFilePath("summary");
     // generate the spreadsheet
-    generateSummarySpreadsheet(roundTallies, null, outputPath);
+    generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
 
     // generate json output
-    generateSummaryJson(roundTallies, null, outputPath);
+    generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
   // create NIST Common Data Format CVR json
@@ -566,17 +598,9 @@ class ResultsWriter {
     GpUnitIds = generateGpUnitIds();
 
     HashMap<String, Object> outputJson = new HashMap<>();
-    String outputPath =
-        getOutputFilePath(
-            config.getOutputDirectory(),
-            "cvr_cdf",
-            timestampString,
-            config.isSequentialMultiSeatEnabled()
-                ? config.getSequentialWinners().size() + 1
-                : null)
-            + ".json";
+    String outputPath = getOutputFilePath("cvr_cdf") + ".json";
 
-    Logger.log(Level.INFO, "Generating CVR CDF JSON file: %s...", outputPath);
+    Logger.log(Level.INFO, "Generating cast vote record CDF JSON file: %s...", outputPath);
 
     outputJson.put("CVR", generateCdfMapForCvrs(castVoteRecords));
     outputJson.put("Election", new Map[]{generateCdfMapForElection()});
@@ -590,7 +614,7 @@ class ResultsWriter {
             Map.ofEntries(
                 entry("@id", CDF_REPORTING_DEVICE_ID),
                 entry("@type", "CVR.ReportingDevice"),
-                entry("Application", "RCVRC Tabulator"),
+                entry("Application", Main.APP_NAME),
                 entry("Manufacturer", "Bright Spots"))
         });
     outputJson.put("Version", "1.0.0");
@@ -794,11 +818,16 @@ class ResultsWriter {
 
   // function: generateSummaryJson
   // purpose: create summary json data for use in visualizer, unit tests and other tools
-  // param: outputPath where to write json file
   // param: roundTallies all tally information
+  // param: tallyTransfers record of vote transfers
+  // param: precinct the precinct name, if applicable
+  // param: outputPath where to write json file
   // file access: write to outputPath
   private void generateSummaryJson(
-      Map<Integer, Map<String, BigDecimal>> roundTallies, String precinct, String outputPath)
+      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      TallyTransfers tallyTransfers,
+      String precinct,
+      String outputPath)
       throws IOException {
     String jsonPath = outputPath + ".json";
     Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
@@ -815,7 +844,7 @@ class ResultsWriter {
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
     configData.put("threshold", winningThreshold);
-    if (precinct != null && !precinct.isEmpty()) {
+    if (!isNullOrBlank(precinct)) {
       configData.put("precinct", precinct);
     }
     // results will be a list of round data objects
@@ -826,16 +855,17 @@ class ResultsWriter {
       HashMap<String, Object> roundData = new HashMap<>();
       // add round number (this is implied by the ordering but for debugging we are explicit)
       roundData.put("round", round);
-      // add actions if this is not a precinct summary
-      if (precinct == null || precinct.isEmpty()) {
-        // actions is a list of one or more action objects
-        ArrayList<Object> actions = new ArrayList<>();
-        addActionObjects("elected", roundToWinningCandidates.get(round), round, actions);
-        // add any elimination actions
-        addActionObjects("eliminated", roundToEliminatedCandidates.get(round), round, actions);
-        // add action objects
-        roundData.put("tallyResults", actions);
-      }
+
+      // actions is a list of one or more action objects
+      ArrayList<Object> actions = new ArrayList<>();
+      addActionObjects(
+          "elected", roundToWinningCandidates.get(round), round, actions, tallyTransfers);
+      // add any elimination actions
+      addActionObjects(
+          "eliminated", roundToEliminatedCandidates.get(round), round, actions, tallyTransfers);
+      // add action objects
+      roundData.put("tallyResults", actions);
+
       // add tally object
       roundData.put("tally", updateCandidateNamesInTally(roundTallies.get(round)));
       // add roundData to results list
@@ -866,8 +896,13 @@ class ResultsWriter {
   // param: candidates list of all candidates action is applied to
   // param: round which this action occurred
   // param: actions list to add new action objects to
+  // param: tallyTransfers record of vote transfers
   private void addActionObjects(
-      String actionType, List<String> candidates, int round, ArrayList<Object> actions) {
+      String actionType,
+      List<String> candidates,
+      int round,
+      ArrayList<Object> actions,
+      TallyTransfers tallyTransfers) {
     // check for valid candidates:
     // "drop undeclared write-in" may result in no one actually being eliminated
     if (candidates != null && candidates.size() > 0) {

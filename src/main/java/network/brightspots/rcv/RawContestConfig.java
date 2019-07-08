@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -26,12 +26,13 @@ package network.brightspots.rcv;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
-import java.util.logging.Level;
 
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
 
+  // tabulator version that created this file
+  public String tabulatorVersion;
   // output settings object
   public OutputSettings outputSettings;
   // list of all cast vote record source files
@@ -45,37 +46,6 @@ public class RawContestConfig {
   // purpose: create a new RawContestConfig object
   // returns: the newly created RawContestConfig object
   RawContestConfig() {
-  }
-
-  // function: validate
-  // purpose: perform some basic validation checks
-  // returns: true if checks pass otherwise false
-  public boolean validate() {
-    boolean isValid = true;
-    if (outputSettings == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"outputSettings\" field specified!");
-    }
-    if (cvrFileSources == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"cvrFileSources\" field specified!");
-    } else {
-      for (CVRSource source : cvrFileSources) {
-        if (source.getFilePath() == null) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "No file specified for CVR Source");
-        }
-      }
-    }
-    if (candidates == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"candidates\" field specified!");
-    }
-    if (rules == null) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "No \"rules\" field specified!");
-    }
-    return isValid;
   }
 
   // OutputSettings: encapsulates the output settings
@@ -105,15 +75,28 @@ public class RawContestConfig {
     // path to the file on disk
     private String filePath;
     // 1-indexed column where rankings data begins
-    private Integer firstVoteColumnIndex;
+    private String firstVoteColumnIndex;
     // 1-indexed row where first CVR appears
-    private Integer firstVoteRowIndex;
+    private String firstVoteRowIndex;
     // 1-indexed column containing CVR ID (if any)
-    private Integer idColumnIndex;
+    private String idColumnIndex;
     // 1-indexed column containing precinct (if any)
-    private Integer precinctColumnIndex;
+    private String precinctColumnIndex;
     // provider for this source e.g. "ES&S"
     private String provider;
+
+    public CVRSource() {
+    }
+
+    public CVRSource(String filePath, String firstVoteColumnIndex, String firstVoteRowIndex,
+        String idColumnIndex, String precinctColumnIndex, String provider) {
+      this.filePath = filePath;
+      this.firstVoteColumnIndex = firstVoteColumnIndex;
+      this.firstVoteRowIndex = firstVoteRowIndex;
+      this.idColumnIndex = idColumnIndex;
+      this.precinctColumnIndex = precinctColumnIndex;
+      this.provider = provider;
+    }
 
     // get underlying file path string
     public String getFilePath() {
@@ -125,35 +108,35 @@ public class RawContestConfig {
       this.filePath = filePath;
     }
 
-    public Integer getFirstVoteColumnIndex() {
+    public String getFirstVoteColumnIndex() {
       return firstVoteColumnIndex;
     }
 
-    public void setFirstVoteColumnIndex(Integer firstVoteColumnIndex) {
+    public void setFirstVoteColumnIndex(String firstVoteColumnIndex) {
       this.firstVoteColumnIndex = firstVoteColumnIndex;
     }
 
-    public Integer getFirstVoteRowIndex() {
+    public String getFirstVoteRowIndex() {
       return firstVoteRowIndex;
     }
 
-    public void setFirstVoteRowIndex(Integer firstVoteRowIndex) {
+    public void setFirstVoteRowIndex(String firstVoteRowIndex) {
       this.firstVoteRowIndex = firstVoteRowIndex;
     }
 
-    public Integer getIdColumnIndex() {
+    public String getIdColumnIndex() {
       return idColumnIndex;
     }
 
-    public void setIdColumnIndex(Integer idColumnIndex) {
+    public void setIdColumnIndex(String idColumnIndex) {
       this.idColumnIndex = idColumnIndex;
     }
 
-    public Integer getPrecinctColumnIndex() {
+    public String getPrecinctColumnIndex() {
       return precinctColumnIndex;
     }
 
-    public void setPrecinctColumnIndex(Integer precinctColumnIndex) {
+    public void setPrecinctColumnIndex(String precinctColumnIndex) {
       this.precinctColumnIndex = precinctColumnIndex;
     }
 
@@ -209,26 +192,22 @@ public class RawContestConfig {
     public String tiebreakMode;
     // which overvote rule to use
     public String overvoteRule;
+    public String winnerElectionMode;
+    public String randomSeed;
     // setting for number of winners
-    public Integer numberOfWinners;
+    public String numberOfWinners;
     // how far to round vote values when performing arithmetic
-    public Integer decimalPlacesForVoteArithmetic;
+    public String decimalPlacesForVoteArithmetic;
     // minimum votes needed to continue
-    public Integer minimumVoteThreshold;
+    public String minimumVoteThreshold;
     // max number of skipped rankings allowed
-    public Integer maxSkippedRanksAllowed;
+    public String maxSkippedRanksAllowed;
     // max rankings allowed
-    public Integer maxRankingsAllowed;
-    public boolean sequentialMultiSeat;
-    public boolean bottomsUpMultiSeat;
+    public String maxRankingsAllowed;
     public boolean nonIntegerWinningThreshold;
     public boolean hareQuota;
     // are we using batch elimination?
     public boolean batchElimination;
-    // keep tabulating beyond selecting winner until only two candidates remain
-    // used to provide additional context for the strength of support for the winner
-    // only valid for single-winner contests
-    public boolean continueUntilTwoCandidatesRemain;
     // should we exhaust a ballot when we hit a duplicate candidate while traversing its rankings?
     public boolean exhaustOnDuplicateCandidate;
     // shall we treat blank cells as UWIs?

@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -21,7 +21,10 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import java.io.File;
+import java.util.logging.Level;
 
 class FileUtils {
 
@@ -43,10 +46,12 @@ class FileUtils {
   }
 
   static void createOutputDirectory(String dir) throws UnableToCreateDirectoryException {
-    if (dir != null && !dir.isEmpty()) {
+    if (!isNullOrBlank(dir)) {
       // dirFile is the File object for dir
       File dirFile = new File(dir);
       if (!dirFile.exists() && !dirFile.mkdirs()) {
+        Logger.log(Level.SEVERE, "Failed to create output directory: %s\n"
+            + "Check the directory name and permissions.", dir);
         throw new UnableToCreateDirectoryException("Unable to create output directory: " + dir);
       }
     }

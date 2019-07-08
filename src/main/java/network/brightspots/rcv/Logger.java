@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -73,7 +73,7 @@ class Logger {
   // function: setup
   // purpose: initialize logging module
   // throws: IOException if unable to open output log file
-  static void setup() throws IOException {
+  static void setup() {
     // cache default logger
     logger = java.util.logging.Logger.getLogger("");
     logger.setLevel(Level.FINE);
@@ -84,12 +84,18 @@ class Logger {
     Path logPath =
         Paths.get(System.getProperty("user.dir"), EXECUTION_LOG_FILE_NAME).toAbsolutePath();
 
-    // executionHandler writes to the execution log file
-    FileHandler executionHandler =
-        new FileHandler(
-            logPath.toString(), LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
-    executionHandler.setLevel(Level.INFO);
-    logger.addHandler(executionHandler);
+    // executionHandler writes to the execution log file in current working directory
+    try {
+      FileHandler executionHandler =
+          new FileHandler(
+              logPath.toString(), LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
+      executionHandler.setLevel(Level.INFO);
+      logger.addHandler(executionHandler);
+    } catch (IOException exception) {
+      log(Level.WARNING,
+          "Failed to start system logging!\nMake sure you have write access in %s\n%s.",
+          System.getProperty("user.dir"), exception.toString());
+    }
 
     // use our custom formatter for all installed handlers
     for (Handler handler : logger.getHandlers()) {
@@ -97,8 +103,7 @@ class Logger {
     }
 
     // log results
-    log(Level.INFO, "RCV Tabulator logging execution to: %s",
-        logPath.toString().replace("%g", "*"));
+    log(Level.INFO, "Execution logging to: %s", logPath.toString().replace("%g", "*"));
   }
 
   // function: addTabulationFileLogging
@@ -114,10 +119,11 @@ class Logger {
     tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
     logger.addHandler(tabulationHandler);
+    log(Level.INFO, "Tabulation logging to: %s", outputPath.replace("%g", "*"));
   }
 
   // function: removeTabulationFileLogging
-  // purpose: remove file logging once a tabulation run is complete
+  // purpose: remove file logging once a tabulation run is completed
   static void removeTabulationFileLogging() {
     tabulationHandler.flush();
     tabulationHandler.close();

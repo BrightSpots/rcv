@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -22,7 +22,6 @@
 
 package network.brightspots.rcv;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,16 +29,17 @@ import java.util.logging.Level;
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
+  public static final String APP_NAME = "Universal RCV Tabulator";
+  public static final String APP_VERSION = "0.1.0";
+
   // function: main
   // purpose: main entry point to the rcv tabulator program
   // param: args command line argument array
   // returns: N/A
   public static void main(String[] args) {
-    try {
-      Logger.setup();
-    } catch (IOException exception) {
-      System.err.print(String.format("Failed to start system logging!\n%s", exception.toString()));
-    }
+    System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
+    Logger.setup();
+    logSystemInfo();
 
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;
@@ -59,10 +59,14 @@ public class Main extends GuiApplication {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       // check for unexpected input
       if (argsCli.size() == 0) {
-        Logger.log(Level.SEVERE, "Please provide a path to the config file!");
+        Logger.log(Level.SEVERE, "No config file path provided on command line!\n"
+            + "Please provide a path to the config file!\n"
+            + "See README.md for more details.");
         System.exit(1);
       } else if (argsCli.size() > 2) {
-        Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d", argsCli.size());
+        Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d\n"
+                + "See README.md for more details.",
+            argsCli.size());
         System.exit(2);
       }
       // config file for configuring the tabulator
@@ -79,4 +83,11 @@ public class Main extends GuiApplication {
 
     System.exit(0);
   }
+
+  private static void logSystemInfo() {
+    Logger.log(Level.INFO, "Launching %s version %s...", APP_NAME, APP_VERSION);
+    Logger.log(Level.INFO, "Host system: %s version %s", System.getProperty("os.name"),
+        System.getProperty("os.version"));
+  }
+
 }

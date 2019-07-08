@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -25,7 +25,6 @@ package network.brightspots.rcv;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
@@ -42,7 +41,8 @@ import org.junit.jupiter.api.Test;
 class TabulatorTests {
 
   // folder where we store test inputs
-  private static final String TEST_ASSET_FOLDER = "src/test/resources/network/brightspots/rcv/test_data";
+  private static final String TEST_ASSET_FOLDER =
+      "src/test/resources/network/brightspots/rcv/test_data";
   // limit log output to avoid spam
   private static final Integer MAX_LOG_ERRORS = 10;
 
@@ -128,7 +128,7 @@ class TabulatorTests {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
 
-    if (config.isSequentialMultiSeatEnabled()) {
+    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
         compareJsons(config, stem, timestampString, i);
       }
@@ -137,7 +137,7 @@ class TabulatorTests {
     }
 
     // test passed so cleanup test output folder
-    File outputFolder = new File(session.outputPath);
+    File outputFolder = new File(session.getOutputPath());
     if (outputFolder.listFiles() != null) {
       //noinspection ConstantConditions
       for (File file : outputFolder.listFiles()) {
@@ -181,12 +181,7 @@ class TabulatorTests {
   // purpose: runs once at the beginning of testing to setup logging
   @BeforeAll
   static void setup() {
-    try {
-      Logger.setup();
-    } catch (IOException exception) {
-      // this is non-fatal
-      System.err.print(String.format("Failed to start system logging!\n%s", exception.toString()));
-    }
+    Logger.setup();
   }
 
   // function: invalidParamsTest
@@ -207,7 +202,8 @@ class TabulatorTests {
   void invalidSourcesTest() {
     String configPath = getTestFilePath("invalid_sources_test", "_config.json");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    assertNull(config);
+    assertNotNull(config);
+    assertFalse(config.validate());
   }
 
   // function: testPortlandMayor
@@ -339,12 +335,36 @@ class TabulatorTests {
     runTabulationTest("2013_minneapolis_park_bottoms_up");
   }
 
+  // function: testAllowOnlyOneWinnerPerRound
+  // purpose: tests allowOnlyOneWinnerPerRound option
+  @Test
+  @DisplayName("test allow only one winner per round logic")
+  void testAllowOnlyOneWinnerPerRound() {
+    runTabulationTest("test_set_allow_only_one_winner_per_round");
+  }
+
   // function: precinctExample
   // purpose: tests a small election with precincts
   @Test
   @DisplayName("precinct example")
   void precinctExample() {
     runTabulationTest("precinct_example");
+  }
+
+  // function: missingPrecinctExample
+  // purpose: tests a small election with missing precinct id
+  @Test
+  @DisplayName("missing precinct example")
+  void missingPrecinctExample() {
+    runTabulationTest("missing_precinct_example");
+  }
+
+  // function: testTiebreakSeed
+  // purpose: tests random seed feature for tiebreaks
+  @Test
+  @DisplayName("test tiebreak seed")
+  void testTiebreakSeed() {
+    runTabulationTest("tiebreak_seed_test");
   }
 
   // function: nistTest0
@@ -425,5 +445,37 @@ class TabulatorTests {
   @DisplayName("multi-seat fractional number threshold")
   void multiWinnerFractionalThresholdTest() {
     runTabulationTest("test_set_multi_winner_fractional_threshold");
+  }
+
+  // function: tiebreakUsePermutationInConfigTest
+  // purpose: tests tiebreak using config permutation setting
+  @Test
+  @DisplayName("tiebreak using permutation in config")
+  void tiebreakUsePermutationInConfigTest() {
+    runTabulationTest("tiebreak_use_permutation_in_config_test");
+  }
+
+  // function: tiebreakGeneratePermutationTest
+  // purpose: tests tiebreak using generated permutation
+  @Test
+  @DisplayName("tiebreak using generated permutation")
+  void tiebreakGeneratePermutationTest() {
+    runTabulationTest("tiebreak_generate_permutation_test");
+  }
+
+  // function: tiebreakPreviousRoundCountsThenRandomTest
+  // purpose: tests tiebreak using previousRoundCountsThenRandom setting
+  @Test
+  @DisplayName("tiebreak using previousRoundCountsThenRandom")
+  void tiebreakPreviousRoundCountsThenRandomTest() {
+    runTabulationTest("tiebreak_previous_round_counts_then_random_test");
+  }
+
+  // function: treatBlankAsUndeclaredWriteInTest
+  // purpose: tests treatBlankAsUndeclaredWriteIn setting
+  @Test
+  @DisplayName("treat blank as undeclared write-in")
+  void treatBlankAsUndeclaredWriteInTest() {
+    runTabulationTest("test_set_treat_blank_as_undeclared_write_in");
   }
 }

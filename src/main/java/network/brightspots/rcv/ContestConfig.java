@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -22,12 +22,13 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -37,31 +38,30 @@ import java.util.Set;
 import java.util.logging.Level;
 import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
+import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
+import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 class ContestConfig {
-
   // If any booleans are unspecified in config file, they should default to false no matter what
+  static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
-  static final boolean SUGGESTED_SEQUENTIAL_MULTI_SEAT = false;
-  static final boolean SUGGESTED_BOTTOMS_UP_MULTI_SEAT = false;
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
-  static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_NUMBER_OF_WINNERS = 1;
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
-
-  private static final int MIN_COLUMN_INDEX = 1;
-  private static final int MAX_COLUMN_INDEX = 1000;
-  private static final int MIN_ROW_INDEX = 1;
-  private static final int MAX_ROW_INDEX = 100000;
+  static final WinnerElectionMode SUGGESTED_WINNER_ELECTION_MODE = WinnerElectionMode.STANDARD;
+  static final int MIN_COLUMN_INDEX = 1;
+  static final int MAX_COLUMN_INDEX = 1000;
+  static final int MIN_ROW_INDEX = 1;
+  static final int MAX_ROW_INDEX = 100000;
   private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
   private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
   private static final int MIN_NUMBER_OF_WINNERS = 1;
@@ -69,6 +69,12 @@ class ContestConfig {
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
   private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
+  private static final int MIN_RANDOM_SEED = 0;
+  private static final String CDF_PROVIDER = "CDF";
+  private static final String JSON_EXTENSION = ".json";
+  private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
+  private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
+  static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
 
   // underlying rawConfig object data
   final RawContestConfig rawConfig;
@@ -101,7 +107,7 @@ class ContestConfig {
     try {
       config.processCandidateData();
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error processing candidate data:", e.toString());
+      Logger.log(Level.SEVERE, "Error processing candidate data:\n%s", e.toString());
       config = null;
     }
     return config;
@@ -110,10 +116,8 @@ class ContestConfig {
   // function: loadContestConfig
   // purpose: factory method to create ContestConfig from configPath
   // - create rawContestConfig from file - can fail for IO issues or invalid json
-  // - validate rawContestConfig - can fail if certain elements do not exist
-  // - if the above succeed create and return ContestConfig wrapping rawContestConfig (cannot fail)
   // returns: new ContestConfig object if checks pass otherwise null
-  static ContestConfig loadContestConfig(String configPath) {
+  static ContestConfig loadContestConfig(String configPath, boolean silentMode) {
     if (configPath == null) {
       Logger.log(Level.SEVERE, "No contest config path specified!");
       return null;
@@ -127,16 +131,51 @@ class ContestConfig {
     if (rawConfig == null) {
       Logger.log(Level.SEVERE, "Failed to load contest config: %s", configPath);
     } else {
-      Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
-      // perform some additional sanity checks
-      if (rawConfig.validate()) {
-        // checks passed so continue processing
-        config = loadContestConfig(rawConfig, new File(configPath).getParent());
-      } else {
-        Logger.log(Level.SEVERE, "Failed to create contest config!");
+      if (!silentMode) {
+        Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
       }
+      // source folder will be the parent of configPath
+      String parentFolder = new File(configPath).getParent();
+      // if there is no parent folder use current working directory
+      if (parentFolder == null) {
+        parentFolder = System.getProperty("user.dir");
+      }
+      config = loadContestConfig(rawConfig, parentFolder);
     }
     return config;
+  }
+
+  static ContestConfig loadContestConfig(String configPath) {
+    return loadContestConfig(configPath, false);
+  }
+
+  static boolean isCdf(CVRSource source) {
+    return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER)
+        && source.getFilePath() != null && source.getFilePath().toLowerCase()
+        .endsWith(JSON_EXTENSION);
+  }
+
+  // function: stringMatchesAnotherFieldValue(
+  // purpose: Checks to make sure string value of one field doesn't match value of another field
+  // param: string string to check
+  // param: field field name of provided string
+  // param: otherFieldValue string value of the other field
+  // param: otherField name of the other field
+  private static boolean stringMatchesAnotherFieldValue(
+      String string, String field, String otherFieldValue, String otherField) {
+    boolean match = false;
+    if (!field.equals(otherField)) {
+      if (!isNullOrBlank(otherFieldValue) && otherFieldValue.equalsIgnoreCase(string)) {
+        match = true;
+        Logger.log(
+            Level.SEVERE,
+            "\"%s\" can't be used as %s if it's also being used as %s!",
+            string,
+            field,
+            otherField);
+      }
+    }
+    return match;
   }
 
   // function: resolveConfigPath
@@ -168,6 +207,7 @@ class ContestConfig {
   boolean validate() {
     Logger.log(Level.INFO, "Validating contest config...");
     isValid = true;
+    validateTabulatorVersion();
     validateOutputSettings();
     validateCvrFileSources();
     validateCandidates();
@@ -177,31 +217,97 @@ class ContestConfig {
     } else {
       Logger.log(
           Level.SEVERE,
-          "Contest config validation failed! Please modify the contest config file and try again.");
+          "Contest config validation failed! Please modify the contest config file and try again.\n"
+              + "See config_file_documentation.txt for more details.");
     }
 
     return isValid;
   }
 
-  private void validateOutputSettings() {
-    if (getContestName() == null || getContestName().isEmpty()) {
+  private void invalidateAndLog(String message, String inputLocation) {
+    isValid = false;
+    message += inputLocation == null ? "!" : ": " + inputLocation;
+    Logger.log(Level.SEVERE, message);
+  }
+
+  // Makes sure String input can be converted to an int, and checks that int against boundaries
+  private void checkStringToIntWithBoundaries(String input, String inputName, Integer lowerBoundary,
+      Integer upperBoundary, boolean isRequired) {
+    checkStringToIntWithBoundaries(input, inputName, lowerBoundary, upperBoundary, isRequired,
+        null);
+  }
+
+  // Makes sure String input can be converted to an int, and checks that int against boundaries
+  private void checkStringToIntWithBoundaries(
+      String input, String inputName, Integer lowerBoundary, Integer upperBoundary,
+      boolean isRequired, String inputLocation) {
+    lowerBoundary = lowerBoundary != null ? lowerBoundary : Integer.MIN_VALUE;
+    upperBoundary = upperBoundary != null ? upperBoundary : Integer.MAX_VALUE;
+    String message = String.format("%s must be an integer", inputName);
+    if (lowerBoundary.equals(upperBoundary)) {
+      message += String.format(" equal to %d", lowerBoundary);
+    } else {
+      message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
+    }
+    if (isNullOrBlank(input)) {
+      if (isRequired) {
+        invalidateAndLog(message, inputLocation);
+      }
+    } else {
+      try {
+        int stringInt = Integer.parseInt(input);
+        if (stringInt < lowerBoundary || stringInt > upperBoundary) {
+          if (!isRequired) {
+            message += " if supplied";
+          }
+          invalidateAndLog(message, inputLocation);
+        }
+      } catch (NumberFormatException e) {
+        if (!isRequired) {
+          message += " if supplied";
+        }
+        invalidateAndLog(message, inputLocation);
+      }
+    }
+  }
+
+  // version validation and migration logic goes here
+  // e.g. unsupported versions would fail or be migrated
+  // in this release we support only the current app version
+  private void validateTabulatorVersion() {
+    if (isNullOrBlank(getTabulatorVersion())) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest name is required!");
+      Logger.log(Level.SEVERE, "tabulatorVersion is required!");
+    } else {
+      if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!", getTabulatorVersion());
+      }
+    }
+    if (!isValid) {
+      Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s!", Main.APP_VERSION);
+    }
+  }
+
+  private void validateOutputSettings() {
+    if (isNullOrBlank(getContestName())) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "contestName is required!");
     }
   }
 
   private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest config must contain at least 1 CVR file!");
+      Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
         // perform checks on source input path
-        if (source.getFilePath() == null || source.getFilePath().isEmpty()) {
+        if (isNullOrBlank(source.getFilePath())) {
           isValid = false;
-          Logger.log(Level.SEVERE, "filePath is required for each CVR file!");
-          continue;
+          Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
+          break;
         }
 
         // full path to CVR
@@ -210,7 +316,8 @@ class ContestConfig {
         // look for duplicate paths
         if (cvrFilePathSet.contains(cvrPath)) {
           isValid = false;
-          Logger.log(Level.SEVERE, "Duplicate CVR filePaths are not allowed: %s", cvrPath);
+          Logger.log(
+              Level.SEVERE, "Duplicate cast vote record filePaths are not allowed: %s", cvrPath);
         } else {
           cvrFilePathSet.add(cvrPath);
         }
@@ -218,11 +325,11 @@ class ContestConfig {
         // ensure file exists
         if (!new File(cvrPath).exists()) {
           isValid = false;
-          Logger.log(Level.SEVERE, "CVR file not found: %s", cvrPath);
+          Logger.log(Level.SEVERE, "Cast vote record file not found: %s", cvrPath);
         }
 
         // perform CDF checks
-        if (source.getProvider().equals("CDF")) {
+        if (isCdf(source)) {
           if (rawConfig.cvrFileSources.size() != 1) {
             isValid = false;
             Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
@@ -235,92 +342,94 @@ class ContestConfig {
           // perform ES&S checks
 
           // ensure valid first vote column value
-          if (source.getFirstVoteColumnIndex() == null) {
-            isValid = false;
-            Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", cvrPath);
-          } else if (source.getFirstVoteColumnIndex() < MIN_COLUMN_INDEX
-              || source.getFirstVoteColumnIndex() > MAX_COLUMN_INDEX) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "firstVoteColumnIndex must be from %d to %d: %s",
-                MIN_COLUMN_INDEX,
-                MAX_COLUMN_INDEX,
-                cvrPath);
-          }
+          checkStringToIntWithBoundaries(source.getFirstVoteColumnIndex(), "firstVoteColumnIndex",
+              MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, true, cvrPath);
 
           // ensure valid first vote row value
-          if (source.getFirstVoteRowIndex() == null) {
-            isValid = false;
-            Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", cvrPath);
-          } else if (source.getFirstVoteRowIndex() < MIN_ROW_INDEX
-              || source.getFirstVoteRowIndex() > MAX_ROW_INDEX) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "firstVoteRowIndex must be from %d to %d: %s",
-                MIN_ROW_INDEX,
-                MAX_ROW_INDEX,
-                cvrPath);
-          }
+          checkStringToIntWithBoundaries(source.getFirstVoteRowIndex(), "firstVoteRowIndex",
+              MIN_ROW_INDEX, MAX_ROW_INDEX, true, cvrPath);
 
           // ensure valid id column value
-          if (source.getIdColumnIndex() != null
-              && (source.getIdColumnIndex() < MIN_COLUMN_INDEX
-              || source.getIdColumnIndex() > MAX_COLUMN_INDEX)) {
+          checkStringToIntWithBoundaries(source.getIdColumnIndex(), "idColumnIndex",
+              MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, false, cvrPath);
+
+          // ensure valid precinct column value
+          checkStringToIntWithBoundaries(
+              source.getPrecinctColumnIndex(), "precinctColumnIndex", MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX, false, cvrPath);
+
+          if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
-                "idColumnIndex must be from %d to %d: %s",
-                MIN_COLUMN_INDEX,
-                MAX_COLUMN_INDEX,
+                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
                 cvrPath);
-          }
-
-          // ensure valid precinct column value
-          if (isTabulateByPrecinctEnabled()) {
-            if (source.getPrecinctColumnIndex() == null) {
-              isValid = false;
-              Logger.log(
-                  Level.SEVERE,
-                  "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
-                  cvrPath);
-            } else if (source.getPrecinctColumnIndex() < MIN_COLUMN_INDEX
-                || source.getPrecinctColumnIndex() > MAX_COLUMN_INDEX) {
-              isValid = false;
-              Logger.log(
-                  Level.SEVERE,
-                  "precinctColumnIndex must be from %d to %d: %s",
-                  MIN_COLUMN_INDEX,
-                  MAX_COLUMN_INDEX,
-                  cvrPath);
-            }
           }
         }
       }
     }
   }
 
+  // function: stringAlreadyInUseElsewhere
+  // purpose: Checks to make sure string isn't reserved or used by other fields
+  // param: string string to check
+  // param: field field name of provided string
+  private boolean stringAlreadyInUseElsewhere(String string, String field) {
+    boolean inUse = false;
+    for (String reservedString : TallyTransfers.RESERVED_STRINGS) {
+      if (string.equalsIgnoreCase(reservedString)) {
+        inUse = true;
+        Logger.log(Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", string,
+            field);
+        break;
+      }
+    }
+    if (!inUse) {
+      inUse = stringMatchesAnotherFieldValue(string, field, getOvervoteLabel(), "overvoteLabel")
+          || stringMatchesAnotherFieldValue(string, field, getUndervoteLabel(), "undervoteLabel")
+          || stringMatchesAnotherFieldValue(string, field, getUndeclaredWriteInLabel(),
+          "undeclaredWriteInLabel");
+    }
+    return inUse;
+  }
+
+  // function: candidateStringAlreadyInUseElsewhere
+  // purpose: Takes a candidate name or code and checks for conflicts with other name/codes or other
+  //   strings that are already being used in some other way.
+  // param: candidateString is a candidate name or code
+  // param: field is either "name" or "code"
+  // param: candidateStringsSeen is a running set of names/codes we've already encountered
+  private boolean candidateStringAlreadyInUseElsewhere(
+      String candidateString, String field, Set<String> candidateStringsSeen) {
+    boolean inUse;
+    if (candidateStringsSeen.contains(candidateString)) {
+      inUse = true;
+      Logger.log(
+          Level.SEVERE, "Duplicate candidate %ss are not allowed: %s", field, candidateString);
+    } else {
+      inUse = stringAlreadyInUseElsewhere(candidateString, "a candidate " + field);
+    }
+    return inUse;
+  }
+
   private void validateCandidates() {
-    HashSet<String> candidateNameSet = new HashSet<>();
-    HashSet<String> candidateCodeSet = new HashSet<>();
+    Set<String> candidateNameSet = new HashSet<>();
+    Set<String> candidateCodeSet = new HashSet<>();
+
     for (Candidate candidate : rawConfig.candidates) {
-      if (candidate.getName() == null || candidate.getName().isEmpty()) {
+      if (isNullOrBlank(candidate.getName())) {
         isValid = false;
         Logger.log(Level.SEVERE, "Name is required for each candidate!");
-      } else if (candidateNameSet.contains(candidate.getName())) {
+      } else if (candidateStringAlreadyInUseElsewhere(
+          candidate.getName(), "name", candidateNameSet)) {
         isValid = false;
-        Logger.log(
-            Level.SEVERE, "Duplicate candidate names are not allowed: %s", candidate.getName());
       } else {
         candidateNameSet.add(candidate.getName());
       }
 
-      if (candidate.getCode() != null && !candidate.getCode().isEmpty()) {
-        if (candidateCodeSet.contains(candidate.getCode())) {
+      if (!isNullOrBlank(candidate.getCode())) {
+        if (candidateStringAlreadyInUseElsewhere(candidate.getCode(), "code", candidateCodeSet)) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE, "Duplicate candidate codes are not allowed: %s", candidate.getCode());
         } else {
           candidateCodeSet.add(candidate.getCode());
         }
@@ -344,15 +453,22 @@ class ContestConfig {
   }
 
   private void validateRules() {
-    if (getTiebreakMode() == Tabulator.TieBreakMode.MODE_UNKNOWN) {
+    if (getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Invalid tie-break mode!");
+      Logger.log(Level.SEVERE, "Invalid tiebreakMode!");
     }
 
-    if (getOvervoteRule() == Tabulator.OvervoteRule.RULE_UNKNOWN) {
+    if (needsRandomSeed() && isNullOrBlank(getRandomSeedRaw())) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Invalid overvote rule!");
-    } else if ((getOvervoteLabel() != null && !getOvervoteLabel().isEmpty())
+      Logger.log(
+          Level.SEVERE,
+          "When tiebreakMode involves a random element, randomSeed must be supplied.");
+    }
+
+    if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "Invalid overvoteRule!");
+    } else if (!isNullOrBlank(getOvervoteLabel())
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       isValid = false;
@@ -362,61 +478,49 @@ class ContestConfig {
               + "or alwaysSkipToNextRank!");
     }
 
-    if (getNumDeclaredCandidates() >= 1 && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED) {
+    if (getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
       isValid = false;
-      Logger.log(
-          Level.SEVERE, "maxRankingsAllowed must be %d or higher!", MIN_MAX_RANKINGS_ALLOWED);
+      Logger.log(Level.SEVERE, "Invalid winnerElectionMode!");
     }
 
-    if (getMaxSkippedRanksAllowed() != null
-        && getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
+    if (getMaxRankingsAllowed() == null || (getNumDeclaredCandidates() >= 1
+        && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "maxSkippedRanksAllowed must be %d or higher if it's supplied!",
-          MIN_MAX_SKIPPED_RANKS_ALLOWED);
+          "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
+          MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION, MIN_MAX_RANKINGS_ALLOWED, Integer.MAX_VALUE);
     }
 
-    if (getNumberOfWinners() == null
-        || getNumberOfWinners() < MIN_NUMBER_OF_WINNERS
-        || getNumberOfWinners() > getNumDeclaredCandidates()) {
+    if (getMaxSkippedRanksAllowed() == null
+        || getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "numberOfWinners must be at least %d and no more than the number "
-              + "of declared candidates!",
-          MIN_NUMBER_OF_WINNERS);
+          "maxSkippedRanksAllowed must either be \"%s\" or an integer from %d to %d!",
+          MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION, MIN_MAX_SKIPPED_RANKS_ALLOWED,
+          Integer.MAX_VALUE);
     }
 
-    if (getDecimalPlacesForVoteArithmetic() == null
-        || getDecimalPlacesForVoteArithmetic() < MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC
-        || getDecimalPlacesForVoteArithmetic() > MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC) {
-      isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "decimalPlacesForVoteArithmetic must be from %d to %d!",
-          MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC,
-          MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
-    }
+    checkStringToIntWithBoundaries(getNumberOfWinnersRaw(), "numberOfWinners",
+        MIN_NUMBER_OF_WINNERS, getNumDeclaredCandidates() < 1 ? null : getNumDeclaredCandidates(),
+        true);
 
-    if (getMinimumVoteThreshold() == null
-        || getMinimumVoteThreshold().intValue() < MIN_MINIMUM_VOTE_THRESHOLD
-        || getMinimumVoteThreshold().intValue() > MAX_MINIMUM_VOTE_THRESHOLD) {
-      isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "minimumVoteThreshold must be from %d to %d!",
-          MIN_MINIMUM_VOTE_THRESHOLD,
-          MAX_MINIMUM_VOTE_THRESHOLD);
-    }
+    checkStringToIntWithBoundaries(getDecimalPlacesForVoteArithmeticRaw(),
+        "decimalPlacesForVoteArithmetic",
+        MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, true);
+
+    checkStringToIntWithBoundaries(getMinimumVoteThresholdRaw(), "minimumVoteThreshold",
+        MIN_MINIMUM_VOTE_THRESHOLD, MAX_MINIMUM_VOTE_THRESHOLD, true);
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
-    if (getNumberOfWinners() != null && getNumberOfWinners() > 1) {
-      if (willContinueUntilTwoCandidatesRemain()) {
+    if (Utils.isInt(getNumberOfWinnersRaw()) && getNumberOfWinners() > 1) {
+      if (isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
         isValid = false;
         Logger.log(
             Level.SEVERE,
-            "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest!");
+            "winnerElectionMode can't be singleSeatContinueUntilTwoCandidatesRemain in a "
+                + "multi-seat contest!");
       }
 
       if (isBatchEliminationEnabled()) {
@@ -424,14 +528,23 @@ class ContestConfig {
         Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
       }
     } else {
-      if (isSequentialMultiSeatEnabled()) {
+      if (isMultiSeatSequentialWinnerTakesAllEnabled()) {
         isValid = false;
-        Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a single-seat contest!");
-      }
-
-      if (isBottomsUpMultiSeatEnabled()) {
+        Logger.log(
+            Level.SEVERE,
+            "winnerElectionMode can't be multiSeatSequentialWinnerTakesAll in a single-seat " +
+                "contest!");
+      } else if (isMultiSeatBottomsUpEnabled()) {
         isValid = false;
-        Logger.log(Level.SEVERE, "bottomsUpMultiSeat can't be true in a single-seat contest!");
+        Logger.log(
+            Level.SEVERE,
+            "winnerElectionMode can't be multiSeatBottomsUp in a single-seat contest!");
+      } else if (isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()) {
+        isValid = false;
+        Logger.log(
+            Level.SEVERE,
+            "winnerElectionMode can't be multiSeatAllowOnlyOneWinnerPerRound in a single-seat "
+                + "contest!");
       }
 
       if (isHareQuotaEnabled()) {
@@ -440,28 +553,49 @@ class ContestConfig {
       }
     }
 
-    if (isBottomsUpMultiSeatEnabled()) {
-      if (isBatchEliminationEnabled()) {
-        isValid = false;
-        Logger.log(Level.SEVERE, "batchElimination can't be true in a bottoms-up contest!");
-      }
-
-      if (isSequentialMultiSeatEnabled()) {
-        isValid = false;
-        Logger.log(Level.SEVERE, "sequentialMultiSeat can't be true in a bottoms-up contest!");
-      }
+    if (isMultiSeatBottomsUpEnabled() && isBatchEliminationEnabled()) {
+      isValid = false;
+      Logger.log(
+          Level.SEVERE,
+          "batchElimination can't be true when winnerElectionMode is multiSeatBottomsUp!");
     }
+
+    checkStringToIntWithBoundaries(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, null, false);
+
+    if (!isNullOrBlank(getOvervoteLabel()) && stringAlreadyInUseElsewhere(getOvervoteLabel(),
+        "overvoteLabel")) {
+      isValid = false;
+    }
+    if (!isNullOrBlank(getUndervoteLabel()) && stringAlreadyInUseElsewhere(getUndervoteLabel(),
+        "undervoteLabel")) {
+      isValid = false;
+    }
+    if (!isNullOrBlank(getUndeclaredWriteInLabel())
+        && stringAlreadyInUseElsewhere(getUndeclaredWriteInLabel(), "undeclaredWriteInLabel")) {
+      isValid = false;
+    }
+
+    if (isTreatBlankAsUndeclaredWriteInEnabled() && isNullOrBlank(getUndeclaredWriteInLabel())) {
+      isValid = false;
+      Logger.log(
+          Level.SEVERE,
+          "undeclaredWriteInLabel must be supplied if treatBlankAsUndeclaredWriteIn is true!");
+    }
+  }
+
+  private String getNumberOfWinnersRaw() {
+    return rawConfig.rules.numberOfWinners;
   }
 
   // function: getNumberWinners
   // purpose: how many winners for this contest
   // returns: number of winners
   Integer getNumberOfWinners() {
-    return rawConfig.rules.numberOfWinners;
+    return Integer.parseInt(getNumberOfWinnersRaw());
   }
 
   void setNumberOfWinners(int numberOfWinners) {
-    rawConfig.rules.numberOfWinners = numberOfWinners;
+    rawConfig.rules.numberOfWinners = Integer.toString(numberOfWinners);
   }
 
   List<String> getSequentialWinners() {
@@ -472,19 +606,37 @@ class ContestConfig {
     sequentialWinners.add(winner);
   }
 
+  private String getDecimalPlacesForVoteArithmeticRaw() {
+    return rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
   // function: getDecimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to
   Integer getDecimalPlacesForVoteArithmetic() {
-    return rawConfig.rules.decimalPlacesForVoteArithmetic;
+    return Integer.parseInt(getDecimalPlacesForVoteArithmeticRaw());
   }
 
-  boolean isSequentialMultiSeatEnabled() {
-    return rawConfig.rules.sequentialMultiSeat;
+  WinnerElectionMode getWinnerElectionMode() {
+    WinnerElectionMode mode = WinnerElectionMode.getByLabel(rawConfig.rules.winnerElectionMode);
+    return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
   }
 
-  boolean isBottomsUpMultiSeatEnabled() {
-    return rawConfig.rules.bottomsUpMultiSeat;
+  boolean isSingleSeatContinueUntilTwoCandidatesRemainEnabled() {
+    return getWinnerElectionMode()
+        == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN;
+  }
+
+  boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND;
+  }
+
+  boolean isMultiSeatBottomsUpEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP;
+  }
+
+  boolean isMultiSeatSequentialWinnerTakesAllEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL;
   }
 
   boolean isNonIntegerWinningThresholdEnabled() {
@@ -515,10 +667,7 @@ class ContestConfig {
   // returns: raw string from config or falls back to user folder if none is set
   String getOutputDirectoryRaw() {
     // outputDirectory is where output files should be written
-    return (rawConfig.outputSettings.outputDirectory != null
-        && !rawConfig.outputSettings.outputDirectory.isEmpty())
-        ? rawConfig.outputSettings.outputDirectory
-        : FileUtils.getUserDirectory();
+    return rawConfig.outputSettings.outputDirectory;
   }
 
   // function: getOutputDirectory
@@ -528,12 +677,8 @@ class ContestConfig {
     return resolveConfigPath(getOutputDirectoryRaw());
   }
 
-  // function: willContinueUntilTwoCandidatesRemain
-  // purpose: getter for setting to keep tabulating beyond selecting winner until two candidates
-  // remain
-  // returns: whether to keep tabulating until two candidates remain
-  boolean willContinueUntilTwoCandidatesRemain() {
-    return rawConfig.rules.continueUntilTwoCandidatesRemain;
+  private String getTabulatorVersion() {
+    return rawConfig.tabulatorVersion;
   }
 
   // function: getContestName
@@ -575,13 +720,35 @@ class ContestConfig {
     return rawConfig.outputSettings.generateCdfJson;
   }
 
+  // Converts a String to an Integer and also allows for an additional option as valid input
+  private Integer stringToIntWithOption(String rawInput, String optionFlag, Integer optionResult) {
+    Integer intValue;
+    if (isNullOrBlank(rawInput)) {
+      intValue = null;
+    } else if (rawInput.equalsIgnoreCase(optionFlag)) {
+      intValue = optionResult;
+    } else {
+      try {
+        intValue = Integer.parseInt(rawInput);
+      } catch (NumberFormatException e) {
+        intValue = null;
+      }
+    }
+    return intValue;
+  }
+
+  private String getMaxRankingsAllowedRaw() {
+    return rawConfig.rules.maxRankingsAllowed;
+  }
+
   // function: getMaxRankingsAllowed
   // purpose: getter for maxRankingsAllowed
-  // returns: max rankings allowed (or falls back to the number of candidates)
-  int getMaxRankingsAllowed() {
-    return rawConfig.rules.maxRankingsAllowed != null
-        ? rawConfig.rules.maxRankingsAllowed
-        : getNumDeclaredCandidates();
+  // returns: max rankings allowed
+  Integer getMaxRankingsAllowed() {
+    return stringToIntWithOption(
+        getMaxRankingsAllowedRaw(),
+        MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION,
+        getNumDeclaredCandidates());
   }
 
   // function: isBatchEliminationEnabled
@@ -597,7 +764,7 @@ class ContestConfig {
   int getNumDeclaredCandidates() {
     // num will contain the resulting number of candidates
     int num = getCandidateCodeList().size();
-    if ((getUndeclaredWriteInLabel() != null && !getUndeclaredWriteInLabel().isEmpty())
+    if (!isNullOrBlank(getUndeclaredWriteInLabel())
         && getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
       num--;
     }
@@ -618,25 +785,34 @@ class ContestConfig {
   // function: getOvervoteRule
   // purpose: return overvote rule enum to use
   // returns: overvote rule to use for this config
-  Tabulator.OvervoteRule getOvervoteRule() {
-    Tabulator.OvervoteRule rule = Tabulator.OvervoteRule.getByLabel(rawConfig.rules.overvoteRule);
-    return rule == null ? Tabulator.OvervoteRule.RULE_UNKNOWN : rule;
+  OvervoteRule getOvervoteRule() {
+    OvervoteRule rule = OvervoteRule.getByLabel(rawConfig.rules.overvoteRule);
+    return rule == null ? OvervoteRule.RULE_UNKNOWN : rule;
+  }
+
+  private String getMinimumVoteThresholdRaw() {
+    return rawConfig.rules.minimumVoteThreshold;
   }
 
   // function: getMinimumVoteThreshold
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use or default value if it's not specified
   BigDecimal getMinimumVoteThreshold() {
-    return rawConfig.rules.minimumVoteThreshold != null
-        ? new BigDecimal(rawConfig.rules.minimumVoteThreshold)
-        : null;
+    return new BigDecimal(getMinimumVoteThresholdRaw());
+  }
+
+  private String getMaxSkippedRanksAllowedRaw() {
+    return rawConfig.rules.maxSkippedRanksAllowed;
   }
 
   // function: getMaxSkippedRanksAllowed
   // purpose: getter for maxSkippedRanksAllowed rule
-  // returns: max skipped ranks allowed in this config (possibly null)
+  // returns: max skipped ranks allowed in this config
   Integer getMaxSkippedRanksAllowed() {
-    return rawConfig.rules.maxSkippedRanksAllowed;
+    return stringToIntWithOption(
+        getMaxSkippedRanksAllowedRaw(),
+        MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION,
+        Integer.MAX_VALUE);
   }
 
   // function: getUndeclaredWriteInLabel
@@ -663,9 +839,23 @@ class ContestConfig {
   // function: getTiebreakMode
   // purpose: return tiebreak mode to use
   // returns: tiebreak mode to use for this config
-  Tabulator.TieBreakMode getTiebreakMode() {
-    Tabulator.TieBreakMode mode = Tabulator.TieBreakMode.getByLabel(rawConfig.rules.tiebreakMode);
-    return mode == null ? Tabulator.TieBreakMode.MODE_UNKNOWN : mode;
+  TieBreakMode getTiebreakMode() {
+    TieBreakMode mode = TieBreakMode.getByLabel(rawConfig.rules.tiebreakMode);
+    return mode == null ? TieBreakMode.MODE_UNKNOWN : mode;
+  }
+
+  private String getRandomSeedRaw() {
+    return rawConfig.rules.randomSeed;
+  }
+
+  Integer getRandomSeed() {
+    return Integer.parseInt(getRandomSeedRaw());
+  }
+
+  boolean needsRandomSeed() {
+    return getTiebreakMode() == TieBreakMode.RANDOM ||
+        getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM ||
+        getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION;
   }
 
   // function: isTreatBlankAsUndeclaredWriteInEnabled
@@ -689,14 +879,12 @@ class ContestConfig {
     return candidateCodeToNameMap.keySet();
   }
 
-  // function: getNameForCandidateID
+  // function: getNameForCandidateCode
   // purpose: look up full candidate name given a candidate code
   // param: code the code of the candidate whose name we want to look up
-  // returns: the full name for the given candidateID
+  // returns: the full candidate name for the given candidate code
   String getNameForCandidateCode(String code) {
-    return getUndeclaredWriteInLabel() != null && getUndeclaredWriteInLabel().equals(code)
-        ? "Undeclared"
-        : candidateCodeToNameMap.get(code);
+    return candidateCodeToNameMap.get(code);
   }
 
   // function: getCandidatePermutation
@@ -723,10 +911,10 @@ class ContestConfig {
     candidateCodeToNameMap = new HashMap<>();
 
     for (RawContestConfig.CVRSource source : rawConfig.cvrFileSources) {
-      // cvrPath is the resolved path to this source
-      String cvrPath = resolveConfigPath(source.getFilePath());
       // for any CDF sources extract candidate names
-      if (source.getProvider().equals("CDF")) {
+      if (isCdf(source)) {
+        // cvrPath is the resolved path to this source
+        String cvrPath = resolveConfigPath(source.getFilePath());
         CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this);
         candidateCodeToNameMap = reader.getCandidates();
         candidatePermutation.addAll(candidateCodeToNameMap.keySet());
@@ -737,7 +925,7 @@ class ContestConfig {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
         String code = candidate.getCode();
         String name = candidate.getName();
-        if (code == null || code.isEmpty()) {
+        if (isNullOrBlank(code)) {
           code = name;
         }
 
@@ -750,12 +938,8 @@ class ContestConfig {
       }
     }
 
-    if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      Collections.shuffle(candidatePermutation);
-    }
-
     String uwiLabel = getUndeclaredWriteInLabel();
-    if (uwiLabel != null && !uwiLabel.isEmpty()) {
+    if (!isNullOrBlank(uwiLabel)) {
       candidateCodeToNameMap.put(uwiLabel, uwiLabel);
     }
   }

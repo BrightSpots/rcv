@@ -19,10 +19,10 @@
       "MEG FORNEY" : "7856",
       "STEVE BARLAND" : "3705",
       "TOM NORDYKE" : "6511",
-      "Undeclared" : "342"
+      "UWI" : "342"
     },
     "tallyResults" : [ {
-      "eliminated" : "Undeclared",
+      "eliminated" : "UWI",
       "transfers" : {
         "ANNIE YOUNG" : "8",
         "CASPER HILL" : "4",
@@ -207,19 +207,16 @@
     },
     "tallyResults" : [ {
       "elected" : "ANNIE YOUNG",
-      "transfers" : {
-        "exhausted" : "0.0000"
-      }
+      "transfers" : { }
     }, {
       "elected" : "JOHN ERWIN",
       "transfers" : {
-        "exhausted" : "1827.2600"
+        "exhausted" : "1827.2600",
+        "residual surplus" : "0.7400"
       }
     }, {
       "elected" : "MEG FORNEY",
-      "transfers" : {
-        "exhausted" : "0.0000"
-      }
+      "transfers" : { }
     } ]
   }, {
     "round" : 10,

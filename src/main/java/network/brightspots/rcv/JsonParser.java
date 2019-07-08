@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -50,15 +50,23 @@ class JsonParser {
     } catch (JsonParseException | JsonMappingException exception) {
       if (logsEnabled) {
         Logger.log(
-            Level.SEVERE, "Error parsing JSON file: %s\n%s", jsonFilePath, exception.toString());
-        Logger.log(
-            Level.SEVERE, "Check file formatting and values and make sure they are correct!");
+            Level.SEVERE,
+            "Error parsing JSON file: %s\n%s\n"
+                + "Check file formatting and values and make sure they are correct!\n"
+                + "It might help to try surrounding values causing problems with quotes (e.g. \"value\").\n"
+                + "See config_file_documentation.txt for more details.",
+            jsonFilePath,
+            exception.toString());
       }
       createdObject = null;
     } catch (IOException exception) {
       if (logsEnabled) {
-        Logger.log(Level.SEVERE, "Error opening file: %s\n%s", jsonFilePath, exception.toString());
-        Logger.log(Level.SEVERE, "Check file path and permissions and make sure they are correct!");
+        Logger.log(
+            Level.SEVERE,
+            "Error opening file: %s\n%s\n"
+                + "Check file path and permissions and make sure they are correct!",
+            jsonFilePath,
+            exception.toString());
       }
       createdObject = null;
     }
@@ -83,7 +91,7 @@ class JsonParser {
           .writer()
           .withDefaultPrettyPrinter()
           .writeValue(jsonFile, objectToSerialize);
-      Logger.log(Level.INFO, "Saved object to: %s", jsonFile.getAbsolutePath());
+      Logger.log(Level.INFO, "Successfully saved file: %s", jsonFile.getAbsolutePath());
     } catch (IOException exception) {
       Logger.log(
           Level.SEVERE,

@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -27,10 +27,16 @@ package network.brightspots.rcv;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 // TallyTransfers class stores summary info on vote transfers
-// used primary as visualizer input to help build Sankey plots
+// used primarily as visualizer input to help build Sankey plots
 class TallyTransfers {
+
+  static final String RESIDUAL_TARGET = "residual surplus";
+  private static final String EXHAUSTED = "exhausted";
+  private static final String UNCOUNTED = "uncounted";
+  static final Set<String> RESERVED_STRINGS = Set.of(RESIDUAL_TARGET, EXHAUSTED, UNCOUNTED);
 
   // Map of round number to vote transfers which occurred in that round
   // transfers for a round are a map of SOURCE candidate(s) to one or more TARGET candidates.
@@ -55,11 +61,11 @@ class TallyTransfers {
   void addTransfer(int round, String sourceCandidate, String targetCandidate, BigDecimal value) {
     // null source means we are transferring the initial count
     if (sourceCandidate == null) {
-      sourceCandidate = "uncounted";
+      sourceCandidate = UNCOUNTED;
     }
     // null target means exhausted
     if (targetCandidate == null) {
-      targetCandidate = "exhausted";
+      targetCandidate = EXHAUSTED;
     }
 
     // lookup or create transfer entries for specified round

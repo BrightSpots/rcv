@@ -1,4 +1,5 @@
 {
+  "tabulatorVersion" : "0.1.0",
   "outputSettings" : {
     "contestName" : "Test Set 3",
     "outputDirectory" : "output",
@@ -10,23 +11,24 @@
   },
   "cvrFileSources" : [ {
     "filePath" : "test_set_2_overvote_skip_to_next_cvr.json",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
     "provider" : "CDF"
   } ],
   "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "alwaysSkipToNextRank",
-    "numberOfWinners" : 1,
-    "decimalPlacesForVoteArithmetic" : 1,
-    "minimumVoteThreshold" : 0,
-    "maxSkippedRanksAllowed" : 0,
-    "maxRankingsAllowed" : 4,
-    "sequentialMultiSeat" : false,
-    "bottomsUpMultiSeat" : false,
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "0",
+    "maxRankingsAllowed" : "4",
     "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
-    "continueUntilTwoCandidatesRemain" : true,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
     "overvoteLabel" : "",

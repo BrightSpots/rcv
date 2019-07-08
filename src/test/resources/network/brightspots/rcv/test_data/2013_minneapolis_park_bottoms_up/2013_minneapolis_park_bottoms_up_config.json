@@ -1,4 +1,5 @@
 {
+  "tabulatorVersion" : "0.1.0",
   "outputSettings" : {
     "contestName" : "2013 Minneapolis Park Board",
     "outputDirectory" : "output",
@@ -10,56 +11,66 @@
   },
   "cvrFileSources" : [ {
     "filePath" : "2013_minneapolis_park_bottoms_up_cvr.xlsx",
-    "firstVoteColumnIndex" : 2,
-    "firstVoteRowIndex" : 2,
-    "precinctColumnIndex" : 1,
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "1",
     "provider" : "ES&S"
   } ],
   "candidates" : [ {
     "name" : "ANNIE YOUNG",
+    "code" : "",
     "excluded" : false
   }, {
     "name" : "CASPER HILL",
+    "code" : "",
     "excluded" : false
   }, {
     "name" : "HASHIM YONIS",
+    "code" : "",
     "excluded" : false
   }, {
     "name" : "ISHMAEL ISRAEL",
+    "code" : "",
     "excluded" : false
   }, {
     "name" : "JASON STONE",
+    "code" : "",
     "excluded" : false
   }, {
     "name" : "JOHN ERWIN",
+    "code" : "",
     "excluded" : false
   }, {
     "name" : "MARY LYNN MCPHERSON",
+    "code" : "",
     "excluded" : false
   }, {
     "name" : "MEG FORNEY",
+    "code" : "",
     "excluded" : false
   }, {
     "name" : "STEVE BARLAND",
+    "code" : "",
     "excluded" : false
   }, {
     "name" : "TOM NORDYKE",
+    "code" : "",
     "excluded" : false
   } ],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "alwaysSkipToNextRank",
-    "numberOfWinners" : 3,
-    "decimalPlacesForVoteArithmetic" : 4,
-    "minimumVoteThreshold" : 0,
-    "maxSkippedRanksAllowed" : 2,
-    "maxRankingsAllowed" : 3,
-    "sequentialMultiSeat" : false,
-    "bottomsUpMultiSeat" : true,
+    "winnerElectionMode" : "multiSeatBottomsUp",
+    "randomSeed" : "0",
+    "numberOfWinners" : "3",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "2",
+    "maxRankingsAllowed" : "3",
     "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
-    "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
     "overvoteLabel" : "overvote",

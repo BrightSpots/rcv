@@ -1,5 +1,5 @@
 /*
- * Ranked Choice Voting Universal Tabulator
+ * Universal RCV Tabulator
  * Copyright (c) 2017-2019 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -84,7 +84,7 @@ class CommonDataFormatReader {
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, String.format("Error parsing candidate data: %s", e.toString()));
+      Logger.log(Level.SEVERE, "Error parsing candidate data: %s", e.toString());
     }
     return candidates;
   }
@@ -162,13 +162,12 @@ class CommonDataFormatReader {
 
           // provide some user feedback on the CVR count
           if (castVoteRecords.size() % 50000 == 0) {
-            Logger.log(
-                Level.INFO, String.format("Parsed %d cast vote records.", castVoteRecords.size()));
+            Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
           }
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, String.format("Error parsing CDF data: %s", e.toString()));
+      Logger.log(Level.SEVERE, "Error parsing CDF data: %s", e.toString());
     }
   }
 }
