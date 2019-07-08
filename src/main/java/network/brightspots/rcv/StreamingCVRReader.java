@@ -100,8 +100,8 @@ class StreamingCVRReader {
     this.excelFileName = new File(excelFilePath).getName();
 
     // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
-    this.firstVoteColumnIndex = source.getFirstVoteColumnIndex() - 1;
-    this.firstVoteRowIndex = source.getFirstVoteRowIndex() - 1;
+    this.firstVoteColumnIndex = Integer.parseInt(source.getFirstVoteColumnIndex()) - 1;
+    this.firstVoteRowIndex = Integer.parseInt(source.getFirstVoteRowIndex()) - 1;
     this.idColumnIndex =
         isNullOrBlank(source.getIdColumnIndex()) ? null
             : Integer.parseInt(source.getIdColumnIndex()) - 1;

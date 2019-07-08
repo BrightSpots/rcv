@@ -46,6 +46,7 @@ import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 class ContestConfig {
   // If any booleans are unspecified in config file, they should default to false no matter what
+  static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
@@ -72,6 +73,7 @@ class ContestConfig {
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
   private static final int MIN_RANDOM_SEED = 0;
   private static final String CDF_PROVIDER = "CDF";
+  private static final String JSON_EXTENSION = ".json";
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
@@ -150,7 +152,9 @@ class ContestConfig {
   }
 
   static boolean isCdf(CVRSource source) {
-    return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER);
+    return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER)
+        && source.getFilePath() != null && source.getFilePath().toLowerCase()
+        .endsWith(JSON_EXTENSION);
   }
 
   // function: stringMatchesAnotherFieldValue(
@@ -222,24 +226,58 @@ class ContestConfig {
     return isValid;
   }
 
+  private void invalidateAndLog(String message, String inputLocation) {
+    isValid = false;
+    message += inputLocation == null ? "!" : ": " + inputLocation;
+    Logger.log(Level.SEVERE, message);
+  }
+
+  // Makes sure String input can be converted to an int, and checks that int against boundaries
+  private void checkStringToIntWithBoundaries(String input, String inputName, Integer lowerBoundary,
+      Integer upperBoundary, boolean isRequired) {
+    checkStringToIntWithBoundaries(input, inputName, lowerBoundary, upperBoundary, isRequired,
+        null);
+  }
+
   // Makes sure String input can be converted to an int, and checks that int against boundaries
   private void checkStringToIntWithBoundaries(
-      String input, String inputName, String inputLocation) {
-    try {
-      int columnIndex = Integer.parseInt(input);
-      if (columnIndex < MIN_COLUMN_INDEX || columnIndex > MAX_COLUMN_INDEX) {
-        isValid = false;
-        Logger.log(
-            Level.SEVERE,
-            "%s must be from %d to %d if supplied: %s",
-            inputName,
-            MIN_COLUMN_INDEX,
-            MAX_COLUMN_INDEX,
-            inputLocation);
+      String input, String inputName, Integer lowerBoundary, Integer upperBoundary,
+      boolean isRequired, String inputLocation) {
+    String message = String.format("%s must be", inputName);
+    if (lowerBoundary != null && upperBoundary != null) {
+      if (lowerBoundary.equals(upperBoundary)) {
+        message += String.format(" equal to %d", lowerBoundary);
+      } else {
+        message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
       }
-    } catch (NumberFormatException e) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "%s must be an integer if supplied: %s", inputName, inputLocation);
+    } else if (lowerBoundary != null) {
+      message += String.format(" at least %d", lowerBoundary);
+    } else if (upperBoundary != null) {
+      message += String.format(" no greater than %d", upperBoundary);
+    } else {
+      message += " provided";
+    }
+    if (isNullOrBlank(input)) {
+      if (isRequired) {
+        invalidateAndLog(message, inputLocation);
+      }
+    } else {
+      try {
+        int stringInt = Integer.parseInt(input);
+        if ((lowerBoundary != null && stringInt < lowerBoundary)
+            || (upperBoundary != null && stringInt > upperBoundary)) {
+          if (!isRequired) {
+            message += " if supplied";
+          }
+          invalidateAndLog(message, inputLocation);
+        }
+      } catch (NumberFormatException e) {
+        message = String.format("%s must be an integer", inputName);
+        if (!isRequired) {
+          message += " if supplied";
+        }
+        invalidateAndLog(message, inputLocation);
+      }
     }
   }
 
@@ -253,15 +291,11 @@ class ContestConfig {
     } else {
       if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
         isValid = false;
-        Logger.log(
-            Level.SEVERE,
-            "tabulatorVersion %s not supported!",
-            getTabulatorVersion(),
-            Main.APP_VERSION);
+        Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!", getTabulatorVersion());
       }
     }
     if (!isValid) {
-      Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s.", Main.APP_VERSION);
+      Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s!", Main.APP_VERSION);
     }
   }
 
@@ -275,7 +309,7 @@ class ContestConfig {
   private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest config must contain at least one cast vote record file!");
+      Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
@@ -318,45 +352,23 @@ class ContestConfig {
           // perform ES&S checks
 
           // ensure valid first vote column value
-          if (source.getFirstVoteColumnIndex() == null) {
-            isValid = false;
-            Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", cvrPath);
-          } else if (source.getFirstVoteColumnIndex() < MIN_COLUMN_INDEX
-              || source.getFirstVoteColumnIndex() > MAX_COLUMN_INDEX) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "firstVoteColumnIndex must be from %d to %d: %s",
-                MIN_COLUMN_INDEX,
-                MAX_COLUMN_INDEX,
-                cvrPath);
-          }
+          checkStringToIntWithBoundaries(source.getFirstVoteColumnIndex(), "firstVoteColumnIndex",
+              MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, true, cvrPath);
 
           // ensure valid first vote row value
-          if (source.getFirstVoteRowIndex() == null) {
-            isValid = false;
-            Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", cvrPath);
-          } else if (source.getFirstVoteRowIndex() < MIN_ROW_INDEX
-              || source.getFirstVoteRowIndex() > MAX_ROW_INDEX) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "firstVoteRowIndex must be from %d to %d: %s",
-                MIN_ROW_INDEX,
-                MAX_ROW_INDEX,
-                cvrPath);
-          }
+          checkStringToIntWithBoundaries(source.getFirstVoteRowIndex(), "firstVoteRowIndex",
+              MIN_ROW_INDEX, MAX_ROW_INDEX, true, cvrPath);
 
           // ensure valid id column value
-          if (!isNullOrBlank(source.getIdColumnIndex())) {
-            checkStringToIntWithBoundaries(source.getIdColumnIndex(), "idColumnIndex", cvrPath);
-          }
+          checkStringToIntWithBoundaries(source.getIdColumnIndex(), "idColumnIndex",
+              MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, false, cvrPath);
 
           // ensure valid precinct column value
-          if (!isNullOrBlank(source.getPrecinctColumnIndex())) {
-            checkStringToIntWithBoundaries(
-                source.getPrecinctColumnIndex(), "precinctColumnIndex", cvrPath);
-          } else if (isTabulateByPrecinctEnabled()) {
+          checkStringToIntWithBoundaries(
+              source.getPrecinctColumnIndex(), "precinctColumnIndex", MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX, false, cvrPath);
+
+          if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
@@ -450,6 +462,16 @@ class ContestConfig {
     }
   }
 
+  private boolean isInt(String s) {
+    boolean isInt = true;
+    try {
+      Integer.parseInt(s);
+    } catch (NumberFormatException e) {
+      isInt = false;
+    }
+    return isInt;
+  }
+
   private void validateRules() {
     if (getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
@@ -459,7 +481,7 @@ class ContestConfig {
     if ((getTiebreakMode() == TieBreakMode.RANDOM
         || getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
         || getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION)
-        && getRandomSeed() == null) {
+        && isNullOrBlank(getRandomSeedRaw())) {
       isValid = false;
       Logger.log(
           Level.SEVERE,
@@ -511,41 +533,20 @@ class ContestConfig {
           MIN_MAX_SKIPPED_RANKS_ALLOWED);
     }
 
-    if (getNumberOfWinners() == null
-        || getNumberOfWinners() < MIN_NUMBER_OF_WINNERS
-        || getNumberOfWinners() > getNumDeclaredCandidates()) {
-      isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "numberOfWinners must be at least %d and no more than the number "
-              + "of declared candidates!",
-          MIN_NUMBER_OF_WINNERS);
-    }
+    checkStringToIntWithBoundaries(getNumberOfWinnersRaw(), "numberOfWinners",
+        MIN_NUMBER_OF_WINNERS, getNumDeclaredCandidates() < 1 ? null : getNumDeclaredCandidates(),
+        true);
 
-    if (getDecimalPlacesForVoteArithmetic() == null
-        || getDecimalPlacesForVoteArithmetic() < MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC
-        || getDecimalPlacesForVoteArithmetic() > MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC) {
-      isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "decimalPlacesForVoteArithmetic must be from %d to %d!",
-          MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC,
-          MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC);
-    }
+    checkStringToIntWithBoundaries(getDecimalPlacesForVoteArithmeticRaw(),
+        "decimalPlacesForVoteArithmetic",
+        MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, true);
 
-    if (getMinimumVoteThreshold() == null
-        || getMinimumVoteThreshold().intValue() < MIN_MINIMUM_VOTE_THRESHOLD
-        || getMinimumVoteThreshold().intValue() > MAX_MINIMUM_VOTE_THRESHOLD) {
-      isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "minimumVoteThreshold must be from %d to %d!",
-          MIN_MINIMUM_VOTE_THRESHOLD,
-          MAX_MINIMUM_VOTE_THRESHOLD);
-    }
+    checkStringToIntWithBoundaries(getMinimumVoteThresholdRaw(), "minimumVoteThreshold",
+        MIN_MINIMUM_VOTE_THRESHOLD, MAX_MINIMUM_VOTE_THRESHOLD, true);
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
-    if (getNumberOfWinners() != null && getNumberOfWinners() > 1) {
+    if (!isNullOrBlank(getNumberOfWinnersRaw()) && isInt(getNumberOfWinnersRaw())
+        && getNumberOfWinners() > 1) {
       if (isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
         isValid = false;
         Logger.log(
@@ -591,10 +592,7 @@ class ContestConfig {
           "batchElimination can't be true when winnerElectionMode is multiSeatBottomsUp!");
     }
 
-    if (getRandomSeed() != null && getRandomSeed() < MIN_RANDOM_SEED) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "randomSeed can't be less than %d!", MIN_RANDOM_SEED);
-    }
+    checkStringToIntWithBoundaries(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, null, false);
 
     if (!isNullOrBlank(getOvervoteLabel()) && stringAlreadyInUseElsewhere(getOvervoteLabel(),
         "overvoteLabel")) {
@@ -617,15 +615,19 @@ class ContestConfig {
     }
   }
 
+  private String getNumberOfWinnersRaw() {
+    return rawConfig.rules.numberOfWinners;
+  }
+
   // function: getNumberWinners
   // purpose: how many winners for this contest
   // returns: number of winners
   Integer getNumberOfWinners() {
-    return rawConfig.rules.numberOfWinners;
+    return Integer.parseInt(getNumberOfWinnersRaw());
   }
 
   void setNumberOfWinners(int numberOfWinners) {
-    rawConfig.rules.numberOfWinners = numberOfWinners;
+    rawConfig.rules.numberOfWinners = Integer.toString(numberOfWinners);
   }
 
   List<String> getSequentialWinners() {
@@ -636,11 +638,15 @@ class ContestConfig {
     sequentialWinners.add(winner);
   }
 
+  private String getDecimalPlacesForVoteArithmeticRaw() {
+    return rawConfig.rules.decimalPlacesForVoteArithmetic;
+  }
+
   // function: getDecimalPlacesForVoteArithmetic
   // purpose: how many places to round votes to after performing fractional vote transfers
   // returns: number of places to round to
   Integer getDecimalPlacesForVoteArithmetic() {
-    return rawConfig.rules.decimalPlacesForVoteArithmetic;
+    return Integer.parseInt(getDecimalPlacesForVoteArithmeticRaw());
   }
 
   WinnerElectionMode getWinnerElectionMode() {
@@ -693,8 +699,7 @@ class ContestConfig {
   // returns: raw string from config or falls back to user folder if none is set
   String getOutputDirectoryRaw() {
     // outputDirectory is where output files should be written
-    return isNullOrBlank(rawConfig.outputSettings.outputDirectory) ? FileUtils.getUserDirectory()
-        : rawConfig.outputSettings.outputDirectory;
+    return rawConfig.outputSettings.outputDirectory;
   }
 
   // function: getOutputDirectory
@@ -813,13 +818,15 @@ class ContestConfig {
     return rule == null ? OvervoteRule.RULE_UNKNOWN : rule;
   }
 
+  private String getMinimumVoteThresholdRaw() {
+    return rawConfig.rules.minimumVoteThreshold;
+  }
+
   // function: getMinimumVoteThreshold
   // purpose: getter for minimumVoteThreshold rule
   // returns: minimum vote threshold to use or default value if it's not specified
   BigDecimal getMinimumVoteThreshold() {
-    return rawConfig.rules.minimumVoteThreshold != null
-        ? new BigDecimal(rawConfig.rules.minimumVoteThreshold)
-        : null;
+    return new BigDecimal(getMinimumVoteThresholdRaw());
   }
 
   // function: getMaxSkippedRanksAllowed
@@ -861,8 +868,12 @@ class ContestConfig {
     return mode == null ? TieBreakMode.MODE_UNKNOWN : mode;
   }
 
-  Integer getRandomSeed() {
+  private String getRandomSeedRaw() {
     return rawConfig.rules.randomSeed;
+  }
+
+  Integer getRandomSeed() {
+    return Integer.parseInt(getRandomSeedRaw());
   }
 
   // function: isTreatBlankAsUndeclaredWriteInEnabled
@@ -949,10 +960,10 @@ class ContestConfig {
       // It's not valid to have a null random seed with this tie-break mode; the validation will
       // catch that and report a helpful error. Validation also hits this code path, though, so we
       // need to prevent a NullPointerException here.
-      if (getRandomSeed() != null) {
+      if (!isNullOrBlank(getRandomSeedRaw()) && isInt(getRandomSeedRaw())) {
         // sort candidate permutation for reproducibility
         Collections.sort(candidatePermutation);
-        Logger.log(Level.INFO, "shuffling!");
+        Logger.log(Level.INFO, "Shuffling!");
         Collections.shuffle(candidatePermutation, new Random(getRandomSeed()));
       }
     }

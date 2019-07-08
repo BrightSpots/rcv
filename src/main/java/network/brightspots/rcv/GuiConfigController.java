@@ -34,8 +34,6 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -62,7 +60,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
-import javafx.util.converter.IntegerStringConverter;
 import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
@@ -111,9 +108,9 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CVRSource, String> tableColumnCvrFilePath;
   @FXML
-  private TableColumn<CVRSource, Integer> tableColumnCvrFirstVoteCol;
+  private TableColumn<CVRSource, String> tableColumnCvrFirstVoteCol;
   @FXML
-  private TableColumn<CVRSource, Integer> tableColumnCvrFirstVoteRow;
+  private TableColumn<CVRSource, String> tableColumnCvrFirstVoteRow;
   @FXML
   private TableColumn<CVRSource, String> tableColumnCvrIdCol;
   @FXML
@@ -350,25 +347,29 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  private boolean cvrSourceHasRequiredFields(CVRSource source) {
+    boolean hasRequiredFields = true;
+    if (source.getFilePath().isBlank()) {
+      hasRequiredFields = false;
+      Logger.log(Level.WARNING, "filePath is required!");
+    }
+    if (source.getFirstVoteColumnIndex().isBlank() && !ContestConfig.isCdf(source)) {
+      hasRequiredFields = false;
+      Logger.log(Level.WARNING, "firstVoteColumnIndex is required for non-CDF files!");
+    }
+    if (source.getFirstVoteRowIndex().isBlank() && !ContestConfig.isCdf(source)) {
+      hasRequiredFields = false;
+      Logger.log(Level.WARNING, "firstVoteRowIndex is required for non-CDF files!");
+    }
+    return hasRequiredFields;
+  }
+
   public void buttonAddCvrFileClicked() {
-    CVRSource cvrSource = new CVRSource();
-    String cvrFilePath = getTextOrEmptyString(textFieldCvrFilePath);
-    String cvrFirstVoteCol = getTextOrEmptyString(textFieldCvrFirstVoteCol);
-    String cvrFirstVoteRow = getTextOrEmptyString(textFieldCvrFirstVoteRow);
-    boolean fileIsJson = cvrFilePath.toLowerCase().endsWith(".json");
-    if (cvrFilePath.isBlank()) {
-      Logger.log(Level.WARNING, "Cast vote record file path is required!");
-    } else if (cvrFirstVoteCol.isBlank() && !fileIsJson) {
-      Logger.log(Level.WARNING, "Cast vote record first vote column index is required!");
-    } else if (cvrFirstVoteRow.isBlank() && !fileIsJson) {
-      Logger.log(Level.WARNING, "Cast vote record first vote row index is required!");
-    } else {
-      cvrSource.setFilePath(cvrFilePath);
-      cvrSource.setFirstVoteColumnIndex(getIntValueOrNull(cvrFirstVoteCol));
-      cvrSource.setFirstVoteRowIndex(getIntValueOrNull(cvrFirstVoteRow));
-      cvrSource.setIdColumnIndex(getTextOrEmptyString(textFieldCvrIdCol));
-      cvrSource.setPrecinctColumnIndex(getTextOrEmptyString(textFieldCvrPrecinctCol));
-      cvrSource.setProvider(getTextOrEmptyString(textFieldCvrProvider));
+    CVRSource cvrSource = new CVRSource(getTextOrEmptyString(textFieldCvrFilePath),
+        getTextOrEmptyString(textFieldCvrFirstVoteCol),
+        getTextOrEmptyString(textFieldCvrFirstVoteRow), getTextOrEmptyString(textFieldCvrIdCol),
+        getTextOrEmptyString(textFieldCvrPrecinctCol), getTextOrEmptyString(textFieldCvrProvider));
+    if (cvrSourceHasRequiredFields(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
@@ -387,50 +388,67 @@ public class GuiConfigController implements Initializable {
 
   public void changeCvrFilePath(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    String cvrFilePath = cellEditEvent.getNewValue().toString().trim();
-    if (cvrFilePath.isBlank()) {
-      Logger.log(Level.WARNING, "Cast vote record file path is required!");
-    } else {
-      cvrSelected.setFilePath(cvrFilePath);
+    // Cache the original value to revert back to in case the change fails
+    String oldFilePath = cvrSelected.getFilePath();
+    cvrSelected.setFilePath(cellEditEvent.getNewValue().toString().trim());
+    if (!cvrSourceHasRequiredFields(cvrSelected)) {
+      cvrSelected.setFilePath(oldFilePath);
     }
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    if (cellEditEvent.getNewValue() == null) {
-      Logger.log(Level.WARNING, "Cast vote record first vote column is required!");
-    } else {
-      cvrSelected.setFirstVoteColumnIndex((Integer) cellEditEvent.getNewValue());
+    // Cache the original value to revert back to in case the change fails
+    String oldFirstVoteCol = cvrSelected.getFirstVoteColumnIndex();
+    cvrSelected.setFirstVoteColumnIndex(cellEditEvent.getNewValue().toString().trim());
+    if (!cvrSourceHasRequiredFields(cvrSelected)) {
+      cvrSelected.setFirstVoteColumnIndex(oldFirstVoteCol);
     }
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
     CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    if (cellEditEvent.getNewValue() == null) {
-      Logger.log(Level.WARNING, "Cast vote record first vote row index is required!");
-    } else {
-      cvrSelected.setFirstVoteRowIndex((Integer) cellEditEvent.getNewValue());
+    // Cache the original value to revert back to in case the change fails
+    String oldFirstVoteRow = cvrSelected.getFirstVoteRowIndex();
+    cvrSelected.setFirstVoteRowIndex(cellEditEvent.getNewValue().toString().trim());
+    if (!cvrSourceHasRequiredFields(cvrSelected)) {
+      cvrSelected.setFirstVoteRowIndex(oldFirstVoteRow);
     }
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
-        .setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // Cache the original value to revert back to in case the change fails
+    String oldIdColIndex = cvrSelected.getIdColumnIndex();
+    cvrSelected.setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
+    if (!cvrSourceHasRequiredFields(cvrSelected)) {
+      cvrSelected.setIdColumnIndex(oldIdColIndex);
+    }
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
-        .setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // Cache the original value to revert back to in case the change fails
+    String oldPrecinctColIndex = cvrSelected.getPrecinctColumnIndex();
+    cvrSelected.setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
+    if (!cvrSourceHasRequiredFields(cvrSelected)) {
+      cvrSelected.setPrecinctColumnIndex(oldPrecinctColIndex);
+    }
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
-        .setProvider(cellEditEvent.getNewValue().toString().trim());
+    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
+    // Cache the original value to revert back to in case the change fails
+    String oldProvider = cvrSelected.getProvider();
+    cvrSelected.setProvider(cellEditEvent.getNewValue().toString().trim());
+    if (!cvrSourceHasRequiredFields(cvrSelected)) {
+      cvrSelected.setProvider(oldProvider);
+    }
     tableViewCvrFiles.refresh();
   }
 
@@ -471,22 +489,6 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.refresh();
   }
 
-  private static Integer getIntValueOrNull(String str) {
-    Integer returnValue = null;
-    try {
-      if (!isNullOrBlank(str)) {
-        returnValue = Integer.valueOf(str);
-      }
-    } catch (Exception exception) {
-      Logger.log(Level.WARNING, "Integer required! Illegal value \"%s\" found.", str);
-    }
-    return returnValue;
-  }
-
-  private static void setTextFieldToInteger(TextField textField, Integer value) {
-    textField.setText(value != null ? Integer.toString(value) : "");
-  }
-
   private void setDefaultValues() {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
@@ -503,6 +505,7 @@ public class GuiConfigController implements Initializable {
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
         ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
 
+    textFieldOutputDirectory.setText(ContestConfig.SUGGESTED_OUTPUT_DIRECTORY);
     textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.SUGGESTED_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic.setText(
         String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
@@ -641,10 +644,6 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private static Integer getIntValueOrNull(TextField textField) {
-    return getIntValueOrNull(textField.getText().trim());
-  }
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
@@ -693,21 +692,13 @@ public class GuiConfigController implements Initializable {
           }
         });
 
-    textFieldCvrFirstVoteCol
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteCol));
-    textFieldCvrFirstVoteRow
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteRow));
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
     tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
         new PropertyValueFactory<>("firstVoteColumnIndex"));
-    tableColumnCvrFirstVoteCol.setCellFactory(
-        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
+    tableColumnCvrFirstVoteCol.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
-    tableColumnCvrFirstVoteRow.setCellFactory(
-        TextFieldTableCell.forTableColumn(new SimpleIntegerStringConverter()));
+    tableColumnCvrFirstVoteRow.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
     tableColumnCvrIdCol.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrPrecinctCol.setCellValueFactory(
@@ -743,19 +734,6 @@ public class GuiConfigController implements Initializable {
     choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
     choiceWinnerElectionMode.getItems().remove(WinnerElectionMode.MODE_UNKNOWN);
 
-    textFieldRandomSeed
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldRandomSeed));
-    textFieldNumberOfWinners
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
-    textFieldDecimalPlacesForVoteArithmetic
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldDecimalPlacesForVoteArithmetic));
-    textFieldMinimumVoteThreshold
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
-
     setDefaultValues();
 
     try {
@@ -772,13 +750,14 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  // version migration logic goes here
   private void migrateConfigVersion(ContestConfig config) {
     if (config.rawConfig.tabulatorVersion == null || !config.rawConfig.tabulatorVersion
         .equals(Main.APP_VERSION)) {
+      // Any necessary future version migration logic goes here
+      Logger.log(Level.INFO, "Migrated tabulator config version from %s to %s.",
+          config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
+          Main.APP_VERSION);
       config.rawConfig.tabulatorVersion = Main.APP_VERSION;
-      Logger.log(Level.INFO, "Migrated tabulator version from %s to %s.",
-          config.rawConfig.tabulatorVersion, Main.APP_VERSION);
     }
   }
 
@@ -812,16 +791,18 @@ public class GuiConfigController implements Initializable {
     }
 
     ContestRules rules = rawConfig.rules;
-    choiceTiebreakMode.setValue(config.getTiebreakMode());
-    choiceOvervoteRule.setValue(config.getOvervoteRule());
-    if (config.getWinnerElectionMode() != WinnerElectionMode.MODE_UNKNOWN) {
-      choiceWinnerElectionMode.setValue(config.getWinnerElectionMode());
-    }
-    setTextFieldToInteger(textFieldRandomSeed, rules.randomSeed);
-    setTextFieldToInteger(textFieldNumberOfWinners, rules.numberOfWinners);
-    setTextFieldToInteger(
-        textFieldDecimalPlacesForVoteArithmetic, rules.decimalPlacesForVoteArithmetic);
-    setTextFieldToInteger(textFieldMinimumVoteThreshold, rules.minimumVoteThreshold);
+    choiceTiebreakMode.setValue(
+        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
+    choiceOvervoteRule.setValue(
+        config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
+    choiceWinnerElectionMode.setValue(
+        config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN ? null
+            : config.getWinnerElectionMode());
+
+    textFieldRandomSeed.setText(rules.randomSeed);
+    textFieldNumberOfWinners.setText(rules.numberOfWinners);
+    textFieldDecimalPlacesForVoteArithmetic.setText(rules.decimalPlacesForVoteArithmetic);
+    textFieldMinimumVoteThreshold.setText(rules.minimumVoteThreshold);
     textFieldMaxSkippedRanksAllowed.setText(rules.maxSkippedRanksAllowed);
     textFieldMaxRankingsAllowed.setText(rules.maxRankingsAllowed);
     textFieldOvervoteLabel.setText(rules.overvoteLabel);
@@ -880,11 +861,11 @@ public class GuiConfigController implements Initializable {
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
     rules.winnerElectionMode = getChoiceElse(choiceWinnerElectionMode,
         WinnerElectionMode.MODE_UNKNOWN);
-    rules.randomSeed = getIntValueOrNull(textFieldRandomSeed);
-    rules.numberOfWinners = getIntValueOrNull(textFieldNumberOfWinners);
+    rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
+    rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
     rules.decimalPlacesForVoteArithmetic =
-        getIntValueOrNull(textFieldDecimalPlacesForVoteArithmetic);
-    rules.minimumVoteThreshold = getIntValueOrNull(textFieldMinimumVoteThreshold);
+        getTextOrEmptyString(textFieldDecimalPlacesForVoteArithmetic);
+    rules.minimumVoteThreshold = getTextOrEmptyString(textFieldMinimumVoteThreshold);
     rules.maxSkippedRanksAllowed = getTextOrEmptyString(textFieldMaxSkippedRanksAllowed);
     rules.maxRankingsAllowed = getTextOrEmptyString(textFieldMaxRankingsAllowed);
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
@@ -960,32 +941,6 @@ public class GuiConfigController implements Initializable {
                   "Error during tabulation:\n%s\nTabulation failed!",
                   task.getException().toString()));
       return task;
-    }
-  }
-
-  private class TextFieldListenerNonNegInt implements ChangeListener<String> {
-    // Restricts text fields to non-negative integers
-
-    private final TextField textField;
-
-    TextFieldListenerNonNegInt(TextField textField) {
-      this.textField = textField;
-    }
-
-    @Override
-    public void changed(
-        ObservableValue<? extends String> observable, String oldValue, String newValue) {
-      if (!newValue.matches("\\d*")) {
-        textField.setText(oldValue);
-      }
-    }
-  }
-
-  private class SimpleIntegerStringConverter extends IntegerStringConverter {
-
-    @Override
-    public Integer fromString(String value) {
-      return getIntValueOrNull(value);
     }
   }
 }

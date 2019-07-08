@@ -75,15 +75,28 @@ public class RawContestConfig {
     // path to the file on disk
     private String filePath;
     // 1-indexed column where rankings data begins
-    private Integer firstVoteColumnIndex;
+    private String firstVoteColumnIndex;
     // 1-indexed row where first CVR appears
-    private Integer firstVoteRowIndex;
+    private String firstVoteRowIndex;
     // 1-indexed column containing CVR ID (if any)
     private String idColumnIndex;
     // 1-indexed column containing precinct (if any)
     private String precinctColumnIndex;
     // provider for this source e.g. "ES&S"
     private String provider;
+
+    public CVRSource() {
+    }
+
+    public CVRSource(String filePath, String firstVoteColumnIndex, String firstVoteRowIndex,
+        String idColumnIndex, String precinctColumnIndex, String provider) {
+      this.filePath = filePath;
+      this.firstVoteColumnIndex = firstVoteColumnIndex;
+      this.firstVoteRowIndex = firstVoteRowIndex;
+      this.idColumnIndex = idColumnIndex;
+      this.precinctColumnIndex = precinctColumnIndex;
+      this.provider = provider;
+    }
 
     // get underlying file path string
     public String getFilePath() {
@@ -95,19 +108,19 @@ public class RawContestConfig {
       this.filePath = filePath;
     }
 
-    public Integer getFirstVoteColumnIndex() {
+    public String getFirstVoteColumnIndex() {
       return firstVoteColumnIndex;
     }
 
-    public void setFirstVoteColumnIndex(Integer firstVoteColumnIndex) {
+    public void setFirstVoteColumnIndex(String firstVoteColumnIndex) {
       this.firstVoteColumnIndex = firstVoteColumnIndex;
     }
 
-    public Integer getFirstVoteRowIndex() {
+    public String getFirstVoteRowIndex() {
       return firstVoteRowIndex;
     }
 
-    public void setFirstVoteRowIndex(Integer firstVoteRowIndex) {
+    public void setFirstVoteRowIndex(String firstVoteRowIndex) {
       this.firstVoteRowIndex = firstVoteRowIndex;
     }
 
@@ -180,13 +193,13 @@ public class RawContestConfig {
     // which overvote rule to use
     public String overvoteRule;
     public String winnerElectionMode;
-    public Integer randomSeed;
+    public String randomSeed;
     // setting for number of winners
-    public Integer numberOfWinners;
+    public String numberOfWinners;
     // how far to round vote values when performing arithmetic
-    public Integer decimalPlacesForVoteArithmetic;
+    public String decimalPlacesForVoteArithmetic;
     // minimum votes needed to continue
-    public Integer minimumVoteThreshold;
+    public String minimumVoteThreshold;
     // max number of skipped rankings allowed
     public String maxSkippedRanksAllowed;
     // max rankings allowed
