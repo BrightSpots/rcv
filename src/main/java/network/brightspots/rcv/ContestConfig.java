@@ -462,7 +462,7 @@ class ContestConfig {
     }
   }
 
-  private boolean checkIfInt(String s) {
+  private boolean isInt(String s) {
     boolean isInt = true;
     try {
       Integer.parseInt(s);
@@ -545,7 +545,7 @@ class ContestConfig {
         MIN_MINIMUM_VOTE_THRESHOLD, MAX_MINIMUM_VOTE_THRESHOLD, true);
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
-    if (!isNullOrBlank(getNumberOfWinnersRaw()) && checkIfInt(getNumberOfWinnersRaw())
+    if (!isNullOrBlank(getNumberOfWinnersRaw()) && isInt(getNumberOfWinnersRaw())
         && getNumberOfWinners() > 1) {
       if (isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
         isValid = false;
@@ -960,7 +960,7 @@ class ContestConfig {
       // It's not valid to have a null random seed with this tie-break mode; the validation will
       // catch that and report a helpful error. Validation also hits this code path, though, so we
       // need to prevent a NullPointerException here.
-      if (!isNullOrBlank(getRandomSeedRaw()) && checkIfInt(getRandomSeedRaw())) {
+      if (!isNullOrBlank(getRandomSeedRaw()) && isInt(getRandomSeedRaw())) {
         Collections.shuffle(candidatePermutation, new Random(getRandomSeed()));
       }
     }

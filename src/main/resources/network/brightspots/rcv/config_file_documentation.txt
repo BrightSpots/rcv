@@ -134,7 +134,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
       "randomSeed" required when tiebreakMode is random, previousRoundCountsThenRandom, or generatePermutation
         the integer seed for the application's pseudorandom number generator
         value: [0..2147483647]
-        if not supplied: null
 
       "numberOfWinners" required
         the number of seats to be won in this contest
