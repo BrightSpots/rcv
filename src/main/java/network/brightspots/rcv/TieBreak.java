@@ -46,13 +46,14 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
+import network.brightspots.rcv.Tabulator.TieBreakMode;
 
 class TieBreak {
 
   private static Random random;
 
-  // list of candidates who are tied
-  private final List<String> tiedCandidates;
+  // list of all candidates who are tied for this tie-breaker
+  private final List<String> allTiedCandidates;
   // mode we're using for breaking ties
   private final Tabulator.TieBreakMode tieBreakMode;
   // ordering to use if we're doing permutation-based tie-breaking
@@ -73,7 +74,7 @@ class TieBreak {
   // function: TieBreak
   // purpose: TieBreak constructor stores member data
   // param: selectingAWinner whether we're determining a winner (as opposed to a loser)
-  // param: tiedCandidates list of all candidate IDs tied at this vote total
+  // param: allTiedCandidates list of all candidate IDs tied at this vote total
   // param: tieBreakMode rule to use for selecting the loser/winner
   // param: round in which this tie occurs
   // param: numVotes tally of votes for tying candidates
@@ -81,21 +82,22 @@ class TieBreak {
   // return newly constructed TieBreak object
   TieBreak(
       boolean selectingAWinner,
-      List<String> tiedCandidates,
+      List<String> allTiedCandidates,
       Tabulator.TieBreakMode tieBreakMode,
       int round,
       BigDecimal numVotes,
       Map<Integer, Map<String, BigDecimal>> roundTallies,
       ArrayList<String> candidatePermutation) {
     this.selectingAWinner = selectingAWinner;
-    this.tiedCandidates = tiedCandidates;
+    this.allTiedCandidates = allTiedCandidates;
     this.tieBreakMode = tieBreakMode;
     this.round = round;
     this.numVotes = numVotes;
     this.roundTallies = roundTallies;
     this.candidatePermutation = candidatePermutation;
+
     // sort tied candidates for reproducibility
-    Collections.sort(this.tiedCandidates);
+    Collections.sort(this.allTiedCandidates);
   }
 
   static void setRandomSeed(int randomSeed) {
@@ -109,29 +111,13 @@ class TieBreak {
     // options: container for non selected candidate IDs
     ArrayList<String> options = new ArrayList<>();
     // contestOptionId indexes over tied candidates
-    for (String contestOptionId : tiedCandidates) {
+    for (String contestOptionId : allTiedCandidates) {
       if (!contestOptionId.equals(selectedCandidate)) {
         options.add(contestOptionId);
       }
     }
-    // container for results
-    String nonSelected;
-    if (options.size() == 1) {
-      nonSelected = String.format("\"%s\"", options.get(0));
-    } else if (options.size() == 2) {
-      // if there are only 2 candidates don't use a comma
-      nonSelected = String.format("\"%s\" and \"%s\"", options.get(0), options.get(1));
-    } else {
-      // StringBuilder for faster string construction
-      StringBuilder stringBuilder = new StringBuilder();
-      // i indexes over all candidates
-      for (int i = 0; i < options.size() - 1; i++) {
-        stringBuilder.append("\"").append(options.get(i)).append("\", ");
-      }
-      stringBuilder.append("and \"").append(options.get(options.size() - 1)).append("\"");
-      nonSelected = stringBuilder.toString();
-    }
-    return nonSelected;
+
+    return Utils.listToSentenceWithQuotes(options);
   }
 
   String getExplanation() {
@@ -144,36 +130,26 @@ class TieBreak {
   String selectCandidate() throws TabulationCancelledException {
     switch (tieBreakMode) {
       case INTERACTIVE:
-        selectedCandidate = doInteractive();
+        selectedCandidate = doInteractive(allTiedCandidates);
         break;
       case RANDOM:
-        selectedCandidate = doRandom();
+        selectedCandidate = doRandom(allTiedCandidates);
         break;
       case GENERATE_PERMUTATION:
       case USE_PERMUTATION_IN_CONFIG:
-        selectedCandidate = doPermutationSelection();
+        selectedCandidate = doPermutationSelection(allTiedCandidates);
         break;
       default:
-        // handle tiebreaks that involve previous round tallies
-        // selectedCandidate will be set if there is a previous round count winner/loser
-        // it will be null if candidates are still tied all the way back to the first round
-        selectedCandidate = doPreviousRounds();
-        if (selectedCandidate == null) {
-          if (tieBreakMode == Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
-            selectedCandidate = doInteractive();
-          } else {
-            // PREVIOUS_ROUND_COUNTS_THEN_RANDOM is handled here
-            selectedCandidate = doRandom();
-          }
-        }
+        selectedCandidate = doPreviousRounds(allTiedCandidates);
     }
     return selectedCandidate;
   }
 
   // function: doPermutationSelection
   // purpose: select the candidate based on the provided permutation order
+  // param: tiedCandidates is the list of candidates in contention to be selected
   // returns: selected candidate
-  private String doPermutationSelection() {
+  private String doPermutationSelection(List<String> tiedCandidates) {
     String selection = null;
     // create a set to simplify matching logic
     Set<String> tiedCandidatesSet = new HashSet<>(tiedCandidates);
@@ -201,8 +177,9 @@ class TieBreak {
 
   // function doInteractiveCli
   // purpose: interactively select the winner/loser of this tiebreak via the command-line interface
+  // param: tiedCandidates is the list of candidates in contention to be selected
   // returns: selected candidate
-  private String doInteractiveCli() throws TabulationCancelledException {
+  private String doInteractiveCli(List<String> tiedCandidates) throws TabulationCancelledException {
     System.out.println(
         String.format(
             "Tie in round %d for the following candidates, each of whom has %d vote(s): ",
@@ -250,8 +227,9 @@ class TieBreak {
 
   // function doInteractiveGui
   // purpose: interactively select the loser of this tiebreak via the graphical user interface
+  // param: tiedCandidates is the list of candidates in contention to be selected
   // returns: selected candidate
-  private String doInteractiveGui() throws TabulationCancelledException {
+  private String doInteractiveGui(List<String> tiedCandidates) throws TabulationCancelledException {
     Logger.log(
         Level.INFO,
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
@@ -268,8 +246,9 @@ class TieBreak {
 
     while (selection == null) {
       try {
-        FutureTask<GuiTiebreakerPromptResponse> futureTask =
-            new FutureTask<>(new GuiTiebreakerPrompt());
+        GuiTiebreakerPrompt prompt = new GuiTiebreakerPrompt();
+        prompt.setTiedCandidates(tiedCandidates);
+        FutureTask<GuiTiebreakerPromptResponse> futureTask = new FutureTask<>(prompt);
         Platform.runLater(futureTask);
         GuiTiebreakerPromptResponse guiTiebreakerPromptResponse = futureTask.get();
         if (guiTiebreakerPromptResponse.tabulationCancelled) {
@@ -290,13 +269,14 @@ class TieBreak {
 
   // function doInteractive
   // purpose: interactively select the winner/loser of this tiebreak
+  // param: tiedCandidates is the list of candidates in contention to be selected
   // returns: selected candidate
-  private String doInteractive() throws TabulationCancelledException {
+  private String doInteractive(List<String> tiedCandidates) throws TabulationCancelledException {
     String selection;
     if (GuiContext.getInstance().getConfig() != null) {
-      selection = doInteractiveGui();
+      selection = doInteractiveGui(tiedCandidates);
     } else {
-      selection = doInteractiveCli();
+      selection = doInteractiveCli(tiedCandidates);
     }
     explanation = "The selected candidate was supplied by the operator.";
     return selection;
@@ -304,8 +284,9 @@ class TieBreak {
 
   // function doRandom
   // purpose: randomly select the winner/loser for this tiebreak
+  // param: tiedCandidates is the list of candidates in contention to be selected
   // returns: selected candidate
-  private String doRandom() {
+  private String doRandom(List<String> tiedCandidates) {
     // random number used for random candidate selection
     double randomDouble = random.nextDouble();
     // index of randomly selected candidate
@@ -315,41 +296,62 @@ class TieBreak {
   }
 
   // function doPreviousRounds
-  // purpose: select candidate based on previous round tallies
+  // purpose: select candidate based on previous round tallies (with a fallback to interactive or
+  //   random if necessary)
+  // param: tiedCandidates is the list of candidates in contention to be selected
   // returns: selected candidate
-  private String doPreviousRounds() {
+  private String doPreviousRounds(List<String> tiedCandidates) throws TabulationCancelledException {
     String selection = null;
     // stores candidates still in contention while we iterate through previous rounds to determine
     // the selection
-    Set<String> candidatesInContention = new HashSet<>(tiedCandidates);
+    List<String> candidatesInContention = tiedCandidates;
 
-    for (int round = this.round - 1; round > 0; round--) {
+    for (int roundToCompare = this.round - 1; roundToCompare > 0; roundToCompare--) {
       // map of tally to candidate IDs for round under consideration
       SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates =
-          Tabulator.buildTallyToCandidates(roundTallies.get(round), candidatesInContention, false);
+          Tabulator.buildTallyToCandidates(
+              roundTallies.get(roundToCompare), new HashSet<>(candidatesInContention), false);
       BigDecimal voteTotalForSelection =
           selectingAWinner ? tallyToCandidates.lastKey() : tallyToCandidates.firstKey();
-      LinkedList<String> candidatesWithVoteTotal = tallyToCandidates.get(voteTotalForSelection);
-      if (candidatesWithVoteTotal.size() == 1) {
-        selection = candidatesWithVoteTotal.getFirst();
+      candidatesInContention = tallyToCandidates.get(voteTotalForSelection);
+      if (candidatesInContention.size() == 1) {
+        selection = candidatesInContention.get(0);
         explanation =
             String.format(
                 "%s had the %s votes (%s) in round %d.",
                 selection,
                 selectingAWinner ? "most" : "fewest",
                 voteTotalForSelection.toString(),
-                round);
+                roundToCompare);
         break;
-      } else {
-        // update candidatesInContention and check the previous round
-        candidatesInContention = new HashSet<>(candidatesWithVoteTotal);
+      } // else keep looping
+    }
+
+    // if 2 or more candidates are still tied, we fall back to interactive or random with the
+    // remaining candidates
+    if (candidatesInContention.size() > 1) {
+      String explanationPrefix =
+          String.format(
+              "Comparing previous round counts still resulted in a tie %s %s, so we fell back to %s.",
+              candidatesInContention.size() > 2 ? "among" : "between",
+              Utils.listToSentenceWithQuotes(candidatesInContention),
+              tieBreakMode == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
+                  ? "random"
+                  : "interactive");
+      if (tieBreakMode == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
+        selection = doInteractive(candidatesInContention);
+      } else { // PREVIOUS_ROUND_COUNTS_THEN_RANDOM
+        selection = doRandom(candidatesInContention);
       }
+      explanation = String.format("%s %s", explanationPrefix, explanation);
     }
 
     return selection;
   }
 
   class GuiTiebreakerPrompt implements Callable<GuiTiebreakerPromptResponse> {
+
+    private List<String> tiedCandidates;
 
     @Override
     public GuiTiebreakerPromptResponse call() {
@@ -376,6 +378,10 @@ class TieBreak {
         Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw.toString());
       }
       return guiTiebreakerPromptResponse;
+    }
+
+    void setTiedCandidates(List<String> tiedCandidates) {
+      this.tiedCandidates = tiedCandidates;
     }
   }
 
