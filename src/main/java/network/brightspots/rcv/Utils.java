@@ -16,9 +16,31 @@
 
 package network.brightspots.rcv;
 
+import java.util.List;
+
 class Utils {
 
   static boolean isNullOrBlank(String s) {
     return s == null || s.isBlank();
+  }
+
+  static String listToSentenceWithQuotes(List<String> list) {
+    String sentence;
+
+    if (list.size() == 1) {
+      sentence = String.format("\"%s\"", list.get(0));
+    } else if (list.size() == 2) {
+      // if there are only 2 candidates, don't use a comma
+      sentence = String.format("\"%s\" and \"%s\"", list.get(0), list.get(1));
+    } else {
+      StringBuilder stringBuilder = new StringBuilder();
+      for (int i = 0; i < list.size() - 1; i++) {
+        stringBuilder.append("\"").append(list.get(i)).append("\", ");
+      }
+      stringBuilder.append("and \"").append(list.get(list.size() - 1)).append("\"");
+      sentence = stringBuilder.toString();
+    }
+
+    return sentence;
   }
 }

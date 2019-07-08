@@ -1,4 +1,5 @@
 {
+  "tabulatorVersion" : "0.1.0",
   "outputSettings" : {
     "contestName" : "Tiebreak test",
     "outputDirectory" : "output",
@@ -36,18 +37,16 @@
   "rules" : {
     "tiebreakMode" : "generatePermutation",
     "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "standard",
     "randomSeed" : 12345,
     "numberOfWinners" : 1,
     "decimalPlacesForVoteArithmetic" : 4,
     "minimumVoteThreshold" : 0,
     "maxSkippedRanksAllowed" : "0",
     "maxRankingsAllowed" : "1",
-    "sequentialMultiSeat" : false,
-    "bottomsUpMultiSeat" : false,
     "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : true,
-    "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
     "overvoteLabel" : "overvote",
