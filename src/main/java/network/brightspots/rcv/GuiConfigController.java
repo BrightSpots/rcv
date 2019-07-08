@@ -794,7 +794,7 @@ public class GuiConfigController implements Initializable {
         datePickerContestDate.setValue(
             LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
       } catch (DateTimeParseException exception) {
-        Logger.log(Level.SEVERE, "invalid contestDate: %s", outputSettings.contestDate);
+        Logger.log(Level.SEVERE, "Invalid contestDate: %s!", outputSettings.contestDate);
         datePickerContestDate.setValue(null);
       }
     }
