@@ -73,6 +73,7 @@ class ContestConfig {
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
   private static final int MIN_RANDOM_SEED = 0;
   private static final String CDF_PROVIDER = "CDF";
+  private static final String JSON_EXTENSION = ".json";
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
@@ -151,7 +152,9 @@ class ContestConfig {
   }
 
   static boolean isCdf(CVRSource source) {
-    return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER);
+    return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER)
+        && source.getFilePath() != null && source.getFilePath().toLowerCase()
+        .endsWith(JSON_EXTENSION);
   }
 
   // function: stringMatchesAnotherFieldValue(
@@ -225,17 +228,17 @@ class ContestConfig {
 
   // Makes sure String input can be converted to an int, and checks that int against boundaries
   private void checkStringToIntWithBoundaries(
-      String input, String inputName, String inputLocation) {
+      String input, String inputName, int lowerBoundary, int upperBoundary, String inputLocation) {
     try {
-      int columnIndex = Integer.parseInt(input);
-      if (columnIndex < MIN_COLUMN_INDEX || columnIndex > MAX_COLUMN_INDEX) {
+      int stringInt = Integer.parseInt(input);
+      if (stringInt < lowerBoundary || stringInt > upperBoundary) {
         isValid = false;
         Logger.log(
             Level.SEVERE,
             "%s must be from %d to %d if supplied: %s",
             inputName,
-            MIN_COLUMN_INDEX,
-            MAX_COLUMN_INDEX,
+            lowerBoundary,
+            upperBoundary,
             inputLocation);
       }
     } catch (NumberFormatException e) {
@@ -315,44 +318,34 @@ class ContestConfig {
           // perform ES&S checks
 
           // ensure valid first vote column value
-          if (source.getFirstVoteColumnIndex() == null) {
+          if (isNullOrBlank(source.getFirstVoteColumnIndex())) {
             isValid = false;
             Logger.log(Level.SEVERE, "firstVoteColumnIndex is required: %s", cvrPath);
-          } else if (source.getFirstVoteColumnIndex() < MIN_COLUMN_INDEX
-              || source.getFirstVoteColumnIndex() > MAX_COLUMN_INDEX) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "firstVoteColumnIndex must be from %d to %d: %s",
-                MIN_COLUMN_INDEX,
-                MAX_COLUMN_INDEX,
-                cvrPath);
+          } else {
+            checkStringToIntWithBoundaries(source.getFirstVoteColumnIndex(), "firstVoteColumnIndex",
+                MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, cvrPath);
           }
 
           // ensure valid first vote row value
-          if (source.getFirstVoteRowIndex() == null) {
+          if (isNullOrBlank(source.getFirstVoteRowIndex())) {
             isValid = false;
             Logger.log(Level.SEVERE, "firstVoteRowIndex is required: %s", cvrPath);
-          } else if (source.getFirstVoteRowIndex() < MIN_ROW_INDEX
-              || source.getFirstVoteRowIndex() > MAX_ROW_INDEX) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "firstVoteRowIndex must be from %d to %d: %s",
-                MIN_ROW_INDEX,
-                MAX_ROW_INDEX,
-                cvrPath);
+          } else {
+            checkStringToIntWithBoundaries(source.getFirstVoteRowIndex(), "firstVoteRowIndex",
+                MIN_ROW_INDEX, MAX_ROW_INDEX, cvrPath);
           }
 
           // ensure valid id column value
           if (!isNullOrBlank(source.getIdColumnIndex())) {
-            checkStringToIntWithBoundaries(source.getIdColumnIndex(), "idColumnIndex", cvrPath);
+            checkStringToIntWithBoundaries(source.getIdColumnIndex(), "idColumnIndex",
+                MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, cvrPath);
           }
 
           // ensure valid precinct column value
           if (!isNullOrBlank(source.getPrecinctColumnIndex())) {
             checkStringToIntWithBoundaries(
-                source.getPrecinctColumnIndex(), "precinctColumnIndex", cvrPath);
+                source.getPrecinctColumnIndex(), "precinctColumnIndex", MIN_COLUMN_INDEX,
+                MAX_COLUMN_INDEX, cvrPath);
           } else if (isTabulateByPrecinctEnabled()) {
             isValid = false;
             Logger.log(
