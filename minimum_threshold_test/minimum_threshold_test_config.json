@@ -1,50 +1,61 @@
 {
-  "outputSettings": {
-    "contestName": "Minimum threshold test",
-    "outputDirectory": "output",
-    "contestDate": "2018-01-07",
-    "contestJurisdiction": "Funkytown, USA",
-    "contestOffice": "Sergeant-at-Arms",
-    "tabulateByPrecinct": false
+  "tabulatorVersion" : "0.1.0",
+  "outputSettings" : {
+    "contestName" : "Minimum threshold test",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-01-07",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Sergeant-at-Arms",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "minimum_threshold_test_cvr.xlsx",
-      "firstVoteColumnIndex": 2,
-      "firstVoteRowIndex": 2,
-      "provider": "ES&S"
-    }
-  ],
-  "candidates": [
-    {
-      "name": "Gargamel"
-    },
-    {
-      "name": "Skeletor"
-    },
-    {
-      "name": "Megatron"
-    },
-    {
-      "name": "Garfield"
-    },
-    {
-      "name": "Odie"
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "random",
-    "randomSeed" : 0,
-    "overvoteRule": "exhaustImmediately",
-    "maxRankingsAllowed": 3,
-    "maxSkippedRanksAllowed": 1,
-    "numberOfWinners": 1,
-    "decimalPlacesForVoteArithmetic": 4,
-    "minimumVoteThreshold": 3,
-    "batchElimination": false,
-    "continueUntilTwoCandidatesRemain": false,
-    "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "rulesDescription": "Doyle Rules"
+  "cvrFileSources" : [ {
+    "filePath" : "minimum_threshold_test_cvr.xlsx",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "provider" : "ES&S"
+  } ],
+  "candidates" : [ {
+    "name" : "Gargamel",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Skeletor",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Megatron",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Garfield",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Odie",
+    "code" : "",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "3",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : "Doyle Rules"
   }
 }

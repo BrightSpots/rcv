@@ -15,7 +15,7 @@
       "Yinka Dare" : "2"
     },
     "tallyResults" : [ {
-      "eliminated" : "Yinka Dare",
+      "eliminated" : "Mookie Blaylock",
       "transfers" : {
         "exhausted" : "2"
       }
@@ -24,7 +24,19 @@
     "round" : 2,
     "tally" : {
       "George Gervin" : "2",
-      "Mookie Blaylock" : "2",
+      "Sedale Threatt" : "2",
+      "Yinka Dare" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Yinka Dare",
+      "transfers" : {
+        "exhausted" : "2"
+      }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "George Gervin" : "2",
       "Sedale Threatt" : "2"
     },
     "tallyResults" : [ {
@@ -34,24 +46,12 @@
       }
     } ]
   }, {
-    "round" : 3,
-    "tally" : {
-      "George Gervin" : "2",
-      "Mookie Blaylock" : "2"
-    },
-    "tallyResults" : [ {
-      "eliminated" : "George Gervin",
-      "transfers" : {
-        "exhausted" : "2"
-      }
-    } ]
-  }, {
     "round" : 4,
     "tally" : {
-      "Mookie Blaylock" : "2"
+      "George Gervin" : "2"
     },
     "tallyResults" : [ {
-      "elected" : "Mookie Blaylock",
+      "elected" : "George Gervin",
       "transfers" : { }
     } ]
   } ]

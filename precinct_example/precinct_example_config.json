@@ -1,94 +1,113 @@
 {
-  "outputSettings": {
-    "contestName": "Precinct example",
-    "outputDirectory": "output",
-    "contestDate": "2017-11-07",
-    "contestJurisdiction": "Minneapolis, MN",
-    "contestOffice": "Mayor",
-    "tabulateByPrecinct": true,
+  "tabulatorVersion" : "0.1.0",
+  "outputSettings" : {
+    "contestName" : "Precinct example",
+    "outputDirectory" : "output",
+    "contestDate" : "2017-11-07",
+    "contestJurisdiction" : "Minneapolis, MN",
+    "contestOffice" : "Mayor",
+    "tabulateByPrecinct" : true,
     "generateCdfJson" : true
   },
-  "cvrFileSources": [
-    {
-      "filePath": "precinct_example_cvr.xlsx",
-      "firstVoteColumnIndex": 2,
-      "firstVoteRowIndex": 2,
-      "precinctColumnIndex": 1,
-      "provider": "ES&S"
-    }
-  ],
-  "candidates": [
-    {
-      "name": "Jacob Frey"
-    },
-    {
-      "name": "Tom Hoch"
-    },
-    {
-      "name": "Betsy Hodges"
-    },
-    {
-      "name": "Raymond Dehn"
-    },
-    {
-      "name": "Nekima Levy-Pounds"
-    },
-    {
-      "name": "Charlie Gers"
-    },
-    {
-      "name": "Aswar Rahman"
-    },
-    {
-      "name": "Al Flowers"
-    },
-    {
-      "name": "L.A. Nik"
-    },
-    {
-      "name": "David Rosenfeld"
-    },
-    {
-      "name": "Captain Jack Sparrow"
-    },
-    {
-      "name": "Gregg A. Iverson"
-    },
-    {
-      "name": "Ronald Lischeid"
-    },
-    {
-      "name": "David John Wilson"
-    },
-    {
-      "name": "Troy Benjegerdes"
-    },
-    {
-      "name": "Ian Simpson"
-    },
-    {
-      "name": "Christopher Zimmerman"
-    },
-    {
-      "name": "Theron Preston Washington"
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "random",
-    "randomSeed" : 0,
-    "overvoteRule": "alwaysSkipToNextRank",
-    "maxRankingsAllowed": 3,
-    "maxSkippedRanksAllowed": 1,
-    "numberOfWinners": 1,
-    "decimalPlacesForVoteArithmetic": 4,
-    "minimumVoteThreshold": 0,
-    "batchElimination": true,
-    "continueUntilTwoCandidatesRemain": false,
-    "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI",
-    "rulesDescription": "Minneapolis Rules"
+  "cvrFileSources" : [ {
+    "filePath" : "precinct_example_cvr.xlsx",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "1",
+    "provider" : "ES&S"
+  } ],
+  "candidates" : [ {
+    "name" : "Jacob Frey",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Tom Hoch",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Betsy Hodges",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Raymond Dehn",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Nekima Levy-Pounds",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Charlie Gers",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Aswar Rahman",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Al Flowers",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "L.A. Nik",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "David Rosenfeld",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Captain Jack Sparrow",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Gregg A. Iverson",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Ronald Lischeid",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "David John Wilson",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Troy Benjegerdes",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Ian Simpson",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Christopher Zimmerman",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Theron Preston Washington",
+    "code" : "",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "undervoteLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "rulesDescription" : "Minneapolis Rules"
   }
 }

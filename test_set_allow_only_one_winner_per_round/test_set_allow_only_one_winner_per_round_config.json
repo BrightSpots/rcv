@@ -11,8 +11,8 @@
   },
   "cvrFileSources" : [ {
     "filePath" : "test_set_allow_only_one_winner_per_round_cvr.xlsx",
-    "firstVoteColumnIndex" : 2,
-    "firstVoteRowIndex" : 2,
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
     "provider" : "ESS"
@@ -37,12 +37,13 @@
   "rules" : {
     "tiebreakMode" : "usePermutationInConfig",
     "overvoteRule" : "alwaysSkipToNextRank",
-    "numberOfWinners" : 3,
-    "decimalPlacesForVoteArithmetic" : 4,
-    "minimumVoteThreshold" : 0,
+    "winnerElectionMode" : "multiSeatAllowOnlyOneWinnerPerRound",
+    "randomSeed" : "",
+    "numberOfWinners" : "3",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
     "maxSkippedRanksAllowed" : "1",
     "maxRankingsAllowed" : "3",
-    "winnerElectionMode" : "multiSeatAllowOnlyOneWinnerPerRound",
     "nonIntegerWinningThreshold" : true,
     "hareQuota" : false,
     "batchElimination" : false,

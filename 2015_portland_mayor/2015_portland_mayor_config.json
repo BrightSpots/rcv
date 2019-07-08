@@ -11,8 +11,8 @@
   },
   "cvrFileSources" : [ {
     "filePath" : "2015_portland_mayor_cvr.xlsx",
-    "firstVoteColumnIndex" : 4,
-    "firstVoteRowIndex" : 2,
+    "firstVoteColumnIndex" : "4",
+    "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "2",
     "provider" : "ES&S"
@@ -81,12 +81,13 @@
   "rules" : {
     "tiebreakMode" : "usePermutationInConfig",
     "overvoteRule" : "exhaustImmediately",
-    "numberOfWinners" : 1,
-    "decimalPlacesForVoteArithmetic" : 4,
-    "minimumVoteThreshold" : 0,
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
     "maxSkippedRanksAllowed" : "1",
     "maxRankingsAllowed" : "15",
-    "winnerElectionMode" : "standard",
     "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : true,
