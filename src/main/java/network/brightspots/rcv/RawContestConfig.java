@@ -179,6 +179,7 @@ public class RawContestConfig {
     public String tiebreakMode;
     // which overvote rule to use
     public String overvoteRule;
+    public String winnerElectionMode;
     public Integer randomSeed;
     // setting for number of winners
     public Integer numberOfWinners;
@@ -190,17 +191,10 @@ public class RawContestConfig {
     public String maxSkippedRanksAllowed;
     // max rankings allowed
     public String maxRankingsAllowed;
-    public boolean sequentialMultiSeat;
-    public boolean bottomsUpMultiSeat;
-    public boolean allowOnlyOneWinnerPerRound;
     public boolean nonIntegerWinningThreshold;
     public boolean hareQuota;
     // are we using batch elimination?
     public boolean batchElimination;
-    // keep tabulating beyond selecting winner until only two candidates remain
-    // used to provide additional context for the strength of support for the winner
-    // only valid for single-winner contests
-    public boolean continueUntilTwoCandidatesRemain;
     // should we exhaust a ballot when we hit a duplicate candidate while traversing its rankings?
     public boolean exhaustOnDuplicateCandidate;
     // shall we treat blank cells as UWIs?

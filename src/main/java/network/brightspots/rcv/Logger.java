@@ -123,7 +123,7 @@ class Logger {
   }
 
   // function: removeTabulationFileLogging
-  // purpose: remove file logging once a tabulation run is complete
+  // purpose: remove file logging once a tabulation run is completed
   static void removeTabulationFileLogging() {
     tabulationHandler.flush();
     tabulationHandler.close();

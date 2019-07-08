@@ -1,56 +1,57 @@
 {
   "tabulatorVersion" : "0.1.0",
   "outputSettings" : {
-    "contestName" : "Allow Only One Winner per Round Test",
+    "contestName" : "Tiebreak test",
     "outputDirectory" : "output",
-    "contestDate" : "2019-01-18",
-    "contestJurisdiction" : "",
-    "contestOffice" : "",
+    "contestDate" : "2017-12-03",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Sergeant-at-Arms",
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "test_set_allow_only_one_winner_per_round_cvr.xlsx",
+    "filePath" : "tiebreak_previous_round_counts_then_random_test_cvr.xlsx",
     "firstVoteColumnIndex" : 2,
     "firstVoteRowIndex" : 2,
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
-    "provider" : "ESS"
+    "provider" : ""
   } ],
   "candidates" : [ {
-    "name" : "A",
+    "name" : "Happy",
     "code" : "",
     "excluded" : false
   }, {
-    "name" : "B",
+    "name" : "Sneezy",
     "code" : "",
     "excluded" : false
   }, {
-    "name" : "C",
+    "name" : "Dopey",
     "code" : "",
     "excluded" : false
   }, {
-    "name" : "D",
+    "name" : "Grumpy",
     "code" : "",
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode" : "usePermutationInConfig",
+    "tiebreakMode" : "previousRoundCountsThenRandom",
     "overvoteRule" : "alwaysSkipToNextRank",
-    "numberOfWinners" : 3,
+    "winnerElectionMode" : "standard",
+    "randomSeed" : 12345,
+    "numberOfWinners" : 1,
     "decimalPlacesForVoteArithmetic" : 4,
     "minimumVoteThreshold" : 0,
-    "maxSkippedRanksAllowed" : "1",
+    "maxSkippedRanksAllowed" : "0",
     "maxRankingsAllowed" : "3",
-    "winnerElectionMode" : "multiSeatAllowOnlyOneWinnerPerRound",
-    "nonIntegerWinningThreshold" : true,
+    "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "",
+    "overvoteLabel" : "overvote",
     "undervoteLabel" : "undervote",
     "undeclaredWriteInLabel" : "",
-    "rulesDescription" : "Allow Only One Winner per Round Test"
+    "rulesDescription" : "Doyle Rules"
   }
 }

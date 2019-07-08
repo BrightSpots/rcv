@@ -34,7 +34,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Level;
-import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -123,17 +122,13 @@ class TabulatorTests {
     String configPath = getTestFilePath(stem, "_config.json");
     // create a session object and run the tabulation
     TabulatorSession session = new TabulatorSession(configPath);
-    try {
-      session.tabulate();
-    } catch (TabulationCancelledException e) {
-      e.printStackTrace();
-    }
+    session.tabulate();
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
 
-    if (config.isSequentialMultiSeatEnabled()) {
+    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
         compareJsons(config, stem, timestampString, i);
       }
@@ -468,6 +463,14 @@ class TabulatorTests {
     runTabulationTest("tiebreak_generate_permutation_test");
   }
 
+  // function: tiebreakPreviousRoundCountsThenRandomTest
+  // purpose: tests tiebreak using previousRoundCountsThenRandom setting
+  @Test
+  @DisplayName("tiebreak using previousRoundCountsThenRandom")
+  void tiebreakPreviousRoundCountsThenRandomTest() {
+    runTabulationTest("tiebreak_previous_round_counts_then_random_test");
+  }
+
   // function: treatBlankAsUndeclaredWriteInTest
   // purpose: tests treatBlankAsUndeclaredWriteIn setting
   @Test
@@ -475,5 +478,4 @@ class TabulatorTests {
   void treatBlankAsUndeclaredWriteInTest() {
     runTabulationTest("test_set_treat_blank_as_undeclared_write_in");
   }
-
 }
