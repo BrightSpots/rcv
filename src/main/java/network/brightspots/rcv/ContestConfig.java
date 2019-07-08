@@ -46,6 +46,7 @@ import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 class ContestConfig {
   // If any booleans are unspecified in config file, they should default to false no matter what
+  static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
@@ -689,8 +690,7 @@ class ContestConfig {
   // returns: raw string from config or falls back to user folder if none is set
   String getOutputDirectoryRaw() {
     // outputDirectory is where output files should be written
-    return isNullOrBlank(rawConfig.outputSettings.outputDirectory) ? FileUtils.getUserDirectory()
-        : rawConfig.outputSettings.outputDirectory;
+    return rawConfig.outputSettings.outputDirectory;
   }
 
   // function: getOutputDirectory
