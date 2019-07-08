@@ -19,10 +19,10 @@
       "MEG FORNEY" : "7856",
       "STEVE BARLAND" : "3705",
       "TOM NORDYKE" : "6511",
-      "Undeclared" : "342"
+      "UWI" : "342"
     },
     "tallyResults" : [ {
-      "eliminated" : "Undeclared",
+      "eliminated" : "UWI",
       "transfers" : {
         "ANNIE YOUNG" : "8",
         "CASPER HILL" : "4",
@@ -81,17 +81,7 @@
     },
     "tallyResults" : [ {
       "elected" : "JOHN ERWIN",
-      "transfers" : {
-        "ANNIE YOUNG" : "0.0000",
-        "HASHIM YONIS" : "0.0000",
-        "ISHMAEL ISRAEL" : "0.0000",
-        "JASON STONE" : "0.0000",
-        "MARY LYNN MCPHERSON" : "0.0000",
-        "MEG FORNEY" : "0.0000",
-        "STEVE BARLAND" : "0.0000",
-        "TOM NORDYKE" : "0.0000",
-        "exhausted" : "0.0000"
-      }
+      "transfers" : { }
     } ]
   }, {
     "round" : 4,
@@ -109,14 +99,14 @@
     "tallyResults" : [ {
       "eliminated" : "ISHMAEL ISRAEL",
       "transfers" : {
-        "ANNIE YOUNG" : "603.0000",
-        "HASHIM YONIS" : "547.0000",
-        "JASON STONE" : "342.0000",
-        "MARY LYNN MCPHERSON" : "215.0000",
-        "MEG FORNEY" : "390.0000",
-        "STEVE BARLAND" : "98.0000",
-        "TOM NORDYKE" : "164.0000",
-        "exhausted" : "1015.0000"
+        "ANNIE YOUNG" : "603",
+        "HASHIM YONIS" : "547",
+        "JASON STONE" : "342",
+        "MARY LYNN MCPHERSON" : "215",
+        "MEG FORNEY" : "390",
+        "STEVE BARLAND" : "98",
+        "TOM NORDYKE" : "164",
+        "exhausted" : "1015"
       }
     } ]
   }, {
@@ -134,13 +124,13 @@
     "tallyResults" : [ {
       "eliminated" : "MARY LYNN MCPHERSON",
       "transfers" : {
-        "ANNIE YOUNG" : "999.0000",
-        "HASHIM YONIS" : "144.0000",
-        "JASON STONE" : "278.0000",
-        "MEG FORNEY" : "738.0000",
-        "STEVE BARLAND" : "212.0000",
-        "TOM NORDYKE" : "242.0000",
-        "exhausted" : "1081.0000"
+        "ANNIE YOUNG" : "999",
+        "HASHIM YONIS" : "144",
+        "JASON STONE" : "278",
+        "MEG FORNEY" : "738",
+        "STEVE BARLAND" : "212",
+        "TOM NORDYKE" : "242",
+        "exhausted" : "1081"
       }
     } ]
   }, {
@@ -157,12 +147,12 @@
     "tallyResults" : [ {
       "eliminated" : "STEVE BARLAND",
       "transfers" : {
-        "ANNIE YOUNG" : "471.0000",
-        "HASHIM YONIS" : "81.0000",
-        "JASON STONE" : "452.0000",
-        "MEG FORNEY" : "670.0000",
-        "TOM NORDYKE" : "534.0000",
-        "exhausted" : "1905.0000"
+        "ANNIE YOUNG" : "471",
+        "HASHIM YONIS" : "81",
+        "JASON STONE" : "452",
+        "MEG FORNEY" : "670",
+        "TOM NORDYKE" : "534",
+        "exhausted" : "1905"
       }
     } ]
   }, {
@@ -178,11 +168,11 @@
     "tallyResults" : [ {
       "eliminated" : "HASHIM YONIS",
       "transfers" : {
-        "ANNIE YOUNG" : "502.0000",
-        "JASON STONE" : "192.0000",
-        "MEG FORNEY" : "327.0000",
-        "TOM NORDYKE" : "153.0000",
-        "exhausted" : "3397.0000"
+        "ANNIE YOUNG" : "502",
+        "JASON STONE" : "192",
+        "MEG FORNEY" : "327",
+        "TOM NORDYKE" : "153",
+        "exhausted" : "3397"
       }
     } ]
   }, {
@@ -197,10 +187,10 @@
     "tallyResults" : [ {
       "eliminated" : "JASON STONE",
       "transfers" : {
-        "ANNIE YOUNG" : "1859.0000",
-        "MEG FORNEY" : "809.0000",
-        "TOM NORDYKE" : "1013.0000",
-        "exhausted" : "3060.0000"
+        "ANNIE YOUNG" : "1859",
+        "MEG FORNEY" : "809",
+        "TOM NORDYKE" : "1013",
+        "exhausted" : "3060"
       }
     } ]
   }, {
@@ -214,9 +204,9 @@
     "tallyResults" : [ {
       "eliminated" : "TOM NORDYKE",
       "transfers" : {
-        "ANNIE YOUNG" : "1158.0000",
-        "MEG FORNEY" : "1280.0000",
-        "exhausted" : "6263.0000"
+        "ANNIE YOUNG" : "1158",
+        "MEG FORNEY" : "1280",
+        "exhausted" : "6263"
       }
     } ]
   }, {
@@ -234,9 +224,7 @@
       }
     }, {
       "elected" : "MEG FORNEY",
-      "transfers" : {
-        "exhausted" : "0.0000"
-      }
+      "transfers" : { }
     } ]
   }, {
     "round" : 11,

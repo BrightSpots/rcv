@@ -1,44 +1,53 @@
 {
-  "outputSettings": {
-    "contestName": "Duplicate test",
-    "outputDirectory": "output",
-    "contestDate": "2018-05-21",
-    "contestJurisdiction": "Funkytown, USA",
-    "contestOffice": "Director of Produce",
-    "tabulateByPrecinct": false
+  "tabulatorVersion" : "0.1.0",
+  "outputSettings" : {
+    "contestName" : "Duplicate test",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-05-21",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Director of Produce",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "duplicate_test_cvr.xlsx",
-      "firstVoteColumnIndex": 2,
-      "firstVoteRowIndex": 2,
-      "provider": "ES&S"
-    }
-  ],
-  "candidates": [
-    {
-      "name": "Banana"
-    },
-    {
-      "name": "Kumquat"
-    },
-    {
-      "name": "Durian"
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "random",
-    "randomSeed" : 0,
-    "overvoteRule": "alwaysSkipToNextRank",
-    "maxRankingsAllowed": 3,
-    "maxSkippedRanksAllowed": 1,
-    "numberOfWinners": 1,
-    "decimalPlacesForVoteArithmetic": 4,
-    "minimumVoteThreshold": 0,
-    "batchElimination": false,
-    "continueUntilTwoCandidatesRemain": false,
-    "exhaustOnDuplicateCandidate": true,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "rulesDescription": "Doyle Rules"
+  "cvrFileSources" : [ {
+    "filePath" : "duplicate_test_cvr.xlsx",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "provider" : "ES&S"
+  } ],
+  "candidates" : [ {
+    "name" : "Banana",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Kumquat",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Durian",
+    "code" : "",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : true,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : "Doyle Rules"
   }
 }

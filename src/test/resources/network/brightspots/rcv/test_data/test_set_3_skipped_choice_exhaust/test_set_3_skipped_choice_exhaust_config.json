@@ -1,4 +1,5 @@
 {
+  "tabulatorVersion" : "0.1.0",
   "outputSettings" : {
     "contestName" : "ExhaustSkip",
     "outputDirectory" : "output",
@@ -10,27 +11,29 @@
   },
   "cvrFileSources" : [ {
     "filePath" : "test_set_3_skipped_choice_exhaust_cvr.json",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
     "provider" : "CDF"
   } ],
   "candidates" : [ ],
   "rules" : {
     "tiebreakMode" : "random",
-    "randomSeed" : 0,
     "overvoteRule" : "alwaysSkipToNextRank",
-    "numberOfWinners" : 1,
-    "decimalPlacesForVoteArithmetic" : 1,
-    "minimumVoteThreshold" : 0,
-    "maxSkippedRanksAllowed" : 0,
-    "maxRankingsAllowed" : 4,
-    "sequentialMultiSeat" : false,
-    "bottomsUpMultiSeat" : false,
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "0",
+    "maxRankingsAllowed" : "4",
     "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
-    "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
     "overvoteLabel" : "",
-    "undervoteLabel" : ""
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : ""
   }
 }

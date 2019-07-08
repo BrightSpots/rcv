@@ -1,47 +1,60 @@
 {
+  "tabulatorVersion" : "0.1.0",
   "outputSettings" : {
     "contestName" : "Multi_winner2",
     "outputDirectory" : "output",
     "contestDate" : "2018-09-30",
     "contestJurisdiction" : "Multi-winner",
     "contestOffice" : "Multi_winner2",
-    "tabulateByPrecinct" : false
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
     "filePath" : "minneapolis_multi_seat_threshold_cvr.xlsx",
-    "firstVoteColumnIndex" : 2,
-    "firstVoteRowIndex": 2,
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
     "provider" : ""
   } ],
   "candidates" : [ {
     "name" : "A",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "B",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "C",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "D",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "E",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   }, {
     "name" : "F",
-    "code" : ""
+    "code" : "",
+    "excluded" : false
   } ],
   "rules" : {
     "tiebreakMode" : "interactive",
     "overvoteRule" : "alwaysSkipToNextRank",
-    "maxRankingsAllowed" : 6,
-    "maxSkippedRanksAllowed" : 1,
-    "numberOfWinners" : 3,
-    "decimalPlacesForVoteArithmetic" : 4,
-    "minimumVoteThreshold" : 0,
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "",
+    "numberOfWinners" : "3",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "6",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
     "batchElimination" : false,
-    "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,
     "treatBlankAsUndeclaredWriteIn" : false,
     "overvoteLabel" : "overvote",
