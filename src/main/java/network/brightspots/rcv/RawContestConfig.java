@@ -193,13 +193,13 @@ public class RawContestConfig {
     // which overvote rule to use
     public String overvoteRule;
     public String winnerElectionMode;
-    public Integer randomSeed;
+    public String randomSeed;
     // setting for number of winners
-    public Integer numberOfWinners;
+    public String numberOfWinners;
     // how far to round vote values when performing arithmetic
-    public Integer decimalPlacesForVoteArithmetic;
+    public String decimalPlacesForVoteArithmetic;
     // minimum votes needed to continue
-    public Integer minimumVoteThreshold;
+    public String minimumVoteThreshold;
     // max number of skipped rankings allowed
     public String maxSkippedRanksAllowed;
     // max rankings allowed

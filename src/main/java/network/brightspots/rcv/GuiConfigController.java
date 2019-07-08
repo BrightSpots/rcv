@@ -33,8 +33,6 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -61,7 +59,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
-import javafx.util.converter.IntegerStringConverter;
 import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
@@ -485,22 +482,6 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.refresh();
   }
 
-  private static Integer getIntValueOrNull(String str) {
-    Integer returnValue = null;
-    try {
-      if (!isNullOrBlank(str)) {
-        returnValue = Integer.valueOf(str);
-      }
-    } catch (Exception exception) {
-      Logger.log(Level.WARNING, "Integer required! Illegal value \"%s\" found.", str);
-    }
-    return returnValue;
-  }
-
-  private static void setTextFieldToInteger(TextField textField, Integer value) {
-    textField.setText(value != null ? Integer.toString(value) : "");
-  }
-
   private void setDefaultValues() {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
@@ -656,10 +637,6 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private static Integer getIntValueOrNull(TextField textField) {
-    return getIntValueOrNull(textField.getText().trim());
-  }
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
@@ -708,12 +685,6 @@ public class GuiConfigController implements Initializable {
           }
         });
 
-    textFieldCvrFirstVoteCol
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteCol));
-    textFieldCvrFirstVoteRow
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldCvrFirstVoteRow));
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
     tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
@@ -755,19 +726,6 @@ public class GuiConfigController implements Initializable {
     choiceOvervoteRule.getItems().remove(OvervoteRule.RULE_UNKNOWN);
     choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
     choiceWinnerElectionMode.getItems().remove(WinnerElectionMode.MODE_UNKNOWN);
-
-    textFieldRandomSeed
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldRandomSeed));
-    textFieldNumberOfWinners
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldNumberOfWinners));
-    textFieldDecimalPlacesForVoteArithmetic
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldDecimalPlacesForVoteArithmetic));
-    textFieldMinimumVoteThreshold
-        .textProperty()
-        .addListener(new TextFieldListenerNonNegInt(textFieldMinimumVoteThreshold));
 
     setDefaultValues();
 
@@ -829,11 +787,10 @@ public class GuiConfigController implements Initializable {
         config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN ? null
             : config.getWinnerElectionMode());
 
-    setTextFieldToInteger(textFieldRandomSeed, rules.randomSeed);
-    setTextFieldToInteger(textFieldNumberOfWinners, rules.numberOfWinners);
-    setTextFieldToInteger(
-        textFieldDecimalPlacesForVoteArithmetic, rules.decimalPlacesForVoteArithmetic);
-    setTextFieldToInteger(textFieldMinimumVoteThreshold, rules.minimumVoteThreshold);
+    textFieldRandomSeed.setText(rules.randomSeed);
+    textFieldNumberOfWinners.setText(rules.numberOfWinners);
+    textFieldDecimalPlacesForVoteArithmetic.setText(rules.decimalPlacesForVoteArithmetic);
+    textFieldMinimumVoteThreshold.setText(rules.minimumVoteThreshold);
     textFieldMaxSkippedRanksAllowed.setText(rules.maxSkippedRanksAllowed);
     textFieldMaxRankingsAllowed.setText(rules.maxRankingsAllowed);
     textFieldOvervoteLabel.setText(rules.overvoteLabel);
@@ -892,11 +849,11 @@ public class GuiConfigController implements Initializable {
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
     rules.winnerElectionMode = getChoiceElse(choiceWinnerElectionMode,
         WinnerElectionMode.MODE_UNKNOWN);
-    rules.randomSeed = getIntValueOrNull(textFieldRandomSeed);
-    rules.numberOfWinners = getIntValueOrNull(textFieldNumberOfWinners);
+    rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
+    rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
     rules.decimalPlacesForVoteArithmetic =
-        getIntValueOrNull(textFieldDecimalPlacesForVoteArithmetic);
-    rules.minimumVoteThreshold = getIntValueOrNull(textFieldMinimumVoteThreshold);
+        getTextOrEmptyString(textFieldDecimalPlacesForVoteArithmetic);
+    rules.minimumVoteThreshold = getTextOrEmptyString(textFieldMinimumVoteThreshold);
     rules.maxSkippedRanksAllowed = getTextOrEmptyString(textFieldMaxSkippedRanksAllowed);
     rules.maxRankingsAllowed = getTextOrEmptyString(textFieldMaxRankingsAllowed);
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
@@ -972,32 +929,6 @@ public class GuiConfigController implements Initializable {
                   "Error during tabulation:\n%s\nTabulation failed!",
                   task.getException().toString()));
       return task;
-    }
-  }
-
-  private class TextFieldListenerNonNegInt implements ChangeListener<String> {
-    // Restricts text fields to non-negative integers
-
-    private final TextField textField;
-
-    TextFieldListenerNonNegInt(TextField textField) {
-      this.textField = textField;
-    }
-
-    @Override
-    public void changed(
-        ObservableValue<? extends String> observable, String oldValue, String newValue) {
-      if (!newValue.matches("\\d*")) {
-        textField.setText(oldValue);
-      }
-    }
-  }
-
-  private class SimpleIntegerStringConverter extends IntegerStringConverter {
-
-    @Override
-    public Integer fromString(String value) {
-      return getIntValueOrNull(value);
     }
   }
 }
