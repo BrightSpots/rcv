@@ -100,8 +100,8 @@ class TieBreak {
     Collections.sort(this.allTiedCandidates);
   }
 
-  static void setRandomSeed(int randomSeed) {
-    random = new Random(randomSeed);
+  static void setRandom(Random r) {
+    random = r;
   }
 
   // function: nonSelectedCandidateDescription
@@ -161,8 +161,7 @@ class TieBreak {
       Collections.reverse(permutationToSearch);
     }
     // start from beginning of list and look for a matching candidate
-    for (int i = 0; i < permutationToSearch.size(); i++) {
-      String candidate = permutationToSearch.get(i);
+    for (String candidate : permutationToSearch) {
       if (tiedCandidatesSet.contains(candidate)) {
         selection = candidate;
         break;

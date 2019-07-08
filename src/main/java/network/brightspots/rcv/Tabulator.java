@@ -28,11 +28,13 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -128,11 +130,18 @@ class Tabulator {
   //  this is the high-level control of the tabulation algorithm
   // returns: set containing winner(s)
   Set<String> tabulate() throws TabulationCancelledException {
-    logSummaryInfo();
-
     if (config.needsRandomSeed()) {
-      TieBreak.setRandomSeed(config.getRandomSeed());
+      Random random = new Random(config.getRandomSeed());
+      if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
+        // sort candidate permutation for reproducibility
+        Collections.sort(config.getCandidatePermutation());
+        Collections.shuffle(config.getCandidatePermutation(), random);
+      } else {
+        TieBreak.setRandom(random);
+      }
     }
+
+    logSummaryInfo();
 
     // Loop until we've found our winner(s), unless singleSeatContinueUntilTwoCandidatesRemain mode
     // is active -- in which case we loop until only two candidates remain.

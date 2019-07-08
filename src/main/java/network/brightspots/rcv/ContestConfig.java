@@ -29,13 +29,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import network.brightspots.rcv.RawContestConfig.CVRSource;
@@ -956,17 +954,6 @@ class ContestConfig {
         if (candidate.isExcluded()) {
           excludedCandidates.add(code);
         }
-      }
-    }
-
-    if (getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
-      // It's not valid to have a null random seed with this tie-break mode; the validation will
-      // catch that and report a helpful error. Validation also hits this code path, though, so we
-      // need to prevent a NullPointerException here.
-      if (!isNullOrBlank(getRandomSeedRaw()) && isInt(getRandomSeedRaw())) {
-        // sort candidate permutation for reproducibility
-        Collections.sort(candidatePermutation);
-        Collections.shuffle(candidatePermutation, new Random(getRandomSeed()));
       }
     }
 
