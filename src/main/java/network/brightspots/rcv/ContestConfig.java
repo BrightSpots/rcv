@@ -253,15 +253,11 @@ class ContestConfig {
     } else {
       if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
         isValid = false;
-        Logger.log(
-            Level.SEVERE,
-            "tabulatorVersion %s not supported!",
-            getTabulatorVersion(),
-            Main.APP_VERSION);
+        Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!", getTabulatorVersion());
       }
     }
     if (!isValid) {
-      Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s.", Main.APP_VERSION);
+      Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s!", Main.APP_VERSION);
     }
   }
 

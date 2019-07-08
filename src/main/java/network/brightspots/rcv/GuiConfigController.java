@@ -771,13 +771,14 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  // version migration logic goes here
   private void migrateConfigVersion(ContestConfig config) {
     if (config.rawConfig.tabulatorVersion == null || !config.rawConfig.tabulatorVersion
         .equals(Main.APP_VERSION)) {
+      // Any necessary future version migration logic goes here
+      Logger.log(Level.INFO, "Migrated tabulator config version from %s to %s.",
+          config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
+          Main.APP_VERSION);
       config.rawConfig.tabulatorVersion = Main.APP_VERSION;
-      Logger.log(Level.INFO, "Migrated tabulator version from %s to %s.",
-          config.rawConfig.tabulatorVersion, Main.APP_VERSION);
     }
   }
 
@@ -806,11 +807,14 @@ public class GuiConfigController implements Initializable {
     }
 
     ContestRules rules = rawConfig.rules;
-    choiceTiebreakMode.setValue(config.getTiebreakMode());
-    choiceOvervoteRule.setValue(config.getOvervoteRule());
-    if (config.getWinnerElectionMode() != WinnerElectionMode.MODE_UNKNOWN) {
-      choiceWinnerElectionMode.setValue(config.getWinnerElectionMode());
-    }
+    choiceTiebreakMode.setValue(
+        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
+    choiceOvervoteRule.setValue(
+        config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
+    choiceWinnerElectionMode.setValue(
+        config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN ? null
+            : config.getWinnerElectionMode());
+
     setTextFieldToInteger(textFieldRandomSeed, rules.randomSeed);
     setTextFieldToInteger(textFieldNumberOfWinners, rules.numberOfWinners);
     setTextFieldToInteger(
