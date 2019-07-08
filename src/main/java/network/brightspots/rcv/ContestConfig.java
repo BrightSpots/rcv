@@ -58,10 +58,10 @@ class ContestConfig {
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final WinnerElectionMode SUGGESTED_WINNER_ELECTION_MODE = WinnerElectionMode.STANDARD;
-  private static final int MIN_COLUMN_INDEX = 1;
-  private static final int MAX_COLUMN_INDEX = 1000;
-  private static final int MIN_ROW_INDEX = 1;
-  private static final int MAX_ROW_INDEX = 100000;
+  static final int MIN_COLUMN_INDEX = 1;
+  static final int MAX_COLUMN_INDEX = 1000;
+  static final int MIN_ROW_INDEX = 1;
+  static final int MAX_ROW_INDEX = 100000;
   private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
   private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
   private static final int MIN_NUMBER_OF_WINNERS = 1;
@@ -241,19 +241,13 @@ class ContestConfig {
   private void checkStringToIntWithBoundaries(
       String input, String inputName, Integer lowerBoundary, Integer upperBoundary,
       boolean isRequired, String inputLocation) {
-    String message = String.format("%s must be", inputName);
-    if (lowerBoundary != null && upperBoundary != null) {
-      if (lowerBoundary.equals(upperBoundary)) {
-        message += String.format(" equal to %d", lowerBoundary);
-      } else {
-        message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
-      }
-    } else if (lowerBoundary != null) {
-      message += String.format(" at least %d", lowerBoundary);
-    } else if (upperBoundary != null) {
-      message += String.format(" no greater than %d", upperBoundary);
+    lowerBoundary = lowerBoundary != null ? lowerBoundary : Integer.MIN_VALUE;
+    upperBoundary = upperBoundary != null ? upperBoundary : Integer.MAX_VALUE;
+    String message = String.format("%s must be an integer", inputName);
+    if (lowerBoundary.equals(upperBoundary)) {
+      message += String.format(" equal to %d", lowerBoundary);
     } else {
-      message += " provided";
+      message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
     }
     if (isNullOrBlank(input)) {
       if (isRequired) {
@@ -262,15 +256,13 @@ class ContestConfig {
     } else {
       try {
         int stringInt = Integer.parseInt(input);
-        if ((lowerBoundary != null && stringInt < lowerBoundary)
-            || (upperBoundary != null && stringInt > upperBoundary)) {
+        if (stringInt < lowerBoundary || stringInt > upperBoundary) {
           if (!isRequired) {
             message += " if supplied";
           }
           invalidateAndLog(message, inputLocation);
         }
       } catch (NumberFormatException e) {
-        message = String.format("%s must be an integer", inputName);
         if (!isRequired) {
           message += " if supplied";
         }
@@ -315,7 +307,7 @@ class ContestConfig {
         if (isNullOrBlank(source.getFilePath())) {
           isValid = false;
           Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
-          continue;
+          break;
         }
 
         // full path to CVR
@@ -460,16 +452,6 @@ class ContestConfig {
     }
   }
 
-  private boolean isInt(String s) {
-    boolean isInt = true;
-    try {
-      Integer.parseInt(s);
-    } catch (NumberFormatException e) {
-      isInt = false;
-    }
-    return isInt;
-  }
-
   private void validateRules() {
     if (getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
@@ -501,31 +483,23 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "Invalid winnerElectionMode!");
     }
 
-    if (getMaxRankingsAllowed() == null) {
+    if (getMaxRankingsAllowed() == null || (getNumDeclaredCandidates() >= 1
+        && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "maxRankingsAllowed must either be \"%s\" or an integer!",
-          MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION);
-    } else if (getNumDeclaredCandidates() >= 1
-        && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED) {
-      isValid = false;
-      Logger.log(
-          Level.SEVERE, "maxRankingsAllowed must be %d or higher!", MIN_MAX_RANKINGS_ALLOWED);
+          "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
+          MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION, MIN_MAX_RANKINGS_ALLOWED, Integer.MAX_VALUE);
     }
 
-    if (getMaxSkippedRanksAllowed() == null) {
+    if (getMaxSkippedRanksAllowed() == null
+        || getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "maxSkippedRanksAllowed must either be \"%s\" or an integer!",
-          MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION);
-    } else if (getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
-      isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "maxSkippedRanksAllowed must be %d or higher!",
-          MIN_MAX_SKIPPED_RANKS_ALLOWED);
+          "maxSkippedRanksAllowed must either be \"%s\" or an integer from %d to %d!",
+          MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION, MIN_MAX_SKIPPED_RANKS_ALLOWED,
+          Integer.MAX_VALUE);
     }
 
     checkStringToIntWithBoundaries(getNumberOfWinnersRaw(), "numberOfWinners",
@@ -540,8 +514,7 @@ class ContestConfig {
         MIN_MINIMUM_VOTE_THRESHOLD, MAX_MINIMUM_VOTE_THRESHOLD, true);
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
-    if (!isNullOrBlank(getNumberOfWinnersRaw()) && isInt(getNumberOfWinnersRaw())
-        && getNumberOfWinners() > 1) {
+    if (Utils.isInt(getNumberOfWinnersRaw()) && getNumberOfWinners() > 1) {
       if (isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
         isValid = false;
         Logger.log(
@@ -764,12 +737,16 @@ class ContestConfig {
     return intValue;
   }
 
+  private String getMaxRankingsAllowedRaw() {
+    return rawConfig.rules.maxRankingsAllowed;
+  }
+
   // function: getMaxRankingsAllowed
   // purpose: getter for maxRankingsAllowed
   // returns: max rankings allowed
   Integer getMaxRankingsAllowed() {
     return stringToIntWithOption(
-        rawConfig.rules.maxRankingsAllowed,
+        getMaxRankingsAllowedRaw(),
         MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION,
         getNumDeclaredCandidates());
   }
@@ -824,12 +801,16 @@ class ContestConfig {
     return new BigDecimal(getMinimumVoteThresholdRaw());
   }
 
+  private String getMaxSkippedRanksAllowedRaw() {
+    return rawConfig.rules.maxSkippedRanksAllowed;
+  }
+
   // function: getMaxSkippedRanksAllowed
   // purpose: getter for maxSkippedRanksAllowed rule
   // returns: max skipped ranks allowed in this config
   Integer getMaxSkippedRanksAllowed() {
     return stringToIntWithOption(
-        rawConfig.rules.maxSkippedRanksAllowed,
+        getMaxSkippedRanksAllowedRaw(),
         MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION,
         Integer.MAX_VALUE);
   }
