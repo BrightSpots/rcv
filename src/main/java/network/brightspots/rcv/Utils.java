@@ -24,6 +24,16 @@ class Utils {
     return s == null || s.isBlank();
   }
 
+  static boolean isInt(String s) {
+    boolean isInt = true;
+    try {
+      Integer.parseInt(s);
+    } catch (NumberFormatException e) {
+      isInt = false;
+    }
+    return isInt;
+  }
+
   static String listToSentenceWithQuotes(List<String> list) {
     String sentence;
 

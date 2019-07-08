@@ -353,13 +353,26 @@ public class GuiConfigController implements Initializable {
       hasRequiredFields = false;
       Logger.log(Level.WARNING, "filePath is required!");
     }
-    if (source.getFirstVoteColumnIndex().isBlank() && !ContestConfig.isCdf(source)) {
-      hasRequiredFields = false;
-      Logger.log(Level.WARNING, "firstVoteColumnIndex is required for non-CDF files!");
-    }
-    if (source.getFirstVoteRowIndex().isBlank() && !ContestConfig.isCdf(source)) {
-      hasRequiredFields = false;
-      Logger.log(Level.WARNING, "firstVoteRowIndex is required for non-CDF files!");
+    if (!ContestConfig.isCdf(source)) {
+      String colIndex = source.getFirstVoteColumnIndex();
+      if (!Utils.isInt(colIndex) || Integer.parseInt(colIndex) < ContestConfig.MIN_COLUMN_INDEX
+          || Integer.parseInt(colIndex) > ContestConfig.MAX_COLUMN_INDEX) {
+        hasRequiredFields = false;
+        Logger.log(Level.WARNING,
+            "firstVoteColumnIndex must be an integer from %d to %d for non-CDF files!",
+            ContestConfig.MIN_COLUMN_INDEX, ContestConfig.MAX_COLUMN_INDEX);
+      }
+      String rowIndex = source.getFirstVoteRowIndex();
+      if (!Utils.isInt(rowIndex)
+          || Integer.parseInt(rowIndex) < ContestConfig.MIN_ROW_INDEX
+          || Integer.parseInt(rowIndex) > ContestConfig.MAX_ROW_INDEX) {
+        hasRequiredFields = false;
+        Logger.log(
+            Level.WARNING,
+            "firstVoteRowIndex must be an integer from %d to %d for non-CDF files!",
+            ContestConfig.MIN_ROW_INDEX,
+            ContestConfig.MAX_ROW_INDEX);
+      }
     }
     return hasRequiredFields;
   }
