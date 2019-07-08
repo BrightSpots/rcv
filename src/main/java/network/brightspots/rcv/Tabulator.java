@@ -131,12 +131,13 @@ class Tabulator {
   // returns: set containing winner(s)
   Set<String> tabulate() throws TabulationCancelledException {
     if (config.needsRandomSeed()) {
+      Random random = new Random(config.getRandomSeed());
       if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
         // sort candidate permutation for reproducibility
         Collections.sort(config.getCandidatePermutation());
-        Collections.shuffle(config.getCandidatePermutation(), new Random(config.getRandomSeed()));
+        Collections.shuffle(config.getCandidatePermutation(), random);
       } else {
-        TieBreak.setRandomSeed(config.getRandomSeed());
+        TieBreak.setRandom(random);
       }
     }
 
