@@ -94,6 +94,8 @@ class TieBreak {
     this.numVotes = numVotes;
     this.roundTallies = roundTallies;
     this.candidatePermutation = candidatePermutation;
+    // sort tied candidates for reproducibility
+    Collections.sort(this.tiedCandidates);
   }
 
   static void setRandomSeed(int randomSeed) {
@@ -160,6 +162,7 @@ class TieBreak {
           if (tieBreakMode == Tabulator.TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
             selectedCandidate = doInteractive();
           } else {
+            // PREVIOUS_ROUND_COUNTS_THEN_RANDOM is handled here
             selectedCandidate = doRandom();
           }
         }
