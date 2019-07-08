@@ -950,8 +950,8 @@ class ContestConfig {
       // catch that and report a helpful error. Validation also hits this code path, though, so we
       // need to prevent a NullPointerException here.
       if (getRandomSeed() != null) {
-	    // sort candidate permutation for reproducibility
-	    Collections.sort(candidatePermutation);
+        // sort candidate permutation for reproducibility
+        Collections.sort(candidatePermutation);
         Logger.log(Level.INFO, "shuffling!");
         Collections.shuffle(candidatePermutation, new Random(getRandomSeed()));
       }

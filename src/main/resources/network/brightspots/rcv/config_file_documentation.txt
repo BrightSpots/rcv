@@ -121,12 +121,13 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
       "tiebreakMode" required
         how the program should decide which candidate to eliminate when multiple candidates are tied for last place
         or which candidate to elect first when:
-          electionWinnerMode is set to multiSeatAllowOnlyOneWinnerPerRound and
-          multiple candidates exceed the winning threshold and
-          also tie for the highest vote total in the same round
+          1) electionWinnerMode is set to multiSeatAllowOnlyOneWinnerPerRound, and
+          2) multiple candidates exceed the winning threshold in the same round, and
+          3) at least two of those candidates are tied for the highest vote total in that round
         value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive" | "usePermutationInConfig" | "generatePermutation"
 
-        we use Java 12 java.util.random in our tiebreak implementations as follows:
+        we use Java 12 java.util.random for randomness in our tiebreak implementations
+        See https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/util/Random.html
 
         "random"
           on config load a java.util.Random object is created using the randomSeed value specified in the input config file:
@@ -157,8 +158,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
           if selecting a loser the tied candidate who appears latest is selected as the loser
 
         "generatePermutation"
-          we use Java 12 java.util.random for randomness in our tiebreak implementations
-          https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/util/Random.html
           on config load candidate names are sorted alphabetically by candidate code, or if code is not present, candidate name
           a randomly ordered candidate permutation is created with:
           java.util.Collections.shuffle(sortedCandidateNames, new java.util.Random(randomSeed))
