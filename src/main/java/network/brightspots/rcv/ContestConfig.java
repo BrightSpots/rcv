@@ -69,7 +69,8 @@ class ContestConfig {
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
   private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
-  private static final int MIN_RANDOM_SEED = 0;
+  private static final long MIN_RANDOM_SEED = -140737488355328L;
+  private static final long MAX_RANDOM_SEED = 140737488355327L;
   private static final String CDF_PROVIDER = "CDF";
   private static final String JSON_EXTENSION = ".json";
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
@@ -271,6 +272,40 @@ class ContestConfig {
     }
   }
 
+  // Makes sure String input can be converted to a long, and checks that long against boundaries
+  private void checkStringToLongWithBoundaries(String input, String inputName, Long lowerBoundary,
+      Long upperBoundary, boolean isRequired) {
+    lowerBoundary = lowerBoundary != null ? lowerBoundary : Long.MIN_VALUE;
+    upperBoundary = upperBoundary != null ? upperBoundary : Long.MAX_VALUE;
+    // "integer" in the mathematical sense, not the computer science sense
+    String message = String.format("%s must be an integer", inputName);
+    if (lowerBoundary.equals(upperBoundary)) {
+      message += String.format(" equal to %d", lowerBoundary);
+    } else {
+      message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
+    }
+    if (isNullOrBlank(input)) {
+      if (isRequired) {
+        invalidateAndLog(message, null);
+      }
+    } else {
+      try {
+        long stringLong = Long.parseLong(input);
+        if (stringLong < lowerBoundary || stringLong > upperBoundary) {
+          if (!isRequired) {
+            message += " if supplied";
+          }
+          invalidateAndLog(message, null);
+        }
+      } catch (NumberFormatException e) {
+        if (!isRequired) {
+          message += " if supplied";
+        }
+        invalidateAndLog(message, null);
+      }
+    }
+  }
+
   // version validation and migration logic goes here
   // e.g. unsupported versions would fail or be migrated
   // in this release we support only the current app version
@@ -464,6 +499,8 @@ class ContestConfig {
           Level.SEVERE,
           "When tiebreakMode involves a random element, randomSeed must be supplied.");
     }
+    checkStringToLongWithBoundaries(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED,
+        MAX_RANDOM_SEED, false);
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
@@ -559,8 +596,6 @@ class ContestConfig {
           Level.SEVERE,
           "batchElimination can't be true when winnerElectionMode is multiSeatBottomsUp!");
     }
-
-    checkStringToIntWithBoundaries(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, null, false);
 
     if (!isNullOrBlank(getOvervoteLabel()) && stringAlreadyInUseElsewhere(getOvervoteLabel(),
         "overvoteLabel")) {
@@ -848,8 +883,8 @@ class ContestConfig {
     return rawConfig.rules.randomSeed;
   }
 
-  Integer getRandomSeed() {
-    return Integer.parseInt(getRandomSeedRaw());
+  Long getRandomSeed() {
+    return Long.parseLong(getRandomSeedRaw());
   }
 
   boolean needsRandomSeed() {
