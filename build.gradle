@@ -73,22 +73,34 @@ jlink {
     }
 }
 
+def docsToCopy = copySpec {
+    from("$projectDir") {
+        include "README.md", "LICENSE"
+    }
+}
+
+def sampleInputToCopy = copySpec {
+    includeEmptyDirs = false
+    from("$projectDir/src/test/resources/network/brightspots/rcv/test_data") {
+        include "2015_portland_mayor/2015_portland_mayor_config.json"
+        include "2015_portland_mayor/2015_portland_mayor_cvr.xlsx"
+        include "sample_interactive_tiebreak/sample_interactive_tiebreak_config.json"
+        include "sample_interactive_tiebreak/sample_interactive_tiebreak_sequential_config.json"
+        include "sample_interactive_tiebreak/sample_interactive_tiebreak_cvr.xlsx"
+        include "precinct_example/precinct_example_config.json"
+        include "precinct_example/precinct_example_cvr.xlsx"
+        exclude "output"
+        exclude "**/*expected*"
+    }
+}
+
 tasks.jlink.doLast {
     copy {
-        from("/") {
-            include "README.md", "LICENSE"
-        }
+        with docsToCopy
         into JLINK_DIR + "/docs"
     }
     copy {
-        includeEmptyDirs = false
-        from("/src/test/resources/network/brightspots/rcv/test_data") {
-            include "2015_portland_mayor/*"
-            include "sample_interactive_tiebreak/*"
-            include "precinct_example/*"
-            exclude "output"
-            exclude "**/*expected*"
-        }
+        with sampleInputToCopy
         into JLINK_DIR + "/sample_input"
     }
 }
