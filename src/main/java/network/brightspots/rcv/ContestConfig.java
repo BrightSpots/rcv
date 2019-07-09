@@ -58,10 +58,10 @@ class ContestConfig {
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final WinnerElectionMode SUGGESTED_WINNER_ELECTION_MODE = WinnerElectionMode.STANDARD;
-  static final int MIN_COLUMN_INDEX = 1;
-  static final int MAX_COLUMN_INDEX = 1000;
-  static final int MIN_ROW_INDEX = 1;
-  static final int MAX_ROW_INDEX = 100000;
+  private static final int MIN_COLUMN_INDEX = 1;
+  private static final int MAX_COLUMN_INDEX = 1000;
+  private static final int MIN_ROW_INDEX = 1;
+  private static final int MAX_ROW_INDEX = 100000;
   private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
   private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
   private static final int MIN_NUMBER_OF_WINNERS = 1;
@@ -224,21 +224,22 @@ class ContestConfig {
     return isValid;
   }
 
-  private void invalidateAndLog(String message, String inputLocation) {
-    isValid = false;
+  private static void logWithLocation(String message, String inputLocation) {
     message += inputLocation == null ? "!" : ": " + inputLocation;
     Logger.log(Level.SEVERE, message);
   }
 
-  // Makes sure String input can be converted to an int, and checks that int against boundaries
-  private void checkStringToIntWithBoundaries(String input, String inputName, Integer lowerBoundary,
+  // Returns true if String input can be converted to an int and is within supplied boundaries
+  private static boolean checkStringToIntWithBoundaries(String input, String inputName,
+      Integer lowerBoundary,
       Integer upperBoundary, boolean isRequired) {
-    checkStringToIntWithBoundaries(input, inputName, lowerBoundary, upperBoundary, isRequired,
+    return checkStringToIntWithBoundaries(input, inputName, lowerBoundary, upperBoundary,
+        isRequired,
         null);
   }
 
-  // Makes sure String input can be converted to an int, and checks that int against boundaries
-  private void checkStringToIntWithBoundaries(
+  // Returns true if String input can be converted to an int and is within supplied boundaries
+  private static boolean checkStringToIntWithBoundaries(
       String input, String inputName, Integer lowerBoundary, Integer upperBoundary,
       boolean isRequired, String inputLocation) {
     lowerBoundary = lowerBoundary != null ? lowerBoundary : Integer.MIN_VALUE;
@@ -249,9 +250,11 @@ class ContestConfig {
     } else {
       message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
     }
+    boolean stringValid = true;
     if (isNullOrBlank(input)) {
       if (isRequired) {
-        invalidateAndLog(message, inputLocation);
+        stringValid = false;
+        logWithLocation(message, inputLocation);
       }
     } else {
       try {
@@ -260,15 +263,18 @@ class ContestConfig {
           if (!isRequired) {
             message += " if supplied";
           }
-          invalidateAndLog(message, inputLocation);
+          stringValid = false;
+          logWithLocation(message, inputLocation);
         }
       } catch (NumberFormatException e) {
         if (!isRequired) {
           message += " if supplied";
         }
-        invalidateAndLog(message, inputLocation);
+        stringValid = false;
+        logWithLocation(message, inputLocation);
       }
     }
+    return stringValid;
   }
 
   // version validation and migration logic goes here
@@ -296,78 +302,48 @@ class ContestConfig {
     }
   }
 
-  private void validateCvrFileSources() {
-    if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
-      isValid = false;
-      Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
+  static boolean isCvrSourceValid(CVRSource source) {
+    boolean sourceValid = true;
+    // perform checks on source input path
+    if (isNullOrBlank(source.getFilePath())) {
+      sourceValid = false;
+      Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
     } else {
-      HashSet<String> cvrFilePathSet = new HashSet<>();
-      for (CVRSource source : rawConfig.cvrFileSources) {
-        // perform checks on source input path
-        if (isNullOrBlank(source.getFilePath())) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
-          break;
-        }
+      // ensure valid first vote column value
+      if (!checkStringToIntWithBoundaries(source.getFirstVoteColumnIndex(), "firstVoteColumnIndex",
+          MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, !isCdf(source), source.getFilePath())) {
+        sourceValid = false;
+      }
 
-        // full path to CVR
-        String cvrPath = resolveConfigPath(source.getFilePath());
+      // ensure valid first vote row value
+      if (!checkStringToIntWithBoundaries(source.getFirstVoteRowIndex(), "firstVoteRowIndex",
+          MIN_ROW_INDEX, MAX_ROW_INDEX, !isCdf(source), source.getFilePath())) {
+        sourceValid = false;
+      }
 
-        // look for duplicate paths
-        if (cvrFilePathSet.contains(cvrPath)) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE, "Duplicate cast vote record filePaths are not allowed: %s", cvrPath);
-        } else {
-          cvrFilePathSet.add(cvrPath);
-        }
+      // ensure valid id column value
+      if (!checkStringToIntWithBoundaries(source.getIdColumnIndex(), "idColumnIndex",
+          MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, false, source.getFilePath())) {
+        sourceValid = false;
+      }
 
-        // ensure file exists
-        if (!new File(cvrPath).exists()) {
-          isValid = false;
-          Logger.log(Level.SEVERE, "Cast vote record file not found: %s", cvrPath);
-        }
-
-        // perform CDF checks
-        if (isCdf(source)) {
-          if (rawConfig.cvrFileSources.size() != 1) {
-            isValid = false;
-            Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
-          }
-          if (isTabulateByPrecinctEnabled()) {
-            isValid = false;
-            Logger.log(Level.SEVERE, "tabulateByPrecinct may not be used with CDF files.");
-          }
-        } else {
-          // perform ES&S checks
-
-          // ensure valid first vote column value
-          checkStringToIntWithBoundaries(source.getFirstVoteColumnIndex(), "firstVoteColumnIndex",
-              MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, true, cvrPath);
-
-          // ensure valid first vote row value
-          checkStringToIntWithBoundaries(source.getFirstVoteRowIndex(), "firstVoteRowIndex",
-              MIN_ROW_INDEX, MAX_ROW_INDEX, true, cvrPath);
-
-          // ensure valid id column value
-          checkStringToIntWithBoundaries(source.getIdColumnIndex(), "idColumnIndex",
-              MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, false, cvrPath);
-
-          // ensure valid precinct column value
-          checkStringToIntWithBoundaries(
-              source.getPrecinctColumnIndex(), "precinctColumnIndex", MIN_COLUMN_INDEX,
-              MAX_COLUMN_INDEX, false, cvrPath);
-
-          if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
-            isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
-                cvrPath);
-          }
-        }
+      // ensure valid precinct column value
+      if (!checkStringToIntWithBoundaries(
+          source.getPrecinctColumnIndex(), "precinctColumnIndex", MIN_COLUMN_INDEX,
+          MAX_COLUMN_INDEX, false, source.getFilePath())) {
+        sourceValid = false;
       }
     }
+    return sourceValid;
+  }
+
+  static boolean isCandidateValid(Candidate candidate) {
+    boolean candidateValid = true;
+    if (isNullOrBlank(candidate.getName())) {
+      candidateValid = false;
+      Logger.log(Level.SEVERE, "A name is required for each candidate!");
+    }
+    return candidateValid;
   }
 
   // function: stringAlreadyInUseElsewhere
@@ -412,19 +388,76 @@ class ContestConfig {
     return inUse;
   }
 
+  private void validateCvrFileSources() {
+    if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
+      isValid = false;
+      Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
+    } else {
+      HashSet<String> cvrFilePathSet = new HashSet<>();
+      for (CVRSource source : rawConfig.cvrFileSources) {
+        if (!isCvrSourceValid(source)) {
+          isValid = false;
+        }
+
+        // full path to CVR
+        String cvrPath =
+            isNullOrBlank(source.getFilePath()) ? null : resolveConfigPath(source.getFilePath());
+
+        // look for duplicate paths
+        if (cvrFilePathSet.contains(cvrPath)) {
+          isValid = false;
+          Logger.log(
+              Level.SEVERE, "Duplicate cast vote record filePaths are not allowed: %s", cvrPath);
+        } else {
+          cvrFilePathSet.add(cvrPath);
+        }
+
+        // ensure file exists
+        if (cvrPath != null && !new File(cvrPath).exists()) {
+          isValid = false;
+          Logger.log(Level.SEVERE, "Cast vote record file not found: %s", cvrPath);
+        }
+
+        if (isCdf(source)) {
+          // perform CDF checks
+          if (rawConfig.cvrFileSources.size() != 1) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
+          }
+          if (isTabulateByPrecinctEnabled()) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "tabulateByPrecinct may not be used with CDF files.");
+          }
+        } else {
+          // perform ES&S checks
+          if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
+                cvrPath);
+          }
+        }
+      }
+    }
+  }
+
   private void validateCandidates() {
     Set<String> candidateNameSet = new HashSet<>();
     Set<String> candidateCodeSet = new HashSet<>();
 
     for (Candidate candidate : rawConfig.candidates) {
-      if (isNullOrBlank(candidate.getName())) {
+      if (!isCandidateValid(candidate)) {
         isValid = false;
-        Logger.log(Level.SEVERE, "Name is required for each candidate!");
-      } else if (candidateStringAlreadyInUseElsewhere(
-          candidate.getName(), "name", candidateNameSet)) {
-        isValid = false;
-      } else {
-        candidateNameSet.add(candidate.getName());
+      }
+
+      if (!isNullOrBlank(candidate.getName())) {
+        if (candidateStringAlreadyInUseElsewhere(
+            candidate.getName(), "name", candidateNameSet)) {
+          isValid = false;
+        } else {
+          candidateNameSet.add(candidate.getName());
+        }
       }
 
       if (!isNullOrBlank(candidate.getCode())) {
@@ -502,16 +535,22 @@ class ContestConfig {
           Integer.MAX_VALUE);
     }
 
-    checkStringToIntWithBoundaries(getNumberOfWinnersRaw(), "numberOfWinners",
+    if (!checkStringToIntWithBoundaries(getNumberOfWinnersRaw(), "numberOfWinners",
         MIN_NUMBER_OF_WINNERS, getNumDeclaredCandidates() < 1 ? null : getNumDeclaredCandidates(),
-        true);
+        true)) {
+      isValid = false;
+    }
 
-    checkStringToIntWithBoundaries(getDecimalPlacesForVoteArithmeticRaw(),
+    if (!checkStringToIntWithBoundaries(getDecimalPlacesForVoteArithmeticRaw(),
         "decimalPlacesForVoteArithmetic",
-        MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, true);
+        MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, true)) {
+      isValid = false;
+    }
 
-    checkStringToIntWithBoundaries(getMinimumVoteThresholdRaw(), "minimumVoteThreshold",
-        MIN_MINIMUM_VOTE_THRESHOLD, MAX_MINIMUM_VOTE_THRESHOLD, true);
+    if (!checkStringToIntWithBoundaries(getMinimumVoteThresholdRaw(), "minimumVoteThreshold",
+        MIN_MINIMUM_VOTE_THRESHOLD, MAX_MINIMUM_VOTE_THRESHOLD, true)) {
+      isValid = false;
+    }
 
     // If this is a multi-seat contest, we validate a couple extra parameters.
     if (Utils.isInt(getNumberOfWinnersRaw()) && getNumberOfWinners() > 1) {
@@ -560,7 +599,10 @@ class ContestConfig {
           "batchElimination can't be true when winnerElectionMode is multiSeatBottomsUp!");
     }
 
-    checkStringToIntWithBoundaries(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, null, false);
+    if (!checkStringToIntWithBoundaries(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, null,
+        false)) {
+      isValid = false;
+    }
 
     if (!isNullOrBlank(getOvervoteLabel()) && stringAlreadyInUseElsewhere(getOvervoteLabel(),
         "overvoteLabel")) {

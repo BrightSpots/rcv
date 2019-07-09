@@ -153,6 +153,16 @@ public class RawContestConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
+
+    public Candidate() {
+    }
+
+    public Candidate(String name, String code, boolean excluded) {
+      this.name = name;
+      this.code = code;
+      this.excluded = excluded;
+    }
+
     // full candidate name
     private String name;
     // candidate ID
