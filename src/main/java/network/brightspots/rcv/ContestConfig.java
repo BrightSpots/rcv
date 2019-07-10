@@ -192,7 +192,7 @@ class ContestConfig {
         value, fieldName, lowerBoundary, upperBoundary, isRequired, null);
   }
 
-  // Returns true if string can't be converted to a long int or isn't within supplied boundaries
+  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
   private static boolean fieldOutOfRangeOrNotInteger(
       String value,
       String fieldName,
