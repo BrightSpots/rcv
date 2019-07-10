@@ -116,7 +116,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
       "randomSeed" required when tiebreakMode is random, previousRoundCountsThenRandom, or generatePermutation
         the integer seed for the application's pseudorandom number generator
-        value: [0..2147483647]
+        value: [-140737488355328..140737488355327]
 
       "tiebreakMode" required
         how the program should decide which candidate to eliminate when multiple candidates are tied for last place
@@ -126,17 +126,18 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
           3) at least two of those candidates are tied for the highest vote total in that round
         value: "random" | "interactive" | "previousRoundCountsThenRandom" | "previousRoundCountsThenInteractive" | "usePermutationInConfig" | "generatePermutation"
 
-        we use Java 12 java.util.random for randomness in our tiebreak implementations
-        See https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/util/Random.html
+        we use java.util.random for randomness in our tiebreak implementations
+        see: https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/util/Random.html
+        compatible methods exist for other languages, e.g. https://pypi.org/project/java-random/
+        on tabulation start a java.util.Random object is created if required using the randomSeed value specified in the input config file:
+          Random random = new Random(config.getRandomSeed());
 
         "random"
-          on config load a java.util.Random object is created using the randomSeed value specified in the input config file:
-          random = new Random(randomSeed);
           during tabulation, in the event of a tie at the end of a round:
           the list of tied candidates is sorted alphabetically
-          a randomDouble is created using the random object:
+          a randomDouble is generated using the random object:
             double randomDouble = random.nextDouble();
-            the randomDouble is mapped to one of the tied candidates in the list:
+          the randomDouble is mapped to one of the tied candidates in the list:
             int randomCandidateIndex = (int) Math.floor(randomDouble * (double) tiedCandidates.size());
           the selected candidate will be the winner or loser for that round
 
@@ -159,9 +160,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
         "generatePermutation"
           on config load candidate names are sorted alphabetically by candidate code, or if code is not present, candidate name
-          a randomly ordered candidate permutation is created with:
-          java.util.Collections.shuffle(sortedCandidateNames, new java.util.Random(randomSeed))
-          where randomSeed is specified in the input config file
+          a randomly ordered candidate permutation is created using Collections.shuffle() with the randomSeed specified in the input config file
           during tabulation, in the event of a tie at the end of a round, this permutation is consulted
           if selecting a winner: the tied candidate in this round who appears earliest is selected
           if selecting a loser: the tied candidate who appears latest is selected
@@ -172,16 +171,12 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
       "winnerElectionMode" required
         whether the program should apply a special process for selecting the winner(s)
+        value: "standard" | "singleSeatContinueUntilTwoCandidatesRemain" | "multiSeatAllowOnlyOneWinnerPerRound" | "multiSeatBottomsUp" | "multiSeatSequentialWinnerTakesAll"
         "standard": no special process
         "singleSeatContinueUntilTwoCandidatesRemain": keep tabulating after the winning round until only two candidates remain (only valid when numberOfWinners = 1)
         "multiSeatAllowOnlyOneWinnerPerRound": elect no more than one winner per round, even when there are multiple candidates exceeding the winning threshold (only valid when numberOfWinners > 1)
         "multiSeatBottomsUp": instead of running a standard multi-seat contest with single transferable votes, just eliminate candidates until there are numWinners remaining, then stop (only valid when numberOfWinners > 1)
         "multiSeatSequentialWinnerTakesAll": instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats (only valid when numberOfWinners > 1)
-        value: "standard" | "singleSeatContinueUntilTwoCandidatesRemain" | "multiSeatAllowOnlyOneWinnerPerRound" | "multiSeatBottomsUp" | "multiSeatSequentialWinnerTakesAll"
-
-      "randomSeed" required when tiebreakMode is random, previousRoundCountsThenRandom, or generatePermutation
-        the integer seed for the application's pseudorandom number generator
-        value: [0..2147483647]
 
       "numberOfWinners" required
         the number of seats to be won in this contest
