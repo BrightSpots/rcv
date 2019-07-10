@@ -1,13 +1,5 @@
 # Universal RCV Tabulator
 
-## Dependencies
-
-#### Java
-[JDK 11+](https://jdk.java.net/) (OpenJDK recommended)
-
-#### Other Dependencies
-See the `dependencies` entry in the [Gradle build file](build.gradle). Gradle should be used to automatically download these libraries.
-
 ## Overview
 
 The Universal RCV Tabulator is a free, open-source application designed to quickly and accurately tabulate a wide variety of ranked choice voting (RCV) elections. It allows users to:
@@ -30,7 +22,7 @@ The Tabulator produces the following as output:
 
 #### Method 1 (Easy): Pre-Compiled Version
 
-1. Download the pre-compiled Tabulator for your OS from the Ranked Choice Voting Resource Center's Google Drive [here](https://drive.google.com/drive/u/1/folders/1vYYJa5-oJe0lpaVnI_ELn9foZIVZ54pL).
+1. Download the pre-compiled Tabulator for your OS from the GitHub [releases page](https://github.com/BrightSpots/rcv/releases).
 
     **Note**: this download should be a "jlink image", which means you don't even need to have Java installed on your machine to run it!
 

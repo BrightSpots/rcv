@@ -347,42 +347,12 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private boolean cvrSourceHasRequiredFields(CVRSource source) {
-    boolean hasRequiredFields = true;
-    if (source.getFilePath().isBlank()) {
-      hasRequiredFields = false;
-      Logger.log(Level.WARNING, "filePath is required!");
-    }
-    if (!ContestConfig.isCdf(source)) {
-      String colIndex = source.getFirstVoteColumnIndex();
-      if (!Utils.isInt(colIndex) || Integer.parseInt(colIndex) < ContestConfig.MIN_COLUMN_INDEX
-          || Integer.parseInt(colIndex) > ContestConfig.MAX_COLUMN_INDEX) {
-        hasRequiredFields = false;
-        Logger.log(Level.WARNING,
-            "firstVoteColumnIndex must be an integer from %d to %d for non-CDF files!",
-            ContestConfig.MIN_COLUMN_INDEX, ContestConfig.MAX_COLUMN_INDEX);
-      }
-      String rowIndex = source.getFirstVoteRowIndex();
-      if (!Utils.isInt(rowIndex)
-          || Integer.parseInt(rowIndex) < ContestConfig.MIN_ROW_INDEX
-          || Integer.parseInt(rowIndex) > ContestConfig.MAX_ROW_INDEX) {
-        hasRequiredFields = false;
-        Logger.log(
-            Level.WARNING,
-            "firstVoteRowIndex must be an integer from %d to %d for non-CDF files!",
-            ContestConfig.MIN_ROW_INDEX,
-            ContestConfig.MAX_ROW_INDEX);
-      }
-    }
-    return hasRequiredFields;
-  }
-
   public void buttonAddCvrFileClicked() {
     CVRSource cvrSource = new CVRSource(getTextOrEmptyString(textFieldCvrFilePath),
         getTextOrEmptyString(textFieldCvrFirstVoteCol),
         getTextOrEmptyString(textFieldCvrFirstVoteRow), getTextOrEmptyString(textFieldCvrIdCol),
         getTextOrEmptyString(textFieldCvrPrecinctCol), getTextOrEmptyString(textFieldCvrProvider));
-    if (cvrSourceHasRequiredFields(cvrSource)) {
+    if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
@@ -400,80 +370,45 @@ public class GuiConfigController implements Initializable {
   }
 
   public void changeCvrFilePath(CellEditEvent cellEditEvent) {
-    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    // Cache the original value to revert back to in case the change fails
-    String oldFilePath = cvrSelected.getFilePath();
-    cvrSelected.setFilePath(cellEditEvent.getNewValue().toString().trim());
-    if (!cvrSourceHasRequiredFields(cvrSelected)) {
-      cvrSelected.setFilePath(oldFilePath);
-    }
+    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+        .setFilePath(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
-    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    // Cache the original value to revert back to in case the change fails
-    String oldFirstVoteCol = cvrSelected.getFirstVoteColumnIndex();
-    cvrSelected.setFirstVoteColumnIndex(cellEditEvent.getNewValue().toString().trim());
-    if (!cvrSourceHasRequiredFields(cvrSelected)) {
-      cvrSelected.setFirstVoteColumnIndex(oldFirstVoteCol);
-    }
+    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+        .setFirstVoteColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
-    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    // Cache the original value to revert back to in case the change fails
-    String oldFirstVoteRow = cvrSelected.getFirstVoteRowIndex();
-    cvrSelected.setFirstVoteRowIndex(cellEditEvent.getNewValue().toString().trim());
-    if (!cvrSourceHasRequiredFields(cvrSelected)) {
-      cvrSelected.setFirstVoteRowIndex(oldFirstVoteRow);
-    }
+    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+        .setFirstVoteRowIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
-    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    // Cache the original value to revert back to in case the change fails
-    String oldIdColIndex = cvrSelected.getIdColumnIndex();
-    cvrSelected.setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
-    if (!cvrSourceHasRequiredFields(cvrSelected)) {
-      cvrSelected.setIdColumnIndex(oldIdColIndex);
-    }
+    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+        .setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
-    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    // Cache the original value to revert back to in case the change fails
-    String oldPrecinctColIndex = cvrSelected.getPrecinctColumnIndex();
-    cvrSelected.setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
-    if (!cvrSourceHasRequiredFields(cvrSelected)) {
-      cvrSelected.setPrecinctColumnIndex(oldPrecinctColIndex);
-    }
+    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+        .setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
-    CVRSource cvrSelected = tableViewCvrFiles.getSelectionModel().getSelectedItem();
-    // Cache the original value to revert back to in case the change fails
-    String oldProvider = cvrSelected.getProvider();
-    cvrSelected.setProvider(cellEditEvent.getNewValue().toString().trim());
-    if (!cvrSourceHasRequiredFields(cvrSelected)) {
-      cvrSelected.setProvider(oldProvider);
-    }
+    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+        .setProvider(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
   public void buttonAddCandidateClicked() {
-    Candidate candidate = new Candidate();
-    String candidateName = getTextOrEmptyString(textFieldCandidateName);
-    if (candidateName.isBlank()) {
-      Logger.log(Level.WARNING, "Candidate name is required!");
-    } else {
-      candidate.setName(candidateName);
-      candidate.setCode(getTextOrEmptyString(textFieldCandidateCode));
-      candidate.setExcluded(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+    Candidate candidate = new Candidate(getTextOrEmptyString(textFieldCandidateName),
+        getTextOrEmptyString(textFieldCandidateCode), ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+    if (ContestConfig.passesBasicCandidateValidation(candidate)) {
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
       textFieldCandidateCode.clear();
@@ -487,12 +422,8 @@ public class GuiConfigController implements Initializable {
   }
 
   public void changeCandidateName(CellEditEvent cellEditEvent) {
-    String candidateName = cellEditEvent.getNewValue().toString().trim();
-    if (candidateName.isBlank()) {
-      Logger.log(Level.WARNING, "Candidate name is required!");
-    } else {
-      tableViewCandidates.getSelectionModel().getSelectedItem().setName(candidateName);
-    }
+    tableViewCandidates.getSelectionModel().getSelectedItem()
+        .setName(cellEditEvent.getNewValue().toString().trim());
     tableViewCandidates.refresh();
   }
 
