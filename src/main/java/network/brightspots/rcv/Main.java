@@ -30,7 +30,7 @@ import java.util.logging.Level;
 public class Main extends GuiApplication {
 
   public static final String APP_NAME = "Universal RCV Tabulator";
-  public static final String APP_VERSION = "0.1.0";
+  public static final String APP_VERSION = "0.1.1";
 
   // function: main
   // purpose: main entry point to the rcv tabulator program
