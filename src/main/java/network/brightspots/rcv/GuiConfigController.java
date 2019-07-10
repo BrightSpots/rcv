@@ -352,7 +352,7 @@ public class GuiConfigController implements Initializable {
         getTextOrEmptyString(textFieldCvrFirstVoteCol),
         getTextOrEmptyString(textFieldCvrFirstVoteRow), getTextOrEmptyString(textFieldCvrIdCol),
         getTextOrEmptyString(textFieldCvrPrecinctCol), getTextOrEmptyString(textFieldCvrProvider));
-    if (ContestConfig.isCvrSourceValid(cvrSource)) {
+    if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
@@ -408,7 +408,7 @@ public class GuiConfigController implements Initializable {
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate(getTextOrEmptyString(textFieldCandidateName),
         getTextOrEmptyString(textFieldCandidateCode), ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
-    if (ContestConfig.isCandidateValid(candidate)) {
+    if (ContestConfig.passesBasicCandidateValidation(candidate)) {
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
       textFieldCandidateCode.clear();

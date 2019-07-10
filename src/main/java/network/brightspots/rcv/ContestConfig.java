@@ -224,7 +224,7 @@ class ContestConfig {
     return isValid;
   }
 
-  private static void logWithLocation(String message, String inputLocation) {
+  private static void logErrorWithLocation(String message, String inputLocation) {
     message += inputLocation == null ? "!" : ": " + inputLocation;
     Logger.log(Level.SEVERE, message);
   }
@@ -252,7 +252,7 @@ class ContestConfig {
     if (isNullOrBlank(value)) {
       if (isRequired) {
         stringValid = false;
-        logWithLocation(message, inputLocation);
+        logErrorWithLocation(message, inputLocation);
       }
     } else {
       try {
@@ -262,14 +262,14 @@ class ContestConfig {
             message += " if supplied";
           }
           stringValid = false;
-          logWithLocation(message, inputLocation);
+          logErrorWithLocation(message, inputLocation);
         }
       } catch (NumberFormatException e) {
         if (!isRequired) {
           message += " if supplied";
         }
         stringValid = false;
-        logWithLocation(message, inputLocation);
+        logErrorWithLocation(message, inputLocation);
       }
     }
     return !stringValid;
@@ -300,7 +300,7 @@ class ContestConfig {
     }
   }
 
-  static boolean isCvrSourceValid(CVRSource source) {
+  static boolean passesBasicCvrSourceValidation(CVRSource source) {
     boolean sourceValid = true;
     // perform checks on source input path
     if (isNullOrBlank(source.getFilePath())) {
@@ -335,7 +335,7 @@ class ContestConfig {
     return sourceValid;
   }
 
-  static boolean isCandidateValid(Candidate candidate) {
+  static boolean passesBasicCandidateValidation(Candidate candidate) {
     boolean candidateValid = true;
     if (isNullOrBlank(candidate.getName())) {
       candidateValid = false;
@@ -393,7 +393,7 @@ class ContestConfig {
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CVRSource source : rawConfig.cvrFileSources) {
-        if (!isCvrSourceValid(source)) {
+        if (!passesBasicCvrSourceValidation(source)) {
           isValid = false;
         }
 
@@ -445,7 +445,7 @@ class ContestConfig {
     Set<String> candidateCodeSet = new HashSet<>();
 
     for (Candidate candidate : rawConfig.candidates) {
-      if (!isCandidateValid(candidate)) {
+      if (!passesBasicCandidateValidation(candidate)) {
         isValid = false;
       }
 

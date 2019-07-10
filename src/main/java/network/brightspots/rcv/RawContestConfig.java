@@ -88,8 +88,13 @@ public class RawContestConfig {
     public CVRSource() {
     }
 
-    public CVRSource(String filePath, String firstVoteColumnIndex, String firstVoteRowIndex,
-        String idColumnIndex, String precinctColumnIndex, String provider) {
+    public CVRSource(
+        String filePath,
+        String firstVoteColumnIndex,
+        String firstVoteRowIndex,
+        String idColumnIndex,
+        String precinctColumnIndex,
+        String provider) {
       this.filePath = filePath;
       this.firstVoteColumnIndex = firstVoteColumnIndex;
       this.firstVoteRowIndex = firstVoteRowIndex;
@@ -153,6 +158,11 @@ public class RawContestConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
+    // full candidate name
+    private String name;
+    // candidate ID
+    private String code;
+    private boolean excluded;
 
     public Candidate() {
     }
@@ -162,12 +172,6 @@ public class RawContestConfig {
       this.code = code;
       this.excluded = excluded;
     }
-
-    // full candidate name
-    private String name;
-    // candidate ID
-    private String code;
-    private boolean excluded;
 
     public String getName() {
       return name;
