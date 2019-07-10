@@ -151,9 +151,10 @@ class ContestConfig {
   }
 
   static boolean isCdf(CVRSource source) {
-    return source.getProvider() != null && source.getProvider().toUpperCase().equals(CDF_PROVIDER)
-        && source.getFilePath() != null && source.getFilePath().toLowerCase()
-        .endsWith(JSON_EXTENSION);
+    return source.getProvider() != null
+        && source.getProvider().toUpperCase().equals(CDF_PROVIDER)
+        && source.getFilePath() != null
+        && source.getFilePath().toLowerCase().endsWith(JSON_EXTENSION);
   }
 
   // function: stringMatchesAnotherFieldValue(
@@ -177,6 +178,123 @@ class ContestConfig {
       }
     }
     return match;
+  }
+
+  private static void logErrorWithLocation(String message, String inputLocation) {
+    message += inputLocation == null ? "!" : ": " + inputLocation;
+    Logger.log(Level.SEVERE, message);
+  }
+
+  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
+  private static boolean fieldOutOfRangeOrNotInteger(
+      String value, String fieldName, long lowerBoundary, long upperBoundary, boolean isRequired) {
+    return fieldOutOfRangeOrNotInteger(
+        value, fieldName, lowerBoundary, upperBoundary, isRequired, null);
+  }
+
+  // Returns true if string can't be converted to a long int or isn't within supplied boundaries
+  private static boolean fieldOutOfRangeOrNotInteger(
+      String value,
+      String fieldName,
+      long lowerBoundary,
+      long upperBoundary,
+      boolean isRequired,
+      String inputLocation) {
+    // "integer" in the mathematical sense, not the Java sense
+    String message = String.format("%s must be an integer", fieldName);
+    if (lowerBoundary == upperBoundary) {
+      message += String.format(" equal to %d", lowerBoundary);
+    } else {
+      message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
+    }
+    boolean stringValid = true;
+    if (isNullOrBlank(value)) {
+      if (isRequired) {
+        stringValid = false;
+        logErrorWithLocation(message, inputLocation);
+      }
+    } else {
+      try {
+        long stringLong = Long.parseLong(value);
+        if (stringLong < lowerBoundary || stringLong > upperBoundary) {
+          if (!isRequired) {
+            message += " if supplied";
+          }
+          stringValid = false;
+          logErrorWithLocation(message, inputLocation);
+        }
+      } catch (NumberFormatException e) {
+        if (!isRequired) {
+          message += " if supplied";
+        }
+        stringValid = false;
+        logErrorWithLocation(message, inputLocation);
+      }
+    }
+    return !stringValid;
+  }
+
+  static boolean passesBasicCvrSourceValidation(CVRSource source) {
+    boolean sourceValid = true;
+    // perform checks on source input path
+    if (isNullOrBlank(source.getFilePath())) {
+      sourceValid = false;
+      Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
+    } else {
+      // ensure valid first vote column value
+      if (fieldOutOfRangeOrNotInteger(
+          source.getFirstVoteColumnIndex(),
+          "firstVoteColumnIndex",
+          MIN_COLUMN_INDEX,
+          MAX_COLUMN_INDEX,
+          !isCdf(source),
+          source.getFilePath())) {
+        sourceValid = false;
+      }
+
+      // ensure valid first vote row value
+      if (fieldOutOfRangeOrNotInteger(
+          source.getFirstVoteRowIndex(),
+          "firstVoteRowIndex",
+          MIN_ROW_INDEX,
+          MAX_ROW_INDEX,
+          !isCdf(source),
+          source.getFilePath())) {
+        sourceValid = false;
+      }
+
+      // ensure valid id column value
+      if (fieldOutOfRangeOrNotInteger(
+          source.getIdColumnIndex(),
+          "idColumnIndex",
+          MIN_COLUMN_INDEX,
+          MAX_COLUMN_INDEX,
+          false,
+          source.getFilePath())) {
+        sourceValid = false;
+      }
+
+      // ensure valid precinct column value
+      if (fieldOutOfRangeOrNotInteger(
+          source.getPrecinctColumnIndex(),
+          "precinctColumnIndex",
+          MIN_COLUMN_INDEX,
+          MAX_COLUMN_INDEX,
+          false,
+          source.getFilePath())) {
+        sourceValid = false;
+      }
+    }
+    return sourceValid;
+  }
+
+  static boolean passesBasicCandidateValidation(Candidate candidate) {
+    boolean candidateValid = true;
+    if (isNullOrBlank(candidate.getName())) {
+      candidateValid = false;
+      Logger.log(Level.SEVERE, "A name is required for each candidate!");
+    }
+    return candidateValid;
   }
 
   // function: resolveConfigPath
@@ -225,104 +343,6 @@ class ContestConfig {
     return isValid;
   }
 
-  private static void logErrorWithLocation(String message, String inputLocation) {
-    message += inputLocation == null ? "!" : ": " + inputLocation;
-    Logger.log(Level.SEVERE, message);
-  }
-
-  // Returns true if field value can't be converted to an int or isn't within supplied boundaries
-  private static boolean fieldOutOfRangeOrNotInt(String value, String fieldName,
-      Integer lowerBoundary, Integer upperBoundary, boolean isRequired) {
-    return fieldOutOfRangeOrNotInt(value, fieldName, lowerBoundary, upperBoundary,
-        isRequired,
-        null);
-  }
-
-  // Returns true if field value can't be converted to an int or isn't within supplied boundaries
-  private static boolean fieldOutOfRangeOrNotInt(String value, String fieldName,
-      Integer lowerBoundary, Integer upperBoundary, boolean isRequired, String inputLocation) {
-    lowerBoundary = lowerBoundary != null ? lowerBoundary : Integer.MIN_VALUE;
-    upperBoundary = upperBoundary != null ? upperBoundary : Integer.MAX_VALUE;
-    // "integer" in the mathematical sense, not the Java sense
-    String message = String.format("%s must be an integer", fieldName);
-    if (lowerBoundary.equals(upperBoundary)) {
-      message += String.format(" equal to %d", lowerBoundary);
-    } else {
-      message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
-    }
-    boolean stringValid = true;
-    if (isNullOrBlank(value)) {
-      if (isRequired) {
-        stringValid = false;
-        logErrorWithLocation(message, inputLocation);
-      }
-    } else {
-      try {
-        int stringInt = Integer.parseInt(value);
-        if (stringInt < lowerBoundary || stringInt > upperBoundary) {
-          if (!isRequired) {
-            message += " if supplied";
-          }
-          stringValid = false;
-          logErrorWithLocation(message, inputLocation);
-        }
-      } catch (NumberFormatException e) {
-        if (!isRequired) {
-          message += " if supplied";
-        }
-        stringValid = false;
-        logErrorWithLocation(message, inputLocation);
-      }
-    }
-    return !stringValid;
-  }
-
-  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
-  private static boolean fieldOutOfRangeOrNotLong(String value, String fieldName,
-      Long lowerBoundary, Long upperBoundary, boolean isRequired) {
-    return fieldOutOfRangeOrNotLong(value, fieldName, lowerBoundary, upperBoundary, isRequired,
-        null);
-  }
-
-  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
-  private static boolean fieldOutOfRangeOrNotLong(String value, String fieldName,
-      Long lowerBoundary, Long upperBoundary, boolean isRequired, String inputLocation) {
-    lowerBoundary = lowerBoundary != null ? lowerBoundary : Long.MIN_VALUE;
-    upperBoundary = upperBoundary != null ? upperBoundary : Long.MAX_VALUE;
-    // "integer" in the mathematical sense, not the Java sense
-    String message = String.format("%s must be an integer", fieldName);
-    if (lowerBoundary.equals(upperBoundary)) {
-      message += String.format(" equal to %d", lowerBoundary);
-    } else {
-      message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
-    }
-    boolean stringValid = true;
-    if (isNullOrBlank(value)) {
-      if (isRequired) {
-        stringValid = false;
-        logErrorWithLocation(message, inputLocation);
-      }
-    } else {
-      try {
-        long stringLong = Long.parseLong(value);
-        if (stringLong < lowerBoundary || stringLong > upperBoundary) {
-          if (!isRequired) {
-            message += " if supplied";
-          }
-          stringValid = false;
-          logErrorWithLocation(message, inputLocation);
-        }
-      } catch (NumberFormatException e) {
-        if (!isRequired) {
-          message += " if supplied";
-        }
-        stringValid = false;
-        logErrorWithLocation(message, inputLocation);
-      }
-    }
-    return !stringValid;
-  }
-
   // version validation and migration logic goes here
   // e.g. unsupported versions would fail or be migrated
   // in this release we support only the current app version
@@ -348,50 +368,6 @@ class ContestConfig {
     }
   }
 
-  static boolean passesBasicCvrSourceValidation(CVRSource source) {
-    boolean sourceValid = true;
-    // perform checks on source input path
-    if (isNullOrBlank(source.getFilePath())) {
-      sourceValid = false;
-      Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
-    } else {
-      // ensure valid first vote column value
-      if (fieldOutOfRangeOrNotInt(source.getFirstVoteColumnIndex(), "firstVoteColumnIndex",
-          MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, !isCdf(source), source.getFilePath())) {
-        sourceValid = false;
-      }
-
-      // ensure valid first vote row value
-      if (fieldOutOfRangeOrNotInt(source.getFirstVoteRowIndex(), "firstVoteRowIndex",
-          MIN_ROW_INDEX, MAX_ROW_INDEX, !isCdf(source), source.getFilePath())) {
-        sourceValid = false;
-      }
-
-      // ensure valid id column value
-      if (fieldOutOfRangeOrNotInt(source.getIdColumnIndex(), "idColumnIndex",
-          MIN_COLUMN_INDEX, MAX_COLUMN_INDEX, false, source.getFilePath())) {
-        sourceValid = false;
-      }
-
-      // ensure valid precinct column value
-      if (fieldOutOfRangeOrNotInt(
-          source.getPrecinctColumnIndex(), "precinctColumnIndex", MIN_COLUMN_INDEX,
-          MAX_COLUMN_INDEX, false, source.getFilePath())) {
-        sourceValid = false;
-      }
-    }
-    return sourceValid;
-  }
-
-  static boolean passesBasicCandidateValidation(Candidate candidate) {
-    boolean candidateValid = true;
-    if (isNullOrBlank(candidate.getName())) {
-      candidateValid = false;
-      Logger.log(Level.SEVERE, "A name is required for each candidate!");
-    }
-    return candidateValid;
-  }
-
   // function: stringAlreadyInUseElsewhere
   // purpose: Checks to make sure string isn't reserved or used by other fields
   // param: string string to check
@@ -401,16 +377,18 @@ class ContestConfig {
     for (String reservedString : TallyTransfers.RESERVED_STRINGS) {
       if (string.equalsIgnoreCase(reservedString)) {
         inUse = true;
-        Logger.log(Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", string,
-            field);
+        Logger.log(
+            Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", string, field);
         break;
       }
     }
     if (!inUse) {
-      inUse = stringMatchesAnotherFieldValue(string, field, getOvervoteLabel(), "overvoteLabel")
-          || stringMatchesAnotherFieldValue(string, field, getUndervoteLabel(), "undervoteLabel")
-          || stringMatchesAnotherFieldValue(string, field, getUndeclaredWriteInLabel(),
-          "undeclaredWriteInLabel");
+      inUse =
+          stringMatchesAnotherFieldValue(string, field, getOvervoteLabel(), "overvoteLabel")
+              || stringMatchesAnotherFieldValue(
+              string, field, getUndervoteLabel(), "undervoteLabel")
+              || stringMatchesAnotherFieldValue(
+              string, field, getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
     }
     return inUse;
   }
@@ -498,8 +476,7 @@ class ContestConfig {
       }
 
       if (!isNullOrBlank(candidate.getName())) {
-        if (candidateStringAlreadyInUseElsewhere(
-            candidate.getName(), "name", candidateNameSet)) {
+        if (candidateStringAlreadyInUseElsewhere(candidate.getName(), "name", candidateNameSet)) {
           isValid = false;
         } else {
           candidateNameSet.add(candidate.getName());
@@ -543,8 +520,8 @@ class ContestConfig {
           Level.SEVERE,
           "When tiebreakMode involves a random element, randomSeed must be supplied.");
     }
-    if (fieldOutOfRangeOrNotLong(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, MAX_RANDOM_SEED,
-        false)) {
+    if (fieldOutOfRangeOrNotInteger(
+        getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, MAX_RANDOM_SEED, false)) {
       isValid = false;
     }
 
@@ -566,13 +543,16 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "Invalid winnerElectionMode!");
     }
 
-    if (getMaxRankingsAllowed() == null || (getNumDeclaredCandidates() >= 1
+    if (getMaxRankingsAllowed() == null
+        || (getNumDeclaredCandidates() >= 1
         && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
       isValid = false;
       Logger.log(
           Level.SEVERE,
           "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
-          MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION, MIN_MAX_RANKINGS_ALLOWED, Integer.MAX_VALUE);
+          MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION,
+          MIN_MAX_RANKINGS_ALLOWED,
+          Integer.MAX_VALUE);
     }
 
     if (getMaxSkippedRanksAllowed() == null
@@ -581,24 +561,35 @@ class ContestConfig {
       Logger.log(
           Level.SEVERE,
           "maxSkippedRanksAllowed must either be \"%s\" or an integer from %d to %d!",
-          MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION, MIN_MAX_SKIPPED_RANKS_ALLOWED,
+          MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION,
+          MIN_MAX_SKIPPED_RANKS_ALLOWED,
           Integer.MAX_VALUE);
     }
 
-    if (fieldOutOfRangeOrNotInt(getNumberOfWinnersRaw(), "numberOfWinners",
-        MIN_NUMBER_OF_WINNERS, getNumDeclaredCandidates() < 1 ? null : getNumDeclaredCandidates(),
+    if (fieldOutOfRangeOrNotInteger(
+        getNumberOfWinnersRaw(),
+        "numberOfWinners",
+        MIN_NUMBER_OF_WINNERS,
+        getNumDeclaredCandidates() < 1 ? Integer.MAX_VALUE : getNumDeclaredCandidates(),
         true)) {
       isValid = false;
     }
 
-    if (fieldOutOfRangeOrNotInt(getDecimalPlacesForVoteArithmeticRaw(),
+    if (fieldOutOfRangeOrNotInteger(
+        getDecimalPlacesForVoteArithmeticRaw(),
         "decimalPlacesForVoteArithmetic",
-        MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC, true)) {
+        MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC,
+        MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC,
+        true)) {
       isValid = false;
     }
 
-    if (fieldOutOfRangeOrNotInt(getMinimumVoteThresholdRaw(), "minimumVoteThreshold",
-        MIN_MINIMUM_VOTE_THRESHOLD, MAX_MINIMUM_VOTE_THRESHOLD, true)) {
+    if (fieldOutOfRangeOrNotInteger(
+        getMinimumVoteThresholdRaw(),
+        "minimumVoteThreshold",
+        MIN_MINIMUM_VOTE_THRESHOLD,
+        MAX_MINIMUM_VOTE_THRESHOLD,
+        true)) {
       isValid = false;
     }
 
@@ -621,8 +612,8 @@ class ContestConfig {
         isValid = false;
         Logger.log(
             Level.SEVERE,
-            "winnerElectionMode can't be multiSeatSequentialWinnerTakesAll in a single-seat " +
-                "contest!");
+            "winnerElectionMode can't be multiSeatSequentialWinnerTakesAll in a single-seat "
+                + "contest!");
       } else if (isMultiSeatBottomsUpEnabled()) {
         isValid = false;
         Logger.log(
@@ -649,12 +640,12 @@ class ContestConfig {
           "batchElimination can't be true when winnerElectionMode is multiSeatBottomsUp!");
     }
 
-    if (!isNullOrBlank(getOvervoteLabel()) && stringAlreadyInUseElsewhere(getOvervoteLabel(),
-        "overvoteLabel")) {
+    if (!isNullOrBlank(getOvervoteLabel())
+        && stringAlreadyInUseElsewhere(getOvervoteLabel(), "overvoteLabel")) {
       isValid = false;
     }
-    if (!isNullOrBlank(getUndervoteLabel()) && stringAlreadyInUseElsewhere(getUndervoteLabel(),
-        "undervoteLabel")) {
+    if (!isNullOrBlank(getUndervoteLabel())
+        && stringAlreadyInUseElsewhere(getUndervoteLabel(), "undervoteLabel")) {
       isValid = false;
     }
     if (!isNullOrBlank(getUndeclaredWriteInLabel())
@@ -940,9 +931,9 @@ class ContestConfig {
   }
 
   boolean needsRandomSeed() {
-    return getTiebreakMode() == TieBreakMode.RANDOM ||
-        getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM ||
-        getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION;
+    return getTiebreakMode() == TieBreakMode.RANDOM
+        || getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
+        || getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION;
   }
 
   // function: isTreatBlankAsUndeclaredWriteInEnabled
