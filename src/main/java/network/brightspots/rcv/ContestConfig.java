@@ -243,6 +243,7 @@ class ContestConfig {
       Integer lowerBoundary, Integer upperBoundary, boolean isRequired, String inputLocation) {
     lowerBoundary = lowerBoundary != null ? lowerBoundary : Integer.MIN_VALUE;
     upperBoundary = upperBoundary != null ? upperBoundary : Integer.MAX_VALUE;
+    // "integer" in the mathematical sense, not the Java sense
     String message = String.format("%s must be an integer", fieldName);
     if (lowerBoundary.equals(upperBoundary)) {
       message += String.format(" equal to %d", lowerBoundary);
@@ -276,38 +277,50 @@ class ContestConfig {
     return !stringValid;
   }
 
-  // Makes sure String input can be converted to a long, and checks that long against boundaries
-  private void checkStringToLongWithBoundaries(String input, String inputName, Long lowerBoundary,
-      Long upperBoundary, boolean isRequired) {
+  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
+  private static boolean fieldOutOfRangeOrNotLong(String value, String fieldName,
+      Long lowerBoundary, Long upperBoundary, boolean isRequired) {
+    return fieldOutOfRangeOrNotLong(value, fieldName, lowerBoundary, upperBoundary, isRequired,
+        null);
+  }
+
+  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
+  private static boolean fieldOutOfRangeOrNotLong(String value, String fieldName,
+      Long lowerBoundary, Long upperBoundary, boolean isRequired, String inputLocation) {
     lowerBoundary = lowerBoundary != null ? lowerBoundary : Long.MIN_VALUE;
     upperBoundary = upperBoundary != null ? upperBoundary : Long.MAX_VALUE;
-    // "integer" in the mathematical sense, not the computer science sense
-    String message = String.format("%s must be an integer", inputName);
+    // "integer" in the mathematical sense, not the Java sense
+    String message = String.format("%s must be an integer", fieldName);
     if (lowerBoundary.equals(upperBoundary)) {
       message += String.format(" equal to %d", lowerBoundary);
     } else {
       message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
     }
-    if (isNullOrBlank(input)) {
+    boolean stringValid = true;
+    if (isNullOrBlank(value)) {
       if (isRequired) {
-        invalidateAndLog(message, null);
+        stringValid = false;
+        logErrorWithLocation(message, inputLocation);
       }
     } else {
       try {
-        long stringLong = Long.parseLong(input);
+        long stringLong = Long.parseLong(value);
         if (stringLong < lowerBoundary || stringLong > upperBoundary) {
           if (!isRequired) {
             message += " if supplied";
           }
-          invalidateAndLog(message, null);
+          stringValid = false;
+          logErrorWithLocation(message, inputLocation);
         }
       } catch (NumberFormatException e) {
         if (!isRequired) {
           message += " if supplied";
         }
-        invalidateAndLog(message, null);
+        stringValid = false;
+        logErrorWithLocation(message, inputLocation);
       }
     }
+    return !stringValid;
   }
 
   // version validation and migration logic goes here
@@ -530,13 +543,10 @@ class ContestConfig {
           Level.SEVERE,
           "When tiebreakMode involves a random element, randomSeed must be supplied.");
     }
-    checkStringToLongWithBoundaries(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED,
-        MAX_RANDOM_SEED, false);
-    // TODO
-//    if (fieldOutOfRangeOrNotInt(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, null,
-//        false)) {
-//      isValid = false;
-//    }
+    if (fieldOutOfRangeOrNotLong(getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, MAX_RANDOM_SEED,
+        false)) {
+      isValid = false;
+    }
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
