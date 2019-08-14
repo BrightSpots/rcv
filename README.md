@@ -50,11 +50,20 @@ The Tabulator produces the following as output:
     
     `$ chmod 777 gradlew`
 
+#### Encrypting the Tabulator Directory
+For security purposes, we **strongly recommend** applying password encryption (e.g. 256-bit SHA) to the directory containing the Tabulator, config files, CVR files, and any other related files.
+
+We recommend using open-source utilities such as [7-Zip](https://www.7-zip.org/) for Windows or EncFS, gocryptfs, etc. for Linux (see [this comparison](https://nuetzlich.net/gocryptfs/comparison/)). 
+
+Mac OS has built-in encryption capability that allows users to create encrypted disk images from folders using Disk Utility (see ["Create a secure disk image"](https://support.apple.com/guide/disk-utility/create-a-disk-image-dskutl11888/mac)). 
+
 ## Configuring a Contest
 
 The GUI can be used to easily create, save, and load contest configuration files (which are in .json format). These files can also be created manually using any basic text editor, but this method isn't recommended.
 
 In either case, please reference the [config file documentation](src/main/resources/network/brightspots/rcv/config_file_documentation.txt) when configuring a contest.
+
+**Warning**: Avoid clicking in the command prompt / terminal window when starting the Tabulator GUI, as it may halt the startup process.
 
 ## Loading and Tabulating a Contest
 
@@ -93,6 +102,8 @@ Look in the console window to see where the output spreadsheet was written, e.g.
 `2019-06-25 17:19:28 PDT INFO: Generating summary spreadsheet: /rcv/test_data/2018_maine_gov_primary_dem/output/2019-06-25_17-19-28_summary.csv...`
 
 The summary spreadsheet (in .csv format), summary .json, and audit .log files are all readable using a basic text editor.
+
+**Note**: If you intend to print any of the output files, we **strongly recommend** adding headers / footers with page numbers, the file name, the date and time of printing, who is doing the printing, and any other desired information.
 
 ## Acknowledgements
 
