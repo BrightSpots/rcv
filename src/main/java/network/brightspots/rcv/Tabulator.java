@@ -63,7 +63,7 @@ class Tabulator {
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
   // map from candidate ID to the round in which they won
   private final Map<String, Integer> winnerToRound = new HashMap<>();
-  // tracks vote transfer summaries for visualizer
+  // tracks vote transfer summaries (usable by external visualizer software)
   private final TallyTransfers tallyTransfers = new TallyTransfers();
   private final Map<String, TallyTransfers> precinctTallyTransfers = new HashMap<>();
   // tracks residual surplus from multi-seat contest vote transfers
@@ -417,7 +417,7 @@ class Tabulator {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
-          || candidateToRoundEliminated.values().contains(currentRound);
+          || candidateToRoundEliminated.containsValue(currentRound);
     } else {
       // If there are more seats to fill, we should keep going, of course.
       // But also: if we've selected all the winners in a multi-seat contest, we should tabulate one
@@ -425,7 +425,7 @@ class Tabulator {
       // bottoms-up is enabled, in which case we can stop as soon as we've declared the winners.
       return numWinnersDeclared < config.getNumberOfWinners()
           || (config.getNumberOfWinners() > 1
-              && winnerToRound.values().contains(currentRound)
+          && winnerToRound.containsValue(currentRound)
               && !config.isMultiSeatBottomsUpEnabled());
     }
   }

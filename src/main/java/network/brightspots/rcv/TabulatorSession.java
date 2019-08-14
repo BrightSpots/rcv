@@ -225,7 +225,6 @@ class TabulatorSession {
     Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIDs);
     // do the tabulation
     winners = tabulator.tabulate();
-    // generate visualizer spreadsheet data
     try {
       tabulator.generateSummaryFiles(timestampString);
     } catch (IOException e) {
