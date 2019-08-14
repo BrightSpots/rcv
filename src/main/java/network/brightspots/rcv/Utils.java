@@ -17,8 +17,11 @@
 package network.brightspots.rcv;
 
 import java.util.List;
+import java.util.Map;
 
 class Utils {
+
+  private static final Map<String, String> envMap = System.getenv();
 
   static boolean isNullOrBlank(String s) {
     return s == null || s.isBlank();
@@ -52,5 +55,19 @@ class Utils {
     }
 
     return sentence;
+  }
+
+  static String getComputerName() {
+    String computerName = "[unknown]";
+    if (envMap.containsKey("COMPUTERNAME")) {
+      computerName = envMap.get("COMPUTERNAME");
+    } else if (envMap.containsKey("HOSTNAME")) {
+      computerName = envMap.get("HOSTNAME");
+    }
+    return computerName;
+  }
+
+  static String getUserName() {
+    return envMap.getOrDefault("USERNAME", "[unknown]");
   }
 }
