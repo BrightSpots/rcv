@@ -63,7 +63,7 @@ The GUI can be used to easily create, save, and load contest configuration files
 
 In either case, please reference the [config file documentation](src/main/resources/network/brightspots/rcv/config_file_documentation.txt) when configuring a contest.
 
-**Warning**: Avoid clicking in the command prompt / terminal window when starting the Tabulator GUI, as it may halt the startup process.
+**Warning**: Using shortcuts, aliases, or symbolic links to launch the Tabulator is not supported; doing so may result in unexpected behavior. Also, please avoid clicking in the command prompt / terminal window when starting the Tabulator GUI, as it may halt the startup process.
 
 ## Loading and Tabulating a Contest
 
