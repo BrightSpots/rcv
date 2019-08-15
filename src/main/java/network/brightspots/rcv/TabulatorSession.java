@@ -117,6 +117,8 @@ class TabulatorSession {
     boolean tabulationSuccess = false;
     if (config != null && config.validate() && setUpLogging(config)) {
       try {
+        Logger.log(Level.INFO, "Computer name: %s", Utils.getComputerName());
+        Logger.log(Level.INFO, "User name: %s", Utils.getUserName());
         Logger.log(Level.INFO, "Begin config file contents:");
         BufferedReader reader = new BufferedReader(new FileReader(configPath));
         String line = reader.readLine();
@@ -225,7 +227,6 @@ class TabulatorSession {
     Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIDs);
     // do the tabulation
     winners = tabulator.tabulate();
-    // generate visualizer spreadsheet data
     try {
       tabulator.generateSummaryFiles(timestampString);
     } catch (IOException e) {

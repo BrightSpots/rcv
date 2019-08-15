@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 // TallyTransfers class stores summary info on vote transfers
-// used primarily as visualizer input to help build Sankey plots
+// used primarily as input for external visualizer software to help build Sankey plots
 class TallyTransfers {
 
   static final String RESIDUAL_TARGET = "residual surplus";

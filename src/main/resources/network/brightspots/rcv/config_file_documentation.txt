@@ -13,12 +13,12 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
       "contestName" required
         the name of the contest
-        used for naming output files (visualizer and audit)
+        used for naming output files
         example: "Portland Mayoral Race 2017"
         value: text string of length [1..1000]
 
       "outputDirectory" optional
-        directory for visualizer and audit output files
+        directory for output files
         if a relative path is supplied it will be appended to the current working directory
         if an absolute path is supplied it will be used as is
         example: /Path/To/TabulatorResults
@@ -28,19 +28,16 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
       "contestDate" optional
         date of the contest
-        used for visualizer output only (not used in tabulation)
         example: "2015-11-03"
         value: text string of length [1..1000]
 
       "contestJurisdiction" optional
         text description of the jurisdiction of this contest
-        used for visualizer output only (not used in tabulation)
         example: "Portland, ME"
         value: text string of length [1..1000]
 
       "contestOffice" optional
         text description of the office being contested
-        used for visualizer output only (not used in tabulation)
         example: "Mayor"
         value: text string of length [1..1000]
 

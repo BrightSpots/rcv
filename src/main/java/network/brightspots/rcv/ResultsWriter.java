@@ -519,7 +519,7 @@ class ResultsWriter {
   }
 
   // function: addHeaderRows
-  // purpose: add arbitrary header rows and cell to the top of the visualizer spreadsheet
+  // purpose: add arbitrary header rows and cell to the top of the spreadsheet
   private void addHeaderRows(CSVPrinter csvPrinter, String precinct) throws IOException {
     csvPrinter.printRecord("Contest", config.getContestName());
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
@@ -817,7 +817,8 @@ class ResultsWriter {
   }
 
   // function: generateSummaryJson
-  // purpose: create summary json data for use in visualizer, unit tests and other tools
+  // purpose: create summary json data for use with external visualizer software, unit tests and
+  // other tools
   // param: roundTallies all tally information
   // param: tallyTransfers record of vote transfers
   // param: precinct the precinct name, if applicable
