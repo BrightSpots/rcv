@@ -133,16 +133,10 @@
                     <TextField fx:id="textFieldCvrProvider" maxWidth="250.0" prefHeight="25.0"
                       prefWidth="175.0" promptText="Provider"/>
                   </HBox>
-                  <Label
-                    text="Note: double-click existing entries below to edit and press Enter to save changes.">
-                    <padding>
-                      <Insets left="2.0"/>
-                    </padding>
-                  </Label>
                 </VBox>
                 <VBox alignment="BOTTOM_LEFT" spacing="4.0">
                   <padding>
-                    <Insets bottom="22.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets left="4.0" right="4.0" top="4.0"/>
                   </padding>
                   <Button mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add"/>
                   <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
@@ -152,16 +146,20 @@
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                 </padding>
               </HBox>
+              <Label
+                text="Note: double-click existing entries below to edit and press Enter to save changes.">
+                <padding>
+                  <Insets left="2.0"/>
+                </padding>
+              </Label>
               <TableView fx:id="tableViewCvrFiles">
                 <columns>
                   <TableColumn fx:id="tableColumnCvrFilePath" minWidth="20.0"
-                    onEditCommit="#changeCvrFilePath" prefWidth="210.0" text="File Path"/>
+                    onEditCommit="#changeCvrFilePath" prefWidth="190.0" text="File Path"/>
                   <TableColumn fx:id="tableColumnCvrFirstVoteCol" minWidth="20.0"
-                    onEditCommit="#changeCvrFirstVoteCol" prefWidth="70.0"
-                    text="First Vote&#10;Column&#10;Index"/>
+                    onEditCommit="#changeCvrFirstVoteCol" text="First Vote&#10;Column&#10;Index"/>
                   <TableColumn fx:id="tableColumnCvrFirstVoteRow" minWidth="20.0"
-                    onEditCommit="#changeCvrFirstVoteRow" prefWidth="70.0"
-                    text="First Vote&#10;Row&#10;Index"/>
+                    onEditCommit="#changeCvrFirstVoteRow" text="First Vote&#10;Row&#10;Index"/>
                   <TableColumn fx:id="tableColumnCvrIdCol" minWidth="20.0"
                     onEditCommit="#changeCvrIdColIndex" prefWidth="70.0"
                     text="ID&#10;Column&#10;Index"/>
