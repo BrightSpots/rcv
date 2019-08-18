@@ -32,25 +32,18 @@ import javafx.util.Pair;
 
 class CommonDataFormatReader {
 
-  // path of the source file
   private final String filePath;
   private final ContestConfig config;
 
-  // function: CommonDataFormatReader
-  // purpose: class constructor
-  // param: filePath source file to read
   CommonDataFormatReader(String filePath, ContestConfig config) {
     this.filePath = filePath;
     this.config = config;
   }
 
-  // function: getCandidates
-  // purpose: returns map from candidate ID to name parsed from CDF election json
+  // returns map from candidate ID to name parsed from CDF election json
   Map<String, String> getCandidates() {
-    // container for results
     Map<String, String> candidates = new HashMap<>();
     try {
-      // try to read in the file
       HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
       // top-level election is a list of election objects:
       ArrayList electionArray = (ArrayList) json.get("Election");
@@ -89,10 +82,8 @@ class CommonDataFormatReader {
     return candidates;
   }
 
-  // function: parseRankingsFromSnapshot
-  // purpose: parse a list of contest selection rankings from a NIST "Snapshot" HashMap
+  // parse a list of contest selection rankings from a NIST "Snapshot" HashMap
   private List<Pair<Integer, String>> parseRankingsFromSnapshot(HashMap snapshot) {
-    // list to contain rankings as they are parsed
     List<Pair<Integer, String>> rankings = new ArrayList<>();
     // at the top level is a list of contests each of which contains selections
     ArrayList CVRContests = (ArrayList) snapshot.get("CVRContest");
@@ -115,7 +106,6 @@ class CommonDataFormatReader {
           // and finally the rank
           Integer rank = (Integer) selectionPosition.get("Rank");
           assert rank != null && rank >= 1;
-          // create a new ranking object and save it
           rankings.add(new Pair<>(rank, selectionID));
         }
       }
@@ -123,9 +113,7 @@ class CommonDataFormatReader {
     return rankings;
   }
 
-  // function: parseCVRFile
-  // purpose: parse the given file into a List of CastVoteRecords for tabulation
-  // param: castVoteRecords existing list to append new CastVoteRecords to
+  // parse the given file into a List of CastVoteRecords for tabulation
   void parseCVRFile(List<CastVoteRecord> castVoteRecords) {
     // cvrIndex and fileName are used to generate IDs for cvrs
     int cvrIndex = 0;
@@ -140,11 +128,8 @@ class CommonDataFormatReader {
       for (Object CVR : CVRs) {
         HashMap CVRObject = (HashMap) CVR;
         String currentSnapshotID = (String) CVRObject.get("CurrentSnapshotId");
-        // get ballotID
         String ballotID = (String) CVRObject.get("BallotPrePrintedId");
-        // compute internal ballot ID
         String computedCastVoteRecordID = String.format("%s(%d)", fileName, ++cvrIndex);
-
         ArrayList CVRSnapshots = (ArrayList) CVRObject.get("CVRSnapshot");
         for (Object snapshotObject : CVRSnapshots) {
           HashMap snapshot = (HashMap) snapshotObject;
@@ -154,8 +139,6 @@ class CommonDataFormatReader {
 
           // we found the current CVR snapshot so get rankings and create a new cvr
           List<Pair<Integer, String>> rankings = parseRankingsFromSnapshot(snapshot);
-
-          // create new cast vote record
           CastVoteRecord newRecord =
               new CastVoteRecord(computedCastVoteRecordID, ballotID, null, null, rankings);
           castVoteRecords.add(newRecord);

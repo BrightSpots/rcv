@@ -15,9 +15,8 @@
  */
 
 /*
- * Purpose:
- * Internal representation of a single cast vote record including rankings ID and state (exhausted
- * or not). Conceptually this is a ballot.
+ * Internal representation of a single cast vote record, including to whom it counts over the course
+ *  of a tabulation (can be multiple candidates for a multi-winner election).
  */
 
 package network.brightspots.rcv;
@@ -63,12 +62,6 @@ class CastVoteRecord {
   // add a new entry.
   private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
 
-  // function: CastVoteRecord
-  // purpose: create a new CVR object
-  // param: computedID is our computed unique ID for this CVR
-  // param: suppliedID is the (ostensibly unique) ID from the input data
-  // param: rankings list of rank->candidateID selections parsed for this CVR
-  // param: fullCVRData list of strings containing ALL data parsed for this CVR
   CastVoteRecord(
       String computedID,
       String suppliedID,
@@ -86,23 +79,17 @@ class CastVoteRecord {
     return suppliedID != null ? suppliedID : computedID;
   }
 
-  // function: logRoundOutcome
-  // purpose: logs the outcome for this CVR for this round for auditing purposes
-  // param: outcomeType indicates what happened
-  // param: detail reflects who received the vote OR why it was exhausted/ignored
-  // param: fractionalTransferValue if someone received the vote (not exhausted/ignored)
+  // logs the outcome for this CVR for this round for auditing purposes
   void logRoundOutcome(
       int round, VoteOutcomeType outcomeType, String detail, BigDecimal fractionalTransferValue) {
 
     StringBuilder logStringBuilder = new StringBuilder();
-    // add round and ID
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
     if (!isNullOrBlank(suppliedID)) {
       logStringBuilder.append(suppliedID);
     } else {
       logStringBuilder.append(computedID);
     }
-    // add outcome type
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
@@ -114,10 +101,9 @@ class CastVoteRecord {
         logStringBuilder.append(" [transferred to] ");
       }
     }
-    // add detail: either candidate ID or more explanation for other outcomes
     logStringBuilder.append(detail);
 
-    // add fractional transfer value of the vote if it is fractional
+    // add vote value if not 1
     if (fractionalTransferValue != null && !fractionalTransferValue.equals(BigDecimal.ONE)) {
       logStringBuilder.append(" [value] ").append(fractionalTransferValue.toString());
     }
@@ -128,7 +114,6 @@ class CastVoteRecord {
       logStringBuilder.append(fullCVRData);
     }
 
-    // output with level FINE routes to audit log
     Logger.log(Level.FINE, logStringBuilder.toString());
   }
 
@@ -136,8 +121,7 @@ class CastVoteRecord {
     return cdfSnapshotData;
   }
 
-  // purpose: store info that we'll need in order to generate the CVR JSON snapshots in the Common
-  // Data Format at the end of the tabulation (if this option is enabled)
+  // store info needed to generate the CVR JSON snapshots in Common Data Format
   void logCdfSnapshotData(int round) {
     List<Pair<String, BigDecimal>> data = new LinkedList<>();
     for (Entry<String, BigDecimal> entry : winnerToFractionalValue.entrySet()) {
@@ -150,27 +134,18 @@ class CastVoteRecord {
     cdfSnapshotData.put(round, data);
   }
 
-  // function: exhaust
-  // purpose: transition the CVR into exhausted state
   void exhaust() {
     assert !isExhausted;
     isExhausted = true;
   }
 
-  // function: isExhausted
-  // purpose: getter for exhausted state
-  // returns: true if CVR is exhausted otherwise false
   boolean isExhausted() {
     return isExhausted;
   }
 
-  // function: getFractionalTransferValue
-  // purpose: getter for fractionalTransferValue
-  // the FTV for this cast vote record (by default the FTV is exactly one vote, but it
-  // could be less in a multi-winner contest if this CVR already helped elect a winner)
-  // returns: value of field
+  // fractional transfer value is one by default but can be less if this
+  // CVR already helped elect winner(s) (multi-winner contest only)
   BigDecimal getFractionalTransferValue() {
-    // remainingValue starts at one, and we subtract all the parts that are already allocated
     BigDecimal remainingValue = BigDecimal.ONE;
     for (BigDecimal allocatedValue : winnerToFractionalValue.values()) {
       remainingValue = remainingValue.subtract(allocatedValue);
@@ -178,11 +153,9 @@ class CastVoteRecord {
     return remainingValue;
   }
 
-  // function: recordCurrentRecipientAsWinner
-  // purpose: calculate and store new vote value for current (newly elected) recipient
+  // calculate and store new vote value for current (newly elected) recipient
   // param: surplusFraction fraction of this vote's current value which is now surplus and will
   // be transferred
-  // param: config used for vote math
   void recordCurrentRecipientAsWinner(BigDecimal surplusFraction, ContestConfig config) {
     // Calculate transfer amount rounding DOWN to ensure we leave more of the vote with
     // the winner. This avoids transferring more than intended which could leave the winner with
@@ -193,46 +166,28 @@ class CastVoteRecord {
     winnerToFractionalValue.put(getCurrentRecipientOfVote(), newAllocatedValue);
   }
 
-  // function: getCurrentRecipientOfVote
-  // purpose: getter for currentRecipientOfVote
-  // returns: value of field
   String getCurrentRecipientOfVote() {
     return currentRecipientOfVote;
   }
 
-  // function: setCurrentRecipientOfVote
-  // purpose: setter for currentRecipientOfVote
-  // param: new value of field
   void setCurrentRecipientOfVote(String currentRecipientOfVote) {
     this.currentRecipientOfVote = currentRecipientOfVote;
   }
 
-  // function: getPrecinct
-  // purpose: getter for precinct
-  // returns: value of field
   String getPrecinct() {
     return precinct;
   }
 
-  // function: getWinnerToFractionalValue
-  // purpose: getter for winnerToFractionalValue
-  // returns: value of field
   Map<String, BigDecimal> getWinnerToFractionalValue() {
     return winnerToFractionalValue;
   }
 
-  // function: sortRankings
-  // purpose: create a map of ranking to candidates selected at that rank
-  // param: rankings list of rankings (rank, candidateID pairs) to be sorted
+  // create a sorted map of ranking to candidates selected at that rank
   private void sortRankings(List<Pair<Integer, String>> rankings) {
     rankToCandidateIDs = new TreeMap<>();
-    // index for iterating over all rankings
     for (Pair<Integer, String> ranking : rankings) {
-      // set of candidates given this rank
       Set<String> candidatesAtRank =
           rankToCandidateIDs.computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
-      // create the new optionsAtRank and add to the sorted CVR
-      // add this option into the map
       candidatesAtRank.add(ranking.getValue());
     }
   }

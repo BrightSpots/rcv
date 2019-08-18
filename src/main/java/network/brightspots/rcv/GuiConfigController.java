@@ -859,9 +859,7 @@ public class GuiConfigController implements Initializable {
     // path to config file we will use for tabulation
     private final String configPath;
 
-    // function: TabulatorService
-    // purpose: constructor for Service object which runs a tabulation
-    // param: configPath path to config file to be tabulated
+    // constructor for Service object which runs a tabulation in the background
     TabulatorService(String configPath) {
       this.configPath = configPath;
     }
@@ -872,7 +870,6 @@ public class GuiConfigController implements Initializable {
           new Task<>() {
             @Override
             protected Void call() {
-              // create session object used for tabulation
               TabulatorSession session = new TabulatorSession(configPath);
               session.tabulate();
               return null;
