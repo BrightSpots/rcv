@@ -36,7 +36,7 @@ import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import network.brightspots.rcv.RawContestConfig.CVRSource;
+import network.brightspots.rcv.RawContestConfig.CvrSource;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
@@ -50,7 +50,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-class StreamingCVRReader {
+class StreamingCvrReader {
 
   // this indicates a missing precinct Id in output files
   private final String MISSING_PRECINCT_ID = "missing_precinct_id";
@@ -75,28 +75,27 @@ class StreamingCVRReader {
   // list of currentRankings for CVR in progress
   private LinkedList<Pair<Integer, String>> currentRankings;
   // list of raw strings for CVR in progress
-  private LinkedList<String> currentCVRData;
+  private LinkedList<String> currentCvrData;
   // supplied CVR ID for CVR in progress
   private String currentSuppliedCvrId;
   // precinct ID for CVR in progress
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
   private List<CastVoteRecord> cvrList;
-  // store precinctIDs (new IDs will be added as we parse)
-  private Set<String> precinctIDs;
+  // store precinct IDs (new IDs will be added as we parse)
+  private Set<String> precinctIds;
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
   // flag indicating data issues during parsing
   private boolean encounteredDataErrors = false;
 
-  // function: StreamingCVRReader
+  // function: StreamingCvrReader
   // purpose: class constructor
   // param: config an ContestConfig object specifying rules for interpreting CVR file data
   // param: source file to read
-  StreamingCVRReader(ContestConfig config, CVRSource source) {
+  StreamingCvrReader(ContestConfig config, CvrSource source) {
     this.config = config;
     this.excelFilePath = config.resolveConfigPath(source.getFilePath());
-    // cvrFileName for generating cvrIDs
     this.excelFileName = new File(excelFilePath).getName();
 
     // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
@@ -161,7 +160,7 @@ class StreamingCVRReader {
     // rank iterates between lastRankSeen and currentRank adding audit data and UWI rankings
     for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {
       // add data to audit log
-      currentCVRData.add("empty cell");
+      currentCvrData.add("empty cell");
       // add UWI ranking if required by settings
       if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
         // add the new ranking
@@ -170,25 +169,25 @@ class StreamingCVRReader {
     }
   }
 
-  // function: beginCVR
+  // function: beginCvr
   // purpose: prepare to begin parsing a new CVR
-  private void beginCVR() {
+  private void beginCvr() {
     // setup data structures for parsing a new CVR
     cvrIndex++;
     currentRankings = new LinkedList<>();
-    currentCVRData = new LinkedList<>();
+    currentCvrData = new LinkedList<>();
     currentSuppliedCvrId = null;
     currentPrecinct = null;
     lastRankSeen = 0;
   }
 
-  // function: endCVR
+  // function: endCvr
   // purpose: complete construction of new CVR object
-  private void endCVR() {
+  private void endCvr() {
     // handle any empty cells which may appear at the end of this row
     handleEmptyCells(config.getMaxRankingsAllowed() + 1);
     // determine what the new cvr ID will be
-    String computedCastVoteRecordID =
+    String computedCastVoteRecordId =
         String.format("%s-%d", ResultsWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
 
     // add precinct ID if needed
@@ -198,26 +197,26 @@ class StreamingCVRReader {
         Logger.log(
             Level.WARNING,
             "Precinct identifier not found for cast vote record: %s",
-            computedCastVoteRecordID);
+            computedCastVoteRecordId);
         currentPrecinct = MISSING_PRECINCT_ID;
       }
-      precinctIDs.add(currentPrecinct);
+      precinctIds.add(currentPrecinct);
     }
 
     // look for missing Cvr Id
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
       Logger.log(
-          Level.SEVERE, "Cast vote record identifier not found for: %s", computedCastVoteRecordID);
+          Level.SEVERE, "Cast vote record identifier not found for: %s", computedCastVoteRecordId);
       encounteredDataErrors = true;
     }
 
     // create new cast vote record
     CastVoteRecord newRecord =
         new CastVoteRecord(
-            computedCastVoteRecordID,
+            computedCastVoteRecordId,
             currentSuppliedCvrId,
             currentPrecinct,
-            currentCVRData,
+            currentCvrData,
             currentRankings);
     // add it to overall list
     cvrList.add(newRecord);
@@ -235,7 +234,7 @@ class StreamingCVRReader {
   private void cvrCell(int col, String cellData) {
 
     // add cell data to "full" audit string
-    currentCVRData.add(cellData);
+    currentCvrData.add(cellData);
 
     // check for a currentPrecinct string or CVR ID string
     if (precinctColumnIndex != null && col == precinctColumnIndex) {
@@ -274,18 +273,18 @@ class StreamingCVRReader {
     }
   }
 
-  // function: parseCVRFile
+  // function: parseCvrFile
   // purpose: parse the given file into a List of CastVoteRecords for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
-  void parseCVRFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIDs)
+  void parseCvrFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
       throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException,
       ParserConfigurationException, CvrDataFormatException {
 
     // cache the cvr list so it is accessible in callbacks
     cvrList = castVoteRecords;
     // cache precinctIDs set so it is accessible in callbacks
-    this.precinctIDs = precinctIDs;
+    this.precinctIds = precinctIds;
 
     // open the zip package
     OPCPackage pkg = OPCPackage.open(excelFilePath);
@@ -304,7 +303,7 @@ class StreamingCVRReader {
           @Override
           public void startRow(int i) {
             if (i >= firstVoteRowIndex) {
-              beginCVR();
+              beginCvr();
             }
           }
 
@@ -315,7 +314,7 @@ class StreamingCVRReader {
           @Override
           public void endRow(int i) {
             if (i >= firstVoteRowIndex) {
-              endCVR();
+              endCvr();
             }
           }
 

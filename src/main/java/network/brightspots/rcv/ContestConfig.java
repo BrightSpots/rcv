@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
+import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
@@ -137,7 +137,7 @@ class ContestConfig {
     return loadContestConfig(configPath, false);
   }
 
-  static boolean isCdf(CVRSource source) {
+  static boolean isCdf(CvrSource source) {
     return source.getProvider() != null
         && source.getProvider().toUpperCase().equals(CDF_PROVIDER)
         && source.getFilePath() != null
@@ -221,7 +221,7 @@ class ContestConfig {
     return !stringValid;
   }
 
-  static boolean passesBasicCvrSourceValidation(CVRSource source) {
+  static boolean passesBasicCvrSourceValidation(CvrSource source) {
     boolean sourceValid = true;
     // perform checks on source input path
     if (isNullOrBlank(source.getFilePath())) {
@@ -393,7 +393,7 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
-      for (CVRSource source : rawConfig.cvrFileSources) {
+      for (CvrSource source : rawConfig.cvrFileSources) {
         if (!passesBasicCvrSourceValidation(source)) {
           isValid = false;
         }
@@ -881,7 +881,7 @@ class ContestConfig {
   private void processCandidateData() {
     candidateCodeToNameMap = new HashMap<>();
 
-    for (RawContestConfig.CVRSource source : rawConfig.cvrFileSources) {
+    for (RawContestConfig.CvrSource source : rawConfig.cvrFileSources) {
       // for any CDF sources extract candidate names
       if (isCdf(source)) {
         String cvrPath = resolveConfigPath(source.getFilePath());

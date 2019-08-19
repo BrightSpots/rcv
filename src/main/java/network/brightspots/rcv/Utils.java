@@ -43,7 +43,7 @@ class Utils {
     if (list.size() == 1) {
       sentence = String.format("\"%s\"", list.get(0));
     } else if (list.size() == 2) {
-      // if there are only 2 candidates, don't use a comma
+      // if there are only 2 items, don't use a comma
       sentence = String.format("\"%s\" and \"%s\"", list.get(0), list.get(1));
     } else {
       StringBuilder stringBuilder = new StringBuilder();
