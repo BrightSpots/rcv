@@ -30,6 +30,7 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
+
   public String tabulatorVersion;
   public OutputSettings outputSettings;
   public List<CvrSource> cvrFileSources;
@@ -43,6 +44,7 @@ public class RawContestConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class OutputSettings {
+
     public String contestName;
     public String outputDirectory;
     public String contestDate;
@@ -58,6 +60,7 @@ public class RawContestConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
+
     private String filePath;
     private String firstVoteColumnIndex;
     private String firstVoteRowIndex;
@@ -136,6 +139,7 @@ public class RawContestConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
+
     private String name;
     private String code;
     private boolean excluded;
@@ -178,6 +182,7 @@ public class RawContestConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class ContestRules {
+
     public String tiebreakMode;
     public String overvoteRule;
     public String winnerElectionMode;

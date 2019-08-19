@@ -43,6 +43,7 @@ import network.brightspots.rcv.Tabulator.TieBreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 class ContestConfig {
+
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
