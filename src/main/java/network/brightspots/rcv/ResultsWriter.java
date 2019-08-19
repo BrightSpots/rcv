@@ -127,10 +127,10 @@ class ResultsWriter {
     Logger.log(Level.INFO, "JSON file generated successfully.");
   }
 
-  private static String generateCvrSnapshotID(String cvrID, Integer round) {
+  private static String generateCvrSnapshotId(String cvrId, Integer round) {
     return round != null && round > 0
-        ? String.format("ballot-%s-round-%d", cvrID, round)
-        : String.format("ballot-%s", cvrID);
+        ? String.format("ballot-%s-round-%d", cvrId, round)
+        : String.format("ballot-%s", cvrId);
   }
 
   private static String getCdfIdForCandidateCode(String code) {
@@ -151,11 +151,11 @@ class ResultsWriter {
   // ranks.
   // We sort by the lowest (best) rank, then alphabetically by name.
   private static List<Map.Entry<String, List<Integer>>> getCandidatesWithRanksList(
-      Map<Integer, Set<String>> rankToCandidateIDs) {
+      Map<Integer, Set<String>> rankToCandidateIds) {
     Map<String, List<Integer>> candidateIdToRanks = new HashMap<>();
     // first group the ranks by candidate
-    for (int rank : rankToCandidateIDs.keySet()) {
-      for (String candidateId : rankToCandidateIDs.get(rank)) {
+    for (int rank : rankToCandidateIds.keySet()) {
+      for (String candidateId : rankToCandidateIds.get(rank)) {
         candidateIdToRanks.computeIfAbsent(candidateId, k -> new LinkedList<>());
         candidateIdToRanks.get(candidateId).add(rank);
       }
@@ -561,7 +561,7 @@ class ResultsWriter {
     for (CastVoteRecord cvr : castVoteRecords) {
       List<Map<String, Object>> cvrSnapshots = new LinkedList<>();
       cvrSnapshots.add(generateCvrSnapshotMap(cvr, null, null));
-      String sanitizedId = sanitizeStringForOutput(cvr.getID());
+      String sanitizedId = sanitizeStringForOutput(cvr.getId());
       // copy most recent round snapshot data to subsequent rounds
       // until more snapshot data is available
       List<Pair<String, BigDecimal>> previousRoundSnapshotData = null;
@@ -582,7 +582,7 @@ class ResultsWriter {
       // create new cvr map entry
       Map<String, Object> cvrMap = new HashMap<>();
       cvrMap.put("BallotPrePrintedId", sanitizedId);
-      cvrMap.put("CurrentSnapshotId", generateCvrSnapshotID(sanitizedId, numRounds));
+      cvrMap.put("CurrentSnapshotId", generateCvrSnapshotId(sanitizedId, numRounds));
       cvrMap.put("CVRSnapshot", cvrSnapshots);
       cvrMap.put("ElectionId", CDF_ELECTION_ID);
       cvrMap.put("@type", "CVR.CVR");
@@ -601,7 +601,7 @@ class ResultsWriter {
       CastVoteRecord cvr, Integer round, List<Pair<String, BigDecimal>> currentRoundSnapshotData) {
     List<Map<String, Object>> selectionMapList = new LinkedList<>();
     List<Map.Entry<String, List<Integer>>> candidatesWithRanksList =
-        getCandidatesWithRanksList(cvr.rankToCandidateIDs);
+        getCandidatesWithRanksList(cvr.rankToCandidateIds);
 
     for (Map.Entry<String, List<Integer>> candidateWithRanks : candidatesWithRanksList) {
       String candidateCode = candidateWithRanks.getKey();
@@ -667,7 +667,7 @@ class ResultsWriter {
             entry("@type", "CVR.CVRContest"));
 
     return Map.ofEntries(
-        entry("@id", generateCvrSnapshotID(sanitizeStringForOutput(cvr.getID()), round)),
+        entry("@id", generateCvrSnapshotId(sanitizeStringForOutput(cvr.getId()), round)),
         entry("CVRContest", new Map[]{contestMap}),
         entry("Type", round != null ? "interpreted" : "original"),
         entry("@type", "CVR.CVRSnapshot"));

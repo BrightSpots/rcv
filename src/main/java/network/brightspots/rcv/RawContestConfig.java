@@ -32,7 +32,7 @@ import java.util.List;
 public class RawContestConfig {
   public String tabulatorVersion;
   public OutputSettings outputSettings;
-  public List<CVRSource> cvrFileSources;
+  public List<CvrSource> cvrFileSources;
   public List<Candidate> candidates;
   public ContestRules rules;
 
@@ -52,12 +52,12 @@ public class RawContestConfig {
     public boolean generateCdfJson;
   }
 
-  // CVRSource: encapsulates a source cast vote record file
+  // CvrSource: encapsulates a source cast vote record file
   // all indexes are 1-based
   @SuppressWarnings("unused")
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public static class CVRSource {
+  public static class CvrSource {
     private String filePath;
     private String firstVoteColumnIndex;
     private String firstVoteRowIndex;
@@ -65,10 +65,10 @@ public class RawContestConfig {
     private String precinctColumnIndex;
     private String provider;
 
-    public CVRSource() {
+    public CvrSource() {
     }
 
-    public CVRSource(
+    public CvrSource(
         String filePath,
         String firstVoteColumnIndex,
         String firstVoteRowIndex,

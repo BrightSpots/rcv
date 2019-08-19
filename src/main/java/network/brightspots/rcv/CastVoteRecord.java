@@ -39,18 +39,18 @@ import javafx.util.Pair;
 class CastVoteRecord {
 
   // computed unique ID for this CVR (source file + line number)
-  private final String computedID;
+  private final String computedId;
   // supplied unique ID for this CVR
-  private final String suppliedID;
+  private final String suppliedId;
   // which precinct this ballot came from
   private final String precinct;
   // container for ALL CVR data parsed from the source CVR file
-  private final List<String> fullCVRData;
+  private final List<String> fullCvrData;
   // records winners to whom some fraction of this vote has been allocated
   private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
-  SortedMap<Integer, Set<String>> rankToCandidateIDs;
+  SortedMap<Integer, Set<String>> rankToCandidateIds;
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
@@ -63,20 +63,20 @@ class CastVoteRecord {
   private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
 
   CastVoteRecord(
-      String computedID,
-      String suppliedID,
+      String computedId,
+      String suppliedId,
       String precinct,
-      List<String> fullCVRData,
+      List<String> fullCvrData,
       List<Pair<Integer, String>> rankings) {
-    this.computedID = computedID;
-    this.suppliedID = suppliedID;
+    this.computedId = computedId;
+    this.suppliedId = suppliedId;
     this.precinct = precinct;
-    this.fullCVRData = fullCVRData;
+    this.fullCvrData = fullCvrData;
     sortRankings(rankings);
   }
 
-  String getID() {
-    return suppliedID != null ? suppliedID : computedID;
+  String getId() {
+    return suppliedId != null ? suppliedId : computedId;
   }
 
   // logs the outcome for this CVR for this round for auditing purposes
@@ -85,10 +85,10 @@ class CastVoteRecord {
 
     StringBuilder logStringBuilder = new StringBuilder();
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (!isNullOrBlank(suppliedID)) {
-      logStringBuilder.append(suppliedID);
+    if (!isNullOrBlank(suppliedId)) {
+      logStringBuilder.append(suppliedId);
     } else {
-      logStringBuilder.append(computedID);
+      logStringBuilder.append(computedId);
     }
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
@@ -111,7 +111,7 @@ class CastVoteRecord {
     // add complete data for round 1 only
     if (round == 1) {
       logStringBuilder.append(" [Raw Data] ");
-      logStringBuilder.append(fullCVRData);
+      logStringBuilder.append(fullCvrData);
     }
 
     Logger.log(Level.FINE, logStringBuilder.toString());
@@ -184,10 +184,10 @@ class CastVoteRecord {
 
   // create a sorted map of ranking to candidates selected at that rank
   private void sortRankings(List<Pair<Integer, String>> rankings) {
-    rankToCandidateIDs = new TreeMap<>();
+    rankToCandidateIds = new TreeMap<>();
     for (Pair<Integer, String> ranking : rankings) {
       Set<String> candidatesAtRank =
-          rankToCandidateIDs.computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
+          rankToCandidateIds.computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
       candidatesAtRank.add(ranking.getValue());
     }
   }
