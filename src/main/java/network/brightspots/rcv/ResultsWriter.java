@@ -490,7 +490,7 @@ class ResultsWriter {
   // create NIST Common Data Format CVR json
   void generateCdfJson(List<CastVoteRecord> castVoteRecords)
       throws IOException, RoundSnapshotDataMissingException {
-    // generate GpUnitIds for precincts (identify election jurisdiction and precincts)
+    // generate GpUnitIds for precincts "geo-political units" (can be a precinct or jurisdiction)
     GpUnitIds = generateGpUnitIds();
 
     HashMap<String, Object> outputJson = new HashMap<>();
