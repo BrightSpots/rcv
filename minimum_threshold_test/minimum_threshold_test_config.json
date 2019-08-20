@@ -1,5 +1,5 @@
 {
-  "tabulatorVersion": "0.1.1",
+  "tabulatorVersion": "0.1.2",
   "outputSettings" : {
     "contestName" : "Minimum threshold test",
     "outputDirectory" : "output",
