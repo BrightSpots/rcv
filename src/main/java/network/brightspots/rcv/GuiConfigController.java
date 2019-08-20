@@ -854,12 +854,11 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  // TabulatorService runs a tabulation in the background
   private static class TabulatorService extends Service<Void> {
 
-    // path to config file we will use for tabulation
     private final String configPath;
 
-    // constructor for Service object which runs a tabulation in the background
     TabulatorService(String configPath) {
       this.configPath = configPath;
     }

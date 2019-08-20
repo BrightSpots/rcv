@@ -114,7 +114,9 @@ class StreamingCvrReader {
       Logger.log(Level.SEVERE, "Invalid cell address: %s", address);
       throw new InvalidParameterException();
     }
+    // row is the 0-based row of the cell
     Integer row = Integer.parseInt(addressParts[1]) - 1;
+    // col is the 0-based column of the cell
     Integer col = getColumnIndex(addressParts[0]);
     return new Pair<>(col, row);
   }
@@ -141,7 +143,6 @@ class StreamingCvrReader {
   // param: currentRank the rank at which we stop inferring empty cells for this invocation
   private void handleEmptyCells(int currentRank) {
     for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {
-      // add "empty cell" to audit log
       currentCvrData.add("empty cell");
       // add UWI ranking if required by settings
       if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
