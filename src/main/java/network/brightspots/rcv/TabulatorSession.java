@@ -43,8 +43,8 @@ import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
-import network.brightspots.rcv.StreamingCVRReader.CvrDataFormatException;
-import network.brightspots.rcv.StreamingCVRReader.UnrecognizedCandidatesException;
+import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
+import network.brightspots.rcv.StreamingCvrReader.UnrecognizedCandidatesException;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -52,17 +52,12 @@ import org.xml.sax.SAXException;
 
 class TabulatorSession {
 
-  // configPath points to config file we use for configuring tabulation
   private final String configPath;
   // precinct IDs discovered during CVR parsing to support testing
-  private final Set<String> precinctIDs = new HashSet<>();
-  // cache output path location
+  private final Set<String> precinctIds = new HashSet<>();
   private String outputPath;
   private final String timestampString;
 
-  // function: TabulatorSession
-  // purpose: TabulatorSession constructor
-  // param: configPath path to config json file
   TabulatorSession(String configPath) {
     this.configPath = configPath;
     // current date-time formatted as a string used for creating unique output files names
@@ -81,19 +76,19 @@ class TabulatorSession {
     return timestampString;
   }
 
-  // purpose: special mode to just export the CVR as CDF JSON instead of tabulating
+  // special mode to just export the CVR as CDF JSON instead of tabulating
   void convertToCdf() {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate()) {
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
+        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
         ResultsWriter writer =
             new ResultsWriter()
                 .setNumRounds(0)
                 .setContestConfig(config)
                 .setTimestampString(timestampString)
-                .setPrecinctIds(precinctIDs);
+                .setPrecinctIds(precinctIds);
         try {
           writer.generateCdfJson(castVoteRecords);
         } catch (RoundSnapshotDataMissingException e) {
@@ -108,9 +103,6 @@ class TabulatorSession {
     }
   }
 
-  // function: tabulate
-  // purpose: run tabulation
-  // returns: list of winners
   void tabulate() {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
@@ -141,7 +133,7 @@ class TabulatorSession {
           Logger.log(Level.INFO, "Beginning tabulation for seat #%d...",
               config.getSequentialWinners().size() + 1);
           // Read cast vote records and precinct IDs from CVR files
-          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
+          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
           if (castVoteRecords == null) {
             Logger.log(Level.SEVERE, "Aborting tabulation due to cast vote record errors!");
             break;
@@ -172,7 +164,7 @@ class TabulatorSession {
       } else {
         // normal operation (not sequential multi-seat)
         // Read cast vote records and precinct IDs from CVR files
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIDs);
+        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
         if (castVoteRecords == null) {
           Logger.log(Level.SEVERE, "Aborting tabulation due to cast vote record errors!");
         } else {
@@ -216,16 +208,12 @@ class TabulatorSession {
     return success;
   }
 
-  // function: executeTabulation
-  // purpose: execute tabulation for given ContestConfig
-  // param: config object containing CVR file paths to parse
+  // execute tabulation for given ContestConfig (a Session may comprise multiple tabulations)
   // returns: set of winners from tabulation
   private Set<String> runTabulationForConfig(ContestConfig config,
       List<CastVoteRecord> castVoteRecords) throws TabulationCancelledException {
     Set<String> winners;
-    // tabulator for tabulation logic
-    Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIDs);
-    // do the tabulation
+    Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIds);
     winners = tabulator.tabulate();
     try {
       tabulator.generateSummaryFiles(timestampString);
@@ -235,33 +223,25 @@ class TabulatorSession {
     return winners;
   }
 
-  // function: parseCastVoteRecords
-  // purpose: parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
+  // parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
-  // param: precinctIDs a set of precinctIDs which will be populated during cvr parsing
+  // param: precinctIds a set of precinct IDs which will be populated during cvr parsing
   // returns: list of parsed CVRs or null if an error was encountered
-  private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config, Set<String> precinctIDs) {
+  private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config, Set<String> precinctIds) {
     Logger.log(Level.INFO, "Parsing cast vote records...");
-
-    // castVoteRecords will contain all cast vote records parsed by the reader
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    // did we encounter a fatal problem for any source?
     boolean encounteredSourceProblem = false;
 
     // At each iteration of the following loop, we add records from another source file.
-    // source: index over config sources
-    for (RawContestConfig.CVRSource source : config.rawConfig.cvrFileSources) {
-      // cvrPath is the resolved path to this source
+    for (RawContestConfig.CvrSource source : config.rawConfig.cvrFileSources) {
       String cvrPath = config.resolveConfigPath(source.getFilePath());
-
       Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       try {
         if (ContestConfig.isCdf(source)) {
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
-          reader.parseCVRFile(castVoteRecords);
+          reader.parseCvrFile(castVoteRecords);
         } else {
-          // use xlsx reader for ES&S
-          new StreamingCVRReader(config, source).parseCVRFile(castVoteRecords, precinctIDs);
+          new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
         }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.log(Level.SEVERE, "Source file contains unrecognized candidate(s): %s", cvrPath);

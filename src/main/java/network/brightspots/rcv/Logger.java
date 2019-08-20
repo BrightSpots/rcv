@@ -63,18 +63,11 @@ class Logger {
   // how many tabulation files to keep
   // this will effectively keep ALL output from any tabulation
   private static final Integer TABULATION_LOG_FILE_COUNT = 1000;
-  // cache for custom formatter
   private static final java.util.logging.Formatter formatter = new LogFormatter();
-  // cache for logger
   private static java.util.logging.Logger logger;
-  // cache for tabulation handler
   private static java.util.logging.FileHandler tabulationHandler;
 
-  // function: setup
-  // purpose: initialize logging module
-  // throws: IOException if unable to open output log file
   static void setup() {
-    // cache default logger
     logger = java.util.logging.Logger.getLogger("");
     logger.setLevel(Level.FINE);
 
@@ -97,23 +90,16 @@ class Logger {
           System.getProperty("user.dir"), exception.toString());
     }
 
-    // use our custom formatter for all installed handlers
     for (Handler handler : logger.getHandlers()) {
       handler.setFormatter(formatter);
     }
 
-    // log results
     log(Level.INFO, "Execution logging to: %s", logPath.toString().replace("%g", "*"));
   }
 
-  // function: addTabulationFileLogging
-  // purpose: adds file logging for a tabulation run
-  // param: loggerOutputPath: file path for logger logging output
-  // file access: write - existing file will be overwritten
-  // throws: IOException if unable to open loggerOutputPath
+  // adds file logging for a tabulation run
   static void addTabulationFileLogging(String outputPath) throws IOException {
-    // create file handler at FINE level (we have detailed audit logging we want to capture)
-    // and use our custom formatter
+    // use Level.FINE to capture audit info
     tabulationHandler =
         new FileHandler(outputPath, LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
     tabulationHandler.setFormatter(formatter);
@@ -122,8 +108,7 @@ class Logger {
     log(Level.INFO, "Tabulation logging to: %s", outputPath.replace("%g", "*"));
   }
 
-  // function: removeTabulationFileLogging
-  // purpose: remove file logging once a tabulation run is completed
+  // remove file logging once a tabulation run is completed
   static void removeTabulationFileLogging() {
     tabulationHandler.flush();
     tabulationHandler.close();
@@ -137,7 +122,6 @@ class Logger {
 
   // add logging to the provided text area for display to user in the GUI
   static void addGuiLogging(TextArea textArea) {
-    // custom handler logs text to the GUI
     java.util.logging.Handler guiHandler =
         new Handler() {
           @Override
@@ -146,23 +130,19 @@ class Logger {
               return;
             }
             String msg = getFormatter().format(record);
-            // if we are executing on the GUI thread we can post immediately
-            // e.g. responses to button clicks
+            // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
+            // otherwise schedule the text update to run on the GUI thread
             if (Platform.isFxApplicationThread()) {
               textArea.appendText(msg);
             } else {
-              // if not currently on GUI thread schedule the text update to run on the GUI thread
-              // e.g. tabulation thread updates
               Platform.runLater(() -> textArea.appendText(msg));
             }
           }
 
-          // nothing to do here
           @Override
           public void flush() {
           }
 
-          // nothing to do here
           @Override
           public void close() {
           }
@@ -172,14 +152,9 @@ class Logger {
     logger.addHandler(guiHandler);
   }
 
-  // custom LogFormatter class for log output string formatting
-  // extends the default logging Formatter class
+  // custom LogFormatter is used for all logging
   private static class LogFormatter extends Formatter {
 
-    // function: format
-    // purpose: overrides the format function with our custom formatter
-    // param: record the LogRecord to be formatted into a string for output
-    // returns: the formatted string for output
     @Override
     public String format(LogRecord record) {
       return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new Date())

@@ -32,7 +32,6 @@ import java.util.logging.Level;
 @SuppressWarnings("SameParameterValue")
 class JsonParser {
 
-  // function: readFromFile
   // purpose: parse input json file into an object of the specified type
   // param: jsonFilePath path to json file to be parsed into java
   // param: valueType class of the object to be created from parsed json
@@ -41,11 +40,8 @@ class JsonParser {
   private static <T> T readFromFile(String jsonFilePath, Class<T> valueType, boolean logsEnabled) {
     T createdObject;
     try {
-      // fileReader will read the json file from disk
       FileReader fileReader = new FileReader(jsonFilePath);
-      // objectMapper will map json values into the new java object
       ObjectMapper objectMapper = new ObjectMapper();
-      // object is the newly created object populated with json values
       createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException exception) {
       if (logsEnabled) {
@@ -81,10 +77,6 @@ class JsonParser {
     return readFromFile(jsonFilePath, valueType, false);
   }
 
-  // function: writeToFile
-  // purpose: write object to file as json
-  // param: jsonFile File object to write to
-  // param: objectToSerialize object to be written
   static void writeToFile(File jsonFile, Object objectToSerialize) {
     try {
       new ObjectMapper()
