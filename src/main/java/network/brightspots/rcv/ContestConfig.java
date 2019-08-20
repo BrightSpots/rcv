@@ -36,13 +36,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
+import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 class ContestConfig {
+
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
@@ -84,25 +85,18 @@ class ContestConfig {
   private final Set<String> excludedCandidates = new HashSet<>();
   // path from which any relative paths should be resolved
   private final String sourceDirectory;
-  // used for sequential multi-seat
+  // used to track a sequential multi-seat race
   private final List<String> sequentialWinners = new LinkedList<>();
   // mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
   // whether or not there are any validation errors
   private boolean isValid;
 
-  // function: ContestConfig
-  // purpose: create a new ContestConfig object
-  // param: rawConfig underlying rawConfig object this object wraps
-  // param: sourceDirectory folder to use for resolving relative paths
   private ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     this.rawConfig = rawConfig;
     this.sourceDirectory = sourceDirectory;
   }
 
-  // function: loadContestConfig
-  // purpose: create ContestConfig from pre-populated rawConfig and default folder
-  // returns: new ContestConfig object if checks pass otherwise null
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
     try {
@@ -114,20 +108,14 @@ class ContestConfig {
     return config;
   }
 
-  // function: loadContestConfig
-  // purpose: factory method to create ContestConfig from configPath
-  // - create rawContestConfig from file - can fail for IO issues or invalid json
+  // create rawContestConfig from file - can fail for IO issues or invalid json
   // returns: new ContestConfig object if checks pass otherwise null
   static ContestConfig loadContestConfig(String configPath, boolean silentMode) {
     if (configPath == null) {
       Logger.log(Level.SEVERE, "No contest config path specified!");
       return null;
     }
-    // config will hold the new ContestConfig if construction succeeds
     ContestConfig config = null;
-
-    // rawConfig holds the basic contest config data parsed from json
-    // this will be null if there is a problem loading it
     RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
     if (rawConfig == null) {
       Logger.log(Level.SEVERE, "Failed to load contest config: %s", configPath);
@@ -135,9 +123,9 @@ class ContestConfig {
       if (!silentMode) {
         Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
       }
-      // source folder will be the parent of configPath
-      String parentFolder = new File(configPath).getParent();
+      // parent folder is used as the default source folder
       // if there is no parent folder use current working directory
+      String parentFolder = new File(configPath).getParent();
       if (parentFolder == null) {
         parentFolder = System.getProperty("user.dir");
       }
@@ -150,7 +138,7 @@ class ContestConfig {
     return loadContestConfig(configPath, false);
   }
 
-  static boolean isCdf(CVRSource source) {
+  static boolean isCdf(CvrSource source) {
     return source.getProvider() != null
         && source.getProvider().toUpperCase().equals(CDF_PROVIDER)
         && source.getFilePath() != null
@@ -234,7 +222,7 @@ class ContestConfig {
     return !stringValid;
   }
 
-  static boolean passesBasicCvrSourceValidation(CVRSource source) {
+  static boolean passesBasicCvrSourceValidation(CvrSource source) {
     boolean sourceValid = true;
     // perform checks on source input path
     if (isNullOrBlank(source.getFilePath())) {
@@ -297,20 +285,13 @@ class ContestConfig {
     return candidateValid;
   }
 
-  // function: resolveConfigPath
-  // purpose: given a path returns absolute path for use in File IO
-  // param: path from this config file (cvr or output folder)
-  // returns: resolved path
+  // given a relative or absolute path returns absolute path for use in File IO
   String resolveConfigPath(String configPath) {
-    // create File for IO operations
     File userFile = new File(configPath);
-    // resolvedPath will be returned to caller
     String resolvedPath;
     if (userFile.isAbsolute()) {
-      // path is already absolute so use as-is
       resolvedPath = userFile.getAbsolutePath();
     } else {
-      // return sourceDirectory/configPath
       resolvedPath = Paths.get(sourceDirectory, configPath).toAbsolutePath().toString();
     }
     return resolvedPath;
@@ -320,9 +301,6 @@ class ContestConfig {
     return rawConfig;
   }
 
-  // function: validate
-  // purpose: validate the correctness of the config data
-  // returns any detected problems
   boolean validate() {
     Logger.log(Level.INFO, "Validating contest config...");
     isValid = true;
@@ -393,9 +371,7 @@ class ContestConfig {
     return inUse;
   }
 
-  // function: candidateStringAlreadyInUseElsewhere
-  // purpose: Takes a candidate name or code and checks for conflicts with other name/codes or other
-  //   strings that are already being used in some other way.
+  // checks for conflicts between a candidate name and other name/codes or other reserved strings
   // param: candidateString is a candidate name or code
   // param: field is either "name" or "code"
   // param: candidateStringsSeen is a running set of names/codes we've already encountered
@@ -418,12 +394,11 @@ class ContestConfig {
       Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
-      for (CVRSource source : rawConfig.cvrFileSources) {
+      for (CvrSource source : rawConfig.cvrFileSources) {
         if (!passesBasicCvrSourceValidation(source)) {
           isValid = false;
         }
 
-        // full path to CVR
         String cvrPath =
             isNullOrBlank(source.getFilePath()) ? null : resolveConfigPath(source.getFilePath());
 
@@ -665,9 +640,6 @@ class ContestConfig {
     return rawConfig.rules.numberOfWinners;
   }
 
-  // function: getNumberWinners
-  // purpose: how many winners for this contest
-  // returns: number of winners
   Integer getNumberOfWinners() {
     return Integer.parseInt(getNumberOfWinnersRaw());
   }
@@ -688,9 +660,6 @@ class ContestConfig {
     return rawConfig.rules.decimalPlacesForVoteArithmetic;
   }
 
-  // function: getDecimalPlacesForVoteArithmetic
-  // purpose: how many places to round votes to after performing fractional vote transfers
-  // returns: number of places to round to
   Integer getDecimalPlacesForVoteArithmetic() {
     return Integer.parseInt(getDecimalPlacesForVoteArithmeticRaw());
   }
@@ -725,11 +694,7 @@ class ContestConfig {
     return rawConfig.rules.hareQuota;
   }
 
-  // function: divide
-  // purpose: perform a division operation according to the config settings
-  // param: dividend is the numerator in the division operation
-  // param: divisor is the denominator in the division operation
-  // returns: the quotient
+  // perform a division operation according to the config settings
   BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
     return dividend.divide(divisor, getDecimalPlacesForVoteArithmetic(), RoundingMode.DOWN);
   }
@@ -740,17 +705,12 @@ class ContestConfig {
         .setScale(getDecimalPlacesForVoteArithmetic(), RoundingMode.DOWN);
   }
 
-  // function: getOutputDirectoryRaw
-  // purpose: getter for outputDirectory
-  // returns: raw string from config or falls back to user folder if none is set
+  // returns output directory from config file
   String getOutputDirectoryRaw() {
-    // outputDirectory is where output files should be written
     return rawConfig.outputSettings.outputDirectory;
   }
 
-  // function: getOutputDirectory
-  // purpose: get the directory location where output files should be written
-  // returns: path to directory where output files should be written
+  // path to directory where output files should be written
   String getOutputDirectory() {
     return resolveConfigPath(getOutputDirectoryRaw());
   }
@@ -759,37 +719,22 @@ class ContestConfig {
     return rawConfig.tabulatorVersion;
   }
 
-  // function: getContestName
-  // purpose: getter for contestName
-  // returns: contest name
   String getContestName() {
     return rawConfig.outputSettings.contestName;
   }
 
-  // function: getContestJurisdiction
-  // purpose: getter for contestJurisdiction
-  // returns: contest jurisdiction name
   String getContestJurisdiction() {
     return rawConfig.outputSettings.contestJurisdiction;
   }
 
-  // function: getContestOffice
-  // purpose: getter for contestOffice
-  // returns: contest office name
   String getContestOffice() {
     return rawConfig.outputSettings.contestOffice;
   }
 
-  // function: getContestDate
-  // purpose: getter for contestDate
-  // returns: contest date
   String getContestDate() {
     return rawConfig.outputSettings.contestDate;
   }
 
-  // function: isTabulateByPrecinctEnabled
-  // purpose: getter for tabulateByPrecinct
-  // returns: true if and only if we should tabulate by precinct
   boolean isTabulateByPrecinctEnabled() {
     return rawConfig.outputSettings.tabulateByPrecinct;
   }
@@ -819,9 +764,6 @@ class ContestConfig {
     return rawConfig.rules.maxRankingsAllowed;
   }
 
-  // function: getMaxRankingsAllowed
-  // purpose: getter for maxRankingsAllowed
-  // returns: max rankings allowed
   Integer getMaxRankingsAllowed() {
     return stringToIntWithOption(
         getMaxRankingsAllowedRaw(),
@@ -829,18 +771,11 @@ class ContestConfig {
         getNumDeclaredCandidates());
   }
 
-  // function: isBatchEliminationEnabled
-  // purpose: getter for batchElimination
-  // returns: true if and only if we should use batch elimination
   boolean isBatchEliminationEnabled() {
     return rawConfig.rules.batchElimination;
   }
 
-  // function: numDeclaredCandidates
-  // purpose: calculate the number of declared candidates from the contest configuration
-  // returns: the number of declared candidates from the contest configuration
   int getNumDeclaredCandidates() {
-    // num will contain the resulting number of candidates
     int num = getCandidateCodeList().size();
     if (!isNullOrBlank(getUndeclaredWriteInLabel())
         && getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
@@ -849,9 +784,6 @@ class ContestConfig {
     return num;
   }
 
-  // function: numCandidates
-  // purpose: return number of candidates including UWIs as a candidate if they are in use
-  // num will contain the resulting number of candidates
   int getNumCandidates() {
     return getCandidateCodeList().size();
   }
@@ -860,9 +792,6 @@ class ContestConfig {
     return excludedCandidates.contains(candidate);
   }
 
-  // function: getOvervoteRule
-  // purpose: return overvote rule enum to use
-  // returns: overvote rule to use for this config
   OvervoteRule getOvervoteRule() {
     OvervoteRule rule = OvervoteRule.getByLabel(rawConfig.rules.overvoteRule);
     return rule == null ? OvervoteRule.RULE_UNKNOWN : rule;
@@ -872,9 +801,6 @@ class ContestConfig {
     return rawConfig.rules.minimumVoteThreshold;
   }
 
-  // function: getMinimumVoteThreshold
-  // purpose: getter for minimumVoteThreshold rule
-  // returns: minimum vote threshold to use or default value if it's not specified
   BigDecimal getMinimumVoteThreshold() {
     return new BigDecimal(getMinimumVoteThresholdRaw());
   }
@@ -883,9 +809,6 @@ class ContestConfig {
     return rawConfig.rules.maxSkippedRanksAllowed;
   }
 
-  // function: getMaxSkippedRanksAllowed
-  // purpose: getter for maxSkippedRanksAllowed rule
-  // returns: max skipped ranks allowed in this config
   Integer getMaxSkippedRanksAllowed() {
     return stringToIntWithOption(
         getMaxSkippedRanksAllowedRaw(),
@@ -893,30 +816,18 @@ class ContestConfig {
         Integer.MAX_VALUE);
   }
 
-  // function: getUndeclaredWriteInLabel
-  // purpose: getter for UWI label
-  // returns: UWI label for this config
   String getUndeclaredWriteInLabel() {
     return rawConfig.rules.undeclaredWriteInLabel;
   }
 
-  // function: getOvervoteLabel
-  // purpose: getter for overvote label rule
-  // returns: overvote label for this config
   String getOvervoteLabel() {
     return rawConfig.rules.overvoteLabel;
   }
 
-  // function: getUndervoteLabel
-  // purpose: getter for undervote label
-  // returns: undervote label for this config
   String getUndervoteLabel() {
     return rawConfig.rules.undervoteLabel;
   }
 
-  // function: getTiebreakMode
-  // purpose: return tiebreak mode to use
-  // returns: tiebreak mode to use for this config
   TieBreakMode getTiebreakMode() {
     TieBreakMode mode = TieBreakMode.getByLabel(rawConfig.rules.tiebreakMode);
     return mode == null ? TieBreakMode.MODE_UNKNOWN : mode;
@@ -936,38 +847,22 @@ class ContestConfig {
         || getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION;
   }
 
-  // function: isTreatBlankAsUndeclaredWriteInEnabled
-  // purpose: getter for treatBlankAsUndeclaredWriteIn rule
-  // returns: true if we are to treat blank cell as UWI
   boolean isTreatBlankAsUndeclaredWriteInEnabled() {
     return rawConfig.rules.treatBlankAsUndeclaredWriteIn;
   }
 
-  // function: isExhaustOnDuplicateCandidateEnabled
-  // purpose: getter for exhaustOnDuplicateCandidate rule
-  // returns: true if tabulation should exhaust ballot when encountering a duplicate candidate
   boolean isExhaustOnDuplicateCandidateEnabled() {
     return rawConfig.rules.exhaustOnDuplicateCandidate;
   }
 
-  // function: getCandidateCodeList
-  // purpose: return list of candidate codes for this config
-  // returns: return list of candidate codes for this config
   Set<String> getCandidateCodeList() {
     return candidateCodeToNameMap.keySet();
   }
 
-  // function: getNameForCandidateCode
-  // purpose: look up full candidate name given a candidate code
-  // param: code the code of the candidate whose name we want to look up
-  // returns: the full candidate name for the given candidate code
   String getNameForCandidateCode(String code) {
     return candidateCodeToNameMap.get(code);
   }
 
-  // function: getCandidatePermutation
-  // purpose: getter for ordered list of candidates for tie-breaking
-  // returns: ordered list of candidates
   ArrayList<String> getCandidatePermutation() {
     return candidatePermutation;
   }
@@ -980,18 +875,16 @@ class ContestConfig {
     }
   }
 
-  // function: processCandidateData
-  // purpose: perform pre-processing on candidates:
+  // perform pre-processing on candidates:
   // 1) if there are any CDF input sources extract candidates names from them
   // 2) build map of candidate ID to candidate name
   // 3) generate tie-break ordering if needed
   private void processCandidateData() {
     candidateCodeToNameMap = new HashMap<>();
 
-    for (RawContestConfig.CVRSource source : rawConfig.cvrFileSources) {
+    for (RawContestConfig.CvrSource source : rawConfig.cvrFileSources) {
       // for any CDF sources extract candidate names
       if (isCdf(source)) {
-        // cvrPath is the resolved path to this source
         String cvrPath = resolveConfigPath(source.getFilePath());
         CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this);
         candidateCodeToNameMap = reader.getCandidates();

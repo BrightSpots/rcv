@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 // TallyTransfers class stores summary info on vote transfers
-// used primarily as visualizer input to help build Sankey plots
+// used primarily as input for external visualizer software to help build Sankey plots
 class TallyTransfers {
 
   static final String RESIDUAL_TARGET = "residual surplus";
@@ -44,20 +44,11 @@ class TallyTransfers {
   // For round 1 source candidate is marked "uncounted" since the votes had no prior recipient.
   private final Map<Integer, Map<String, Map<String, BigDecimal>>> tallyTransfers = new HashMap<>();
 
-  // function: getTransfersForRound
-  // purpose: getter for tallyTransfers object
-  // param: round for which to return transfers
-  // returns: tally transfer map for specified round
   Map<String, Map<String, BigDecimal>> getTransfersForRound(int round) {
     return tallyTransfers.get(round);
   }
 
-  // function: addTransfer
-  // purpose: add vote transfer value for given round
-  // param: round transfers should be added to
-  // param: sourceCandidate from which the transfers originate
-  // param: targetCandidate to which the transfers go
-  // param: value total value of all transfers
+  // add vote transfer value for given round
   void addTransfer(int round, String sourceCandidate, String targetCandidate, BigDecimal value) {
     // null source means we are transferring the initial count
     if (sourceCandidate == null) {
@@ -68,15 +59,12 @@ class TallyTransfers {
       targetCandidate = EXHAUSTED;
     }
 
-    // lookup or create transfer entries for specified round
+    // lookup or create entries for specified round
     Map<String, Map<String, BigDecimal>> roundEntries =
         tallyTransfers.computeIfAbsent(round, k -> new HashMap<>());
-    // lookup or create map for the source candidate
     Map<String, BigDecimal> candidateEntries =
         roundEntries.computeIfAbsent(sourceCandidate, k -> new HashMap<>());
-    // lookup or create entry for the destination candidate
     BigDecimal currentValue = candidateEntries.getOrDefault(targetCandidate, BigDecimal.ZERO);
-    // add transfer value and store the result
     BigDecimal newTally = currentValue.add(value);
     candidateEntries.put(targetCandidate, newTally);
   }

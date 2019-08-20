@@ -60,9 +60,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
-import network.brightspots.rcv.RawContestConfig.CVRSource;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
+import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.RawContestConfig.OutputSettings;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
@@ -104,19 +104,19 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxGenerateCdfJson;
   @FXML
-  private TableView<CVRSource> tableViewCvrFiles;
+  private TableView<CvrSource> tableViewCvrFiles;
   @FXML
-  private TableColumn<CVRSource, String> tableColumnCvrFilePath;
+  private TableColumn<CvrSource, String> tableColumnCvrFilePath;
   @FXML
-  private TableColumn<CVRSource, String> tableColumnCvrFirstVoteCol;
+  private TableColumn<CvrSource, String> tableColumnCvrFirstVoteCol;
   @FXML
-  private TableColumn<CVRSource, String> tableColumnCvrFirstVoteRow;
+  private TableColumn<CvrSource, String> tableColumnCvrFirstVoteRow;
   @FXML
-  private TableColumn<CVRSource, String> tableColumnCvrIdCol;
+  private TableColumn<CvrSource, String> tableColumnCvrIdCol;
   @FXML
-  private TableColumn<CVRSource, String> tableColumnCvrPrecinctCol;
+  private TableColumn<CvrSource, String> tableColumnCvrPrecinctCol;
   @FXML
-  private TableColumn<CVRSource, String> tableColumnCvrProvider;
+  private TableColumn<CvrSource, String> tableColumnCvrProvider;
   @FXML
   private TextField textFieldCvrFilePath;
   @FXML
@@ -348,7 +348,7 @@ public class GuiConfigController implements Initializable {
   }
 
   public void buttonAddCvrFileClicked() {
-    CVRSource cvrSource = new CVRSource(getTextOrEmptyString(textFieldCvrFilePath),
+    CvrSource cvrSource = new CvrSource(getTextOrEmptyString(textFieldCvrFilePath),
         getTextOrEmptyString(textFieldCvrFirstVoteCol),
         getTextOrEmptyString(textFieldCvrFirstVoteRow), getTextOrEmptyString(textFieldCvrIdCol),
         getTextOrEmptyString(textFieldCvrPrecinctCol), getTextOrEmptyString(textFieldCvrProvider));
@@ -782,8 +782,8 @@ public class GuiConfigController implements Initializable {
     outputSettings.generateCdfJson = checkBoxGenerateCdfJson.isSelected();
     config.outputSettings = outputSettings;
 
-    ArrayList<CVRSource> cvrSources = new ArrayList<>(tableViewCvrFiles.getItems());
-    for (CVRSource source : cvrSources) {
+    ArrayList<CvrSource> cvrSources = new ArrayList<>(tableViewCvrFiles.getItems());
+    for (CvrSource source : cvrSources) {
       source.setFilePath(source.getFilePath() != null ? source.getFilePath().trim() : "");
       source.setIdColumnIndex(
           source.getIdColumnIndex() != null ? source.getIdColumnIndex().trim() : "");
@@ -854,14 +854,11 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  // TabulatorService runs a tabulation in the background
   private static class TabulatorService extends Service<Void> {
 
-    // path to config file we will use for tabulation
     private final String configPath;
 
-    // function: TabulatorService
-    // purpose: constructor for Service object which runs a tabulation
-    // param: configPath path to config file to be tabulated
     TabulatorService(String configPath) {
       this.configPath = configPath;
     }
@@ -872,7 +869,6 @@ public class GuiConfigController implements Initializable {
           new Task<>() {
             @Override
             protected Void call() {
-              // create session object used for tabulation
               TabulatorSession session = new TabulatorSession(configPath);
               session.tabulate();
               return null;

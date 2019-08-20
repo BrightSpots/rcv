@@ -32,25 +32,18 @@ import javafx.util.Pair;
 
 class CommonDataFormatReader {
 
-  // path of the source file
   private final String filePath;
   private final ContestConfig config;
 
-  // function: CommonDataFormatReader
-  // purpose: class constructor
-  // param: filePath source file to read
   CommonDataFormatReader(String filePath, ContestConfig config) {
     this.filePath = filePath;
     this.config = config;
   }
 
-  // function: getCandidates
-  // purpose: returns map from candidate ID to name parsed from CDF election json
+  // returns map from candidate ID to name parsed from CDF election json
   Map<String, String> getCandidates() {
-    // container for results
     Map<String, String> candidates = new HashMap<>();
     try {
-      // try to read in the file
       HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
       // top-level election is a list of election objects:
       ArrayList electionArray = (ArrayList) json.get("Election");
@@ -66,8 +59,8 @@ class CommonDataFormatReader {
           ArrayList contestSelectionArray = (ArrayList) contest.get("ContestSelection");
           for (Object contestSelectionObject : contestSelectionArray) {
             HashMap contestSelection = (HashMap) contestSelectionObject;
-            // selectionID is the candidate ID
-            String selectionID = (String) contestSelection.get("@id");
+            // selectionId is the candidate ID
+            String selectionId = (String) contestSelection.get("@id");
             String selectionName = null;
             ArrayList codeArray = (ArrayList) contestSelection.get("Code");
             if (codeArray != null) {
@@ -79,7 +72,7 @@ class CommonDataFormatReader {
                 }
               }
             }
-            candidates.put(selectionID, selectionName != null ? selectionName : selectionID);
+            candidates.put(selectionId, selectionName != null ? selectionName : selectionId);
           }
         }
       }
@@ -89,23 +82,21 @@ class CommonDataFormatReader {
     return candidates;
   }
 
-  // function: parseRankingsFromSnapshot
-  // purpose: parse a list of contest selection rankings from a NIST "Snapshot" HashMap
+  // parse a list of contest selection rankings from a NIST "Snapshot" HashMap
   private List<Pair<Integer, String>> parseRankingsFromSnapshot(HashMap snapshot) {
-    // list to contain rankings as they are parsed
     List<Pair<Integer, String>> rankings = new ArrayList<>();
     // at the top level is a list of contests each of which contains selections
-    ArrayList CVRContests = (ArrayList) snapshot.get("CVRContest");
-    for (Object contestObject : CVRContests) {
-      HashMap CVRContest = (HashMap) contestObject;
+    ArrayList CvrContests = (ArrayList) snapshot.get("CVRContest");
+    for (Object contestObject : CvrContests) {
+      HashMap CvrContest = (HashMap) contestObject;
       // each contest contains contestSelections
-      ArrayList contestSelections = (ArrayList) CVRContest.get("CVRContestSelection");
+      ArrayList contestSelections = (ArrayList) CvrContest.get("CVRContestSelection");
       for (Object contestSelectionObject : contestSelections) {
         HashMap contestSelection = (HashMap) contestSelectionObject;
-        // selectionID is the candidate/contest ID for this selection position
-        String selectionID = (String) contestSelection.get("ContestSelectionId");
-        if (selectionID.equals(config.getOvervoteLabel())) {
-          selectionID = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+        // selectionId is the candidate/contest ID for this selection position
+        String selectionId = (String) contestSelection.get("ContestSelectionId");
+        if (selectionId.equals(config.getOvervoteLabel())) {
+          selectionId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
         }
         // extract all the positions (ranks) which this selection has been assigned
         ArrayList selectionPositions = (ArrayList) contestSelection.get("SelectionPosition");
@@ -115,18 +106,15 @@ class CommonDataFormatReader {
           // and finally the rank
           Integer rank = (Integer) selectionPosition.get("Rank");
           assert rank != null && rank >= 1;
-          // create a new ranking object and save it
-          rankings.add(new Pair<>(rank, selectionID));
+          rankings.add(new Pair<>(rank, selectionId));
         }
       }
     }
     return rankings;
   }
 
-  // function: parseCVRFile
-  // purpose: parse the given file into a List of CastVoteRecords for tabulation
-  // param: castVoteRecords existing list to append new CastVoteRecords to
-  void parseCVRFile(List<CastVoteRecord> castVoteRecords) {
+  // parse the given file into a List of CastVoteRecords for tabulation
+  void parseCvrFile(List<CastVoteRecord> castVoteRecords) {
     // cvrIndex and fileName are used to generate IDs for cvrs
     int cvrIndex = 0;
     String fileName = new File(filePath).getName();
@@ -134,30 +122,25 @@ class CommonDataFormatReader {
     try {
       HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
       // we expect a top-level "CVR" object containing a list of CVR objects
-      ArrayList CVRs = (ArrayList) json.get("CVR");
+      ArrayList cvrs = (ArrayList) json.get("CVR");
       // for each CVR object extract the current snapshot
       // it will be used to build the ballot data
-      for (Object CVR : CVRs) {
-        HashMap CVRObject = (HashMap) CVR;
-        String currentSnapshotID = (String) CVRObject.get("CurrentSnapshotId");
-        // get ballotID
-        String ballotID = (String) CVRObject.get("BallotPrePrintedId");
-        // compute internal ballot ID
-        String computedCastVoteRecordID = String.format("%s(%d)", fileName, ++cvrIndex);
-
-        ArrayList CVRSnapshots = (ArrayList) CVRObject.get("CVRSnapshot");
-        for (Object snapshotObject : CVRSnapshots) {
+      for (Object cvr : cvrs) {
+        HashMap cvrObject = (HashMap) cvr;
+        String currentSnapshotId = (String) cvrObject.get("CurrentSnapshotId");
+        String ballotId = (String) cvrObject.get("BallotPrePrintedId");
+        String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
+        ArrayList cvrSnapshots = (ArrayList) cvrObject.get("CVRSnapshot");
+        for (Object snapshotObject : cvrSnapshots) {
           HashMap snapshot = (HashMap) snapshotObject;
-          if (!snapshot.get("@id").equals(currentSnapshotID)) {
+          if (!snapshot.get("@id").equals(currentSnapshotId)) {
             continue;
           }
 
           // we found the current CVR snapshot so get rankings and create a new cvr
           List<Pair<Integer, String>> rankings = parseRankingsFromSnapshot(snapshot);
-
-          // create new cast vote record
           CastVoteRecord newRecord =
-              new CastVoteRecord(computedCastVoteRecordID, ballotID, null, null, rankings);
+              new CastVoteRecord(computedCastVoteRecordId, ballotId, null, null, rankings);
           castVoteRecords.add(newRecord);
 
           // provide some user feedback on the CVR count

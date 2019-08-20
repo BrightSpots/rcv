@@ -17,8 +17,11 @@
 package network.brightspots.rcv;
 
 import java.util.List;
+import java.util.Map;
 
 class Utils {
+
+  private static final Map<String, String> envMap = System.getenv();
 
   static boolean isNullOrBlank(String s) {
     return s == null || s.isBlank();
@@ -40,7 +43,7 @@ class Utils {
     if (list.size() == 1) {
       sentence = String.format("\"%s\"", list.get(0));
     } else if (list.size() == 2) {
-      // if there are only 2 candidates, don't use a comma
+      // if there are only 2 items, don't use a comma
       sentence = String.format("\"%s\" and \"%s\"", list.get(0), list.get(1));
     } else {
       StringBuilder stringBuilder = new StringBuilder();
@@ -52,5 +55,19 @@ class Utils {
     }
 
     return sentence;
+  }
+
+  static String getComputerName() {
+    String computerName = "[unknown]";
+    if (envMap.containsKey("COMPUTERNAME")) {
+      computerName = envMap.get("COMPUTERNAME");
+    } else if (envMap.containsKey("HOSTNAME")) {
+      computerName = envMap.get("HOSTNAME");
+    }
+    return computerName;
+  }
+
+  static String getUserName() {
+    return envMap.getOrDefault("USERNAME", "[unknown]");
   }
 }
