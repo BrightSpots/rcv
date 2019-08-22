@@ -1,5 +1,5 @@
 {
-  "tabulatorVersion": "0.1.2",
+  "tabulatorVersion": "1.0.0",
   "outputSettings" : {
     "contestName" : "Portland 2015 Mayoral Race",
     "outputDirectory" : "output",
