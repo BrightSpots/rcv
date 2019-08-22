@@ -1,5 +1,5 @@
 {
-  "tabulatorVersion": "0.1.2",
+  "tabulatorVersion": "1.0.0",
   "outputSettings" : {
     "contestName" : "Allow Only One Winner per Round Test",
     "outputDirectory" : "output",
