@@ -50,6 +50,7 @@ import network.brightspots.rcv.Tabulator.TieBreakMode;
 
 class TieBreak {
 
+  private static final String CLI_CANCEL_COMMAND = "x";
   private static Random random;
   private final List<String> allTiedCandidates;
   private final Tabulator.TieBreakMode tieBreakMode;
@@ -163,12 +164,11 @@ class TieBreak {
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i + 1) + ". " + tiedCandidates.get(i));
     }
-    final String cancelCommand = "x";
     final String prompt =
         "Enter the number corresponding to the candidate who should "
             + (selectingAWinner ? "win" : "lose")
             + " this tiebreaker (or "
-            + cancelCommand
+            + CLI_CANCEL_COMMAND
             + " to cancel): ";
     System.out.println(prompt);
 
@@ -177,7 +177,7 @@ class TieBreak {
     while (selection == null) {
       Scanner sc = new Scanner(System.in);
       String userInput = sc.nextLine();
-      if (userInput.equals(cancelCommand)) {
+      if (userInput.equals(CLI_CANCEL_COMMAND)) {
         System.out.println("Cancelling tabulation...");
         throw new TabulationCancelledException();
       }
