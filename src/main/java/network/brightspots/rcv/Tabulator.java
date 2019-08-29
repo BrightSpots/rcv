@@ -472,7 +472,8 @@ class Tabulator {
         selectedWinners.add(winner);
         Logger.log(
             Level.INFO,
-            "Candidate \"%s\" won a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
+            "Candidate \"%s\" won a tie-breaker in round %d against %s. Each candidate had %s "
+                + "vote(s). %s",
             winner,
             currentRound,
             tieBreak.nonSelectedCandidateDescription(),
@@ -509,7 +510,8 @@ class Tabulator {
       eliminated.add(label);
       Logger.log(
           Level.INFO,
-          "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It had %s votes.",
+          "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It "
+              + "had %s votes.",
           label,
           currentRound,
           currentRoundCandidateToTally.get(label).toString());
@@ -533,7 +535,8 @@ class Tabulator {
             eliminated.add(candidate);
             Logger.log(
                 Level.INFO,
-                "Eliminated candidate \"%s\" in round %d because they only had %s vote(s), below the minimum threshold of %s.",
+                "Eliminated candidate \"%s\" in round %d because they only had %s vote(s), below "
+                    + "the minimum threshold of %s.",
                 candidate,
                 currentRound,
                 tally.toString(),
@@ -560,7 +563,8 @@ class Tabulator {
           eliminated.add(elimination.candidateId);
           Logger.log(
               Level.INFO,
-              "Batch-eliminated candidate \"%s\" in round %d. The running total was %s vote(s) and the next-highest count was %s vote(s).",
+              "Batch-eliminated candidate \"%s\" in round %d. The running total was %s vote(s) and "
+                  + "the next-highest count was %s vote(s).",
               elimination.candidateId,
               currentRound,
               elimination.runningTotal.toString(),
@@ -599,7 +603,8 @@ class Tabulator {
       eliminatedCandidate = tieBreak.selectCandidate();
       Logger.log(
           Level.INFO,
-          "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s vote(s). %s",
+          "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s "
+              + "vote(s). %s",
           eliminatedCandidate,
           currentRound,
           tieBreak.nonSelectedCandidateDescription(),

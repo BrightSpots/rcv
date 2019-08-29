@@ -52,8 +52,8 @@ import org.xml.sax.XMLReader;
 
 class StreamingCvrReader {
 
-  // this indicates a missing precinct Id in output files
-  private final String MISSING_PRECINCT_ID = "missing_precinct_id";
+  // this indicates a missing precinct ID in output files
+  private static final String MISSING_PRECINCT_ID = "missing_precinct_id";
   // config for the contest
   private final ContestConfig config;
   // path of the source file
@@ -100,8 +100,9 @@ class StreamingCvrReader {
     this.idColumnIndex =
         isNullOrBlank(source.getIdColumnIndex()) ? null
             : Integer.parseInt(source.getIdColumnIndex()) - 1;
-    this.precinctColumnIndex = !isNullOrBlank(source.getPrecinctColumnIndex()) ?
-        Integer.parseInt(source.getPrecinctColumnIndex()) - 1 : null;
+    this.precinctColumnIndex = !isNullOrBlank(source.getPrecinctColumnIndex())
+        ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
+        : null;
   }
 
   // given Excel-style address string return the cell address as a pair of Integers

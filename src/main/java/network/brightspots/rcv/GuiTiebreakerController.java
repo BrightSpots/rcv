@@ -65,12 +65,12 @@ public class GuiTiebreakerController {
     buttonSelect.setText((selectingAWinner ? "Elect" : "Eliminate") + " Candidate");
   }
 
-  public void buttonCancelClicked(ActionEvent actionEvent) {
+  void buttonCancelClicked(ActionEvent actionEvent) {
     setTabulationCancelled(true);
     ((Stage) ((Node) actionEvent.getSource()).getScene().getWindow()).close();
   }
 
-  public void buttonSelectClicked(ActionEvent actionEvent) {
+  void buttonSelectClicked(ActionEvent actionEvent) {
     if (listViewCandidates.getSelectionModel().getSelectedItems().size() == 1) {
       setSelectedCandidate(listViewCandidates.getSelectionModel().getSelectedItems().get(0));
       ((Stage) ((Node) actionEvent.getSource()).getScene().getWindow()).close();

@@ -182,6 +182,9 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TabPane tabPane;
 
+  /**
+   * Action when new config button is clicked.
+   */
   public void buttonNewConfigClicked() {
     if (checkForSaveAndContinue()) {
       Logger.log(Level.INFO, "Creating new contest config...");
@@ -204,6 +207,9 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when load config button is clicked.
+   */
   public void buttonLoadConfigClicked() {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
@@ -248,6 +254,9 @@ public class GuiConfigController implements Initializable {
     loadFile(fileToSave, true);
   }
 
+  /**
+   * Action when save button is clicked.
+   */
   public void buttonSaveClicked() {
     File fileToSave = getSaveFile();
     if (fileToSave != null) {
@@ -261,7 +270,10 @@ public class GuiConfigController implements Initializable {
     tabPane.setDisable(isBusy);
   }
 
-  // validate whatever is currently entered into the GUI - does not save data
+  /**
+   * Action when validate button is clicked.
+   * Validates whatever is currently entered into the GUI. Does not save data.
+   */
   public void buttonValidateClicked() {
     setGuiIsBusy(true);
     ContestConfig config =
@@ -273,9 +285,11 @@ public class GuiConfigController implements Initializable {
     service.start();
   }
 
-  // tabulate whatever is currently entered into the GUI:
-  // - require user to save if there are un-saved changes
-  // - create and launch TabulatorService from the saved config path
+  /**
+   * Tabulate whatever is currently entered into the GUI.
+   * - Require user to save if there are unsaved changes.
+   * - Create and launch TabulatorService from the saved config path.
+   */
   public void buttonTabulateClicked() {
     if (checkForSaveAndTabulate()) {
       if (GuiContext.getInstance().getConfig() != null) {
@@ -316,10 +330,16 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when exit button is clicked.
+   */
   public void buttonExitClicked() {
     exitGui();
   }
 
+  /**
+   * Action when output directory button is clicked.
+   */
   public void buttonOutputDirectoryClicked() {
     DirectoryChooser dc = new DirectoryChooser();
     dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -330,10 +350,16 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when clear button is clicked for contest date.
+   */
   public void buttonClearDatePickerContestDateClicked() {
     datePickerContestDate.setValue(null);
   }
 
+  /**
+   * Action when CVR file path button is clicked.
+   */
   public void buttonCvrFilePathClicked() {
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -347,6 +373,9 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when add CVR file button is clicked.
+   */
   public void buttonAddCvrFileClicked() {
     CvrSource cvrSource = new CvrSource(getTextOrEmptyString(textFieldCvrFilePath),
         getTextOrEmptyString(textFieldCvrFirstVoteCol),
@@ -363,48 +392,72 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when delete CVR file button is clicked.
+   */
   public void buttonDeleteCvrFileClicked() {
     tableViewCvrFiles
         .getItems()
         .removeAll(tableViewCvrFiles.getSelectionModel().getSelectedItems());
   }
 
+  /**
+   * Action when CVR file path is changed.
+   */
   public void changeCvrFilePath(CellEditEvent cellEditEvent) {
     tableViewCvrFiles.getSelectionModel().getSelectedItem()
         .setFilePath(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
+  /**
+   * Action when CVR first vote col is changed.
+   */
   public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
     tableViewCvrFiles.getSelectionModel().getSelectedItem()
         .setFirstVoteColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
+  /**
+   * Action when CVR first vote row is changed.
+   */
   public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
     tableViewCvrFiles.getSelectionModel().getSelectedItem()
         .setFirstVoteRowIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
+  /**
+   * Action when CVR ID col index is changed.
+   */
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
     tableViewCvrFiles.getSelectionModel().getSelectedItem()
         .setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
+  /**
+   * Action when CVR precinct col index is changed.
+   */
   public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
     tableViewCvrFiles.getSelectionModel().getSelectedItem()
         .setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
+  /**
+   * Action when CVR provider is changed.
+   */
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
     tableViewCvrFiles.getSelectionModel().getSelectedItem()
         .setProvider(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
+  /**
+   * Action when add candidate button is clicked.
+   */
   public void buttonAddCandidateClicked() {
     Candidate candidate = new Candidate(getTextOrEmptyString(textFieldCandidateName),
         getTextOrEmptyString(textFieldCandidateCode), ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
@@ -415,18 +468,27 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when delete candidate button is clicked.
+   */
   public void buttonDeleteCandidateClicked() {
     tableViewCandidates
         .getItems()
         .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
   }
 
+  /**
+   * Action when candidate name is changed.
+   */
   public void changeCandidateName(CellEditEvent cellEditEvent) {
     tableViewCandidates.getSelectionModel().getSelectedItem()
         .setName(cellEditEvent.getNewValue().toString().trim());
     tableViewCandidates.refresh();
   }
 
+  /**
+   * Action when candidate code is changed.
+   */
   public void changeCandidateCode(CellEditEvent cellEditEvent) {
     tableViewCandidates.getSelectionModel().getSelectedItem()
         .setCode(cellEditEvent.getNewValue().toString().trim());
@@ -528,7 +590,8 @@ public class GuiConfigController implements Initializable {
     } catch (JsonProcessingException exception) {
       Logger.log(
           Level.WARNING,
-          "Unable tell if saving is necessary, but everything should work fine anyway! Prompting for save just in case...\n%s",
+          "Unable tell if saving is necessary, but everything should work fine anyway! Prompting "
+              + "for save just in case...\n%s",
           exception.toString());
     }
     return needsSaving;
@@ -664,7 +727,7 @@ public class GuiConfigController implements Initializable {
           checkBox.selectedProperty().setValue(candidate.isExcluded());
           checkBox
               .selectedProperty()
-              .addListener((ov, old_val, new_val) -> candidate.setExcluded(new_val));
+              .addListener((ov, oldVal, newVal) -> candidate.setExcluded(newVal));
           //noinspection unchecked
           return new SimpleObjectProperty(checkBox);
         });
@@ -734,7 +797,6 @@ public class GuiConfigController implements Initializable {
       tableViewCandidates.setItems(FXCollections.observableArrayList(rawConfig.candidates));
     }
 
-    ContestRules rules = rawConfig.rules;
     choiceTiebreakMode.setValue(
         config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
     choiceOvervoteRule.setValue(
@@ -743,6 +805,7 @@ public class GuiConfigController implements Initializable {
         config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN ? null
             : config.getWinnerElectionMode());
 
+    ContestRules rules = rawConfig.rules;
     textFieldRandomSeed.setText(rules.randomSeed);
     textFieldNumberOfWinners.setText(rules.numberOfWinners);
     textFieldDecimalPlacesForVoteArithmetic.setText(rules.decimalPlacesForVoteArithmetic);
