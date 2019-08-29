@@ -69,7 +69,7 @@ class ResultsWriter {
   // all precinct Ids which may appear in the output cvrs
   private Set<String> precinctIds;
   // precinct to GpUnitId map (CDF only)
-  private Map<String, String> GpUnitIds;
+  private Map<String, String> gpUnitIds;
   private BigDecimal winningThreshold;
   // map from round number to list of candidates eliminated in that round
   private Map<Integer, List<String>> roundToEliminatedCandidates;
@@ -98,6 +98,16 @@ class ResultsWriter {
             "%s_%s%s",
             timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationNumber));
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
+  }
+
+  private String getOutputFilePath(String outputType) {
+    return getOutputFilePath(
+        config.getOutputDirectory(),
+        outputType,
+        timestampString,
+        config.isMultiSeatSequentialWinnerTakesAllEnabled()
+            ? config.getSequentialWinners().size() + 1
+            : null);
   }
 
   static String sanitizeStringForOutput(String s) {
@@ -197,16 +207,6 @@ class ResultsWriter {
     return filename;
   }
 
-  private String getOutputFilePath(String outputType) {
-    return getOutputFilePath(
-        config.getOutputDirectory(),
-        outputType,
-        timestampString,
-        config.isMultiSeatSequentialWinnerTakesAllEnabled()
-            ? config.getSequentialWinners().size() + 1
-            : null);
-  }
-
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
     this.roundToResidualSurplus = roundToResidualSurplus;
     return this;
@@ -297,10 +297,6 @@ class ResultsWriter {
     String csvPath = outputPath + ".csv";
     Logger.log(Level.INFO, "Generating summary spreadsheet: %s...", csvPath);
 
-    // Get all candidates sorted by their first round tally. This determines the display order.
-    Map<String, BigDecimal> firstRoundTally = roundTallies.get(1);
-    List<String> sortedCandidates = sortCandidatesByTally(firstRoundTally);
-
     // totalActiveVotesPerRound is a map of round to active votes in each round
     Map<Integer, BigDecimal> totalActiveVotesPerRound = new HashMap<>();
     for (int round = 1; round <= numRounds; round++) {
@@ -340,6 +336,10 @@ class ResultsWriter {
     if (isNullOrBlank(precinct)) {
       addActionRows(csvPrinter);
     }
+
+    // Get all candidates sorted by their first round tally. This determines the display order.
+    Map<String, BigDecimal> firstRoundTally = roundTallies.get(1);
+    List<String> sortedCandidates = sortCandidatesByTally(firstRoundTally);
 
     // For each candidate: for each round: output total votes
     for (String candidate : sortedCandidates) {
@@ -491,13 +491,12 @@ class ResultsWriter {
   void generateCdfJson(List<CastVoteRecord> castVoteRecords)
       throws IOException, RoundSnapshotDataMissingException {
     // generate GpUnitIds for precincts "geo-political units" (can be a precinct or jurisdiction)
-    GpUnitIds = generateGpUnitIds();
+    gpUnitIds = generateGpUnitIds();
 
-    HashMap<String, Object> outputJson = new HashMap<>();
     String outputPath = getOutputFilePath("cvr_cdf") + ".json";
-
     Logger.log(Level.INFO, "Generating cast vote record CDF JSON file: %s...", outputPath);
 
+    HashMap<String, Object> outputJson = new HashMap<>();
     outputJson.put("CVR", generateCdfMapForCvrs(castVoteRecords));
     outputJson.put("Election", new Map[]{generateCdfMapForElection()});
     outputJson.put(
@@ -521,19 +520,19 @@ class ResultsWriter {
 
   // build map from precinctId => GpUnitId as lookups are done by precinctId during cvr creation
   private Map<String, String> generateGpUnitIds() {
-    Map<String, String> GpUnitIdToPrecinctId = new HashMap<>();
-    int GpUnitIdIndex = 0;
+    Map<String, String> gpUnitIdToPrecinctId = new HashMap<>();
+    int gpUnitIdIndex = 0;
     for (String precinctId : precinctIds) {
-      GpUnitIdToPrecinctId.put(precinctId, String.format(CDF_GPU_ID_FORMAT, ++GpUnitIdIndex));
+      gpUnitIdToPrecinctId.put(precinctId, String.format(CDF_GPU_ID_FORMAT, ++gpUnitIdIndex));
     }
-    return GpUnitIdToPrecinctId;
+    return gpUnitIdToPrecinctId;
   }
 
   // generates json containing GpUnit definitions
   private List<Map<String, Object>> generateCdfMapForGpUnits() {
-    List<Map<String, Object>> GpUnitMaps = new LinkedList<>();
+    List<Map<String, Object>> gpUnitMaps = new LinkedList<>();
     // election-scope entry for the election jurisdiction
-    GpUnitMaps.add(
+    gpUnitMaps.add(
         Map.ofEntries(
             entry("@id", CDF_GPU_ID),
             entry("Type", "other"),
@@ -542,15 +541,15 @@ class ResultsWriter {
             entry("@type", "CVR.GpUnit")));
 
     // generate GpUnit entries
-    for (Entry<String, String> entry : GpUnitIds.entrySet()) {
-      GpUnitMaps.add(
+    for (Entry<String, String> entry : gpUnitIds.entrySet()) {
+      gpUnitMaps.add(
           Map.ofEntries(
               entry("@id", entry.getValue()),
               entry("Type", "precinct"),
               entry("Name", entry.getKey()),
               entry("@type", "CVR.GpUnit")));
     }
-    return GpUnitMaps;
+    return gpUnitMaps;
   }
 
   // helper method for generateCdfJson to compile the data for all the CVR snapshots
@@ -588,8 +587,8 @@ class ResultsWriter {
       cvrMap.put("@type", "CVR.CVR");
       // if using precincts add GpUnitId for cvr precinct
       if (config.isTabulateByPrecinctEnabled()) {
-        String GpUnitId = GpUnitIds.get(cvr.getPrecinct());
-        cvrMap.put("BallotStyleUnitId", GpUnitId);
+        String gpUnitId = gpUnitIds.get(cvr.getPrecinct());
+        cvrMap.put("BallotStyleUnitId", gpUnitId);
       }
       cvrMaps.add(cvrMap);
     }
@@ -718,10 +717,6 @@ class ResultsWriter {
     String jsonPath = outputPath + ".json";
     Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
 
-    // root outputJson dict will have two entries:
-    // results - vote totals, transfers, and candidates elected / eliminated
-    // config - global config into
-    HashMap<String, Object> outputJson = new HashMap<>();
     // config will contain contest configuration info
     HashMap<String, Object> configData = new HashMap<>();
     configData.put("contest", config.getContestName());
@@ -746,6 +741,10 @@ class ResultsWriter {
       roundData.put("tally", updateCandidateNamesInTally(roundTallies.get(round)));
       results.add(roundData);
     }
+    // root outputJson dict will have two entries:
+    // results - vote totals, transfers, and candidates elected / eliminated
+    // config - global config into
+    HashMap<String, Object> outputJson = new HashMap<>();
     outputJson.put("config", configData);
     outputJson.put("results", results);
 

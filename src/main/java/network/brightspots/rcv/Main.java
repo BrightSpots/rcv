@@ -32,7 +32,10 @@ public class Main extends GuiApplication {
   public static final String APP_NAME = "Universal RCV Tabulator";
   public static final String APP_VERSION = "1.0.0";
 
-  // main entry point to the rcv tabulator program
+  /**
+   * Main entry point to the RCV tabulator program.
+   * @param args command-line args
+   */
   public static void main(String[] args) {
     System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
     Logger.setup();

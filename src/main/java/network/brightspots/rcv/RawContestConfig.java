@@ -68,10 +68,10 @@ public class RawContestConfig {
     private String precinctColumnIndex;
     private String provider;
 
-    public CvrSource() {
+    CvrSource() {
     }
 
-    public CvrSource(
+    CvrSource(
         String filePath,
         String firstVoteColumnIndex,
         String firstVoteRowIndex,
@@ -144,10 +144,10 @@ public class RawContestConfig {
     private String code;
     private boolean excluded;
 
-    public Candidate() {
+    Candidate() {
     }
 
-    public Candidate(String name, String code, boolean excluded) {
+    Candidate(String name, String code, boolean excluded) {
       this.name = name;
       this.code = code;
       this.excluded = excluded;

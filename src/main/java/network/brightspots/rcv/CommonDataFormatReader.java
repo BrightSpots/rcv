@@ -86,11 +86,11 @@ class CommonDataFormatReader {
   private List<Pair<Integer, String>> parseRankingsFromSnapshot(HashMap snapshot) {
     List<Pair<Integer, String>> rankings = new ArrayList<>();
     // at the top level is a list of contests each of which contains selections
-    ArrayList CvrContests = (ArrayList) snapshot.get("CVRContest");
-    for (Object contestObject : CvrContests) {
-      HashMap CvrContest = (HashMap) contestObject;
+    ArrayList cvrContests = (ArrayList) snapshot.get("CVRContest");
+    for (Object contestObject : cvrContests) {
+      HashMap cvrContest = (HashMap) contestObject;
       // each contest contains contestSelections
-      ArrayList contestSelections = (ArrayList) CvrContest.get("CVRContestSelection");
+      ArrayList contestSelections = (ArrayList) cvrContest.get("CVRContestSelection");
       for (Object contestSelectionObject : contestSelections) {
         HashMap contestSelection = (HashMap) contestSelectionObject;
         // selectionId is the candidate/contest ID for this selection position
