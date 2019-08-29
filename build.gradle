@@ -1,5 +1,6 @@
 plugins {
     id "application"
+    id "checkstyle"
     id "idea"
     id "java"
     id "org.openjfx.javafxplugin" version "0.0.7"
@@ -30,6 +31,15 @@ application {
 //    standardInput = System.in
 //    args = ["-cli", "path/to/config"]
 //}
+
+// ### Checkstyle plugin settings
+checkstyle {
+    toolVersion = "8.23"
+    // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
+    // the tag matching the toolVersion above):
+    // https://github.com/checkstyle/checkstyle/blob/checkstyle-8.23/src/main/resources/google_checks.xml
+    configFile = file("${configDir}/google_checks.xml")
+}
 
 // ### Idea plugin settings
 idea {
