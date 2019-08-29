@@ -717,9 +717,6 @@ class ResultsWriter {
     String jsonPath = outputPath + ".json";
     Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
 
-    // root outputJson dict will have two entries:
-    // results - vote totals, transfers, and candidates elected / eliminated
-    // config - global config into
     // config will contain contest configuration info
     HashMap<String, Object> configData = new HashMap<>();
     configData.put("contest", config.getContestName());
@@ -744,6 +741,9 @@ class ResultsWriter {
       roundData.put("tally", updateCandidateNamesInTally(roundTallies.get(round)));
       results.add(roundData);
     }
+    // root outputJson dict will have two entries:
+    // results - vote totals, transfers, and candidates elected / eliminated
+    // config - global config into
     HashMap<String, Object> outputJson = new HashMap<>();
     outputJson.put("config", configData);
     outputJson.put("results", results);
