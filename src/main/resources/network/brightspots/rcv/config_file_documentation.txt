@@ -4,7 +4,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
   "tabulatorVersion" required
     version of the application that created this file
     used for migrating config data between different application versions
-    example: "1.0.0"
+    example: "1.0.1"
     value: text string of length [1..1000]
 
   "outputSettings" required
