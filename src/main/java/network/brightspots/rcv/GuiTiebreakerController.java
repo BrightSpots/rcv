@@ -65,11 +65,19 @@ public class GuiTiebreakerController {
     buttonSelect.setText((selectingAWinner ? "Elect" : "Eliminate") + " Candidate");
   }
 
+  /**
+   * Action when cancel button is clicked.
+   * @param actionEvent ignored
+   */
   public void buttonCancelClicked(ActionEvent actionEvent) {
     setTabulationCancelled(true);
     ((Stage) ((Node) actionEvent.getSource()).getScene().getWindow()).close();
   }
 
+  /**
+   * Action when select button is clicked.
+   * @param actionEvent ignored
+   */
   public void buttonSelectClicked(ActionEvent actionEvent) {
     if (listViewCandidates.getSelectionModel().getSelectedItems().size() == 1) {
       setSelectedCandidate(listViewCandidates.getSelectionModel().getSelectedItems().get(0));

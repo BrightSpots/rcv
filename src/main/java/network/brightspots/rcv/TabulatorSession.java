@@ -263,10 +263,10 @@ class TabulatorSession {
         Logger.log(Level.SEVERE, "Error opening cast vote record file: %s", cvrPath);
         Logger.log(Level.INFO, "Check file path and permissions and make sure they are correct!");
         encounteredSourceProblem = true;
-      } catch (ParserConfigurationException |
-          SAXException |
-          OpenXML4JException |
-          POIXMLException e) {
+      } catch (ParserConfigurationException
+          | SAXException
+          | OpenXML4JException
+          | POIXMLException e) {
         Logger.log(Level.SEVERE, "Error parsing source file %s", cvrPath);
         Logger.log(Level.INFO, "ES&S cast vote record files must be Microsoft Excel Workbook "
             + "format.\nStrict Open XML and Open Office are not supported.");

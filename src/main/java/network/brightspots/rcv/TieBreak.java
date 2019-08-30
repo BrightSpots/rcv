@@ -50,6 +50,7 @@ import network.brightspots.rcv.Tabulator.TieBreakMode;
 
 class TieBreak {
 
+  private static final String CLI_CANCEL_COMMAND = "x";
   private static Random random;
   private final List<String> allTiedCandidates;
   private final Tabulator.TieBreakMode tieBreakMode;
@@ -163,21 +164,20 @@ class TieBreak {
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i + 1) + ". " + tiedCandidates.get(i));
     }
-    final String CANCEL_COMMAND = "x";
-    final String TIEBREAKER_PROMPT =
+    final String prompt =
         "Enter the number corresponding to the candidate who should "
             + (selectingAWinner ? "win" : "lose")
             + " this tiebreaker (or "
-            + CANCEL_COMMAND
+            + CLI_CANCEL_COMMAND
             + " to cancel): ";
-    System.out.println(TIEBREAKER_PROMPT);
+    System.out.println(prompt);
 
     String selection = null;
 
     while (selection == null) {
       Scanner sc = new Scanner(System.in);
       String userInput = sc.nextLine();
-      if (userInput.equals(CANCEL_COMMAND)) {
+      if (userInput.equals(CLI_CANCEL_COMMAND)) {
         System.out.println("Cancelling tabulation...");
         throw new TabulationCancelledException();
       }
@@ -192,7 +192,7 @@ class TieBreak {
       }
       if (selection == null) {
         System.out.println("Invalid selection. Please try again.");
-        System.out.println(TIEBREAKER_PROMPT);
+        System.out.println(prompt);
       }
     }
 
@@ -289,7 +289,8 @@ class TieBreak {
     if (candidatesInContention.size() > 1) {
       String explanationPrefix =
           String.format(
-              "Comparing previous round counts still resulted in a tie %s %s, so we fell back to %s.",
+              "Comparing previous round counts still resulted in a tie %s %s, so we fell back to "
+                  + "%s.",
               candidatesInContention.size() > 2 ? "among" : "between",
               Utils.listToSentenceWithQuotes(candidatesInContention),
               tieBreakMode == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
