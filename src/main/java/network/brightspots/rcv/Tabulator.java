@@ -442,7 +442,12 @@ class Tabulator {
           if (tally.compareTo(winningThreshold) >= 0) {
             // we have winner(s)
             List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
-            selectedWinners.addAll(winningCandidates);
+            for (String candidate : winningCandidates) {
+              // The undeclared write-in placeholder can't win!
+              if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
+                selectedWinners.add(candidate);
+              }
+            }
           }
         }
       }
@@ -503,9 +508,8 @@ class Tabulator {
     List<String> eliminated = new LinkedList<>();
     // undeclared label
     String label = config.getUndeclaredWriteInLabel();
-    if (currentRound == 1
-        && !isNullOrBlank(label)
-        && candidateIds.contains(label)
+    if (!isNullOrBlank(label)
+        && currentRoundCandidateToTally.get(label) != null
         && currentRoundCandidateToTally.get(label).signum() == 1) {
       eliminated.add(label);
       Logger.log(
