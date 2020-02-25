@@ -44,6 +44,12 @@ class CastVoteRecord {
   private final String suppliedId;
   // which precinct this ballot came from
   private final String precinct;
+  // contest associated with this CVR
+  private String contestId = null;
+  //tabulatorId parsed from Dominion CVR data
+  private String tabulatorId = null;
+  // batchId parsed from Dominion CVR data
+  private String batchId = null;
   // container for ALL CVR data parsed from the source CVR file
   private final List<String> fullCvrData;
   // records winners to whom some fraction of this vote has been allocated
