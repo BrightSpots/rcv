@@ -46,7 +46,7 @@ class CastVoteRecord {
   private final String precinct;
   // contest associated with this CVR
   private String contestId = null;
-  //tabulatorId parsed from Dominion CVR data
+  // tabulatorId parsed from Dominion CVR data
   private String tabulatorId = null;
   // batchId parsed from Dominion CVR data
   private String batchId = null;
