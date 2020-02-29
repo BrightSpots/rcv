@@ -24,6 +24,7 @@ package network.brightspots.rcv;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -50,6 +51,8 @@ class CastVoteRecord {
   private Integer tabulatorId;
   // batchId parsed from Dominion CVR data
   private Integer batchId;
+  // ballotTypeId parsed from Dominion CVR data
+  private Integer ballotTypeId;
   // container for ALL CVR data parsed from the source CVR file
   private final List<String> fullCvrData;
   // records winners to whom some fraction of this vote has been allocated
@@ -67,6 +70,27 @@ class CastVoteRecord {
   // getting. As a memory optimization, if the data is unchanged from the previous round, we don't
   // add a new entry.
   private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
+
+  CastVoteRecord(
+      Integer contestId,
+      Integer tabulatorId,
+      Integer batchId,
+      String suppliedId,
+      String precinct,
+      Integer ballotTypeId,
+      List<Pair<Integer, String>> rankings) {
+    this.contestId = contestId;
+    this.tabulatorId = tabulatorId;
+    this.batchId = batchId;
+    this.computedId = suppliedId;
+    this.suppliedId = suppliedId;
+    this.precinct = precinct;
+    this.ballotTypeId = ballotTypeId;
+    this.fullCvrData = new ArrayList<>();
+    sortRankings(rankings);
+  }
+
+  static class CvrParseException extends Exception {}
 
   CastVoteRecord(
       String computedId,
