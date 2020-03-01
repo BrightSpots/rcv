@@ -25,7 +25,6 @@ package network.brightspots.rcv;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
@@ -41,17 +40,6 @@ public class Main extends GuiApplication {
     System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
     Logger.setup();
     logSystemInfo();
-
-    // for testing
-    String wyoming = "/Flair/Downloads/Dominion/Wyoming";
-    String sf = "/Flair/Downloads/Dominion/SF";
-    List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    DominionCvrReader test = new DominionCvrReader(wyoming);
-    try {
-      test.readCastVoteRecords(castVoteRecords);
-    } catch (CvrParseException e) {
-      e.printStackTrace();
-    }
 
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;

@@ -184,6 +184,7 @@ public class RawContestConfig {
     public void setExcluded(boolean excluded) {
       this.excluded = excluded;
     }
+
     public Integer getContestId() {
       return contestId;
     }
