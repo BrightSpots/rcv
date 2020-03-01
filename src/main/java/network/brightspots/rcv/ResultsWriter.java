@@ -197,7 +197,7 @@ class ResultsWriter {
     return filename;
   }
 
-  private String getOutputFilePath(String outputType) {
+  private String getOutputFilePathFromInstance(String outputType) {
     return getOutputFilePath(
         config.getOutputDirectory(),
         outputType,
@@ -273,7 +273,7 @@ class ResultsWriter {
     for (String precinct : precinctRoundTallies.keySet()) {
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
-          getOutputFilePath(String.format("%s_precinct_summary", precinctFileString));
+          getOutputFilePathFromInstance(String.format("%s_precinct_summary", precinctFileString));
       int numBallots = numBallotsByPrecinct.get(precinct);
       generateSummarySpreadsheet(
           precinctRoundTallies.get(precinct), numBallots, precinct, outputPath);
@@ -483,7 +483,7 @@ class ResultsWriter {
       TallyTransfers tallyTransfers,
       int numBallots)
       throws IOException {
-    String outputPath = getOutputFilePath("summary");
+    String outputPath = getOutputFilePathFromInstance("summary");
     generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
@@ -494,7 +494,7 @@ class ResultsWriter {
     // generate GpUnitIds for precincts "geo-political units" (can be a precinct or jurisdiction)
     gpUnitIds = generateGpUnitIds();
 
-    String outputPath = getOutputFilePath("cvr_cdf") + ".json";
+    String outputPath = getOutputFilePathFromInstance("cvr_cdf") + ".json";
     Logger.log(Level.INFO, "Generating cast vote record CDF JSON file: %s...", outputPath);
 
     HashMap<String, Object> outputJson = new HashMap<>();
