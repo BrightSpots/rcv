@@ -165,14 +165,17 @@ class DominionCvrReader {
       // for each Cvr object extract various fields
       for (Object sessionObject : sessions) {
         HashMap session = (HashMap) sessionObject;
-
         // extract various ids
         Integer tabulatorId = (Integer) session.get("TabulatorId");
         Integer batchId = (Integer) session.get("BatchId");
         Integer recordId = (Integer) session.get("RecordId");
         String suppliedId = recordId.toString();
         HashMap originalObject = (HashMap) session.get("Original");
-
+        // filter out records which are not current (these result from adjudication)
+        Boolean isCurrent = (Boolean) originalObject.get("IsCurrent");
+        if (!isCurrent) {
+          continue;
+        }
         // validate precinct
         Integer precinctPortionId = (Integer) originalObject.get("PrecinctPortionId");
         if (!this.precincts.containsKey(precinctPortionId)) {
@@ -243,14 +246,14 @@ class DominionCvrReader {
   }
 
   // Simple container class for contest data
-  public static class Contest {
+  private static class Contest {
 
-    String name;
-    Integer id;
-    Integer numCandidates;
-    Integer maxRanks;
+    private String name;
+    private Integer id;
+    private Integer numCandidates;
+    private Integer maxRanks;
 
-    public Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
+    private Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
       this.name = name;
       this.id = id;
       this.numCandidates = numCandidates;
