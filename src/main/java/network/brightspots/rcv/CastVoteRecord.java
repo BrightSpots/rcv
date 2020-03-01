@@ -229,5 +229,4 @@ class CastVoteRecord {
   static class CvrParseException extends Exception {
 
   }
-
 }

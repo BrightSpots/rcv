@@ -100,16 +100,6 @@ class ResultsWriter {
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
   }
 
-  private String getOutputFilePath(String outputType) {
-    return getOutputFilePath(
-        config.getOutputDirectory(),
-        outputType,
-        timestampString,
-        config.isMultiSeatSequentialWinnerTakesAllEnabled()
-            ? config.getSequentialWinners().size() + 1
-            : null);
-  }
-
   static String sanitizeStringForOutput(String s) {
     return s.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
   }
@@ -205,6 +195,16 @@ class ResultsWriter {
     }
     filenames.add(filename);
     return filename;
+  }
+
+  private String getOutputFilePath(String outputType) {
+    return getOutputFilePath(
+        config.getOutputDirectory(),
+        outputType,
+        timestampString,
+        config.isMultiSeatSequentialWinnerTakesAllEnabled()
+            ? config.getSequentialWinners().size() + 1
+            : null);
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
@@ -361,8 +361,7 @@ class ResultsWriter {
       // Exhausted/inactive count is the difference between the total ballots and the total votes
       // still active or counting as residual surplus votes in the current round.
       BigDecimal thisRoundInactive =
-          new BigDecimal(numBallots)
-              .subtract(totalActiveVotesPerRound.get(round));
+          new BigDecimal(numBallots).subtract(totalActiveVotesPerRound.get(round));
 
       if (precinct == null) {
         // We don't have the concept of residual surplus at the precinct level (see comment below),
@@ -480,8 +479,10 @@ class ResultsWriter {
 
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a precinct)
   void generateOverallSummaryFiles(
-      Map<Integer, Map<String, BigDecimal>> roundTallies, TallyTransfers tallyTransfers,
-      int numBallots) throws IOException {
+      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      TallyTransfers tallyTransfers,
+      int numBallots)
+      throws IOException {
     String outputPath = getOutputFilePath("summary");
     generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);

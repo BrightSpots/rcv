@@ -182,6 +182,14 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TabPane tabPane;
 
+  private static String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
+    return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
+  }
+
+  private static String getTextOrEmptyString(TextField textField) {
+    return textField.getText() != null ? textField.getText().trim() : "";
+  }
+
   /**
    * Action when new config button is clicked.
    */
@@ -271,8 +279,8 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when validate button is clicked.
-   * Validates whatever is currently entered into the GUI. Does not save data.
+   * Action when validate button is clicked. Validates whatever is currently entered into the GUI.
+   * Does not save data.
    */
   public void buttonValidateClicked() {
     setGuiIsBusy(true);
@@ -330,16 +338,12 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Action when exit button is clicked.
-   */
+  /** Action when exit button is clicked. */
   public void buttonExitClicked() {
     exitGui();
   }
 
-  /**
-   * Action when output directory button is clicked.
-   */
+  /** Action when output directory button is clicked. */
   public void buttonOutputDirectoryClicked() {
     DirectoryChooser dc = new DirectoryChooser();
     dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -350,16 +354,12 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Action when clear button is clicked for contest date.
-   */
+  /** Action when clear button is clicked for contest date. */
   public void buttonClearDatePickerContestDateClicked() {
     datePickerContestDate.setValue(null);
   }
 
-  /**
-   * Action when CVR file path button is clicked.
-   */
+  /** Action when CVR file path button is clicked. */
   public void buttonCvrFilePathClicked() {
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -373,14 +373,16 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Action when add CVR file button is clicked.
-   */
+  /** Action when add CVR file button is clicked. */
   public void buttonAddCvrFileClicked() {
-    CvrSource cvrSource = new CvrSource(getTextOrEmptyString(textFieldCvrFilePath),
-        getTextOrEmptyString(textFieldCvrFirstVoteCol),
-        getTextOrEmptyString(textFieldCvrFirstVoteRow), getTextOrEmptyString(textFieldCvrIdCol),
-        getTextOrEmptyString(textFieldCvrPrecinctCol), getTextOrEmptyString(textFieldCvrProvider));
+    CvrSource cvrSource =
+        new CvrSource(
+            getTextOrEmptyString(textFieldCvrFilePath),
+            getTextOrEmptyString(textFieldCvrFirstVoteCol),
+            getTextOrEmptyString(textFieldCvrFirstVoteRow),
+            getTextOrEmptyString(textFieldCvrIdCol),
+            getTextOrEmptyString(textFieldCvrPrecinctCol),
+            getTextOrEmptyString(textFieldCvrProvider));
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
@@ -392,75 +394,74 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Action when delete CVR file button is clicked.
-   */
+  /** Action when delete CVR file button is clicked. */
   public void buttonDeleteCvrFileClicked() {
     tableViewCvrFiles
         .getItems()
         .removeAll(tableViewCvrFiles.getSelectionModel().getSelectedItems());
   }
 
-  /**
-   * Action when CVR file path is changed.
-   */
+  /** Action when CVR file path is changed. */
   public void changeCvrFilePath(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setFilePath(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR first vote col is changed.
-   */
+  /** Action when CVR first vote col is changed. */
   public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setFirstVoteColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR first vote row is changed.
-   */
+  /** Action when CVR first vote row is changed. */
   public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setFirstVoteRowIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR ID col index is changed.
-   */
+  /** Action when CVR ID col index is changed. */
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR precinct col index is changed.
-   */
+  /** Action when CVR precinct col index is changed. */
   public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR provider is changed.
-   */
+  /** Action when CVR provider is changed. */
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setProvider(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when add candidate button is clicked.
-   */
+  /** Action when add candidate button is clicked. */
   public void buttonAddCandidateClicked() {
-    Candidate candidate = new Candidate(getTextOrEmptyString(textFieldCandidateName),
-        getTextOrEmptyString(textFieldCandidateCode), ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+    Candidate candidate =
+        new Candidate(
+            getTextOrEmptyString(textFieldCandidateName),
+            getTextOrEmptyString(textFieldCandidateCode),
+            ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
     if (ContestConfig.passesBasicCandidateValidation(candidate)) {
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
@@ -468,29 +469,27 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Action when delete candidate button is clicked.
-   */
+  /** Action when delete candidate button is clicked. */
   public void buttonDeleteCandidateClicked() {
     tableViewCandidates
         .getItems()
         .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
   }
 
-  /**
-   * Action when candidate name is changed.
-   */
+  /** Action when candidate name is changed. */
   public void changeCandidateName(CellEditEvent cellEditEvent) {
-    tableViewCandidates.getSelectionModel().getSelectedItem()
+    tableViewCandidates
+        .getSelectionModel()
+        .getSelectedItem()
         .setName(cellEditEvent.getNewValue().toString().trim());
     tableViewCandidates.refresh();
   }
 
-  /**
-   * Action when candidate code is changed.
-   */
+  /** Action when candidate code is changed. */
   public void changeCandidateCode(CellEditEvent cellEditEvent) {
-    tableViewCandidates.getSelectionModel().getSelectedItem()
+    tableViewCandidates
+        .getSelectionModel()
+        .getSelectedItem()
         .setCode(cellEditEvent.getNewValue().toString().trim());
     tableViewCandidates.refresh();
   }
@@ -758,10 +757,12 @@ public class GuiConfigController implements Initializable {
   }
 
   private void migrateConfigVersion(ContestConfig config) {
-    if (config.rawConfig.tabulatorVersion == null || !config.rawConfig.tabulatorVersion
-        .equals(Main.APP_VERSION)) {
+    if (config.rawConfig.tabulatorVersion == null
+        || !config.rawConfig.tabulatorVersion.equals(Main.APP_VERSION)) {
       // Any necessary future version migration logic goes here
-      Logger.log(Level.INFO, "Migrated tabulator config version from %s to %s.",
+      Logger.log(
+          Level.INFO,
+          "Migrated tabulator config version from %s to %s.",
           config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
           Main.APP_VERSION);
       config.rawConfig.tabulatorVersion = Main.APP_VERSION;
@@ -802,7 +803,8 @@ public class GuiConfigController implements Initializable {
     choiceOvervoteRule.setValue(
         config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
     choiceWinnerElectionMode.setValue(
-        config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN ? null
+        config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN
+            ? null
             : config.getWinnerElectionMode());
 
     ContestRules rules = rawConfig.rules;
@@ -821,14 +823,6 @@ public class GuiConfigController implements Initializable {
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
-  }
-
-  private static String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
-    return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
-  }
-
-  private static String getTextOrEmptyString(TextField textField) {
-    return textField.getText() != null ? textField.getText().trim() : "";
   }
 
   private RawContestConfig createRawContestConfig() {
@@ -866,8 +860,8 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
-    rules.winnerElectionMode = getChoiceElse(choiceWinnerElectionMode,
-        WinnerElectionMode.MODE_UNKNOWN);
+    rules.winnerElectionMode =
+        getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN);
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
     rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
     rules.decimalPlacesForVoteArithmetic =

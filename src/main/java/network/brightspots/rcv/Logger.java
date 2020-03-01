@@ -85,9 +85,11 @@ class Logger {
       executionHandler.setLevel(Level.INFO);
       logger.addHandler(executionHandler);
     } catch (IOException exception) {
-      log(Level.WARNING,
+      log(
+          Level.WARNING,
           "Failed to start system logging!\nMake sure you have write access in %s\n%s.",
-          System.getProperty("user.dir"), exception.toString());
+          System.getProperty("user.dir"),
+          exception.toString());
     }
 
     for (Handler handler : logger.getHandlers()) {

@@ -188,7 +188,6 @@ public class RawContestConfig {
     public Integer getContestId() {
       return contestId;
     }
-
   }
 
   // ContestRules: encapsulates the set of rules required to perform contest tabulation

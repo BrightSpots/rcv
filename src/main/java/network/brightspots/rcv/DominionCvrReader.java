@@ -80,7 +80,6 @@ class DominionCvrReader {
         String name = (String) precinctMap.get("Description");
         Integer id = (Integer) precinctMap.get("Id");
         precinctsById.put(id, name);
-
       }
     } catch (Exception e) {
       Logger.log(Level.SEVERE, "Error parsing precinct manifest: %s", e.toString());
@@ -112,8 +111,7 @@ class DominionCvrReader {
   }
 
   // parse Cvr json into CastVoteRecord objects and add them to the input list
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException {
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
     // read metadata files for precincts, contest, and candidates
     Path precinctPath = Paths.get(manifestFolder, PRECINCT_MANIFEST);
     this.precincts = getPrecincts(precinctPath.toString());
@@ -179,7 +177,9 @@ class DominionCvrReader {
         // validate precinct
         Integer precinctPortionId = (Integer) originalObject.get("PrecinctPortionId");
         if (!this.precincts.containsKey(precinctPortionId)) {
-          Logger.log(Level.SEVERE, "Precinct id %d from Cvr not found in manifest data!",
+          Logger.log(
+              Level.SEVERE,
+              "Precinct id %d from Cvr not found in manifest data!",
               precinctPortionId);
           throw new CvrParseException();
         }
@@ -201,8 +201,8 @@ class DominionCvrReader {
           HashMap contest = (HashMap) contestObject;
           Integer contestId = (Integer) contest.get("Id");
           // validate contest id
-          if (!this.contests.containsKey(contestId) ||
-              !contestIdToCandidateCodes.containsKey(contestId)) {
+          if (!this.contests.containsKey(contestId)
+              || !contestIdToCandidateCodes.containsKey(contestId)) {
             Logger.log(Level.SEVERE, "Unknown contest id %d found while parsing Cvr!", contestId);
             throw new CvrParseException();
           }
@@ -215,8 +215,11 @@ class DominionCvrReader {
             String candidateCode = candidateId.toString();
             Set<String> candidates = contestIdToCandidateCodes.get(contestId);
             if (!candidates.contains(candidateCode)) {
-              Logger.log(Level.SEVERE, "Candidate code %s is not valid for contest %d!",
-                  candidateCode, contestId);
+              Logger.log(
+                  Level.SEVERE,
+                  "Candidate code %s is not valid for contest %d!",
+                  candidateCode,
+                  contestId);
               throw new CvrParseException();
             }
 
@@ -225,13 +228,9 @@ class DominionCvrReader {
             rankings.add(ranking);
           }
           // create the new Cvr
-          CastVoteRecord newCvr = new CastVoteRecord(contestId,
-              tabulatorId,
-              batchId,
-              suppliedId,
-              precinct,
-              ballotTypeId,
-              rankings);
+          CastVoteRecord newCvr =
+              new CastVoteRecord(
+                  contestId, tabulatorId, batchId, suppliedId, precinct, ballotTypeId, rankings);
           castVoteRecords.add(newCvr);
         }
         // provide some user feedback on the Cvr count
@@ -260,5 +259,4 @@ class DominionCvrReader {
       this.maxRanks = maxRanks;
     }
   }
-
 }

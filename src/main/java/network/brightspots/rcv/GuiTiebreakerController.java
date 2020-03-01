@@ -67,6 +67,7 @@ public class GuiTiebreakerController {
 
   /**
    * Action when cancel button is clicked.
+   *
    * @param actionEvent ignored
    */
   public void buttonCancelClicked(ActionEvent actionEvent) {
@@ -76,6 +77,7 @@ public class GuiTiebreakerController {
 
   /**
    * Action when select button is clicked.
+   *
    * @param actionEvent ignored
    */
   public void buttonSelectClicked(ActionEvent actionEvent) {

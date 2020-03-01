@@ -45,8 +45,10 @@ class FileUtils {
     if (!isNullOrBlank(dir)) {
       File dirFile = new File(dir);
       if (!dirFile.exists() && !dirFile.mkdirs()) {
-        Logger.log(Level.SEVERE, "Failed to create output directory: %s\n"
-            + "Check the directory name and permissions.", dir);
+        Logger.log(
+            Level.SEVERE,
+            "Failed to create output directory: %s\n" + "Check the directory name and permissions.",
+            dir);
         throw new UnableToCreateDirectoryException("Unable to create output directory: " + dir);
       }
     }

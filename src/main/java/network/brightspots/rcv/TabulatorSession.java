@@ -55,8 +55,8 @@ class TabulatorSession {
   private final String configPath;
   // precinct IDs discovered during CVR parsing to support testing
   private final Set<String> precinctIds = new HashSet<>();
-  private String outputPath;
   private final String timestampString;
+  private String outputPath;
 
   TabulatorSession(String configPath) {
     this.configPath = configPath;
@@ -130,7 +130,9 @@ class TabulatorSession {
         // temporarily set config to single-seat so we can run sequential elections
         config.setNumberOfWinners(1);
         while (config.getSequentialWinners().size() < numWinners) {
-          Logger.log(Level.INFO, "Beginning tabulation for seat #%d...",
+          Logger.log(
+              Level.INFO,
+              "Beginning tabulation for seat #%d...",
               config.getSequentialWinners().size() + 1);
           // Read cast vote records and precinct IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
@@ -149,7 +151,9 @@ class TabulatorSession {
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
-          Logger.log(Level.INFO, "Tabulation for seat #%d completed.",
+          Logger.log(
+              Level.INFO,
+              "Tabulation for seat #%d completed.",
               config.getSequentialWinners().size());
           if (config.getSequentialWinners().size() < numWinners) {
             Logger.log(Level.INFO, "Excluding %s from the remaining tabulations.", newWinner);
@@ -188,10 +192,10 @@ class TabulatorSession {
     boolean success = false;
 
     // %g format is for log file naming
-    String tabulationLogPath = Paths
-        .get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
-        .toAbsolutePath()
-        .toString();
+    String tabulationLogPath =
+        Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
+            .toAbsolutePath()
+            .toString();
 
     // cache outputPath for testing
     outputPath = config.getOutputDirectory();
@@ -210,8 +214,9 @@ class TabulatorSession {
 
   // execute tabulation for given ContestConfig (a Session may comprise multiple tabulations)
   // returns: set of winners from tabulation
-  private Set<String> runTabulationForConfig(ContestConfig config,
-      List<CastVoteRecord> castVoteRecords) throws TabulationCancelledException {
+  private Set<String> runTabulationForConfig(
+      ContestConfig config, List<CastVoteRecord> castVoteRecords)
+      throws TabulationCancelledException {
     Set<String> winners;
     Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIds);
     winners = tabulator.tabulate();
@@ -255,8 +260,10 @@ class TabulatorSession {
         }
         // various incorrect settings can lead to UnrecognizedCandidatesException so it's hard
         // to know exactly what the problem is
-        Logger.log(Level.INFO, "Check config settings for candidate names, firstVoteRowIndex, "
-            + "firstVoteColumnIndex, and precinctColumnIndex to make sure they are correct!");
+        Logger.log(
+            Level.INFO,
+            "Check config settings for candidate names, firstVoteRowIndex, "
+                + "firstVoteColumnIndex, and precinctColumnIndex to make sure they are correct!");
         Logger.log(Level.INFO, "See config_file_documentation.txt for more details.");
         encounteredSourceProblem = true;
       } catch (IOException e) {
@@ -268,8 +275,10 @@ class TabulatorSession {
           | OpenXML4JException
           | POIXMLException e) {
         Logger.log(Level.SEVERE, "Error parsing source file %s", cvrPath);
-        Logger.log(Level.INFO, "ES&S cast vote record files must be Microsoft Excel Workbook "
-            + "format.\nStrict Open XML and Open Office are not supported.");
+        Logger.log(
+            Level.INFO,
+            "ES&S cast vote record files must be Microsoft Excel Workbook "
+                + "format.\nStrict Open XML and Open Office are not supported.");
         encounteredSourceProblem = true;
       } catch (CvrDataFormatException e) {
         Logger.log(Level.SEVERE, "Data format error while parsing source file: %s", cvrPath);

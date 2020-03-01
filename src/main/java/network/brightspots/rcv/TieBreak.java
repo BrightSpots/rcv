@@ -307,6 +307,17 @@ class TieBreak {
     return selection;
   }
 
+  private static class GuiTiebreakerPromptResponse {
+
+    final boolean tabulationCancelled;
+    final String selectedCandidate;
+
+    GuiTiebreakerPromptResponse(boolean tabulationCancelled, String selectedCandidate) {
+      this.tabulationCancelled = tabulationCancelled;
+      this.selectedCandidate = selectedCandidate;
+    }
+  }
+
   class GuiTiebreakerPrompt implements Callable<GuiTiebreakerPromptResponse> {
 
     private List<String> tiedCandidates;
@@ -340,17 +351,6 @@ class TieBreak {
 
     void setTiedCandidates(List<String> tiedCandidates) {
       this.tiedCandidates = tiedCandidates;
-    }
-  }
-
-  private static class GuiTiebreakerPromptResponse {
-
-    final boolean tabulationCancelled;
-    final String selectedCandidate;
-
-    GuiTiebreakerPromptResponse(boolean tabulationCancelled, String selectedCandidate) {
-      this.tabulationCancelled = tabulationCancelled;
-      this.selectedCandidate = selectedCandidate;
     }
   }
 }
