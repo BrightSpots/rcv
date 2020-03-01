@@ -121,7 +121,7 @@ class TabulatorSession {
         Logger.log(Level.INFO, "End config file contents.");
         reader.close();
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error logging config file: %s\n", configPath, e.toString());
+        Logger.log(Level.SEVERE, "Error logging config file: %s\n%s", configPath, e.toString());
       }
       Logger.log(Level.INFO, "Tabulating '%s'...", config.getContestName());
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {

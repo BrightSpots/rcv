@@ -77,7 +77,7 @@ class CommonDataFormatReader {
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing candidate data: %s", e.toString());
+      Logger.log(Level.SEVERE, "Error parsing candidate data:\n%s", e.toString());
     }
     return candidates;
   }
@@ -150,7 +150,7 @@ class CommonDataFormatReader {
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing CDF data: %s", e.toString());
+      Logger.log(Level.SEVERE, "Error parsing CDF data:\n%s", e.toString());
     }
   }
 }
