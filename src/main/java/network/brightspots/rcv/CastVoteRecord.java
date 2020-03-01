@@ -24,6 +24,7 @@ package network.brightspots.rcv;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -44,29 +45,50 @@ class CastVoteRecord {
   private final String suppliedId;
   // which precinct this ballot came from
   private final String precinct;
-  // contest associated with this CVR
-  private Integer contestId;
-  // tabulatorId parsed from Dominion CVR data
-  private Integer tabulatorId;
-  // batchId parsed from Dominion CVR data
-  private Integer batchId;
   // container for ALL CVR data parsed from the source CVR file
   private final List<String> fullCvrData;
   // records winners to whom some fraction of this vote has been allocated
   private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
-  // map of round to all candidates selected for that round
-  // a set is used to handle overvotes
-  SortedMap<Integer, Set<String>> rankToCandidateIds;
-  // whether this CVR is exhausted or not
-  private boolean isExhausted;
-  // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
-  private String currentRecipientOfVote = null;
   // If CVR CDF output is enabled, we store the necessary info here: for each round, the list of
   // candidates this ballot is counting toward (0 or 1 in a single-seat contest; 0 to n in a
   // multi-seat contest because of fractional vote transfers), and how much of the vote each is
   // getting. As a memory optimization, if the data is unchanged from the previous round, we don't
   // add a new entry.
   private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
+  // map of round to all candidates selected for that round
+  // a set is used to handle overvotes
+  SortedMap<Integer, Set<String>> rankToCandidateIds;
+  // contest associated with this CVR
+  private Integer contestId;
+  // tabulatorId parsed from Dominion CVR data
+  private Integer tabulatorId;
+  // batchId parsed from Dominion CVR data
+  private Integer batchId;
+  // ballotTypeId parsed from Dominion CVR data
+  private Integer ballotTypeId;
+  // whether this CVR is exhausted or not
+  private boolean isExhausted;
+  // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
+  private String currentRecipientOfVote = null;
+
+  CastVoteRecord(
+      Integer contestId,
+      Integer tabulatorId,
+      Integer batchId,
+      String suppliedId,
+      String precinct,
+      Integer ballotTypeId,
+      List<Pair<Integer, String>> rankings) {
+    this.contestId = contestId;
+    this.tabulatorId = tabulatorId;
+    this.batchId = batchId;
+    this.computedId = null;
+    this.suppliedId = suppliedId;
+    this.precinct = precinct;
+    this.ballotTypeId = ballotTypeId;
+    this.fullCvrData = new ArrayList<>();
+    sortRankings(rankings);
+  }
 
   CastVoteRecord(
       String computedId,
@@ -203,4 +225,9 @@ class CastVoteRecord {
     IGNORED,
     EXHAUSTED,
   }
+
+  static class CvrParseException extends Exception {
+
+  }
+
 }
