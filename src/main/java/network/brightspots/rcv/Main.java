@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -34,6 +34,7 @@ public class Main extends GuiApplication {
 
   /**
    * Main entry point to the RCV tabulator program.
+   *
    * @param args command-line args
    */
   public static void main(String[] args) {
@@ -59,13 +60,16 @@ public class Main extends GuiApplication {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
       // check for unexpected input
       if (argsCli.size() == 0) {
-        Logger.log(Level.SEVERE, "No config file path provided on command line!\n"
-            + "Please provide a path to the config file!\n"
-            + "See README.md for more details.");
+        Logger.log(
+            Level.SEVERE,
+            "No config file path provided on command line!\n"
+                + "Please provide a path to the config file!\n"
+                + "See README.md for more details.");
         System.exit(1);
       } else if (argsCli.size() > 2) {
-        Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d\n"
-                + "See README.md for more details.",
+        Logger.log(
+            Level.SEVERE,
+            "Too many arguments! Max is 2 but got: %d\n" + "See README.md for more details.",
             argsCli.size());
         System.exit(2);
       }
@@ -86,8 +90,10 @@ public class Main extends GuiApplication {
 
   private static void logSystemInfo() {
     Logger.log(Level.INFO, "Launching %s version %s...", APP_NAME, APP_VERSION);
-    Logger.log(Level.INFO, "Host system: %s version %s", System.getProperty("os.name"),
+    Logger.log(
+        Level.INFO,
+        "Host system: %s version %s",
+        System.getProperty("os.name"),
         System.getProperty("os.version"));
   }
-
 }

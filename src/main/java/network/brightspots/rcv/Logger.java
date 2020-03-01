@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -85,9 +85,11 @@ class Logger {
       executionHandler.setLevel(Level.INFO);
       logger.addHandler(executionHandler);
     } catch (IOException exception) {
-      log(Level.WARNING,
+      log(
+          Level.WARNING,
           "Failed to start system logging!\nMake sure you have write access in %s\n%s.",
-          System.getProperty("user.dir"), exception.toString());
+          System.getProperty("user.dir"),
+          exception.toString());
     }
 
     for (Handler handler : logger.getHandlers()) {

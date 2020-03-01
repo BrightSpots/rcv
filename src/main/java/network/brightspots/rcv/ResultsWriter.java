@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -100,16 +100,6 @@ class ResultsWriter {
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
   }
 
-  private String getOutputFilePath(String outputType) {
-    return getOutputFilePath(
-        config.getOutputDirectory(),
-        outputType,
-        timestampString,
-        config.isMultiSeatSequentialWinnerTakesAllEnabled()
-            ? config.getSequentialWinners().size() + 1
-            : null);
-  }
-
   static String sanitizeStringForOutput(String s) {
     return s.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
   }
@@ -207,6 +197,16 @@ class ResultsWriter {
     return filename;
   }
 
+  private String getOutputFilePathFromInstance(String outputType) {
+    return getOutputFilePath(
+        config.getOutputDirectory(),
+        outputType,
+        timestampString,
+        config.isMultiSeatSequentialWinnerTakesAllEnabled()
+            ? config.getSequentialWinners().size() + 1
+            : null);
+  }
+
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
     this.roundToResidualSurplus = roundToResidualSurplus;
     return this;
@@ -273,7 +273,7 @@ class ResultsWriter {
     for (String precinct : precinctRoundTallies.keySet()) {
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
-          getOutputFilePath(String.format("%s_precinct_summary", precinctFileString));
+          getOutputFilePathFromInstance(String.format("%s_precinct_summary", precinctFileString));
       int numBallots = numBallotsByPrecinct.get(precinct);
       generateSummarySpreadsheet(
           precinctRoundTallies.get(precinct), numBallots, precinct, outputPath);
@@ -361,8 +361,7 @@ class ResultsWriter {
       // Exhausted/inactive count is the difference between the total ballots and the total votes
       // still active or counting as residual surplus votes in the current round.
       BigDecimal thisRoundInactive =
-          new BigDecimal(numBallots)
-              .subtract(totalActiveVotesPerRound.get(round));
+          new BigDecimal(numBallots).subtract(totalActiveVotesPerRound.get(round));
 
       if (precinct == null) {
         // We don't have the concept of residual surplus at the precinct level (see comment below),
@@ -480,9 +479,11 @@ class ResultsWriter {
 
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a precinct)
   void generateOverallSummaryFiles(
-      Map<Integer, Map<String, BigDecimal>> roundTallies, TallyTransfers tallyTransfers,
-      int numBallots) throws IOException {
-    String outputPath = getOutputFilePath("summary");
+      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      TallyTransfers tallyTransfers,
+      int numBallots)
+      throws IOException {
+    String outputPath = getOutputFilePathFromInstance("summary");
     generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
@@ -493,7 +494,7 @@ class ResultsWriter {
     // generate GpUnitIds for precincts "geo-political units" (can be a precinct or jurisdiction)
     gpUnitIds = generateGpUnitIds();
 
-    String outputPath = getOutputFilePath("cvr_cdf") + ".json";
+    String outputPath = getOutputFilePathFromInstance("cvr_cdf") + ".json";
     Logger.log(Level.INFO, "Generating cast vote record CDF JSON file: %s...", outputPath);
 
     HashMap<String, Object> outputJson = new HashMap<>();

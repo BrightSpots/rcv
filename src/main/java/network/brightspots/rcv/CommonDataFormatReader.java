@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -77,7 +77,7 @@ class CommonDataFormatReader {
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing candidate data: %s", e.toString());
+      Logger.log(Level.SEVERE, "Error parsing candidate data:\n%s", e.toString());
     }
     return candidates;
   }
@@ -150,7 +150,7 @@ class CommonDataFormatReader {
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing CDF data: %s", e.toString());
+      Logger.log(Level.SEVERE, "Error parsing CDF data:\n%s", e.toString());
     }
   }
 }
