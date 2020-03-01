@@ -37,7 +37,7 @@ class DominionCvrReader {
   static final String CONTEST_MANIFEST = "ContestManifest.json";
   static final String CVR_EXPORT = "CvrExport.json";
 
-  private String manifestFolder;
+  private final String manifestFolder;
   private Map<Integer, String> precincts;
   private Map<Integer, Contest> contests;
   private List<Candidate> candidates;
@@ -248,10 +248,10 @@ class DominionCvrReader {
   // Simple container class for contest data
   private static class Contest {
 
-    private String name;
-    private Integer id;
-    private Integer numCandidates;
-    private Integer maxRanks;
+    private final String name;
+    private final Integer id;
+    private final Integer numCandidates;
+    private final Integer maxRanks;
 
     private Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
       this.name = name;

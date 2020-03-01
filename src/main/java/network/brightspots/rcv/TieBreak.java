@@ -62,7 +62,7 @@ class TieBreak {
   // roundTallies: map from round number to map of candidate ID to vote total (for that round)
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
   private final Map<Integer, Map<String, BigDecimal>> roundTallies;
-  private boolean selectingAWinner;
+  private final boolean selectingAWinner;
   private String selectedCandidate;
   private String explanation;
 
@@ -343,7 +343,7 @@ class TieBreak {
     }
   }
 
-  private class GuiTiebreakerPromptResponse {
+  private static class GuiTiebreakerPromptResponse {
 
     final boolean tabulationCancelled;
     final String selectedCandidate;

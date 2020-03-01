@@ -217,7 +217,7 @@ class StreamingCvrReader {
     if (col >= firstVoteColumnIndex
         && col < firstVoteColumnIndex + config.getMaxRankingsAllowed()) {
 
-      Integer currentRank = col - firstVoteColumnIndex + 1;
+      int currentRank = col - firstVoteColumnIndex + 1;
       // handle any empty cells which may exist between this cell and any previous one
       handleEmptyCells(currentRank);
       String candidate = cellData.trim();
