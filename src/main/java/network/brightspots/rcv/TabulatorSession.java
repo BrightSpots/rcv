@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -123,7 +123,7 @@ class TabulatorSession {
       } catch (IOException e) {
         Logger.log(Level.SEVERE, "Error logging config file: %s\n", configPath, e.toString());
       }
-      Logger.log(Level.INFO, "Tabulating \'%s\'...", config.getContestName());
+      Logger.log(Level.INFO, "Tabulating '%s'...", config.getContestName());
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         Logger.log(Level.INFO, "This is a sequential multi-seat contest.");
         int numWinners = config.getNumberOfWinners();
