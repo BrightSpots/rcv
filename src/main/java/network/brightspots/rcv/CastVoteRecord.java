@@ -59,13 +59,13 @@ class CastVoteRecord {
   // a set is used to handle overvotes
   SortedMap<Integer, Set<String>> rankToCandidateIds;
   // contest associated with this CVR
-  private Integer contestId;
+  Integer contestId;
   // tabulatorId parsed from Dominion CVR data
-  private Integer tabulatorId;
+  Integer tabulatorId;
   // batchId parsed from Dominion CVR data
-  private Integer batchId;
+  Integer batchId;
   // ballotTypeId parsed from Dominion CVR data
-  private Integer ballotTypeId;
+  Integer ballotTypeId;
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
@@ -204,6 +204,10 @@ class CastVoteRecord {
 
   String getPrecinct() {
     return precinct;
+  }
+
+  String getPrecinctId() {
+    return suppliedId != null ? suppliedId : computedId;
   }
 
   Map<String, BigDecimal> getWinnerToFractionalValue() {

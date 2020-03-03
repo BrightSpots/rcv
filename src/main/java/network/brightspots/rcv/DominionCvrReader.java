@@ -39,7 +39,7 @@ class DominionCvrReader {
 
   private final String manifestFolder;
   private Map<Integer, String> precincts;
-  private Map<Integer, Contest> contests;
+  public Map<Integer, Contest> contests;
   private List<Candidate> candidates;
 
   DominionCvrReader(String manifestFolder) {
@@ -47,7 +47,7 @@ class DominionCvrReader {
   }
 
   // returns map of contestId to Contest parsed from input file
-  static Map<Integer, Contest> getContests(String contestPath) {
+  private static Map<Integer, Contest> getContests(String contestPath) {
     Map<Integer, Contest> contests = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(contestPath, HashMap.class);
@@ -70,7 +70,7 @@ class DominionCvrReader {
   }
 
   // returns map from precinctId to precinct name parsed from input file
-  static Map<Integer, String> getPrecincts(String precinctPath) {
+  private static Map<Integer, String> getPrecincts(String precinctPath) {
     Map<Integer, String> precinctsById = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(precinctPath, HashMap.class);
@@ -89,7 +89,7 @@ class DominionCvrReader {
   }
 
   // returns list of Candidate objects parsed from CandidateManifest.json
-  static List<Candidate> getCandidates(String candidatePath) {
+  private static List<Candidate> getCandidates(String candidatePath) {
     ArrayList<Candidate> candidates = new ArrayList<>();
     try {
       HashMap json = JsonParser.readFromFile(candidatePath, HashMap.class);
@@ -141,7 +141,7 @@ class DominionCvrReader {
   }
 
   // parse the given file into a List of CastVoteRecords for tabulation
-  void parseCvrFile(String filePath, List<CastVoteRecord> castVoteRecords) {
+  private void parseCvrFile(String filePath, List<CastVoteRecord> castVoteRecords) {
 
     // build a lookup map for candidates codes to optimize Cvr parsing
     Map<Integer, Set<String>> contestIdToCandidateCodes = new HashMap<>();
@@ -245,14 +245,14 @@ class DominionCvrReader {
   }
 
   // Simple container class for contest data
-  private static class Contest {
+  public static class Contest {
 
-    private final String name;
-    private final Integer id;
-    private final Integer numCandidates;
-    private final Integer maxRanks;
+    public String name;
+    public Integer id;
+    public Integer numCandidates;
+    public Integer maxRanks;
 
-    private Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
+    public Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
       this.name = name;
       this.id = id;
       this.numCandidates = numCandidates;

@@ -37,9 +37,11 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,6 +53,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
+import network.brightspots.rcv.DominionCvrReader.Contest;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -487,6 +490,76 @@ class ResultsWriter {
     generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
+
+  // write CastVoteRecords for all contests to the same folder as the csvInputFile
+  // create the folder if needed
+  // folder will default to the input Dominion csv folder
+  void writeGenericCvrCsv(List<CastVoteRecord> castVoteRecords,
+      Collection<Contest> contests,
+      String csvInputFile)
+      throws IOException {
+    try {
+      File csvFile = new File(csvInputFile);
+      String outputFolder = csvFile.getParent();
+      String slug = csvFile.getName();
+      for (Contest contest : contests) {
+        String fileName = String.format("%s-contest-%d.csv", slug, contest.id);
+        Path outputPath = Paths.get(outputFolder, fileName);
+        Logger.log(Level.INFO,
+            "Writing generic cast vote record: %s...",
+            outputPath.toString());
+        CSVPrinter csvPrinter;
+        BufferedWriter writer = Files.newBufferedWriter(outputPath);
+        csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
+        // print header:
+        // ContestId, TabulatorId,  BatchId, RecordId, PrecinctId, rank 1 selection,
+        // rank 2 selection, ... rank maxRanks selection
+        csvPrinter.print("ContestId");
+        csvPrinter.print("TabulatorId");
+        csvPrinter.print("BatchId");
+        csvPrinter.print("RecordId");
+        csvPrinter.print("PrecinctId");
+        Integer numranks = contest.maxRanks;
+        for (Integer rank = 1; rank <= numranks; rank++) {
+          String label = String.format("Rank %d", rank);
+          csvPrinter.print(label);
+        }
+        csvPrinter.println();
+        // print rows:
+        for (CastVoteRecord castVoteRecord : castVoteRecords) {
+          csvPrinter.print(castVoteRecord.contestId);
+          csvPrinter.print(castVoteRecord.tabulatorId);
+          csvPrinter.print(castVoteRecord.batchId);
+          csvPrinter.print(castVoteRecord.getId());
+          csvPrinter.print(castVoteRecord.getPrecinctId());
+          // for each rank determine what candidate id, overvote, or undervote ocurred
+          for (Integer rank = 1; rank <= contest.maxRanks; rank++) {
+            if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
+              Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);
+              assert !candidateSet.isEmpty();
+              if (candidateSet.size() == 1) {
+                String selection = candidateSet.iterator().next();
+                csvPrinter.print(selection);
+              } else {
+                csvPrinter.print("overvote");
+              }
+            } else {
+              csvPrinter.print("undervote");
+            }
+          }
+          csvPrinter.println();
+        }
+        // finalize the file
+        csvPrinter.flush();
+        csvPrinter.close();
+        Logger.log(Level.INFO, "Wrote %s.", outputPath.toString());
+      }
+    } catch (IOException exception) {
+      Logger.log(Level.SEVERE, "Error writing generic cast vote record: %s", exception.toString());
+      throw exception;
+    }
+  }
+
 
   // create NIST Common Data Format CVR json
   void generateCdfJson(List<CastVoteRecord> castVoteRecords)
