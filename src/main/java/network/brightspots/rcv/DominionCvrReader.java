@@ -32,14 +32,19 @@ import network.brightspots.rcv.RawContestConfig.Candidate;
 class DominionCvrReader {
 
   // canonical manifest file names
-  static final String PRECINCT_MANIFEST = "PrecinctPortionManifest.json";
-  static final String CANDIDATE_MANIFEST = "CandidateManifest.json";
-  static final String CONTEST_MANIFEST = "ContestManifest.json";
-  static final String CVR_EXPORT = "CvrExport.json";
+  private static final String PRECINCT_MANIFEST = "PrecinctPortionManifest.json";
+  private static final String CANDIDATE_MANIFEST = "CandidateManifest.json";
+  private static final String CONTEST_MANIFEST = "ContestManifest.json";
+  private static final String CVR_EXPORT = "CvrExport.json";
 
   private final String manifestFolder;
   private Map<Integer, String> precincts;
   private Map<Integer, Contest> contests;
+
+  Map<Integer, Contest> getContests() {
+    return contests;
+  }
+
   private List<Candidate> candidates;
 
   DominionCvrReader(String manifestFolder) {
@@ -47,7 +52,7 @@ class DominionCvrReader {
   }
 
   // returns map of contestId to Contest parsed from input file
-  static Map<Integer, Contest> getContests(String contestPath) {
+  private static Map<Integer, Contest> getContests(String contestPath) {
     Map<Integer, Contest> contests = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(contestPath, HashMap.class);
@@ -70,7 +75,7 @@ class DominionCvrReader {
   }
 
   // returns map from precinctId to precinct name parsed from input file
-  static Map<Integer, String> getPrecincts(String precinctPath) {
+  private static Map<Integer, String> getPrecincts(String precinctPath) {
     Map<Integer, String> precinctsById = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(precinctPath, HashMap.class);
@@ -89,7 +94,7 @@ class DominionCvrReader {
   }
 
   // returns list of Candidate objects parsed from CandidateManifest.json
-  static List<Candidate> getCandidates(String candidatePath) {
+  private static List<Candidate> getCandidates(String candidatePath) {
     ArrayList<Candidate> candidates = new ArrayList<>();
     try {
       HashMap json = JsonParser.readFromFile(candidatePath, HashMap.class);
@@ -141,7 +146,7 @@ class DominionCvrReader {
   }
 
   // parse the given file into a List of CastVoteRecords for tabulation
-  void parseCvrFile(String filePath, List<CastVoteRecord> castVoteRecords) {
+  private void parseCvrFile(String filePath, List<CastVoteRecord> castVoteRecords) {
 
     // build a lookup map for candidates codes to optimize Cvr parsing
     Map<Integer, Set<String>> contestIdToCandidateCodes = new HashMap<>();
@@ -245,18 +250,26 @@ class DominionCvrReader {
   }
 
   // Simple container class for contest data
-  private static class Contest {
+  static class Contest {
 
     private final String name;
     private final Integer id;
     private final Integer numCandidates;
     private final Integer maxRanks;
 
-    private Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
+    Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
       this.name = name;
       this.id = id;
       this.numCandidates = numCandidates;
       this.maxRanks = maxRanks;
+    }
+
+    Integer getId() {
+      return id;
+    }
+
+    Integer getMaxRanks() {
+      return maxRanks;
     }
   }
 }

@@ -76,6 +76,28 @@ class TabulatorSession {
     return timestampString;
   }
 
+  // given a dominion style csv json file path:
+  // read associated manifest data
+  // read Dominion cvr json into CastVoteRecords
+  // write CastVoteRecords to generic cvr csv files: one per contest
+  // return true if files are successfully written
+  // return false if an error is encountered
+  static boolean convertDominionCvrJsonToGenericCsv(String dominionCvrJsonFile) {
+    boolean success = true;
+    DominionCvrReader dominionCvrReader = new DominionCvrReader(dominionCvrJsonFile);
+    List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+    try {
+      dominionCvrReader.readCastVoteRecords(castVoteRecords);
+      ResultsWriter writer = new ResultsWriter();
+      writer.writeGenericCvrCsv(castVoteRecords, dominionCvrReader.getContests().values(),
+          dominionCvrJsonFile);
+    } catch (Exception exception) {
+      Logger.log(Level.SEVERE, "Failed to convert Dominion CVR to CSV:\n%s", exception.toString());
+      success = false;
+    }
+    return success;
+  }
+
   // special mode to just export the CVR as CDF JSON instead of tabulating
   void convertToCdf() {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
