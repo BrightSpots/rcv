@@ -68,21 +68,22 @@ class CastVoteRecord {
   // ballotTypeId parsed from Dominion CVR data
   private Integer ballotTypeId;
 
-  public Integer getContestId() {
+  Integer getContestId() {
     return contestId;
   }
 
-  public Integer getTabulatorId() {
+  Integer getTabulatorId() {
     return tabulatorId;
   }
 
-  public Integer getBatchId() {
+  Integer getBatchId() {
     return batchId;
   }
 
-  public Integer getBallotTypeId() {
+  Integer getBallotTypeId() {
     return ballotTypeId;
   }
+
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)

@@ -82,7 +82,7 @@ class TabulatorSession {
   // write CastVoteRecords to generic cvr csv files: one per contest
   // return true if files are successfully written
   // return false if an error is encountered
-  public static boolean convertDominionCvrJsonToGenericCsv(String dominionCvrJsonFile) {
+  static boolean convertDominionCvrJsonToGenericCsv(String dominionCvrJsonFile) {
     boolean success = true;
     DominionCvrReader dominionCvrReader = new DominionCvrReader(dominionCvrJsonFile);
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();

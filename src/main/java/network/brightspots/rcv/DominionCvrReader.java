@@ -39,10 +39,9 @@ class DominionCvrReader {
 
   private final String manifestFolder;
   private Map<Integer, String> precincts;
-
   private Map<Integer, Contest> contests;
 
-  public Map<Integer, Contest> getContests() {
+  Map<Integer, Contest> getContests() {
     return contests;
   }
 
@@ -251,26 +250,26 @@ class DominionCvrReader {
   }
 
   // Simple container class for contest data
-  public static class Contest {
+  static class Contest {
 
     private final String name;
     private final Integer id;
     private final Integer numCandidates;
     private final Integer maxRanks;
 
-    public Integer getId() {
-      return id;
-    }
-
-    public Integer getMaxRanks() {
-      return maxRanks;
-    }
-
-    public Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
+    Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
       this.name = name;
       this.id = id;
       this.numCandidates = numCandidates;
       this.maxRanks = maxRanks;
+    }
+
+    Integer getId() {
+      return id;
+    }
+
+    Integer getMaxRanks() {
+      return maxRanks;
     }
   }
 }

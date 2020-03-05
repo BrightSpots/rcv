@@ -518,7 +518,7 @@ class ResultsWriter {
         csvPrinter.print("RecordId");
         csvPrinter.print("PrecinctId");
         Integer numRanks = contest.getMaxRanks();
-        for (Integer rank = 1; rank <= numRanks; rank++) {
+        for (int rank = 1; rank <= numRanks; rank++) {
           String label = String.format("Rank %d", rank);
           csvPrinter.print(label);
         }
@@ -550,10 +550,11 @@ class ResultsWriter {
         // finalize the file
         csvPrinter.flush();
         csvPrinter.close();
-        Logger.log(Level.INFO, "Wrote %s.", outputPath.toString());
+        Logger.log(Level.INFO, "Successfully wrote: %s", outputPath.toString());
       }
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error writing cast vote records in generic format: %s",
+      Logger.log(Level.SEVERE,
+          "Error writing cast vote records in generic format from input file: %s\n%s", csvInputFile,
           exception.toString());
       throw exception;
     }
