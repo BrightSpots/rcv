@@ -42,12 +42,6 @@ public class Main extends GuiApplication {
     Logger.setup();
     logSystemInfo();
 
-    // for testing
-    String wyoming = "/Flair/Downloads/Dominion/Wyoming";
-    String sf = "/Flair/Downloads/Dominion/SF";
-    TabulatorSession.convertDominionCvrJsonToGenericCsv(wyoming);
-
-
     // Determine if user intends to use the command-line interface, and gather args if so
     boolean useCli = false;
     List<String> argsCli = new ArrayList<>();

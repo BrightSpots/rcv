@@ -58,14 +58,31 @@ class CastVoteRecord {
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
   SortedMap<Integer, Set<String>> rankToCandidateIds;
+
   // contest associated with this CVR
-  Integer contestId;
+  private Integer contestId;
   // tabulatorId parsed from Dominion CVR data
-  Integer tabulatorId;
+  private Integer tabulatorId;
   // batchId parsed from Dominion CVR data
-  Integer batchId;
+  private Integer batchId;
   // ballotTypeId parsed from Dominion CVR data
-  Integer ballotTypeId;
+  private Integer ballotTypeId;
+
+  public Integer getContestId() {
+    return contestId;
+  }
+
+  public Integer getTabulatorId() {
+    return tabulatorId;
+  }
+
+  public Integer getBatchId() {
+    return batchId;
+  }
+
+  public Integer getBallotTypeId() {
+    return ballotTypeId;
+  }
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)

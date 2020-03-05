@@ -32,14 +32,20 @@ import network.brightspots.rcv.RawContestConfig.Candidate;
 class DominionCvrReader {
 
   // canonical manifest file names
-  static final String PRECINCT_MANIFEST = "PrecinctPortionManifest.json";
-  static final String CANDIDATE_MANIFEST = "CandidateManifest.json";
-  static final String CONTEST_MANIFEST = "ContestManifest.json";
-  static final String CVR_EXPORT = "CvrExport.json";
+  private static final String PRECINCT_MANIFEST = "PrecinctPortionManifest.json";
+  private static final String CANDIDATE_MANIFEST = "CandidateManifest.json";
+  private static final String CONTEST_MANIFEST = "ContestManifest.json";
+  private static final String CVR_EXPORT = "CvrExport.json";
 
   private final String manifestFolder;
   private Map<Integer, String> precincts;
-  public Map<Integer, Contest> contests;
+
+  private Map<Integer, Contest> contests;
+
+  public Map<Integer, Contest> getContests() {
+    return contests;
+  }
+
   private List<Candidate> candidates;
 
   DominionCvrReader(String manifestFolder) {
@@ -247,10 +253,18 @@ class DominionCvrReader {
   // Simple container class for contest data
   public static class Contest {
 
-    public String name;
-    public Integer id;
-    public Integer numCandidates;
-    public Integer maxRanks;
+    private final String name;
+    private final Integer id;
+    private final Integer numCandidates;
+    private final Integer maxRanks;
+
+    public Integer getId() {
+      return id;
+    }
+
+    public Integer getMaxRanks() {
+      return maxRanks;
+    }
 
     public Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
       this.name = name;

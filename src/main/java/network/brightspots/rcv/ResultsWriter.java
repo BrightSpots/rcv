@@ -492,8 +492,6 @@ class ResultsWriter {
   }
 
   // write CastVoteRecords for all contests to the same folder as the csvInputFile
-  // create the folder if needed
-  // folder will default to the input Dominion csv folder
   void writeGenericCvrCsv(List<CastVoteRecord> castVoteRecords,
       Collection<Contest> contests,
       String csvInputFile)
@@ -503,10 +501,10 @@ class ResultsWriter {
       String outputFolder = csvFile.getParent();
       String slug = csvFile.getName();
       for (Contest contest : contests) {
-        String fileName = String.format("%s-contest-%d.csv", slug, contest.id);
+        String fileName = String.format("%s-contest-%d.csv", slug, contest.getId());
         Path outputPath = Paths.get(outputFolder, fileName);
         Logger.log(Level.INFO,
-            "Writing generic cast vote record: %s...",
+            "Writing cast vote records in generic format to file: %s...",
             outputPath.toString());
         CSVPrinter csvPrinter;
         BufferedWriter writer = Files.newBufferedWriter(outputPath);
@@ -519,21 +517,21 @@ class ResultsWriter {
         csvPrinter.print("BatchId");
         csvPrinter.print("RecordId");
         csvPrinter.print("PrecinctId");
-        Integer numranks = contest.maxRanks;
-        for (Integer rank = 1; rank <= numranks; rank++) {
+        Integer numRanks = contest.getMaxRanks();
+        for (Integer rank = 1; rank <= numRanks; rank++) {
           String label = String.format("Rank %d", rank);
           csvPrinter.print(label);
         }
         csvPrinter.println();
         // print rows:
         for (CastVoteRecord castVoteRecord : castVoteRecords) {
-          csvPrinter.print(castVoteRecord.contestId);
-          csvPrinter.print(castVoteRecord.tabulatorId);
-          csvPrinter.print(castVoteRecord.batchId);
+          csvPrinter.print(castVoteRecord.getContestId());
+          csvPrinter.print(castVoteRecord.getTabulatorId());
+          csvPrinter.print(castVoteRecord.getBatchId());
           csvPrinter.print(castVoteRecord.getId());
           csvPrinter.print(castVoteRecord.getPrecinctId());
           // for each rank determine what candidate id, overvote, or undervote ocurred
-          for (Integer rank = 1; rank <= contest.maxRanks; rank++) {
+          for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
             if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
               Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);
               assert !candidateSet.isEmpty();
@@ -555,7 +553,8 @@ class ResultsWriter {
         Logger.log(Level.INFO, "Wrote %s.", outputPath.toString());
       }
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error writing generic cast vote record: %s", exception.toString());
+      Logger.log(Level.SEVERE, "Error writing cast vote records in generic format: %s",
+          exception.toString());
       throw exception;
     }
   }
