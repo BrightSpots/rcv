@@ -85,13 +85,17 @@ Or, if you're compiling and running using Gradle:
 
 `$ gradlew run --args="-cli path/to/config"`
 
-Finally, you can activate a special `convert-to-cdf` function via the command line to export the CVR as a NIST common data format (CDF) .json instead of tabulating the results, e.g.:
+You can also activate a special `convert-to-cdf` function via the command line to export the CVR as a NIST common data format (CDF) .json instead of tabulating the results, e.g.:
 
 `$ rcv -cli path/to/config convert-to-cdf`
 
 Or, again, if you're compiling and running using Gradle:
 
 `$ gradlew run --args="-cli path/to/config  convert-to-cdf"`
+
+Finally, there's a `convert-dominion-to-generic-csv` option as well for converting Dominion JSON CVRs into a standardized, generic .csv format:
+
+`$ rcv -cli path/to/folder/containing/jsons convert-dominion-to-generic-csv`
 
 ## Viewing Tabulator Output
 
