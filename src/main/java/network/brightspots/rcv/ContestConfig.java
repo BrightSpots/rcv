@@ -65,11 +65,13 @@ class ContestConfig {
   private static final int MAX_ROW_INDEX = 100000;
   private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
   private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
-  private static final int MIN_NUMBER_OF_WINNERS = 1;
+  private static final int MIN_NUMBER_OF_WINNERS = 0;
   private static final int MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 1;
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
   private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
+  private static final int MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 1;
+  private static final int MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 100;
   private static final long MIN_RANDOM_SEED = -140737488355328L;
   private static final long MAX_RANDOM_SEED = 140737488355327L;
   private static final String CDF_PROVIDER = "CDF";
@@ -568,43 +570,80 @@ class ContestConfig {
       isValid = false;
     }
 
-    // If this is a multi-seat contest, we validate a couple extra parameters.
-    if (Utils.isInt(getNumberOfWinnersRaw()) && getNumberOfWinners() > 1) {
-      if (isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
-        isValid = false;
-        Logger.log(
-            Level.SEVERE,
-            "winnerElectionMode can't be singleSeatContinueUntilTwoCandidatesRemain in a "
-                + "multi-seat contest!");
-      }
+    if (fieldOutOfRangeOrNotInteger(
+        getMultiSeatBottomsUpPercentageThresholdRaw(),
+        "multiSeatBottomsUpPercentageThreshold",
+        MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
+        MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
+        false)) {
+      isValid = false;
+    }
 
-      if (isBatchEliminationEnabled()) {
-        isValid = false;
-        Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
-      }
-    } else {
-      if (isMultiSeatSequentialWinnerTakesAllEnabled()) {
-        isValid = false;
-        Logger.log(
-            Level.SEVERE,
-            "winnerElectionMode can't be multiSeatSequentialWinnerTakesAll in a single-seat "
-                + "contest!");
-      } else if (isMultiSeatBottomsUpEnabled()) {
-        isValid = false;
-        Logger.log(
-            Level.SEVERE,
-            "winnerElectionMode can't be multiSeatBottomsUp in a single-seat contest!");
-      } else if (isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()) {
-        isValid = false;
-        Logger.log(
-            Level.SEVERE,
-            "winnerElectionMode can't be multiSeatAllowOnlyOneWinnerPerRound in a single-seat "
-                + "contest!");
-      }
+    boolean isMultiSeatBottomsUpPercentageThresholdSpecified =
+        getMultiSeatBottomsUpPercentageThresholdRaw() != null
+            && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank();
 
-      if (isHareQuotaEnabled()) {
-        isValid = false;
-        Logger.log(Level.SEVERE, "hareQuota can only be true in a multi-seat contest!");
+    if (Utils.isInt(getNumberOfWinnersRaw())) {
+      if (getNumberOfWinners() > 0) {
+        if (isMultiSeatBottomsUpPercentageThresholdSpecified) {
+          isValid = false;
+          Logger.log(
+              Level.SEVERE,
+              "numberOfWinners must be zero if multiSeatBottomsUpPercentageThresholdSpecified "
+                  + "is specified!");
+        }
+
+        if (getNumberOfWinners() > 1) {
+          if (isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "winnerElectionMode can't be singleSeatContinueUntilTwoCandidatesRemain in a "
+                    + "multi-seat contest!");
+          }
+
+          if (isBatchEliminationEnabled()) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
+          }
+        } else { // numberOfWinners == 1
+          if (isMultiSeatSequentialWinnerTakesAllEnabled()) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "winnerElectionMode can't be multiSeatSequentialWinnerTakesAll in a single-seat "
+                    + "contest!");
+          } else if (isMultiSeatBottomsUpEnabled()) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "winnerElectionMode can't be multiSeatBottomsUp in a single-seat contest!");
+          } else if (isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "winnerElectionMode can't be multiSeatAllowOnlyOneWinnerPerRound in a single-seat "
+                    + "contest!");
+          }
+
+          if (isHareQuotaEnabled()) {
+            isValid = false;
+            Logger.log(Level.SEVERE, "hareQuota can only be true in a multi-seat contest!");
+          }
+        }
+      } else { // numberOfWinners == 0
+        if (!isMultiSeatBottomsUpEnabled()) {
+          isValid = false;
+          Logger.log(
+              Level.SEVERE,
+              "numberOfWinners can't be zero unless winnerElectionMode is multiSeatBottomsUp!");
+        } else if (!isMultiSeatBottomsUpPercentageThresholdSpecified) {
+          isValid = false;
+          Logger.log(
+              Level.SEVERE,
+              "If winnerElectionMode is multiSeatBottomsUp and numberOfWinners is zero, "
+                  + "multiSeatBottomsUpPercentageThreshold must be specified.");
+        }
       }
     }
 
@@ -646,6 +685,14 @@ class ContestConfig {
 
   void setNumberOfWinners(int numberOfWinners) {
     rawConfig.rules.numberOfWinners = Integer.toString(numberOfWinners);
+  }
+
+  private String getMultiSeatBottomsUpPercentageThresholdRaw() {
+    return rawConfig.rules.multiSeatBottomsUpPercentageThreshold;
+  }
+
+  BigDecimal getMultiSeatBottomsUpPercentageThreshold() {
+    return new BigDecimal(getMultiSeatBottomsUpPercentageThresholdRaw());
   }
 
   List<String> getSequentialWinners() {

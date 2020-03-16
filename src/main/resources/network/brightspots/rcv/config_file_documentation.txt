@@ -172,13 +172,19 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         "standard": no special process
         "singleSeatContinueUntilTwoCandidatesRemain": keep tabulating after the winning round until only two candidates remain (only valid when numberOfWinners = 1)
         "multiSeatAllowOnlyOneWinnerPerRound": elect no more than one winner per round, even when there are multiple candidates exceeding the winning threshold (only valid when numberOfWinners > 1)
-        "multiSeatBottomsUp": instead of running a standard multi-seat contest with single transferable votes, just eliminate candidates until there are numWinners remaining, then stop (only valid when numberOfWinners > 1)
+        "multiSeatBottomsUp": instead of running a standard multi-seat contest with single transferable votes, just eliminate candidates until either a) there are numWinners remaining or b) all remaining candidates have vote shares that meet or exceed multiSeatBottomsUpPercentageThreshold (only valid when numberOfWinners is 0 or > 1)
         "multiSeatSequentialWinnerTakesAll": instead of running a true multi-seat contest, run a series of single-seat contests and progressively exclude candidates as they win seats (only valid when numberOfWinners > 1)
 
       "numberOfWinners" required
         the number of seats to be won in this contest
         note: we use fractional vote transfer to redistribute votes in multi-seat contests
-        value: [1..number of declared candidates]
+        note: 0 is valid only when winnerElectionMode is set to multiSeatBottomsUp
+        value: [0..number of declared candidates]
+
+      "multiSeatBottomsUpPercentageThreshold" required
+        the percentage threshold used to determine when to stop the tabulation and declare winners
+        note: only valid when winnerElectionMode is multiSeatBottomsUp and numberOfWinners is 0
+        value: [1..100]
 
       "decimalPlacesForVoteArithmetic" required
         number of rounding decimal places when computing winning thresholds and fractional vote transfers
