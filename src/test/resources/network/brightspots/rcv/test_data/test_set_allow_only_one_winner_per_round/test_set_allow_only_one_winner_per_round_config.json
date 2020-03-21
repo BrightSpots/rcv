@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Allow Only One Winner per Round Test",
-    "outputDirectory" : "output",
-    "contestDate" : "2019-01-18",
-    "contestJurisdiction" : "",
-    "contestOffice" : "",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+  "tabulatorVersion": "1.0.1_20200320_internal",
+  "outputSettings": {
+    "contestName": "Allow Only One Winner per Round Test",
+    "outputDirectory": "output",
+    "contestDate": "2019-01-18",
+    "contestJurisdiction": "",
+    "contestOffice": "",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "test_set_allow_only_one_winner_per_round_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

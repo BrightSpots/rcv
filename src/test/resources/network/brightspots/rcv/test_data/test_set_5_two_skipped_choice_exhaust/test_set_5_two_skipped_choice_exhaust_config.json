@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Test Set 5",
-    "outputDirectory" : "output",
-    "contestDate" : "2019-03-06",
-    "contestJurisdiction" : "TestSets_Single_winner",
-    "contestOffice" : "Skipped choice_allow 1",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : true
+  "tabulatorVersion": "1.0.1_20200320_internal",
+  "outputSettings": {
+    "contestName": "Test Set 5",
+    "outputDirectory": "output",
+    "contestDate": "2019-03-06",
+    "contestJurisdiction": "TestSets_Single_winner",
+    "contestOffice": "Skipped choice_allow 1",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": true
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "test_set_5_two_skipped_choice_exhaust_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
