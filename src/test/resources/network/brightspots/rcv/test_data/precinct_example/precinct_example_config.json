@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Precinct example",
-    "outputDirectory" : "output",
-    "contestDate" : "2017-11-07",
-    "contestJurisdiction" : "Minneapolis, MN",
-    "contestOffice" : "Mayor",
-    "tabulateByPrecinct" : true,
-    "generateCdfJson" : true
+  "tabulatorVersion": "1.0.1_20200320_internal",
+  "outputSettings": {
+    "contestName": "Precinct example",
+    "outputDirectory": "output",
+    "contestDate": "2017-11-07",
+    "contestJurisdiction": "Minneapolis, MN",
+    "contestOffice": "Mayor",
+    "tabulateByPrecinct": true,
+    "generateCdfJson": true
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "precinct_example_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

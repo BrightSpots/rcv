@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Multi_winner2",
-    "outputDirectory" : "output",
-    "contestDate" : "2018-09-30",
-    "contestJurisdiction" : "Multi-winner",
-    "contestOffice" : "Multi_winner2",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+  "tabulatorVersion": "1.0.1_20200320_internal",
+  "outputSettings": {
+    "contestName": "Multi_winner2",
+    "outputDirectory": "output",
+    "contestDate": "2018-09-30",
+    "contestJurisdiction": "Multi-winner",
+    "contestOffice": "Multi_winner2",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "minneapolis_multi_seat_threshold_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
