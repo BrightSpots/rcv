@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Portland 2015 Mayoral Race",
-    "outputDirectory" : "output",
-    "contestDate" : "2015-11-03",
-    "contestJurisdiction" : "Portland, ME",
-    "contestOffice" : "Mayor",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+  "tabulatorVersion": "1.0.1_20200320_internal",
+  "outputSettings": {
+    "contestName": "Portland 2015 Mayoral Race",
+    "outputDirectory": "output",
+    "contestDate": "2015-11-03",
+    "contestJurisdiction": "Portland, ME",
+    "contestOffice": "Mayor",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "2015_portland_mayor_codes_cvr.xlsx",
     "firstVoteColumnIndex" : "4",
     "firstVoteRowIndex" : "2",
