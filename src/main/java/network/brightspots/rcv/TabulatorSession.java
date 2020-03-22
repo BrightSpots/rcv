@@ -64,6 +64,28 @@ class TabulatorSession {
     timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
+  // given a dominion style folder path:
+  // read associated manifest data
+  // read Dominion cvr json into CastVoteRecords
+  // write CastVoteRecords to generic cvr csv files: one per contest
+  // return list of files written
+  static List<String> convertDominionCvrJsonToGenericCsv(String dominionDataFolder) {
+    DominionCvrReader dominionCvrReader = new DominionCvrReader(dominionDataFolder);
+    List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+    List<String> filesWritten;
+    try {
+      dominionCvrReader.readCastVoteRecords(castVoteRecords);
+      ResultsWriter writer = new ResultsWriter();
+      filesWritten = writer
+          .writeGenericCvrCsv(castVoteRecords, dominionCvrReader.getContests().values(),
+              dominionDataFolder);
+    } catch (Exception exception) {
+      Logger.log(Level.SEVERE, "Failed to convert Dominion CVR to CSV:\n%s", exception.toString());
+      filesWritten = null;
+    }
+    return filesWritten;
+  }
+
   // Visible for testing
   @SuppressWarnings("unused")
   String getOutputPath() {
@@ -74,28 +96,6 @@ class TabulatorSession {
   @SuppressWarnings("unused")
   String getTimestampString() {
     return timestampString;
-  }
-
-  // given a dominion style csv json file path:
-  // read associated manifest data
-  // read Dominion cvr json into CastVoteRecords
-  // write CastVoteRecords to generic cvr csv files: one per contest
-  // return true if files are successfully written
-  // return false if an error is encountered
-  static boolean convertDominionCvrJsonToGenericCsv(String dominionCvrJsonFile) {
-    boolean success = true;
-    DominionCvrReader dominionCvrReader = new DominionCvrReader(dominionCvrJsonFile);
-    List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    try {
-      dominionCvrReader.readCastVoteRecords(castVoteRecords);
-      ResultsWriter writer = new ResultsWriter();
-      writer.writeGenericCvrCsv(castVoteRecords, dominionCvrReader.getContests().values(),
-          dominionCvrJsonFile);
-    } catch (Exception exception) {
-      Logger.log(Level.SEVERE, "Failed to convert Dominion CVR to CSV:\n%s", exception.toString());
-      success = false;
-    }
-    return success;
   }
 
   // special mode to just export the CVR as CDF JSON instead of tabulating
