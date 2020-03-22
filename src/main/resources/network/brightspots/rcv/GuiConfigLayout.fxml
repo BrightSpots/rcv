@@ -16,6 +16,24 @@
   ~ program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
   prefHeight="810.0" prefWidth="900.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
   xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
@@ -191,7 +209,7 @@
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Rules">
+          <Tab text="Basic Rules">
             <HBox>
               <VBox spacing="8.0">
                 <Label text="Tiebreak Mode *"/>
@@ -200,12 +218,14 @@
                 <ChoiceBox fx:id="choiceOvervoteRule" prefWidth="220.0"/>
                 <Label text="Winner Election Mode *"/>
                 <ChoiceBox fx:id="choiceWinnerElectionMode" prefWidth="220.0"/>
+                <padding>
+                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+                </padding>
+              </VBox>
+              <VBox spacing="8.0">
                 <Label text="Number of Winners *"/>
                 <TextField fx:id="textFieldNumberOfWinners" maxWidth="220.0"
                   promptText="Number of Winners"/>
-                <Label text="Multi-Seat Bottoms-Up Percentage Threshold"/>
-                <TextField maxWidth="220.0" promptText="Bottoms-Up Percentage Threshold"
-                  fx:id="textFieldMultiSeatBottomsUpPercentageThreshold"/>
                 <Label text="Decimal Places for Vote Arithmetic *"/>
                 <TextField fx:id="textFieldDecimalPlacesForVoteArithmetic" maxWidth="220.0"
                   promptText="Decimal Places for Vote Arithmetic"/>
@@ -218,6 +238,32 @@
                 <Label text="Max Rankings Allowed *"/>
                 <TextField fx:id="textFieldMaxRankingsAllowed" maxWidth="220.0"
                   promptText="Max Rankings Allowed"/>
+                <padding>
+                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+                </padding>
+              </VBox>
+            </HBox>
+          </Tab>
+          <Tab text="Advanced Rules">
+            <HBox>
+              <VBox spacing="8.0">
+                <Label text="Random Seed"/>
+                <TextField fx:id="textFieldRandomSeed" maxWidth="220.0" promptText="Random Seed"/>
+                <Label text="Overvote Label"/>
+                <TextField fx:id="textFieldOvervoteLabel" maxWidth="220.0"
+                  promptText="Overvote Label"/>
+                <Label text="Undervote Label"/>
+                <TextField fx:id="textFieldUndervoteLabel" maxWidth="220.0"
+                  promptText="Undervote Label"/>
+                <Label text="Undeclared Write-in Label"/>
+                <TextField fx:id="textFieldUndeclaredWriteInLabel" maxWidth="220.0"
+                  promptText="Undeclared Write-in Label"/>
+                <Label text="Multi-Seat Bottoms-Up Percentage Threshold"/>
+                <TextField maxWidth="220.0" promptText="Bottoms-Up Percentage Threshold"
+                  fx:id="textFieldMultiSeatBottomsUpPercentageThreshold"/>
+                <Label text="Rules Description"/>
+                <TextField fx:id="textFieldRulesDescription" maxWidth="220.0"
+                  promptText="Rules Description"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
@@ -252,20 +298,6 @@
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
-                <Label text="Random Seed"/>
-                <TextField fx:id="textFieldRandomSeed" maxWidth="220.0" promptText="Random Seed"/>
-                <Label text="Overvote Label"/>
-                <TextField fx:id="textFieldOvervoteLabel" maxWidth="220.0"
-                  promptText="Overvote Label"/>
-                <Label text="Undervote Label"/>
-                <TextField fx:id="textFieldUndervoteLabel" maxWidth="220.0"
-                  promptText="Undervote Label"/>
-                <Label text="Undeclared Write-in Label"/>
-                <TextField fx:id="textFieldUndeclaredWriteInLabel" maxWidth="220.0"
-                  promptText="Undeclared Write-in Label"/>
-                <Label text="Rules Description"/>
-                <TextField fx:id="textFieldRulesDescription" maxWidth="220.0"
-                  promptText="Rules Description"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
