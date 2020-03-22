@@ -692,7 +692,9 @@ class ContestConfig {
   }
 
   BigDecimal getMultiSeatBottomsUpPercentageThreshold() {
-    return new BigDecimal(getMultiSeatBottomsUpPercentageThresholdRaw());
+    return getMultiSeatBottomsUpPercentageThresholdRaw() != null
+        ? divide(new BigDecimal(getMultiSeatBottomsUpPercentageThresholdRaw()), new BigDecimal(100))
+        : null;
   }
 
   List<String> getSequentialWinners() {
@@ -727,6 +729,11 @@ class ContestConfig {
 
   boolean isMultiSeatBottomsUpEnabled() {
     return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP;
+  }
+
+  boolean isMultiSeatBottomsUpWithThresholdEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP
+        && getMultiSeatBottomsUpPercentageThreshold() != null;
   }
 
   boolean isMultiSeatSequentialWinnerTakesAllEnabled() {
