@@ -68,7 +68,7 @@ class TabulatorSession {
   // read associated manifest data
   // read Dominion cvr json into CastVoteRecords
   // write CastVoteRecords to generic cvr csv files: one per contest
-  // return list of files written
+  // return list of files written or null if there was a problem
   static List<String> convertDominionCvrJsonToGenericCsv(String dominionDataFolder) {
     DominionCvrReader dominionCvrReader = new DominionCvrReader(dominionDataFolder);
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();

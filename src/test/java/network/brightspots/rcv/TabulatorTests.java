@@ -105,7 +105,7 @@ class TabulatorTests {
         .convertDominionCvrJsonToGenericCsv(dominionDataFolder);
     for (String convertedFile : filesWritten) {
       String referencePath =
-          convertedFile.substring(0, convertedFile.length() - 4) + "_expected.csv";
+          convertedFile.substring(0, convertedFile.lastIndexOf('.')) + "_expected.csv";
       assertTrue(fileCompare(convertedFile, referencePath));
     }
   }
