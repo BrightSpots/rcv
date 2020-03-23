@@ -175,8 +175,20 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Dominion Cvr conversion test - Alaska test data")
+  void testDominionCvrConversionAlaska() {
+    runDominionCvrConversionTest("dominion_cvr_conversion_alaska");
+  }
+
+  @Test
+  @DisplayName("Dominion Cvr conversion test - Kansas test data")
+  void testDominionCvrConversionKansas() {
+    runDominionCvrConversionTest("dominion_cvr_conversion_kansas");
+  }
+
+  @Test
   @DisplayName("Dominion Cvr conversion test - Wyoming fake test data")
-  void testDominionCvrConversion() {
+  void testDominionCvrConversionWyoming() {
     runDominionCvrConversionTest("dominion_cvr_conversion_wyoming");
   }
 
