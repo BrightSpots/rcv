@@ -491,17 +491,19 @@ class ResultsWriter {
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
-  // write CastVoteRecords for all contests to the same folder as the csvInputFile
-  void writeGenericCvrCsv(List<CastVoteRecord> castVoteRecords,
+  // write CastVoteRecords for all contests to the provided folder
+  // returns a list of files written
+  List<String> writeGenericCvrCsv(List<CastVoteRecord> castVoteRecords,
       Collection<Contest> contests,
-      String csvInputFile)
+      String csvOutputFolder)
       throws IOException {
+    List<String> filesWritten = new ArrayList<>();
     try {
-      File csvFile = new File(csvInputFile);
+      File csvFile = new File(csvOutputFolder);
       String outputFolder = csvFile.getParent();
       String slug = csvFile.getName();
       for (Contest contest : contests) {
-        String fileName = String.format("%s-contest-%d.csv", slug, contest.getId());
+        String fileName = String.format("%s_contest_%d.csv", slug, contest.getId());
         Path outputPath = Paths.get(outputFolder, fileName);
         Logger.log(Level.INFO,
             "Writing cast vote records in generic format to file: %s...",
@@ -550,14 +552,17 @@ class ResultsWriter {
         // finalize the file
         csvPrinter.flush();
         csvPrinter.close();
+        filesWritten.add(outputPath.toString());
         Logger.log(Level.INFO, "Successfully wrote: %s", outputPath.toString());
       }
     } catch (IOException exception) {
       Logger.log(Level.SEVERE,
-          "Error writing cast vote records in generic format from input file: %s\n%s", csvInputFile,
+          "Error writing cast vote records in generic format from input file: %s\n%s",
+          csvOutputFolder,
           exception.toString());
       throw exception;
     }
+    return filesWritten;
   }
 
 

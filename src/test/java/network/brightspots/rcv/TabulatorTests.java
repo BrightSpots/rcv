@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.logging.Level;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -97,6 +98,18 @@ class TabulatorTests {
         .toString();
   }
 
+  // helper function test cvr conversion routine
+  private static void runDominionCvrConversionTest(String stem) {
+    String dominionDataFolder = getTestFilePath(stem, "_cvr_export");
+    List<String> filesWritten = TabulatorSession
+        .convertDominionCvrJsonToGenericCsv(dominionDataFolder);
+    for (String convertedFile : filesWritten) {
+      String referencePath =
+          convertedFile.substring(0, convertedFile.lastIndexOf('.')) + "_expected.csv";
+      assertTrue(fileCompare(convertedFile, referencePath));
+    }
+  }
+
   // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
@@ -144,7 +157,7 @@ class TabulatorTests {
       Integer sequentialNumber) {
     String actualOutputPath =
         ResultsWriter.getOutputFilePath(
-                config.getOutputDirectory(), jsonType, timestampString, sequentialNumber)
+            config.getOutputDirectory(), jsonType, timestampString, sequentialNumber)
             + ".json";
     String expectedPath =
         getTestFilePath(
@@ -159,6 +172,24 @@ class TabulatorTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
+  }
+
+  @Test
+  @DisplayName("Dominion Cvr conversion test - Alaska test data")
+  void testDominionCvrConversionAlaska() {
+    runDominionCvrConversionTest("dominion_cvr_conversion_alaska");
+  }
+
+  @Test
+  @DisplayName("Dominion Cvr conversion test - Kansas test data")
+  void testDominionCvrConversionKansas() {
+    runDominionCvrConversionTest("dominion_cvr_conversion_kansas");
+  }
+
+  @Test
+  @DisplayName("Dominion Cvr conversion test - Wyoming fake test data")
+  void testDominionCvrConversionWyoming() {
+    runDominionCvrConversionTest("dominion_cvr_conversion_wyoming");
   }
 
   @Test
