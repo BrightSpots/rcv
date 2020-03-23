@@ -323,19 +323,16 @@ class ContestConfig {
     return isValid;
   }
 
-  // version validation and migration logic goes here
-  // e.g. unsupported versions would fail or be migrated
-  // in this release we support only the current app version
+  // version validation logic
   private void validateTabulatorVersion() {
     if (isNullOrBlank(getTabulatorVersion())) {
       isValid = false;
       Logger.log(Level.SEVERE, "tabulatorVersion is required!");
-    } else {
-      if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
-        isValid = false;
-        Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!", getTabulatorVersion());
-      }
     }
+
+    // version-specific validation logic would go here
+    // currently we support all versions
+
     if (!isValid) {
       Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s!", Main.APP_VERSION);
     }
