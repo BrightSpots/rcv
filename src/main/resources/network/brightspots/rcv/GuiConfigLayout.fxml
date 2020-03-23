@@ -259,7 +259,7 @@
                 <TextField fx:id="textFieldUndeclaredWriteInLabel" maxWidth="220.0"
                   promptText="Undeclared Write-in Label"/>
                 <Label text="Multi-Seat Bottoms-up Percentage Threshold"/>
-                <TextField maxWidth="220.0" promptText="Bottoms-Up Percentage Threshold"
+                <TextField maxWidth="220.0" promptText="Bottoms-up Percentage Threshold"
                   fx:id="textFieldMultiSeatBottomsUpPercentageThreshold"/>
                 <Label text="Rules Description"/>
                 <TextField fx:id="textFieldRulesDescription" maxWidth="220.0"
