@@ -202,6 +202,7 @@ class Tabulator {
         // We need to make more eliminations if
         // a) we haven't found all the winners yet, or
         // b) we've found our winner, but we're continuing until we have only two candidates
+        // c) not all remaining candidates meet the bottoms up threshold 
 
         List<String> eliminated;
         // Four mutually exclusive ways to eliminate candidates.
