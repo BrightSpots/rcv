@@ -209,7 +209,7 @@
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Basic Rules">
+          <Tab text="Required Rules">
             <HBox>
               <VBox spacing="8.0">
                 <Label text="Tiebreak Mode *"/>
@@ -244,7 +244,7 @@
               </VBox>
             </HBox>
           </Tab>
-          <Tab text="Advanced Rules">
+          <Tab text="Optional Rules">
             <HBox>
               <VBox spacing="8.0">
                 <Label text="Random Seed"/>
@@ -258,7 +258,7 @@
                 <Label text="Undeclared Write-in Label"/>
                 <TextField fx:id="textFieldUndeclaredWriteInLabel" maxWidth="220.0"
                   promptText="Undeclared Write-in Label"/>
-                <Label text="Multi-Seat Bottoms-Up Percentage Threshold"/>
+                <Label text="Multi-Seat Bottoms-up Percentage Threshold"/>
                 <TextField maxWidth="220.0" promptText="Bottoms-Up Percentage Threshold"
                   fx:id="textFieldMultiSeatBottomsUpPercentageThreshold"/>
                 <Label text="Rules Description"/>

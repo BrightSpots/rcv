@@ -111,10 +111,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
     set of configuration parameters that specify the tabulation rules
     the "rules" section contains the following parameters:
 
-      "randomSeed" required when tiebreakMode is random, previousRoundCountsThenRandom, or generatePermutation
-        the integer seed for the application's pseudorandom number generator
-        value: [-140737488355328..140737488355327]
-
       "tiebreakMode" required
         how the program should decide which candidate to eliminate when multiple candidates are tied for last place
         or which candidate to elect first when:
@@ -181,11 +177,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         note: 0 is valid only when winnerElectionMode is set to multiSeatBottomsUp
         value: [0..number of declared candidates]
 
-      "multiSeatBottomsUpPercentageThreshold" required
-        the percentage threshold used to determine when to stop the tabulation and declare winners
-        note: only valid when winnerElectionMode is multiSeatBottomsUp and numberOfWinners is 0
-        value: [1..100]
-
       "decimalPlacesForVoteArithmetic" required
         number of rounding decimal places when computing winning thresholds and fractional vote transfers
         value: [1..20]
@@ -204,6 +195,36 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         maximum number of candidates that a ballot is allowed to rank; if "max" is entered, this will default to the total number of declared candidates
         example: 15
         values: [max, 1..1000000]
+
+      "randomSeed" required if tiebreakMode is random, previousRoundCountsThenRandom, or generatePermutation
+        the integer seed for the application's pseudorandom number generator
+        value: [-140737488355328..140737488355327]
+
+      "overvoteLabel" optional
+        label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately" (because the other option, exhaustIfMultipleContinuing, relies on knowing which specific candidates were involved in each overvote)
+        example: "OVERVOTE"
+        value: string of length [1..1000]
+
+      "undervoteLabel" optional
+        the special label used in the cast vote records to denote an undervote
+        example: "UNDERVOTE"
+        value: string of length [1..1000]
+
+      "undeclaredWriteInLabel" required if treatBlankAsUndeclaredWriteIn is enabled
+        the special label used in the cast vote records to denote a vote for an undeclared write-in
+        also used to represent undeclared write-ins in the results output
+        example: "UWI"
+        value: string of length [1..1000]
+
+      "multiSeatBottomsUpPercentageThreshold" required if winnerElectionMode is multiSeatBottomsUp and numberOfWinners is 0
+        the percentage threshold used to determine when to stop the tabulation and declare winners
+        note: only valid when winnerElectionMode is multiSeatBottomsUp and numberOfWinners is 0
+        value: [1..100]
+
+      "rulesDescription" optional
+        text description of this rules configuration for organizing your config files -- not used by the tabulator
+        Example "Maine Rules"
+        value: string of length [1..1000]
 
       "nonIntegerWinningThreshold" optional
         the vote threshold used to determine winners can be a non-integer
@@ -234,24 +255,3 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         tabulator will interpret a blank cell in a CVR as a vote for an undeclared write-in
         value: true | false
         if not supplied: false
-
-      "overvoteLabel" optional
-        label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately" (because the other option, exhaustIfMultipleContinuing, relies on knowing which specific candidates were involved in each overvote)
-        example: "OVERVOTE"
-        value: string of length [1..1000]
-
-      "undervoteLabel" optional
-        the special label used in the cast vote records to denote an undervote
-        example: "UNDERVOTE"
-        value: string of length [1..1000]
-
-      "undeclaredWriteInLabel" required if treatBlankAsUndeclaredWriteIn is enabled
-        the special label used in the cast vote records to denote a vote for an undeclared write-in
-        also used to represent undeclared write-ins in the results output
-        example: "UWI"
-        value: string of length [1..1000]
-
-      "rulesDescription" optional
-        text description of this rules configuration for organizing your config files -- not used by the tabulator
-        Example "Maine Rules"
-        value: string of length [1..1000]

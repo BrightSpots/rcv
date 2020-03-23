@@ -277,7 +277,7 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("test bottoms-up multi-seat logic")
+  @DisplayName("test bottoms-up multi-seat with threshold logic")
   void testBottomsUpMultiSeatWithThreshold() {
     runTabulationTest("multi_seat_bottoms_up_with_threshold");
   }

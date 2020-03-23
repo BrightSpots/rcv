@@ -579,18 +579,14 @@ class ContestConfig {
       isValid = false;
     }
 
-    boolean isMultiSeatBottomsUpPercentageThresholdSpecified =
-        getMultiSeatBottomsUpPercentageThresholdRaw() != null
-            && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank();
-
     if (Utils.isInt(getNumberOfWinnersRaw())) {
       if (getNumberOfWinners() > 0) {
-        if (isMultiSeatBottomsUpPercentageThresholdSpecified) {
+        if (getMultiSeatBottomsUpPercentageThreshold() != null) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
-              "numberOfWinners must be zero if multiSeatBottomsUpPercentageThresholdSpecified "
-                  + "is specified!");
+              "numberOfWinners must be zero if multiSeatBottomsUpPercentageThreshold is "
+                  + "specified!");
         }
 
         if (getNumberOfWinners() > 1) {
@@ -637,7 +633,7 @@ class ContestConfig {
           Logger.log(
               Level.SEVERE,
               "numberOfWinners can't be zero unless winnerElectionMode is multiSeatBottomsUp!");
-        } else if (!isMultiSeatBottomsUpPercentageThresholdSpecified) {
+        } else if (getMultiSeatBottomsUpPercentageThreshold() == null) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
@@ -693,6 +689,7 @@ class ContestConfig {
 
   BigDecimal getMultiSeatBottomsUpPercentageThreshold() {
     return getMultiSeatBottomsUpPercentageThresholdRaw() != null
+        && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()
         ? divide(new BigDecimal(getMultiSeatBottomsUpPercentageThresholdRaw()), new BigDecimal(100))
         : null;
   }
