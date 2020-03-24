@@ -302,7 +302,7 @@ public class GuiConfigController implements Initializable {
    * - Create and launch TabulatorService from the saved config path.
    */
   public void menuItemTabulateClicked() {
-    if (checkForSaveAndTabulate()) {
+    if (checkForSaveAndExecute()) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
         TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
@@ -313,6 +313,27 @@ public class GuiConfigController implements Initializable {
       } else {
         Logger.log(
             Level.WARNING, "Please load a contest config file before attempting to tabulate!");
+      }
+    }
+  }
+
+  /**
+   * Convert CVRs in current config to CDF. - Require user to save if there are unsaved changes. -
+   * Create and launch ConvertToCdfService from the saved config path.
+   */
+  public void menuItemConvertToCdfClicked() {
+    if (checkForSaveAndExecute()) {
+      if (GuiContext.getInstance().getConfig() != null) {
+        setGuiIsBusy(true);
+        ConvertToCdfService service = new ConvertToCdfService(selectedFile.getAbsolutePath());
+        service.setOnSucceeded(event -> setGuiIsBusy(false));
+        service.setOnCancelled(event -> setGuiIsBusy(false));
+        service.setOnFailed(event -> setGuiIsBusy(false));
+        service.start();
+      } else {
+        Logger.log(
+            Level.WARNING,
+            "Please load a contest config file before attempting to convert to CDF!");
       }
     }
   }
@@ -633,7 +654,7 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private boolean checkForSaveAndTabulate() {
+  private boolean checkForSaveAndExecute() {
     boolean willContinue = false;
     if (checkIfNeedsSaving()) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
@@ -948,6 +969,36 @@ public class GuiConfigController implements Initializable {
               Logger.log(
                   Level.SEVERE,
                   "Error during tabulation:\n%s\nTabulation failed!",
+                  task.getException().toString()));
+      return task;
+    }
+  }
+
+  // ConvertToCdfService runs a CDF conversion in the background
+  private static class ConvertToCdfService extends Service<Void> {
+
+    private final String configPath;
+
+    ConvertToCdfService(String configPath) {
+      this.configPath = configPath;
+    }
+
+    @Override
+    protected Task<Void> createTask() {
+      Task<Void> task =
+          new Task<>() {
+            @Override
+            protected Void call() {
+              TabulatorSession session = new TabulatorSession(configPath);
+              session.convertToCdf();
+              return null;
+            }
+          };
+      task.setOnFailed(
+          arg0 ->
+              Logger.log(
+                  Level.SEVERE,
+                  "Error when attempting to convert to CDF:\n%s\nConversion failed!",
                   task.getException().toString()));
       return task;
     }

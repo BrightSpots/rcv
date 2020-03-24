@@ -57,6 +57,10 @@
             <MenuItem mnemonicParsing="false" onAction="#menuItemValidateClicked" text="Validate"/>
             <MenuItem mnemonicParsing="false" onAction="#menuItemTabulateClicked" text="Tabulate"/>
           </Menu>
+          <Menu mnemonicParsing="false" text="Conversion">
+            <MenuItem mnemonicParsing="false" onAction="#menuItemConvertToCdfClicked"
+              text="Convert CVRs in Current Config to CDF"/>
+          </Menu>
         </MenuBar>
         <Label fx:id="labelCurrentlyLoaded">
           <padding>
