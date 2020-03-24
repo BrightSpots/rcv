@@ -47,6 +47,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -180,7 +181,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
   @FXML
-  private ButtonBar buttonBar;
+  private MenuBar menuBar;
   @FXML
   private TabPane tabPane;
 
@@ -193,9 +194,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when new config button is clicked.
+   * Action when new config menu item is clicked.
    */
-  public void buttonNewConfigClicked() {
+  public void menuItemNewConfigClicked() {
     if (checkForSaveAndContinue()) {
       Logger.log(Level.INFO, "Creating new contest config...");
       GuiContext.getInstance().setConfig(null);
@@ -218,9 +219,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when load config button is clicked.
+   * Action when load config menu item is clicked.
    */
-  public void buttonLoadConfigClicked() {
+  public void menuItemLoadConfigClicked() {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
       if (selectedFile == null) {
@@ -265,9 +266,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when save button is clicked.
+   * Action when save menu item is clicked.
    */
-  public void buttonSaveClicked() {
+  public void menuItemSaveClicked() {
     File fileToSave = getSaveFile();
     if (fileToSave != null) {
       saveFile(fileToSave);
@@ -276,15 +277,15 @@ public class GuiConfigController implements Initializable {
 
   private void setGuiIsBusy(boolean isBusy) {
     guiIsBusy = isBusy;
-    buttonBar.setDisable(isBusy);
+    menuBar.setDisable(isBusy);
     tabPane.setDisable(isBusy);
   }
 
   /**
-   * Action when validate button is clicked. Validates whatever is currently entered into the GUI.
-   * Does not save data.
+   * Action when validate menu item is clicked. Validates whatever is currently entered into the
+   * GUI. Does not save data.
    */
-  public void buttonValidateClicked() {
+  public void menuItemValidateClicked() {
     setGuiIsBusy(true);
     ContestConfig config =
         ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
@@ -300,7 +301,7 @@ public class GuiConfigController implements Initializable {
    * - Require user to save if there are unsaved changes.
    * - Create and launch TabulatorService from the saved config path.
    */
-  public void buttonTabulateClicked() {
+  public void menuItemTabulateClicked() {
     if (checkForSaveAndTabulate()) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
@@ -340,12 +341,16 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /** Action when exit button is clicked. */
-  public void buttonExitClicked() {
+  /**
+   * Action when exit menu item is clicked.
+   */
+  public void menuItemExitClicked() {
     exitGui();
   }
 
-  /** Action when output directory button is clicked. */
+  /**
+   * Action when output directory button is clicked.
+   */
   public void buttonOutputDirectoryClicked() {
     DirectoryChooser dc = new DirectoryChooser();
     dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
