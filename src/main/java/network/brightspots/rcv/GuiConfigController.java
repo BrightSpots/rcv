@@ -152,6 +152,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldNumberOfWinners;
   @FXML
+  private TextField textFieldMultiSeatBottomsUpPercentageThreshold;
+  @FXML
   private TextField textFieldDecimalPlacesForVoteArithmetic;
   @FXML
   private TextField textFieldMinimumVoteThreshold;
@@ -547,6 +549,7 @@ public class GuiConfigController implements Initializable {
     choiceWinnerElectionMode.setValue(null);
     textFieldRandomSeed.clear();
     textFieldNumberOfWinners.clear();
+    textFieldMultiSeatBottomsUpPercentageThreshold.clear();
     textFieldDecimalPlacesForVoteArithmetic.clear();
     textFieldMinimumVoteThreshold.clear();
     textFieldMaxSkippedRanksAllowed.clear();
@@ -810,6 +813,8 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = rawConfig.rules;
     textFieldRandomSeed.setText(rules.randomSeed);
     textFieldNumberOfWinners.setText(rules.numberOfWinners);
+    textFieldMultiSeatBottomsUpPercentageThreshold
+        .setText(rules.multiSeatBottomsUpPercentageThreshold);
     textFieldDecimalPlacesForVoteArithmetic.setText(rules.decimalPlacesForVoteArithmetic);
     textFieldMinimumVoteThreshold.setText(rules.minimumVoteThreshold);
     textFieldMaxSkippedRanksAllowed.setText(rules.maxSkippedRanksAllowed);
@@ -864,6 +869,8 @@ public class GuiConfigController implements Initializable {
         getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN);
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
     rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
+    rules.multiSeatBottomsUpPercentageThreshold = getTextOrEmptyString(
+        (textFieldMultiSeatBottomsUpPercentageThreshold));
     rules.decimalPlacesForVoteArithmetic =
         getTextOrEmptyString(textFieldDecimalPlacesForVoteArithmetic);
     rules.minimumVoteThreshold = getTextOrEmptyString(textFieldMinimumVoteThreshold);

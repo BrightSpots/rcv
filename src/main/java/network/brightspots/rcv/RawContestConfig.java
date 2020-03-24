@@ -200,6 +200,7 @@ public class RawContestConfig {
     public String winnerElectionMode;
     public String randomSeed;
     public String numberOfWinners;
+    public String multiSeatBottomsUpPercentageThreshold;
     public String decimalPlacesForVoteArithmetic;
     public String minimumVoteThreshold;
     public String maxSkippedRanksAllowed;

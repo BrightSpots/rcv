@@ -209,7 +209,7 @@
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Rules">
+          <Tab text="Required Rules">
             <HBox>
               <VBox spacing="8.0">
                 <Label text="Tiebreak Mode *"/>
@@ -218,6 +218,11 @@
                 <ChoiceBox fx:id="choiceOvervoteRule" prefWidth="220.0"/>
                 <Label text="Winner Election Mode *"/>
                 <ChoiceBox fx:id="choiceWinnerElectionMode" prefWidth="220.0"/>
+                <padding>
+                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+                </padding>
+              </VBox>
+              <VBox spacing="8.0">
                 <Label text="Number of Winners *"/>
                 <TextField fx:id="textFieldNumberOfWinners" maxWidth="220.0"
                   promptText="Number of Winners"/>
@@ -233,6 +238,32 @@
                 <Label text="Max Rankings Allowed *"/>
                 <TextField fx:id="textFieldMaxRankingsAllowed" maxWidth="220.0"
                   promptText="Max Rankings Allowed"/>
+                <padding>
+                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+                </padding>
+              </VBox>
+            </HBox>
+          </Tab>
+          <Tab text="Optional Rules">
+            <HBox>
+              <VBox spacing="8.0">
+                <Label text="Random Seed"/>
+                <TextField fx:id="textFieldRandomSeed" maxWidth="220.0" promptText="Random Seed"/>
+                <Label text="Overvote Label"/>
+                <TextField fx:id="textFieldOvervoteLabel" maxWidth="220.0"
+                  promptText="Overvote Label"/>
+                <Label text="Undervote Label"/>
+                <TextField fx:id="textFieldUndervoteLabel" maxWidth="220.0"
+                  promptText="Undervote Label"/>
+                <Label text="Undeclared Write-in Label"/>
+                <TextField fx:id="textFieldUndeclaredWriteInLabel" maxWidth="220.0"
+                  promptText="Undeclared Write-in Label"/>
+                <Label text="Multi-Seat Bottoms-up Percentage Threshold"/>
+                <TextField maxWidth="220.0" promptText="Bottoms-up Percentage Threshold"
+                  fx:id="textFieldMultiSeatBottomsUpPercentageThreshold"/>
+                <Label text="Rules Description"/>
+                <TextField fx:id="textFieldRulesDescription" maxWidth="220.0"
+                  promptText="Rules Description"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
@@ -267,20 +298,6 @@
                     <Insets top="4.0"/>
                   </VBox.margin>
                 </CheckBox>
-                <Label text="Random Seed"/>
-                <TextField fx:id="textFieldRandomSeed" maxWidth="220.0" promptText="Random Seed"/>
-                <Label text="Overvote Label"/>
-                <TextField fx:id="textFieldOvervoteLabel" maxWidth="220.0"
-                  promptText="Overvote Label"/>
-                <Label text="Undervote Label"/>
-                <TextField fx:id="textFieldUndervoteLabel" maxWidth="220.0"
-                  promptText="Undervote Label"/>
-                <Label text="Undeclared Write-in Label"/>
-                <TextField fx:id="textFieldUndeclaredWriteInLabel" maxWidth="220.0"
-                  promptText="Undeclared Write-in Label"/>
-                <Label text="Rules Description"/>
-                <TextField fx:id="textFieldRulesDescription" maxWidth="220.0"
-                  promptText="Rules Description"/>
                 <padding>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                 </padding>
