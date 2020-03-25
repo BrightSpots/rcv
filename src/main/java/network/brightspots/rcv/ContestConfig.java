@@ -45,6 +45,7 @@ import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 class ContestConfig {
 
   // If any booleans are unspecified in config file, they should default to false no matter what
+  static final String AUTOMATED_TEST_VERSION = "TEST";
   static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
@@ -331,7 +332,9 @@ class ContestConfig {
       isValid = false;
       Logger.log(Level.SEVERE, "tabulatorVersion is required!");
     } else {
-      if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
+      // ignore this check for test data, but otherwise require version to match current app version
+      if (!getTabulatorVersion().equals(AUTOMATED_TEST_VERSION) && !getTabulatorVersion()
+          .equals(Main.APP_VERSION)) {
         isValid = false;
         Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!", getTabulatorVersion());
       }
