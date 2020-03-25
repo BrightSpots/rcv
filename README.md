@@ -69,11 +69,11 @@ In either case, please reference the [config file documentation](src/main/resour
 
 The Tabulator includes several example contest configuration files and associated CVR files.
 
-1. Click "Load..." at the top of the window and navigate to the `sample_input` folder (if you used Method 2 to install the Tabulator, navigate to the `test_data` folder).
+1. Click "File > Load..." in the menu and navigate to the `sample_input` folder (if you used Method 2 to install the Tabulator, navigate to the `test_data` folder).
 2. Open one of the folders listed here and select the config file (it will have the `_config.json` suffix).
-3. Click on the configuration tabs (Output, CVR Files, Candidates, Rules) to see how this contest is configured.
-4. Click "Validate" to check if this configuration is valid. You will see the results in the console at the bottom of the main window.
-5. Click "Tabulate" to tabulate the election. You will see the results in the console, including the location of the output files.
+3. Click on the configuration tabs (Output, CVR Files, Candidates, Required Rules, Optional Rules) to see how this contest is configured.
+4. Click "Tabulation > Validate" in the menu to check if this configuration is valid. You will see the results in the console at the bottom of the main window.
+5. Click "Tabulation > Tabulate" in the menu to tabulate the election. You will see the results in the console, including the location of the output files.
 
 ## Command-Line Interface
 
@@ -89,6 +89,8 @@ You can also activate a special `convert-to-cdf` function via the command line t
 
 `$ rcv -cli path/to/config convert-to-cdf`
 
+This option is available in the GUI by selecting the "Conversion > Convert CVRs in Current Config to CDF" menu option.
+
 Or, again, if you're compiling and running using Gradle:
 
 `$ gradlew run --args="-cli path/to/config  convert-to-cdf"`
@@ -96,6 +98,8 @@ Or, again, if you're compiling and running using Gradle:
 Finally, there's a `convert-dominion-to-generic-csv` option as well for converting Dominion JSON CVRs into a standardized, generic .csv format:
 
 `$ rcv -cli path/to/folder/containing/jsons convert-dominion-to-generic-csv`
+
+This option is available in the GUI by selecting the "Conversion > Convert Dominion to Generic Format..." menu option.
 
 ## Viewing Tabulator Output
 
