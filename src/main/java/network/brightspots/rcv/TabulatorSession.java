@@ -69,13 +69,13 @@ class TabulatorSession {
   // read Dominion cvr json into CastVoteRecords
   // write CastVoteRecords to generic cvr csv files: one per contest
   // return list of files written or null if there was a problem
-  static List<String> convertDominionCvrJsonToGenericCsv(String dominionDataFolder) {
+  List<String> convertDominionCvrJsonToGenericCsv(String dominionDataFolder) {
     DominionCvrReader dominionCvrReader = new DominionCvrReader(dominionDataFolder);
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     List<String> filesWritten;
     try {
       dominionCvrReader.readCastVoteRecords(castVoteRecords);
-      ResultsWriter writer = new ResultsWriter();
+      ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
       filesWritten = writer
           .writeGenericCvrCsv(castVoteRecords, dominionCvrReader.getContests().values(),
               dominionDataFolder);

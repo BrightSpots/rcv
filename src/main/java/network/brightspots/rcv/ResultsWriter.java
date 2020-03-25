@@ -499,12 +499,10 @@ class ResultsWriter {
       throws IOException {
     List<String> filesWritten = new ArrayList<>();
     try {
-      File csvFile = new File(csvOutputFolder);
-      String outputFolder = csvFile.getParent();
-      String slug = csvFile.getName();
       for (Contest contest : contests) {
-        String fileName = String.format("%s_contest_%d.csv", slug, contest.getId());
-        Path outputPath = Paths.get(outputFolder, fileName);
+        Path outputPath = Paths.get(
+            getOutputFilePath(csvOutputFolder, "dominion_conversion_contest", timestampString,
+                contest.getId()) + ".csv");
         Logger.log(Level.INFO,
             "Writing cast vote records in generic format to file: %s...",
             outputPath.toString());

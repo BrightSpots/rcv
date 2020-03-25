@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
@@ -50,16 +51,20 @@ class TabulatorTests {
   // compare file contents line by line to identify differences
   private static boolean fileCompare(String path1, String path2) {
     boolean result = true;
+    FileReader fr1 = null;
+    FileReader fr2 = null;
     try {
-      BufferedReader reader1 = new BufferedReader(new FileReader(path1));
-      BufferedReader reader2 = new BufferedReader(new FileReader(path2));
+      fr1 = new FileReader(path1);
+      BufferedReader br1 = new BufferedReader(fr1);
+      fr2 = new FileReader(path2);
+      BufferedReader br2 = new BufferedReader(fr2);
       int currentLine = 1;
       int errorCount = 0;
 
       // loop until EOF
       while (true) {
-        String line1 = reader1.readLine();
-        String line2 = reader2.readLine();
+        String line1 = br1.readLine();
+        String line2 = br2.readLine();
         if (line1 == null && line2 == null) {
           break;
         } else if (line1 == null || line2 == null) {
@@ -87,6 +92,17 @@ class TabulatorTests {
     } catch (IOException e) {
       Logger.log(Level.SEVERE, "Error reading file!\n%s", e.toString());
       result = false;
+    } finally {
+      try {
+        if (fr1 != null) {
+          fr1.close();
+        }
+        if (fr2 != null) {
+          fr2.close();
+        }
+      } catch (IOException e) {
+        Logger.log(Level.SEVERE, "Error closing file!\n%s", e.toString());
+      }
     }
     return result;
   }
@@ -98,15 +114,26 @@ class TabulatorTests {
         .toString();
   }
 
-  // helper function test cvr conversion routine
+  // helper function test Dominion CVR conversion routine
   private static void runDominionCvrConversionTest(String stem) {
-    String dominionDataFolder = getTestFilePath(stem, "_cvr_export");
-    List<String> filesWritten = TabulatorSession
-        .convertDominionCvrJsonToGenericCsv(dominionDataFolder);
+    String dominionDataFolder = Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem)
+        .toAbsolutePath().toString();
+    TabulatorSession session = new TabulatorSession(null);
+    List<String> filesWritten = session.convertDominionCvrJsonToGenericCsv(dominionDataFolder);
+
     for (String convertedFile : filesWritten) {
-      String referencePath =
-          convertedFile.substring(0, convertedFile.lastIndexOf('.')) + "_expected.csv";
-      assertTrue(fileCompare(convertedFile, referencePath));
+      String contestNumber = convertedFile
+          .substring(convertedFile.lastIndexOf('_') + 1, convertedFile.lastIndexOf('.'));
+      String expectedPath = Paths
+          .get(dominionDataFolder, stem + "_contest_" + contestNumber + "_expected.csv")
+          .toAbsolutePath().toString();
+      assertTrue(fileCompare(convertedFile, expectedPath));
+      // Clean up test file(s)
+      try {
+        Files.delete(Paths.get(convertedFile));
+      } catch (IOException e) {
+        Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", convertedFile, e.toString());
+      }
     }
   }
 
@@ -134,8 +161,12 @@ class TabulatorTests {
       //noinspection ConstantConditions
       for (File file : outputFolder.listFiles()) {
         if (!file.isDirectory()) {
-          //noinspection ResultOfMethodCallIgnored
-          file.delete();
+          try {
+            Files.delete(file.toPath());
+          } catch (IOException e) {
+            Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", file.getAbsolutePath(),
+                e.toString());
+          }
         }
       }
     }
