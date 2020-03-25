@@ -47,6 +47,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -180,7 +181,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
   @FXML
-  private ButtonBar buttonBar;
+  private MenuBar menuBar;
   @FXML
   private TabPane tabPane;
 
@@ -193,9 +194,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when new config button is clicked.
+   * Action when new config menu item is clicked.
    */
-  public void buttonNewConfigClicked() {
+  public void menuItemNewConfigClicked() {
     if (checkForSaveAndContinue()) {
       Logger.log(Level.INFO, "Creating new contest config...");
       GuiContext.getInstance().setConfig(null);
@@ -218,9 +219,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when load config button is clicked.
+   * Action when load config menu item is clicked.
    */
-  public void buttonLoadConfigClicked() {
+  public void menuItemLoadConfigClicked() {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
       if (selectedFile == null) {
@@ -265,9 +266,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when save button is clicked.
+   * Action when save menu item is clicked.
    */
-  public void buttonSaveClicked() {
+  public void menuItemSaveClicked() {
     File fileToSave = getSaveFile();
     if (fileToSave != null) {
       saveFile(fileToSave);
@@ -276,23 +277,20 @@ public class GuiConfigController implements Initializable {
 
   private void setGuiIsBusy(boolean isBusy) {
     guiIsBusy = isBusy;
-    buttonBar.setDisable(isBusy);
+    menuBar.setDisable(isBusy);
     tabPane.setDisable(isBusy);
   }
 
   /**
-   * Action when validate button is clicked. Validates whatever is currently entered into the GUI.
-   * Does not save data.
+   * Action when validate menu item is clicked. Validates whatever is currently entered into the
+   * GUI. Does not save data.
    */
-  public void buttonValidateClicked() {
+  public void menuItemValidateClicked() {
     setGuiIsBusy(true);
     ContestConfig config =
         ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
     ValidatorService service = new ValidatorService(config);
-    service.setOnSucceeded(event -> setGuiIsBusy(false));
-    service.setOnCancelled(event -> setGuiIsBusy(false));
-    service.setOnFailed(event -> setGuiIsBusy(false));
-    service.start();
+    setUpAndStartService(service);
   }
 
   /**
@@ -300,20 +298,61 @@ public class GuiConfigController implements Initializable {
    * - Require user to save if there are unsaved changes.
    * - Create and launch TabulatorService from the saved config path.
    */
-  public void buttonTabulateClicked() {
-    if (checkForSaveAndTabulate()) {
+  public void menuItemTabulateClicked() {
+    if (checkForSaveAndExecute()) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
         TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
-        service.setOnSucceeded(event -> setGuiIsBusy(false));
-        service.setOnCancelled(event -> setGuiIsBusy(false));
-        service.setOnFailed(event -> setGuiIsBusy(false));
-        service.start();
+        setUpAndStartService(service);
       } else {
         Logger.log(
             Level.WARNING, "Please load a contest config file before attempting to tabulate!");
       }
     }
+  }
+
+  /**
+   * Convert CVRs in current config to CDF.
+   * - Require user to save if there are unsaved changes.
+   * - Create and launch ConvertToCdfService from the saved config path.
+   */
+  public void menuItemConvertToCdfClicked() {
+    if (checkForSaveAndExecute()) {
+      if (GuiContext.getInstance().getConfig() != null) {
+        setGuiIsBusy(true);
+        ConvertToCdfService service = new ConvertToCdfService(selectedFile.getAbsolutePath());
+        setUpAndStartService(service);
+      } else {
+        Logger.log(
+            Level.WARNING,
+            "Please load a contest config file before attempting to convert to CDF!");
+      }
+    }
+  }
+
+  /**
+   * Convert Dominion files in specified folder to generic .csv format.
+   * - Require user to specify a Dominion data folder path.
+   * - Create and launch ConvertDominionService given the provided path.
+   */
+  public void menuItemConvertDominionClicked() {
+    DirectoryChooser dc = new DirectoryChooser();
+    dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+    dc.setTitle("Dominion Data Folder");
+    File dominionDataFolderPath = dc.showDialog(GuiContext.getInstance().getMainWindow());
+    if (dominionDataFolderPath != null) {
+      setGuiIsBusy(true);
+      ConvertDominionService service = new ConvertDominionService(
+          dominionDataFolderPath.getAbsolutePath());
+      setUpAndStartService(service);
+    }
+  }
+
+  private void setUpAndStartService(Service<Void> service) {
+    service.setOnSucceeded(event -> setGuiIsBusy(false));
+    service.setOnCancelled(event -> setGuiIsBusy(false));
+    service.setOnFailed(event -> setGuiIsBusy(false));
+    service.start();
   }
 
   private void exitGui() {
@@ -340,12 +379,16 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /** Action when exit button is clicked. */
-  public void buttonExitClicked() {
+  /**
+   * Action when exit menu item is clicked.
+   */
+  public void menuItemExitClicked() {
     exitGui();
   }
 
-  /** Action when output directory button is clicked. */
+  /**
+   * Action when output directory button is clicked.
+   */
   public void buttonOutputDirectoryClicked() {
     DirectoryChooser dc = new DirectoryChooser();
     dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -628,7 +671,7 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private boolean checkForSaveAndTabulate() {
+  private boolean checkForSaveAndExecute() {
     boolean willContinue = false;
     if (checkIfNeedsSaving()) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
@@ -943,6 +986,65 @@ public class GuiConfigController implements Initializable {
               Logger.log(
                   Level.SEVERE,
                   "Error during tabulation:\n%s\nTabulation failed!",
+                  task.getException().toString()));
+      return task;
+    }
+  }
+
+  // ConvertToCdfService runs a CDF conversion in the background
+  private static class ConvertToCdfService extends Service<Void> {
+
+    private final String configPath;
+
+    ConvertToCdfService(String configPath) {
+      this.configPath = configPath;
+    }
+
+    @Override
+    protected Task<Void> createTask() {
+      Task<Void> task =
+          new Task<>() {
+            @Override
+            protected Void call() {
+              TabulatorSession session = new TabulatorSession(configPath);
+              session.convertToCdf();
+              return null;
+            }
+          };
+      task.setOnFailed(
+          arg0 ->
+              Logger.log(
+                  Level.SEVERE,
+                  "Error when attempting to convert to CDF:\n%s\nConversion failed!",
+                  task.getException().toString()));
+      return task;
+    }
+  }
+
+  // ConvertDominionService runs a Dominion conversion in the background
+  private static class ConvertDominionService extends Service<Void> {
+
+    private final String dominionDataFolderPath;
+
+    ConvertDominionService(String dominionDataFolderPath) {
+      this.dominionDataFolderPath = dominionDataFolderPath;
+    }
+
+    @Override
+    protected Task<Void> createTask() {
+      Task<Void> task =
+          new Task<>() {
+            @Override
+            protected Void call() {
+              TabulatorSession.convertDominionCvrJsonToGenericCsv(dominionDataFolderPath);
+              return null;
+            }
+          };
+      task.setOnFailed(
+          arg0 ->
+              Logger.log(
+                  Level.SEVERE,
+                  "Error when attempting to convert Dominion files:\n%s\nConversion failed!",
                   task.getException().toString()));
       return task;
     }
