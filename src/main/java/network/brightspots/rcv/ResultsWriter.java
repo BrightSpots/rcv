@@ -512,7 +512,7 @@ class ResultsWriter {
         BufferedWriter writer = Files.newBufferedWriter(outputPath);
         csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
         // print header:
-        // ContestId, TabulatorId,  BatchId, RecordId, PrecinctId, rank 1 selection,
+        // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
         // rank 2 selection, ... rank maxRanks selection
         csvPrinter.print("Contest Id");
         csvPrinter.print("Tabulator Id");
