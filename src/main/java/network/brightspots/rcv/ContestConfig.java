@@ -79,6 +79,8 @@ class ContestConfig {
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
+  // special version string which allows regression tests to pass version validation
+  public static final String TEST_TABULATOR_VERSION = "TEST";
 
   // underlying rawConfig object data
   final RawContestConfig rawConfig;
@@ -328,11 +330,15 @@ class ContestConfig {
     if (isNullOrBlank(getTabulatorVersion())) {
       isValid = false;
       Logger.log(Level.SEVERE, "tabulatorVersion is required!");
+    } else {
+      // ignore this check for test data, but otherwise require version to match current app version
+      if (!getTabulatorVersion().equals(TEST_TABULATOR_VERSION)) {
+        if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
+          isValid = false;
+          Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!", getTabulatorVersion());
+        }
+      }
     }
-
-    // version-specific validation logic would go here
-    // currently we support all versions
-
     if (!isValid) {
       Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s!", Main.APP_VERSION);
     }
