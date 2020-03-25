@@ -132,7 +132,7 @@ class TabulatorTests {
       try {
         Files.delete(Paths.get(convertedFile));
       } catch (IOException e) {
-        e.printStackTrace();
+        Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", convertedFile, e.toString());
       }
     }
   }
@@ -161,8 +161,12 @@ class TabulatorTests {
       //noinspection ConstantConditions
       for (File file : outputFolder.listFiles()) {
         if (!file.isDirectory()) {
-          //noinspection ResultOfMethodCallIgnored
-          file.delete();
+          try {
+            Files.delete(file.toPath());
+          } catch (IOException e) {
+            Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", file.getAbsolutePath(),
+                e.toString());
+          }
         }
       }
     }
