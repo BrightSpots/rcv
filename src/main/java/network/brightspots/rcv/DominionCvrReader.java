@@ -205,7 +205,7 @@ class DominionCvrReader {
         if (precinctPortionId != null && !this.precinctPortions.containsKey(precinctPortionId)) {
           Logger.log(
               Level.SEVERE,
-              "Precinct portion Id '%d' from Cvr not found in manifest data!",
+              "Precinct portion ID \"%d\" from CVR not found in manifest data!",
               precinctPortionId);
           throw new CvrParseException();
         }
