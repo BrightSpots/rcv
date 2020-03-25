@@ -514,11 +514,12 @@ class ResultsWriter {
         // print header:
         // ContestId, TabulatorId,  BatchId, RecordId, PrecinctId, rank 1 selection,
         // rank 2 selection, ... rank maxRanks selection
-        csvPrinter.print("ContestId");
-        csvPrinter.print("TabulatorId");
-        csvPrinter.print("BatchId");
-        csvPrinter.print("RecordId");
-        csvPrinter.print("PrecinctId");
+        csvPrinter.print("Contest Id");
+        csvPrinter.print("Tabulator Id");
+        csvPrinter.print("Batch Id");
+        csvPrinter.print("Record Id");
+        csvPrinter.print("Precinct");
+        csvPrinter.print("Precinct Portion");
         Integer numRanks = contest.getMaxRanks();
         for (int rank = 1; rank <= numRanks; rank++) {
           String label = String.format("Rank %d", rank);
@@ -531,7 +532,16 @@ class ResultsWriter {
           csvPrinter.print(castVoteRecord.getTabulatorId());
           csvPrinter.print(castVoteRecord.getBatchId());
           csvPrinter.print(castVoteRecord.getId());
-          csvPrinter.print(castVoteRecord.getPrecinctId());
+          if (castVoteRecord.getPrecinct() == null) {
+            csvPrinter.print("");
+          } else {
+            csvPrinter.print(castVoteRecord.getPrecinct());
+          }
+          if (castVoteRecord.getPrecinctPortion() == null) {
+            csvPrinter.print("");
+          } else {
+            csvPrinter.print(castVoteRecord.getPrecinctPortion());
+          }
           // for each rank determine what candidate id, overvote, or undervote ocurred
           for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
             if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
