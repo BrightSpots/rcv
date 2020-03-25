@@ -45,6 +45,8 @@ class CastVoteRecord {
   private final String suppliedId;
   // which precinct this ballot came from
   private final String precinct;
+  // which precinct portion this ballot came from
+  private final String precinctPortion;
   // container for ALL CVR data parsed from the source CVR file
   private final List<String> fullCvrData;
   // records winners to whom some fraction of this vote has been allocated
@@ -58,7 +60,6 @@ class CastVoteRecord {
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
   SortedMap<Integer, Set<String>> rankToCandidateIds;
-
   // contest associated with this CVR
   private Integer contestId;
   // tabulatorId parsed from Dominion CVR data
@@ -67,6 +68,45 @@ class CastVoteRecord {
   private Integer batchId;
   // ballotTypeId parsed from Dominion CVR data
   private Integer ballotTypeId;
+  // whether this CVR is exhausted or not
+  private boolean isExhausted;
+  // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
+  private String currentRecipientOfVote = null;
+
+  CastVoteRecord(
+      Integer contestId,
+      Integer tabulatorId,
+      Integer batchId,
+      String suppliedId,
+      String precinct,
+      String precinctPortion,
+      Integer ballotTypeId,
+      List<Pair<Integer, String>> rankings) {
+    this.contestId = contestId;
+    this.tabulatorId = tabulatorId;
+    this.batchId = batchId;
+    this.computedId = null;
+    this.suppliedId = suppliedId;
+    this.precinct = precinct;
+    this.precinctPortion = precinctPortion;
+    this.ballotTypeId = ballotTypeId;
+    this.fullCvrData = new ArrayList<>();
+    sortRankings(rankings);
+  }
+
+  CastVoteRecord(
+      String computedId,
+      String suppliedId,
+      String precinct,
+      List<String> fullCvrData,
+      List<Pair<Integer, String>> rankings) {
+    this.computedId = computedId;
+    this.suppliedId = suppliedId;
+    this.precinct = precinct;
+    this.precinctPortion = null;
+    this.fullCvrData = fullCvrData;
+    sortRankings(rankings);
+  }
 
   Integer getContestId() {
     return contestId;
@@ -84,41 +124,12 @@ class CastVoteRecord {
     return ballotTypeId;
   }
 
-  // whether this CVR is exhausted or not
-  private boolean isExhausted;
-  // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
-  private String currentRecipientOfVote = null;
-
-  CastVoteRecord(
-      Integer contestId,
-      Integer tabulatorId,
-      Integer batchId,
-      String suppliedId,
-      String precinct,
-      Integer ballotTypeId,
-      List<Pair<Integer, String>> rankings) {
-    this.contestId = contestId;
-    this.tabulatorId = tabulatorId;
-    this.batchId = batchId;
-    this.computedId = null;
-    this.suppliedId = suppliedId;
-    this.precinct = precinct;
-    this.ballotTypeId = ballotTypeId;
-    this.fullCvrData = new ArrayList<>();
-    sortRankings(rankings);
+  String getPrecinct() {
+    return precinct;
   }
 
-  CastVoteRecord(
-      String computedId,
-      String suppliedId,
-      String precinct,
-      List<String> fullCvrData,
-      List<Pair<Integer, String>> rankings) {
-    this.computedId = computedId;
-    this.suppliedId = suppliedId;
-    this.precinct = precinct;
-    this.fullCvrData = fullCvrData;
-    sortRankings(rankings);
+  String getPrecinctPortion() {
+    return precinctPortion;
   }
 
   String getId() {
@@ -218,14 +229,6 @@ class CastVoteRecord {
 
   void setCurrentRecipientOfVote(String currentRecipientOfVote) {
     this.currentRecipientOfVote = currentRecipientOfVote;
-  }
-
-  String getPrecinct() {
-    return precinct;
-  }
-
-  String getPrecinctId() {
-    return suppliedId != null ? suppliedId : computedId;
   }
 
   Map<String, BigDecimal> getWinnerToFractionalValue() {

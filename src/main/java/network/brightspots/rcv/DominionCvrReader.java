@@ -32,19 +32,19 @@ import network.brightspots.rcv.RawContestConfig.Candidate;
 class DominionCvrReader {
 
   // canonical manifest file names
-  private static final String PRECINCT_MANIFEST = "PrecinctPortionManifest.json";
+  private static final String PRECINCT_MANIFEST = "PrecinctManifest.json";
+  private static final String PRECINCT_PORTION_MANIFEST = "PrecinctPortionManifest.json";
   private static final String CANDIDATE_MANIFEST = "CandidateManifest.json";
   private static final String CONTEST_MANIFEST = "ContestManifest.json";
   private static final String CVR_EXPORT = "CvrExport.json";
 
   private final String manifestFolder;
+  // map of precinct Id to precinct description
   private Map<Integer, String> precincts;
+  // map of precinct portion Id to precinct portion description
+  private Map<Integer, String> precinctPortions;
+  // map of contest Id to Contest data
   private Map<Integer, Contest> contests;
-
-  Map<Integer, Contest> getContests() {
-    return contests;
-  }
-
   private List<Candidate> candidates;
 
   DominionCvrReader(String manifestFolder) {
@@ -74,8 +74,9 @@ class DominionCvrReader {
     return contests;
   }
 
-  // returns map from precinctId to precinct name parsed from input file
-  private static Map<Integer, String> getPrecincts(String precinctPath) {
+  // returns map from Id to Description parsed from input file
+  // PrecinctManifest.json and PrecinctPortionManifest.json use this structure
+  private static Map<Integer, String> getPrecinctData(String precinctPath) {
     Map<Integer, String> precinctsById = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(precinctPath, HashMap.class);
@@ -115,13 +116,23 @@ class DominionCvrReader {
     return candidates;
   }
 
+  Map<Integer, Contest> getContests() {
+    return contests;
+  }
+
   // parse Cvr json into CastVoteRecord objects and add them to the input list
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
-    // read metadata files for precincts, contest, and candidates
+    // read metadata files for precincts, precinct portions, contest, and candidates
     Path precinctPath = Paths.get(manifestFolder, PRECINCT_MANIFEST);
-    this.precincts = getPrecincts(precinctPath.toString());
+    this.precincts = getPrecinctData(precinctPath.toString());
     if (this.precincts == null) {
       Logger.log(Level.SEVERE, "No precinct data found!");
+      throw new CvrParseException();
+    }
+    Path precinctPortionPath = Paths.get(manifestFolder, PRECINCT_PORTION_MANIFEST);
+    this.precinctPortions = getPrecinctData(precinctPortionPath.toString());
+    if (this.precinctPortions == null) {
+      Logger.log(Level.SEVERE, "No precinct portion data found!");
       throw new CvrParseException();
     }
     Path contestPath = Paths.get(manifestFolder, CONTEST_MANIFEST);
@@ -180,15 +191,25 @@ class DominionCvrReader {
           continue;
         }
         // validate precinct
-        Integer precinctPortionId = (Integer) originalObject.get("PrecinctPortionId");
-        if (!this.precincts.containsKey(precinctPortionId)) {
+        Integer precinctId = (Integer) originalObject.get("PrecinctId");
+        if (precinctId != null && !this.precincts.containsKey(precinctId)) {
           Logger.log(
               Level.SEVERE,
-              "Precinct ID '%d' from CVR not found in manifest data!",
+              "Precinct ID \"%d\" from CVR not found in manifest data!",
+              precinctId);
+          throw new CvrParseException();
+        }
+        String precinct = this.precincts.get(precinctId);
+        // validate precinct portion
+        Integer precinctPortionId = (Integer) originalObject.get("PrecinctPortionId");
+        if (precinctPortionId != null && !this.precinctPortions.containsKey(precinctPortionId)) {
+          Logger.log(
+              Level.SEVERE,
+              "Precinct portion ID \"%d\" from CVR not found in manifest data!",
               precinctPortionId);
           throw new CvrParseException();
         }
-        String precinct = this.precincts.get(precinctPortionId);
+        String precinctPortion = this.precinctPortions.get(precinctPortionId);
         Integer ballotTypeId = (Integer) originalObject.get("BallotTypeId");
 
         ArrayList contests;
@@ -235,7 +256,8 @@ class DominionCvrReader {
           // create the new Cvr
           CastVoteRecord newCvr =
               new CastVoteRecord(
-                  contestId, tabulatorId, batchId, suppliedId, precinct, ballotTypeId, rankings);
+                  contestId, tabulatorId, batchId, suppliedId, precinct, precinctPortion,
+                  ballotTypeId, rankings);
           castVoteRecords.add(newCvr);
         }
         // provide some user feedback on the Cvr count
