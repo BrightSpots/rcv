@@ -1036,7 +1036,8 @@ public class GuiConfigController implements Initializable {
           new Task<>() {
             @Override
             protected Void call() {
-              TabulatorSession.convertDominionCvrJsonToGenericCsv(dominionDataFolderPath);
+              TabulatorSession session = new TabulatorSession(null);
+              session.convertDominionCvrJsonToGenericCsv(dominionDataFolderPath);
               return null;
             }
           };

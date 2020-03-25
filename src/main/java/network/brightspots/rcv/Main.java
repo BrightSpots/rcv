@@ -78,7 +78,7 @@ public class Main extends GuiApplication {
       // Session object will manage the tabulation process
       TabulatorSession session = new TabulatorSession(providedPath);
       if (argsCli.size() == 2 && argsCli.get(1).equals("convert-dominion-to-generic-csv")) {
-        TabulatorSession.convertDominionCvrJsonToGenericCsv(providedPath);
+        session.convertDominionCvrJsonToGenericCsv(providedPath);
       } else if (argsCli.size() == 2 && argsCli.get(1).equals("convert-to-cdf")) {
         session.convertToCdf();
       } else {
