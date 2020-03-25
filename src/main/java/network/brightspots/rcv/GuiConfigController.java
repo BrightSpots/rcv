@@ -290,10 +290,7 @@ public class GuiConfigController implements Initializable {
     ContestConfig config =
         ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
     ValidatorService service = new ValidatorService(config);
-    service.setOnSucceeded(event -> setGuiIsBusy(false));
-    service.setOnCancelled(event -> setGuiIsBusy(false));
-    service.setOnFailed(event -> setGuiIsBusy(false));
-    service.start();
+    setUpAndStartService(service);
   }
 
   /**
@@ -306,10 +303,7 @@ public class GuiConfigController implements Initializable {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
         TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
-        service.setOnSucceeded(event -> setGuiIsBusy(false));
-        service.setOnCancelled(event -> setGuiIsBusy(false));
-        service.setOnFailed(event -> setGuiIsBusy(false));
-        service.start();
+        setUpAndStartService(service);
       } else {
         Logger.log(
             Level.WARNING, "Please load a contest config file before attempting to tabulate!");
@@ -327,10 +321,7 @@ public class GuiConfigController implements Initializable {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
         ConvertToCdfService service = new ConvertToCdfService(selectedFile.getAbsolutePath());
-        service.setOnSucceeded(event -> setGuiIsBusy(false));
-        service.setOnCancelled(event -> setGuiIsBusy(false));
-        service.setOnFailed(event -> setGuiIsBusy(false));
-        service.start();
+        setUpAndStartService(service);
       } else {
         Logger.log(
             Level.WARNING,
@@ -353,11 +344,15 @@ public class GuiConfigController implements Initializable {
       setGuiIsBusy(true);
       ConvertDominionService service = new ConvertDominionService(
           dominionDataFolderPath.getAbsolutePath());
-      service.setOnSucceeded(event -> setGuiIsBusy(false));
-      service.setOnCancelled(event -> setGuiIsBusy(false));
-      service.setOnFailed(event -> setGuiIsBusy(false));
-      service.start();
+      setUpAndStartService(service);
     }
+  }
+
+  private void setUpAndStartService(Service<Void> service) {
+    service.setOnSucceeded(event -> setGuiIsBusy(false));
+    service.setOnCancelled(event -> setGuiIsBusy(false));
+    service.setOnFailed(event -> setGuiIsBusy(false));
+    service.start();
   }
 
   private void exitGui() {
