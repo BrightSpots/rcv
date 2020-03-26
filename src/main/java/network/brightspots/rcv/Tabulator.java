@@ -598,11 +598,11 @@ class Tabulator {
           Logger.log(
               Level.INFO,
               "Batch-eliminated candidate \"%s\" in round %d. The running total was %s vote(s) and "
-                  + "the next-highest count was %s vote(s).",
+                  + "the next-lowest count was %s vote(s).",
               elimination.candidateId,
               currentRound,
               elimination.runningTotal.toString(),
-              elimination.nextHighestTally.toString());
+              elimination.nextLowestTally.toString());
         }
       }
     }
@@ -1165,15 +1165,15 @@ class Tabulator {
 
     // the candidate eliminated
     final String candidateId;
-    // how many total votes were totaled when this candidate was eliminated
+    // how many total votes we'd seen at the step of batch elimination when we added this candidate
     final BigDecimal runningTotal;
-    // next highest count total (validates that we were correctly batch eliminated)
-    final BigDecimal nextHighestTally;
+    // next-lowest count total (validates that we were correctly batch-eliminated)
+    final BigDecimal nextLowestTally;
 
-    BatchElimination(String candidateId, BigDecimal runningTotal, BigDecimal nextHighestTally) {
+    BatchElimination(String candidateId, BigDecimal runningTotal, BigDecimal nextLowestTally) {
       this.candidateId = candidateId;
       this.runningTotal = runningTotal;
-      this.nextHighestTally = nextHighestTally;
+      this.nextLowestTally = nextLowestTally;
     }
   }
 
