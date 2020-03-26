@@ -453,9 +453,9 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("undeclared write-in (UWI) test")
-  void uwiTest() {
-    runTabulationTest("uwi_test");
+  @DisplayName("undeclared write-in (UWI) cannot win test")
+  void uwiCannotWinTest() {
+    runTabulationTest("uwi_cannot_win_test");
   }
 
   @Test
