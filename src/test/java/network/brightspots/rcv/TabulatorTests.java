@@ -457,4 +457,10 @@ class TabulatorTests {
   void uwiTest() {
     runTabulationTest("uwi_test");
   }
+
+  @Test
+  @DisplayName("multi-seat UWI test")
+  void multiSeatUwiTest() {
+    runTabulationTest("multi_seat_uwi_test");
+  }
 }
