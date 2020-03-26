@@ -451,4 +451,10 @@ class TabulatorTests {
   void treatBlankAsUndeclaredWriteInTest() {
     runTabulationTest("test_set_treat_blank_as_undeclared_write_in");
   }
+
+  @Test
+  @DisplayName("undeclared write-in (UWI) test")
+  void uwiTest() {
+    runTabulationTest("uwi_test");
+  }
 }

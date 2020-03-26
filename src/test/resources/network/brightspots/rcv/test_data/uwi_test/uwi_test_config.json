@@ -1,0 +1,50 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "UWI Test",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "uwi_test_cvr.xlsx",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "provider" : ""
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "B",
+    "code" : "",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "usePermutationInConfig",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "UWI",
+    "rulesDescription" : ""
+  }
+}
