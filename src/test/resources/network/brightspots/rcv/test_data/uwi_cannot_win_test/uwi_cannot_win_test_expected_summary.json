@@ -1,0 +1,33 @@
+{
+  "config" : {
+    "contest" : "UWI Test",
+    "date" : "",
+    "jurisdiction" : "",
+    "office" : "",
+    "threshold" : "3"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "A" : "3",
+      "B" : "1",
+      "UWI" : "5"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "UWI",
+      "transfers" : {
+        "exhausted" : "5"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "A" : "3",
+      "B" : "1"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    } ]
+  } ]
+}

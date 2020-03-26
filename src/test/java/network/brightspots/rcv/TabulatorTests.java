@@ -451,4 +451,16 @@ class TabulatorTests {
   void treatBlankAsUndeclaredWriteInTest() {
     runTabulationTest("test_set_treat_blank_as_undeclared_write_in");
   }
+
+  @Test
+  @DisplayName("undeclared write-in (UWI) cannot win test")
+  void uwiCannotWinTest() {
+    runTabulationTest("uwi_cannot_win_test");
+  }
+
+  @Test
+  @DisplayName("multi-seat UWI test")
+  void multiSeatUwiTest() {
+    runTabulationTest("multi_seat_uwi_test");
+  }
 }
