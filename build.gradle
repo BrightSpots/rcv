@@ -99,6 +99,7 @@ def sampleInputToCopy = copySpec {
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_cvr.xlsx"
         include "precinct_example/precinct_example_config.json"
         include "precinct_example/precinct_example_cvr.xlsx"
+        include "dominion_cvr_conversion_alaska/*.json"
         exclude "output"
         exclude "**/*expected*"
     }
