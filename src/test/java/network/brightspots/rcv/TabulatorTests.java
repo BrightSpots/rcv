@@ -267,6 +267,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Continue Until Two Candidates Remain with Batch Elimination")
+  void testContinueUntilTwoCandidatesRemainWithBatchElimination() {
+    runTabulationTest("continue_until_two_with_batch_elimination_test");
+  }
+
+  @Test
   @DisplayName("2017 Minneapolis Mayor")
   void test2017MinneapolisMayor() {
     runTabulationTest("2017_minneapolis_mayor");

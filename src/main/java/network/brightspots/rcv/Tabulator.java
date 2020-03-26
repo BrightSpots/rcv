@@ -202,7 +202,7 @@ class Tabulator {
         // We need to make more eliminations if
         // a) we haven't found all the winners yet, or
         // b) we've found our winner, but we're continuing until we have only two candidates
-        // c) not all remaining candidates meet the bottoms up threshold 
+        // c) not all remaining candidates meet the bottoms-up threshold
 
         List<String> eliminated;
         // Four mutually exclusive ways to eliminate candidates.
@@ -598,11 +598,11 @@ class Tabulator {
           Logger.log(
               Level.INFO,
               "Batch-eliminated candidate \"%s\" in round %d. The running total was %s vote(s) and "
-                  + "the next-highest count was %s vote(s).",
+                  + "the next-lowest count was %s vote(s).",
               elimination.candidateId,
               currentRound,
               elimination.runningTotal.toString(),
-              elimination.nextHighestTally.toString());
+              elimination.nextLowestTally.toString());
         }
       }
     }
@@ -702,12 +702,14 @@ class Tabulator {
   // Function: runBatchElimination
   // Purpose: applies batch elimination logic to the input vote counts to remove multiple candidates
   //   in a single round if their vote counts are so low that they could not possibly end up winning
-  //   Consider, after each round of voting a candidate not eliminated could potentially receive ALL
-  //   the votes from candidates who ARE eliminated, keeping them in the race and "leapfrogging"
+  //   Consider, after each round of voting, a candidate not eliminated could potentially receive
+  //   ALL the votes from candidates who ARE eliminated, keeping them in the race and "leapfrogging"
   //   ahead of candidates who were leading them.
   //   In this algorithm we sum candidate vote totals (low to high) and find where this leapfrogging
   //   is impossible: that is, when the sum of all batch-eliminated candidates' votes fails to equal
   //   or exceed the next-lowest candidate vote total.
+  //   One additional caveat when we're in singleSeatContinueUntilTwoCandidatesRemain mode: make
+  //   sure we don't batch-eliminate too many candidates and end up with just the winner.
   //
   // param: currentRoundTallyToCandidates map from vote tally to candidates with that tally
   // returns: list of BatchElimination objects, one for each batch-eliminated candidate
@@ -723,10 +725,17 @@ class Tabulator {
     Set<String> candidatesEliminated = new HashSet<>();
     // BatchElimination objects contain contextual data that will be used by the tabulation to log
     // the batch elimination results.
-    List<BatchElimination> eliminations = new LinkedList<>();
+    LinkedList<BatchElimination> eliminations = new LinkedList<>();
+    // See the caveat above about continueUntilTwoCandidatesRemain. In this situation, we need to
+    // remove the final set of candidates that we had added to the batch, so we hold onto
+    // the previous version of the eliminations list whenever an iteration of the loop augments it.
+    LinkedList<BatchElimination> previousEliminations = new LinkedList<>();
+
     // At each iteration, currentVoteTally is the next-lowest vote count received by one or more
     // candidate(s) in the current round.
     for (BigDecimal currentVoteTally : currentRoundTallyToCandidates.keySet()) {
+      // a shallow copy is sufficient
+      LinkedList<BatchElimination> newEliminations = new LinkedList<>(eliminations);
       // Test whether leapfrogging is possible.
       if (runningTotal.compareTo(currentVoteTally) < 0) {
         // Not possible, so eliminate everyone who has been seen and not eliminated yet.
@@ -734,7 +743,7 @@ class Tabulator {
         for (String candidate : candidatesSeen) {
           if (!candidatesEliminated.contains(candidate)) {
             candidatesEliminated.add(candidate);
-            eliminations.add(new BatchElimination(candidate, runningTotal, currentVoteTally));
+            newEliminations.add(new BatchElimination(candidate, runningTotal, currentVoteTally));
           }
         }
       }
@@ -745,6 +754,17 @@ class Tabulator {
           config.multiply(currentVoteTally, new BigDecimal(currentCandidates.size()));
       runningTotal = runningTotal.add(totalForThisRound);
       candidatesSeen.addAll(currentCandidates);
+      if (newEliminations.size() > eliminations.size()) {
+        previousEliminations = eliminations;
+        eliminations = newEliminations;
+      }
+    }
+    if (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()
+        && eliminations.size() + candidateToRoundEliminated.size()
+        == config.getNumCandidates() - 1) {
+      // See the caveat above about continueUntilTwoCandidatesRemain. In this situation, we need to
+      // remove the final set of candidates that we had added to the elimination list.
+      eliminations = previousEliminations;
     }
     return eliminations;
   }
@@ -1145,15 +1165,15 @@ class Tabulator {
 
     // the candidate eliminated
     final String candidateId;
-    // how many total votes were totaled when this candidate was eliminated
+    // how many total votes we'd seen at the step of batch elimination when we added this candidate
     final BigDecimal runningTotal;
-    // next highest count total (validates that we were correctly batch eliminated)
-    final BigDecimal nextHighestTally;
+    // next-lowest count total (validates that we were correctly batch-eliminated)
+    final BigDecimal nextLowestTally;
 
-    BatchElimination(String candidateId, BigDecimal runningTotal, BigDecimal nextHighestTally) {
+    BatchElimination(String candidateId, BigDecimal runningTotal, BigDecimal nextLowestTally) {
       this.candidateId = candidateId;
       this.runningTotal = runningTotal;
-      this.nextHighestTally = nextHighestTally;
+      this.nextLowestTally = nextLowestTally;
     }
   }
 
