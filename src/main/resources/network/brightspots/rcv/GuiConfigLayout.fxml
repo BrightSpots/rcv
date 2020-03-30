@@ -50,8 +50,8 @@
             <MenuItem mnemonicParsing="false" onAction="#menuItemNewConfigClicked" text="New"/>
             <MenuItem mnemonicParsing="false" onAction="#menuItemLoadConfigClicked" text="Load..."/>
             <MenuItem mnemonicParsing="false" onAction="#menuItemSaveClicked" text="Save..."/>
-            <MenuItem mnemonicParsing="false" onAction="#menuItemExitClicked" text="Exit"/>
             <SeparatorMenuItem mnemonicParsing="false"/>
+            <MenuItem mnemonicParsing="false" onAction="#menuItemExitClicked" text="Exit"/>
           </Menu>
           <Menu mnemonicParsing="false" text="Tabulation">
             <MenuItem mnemonicParsing="false" onAction="#menuItemValidateClicked" text="Validate"/>
