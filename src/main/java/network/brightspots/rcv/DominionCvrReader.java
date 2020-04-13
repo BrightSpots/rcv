@@ -184,14 +184,22 @@ class DominionCvrReader {
         Integer batchId = (Integer) session.get("BatchId");
         Integer recordId = (Integer) session.get("RecordId");
         String suppliedId = recordId.toString();
-        HashMap originalObject = (HashMap) session.get("Original");
-        // filter out records which are not current (these result from adjudication)
-        Boolean isCurrent = (Boolean) originalObject.get("IsCurrent");
+        // filter out records which are not current and replace them with adjudicated ones
+        HashMap adjudicatedData = (HashMap) session.get("Original");
+        boolean isCurrent = (boolean) adjudicatedData.get("IsCurrent");
         if (!isCurrent) {
-          continue;
+          if (session.containsKey("Modified")) {
+            adjudicatedData = (HashMap) session.get("Modified");
+          } else {
+            Logger.log(Level.WARNING,
+                "CVR has no adjudicated rankings, skipping: "
+                    + "Tabulator ID: %d Batch ID: %d Record ID: %d",
+                tabulatorId, batchId, recordId);
+            continue;
+          }
         }
         // validate precinct
-        Integer precinctId = (Integer) originalObject.get("PrecinctId");
+        Integer precinctId = (Integer) adjudicatedData.get("PrecinctId");
         if (precinctId != null && !this.precincts.containsKey(precinctId)) {
           Logger.log(
               Level.SEVERE,
@@ -201,7 +209,7 @@ class DominionCvrReader {
         }
         String precinct = this.precincts.get(precinctId);
         // validate precinct portion
-        Integer precinctPortionId = (Integer) originalObject.get("PrecinctPortionId");
+        Integer precinctPortionId = (Integer) adjudicatedData.get("PrecinctPortionId");
         if (precinctPortionId != null && !this.precinctPortions.containsKey(precinctPortionId)) {
           Logger.log(
               Level.SEVERE,
@@ -210,16 +218,16 @@ class DominionCvrReader {
           throw new CvrParseException();
         }
         String precinctPortion = this.precinctPortions.get(precinctPortionId);
-        Integer ballotTypeId = (Integer) originalObject.get("BallotTypeId");
+        Integer ballotTypeId = (Integer) adjudicatedData.get("BallotTypeId");
 
         ArrayList contests;
         // sometimes there is a "Cards" object at this level
-        if (originalObject.containsKey("Cards")) {
-          ArrayList cardsList = (ArrayList) originalObject.get("Cards");
+        if (adjudicatedData.containsKey("Cards")) {
+          ArrayList cardsList = (ArrayList) adjudicatedData.get("Cards");
           HashMap cardsObject = (HashMap) cardsList.get(0);
           contests = (ArrayList) cardsObject.get("Contests");
         } else {
-          contests = (ArrayList) originalObject.get("Contests");
+          contests = (ArrayList) adjudicatedData.get("Contests");
         }
 
         // each contest object is a cvr
@@ -237,6 +245,11 @@ class DominionCvrReader {
           ArrayList marks = (ArrayList) contest.get("Marks");
           for (Object rankingObject : marks) {
             HashMap rankingMap = (HashMap) rankingObject;
+            // skip ambiguous rankings
+            boolean isAmbiguous = (boolean) rankingMap.get("IsAmbiguous");
+            if (isAmbiguous) {
+              continue;
+            }
             Integer candidateId = (Integer) rankingMap.get("CandidateId");
             String candidateCode = candidateId.toString();
             Set<String> candidates = contestIdToCandidateCodes.get(contestId);
