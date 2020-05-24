@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Multi_winner2",
-    "outputDirectory" : "output",
-    "contestDate" : "2019-01-18",
-    "contestJurisdiction" : "Multi-winner",
-    "contestOffice" : "Multi_winner2",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : true
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "Multi_winner2",
+    "outputDirectory": "output",
+    "contestDate": "2019-01-18",
+    "contestJurisdiction": "Multi-winner",
+    "contestOffice": "Multi_winner2",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": true
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "test_set_multi_winner_whole_threshold_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",

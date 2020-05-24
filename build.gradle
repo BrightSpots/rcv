@@ -3,8 +3,8 @@ plugins {
     id "checkstyle"
     id "idea"
     id "java"
-    id "org.openjfx.javafxplugin" version "0.0.7"
-    id "org.beryx.jlink" version "2.10.4"
+    id "org.openjfx.javafxplugin" version "0.0.8"
+    id "org.beryx.jlink" version "2.17.2"
 }
 
 repositories {
@@ -12,11 +12,11 @@ repositories {
 }
 
 dependencies {
-    compile "org.apache.commons:commons-csv:1.6"
-    compile "org.apache.poi:poi-ooxml:4.1.0"
-    compile "com.fasterxml.jackson.core:jackson-core:2.9.9"
-    compile "com.fasterxml.jackson.core:jackson-annotations:2.9.9"
-    compile "com.fasterxml.jackson.core:jackson-databind:2.9.9"
+    compile "org.apache.commons:commons-csv:1.8"
+    compile "org.apache.poi:poi-ooxml:4.1.2"
+    compile "com.fasterxml.jackson.core:jackson-core:2.10.2"
+    compile "com.fasterxml.jackson.core:jackson-annotations:2.10.2"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.10.2"
     testCompile "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.5.0-M1"
 }
@@ -34,7 +34,7 @@ application {
 
 // ### Checkstyle plugin settings
 checkstyle {
-    toolVersion = "8.23"
+    toolVersion = "8.30"
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-8.23/src/main/resources/google_checks.xml
@@ -64,7 +64,7 @@ test {
 
 // ### JavaFX plugin settings
 javafx {
-    version = "12.0.1"
+    version = "13.0.2"
     modules = ["javafx.controls", "javafx.fxml"]
 }
 
@@ -99,6 +99,7 @@ def sampleInputToCopy = copySpec {
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_cvr.xlsx"
         include "precinct_example/precinct_example_config.json"
         include "precinct_example/precinct_example_cvr.xlsx"
+        include "dominion_cvr_conversion_alaska/*.json"
         exclude "output"
         exclude "**/*expected*"
     }

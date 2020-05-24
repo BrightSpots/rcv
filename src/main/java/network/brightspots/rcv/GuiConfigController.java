@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -47,6 +47,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -152,6 +153,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldNumberOfWinners;
   @FXML
+  private TextField textFieldMultiSeatBottomsUpPercentageThreshold;
+  @FXML
   private TextField textFieldDecimalPlacesForVoteArithmetic;
   @FXML
   private TextField textFieldMinimumVoteThreshold;
@@ -178,14 +181,22 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
   @FXML
-  private ButtonBar buttonBar;
+  private MenuBar menuBar;
   @FXML
   private TabPane tabPane;
 
+  private static String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
+    return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
+  }
+
+  private static String getTextOrEmptyString(TextField textField) {
+    return textField.getText() != null ? textField.getText().trim() : "";
+  }
+
   /**
-   * Action when new config button is clicked.
+   * Action when new config menu item is clicked.
    */
-  public void buttonNewConfigClicked() {
+  public void menuItemNewConfigClicked() {
     if (checkForSaveAndContinue()) {
       Logger.log(Level.INFO, "Creating new contest config...");
       GuiContext.getInstance().setConfig(null);
@@ -208,9 +219,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when load config button is clicked.
+   * Action when load config menu item is clicked.
    */
-  public void buttonLoadConfigClicked() {
+  public void menuItemLoadConfigClicked() {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
       if (selectedFile == null) {
@@ -255,9 +266,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when save button is clicked.
+   * Action when save menu item is clicked.
    */
-  public void buttonSaveClicked() {
+  public void menuItemSaveClicked() {
     File fileToSave = getSaveFile();
     if (fileToSave != null) {
       saveFile(fileToSave);
@@ -266,23 +277,20 @@ public class GuiConfigController implements Initializable {
 
   private void setGuiIsBusy(boolean isBusy) {
     guiIsBusy = isBusy;
-    buttonBar.setDisable(isBusy);
+    menuBar.setDisable(isBusy);
     tabPane.setDisable(isBusy);
   }
 
   /**
-   * Action when validate button is clicked.
-   * Validates whatever is currently entered into the GUI. Does not save data.
+   * Action when validate menu item is clicked. Validates whatever is currently entered into the
+   * GUI. Does not save data.
    */
-  public void buttonValidateClicked() {
+  public void menuItemValidateClicked() {
     setGuiIsBusy(true);
     ContestConfig config =
         ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
     ValidatorService service = new ValidatorService(config);
-    service.setOnSucceeded(event -> setGuiIsBusy(false));
-    service.setOnCancelled(event -> setGuiIsBusy(false));
-    service.setOnFailed(event -> setGuiIsBusy(false));
-    service.start();
+    setUpAndStartService(service);
   }
 
   /**
@@ -290,20 +298,61 @@ public class GuiConfigController implements Initializable {
    * - Require user to save if there are unsaved changes.
    * - Create and launch TabulatorService from the saved config path.
    */
-  public void buttonTabulateClicked() {
-    if (checkForSaveAndTabulate()) {
+  public void menuItemTabulateClicked() {
+    if (checkForSaveAndExecute()) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
         TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
-        service.setOnSucceeded(event -> setGuiIsBusy(false));
-        service.setOnCancelled(event -> setGuiIsBusy(false));
-        service.setOnFailed(event -> setGuiIsBusy(false));
-        service.start();
+        setUpAndStartService(service);
       } else {
         Logger.log(
             Level.WARNING, "Please load a contest config file before attempting to tabulate!");
       }
     }
+  }
+
+  /**
+   * Convert CVRs in current config to CDF.
+   * - Require user to save if there are unsaved changes.
+   * - Create and launch ConvertToCdfService from the saved config path.
+   */
+  public void menuItemConvertToCdfClicked() {
+    if (checkForSaveAndExecute()) {
+      if (GuiContext.getInstance().getConfig() != null) {
+        setGuiIsBusy(true);
+        ConvertToCdfService service = new ConvertToCdfService(selectedFile.getAbsolutePath());
+        setUpAndStartService(service);
+      } else {
+        Logger.log(
+            Level.WARNING,
+            "Please load a contest config file before attempting to convert to CDF!");
+      }
+    }
+  }
+
+  /**
+   * Convert Dominion files in specified folder to generic .csv format.
+   * - Require user to specify a Dominion data folder path.
+   * - Create and launch ConvertDominionService given the provided path.
+   */
+  public void menuItemConvertDominionClicked() {
+    DirectoryChooser dc = new DirectoryChooser();
+    dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+    dc.setTitle("Dominion Data Folder");
+    File dominionDataFolderPath = dc.showDialog(GuiContext.getInstance().getMainWindow());
+    if (dominionDataFolderPath != null) {
+      setGuiIsBusy(true);
+      ConvertDominionService service = new ConvertDominionService(
+          dominionDataFolderPath.getAbsolutePath());
+      setUpAndStartService(service);
+    }
+  }
+
+  private void setUpAndStartService(Service<Void> service) {
+    service.setOnSucceeded(event -> setGuiIsBusy(false));
+    service.setOnCancelled(event -> setGuiIsBusy(false));
+    service.setOnFailed(event -> setGuiIsBusy(false));
+    service.start();
   }
 
   private void exitGui() {
@@ -331,9 +380,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when exit button is clicked.
+   * Action when exit menu item is clicked.
    */
-  public void buttonExitClicked() {
+  public void menuItemExitClicked() {
     exitGui();
   }
 
@@ -350,16 +399,12 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Action when clear button is clicked for contest date.
-   */
+  /** Action when clear button is clicked for contest date. */
   public void buttonClearDatePickerContestDateClicked() {
     datePickerContestDate.setValue(null);
   }
 
-  /**
-   * Action when CVR file path button is clicked.
-   */
+  /** Action when CVR file path button is clicked. */
   public void buttonCvrFilePathClicked() {
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -373,14 +418,16 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Action when add CVR file button is clicked.
-   */
+  /** Action when add CVR file button is clicked. */
   public void buttonAddCvrFileClicked() {
-    CvrSource cvrSource = new CvrSource(getTextOrEmptyString(textFieldCvrFilePath),
-        getTextOrEmptyString(textFieldCvrFirstVoteCol),
-        getTextOrEmptyString(textFieldCvrFirstVoteRow), getTextOrEmptyString(textFieldCvrIdCol),
-        getTextOrEmptyString(textFieldCvrPrecinctCol), getTextOrEmptyString(textFieldCvrProvider));
+    CvrSource cvrSource =
+        new CvrSource(
+            getTextOrEmptyString(textFieldCvrFilePath),
+            getTextOrEmptyString(textFieldCvrFirstVoteCol),
+            getTextOrEmptyString(textFieldCvrFirstVoteRow),
+            getTextOrEmptyString(textFieldCvrIdCol),
+            getTextOrEmptyString(textFieldCvrPrecinctCol),
+            getTextOrEmptyString(textFieldCvrProvider));
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
@@ -392,75 +439,74 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Action when delete CVR file button is clicked.
-   */
+  /** Action when delete CVR file button is clicked. */
   public void buttonDeleteCvrFileClicked() {
     tableViewCvrFiles
         .getItems()
         .removeAll(tableViewCvrFiles.getSelectionModel().getSelectedItems());
   }
 
-  /**
-   * Action when CVR file path is changed.
-   */
+  /** Action when CVR file path is changed. */
   public void changeCvrFilePath(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setFilePath(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR first vote col is changed.
-   */
+  /** Action when CVR first vote col is changed. */
   public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setFirstVoteColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR first vote row is changed.
-   */
+  /** Action when CVR first vote row is changed. */
   public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setFirstVoteRowIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR ID col index is changed.
-   */
+  /** Action when CVR ID col index is changed. */
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR precinct col index is changed.
-   */
+  /** Action when CVR precinct col index is changed. */
   public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when CVR provider is changed.
-   */
+  /** Action when CVR provider is changed. */
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles.getSelectionModel().getSelectedItem()
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
         .setProvider(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
-  /**
-   * Action when add candidate button is clicked.
-   */
+  /** Action when add candidate button is clicked. */
   public void buttonAddCandidateClicked() {
-    Candidate candidate = new Candidate(getTextOrEmptyString(textFieldCandidateName),
-        getTextOrEmptyString(textFieldCandidateCode), ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+    Candidate candidate =
+        new Candidate(
+            getTextOrEmptyString(textFieldCandidateName),
+            getTextOrEmptyString(textFieldCandidateCode),
+            ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
     if (ContestConfig.passesBasicCandidateValidation(candidate)) {
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
@@ -468,29 +514,27 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Action when delete candidate button is clicked.
-   */
+  /** Action when delete candidate button is clicked. */
   public void buttonDeleteCandidateClicked() {
     tableViewCandidates
         .getItems()
         .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
   }
 
-  /**
-   * Action when candidate name is changed.
-   */
+  /** Action when candidate name is changed. */
   public void changeCandidateName(CellEditEvent cellEditEvent) {
-    tableViewCandidates.getSelectionModel().getSelectedItem()
+    tableViewCandidates
+        .getSelectionModel()
+        .getSelectedItem()
         .setName(cellEditEvent.getNewValue().toString().trim());
     tableViewCandidates.refresh();
   }
 
-  /**
-   * Action when candidate code is changed.
-   */
+  /** Action when candidate code is changed. */
   public void changeCandidateCode(CellEditEvent cellEditEvent) {
-    tableViewCandidates.getSelectionModel().getSelectedItem()
+    tableViewCandidates
+        .getSelectionModel()
+        .getSelectedItem()
         .setCode(cellEditEvent.getNewValue().toString().trim());
     tableViewCandidates.refresh();
   }
@@ -548,6 +592,7 @@ public class GuiConfigController implements Initializable {
     choiceWinnerElectionMode.setValue(null);
     textFieldRandomSeed.clear();
     textFieldNumberOfWinners.clear();
+    textFieldMultiSeatBottomsUpPercentageThreshold.clear();
     textFieldDecimalPlacesForVoteArithmetic.clear();
     textFieldMinimumVoteThreshold.clear();
     textFieldMaxSkippedRanksAllowed.clear();
@@ -626,7 +671,7 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private boolean checkForSaveAndTabulate() {
+  private boolean checkForSaveAndExecute() {
     boolean willContinue = false;
     if (checkIfNeedsSaving()) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
@@ -758,10 +803,12 @@ public class GuiConfigController implements Initializable {
   }
 
   private void migrateConfigVersion(ContestConfig config) {
-    if (config.rawConfig.tabulatorVersion == null || !config.rawConfig.tabulatorVersion
-        .equals(Main.APP_VERSION)) {
+    if (config.rawConfig.tabulatorVersion == null
+        || !config.rawConfig.tabulatorVersion.equals(Main.APP_VERSION)) {
       // Any necessary future version migration logic goes here
-      Logger.log(Level.INFO, "Migrated tabulator config version from %s to %s.",
+      Logger.log(
+          Level.INFO,
+          "Migrated tabulator config version from %s to %s.",
           config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
           Main.APP_VERSION);
       config.rawConfig.tabulatorVersion = Main.APP_VERSION;
@@ -802,12 +849,15 @@ public class GuiConfigController implements Initializable {
     choiceOvervoteRule.setValue(
         config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
     choiceWinnerElectionMode.setValue(
-        config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN ? null
+        config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN
+            ? null
             : config.getWinnerElectionMode());
 
     ContestRules rules = rawConfig.rules;
     textFieldRandomSeed.setText(rules.randomSeed);
     textFieldNumberOfWinners.setText(rules.numberOfWinners);
+    textFieldMultiSeatBottomsUpPercentageThreshold
+        .setText(rules.multiSeatBottomsUpPercentageThreshold);
     textFieldDecimalPlacesForVoteArithmetic.setText(rules.decimalPlacesForVoteArithmetic);
     textFieldMinimumVoteThreshold.setText(rules.minimumVoteThreshold);
     textFieldMaxSkippedRanksAllowed.setText(rules.maxSkippedRanksAllowed);
@@ -821,14 +871,6 @@ public class GuiConfigController implements Initializable {
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
-  }
-
-  private static String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
-    return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
-  }
-
-  private static String getTextOrEmptyString(TextField textField) {
-    return textField.getText() != null ? textField.getText().trim() : "";
   }
 
   private RawContestConfig createRawContestConfig() {
@@ -866,10 +908,12 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
-    rules.winnerElectionMode = getChoiceElse(choiceWinnerElectionMode,
-        WinnerElectionMode.MODE_UNKNOWN);
+    rules.winnerElectionMode =
+        getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN);
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
     rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
+    rules.multiSeatBottomsUpPercentageThreshold = getTextOrEmptyString(
+        (textFieldMultiSeatBottomsUpPercentageThreshold));
     rules.decimalPlacesForVoteArithmetic =
         getTextOrEmptyString(textFieldDecimalPlacesForVoteArithmetic);
     rules.minimumVoteThreshold = getTextOrEmptyString(textFieldMinimumVoteThreshold);
@@ -942,6 +986,66 @@ public class GuiConfigController implements Initializable {
               Logger.log(
                   Level.SEVERE,
                   "Error during tabulation:\n%s\nTabulation failed!",
+                  task.getException().toString()));
+      return task;
+    }
+  }
+
+  // ConvertToCdfService runs a CDF conversion in the background
+  private static class ConvertToCdfService extends Service<Void> {
+
+    private final String configPath;
+
+    ConvertToCdfService(String configPath) {
+      this.configPath = configPath;
+    }
+
+    @Override
+    protected Task<Void> createTask() {
+      Task<Void> task =
+          new Task<>() {
+            @Override
+            protected Void call() {
+              TabulatorSession session = new TabulatorSession(configPath);
+              session.convertToCdf();
+              return null;
+            }
+          };
+      task.setOnFailed(
+          arg0 ->
+              Logger.log(
+                  Level.SEVERE,
+                  "Error when attempting to convert to CDF:\n%s\nConversion failed!",
+                  task.getException().toString()));
+      return task;
+    }
+  }
+
+  // ConvertDominionService runs a Dominion conversion in the background
+  private static class ConvertDominionService extends Service<Void> {
+
+    private final String dominionDataFolderPath;
+
+    ConvertDominionService(String dominionDataFolderPath) {
+      this.dominionDataFolderPath = dominionDataFolderPath;
+    }
+
+    @Override
+    protected Task<Void> createTask() {
+      Task<Void> task =
+          new Task<>() {
+            @Override
+            protected Void call() {
+              TabulatorSession session = new TabulatorSession(null);
+              session.convertDominionCvrJsonToGenericCsv(dominionDataFolderPath);
+              return null;
+            }
+          };
+      task.setOnFailed(
+          arg0 ->
+              Logger.log(
+                  Level.SEVERE,
+                  "Error when attempting to convert Dominion files:\n%s\nConversion failed!",
                   task.getException().toString()));
       return task;
     }

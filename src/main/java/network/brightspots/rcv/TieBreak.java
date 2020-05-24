@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -62,7 +62,7 @@ class TieBreak {
   // roundTallies: map from round number to map of candidate ID to vote total (for that round)
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
   private final Map<Integer, Map<String, BigDecimal>> roundTallies;
-  private boolean selectingAWinner;
+  private final boolean selectingAWinner;
   private String selectedCandidate;
   private String explanation;
 
@@ -307,6 +307,17 @@ class TieBreak {
     return selection;
   }
 
+  private static class GuiTiebreakerPromptResponse {
+
+    final boolean tabulationCancelled;
+    final String selectedCandidate;
+
+    GuiTiebreakerPromptResponse(boolean tabulationCancelled, String selectedCandidate) {
+      this.tabulationCancelled = tabulationCancelled;
+      this.selectedCandidate = selectedCandidate;
+    }
+  }
+
   class GuiTiebreakerPrompt implements Callable<GuiTiebreakerPromptResponse> {
 
     private List<String> tiedCandidates;
@@ -340,17 +351,6 @@ class TieBreak {
 
     void setTiedCandidates(List<String> tiedCandidates) {
       this.tiedCandidates = tiedCandidates;
-    }
-  }
-
-  private class GuiTiebreakerPromptResponse {
-
-    final boolean tabulationCancelled;
-    final String selectedCandidate;
-
-    GuiTiebreakerPromptResponse(boolean tabulationCancelled, String selectedCandidate) {
-      this.tabulationCancelled = tabulationCancelled;
-      this.selectedCandidate = selectedCandidate;
     }
   }
 }

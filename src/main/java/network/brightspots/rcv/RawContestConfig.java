@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -143,6 +143,7 @@ public class RawContestConfig {
     private String name;
     private String code;
     private boolean excluded;
+    private Integer contestId;
 
     Candidate() {
     }
@@ -151,6 +152,13 @@ public class RawContestConfig {
       this.name = name;
       this.code = code;
       this.excluded = excluded;
+    }
+
+    Candidate(String name, String code, boolean excluded, Integer contestId) {
+      this.name = name;
+      this.code = code;
+      this.excluded = excluded;
+      this.contestId = contestId;
     }
 
     public String getName() {
@@ -176,6 +184,10 @@ public class RawContestConfig {
     public void setExcluded(boolean excluded) {
       this.excluded = excluded;
     }
+
+    public Integer getContestId() {
+      return contestId;
+    }
   }
 
   // ContestRules: encapsulates the set of rules required to perform contest tabulation
@@ -188,6 +200,7 @@ public class RawContestConfig {
     public String winnerElectionMode;
     public String randomSeed;
     public String numberOfWinners;
+    public String multiSeatBottomsUpPercentageThreshold;
     public String decimalPlacesForVoteArithmetic;
     public String minimumVoteThreshold;
     public String maxSkippedRanksAllowed;

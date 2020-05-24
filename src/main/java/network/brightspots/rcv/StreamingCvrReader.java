@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -98,11 +98,13 @@ class StreamingCvrReader {
     this.firstVoteColumnIndex = Integer.parseInt(source.getFirstVoteColumnIndex()) - 1;
     this.firstVoteRowIndex = Integer.parseInt(source.getFirstVoteRowIndex()) - 1;
     this.idColumnIndex =
-        isNullOrBlank(source.getIdColumnIndex()) ? null
+        isNullOrBlank(source.getIdColumnIndex())
+            ? null
             : Integer.parseInt(source.getIdColumnIndex()) - 1;
-    this.precinctColumnIndex = !isNullOrBlank(source.getPrecinctColumnIndex())
-        ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
-        : null;
+    this.precinctColumnIndex =
+        !isNullOrBlank(source.getPrecinctColumnIndex())
+            ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
+            : null;
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -217,7 +219,7 @@ class StreamingCvrReader {
     if (col >= firstVoteColumnIndex
         && col < firstVoteColumnIndex + config.getMaxRankingsAllowed()) {
 
-      Integer currentRank = col - firstVoteColumnIndex + 1;
+      int currentRank = col - firstVoteColumnIndex + 1;
       // handle any empty cells which may exist between this cell and any previous one
       handleEmptyCells(currentRank);
       String candidate = cellData.trim();

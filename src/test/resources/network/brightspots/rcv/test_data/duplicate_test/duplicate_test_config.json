@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Duplicate test",
-    "outputDirectory" : "output",
-    "contestDate" : "2018-05-21",
-    "contestJurisdiction" : "Funkytown, USA",
-    "contestOffice" : "Director of Produce",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "Duplicate test",
+    "outputDirectory": "output",
+    "contestDate": "2018-05-21",
+    "contestJurisdiction": "Funkytown, USA",
+    "contestOffice": "Director of Produce",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "duplicate_test_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

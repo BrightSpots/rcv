@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "2017 Minneapolis mayoral race",
-    "outputDirectory" : "output",
-    "contestDate" : "2017-11-07",
-    "contestJurisdiction" : "Minneapolis, MN",
-    "contestOffice" : "Mayor",
-    "tabulateByPrecinct" : true,
-    "generateCdfJson" : false
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "2017 Minneapolis mayoral race",
+    "outputDirectory": "output",
+    "contestDate": "2017-11-07",
+    "contestJurisdiction": "Minneapolis, MN",
+    "contestOffice": "Mayor",
+    "tabulateByPrecinct": true,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "2017_minneapolis_mayor_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

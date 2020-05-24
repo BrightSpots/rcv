@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -24,6 +24,7 @@ package network.brightspots.rcv;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -44,23 +45,54 @@ class CastVoteRecord {
   private final String suppliedId;
   // which precinct this ballot came from
   private final String precinct;
+  // which precinct portion this ballot came from
+  private final String precinctPortion;
   // container for ALL CVR data parsed from the source CVR file
   private final List<String> fullCvrData;
   // records winners to whom some fraction of this vote has been allocated
   private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
-  // map of round to all candidates selected for that round
-  // a set is used to handle overvotes
-  SortedMap<Integer, Set<String>> rankToCandidateIds;
-  // whether this CVR is exhausted or not
-  private boolean isExhausted;
-  // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
-  private String currentRecipientOfVote = null;
   // If CVR CDF output is enabled, we store the necessary info here: for each round, the list of
   // candidates this ballot is counting toward (0 or 1 in a single-seat contest; 0 to n in a
   // multi-seat contest because of fractional vote transfers), and how much of the vote each is
   // getting. As a memory optimization, if the data is unchanged from the previous round, we don't
   // add a new entry.
   private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
+  // map of round to all candidates selected for that round
+  // a set is used to handle overvotes
+  SortedMap<Integer, Set<String>> rankToCandidateIds;
+  // contest associated with this CVR
+  private Integer contestId;
+  // tabulatorId parsed from Dominion CVR data
+  private Integer tabulatorId;
+  // batchId parsed from Dominion CVR data
+  private Integer batchId;
+  // ballotTypeId parsed from Dominion CVR data
+  private Integer ballotTypeId;
+  // whether this CVR is exhausted or not
+  private boolean isExhausted;
+  // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
+  private String currentRecipientOfVote = null;
+
+  CastVoteRecord(
+      Integer contestId,
+      Integer tabulatorId,
+      Integer batchId,
+      String suppliedId,
+      String precinct,
+      String precinctPortion,
+      Integer ballotTypeId,
+      List<Pair<Integer, String>> rankings) {
+    this.contestId = contestId;
+    this.tabulatorId = tabulatorId;
+    this.batchId = batchId;
+    this.computedId = null;
+    this.suppliedId = suppliedId;
+    this.precinct = precinct;
+    this.precinctPortion = precinctPortion;
+    this.ballotTypeId = ballotTypeId;
+    this.fullCvrData = new ArrayList<>();
+    sortRankings(rankings);
+  }
 
   CastVoteRecord(
       String computedId,
@@ -71,8 +103,33 @@ class CastVoteRecord {
     this.computedId = computedId;
     this.suppliedId = suppliedId;
     this.precinct = precinct;
+    this.precinctPortion = null;
     this.fullCvrData = fullCvrData;
     sortRankings(rankings);
+  }
+
+  Integer getContestId() {
+    return contestId;
+  }
+
+  Integer getTabulatorId() {
+    return tabulatorId;
+  }
+
+  Integer getBatchId() {
+    return batchId;
+  }
+
+  Integer getBallotTypeId() {
+    return ballotTypeId;
+  }
+
+  String getPrecinct() {
+    return precinct;
+  }
+
+  String getPrecinctPortion() {
+    return precinctPortion;
   }
 
   String getId() {
@@ -174,10 +231,6 @@ class CastVoteRecord {
     this.currentRecipientOfVote = currentRecipientOfVote;
   }
 
-  String getPrecinct() {
-    return precinct;
-  }
-
   Map<String, BigDecimal> getWinnerToFractionalValue() {
     return winnerToFractionalValue;
   }
@@ -196,5 +249,9 @@ class CastVoteRecord {
     COUNTED,
     IGNORED,
     EXHAUSTED,
+  }
+
+  static class CvrParseException extends Exception {
+
   }
 }

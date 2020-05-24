@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Missing Precinct example",
-    "outputDirectory" : "output",
-    "contestDate" : "2017-11-07",
-    "contestJurisdiction" : "Minneapolis, MN",
-    "contestOffice" : "Mayor",
-    "tabulateByPrecinct" : true,
-    "generateCdfJson" : false
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "Missing Precinct example",
+    "outputDirectory": "output",
+    "contestDate": "2017-11-07",
+    "contestJurisdiction": "Minneapolis, MN",
+    "contestOffice": "Mayor",
+    "tabulateByPrecinct": true,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "missing_precinct_example_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

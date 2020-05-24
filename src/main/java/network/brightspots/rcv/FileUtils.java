@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -45,8 +45,10 @@ class FileUtils {
     if (!isNullOrBlank(dir)) {
       File dirFile = new File(dir);
       if (!dirFile.exists() && !dirFile.mkdirs()) {
-        Logger.log(Level.SEVERE, "Failed to create output directory: %s\n"
-            + "Check the directory name and permissions.", dir);
+        Logger.log(
+            Level.SEVERE,
+            "Failed to create output directory: %s\n" + "Check the directory name and permissions.",
+            dir);
         throw new UnableToCreateDirectoryException("Unable to create output directory: " + dir);
       }
     }

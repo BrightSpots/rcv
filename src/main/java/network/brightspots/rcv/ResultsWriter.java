@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -37,9 +37,11 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,6 +53,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
+import network.brightspots.rcv.DominionCvrReader.Contest;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -98,16 +101,6 @@ class ResultsWriter {
             "%s_%s%s",
             timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationNumber));
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
-  }
-
-  private String getOutputFilePath(String outputType) {
-    return getOutputFilePath(
-        config.getOutputDirectory(),
-        outputType,
-        timestampString,
-        config.isMultiSeatSequentialWinnerTakesAllEnabled()
-            ? config.getSequentialWinners().size() + 1
-            : null);
   }
 
   static String sanitizeStringForOutput(String s) {
@@ -207,6 +200,16 @@ class ResultsWriter {
     return filename;
   }
 
+  private String getOutputFilePathFromInstance(String outputType) {
+    return getOutputFilePath(
+        config.getOutputDirectory(),
+        outputType,
+        timestampString,
+        config.isMultiSeatSequentialWinnerTakesAllEnabled()
+            ? config.getSequentialWinners().size() + 1
+            : null);
+  }
+
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
     this.roundToResidualSurplus = roundToResidualSurplus;
     return this;
@@ -273,7 +276,7 @@ class ResultsWriter {
     for (String precinct : precinctRoundTallies.keySet()) {
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
-          getOutputFilePath(String.format("%s_precinct_summary", precinctFileString));
+          getOutputFilePathFromInstance(String.format("%s_precinct_summary", precinctFileString));
       int numBallots = numBallotsByPrecinct.get(precinct);
       generateSummarySpreadsheet(
           precinctRoundTallies.get(precinct), numBallots, precinct, outputPath);
@@ -361,8 +364,7 @@ class ResultsWriter {
       // Exhausted/inactive count is the difference between the total ballots and the total votes
       // still active or counting as residual surplus votes in the current round.
       BigDecimal thisRoundInactive =
-          new BigDecimal(numBallots)
-              .subtract(totalActiveVotesPerRound.get(round));
+          new BigDecimal(numBallots).subtract(totalActiveVotesPerRound.get(round));
 
       if (precinct == null) {
         // We don't have the concept of residual surplus at the precinct level (see comment below),
@@ -480,12 +482,97 @@ class ResultsWriter {
 
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a precinct)
   void generateOverallSummaryFiles(
-      Map<Integer, Map<String, BigDecimal>> roundTallies, TallyTransfers tallyTransfers,
-      int numBallots) throws IOException {
-    String outputPath = getOutputFilePath("summary");
+      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      TallyTransfers tallyTransfers,
+      int numBallots)
+      throws IOException {
+    String outputPath = getOutputFilePathFromInstance("summary");
     generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
+
+  // write CastVoteRecords for all contests to the provided folder
+  // returns a list of files written
+  List<String> writeGenericCvrCsv(List<CastVoteRecord> castVoteRecords,
+      Collection<Contest> contests,
+      String csvOutputFolder)
+      throws IOException {
+    List<String> filesWritten = new ArrayList<>();
+    try {
+      for (Contest contest : contests) {
+        Path outputPath = Paths.get(
+            getOutputFilePath(csvOutputFolder, "dominion_conversion_contest", timestampString,
+                contest.getId()) + ".csv");
+        Logger.log(Level.INFO,
+            "Writing cast vote records in generic format to file: %s...",
+            outputPath.toString());
+        CSVPrinter csvPrinter;
+        BufferedWriter writer = Files.newBufferedWriter(outputPath);
+        csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
+        // print header:
+        // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
+        // rank 2 selection, ... rank maxRanks selection
+        csvPrinter.print("Contest Id");
+        csvPrinter.print("Tabulator Id");
+        csvPrinter.print("Batch Id");
+        csvPrinter.print("Record Id");
+        csvPrinter.print("Precinct");
+        csvPrinter.print("Precinct Portion");
+        Integer numRanks = contest.getMaxRanks();
+        for (int rank = 1; rank <= numRanks; rank++) {
+          String label = String.format("Rank %d", rank);
+          csvPrinter.print(label);
+        }
+        csvPrinter.println();
+        // print rows:
+        for (CastVoteRecord castVoteRecord : castVoteRecords) {
+          csvPrinter.print(castVoteRecord.getContestId());
+          csvPrinter.print(castVoteRecord.getTabulatorId());
+          csvPrinter.print(castVoteRecord.getBatchId());
+          csvPrinter.print(castVoteRecord.getId());
+          if (castVoteRecord.getPrecinct() == null) {
+            csvPrinter.print("");
+          } else {
+            csvPrinter.print(castVoteRecord.getPrecinct());
+          }
+          if (castVoteRecord.getPrecinctPortion() == null) {
+            csvPrinter.print("");
+          } else {
+            csvPrinter.print(castVoteRecord.getPrecinctPortion());
+          }
+          // for each rank determine what candidate id, overvote, or undervote ocurred
+          for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
+            if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
+              Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);
+              assert !candidateSet.isEmpty();
+              if (candidateSet.size() == 1) {
+                String selection = candidateSet.iterator().next();
+                csvPrinter.print(selection);
+              } else {
+                csvPrinter.print("overvote");
+              }
+            } else {
+              csvPrinter.print("undervote");
+            }
+          }
+          csvPrinter.println();
+        }
+        // finalize the file
+        csvPrinter.flush();
+        csvPrinter.close();
+        filesWritten.add(outputPath.toString());
+        Logger.log(Level.INFO, "Successfully wrote: %s", outputPath.toString());
+      }
+    } catch (IOException exception) {
+      Logger.log(Level.SEVERE,
+          "Error writing cast vote records in generic format from input file: %s\n%s",
+          csvOutputFolder,
+          exception.toString());
+      throw exception;
+    }
+    return filesWritten;
+  }
+
 
   // create NIST Common Data Format CVR json
   void generateCdfJson(List<CastVoteRecord> castVoteRecords)
@@ -493,7 +580,7 @@ class ResultsWriter {
     // generate GpUnitIds for precincts "geo-political units" (can be a precinct or jurisdiction)
     gpUnitIds = generateGpUnitIds();
 
-    String outputPath = getOutputFilePath("cvr_cdf") + ".json";
+    String outputPath = getOutputFilePathFromInstance("cvr_cdf") + ".json";
     Logger.log(Level.INFO, "Generating cast vote record CDF JSON file: %s...", outputPath);
 
     HashMap<String, Object> outputJson = new HashMap<>();

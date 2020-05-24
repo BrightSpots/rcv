@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -30,10 +30,11 @@ import java.util.logging.Level;
 public class Main extends GuiApplication {
 
   public static final String APP_NAME = "Universal RCV Tabulator";
-  public static final String APP_VERSION = "1.0.1";
+  public static final String APP_VERSION = "1.1.0";
 
   /**
    * Main entry point to the RCV tabulator program.
+   *
    * @param args command-line args
    */
   public static void main(String[] args) {
@@ -57,24 +58,28 @@ public class Main extends GuiApplication {
       launch(args);
     } else {
       Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
-      // check for unexpected input
+      // Check for unexpected input
       if (argsCli.size() == 0) {
-        Logger.log(Level.SEVERE, "No config file path provided on command line!\n"
-            + "Please provide a path to the config file!\n"
-            + "See README.md for more details.");
+        Logger.log(
+            Level.SEVERE,
+            "No config file path provided on command line!\n"
+                + "Please provide a path to the config file!\n"
+                + "See README.md for more details.");
         System.exit(1);
       } else if (argsCli.size() > 2) {
-        Logger.log(Level.SEVERE, "Too many arguments! Max is 2 but got: %d\n"
-                + "See README.md for more details.",
+        Logger.log(
+            Level.SEVERE,
+            "Too many arguments! Max is 2 but got: %d\n" + "See README.md for more details.",
             argsCli.size());
         System.exit(2);
       }
-      // config file for configuring the tabulator
-      String configPath = argsCli.get(0);
-      boolean convertToCdf = argsCli.size() == 2 && argsCli.get(1).equals("convert-to-cdf");
-      // session object will manage the tabulation process
-      TabulatorSession session = new TabulatorSession(configPath);
-      if (convertToCdf) {
+      // Path to either: config file for configuring the tabulator, or Dominion JSONs
+      String providedPath = argsCli.get(0);
+      // Session object will manage the tabulation process
+      TabulatorSession session = new TabulatorSession(providedPath);
+      if (argsCli.size() == 2 && argsCli.get(1).equals("convert-dominion-to-generic-csv")) {
+        session.convertDominionCvrJsonToGenericCsv(providedPath);
+      } else if (argsCli.size() == 2 && argsCli.get(1).equals("convert-to-cdf")) {
         session.convertToCdf();
       } else {
         session.tabulate();
@@ -86,8 +91,10 @@ public class Main extends GuiApplication {
 
   private static void logSystemInfo() {
     Logger.log(Level.INFO, "Launching %s version %s...", APP_NAME, APP_VERSION);
-    Logger.log(Level.INFO, "Host system: %s version %s", System.getProperty("os.name"),
+    Logger.log(
+        Level.INFO,
+        "Host system: %s version %s",
+        System.getProperty("os.name"),
         System.getProperty("os.version"));
   }
-
 }

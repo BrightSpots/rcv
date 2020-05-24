@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "2013 Minneapolis Mayor",
-    "outputDirectory" : "output",
-    "contestDate" : "",
-    "contestJurisdiction" : "",
-    "contestOffice" : "",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "2013 Minneapolis Mayor",
+    "outputDirectory": "output",
+    "contestDate": "",
+    "contestJurisdiction": "",
+    "contestOffice": "",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "2013_minneapolis_mayor_cvr_1.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

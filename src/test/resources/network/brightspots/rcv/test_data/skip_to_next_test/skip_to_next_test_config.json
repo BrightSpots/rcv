@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Overvote2",
-    "outputDirectory" : "output",
-    "contestDate" : "2018-07-28",
-    "contestJurisdiction" : "Funkytown, USA",
-    "contestOffice" : "Exhausted",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "Overvote2",
+    "outputDirectory": "output",
+    "contestDate": "2018-07-28",
+    "contestJurisdiction": "Funkytown, USA",
+    "contestOffice": "Exhausted",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "skip_to_next_test_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

@@ -1,6 +1,6 @@
 /*
  * Universal RCV Tabulator
- * Copyright (c) 2017-2019 Bright Spots Developers.
+ * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -100,7 +100,7 @@ class Tabulator {
     for (String candidate : candidatesToInclude) {
       BigDecimal votes = roundTally.get(candidate);
       if (shouldLog) {
-        Logger.log(Level.INFO, "Candidate \"%s\" got %s votes.", candidate, votes.toString());
+        Logger.log(Level.INFO, "Candidate \"%s\" got %s vote(s).", candidate, votes.toString());
       }
       LinkedList<String> candidates =
           tallyToCandidates.computeIfAbsent(votes, k -> new LinkedList<>());
@@ -126,8 +126,12 @@ class Tabulator {
 
     logSummaryInfo();
 
-    // Loop until we've found our winner(s), unless singleSeatContinueUntilTwoCandidatesRemain mode
-    // is active -- in which case we loop until only two candidates remain.
+    // Loop until we've found our winner(s), with a couple exceptions:
+    // - If singleSeatContinueUntilTwoCandidatesRemain mode is active, we loop until only two
+    // candidates remain even if we've already found our winner.
+    // - If multiSeatBottomsUp mode is active and multiSeatBottomsUpPercentageThreshold is set,
+    // we loop until all remaining candidates have vote shares that meet or exceed that threshold.
+    //
     // At each iteration, we'll either a) identify one or more
     // winners and transfer their votes to the remaining candidates (if we still need to find more
     // winners), or b) eliminate one or more candidates and gradually transfer votes to the
@@ -148,10 +152,11 @@ class Tabulator {
           currentRound,
           currentRound == 1 ? BigDecimal.ZERO : roundToResidualSurplus.get(currentRound - 1));
 
-      // The winning threshold in a multi-seat contest is based on the number of active votes in the
-      // first round.
-      // In a single-seat contest, it's based on the number of active votes in the current round.
-      if (currentRound == 1 || config.getNumberOfWinners() == 1) {
+      // The winning threshold in a standard multi-seat contest is based on the number of active
+      // votes in the first round.
+      // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
+      // on the number of active votes in the current round.
+      if (currentRound == 1 || config.getNumberOfWinners() <= 1) {
         setWinningThreshold(currentRoundCandidateToTally);
       }
 
@@ -192,10 +197,12 @@ class Tabulator {
         }
       } else if (winnerToRound.size() < config.getNumberOfWinners()
           || (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()
-          && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)) {
+          && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)
+          || config.isMultiSeatBottomsUpWithThresholdEnabled()) {
         // We need to make more eliminations if
         // a) we haven't found all the winners yet, or
         // b) we've found our winner, but we're continuing until we have only two candidates
+        // c) not all remaining candidates meet the bottoms-up threshold
 
         List<String> eliminated;
         // Four mutually exclusive ways to eliminate candidates.
@@ -350,22 +357,28 @@ class Tabulator {
       currentRoundTotalVotes = currentRoundTotalVotes.add(numVotes);
     }
 
-    // divisor for threshold is num winners + 1 (unless archaic Hare quota option is enabled, in
-    // which case it's just num winners)
-    BigDecimal divisor =
-        new BigDecimal(
-            config.isHareQuotaEnabled()
-                ? config.getNumberOfWinners()
-                : config.getNumberOfWinners() + 1);
-    if (config.isNonIntegerWinningThresholdEnabled()) {
-      // threshold = (votes / (num_winners + 1)) + 10^(-1 * decimalPlacesForVoteArithmetic)
-      BigDecimal augend =
-          config.divide(
-              BigDecimal.ONE, BigDecimal.TEN.pow(config.getDecimalPlacesForVoteArithmetic()));
-      winningThreshold = config.divide(currentRoundTotalVotes, divisor).add(augend);
+    if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
+      winningThreshold =
+          currentRoundTotalVotes.multiply(config.getMultiSeatBottomsUpPercentageThreshold());
     } else {
-      // threshold = floor(votes / (num_winners + 1)) + 1
-      winningThreshold = currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
+      // divisor for threshold is num winners + 1 (unless archaic Hare quota option is enabled, in
+      // which case it's just num winners)
+      BigDecimal divisor =
+          new BigDecimal(
+              config.isHareQuotaEnabled()
+                  ? config.getNumberOfWinners()
+                  : config.getNumberOfWinners() + 1);
+      if (config.isNonIntegerWinningThresholdEnabled()) {
+        // threshold = (votes / (num_winners + 1)) + 10^(-1 * decimalPlacesForVoteArithmetic)
+        BigDecimal augend =
+            config.divide(
+                BigDecimal.ONE, BigDecimal.TEN.pow(config.getDecimalPlacesForVoteArithmetic()));
+        winningThreshold = config.divide(currentRoundTotalVotes, divisor).add(augend);
+      } else {
+        // threshold = floor(votes / (num_winners + 1)) + 1
+        winningThreshold = currentRoundTotalVotes.divideToIntegralValue(divisor)
+            .add(BigDecimal.ONE);
+      }
     }
     Logger.log(Level.INFO, "Winning threshold set to %s.", winningThreshold.toString());
   }
@@ -381,6 +394,9 @@ class Tabulator {
       // round after we've made our final elimination.
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
           || candidateToRoundEliminated.containsValue(currentRound);
+    } else if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
+      // in this mode, we're done as soon as we've declared any winners
+      return numWinnersDeclared == 0;
     } else {
       // If there are more seats to fill, we should keep going, of course.
       // But also: if we've selected all the winners in a multi-seat contest, we should tabulate one
@@ -427,58 +443,77 @@ class Tabulator {
       throws TabulationCancelledException {
     List<String> selectedWinners = new LinkedList<>();
 
-    // We should only look for more winners if we haven't already filled all the seats.
-    if (winnerToRound.size() < config.getNumberOfWinners()) {
-      // If the number of continuing candidates equals the number of seats to fill, everyone wins.
-      if (currentRoundCandidateToTally.size()
-          == config.getNumberOfWinners() - winnerToRound.size()) {
+    if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
+      // if everyone meets the threshold, select them all as winners
+      boolean allMeet = true;
+      for (BigDecimal tally : currentRoundCandidateToTally.values()) {
+        if (tally.compareTo(winningThreshold) < 0) {
+          allMeet = false;
+          break;
+        }
+      }
+      if (allMeet) {
         selectedWinners.addAll(currentRoundCandidateToTally.keySet());
-      } else if (!config.isMultiSeatBottomsUpEnabled()) {
-        // We see if anyone has met/exceeded the threshold (unless bottoms-up is enabled, in which
-        // case we just wait until there are numWinners candidates remaining and then declare all of
-        // them as winners simultaneously).
-        // tally indexes over all tallies to find any winners
-        for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
-          if (tally.compareTo(winningThreshold) >= 0) {
-            // we have winner(s)
-            List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
-            selectedWinners.addAll(winningCandidates);
+      }
+    } else {
+      // We should only look for more winners if we haven't already filled all the seats.
+      if (winnerToRound.size() < config.getNumberOfWinners()) {
+        // If the number of continuing candidates equals the number of seats to fill, everyone wins.
+        if (currentRoundCandidateToTally.size()
+            == config.getNumberOfWinners() - winnerToRound.size()) {
+          selectedWinners.addAll(currentRoundCandidateToTally.keySet());
+        } else if (!config.isMultiSeatBottomsUpEnabled()) {
+          // We see if anyone has met/exceeded the threshold (unless bottoms-up is enabled, in which
+          // case we just wait until there are numWinners candidates remaining and then declare all of
+          // them as winners simultaneously).
+          // tally indexes over all tallies to find any winners
+          for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
+            if (tally.compareTo(winningThreshold) >= 0) {
+              // we have winner(s)
+              List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
+              for (String candidate : winningCandidates) {
+                // The undeclared write-in placeholder can't win!
+                if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
+                  selectedWinners.add(candidate);
+                }
+              }
+            }
           }
         }
       }
-    }
 
-    // Edge case: if we've identified multiple winners in this round but we're only supposed to
-    // elect one winner per round, pick the top vote-getter and defer the others to subsequent
-    // rounds.
-    if (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
-      // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
-      BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
-      selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
-      // But if there are multiple candidates tied for the max tally, we need to break the tie.
-      if (selectedWinners.size() > 1) {
-        TieBreak tieBreak =
-            new TieBreak(
-                true,
-                selectedWinners,
-                config.getTiebreakMode(),
-                currentRound,
-                maxVotes,
-                roundTallies,
-                config.getCandidatePermutation());
-        String winner = tieBreak.selectCandidate();
-        // replace the list of tied candidates with our single tie-break winner
-        selectedWinners = new LinkedList<>();
-        selectedWinners.add(winner);
-        Logger.log(
-            Level.INFO,
-            "Candidate \"%s\" won a tie-breaker in round %d against %s. Each candidate had %s "
-                + "vote(s). %s",
-            winner,
-            currentRound,
-            tieBreak.nonSelectedCandidateDescription(),
-            maxVotes.toString(),
-            tieBreak.getExplanation());
+      // Edge case: if we've identified multiple winners in this round but we're only supposed to
+      // elect one winner per round, pick the top vote-getter and defer the others to subsequent
+      // rounds.
+      if (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
+        // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
+        BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
+        selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
+        // But if there are multiple candidates tied for the max tally, we need to break the tie.
+        if (selectedWinners.size() > 1) {
+          TieBreak tieBreak =
+              new TieBreak(
+                  true,
+                  selectedWinners,
+                  config.getTiebreakMode(),
+                  currentRound,
+                  maxVotes,
+                  roundTallies,
+                  config.getCandidatePermutation());
+          String winner = tieBreak.selectCandidate();
+          // replace the list of tied candidates with our single tie-break winner
+          selectedWinners = new LinkedList<>();
+          selectedWinners.add(winner);
+          Logger.log(
+              Level.INFO,
+              "Candidate \"%s\" won a tie-breaker in round %d against %s. Each candidate had %s "
+                  + "vote(s). %s",
+              winner,
+              currentRound,
+              tieBreak.nonSelectedCandidateDescription(),
+              maxVotes.toString(),
+              tieBreak.getExplanation());
+        }
       }
     }
 
@@ -503,9 +538,8 @@ class Tabulator {
     List<String> eliminated = new LinkedList<>();
     // undeclared label
     String label = config.getUndeclaredWriteInLabel();
-    if (currentRound == 1
-        && !isNullOrBlank(label)
-        && candidateIds.contains(label)
+    if (!isNullOrBlank(label)
+        && currentRoundCandidateToTally.get(label) != null
         && currentRoundCandidateToTally.get(label).signum() == 1) {
       eliminated.add(label);
       Logger.log(
@@ -564,11 +598,11 @@ class Tabulator {
           Logger.log(
               Level.INFO,
               "Batch-eliminated candidate \"%s\" in round %d. The running total was %s vote(s) and "
-                  + "the next-highest count was %s vote(s).",
+                  + "the next-lowest count was %s vote(s).",
               elimination.candidateId,
               currentRound,
               elimination.runningTotal.toString(),
-              elimination.nextHighestTally.toString());
+              elimination.nextLowestTally.toString());
         }
       }
     }
@@ -668,12 +702,14 @@ class Tabulator {
   // Function: runBatchElimination
   // Purpose: applies batch elimination logic to the input vote counts to remove multiple candidates
   //   in a single round if their vote counts are so low that they could not possibly end up winning
-  //   Consider, after each round of voting a candidate not eliminated could potentially receive ALL
-  //   the votes from candidates who ARE eliminated, keeping them in the race and "leapfrogging"
+  //   Consider, after each round of voting, a candidate not eliminated could potentially receive
+  //   ALL the votes from candidates who ARE eliminated, keeping them in the race and "leapfrogging"
   //   ahead of candidates who were leading them.
   //   In this algorithm we sum candidate vote totals (low to high) and find where this leapfrogging
   //   is impossible: that is, when the sum of all batch-eliminated candidates' votes fails to equal
   //   or exceed the next-lowest candidate vote total.
+  //   One additional caveat when we're in singleSeatContinueUntilTwoCandidatesRemain mode: make
+  //   sure we don't batch-eliminate too many candidates and end up with just the winner.
   //
   // param: currentRoundTallyToCandidates map from vote tally to candidates with that tally
   // returns: list of BatchElimination objects, one for each batch-eliminated candidate
@@ -689,10 +725,17 @@ class Tabulator {
     Set<String> candidatesEliminated = new HashSet<>();
     // BatchElimination objects contain contextual data that will be used by the tabulation to log
     // the batch elimination results.
-    List<BatchElimination> eliminations = new LinkedList<>();
+    LinkedList<BatchElimination> eliminations = new LinkedList<>();
+    // See the caveat above about continueUntilTwoCandidatesRemain. In this situation, we need to
+    // remove the final set of candidates that we had added to the batch, so we hold onto
+    // the previous version of the eliminations list whenever an iteration of the loop augments it.
+    LinkedList<BatchElimination> previousEliminations = new LinkedList<>();
+
     // At each iteration, currentVoteTally is the next-lowest vote count received by one or more
     // candidate(s) in the current round.
     for (BigDecimal currentVoteTally : currentRoundTallyToCandidates.keySet()) {
+      // a shallow copy is sufficient
+      LinkedList<BatchElimination> newEliminations = new LinkedList<>(eliminations);
       // Test whether leapfrogging is possible.
       if (runningTotal.compareTo(currentVoteTally) < 0) {
         // Not possible, so eliminate everyone who has been seen and not eliminated yet.
@@ -700,7 +743,7 @@ class Tabulator {
         for (String candidate : candidatesSeen) {
           if (!candidatesEliminated.contains(candidate)) {
             candidatesEliminated.add(candidate);
-            eliminations.add(new BatchElimination(candidate, runningTotal, currentVoteTally));
+            newEliminations.add(new BatchElimination(candidate, runningTotal, currentVoteTally));
           }
         }
       }
@@ -711,6 +754,17 @@ class Tabulator {
           config.multiply(currentVoteTally, new BigDecimal(currentCandidates.size()));
       runningTotal = runningTotal.add(totalForThisRound);
       candidatesSeen.addAll(currentCandidates);
+      if (newEliminations.size() > eliminations.size()) {
+        previousEliminations = eliminations;
+        eliminations = newEliminations;
+      }
+    }
+    if (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()
+        && eliminations.size() + candidateToRoundEliminated.size()
+        == config.getNumCandidates() - 1) {
+      // See the caveat above about continueUntilTwoCandidatesRemain. In this situation, we need to
+      // remove the final set of candidates that we had added to the elimination list.
+      eliminations = previousEliminations;
     }
     return eliminations;
   }
@@ -1111,15 +1165,15 @@ class Tabulator {
 
     // the candidate eliminated
     final String candidateId;
-    // how many total votes were totaled when this candidate was eliminated
+    // how many total votes we'd seen at the step of batch elimination when we added this candidate
     final BigDecimal runningTotal;
-    // next highest count total (validates that we were correctly batch eliminated)
-    final BigDecimal nextHighestTally;
+    // next-lowest count total (validates that we were correctly batch-eliminated)
+    final BigDecimal nextLowestTally;
 
-    BatchElimination(String candidateId, BigDecimal runningTotal, BigDecimal nextHighestTally) {
+    BatchElimination(String candidateId, BigDecimal runningTotal, BigDecimal nextLowestTally) {
       this.candidateId = candidateId;
       this.runningTotal = runningTotal;
-      this.nextHighestTally = nextHighestTally;
+      this.nextLowestTally = nextLowestTally;
     }
   }
 
