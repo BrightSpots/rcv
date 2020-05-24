@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "treatBlankAsUndeclaredWriteIn test",
-    "outputDirectory" : "output",
-    "contestDate" : "2019-03-06",
-    "contestJurisdiction" : "",
-    "contestOffice" : "",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "treatBlankAsUndeclaredWriteIn test",
+    "outputDirectory": "output",
+    "contestDate": "2019-03-06",
+    "contestJurisdiction": "",
+    "contestOffice": "",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "test_set_treat_blank_as_undeclared_write_in_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

@@ -1,15 +1,16 @@
 {
-  "tabulatorVersion": "1.0.1",
-  "outputSettings" : {
-    "contestName" : "Tiebreak test",
-    "outputDirectory" : "output",
-    "contestDate" : "2017-12-03",
-    "contestJurisdiction" : "Funkytown, USA",
-    "contestOffice" : "Sergeant-at-Arms",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "Tiebreak test",
+    "outputDirectory": "output",
+    "contestDate": "2017-12-03",
+    "contestJurisdiction": "Funkytown, USA",
+    "contestOffice": "Sergeant-at-Arms",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
+  "cvrFileSources": [
+    {
     "filePath" : "excluded_test_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
