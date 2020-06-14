@@ -186,7 +186,11 @@ class StreamingCvrReader {
 
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
       Logger.log(
-          Level.SEVERE, "Cast vote record identifier not found for: %s", computedCastVoteRecordId);
+          Level.SEVERE,
+          "Cast vote record identifier missing on row %d in file %s.  This may be due to an "
+              + "incorrectly formatted xlsx file.  Try copying your cvr data into a new xlsx file "
+              + "to fix this.",
+          cvrIndex + firstVoteRowIndex, excelFileName);
       encounteredDataErrors = true;
     }
 

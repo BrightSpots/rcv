@@ -777,6 +777,10 @@ class ContestConfig {
     return rawConfig.outputSettings.contestName;
   }
 
+  String getContestId() {
+    return rawConfig.outputSettings.contestId;
+  }
+
   String getContestJurisdiction() {
     return rawConfig.outputSettings.contestJurisdiction;
   }

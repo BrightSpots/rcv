@@ -105,17 +105,21 @@ class TabulatorSession {
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
-        ResultsWriter writer =
-            new ResultsWriter()
-                .setNumRounds(0)
-                .setContestConfig(config)
-                .setTimestampString(timestampString)
-                .setPrecinctIds(precinctIds);
-        try {
-          writer.generateCdfJson(castVoteRecords);
-        } catch (RoundSnapshotDataMissingException e) {
-          // This will never actually happen because no snapshots are involved when you're just
-          // translating the input to CDF, not the tabulation results.
+        if (castVoteRecords == null) {
+          Logger.log(Level.SEVERE, "Aborting conversion due to cast vote record errors!");
+        } else {
+          ResultsWriter writer =
+              new ResultsWriter()
+                  .setNumRounds(0)
+                  .setContestConfig(config)
+                  .setTimestampString(timestampString)
+                  .setPrecinctIds(precinctIds);
+          try {
+            writer.generateCdfJson(castVoteRecords);
+          } catch (RoundSnapshotDataMissingException e) {
+            // This will never actually happen because no snapshots are involved when you're just
+            // translating the input to CDF, not the tabulation results.
+          }
         }
       } catch (IOException | UnableToCreateDirectoryException exception) {
         Logger.log(Level.SEVERE, "CDF JSON generation failed.");
