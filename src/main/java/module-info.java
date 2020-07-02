@@ -8,6 +8,7 @@ module network.brightspots.rcv {
   requires javafx.fxml;
   requires java.xml;
   requires poi.ooxml;
+  requires com.fasterxml.jackson.dataformat.xml;
   // enable reflexive calls from network.brightspots.rcv into javafx.fxml
   opens network.brightspots.rcv;
   // our main module
