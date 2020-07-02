@@ -2,7 +2,7 @@
   "tabulatorVersion" : "1.1.0",
   "outputSettings" : {
     "contestName" : "TRAVIS COUNTY OFFICERS",
-    "outputDirectory" : "/Users/Jon/Documents/rcv/src/test/resources/network/brightspots/rcv/test_data/hart_travis_county_officers/output",
+    "outputDirectory" : "output",
     "contestDate" : "",
     "contestJurisdiction" : "",
     "contestOffice" : "",
@@ -10,7 +10,7 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "/Users/Jon/Documents/rcv/src/test/resources/network/brightspots/rcv/test_data/hart_travis_county_officers/CVRArchive_18_9_0_6298/",
+    "filePath" : "CVRArchive_18_9_0_6298/",
     "firstVoteColumnIndex" : "1",
     "firstVoteRowIndex" : "1",
     "idColumnIndex" : "1",

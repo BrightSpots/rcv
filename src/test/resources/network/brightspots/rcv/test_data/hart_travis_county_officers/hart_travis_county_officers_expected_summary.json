@@ -1,0 +1,21 @@
+{
+  "config" : {
+    "contest" : "TRAVIS COUNTY OFFICERS",
+    "date" : "",
+    "jurisdiction" : "",
+    "office" : "",
+    "threshold" : "3"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "Jim Sylvester" : "4",
+      "Michael Gottner" : "0",
+      "William Poole" : "1"
+    },
+    "tallyResults" : [ {
+      "elected" : "Jim Sylvester",
+      "transfers" : { }
+    } ]
+  } ]
+}
