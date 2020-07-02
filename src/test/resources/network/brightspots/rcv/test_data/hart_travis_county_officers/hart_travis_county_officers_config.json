@@ -1,0 +1,58 @@
+{
+  "tabulatorVersion" : "1.1.0",
+  "outputSettings" : {
+    "contestName" : "TRAVIS COUNTY OFFICERS",
+    "outputDirectory" : "/Users/Jon/Documents/rcv/src/test/resources/network/brightspots/rcv/test_data/hart_travis_county_officers/output",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "/Users/Jon/Documents/rcv/src/test/resources/network/brightspots/rcv/test_data/hart_travis_county_officers/CVRArchive_18_9_0_6298/",
+    "firstVoteColumnIndex" : "1",
+    "firstVoteRowIndex" : "1",
+    "idColumnIndex" : "1",
+    "precinctColumnIndex" : "1",
+    "provider" : "HART"
+  } ],
+  "candidates" : [
+    {
+    "name" : "Michael Gottner",
+    "code" : "bdc77efc-2f86-48d0-a0de-2efb02e1f4d9",
+    "excluded" : false
+  },
+    {
+      "name" : "Jim Sylvester",
+      "code" : "bfb4eda8-35e8-4d13-b152-99b8e5d6b777",
+      "excluded" : false
+    },
+    {
+      "name" : "William Poole",
+      "code" : "24d59598-4ded-428f-842c-08921c8ed039",
+      "excluded" : false
+    }
+  ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "9",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : ""
+  }
+}

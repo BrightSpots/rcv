@@ -76,6 +76,7 @@ class ContestConfig {
   private static final long MIN_RANDOM_SEED = -140737488355328L;
   private static final long MAX_RANDOM_SEED = 140737488355327L;
   private static final String CDF_PROVIDER = "CDF";
+  private static final String HART_PROVIDER = "HART";
   private static final String JSON_EXTENSION = ".json";
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
@@ -146,6 +147,10 @@ class ContestConfig {
         && source.getProvider().toUpperCase().equals(CDF_PROVIDER)
         && source.getFilePath() != null
         && source.getFilePath().toLowerCase().endsWith(JSON_EXTENSION);
+  }
+
+  static boolean isHart(CvrSource source) {
+    return source.getProvider() != null && source.getProvider().toUpperCase().equals(HART_PROVIDER);
   }
 
   // function: stringMatchesAnotherFieldValue(

@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
+import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
@@ -271,6 +272,14 @@ class TabulatorSession {
         if (ContestConfig.isCdf(source)) {
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
           reader.parseCvrFile(castVoteRecords);
+        } else if (ContestConfig.isHart(source)) {
+          HartCvrReader reader = new HartCvrReader(cvrPath, config);
+          try {
+            reader.readCastVoteRecords(castVoteRecords);
+          } catch (CvrParseException exception) {
+            Logger.log(Level.SEVERE, "Exception parsing Hart CVR!");
+            encounteredSourceProblem = true;
+          }
         } else {
           new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
         }

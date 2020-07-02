@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Cvr xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://tempuri.org/CVRDesign.xsd"><Contests><Contest><Name>Council Member
+Ward 1
+1st choice</Name><Id>2e1e58fb-3c51-4fd8-ab96-3ddbd5305bfc</Id><Options><Option><Name>Candidate 2</Name><Id>509e7a60-e432-4cdb-ae4d-9bb8408b6fc8</Id><Value>1</Value></Option></Options></Contest><Contest><Name>Council Member
+Ward 1
+4th choice (if any)</Name><Id>bcb3886d-01d0-4c1e-b525-8bb118804134</Id><Options /><Undervotes>1</Undervotes></Contest><Contest><Name>Council Member
+Ward 1
+2nd choice (if any)</Name><Id>88071134-04fb-45d9-8723-0b4332e07aeb</Id><Options><Option><Name>Candidate 3</Name><Id>4cdb5f5b-bde5-43d7-81bf-cfca8b838f28</Id><Value>1</Value></Option></Options></Contest><Contest><Name>Council Member
+Ward 1
+5th choice (if any)</Name><Id>90060373-9170-4bdd-ac15-ff7e7431e499</Id><Options /><Undervotes>1</Undervotes></Contest><Contest><Name>Council Member
+Ward 1
+3rd choice (if any)</Name><Id>1e85ce67-264d-4ec8-8b3c-47cbaf4587b3</Id><Options><Option><Name>Candidate 1</Name><Id>adaa05f3-65e4-4fe6-99b4-1c251ee5e8ae</Id><Value>1</Value></Option></Options></Contest><Contest><Name>Council Member
+Ward 1
+6th choice (if any)</Name><Id>7d8b08c1-e9c6-4f6a-87f8-036566e7f177</Id><Options /><Undervotes>1</Undervotes></Contest><Contest><Name>School Board Member</Name><Id>a79b253b-8df1-4bc1-ac70-6a65b57a9cb4</Id><Options><Option><Name>Candidate D</Name><Id>ab21953e-6dad-4de9-a611-3602d61ae4a7</Id><Value>1</Value></Option><Option><Name>Candidate G</Name><Id>22e253eb-6c97-42cf-bba5-0d925b4b92fa</Id><Value>1</Value></Option></Options><Undervotes>2</Undervotes></Contest></Contests><SheetNumber>1</SheetNumber><PrecinctSplit><Name>Saint Paul W-1 P-04</Name><Id>6e03200e-fe01-47b9-9999-c0781da58d77</Id></PrecinctSplit></Cvr>

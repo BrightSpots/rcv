@@ -181,7 +181,7 @@ class DominionCvrReader {
         HashMap session = (HashMap) sessionObject;
         // extract various ids
         Integer tabulatorId = (Integer) session.get("TabulatorId");
-        Integer batchId = (Integer) session.get("BatchId");
+        String batchId = (String) session.get("BatchId");
         Integer recordId = (Integer) session.get("RecordId");
         String suppliedId = recordId.toString();
         // filter out records which are not current and replace them with adjudicated ones
@@ -233,7 +233,7 @@ class DominionCvrReader {
         // each contest object is a cvr
         for (Object contestObject : contests) {
           HashMap contest = (HashMap) contestObject;
-          Integer contestId = (Integer) contest.get("Id");
+          String contestId = (String) contest.get("Id");
           // validate contest id
           if (!this.contests.containsKey(contestId)
               || !contestIdToCandidateCodes.containsKey(contestId)) {

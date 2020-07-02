@@ -206,6 +206,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Hart - Travis County Officers")
+  void testHartTravisCountyOfficers() {
+    runTabulationTest("hart_travis_county_officers");
+  }
+
+  @Test
   @DisplayName("Dominion Cvr conversion test - Alaska test data")
   void testDominionCvrConversionAlaska() {
     runDominionCvrConversionTest("dominion_cvr_conversion_alaska");
