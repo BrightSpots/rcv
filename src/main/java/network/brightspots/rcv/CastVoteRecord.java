@@ -81,7 +81,8 @@ class CastVoteRecord {
       String precinct,
       String precinctPortion,
       Integer ballotTypeId,
-      List<Pair<Integer, String>> rankings) {
+      List<Pair<Integer, String>> rankings,
+      ArrayList<String> fullCvrData) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
     this.batchId = batchId;
@@ -90,7 +91,7 @@ class CastVoteRecord {
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
     this.ballotTypeId = ballotTypeId;
-    this.fullCvrData = new ArrayList<>();
+    this.fullCvrData = fullCvrData;
     sortRankings(rankings);
   }
 

@@ -148,8 +148,8 @@ class TabulatorTests {
     assertNotNull(config);
 
     if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
-      for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-        compareJsons(config, stem, timestampString, i);
+      for (Integer i = 1; i <= config.getNumberOfWinners(); i++) {
+        compareJsons(config, stem, timestampString, i.toString());
       }
     } else {
       compareJsons(config, stem, timestampString, null);
@@ -173,10 +173,10 @@ class TabulatorTests {
   }
 
   private static void compareJsons(
-      ContestConfig config, String stem, String timestampString, Integer sequentialNumber) {
-    compareJson(config, stem, "summary", timestampString, sequentialNumber);
+      ContestConfig config, String stem, String timestampString, String sequentialId) {
+    compareJson(config, stem, "summary", timestampString, sequentialId);
     if (config.isGenerateCdfJsonEnabled()) {
-      compareJson(config, stem, "cvr_cdf", timestampString, sequentialNumber);
+      compareJson(config, stem, "cvr_cdf", timestampString, sequentialId);
     }
   }
 
@@ -185,15 +185,15 @@ class TabulatorTests {
       String stem,
       String jsonType,
       String timestampString,
-      Integer sequentialNumber) {
+      String sequentialId) {
     String actualOutputPath =
         ResultsWriter.getOutputFilePath(
-            config.getOutputDirectory(), jsonType, timestampString, sequentialNumber)
+            config.getOutputDirectory(), jsonType, timestampString, sequentialId)
             + ".json";
     String expectedPath =
         getTestFilePath(
             stem,
-            ResultsWriter.sequentialSuffixForOutputPath(sequentialNumber)
+            ResultsWriter.sequentialSuffixForOutputPath(sequentialId)
                 + "_expected_"
                 + jsonType
                 + ".json");

@@ -275,7 +275,7 @@ class TabulatorSession {
         } else if (ContestConfig.isHart(source)) {
           HartCvrReader reader = new HartCvrReader(cvrPath, config);
           try {
-            reader.readCastVoteRecords(castVoteRecords);
+            reader.readCastVoteRecordsFromFolder(castVoteRecords);
           } catch (CvrParseException exception) {
             Logger.log(Level.SEVERE, "Exception parsing Hart CVR!");
             encounteredSourceProblem = true;

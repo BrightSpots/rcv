@@ -44,7 +44,7 @@ class DominionCvrReader {
   // map of precinct portion Id to precinct portion description
   private Map<Integer, String> precinctPortions;
   // map of contest Id to Contest data
-  private Map<Integer, Contest> contests;
+  private Map<String, Contest> contests;
   private List<Candidate> candidates;
 
   DominionCvrReader(String manifestFolder) {
@@ -52,8 +52,8 @@ class DominionCvrReader {
   }
 
   // returns map of contestId to Contest parsed from input file
-  private static Map<Integer, Contest> getContests(String contestPath) {
-    Map<Integer, Contest> contests = new HashMap<>();
+  private static Map<String, Contest> getContests(String contestPath) {
+    Map<String, Contest> contests = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(contestPath, HashMap.class);
       // List is a list of candidate objects:
@@ -61,7 +61,7 @@ class DominionCvrReader {
       for (Object contestObject : contestList) {
         HashMap contestMap = (HashMap) contestObject;
         String name = (String) contestMap.get("Description");
-        Integer id = (Integer) contestMap.get("Id");
+        String id = contestMap.get("Id").toString();
         Integer numCandidates = (Integer) contestMap.get("VoteFor");
         Integer maxRanks = (Integer) contestMap.get("NumOfRanks");
         Contest newContest = new Contest(name, id, numCandidates, maxRanks);
@@ -105,7 +105,7 @@ class DominionCvrReader {
         String name = (String) candidateMap.get("Description");
         Integer id = (Integer) candidateMap.get("Id");
         String code = id.toString();
-        Integer contestId = (Integer) candidateMap.get("ContestId");
+        String contestId = candidateMap.get("ContestId").toString();
         Candidate newCandidate = new Candidate(name, code, false, contestId);
         candidates.add(newCandidate);
       }
@@ -116,7 +116,7 @@ class DominionCvrReader {
     return candidates;
   }
 
-  Map<Integer, Contest> getContests() {
+  Map<String, Contest> getContests() {
     return contests;
   }
 
@@ -160,7 +160,7 @@ class DominionCvrReader {
   private void parseCvrFile(String filePath, List<CastVoteRecord> castVoteRecords) {
 
     // build a lookup map for candidates codes to optimize Cvr parsing
-    Map<Integer, Set<String>> contestIdToCandidateCodes = new HashMap<>();
+    Map<String, Set<String>> contestIdToCandidateCodes = new HashMap<>();
     for (Candidate candidate : this.candidates) {
       Set<String> candidates;
       if (contestIdToCandidateCodes.containsKey(candidate.getContestId())) {
@@ -181,7 +181,7 @@ class DominionCvrReader {
         HashMap session = (HashMap) sessionObject;
         // extract various ids
         Integer tabulatorId = (Integer) session.get("TabulatorId");
-        String batchId = (String) session.get("BatchId");
+        String batchId = session.get("BatchId").toString();
         Integer recordId = (Integer) session.get("RecordId");
         String suppliedId = recordId.toString();
         // filter out records which are not current and replace them with adjudicated ones
@@ -233,7 +233,7 @@ class DominionCvrReader {
         // each contest object is a cvr
         for (Object contestObject : contests) {
           HashMap contest = (HashMap) contestObject;
-          String contestId = (String) contest.get("Id");
+          String contestId = contest.get("Id").toString();
           // validate contest id
           if (!this.contests.containsKey(contestId)
               || !contestIdToCandidateCodes.containsKey(contestId)) {
@@ -270,7 +270,7 @@ class DominionCvrReader {
           CastVoteRecord newCvr =
               new CastVoteRecord(
                   contestId, tabulatorId, batchId, suppliedId, precinct, precinctPortion,
-                  ballotTypeId, rankings);
+                  ballotTypeId, rankings, new ArrayList<>());
           castVoteRecords.add(newCvr);
         }
         // provide some user feedback on the Cvr count
@@ -288,18 +288,18 @@ class DominionCvrReader {
   static class Contest {
 
     private final String name;
-    private final Integer id;
+    private final String id;
     private final Integer numCandidates;
     private final Integer maxRanks;
 
-    Contest(String name, Integer id, Integer numCandidates, Integer maxRanks) {
+    Contest(String name, String id, Integer numCandidates, Integer maxRanks) {
       this.name = name;
       this.id = id;
       this.numCandidates = numCandidates;
       this.maxRanks = maxRanks;
     }
 
-    Integer getId() {
+    String getId() {
       return id;
     }
 

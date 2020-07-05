@@ -85,8 +85,8 @@ class ResultsWriter {
 
   // visible for testing
   @SuppressWarnings("WeakerAccess")
-  static String sequentialSuffixForOutputPath(Integer sequentialTabulationNumber) {
-    return sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
+  static String sequentialSuffixForOutputPath(String sequentialTabulationId) {
+    return sequentialTabulationId != null ? "_" + sequentialTabulationId : "";
   }
 
   // visible for testing
@@ -95,11 +95,11 @@ class ResultsWriter {
       String outputDirectory,
       String outputType,
       String timestampString,
-      Integer sequentialTabulationNumber) {
+      String sequentialTabulationId) {
     String fileName =
         String.format(
             "%s_%s%s",
-            timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationNumber));
+            timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationId));
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
   }
 
@@ -201,13 +201,16 @@ class ResultsWriter {
   }
 
   private String getOutputFilePathFromInstance(String outputType) {
+    String tabulationSequenceId = null;
+    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
+      Integer sequence = config.getSequentialWinners().size() + 1;
+      tabulationSequenceId = sequence.toString();
+    }
     return getOutputFilePath(
         config.getOutputDirectory(),
         outputType,
         timestampString,
-        config.isMultiSeatSequentialWinnerTakesAllEnabled()
-            ? config.getSequentialWinners().size() + 1
-            : null);
+        tabulationSequenceId);
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
