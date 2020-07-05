@@ -18,7 +18,9 @@ package network.brightspots.rcv;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,66 +39,67 @@ class HartCvrReader {
   }
 
 
-
   // iterate all xml files in the source input folder
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
+  void readCastVoteRecordsFromFolder(List<CastVoteRecord> castVoteRecords)
+      throws IOException, CvrParseException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     for (File child : children) {
       if (child.getName().endsWith("xml")) {
-        _readCastVoteRecords(castVoteRecords, child);
+        readCastVoteRecord(castVoteRecords, child.toPath());
       }
     }
   }
-    // parse Cvr xml into CastVoteRecord objects and add them to the input list
-  void _readCastVoteRecords(List<CastVoteRecord> castVoteRecords, File file) throws CvrParseException {
+
+  // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
+  void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
+      throws IOException, CvrParseException {
     try {
       XmlMapper xmlMapper = new XmlMapper();
-      String xmlString = new String(Files.readAllBytes(file.toPath()));
+      String xmlString = new String(Files.readAllBytes(path));
       HashMap cvrData = xmlMapper.readValue(xmlString, HashMap.class);
-      String batchSequence = (String) cvrData.get("BatchSequence");
-//      Boolean isElectronic = (Boolean) dataAsHash.get("IsElectronic");
+      ArrayList<String> extraCvrData = new ArrayList<>();
 
-      // sheet number and precinct split are part of ballot style
-      String sheetNumber = (String) cvrData.get("SheetNumber");
-      String splitName = null;
-      String splitId = null;
+      extraCvrData.add((String) cvrData.get("BatchSequence"));
+      extraCvrData.add((String) cvrData.get("IsElectronic"));
+      extraCvrData.add((String) cvrData.get("SheetNumber"));
+
+      String precinctName = null;
+      String precinctId = null;
       HashMap precinctSplit = (HashMap) cvrData.get("PrecinctSplit");
       if (precinctSplit != null) {
-        splitName = (String) precinctSplit.get("Name");
-        splitId = (String) precinctSplit.get("ID");
+        precinctName = (String) precinctSplit.get("Name");
+        precinctId = (String) precinctSplit.get("ID");
       }
+      extraCvrData.add(precinctName);
+      extraCvrData.add(precinctId);
 
-      // party is part of ballot style
-      String partyName;
-      String partyId;
+      String partyName = null;
+      String partyId = null;
       HashMap party = (HashMap) cvrData.get("Party");
       if (party != null) {
         partyName = (String) party.get("Name");
-      partyId = (String) party.get("ID");
+        partyId = (String) party.get("ID");
       }
+      extraCvrData.add(partyName);
+      extraCvrData.add(partyId);
 
       String batchNumber = (String) cvrData.get("BatchNumber");
-
       String cvrId = (String) cvrData.get("CvrGuid");
       HashMap contests = (HashMap) cvrData.get("Contests");
       for (Object contestObject : contests.values()) {
         HashMap contest = (HashMap) contestObject;
         String contestName = (String) contest.get("Name");
-        // TODO: compare to config.contestID
+        // TODO: once implemented change to config.contestID
         if (!contestName.equals(contestConfig.getContestName())) {
           continue;
         }
-
         String contestId = (String) contest.get("Id");
-        String undervotes = (String) contest.get("Undervotes");
-        Boolean overVoted = (Boolean) contest.get("OverVoted");
         Boolean invalidVote = (Boolean) contest.get("InvalidVote");
         if (invalidVote != null && invalidVote == false) {
           continue;
         }
 
-        // rankings / options:
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         HashMap contestOptions = (HashMap) contest.get("Options");
         if (contestOptions != null) {
@@ -113,25 +116,11 @@ class HartCvrReader {
             }
 
             String optionValue = (String) option.get("Value");
-            HashMap writeInData = (HashMap) option.get("WriteInData");
-            String writeInDataStatus = null;
-            if (writeInData != null) {
-              writeInDataStatus = (String) writeInData.get("WriteInDataStatus");
-              // TODO: how should we react to writeInDataStatus?
-            }
-
             // for RCV elections ranks are indicated by a '1' digit in each place where an option
             // was selected.  so the value 0101 indicates ranks 2 and 3 are selected (an overvote)
             for (int i = 0; i < optionValue.length(); i++) {
               String rankValue = optionValue.substring(i, i + 1);
               if (rankValue.equals("1")) {
-
-                /*
-              Pair<Integer, String> ranking = new Pair<>(rank, candidateCode);
-            rankings.add(ranking);
-
-                 */
-
                 rankings.add(new Pair<>(i + 1, optionId));
               }
             }
@@ -139,14 +128,15 @@ class HartCvrReader {
         }
 
         CastVoteRecord cvr = new CastVoteRecord(
-            contestId, /* contestId */
-            null, /* tabulatorId */
-            batchNumber, /* batchId */
-            cvrId, /* suppliedId */
-            null, /* precinctId */
-            splitId, /* precinctPortion */
-            null, /* ballotTypeId */
-            rankings);
+            contestId,
+            null,
+            batchNumber,
+            cvrId,
+            precinctName,
+            precinctId,
+            null,
+            rankings,
+            extraCvrData);
         castVoteRecords.add(cvr);
 
         // provide some user feedback on the Cvr count
@@ -156,7 +146,7 @@ class HartCvrReader {
       }
     } catch (Exception e) {
       Logger.log(Level.SEVERE, "Error parsing cast vote record:\n%s", e.toString());
-      castVoteRecords.clear();
+      throw e;
     }
   }
 
