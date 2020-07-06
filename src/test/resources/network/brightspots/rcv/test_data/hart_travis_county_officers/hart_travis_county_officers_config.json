@@ -32,6 +32,16 @@
       "name" : "William Poole",
       "code" : "24d59598-4ded-428f-842c-08921c8ed039",
       "excluded" : false
+    },
+    {
+      "name" : "Bruce Elfant",
+      "code" : "fa9ebe45-dd38-423d-a2a8-0bc2de9967f9",
+      "excluded" : false
+    },
+    {
+      "name" : "Sheriff Hamilton",
+      "code" : "39a32be4-1804-467c-bf3e-06b174f892d7",
+      "excluded" : false
     }
   ],
   "rules" : {

@@ -270,7 +270,7 @@ class DominionCvrReader {
           CastVoteRecord newCvr =
               new CastVoteRecord(
                   contestId, tabulatorId, batchId, suppliedId, precinct, precinctPortion,
-                  ballotTypeId, rankings, new ArrayList<>());
+                  ballotTypeId, rankings);
           castVoteRecords.add(newCvr);
         }
         // provide some user feedback on the Cvr count

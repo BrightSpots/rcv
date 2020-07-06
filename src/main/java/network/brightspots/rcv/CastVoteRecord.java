@@ -24,7 +24,6 @@ package network.brightspots.rcv;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -81,8 +80,7 @@ class CastVoteRecord {
       String precinct,
       String precinctPortion,
       Integer ballotTypeId,
-      List<Pair<Integer, String>> rankings,
-      ArrayList<String> fullCvrData) {
+      List<Pair<Integer, String>> rankings) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
     this.batchId = batchId;
@@ -91,7 +89,7 @@ class CastVoteRecord {
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
     this.ballotTypeId = ballotTypeId;
-    this.fullCvrData = fullCvrData;
+    this.fullCvrData = null;
     sortRankings(rankings);
   }
 

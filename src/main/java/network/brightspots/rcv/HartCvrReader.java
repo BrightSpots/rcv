@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import javafx.util.Pair;
@@ -37,7 +36,6 @@ class HartCvrReader {
     this.cvrPath = cvrPath;
     this.contestConfig = contestConfig;
   }
-
 
   // iterate all xml files in the source input folder
   void readCastVoteRecordsFromFolder(List<CastVoteRecord> castVoteRecords)
@@ -55,88 +53,59 @@ class HartCvrReader {
   void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
       throws IOException, CvrParseException {
     try {
+      Logger.log(Level.INFO, "Reading Hart cast vote record file: %s...", path.getFileName());
+
       XmlMapper xmlMapper = new XmlMapper();
+      xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       String xmlString = new String(Files.readAllBytes(path));
-      HashMap cvrData = xmlMapper.readValue(xmlString, HashMap.class);
-      ArrayList<String> extraCvrData = new ArrayList<>();
+      HartCvrXml xmlCvr = xmlMapper.readValue(xmlString, HartCvrXml.class);
 
-      extraCvrData.add((String) cvrData.get("BatchSequence"));
-      extraCvrData.add((String) cvrData.get("IsElectronic"));
-      extraCvrData.add((String) cvrData.get("SheetNumber"));
-
-      String precinctName = null;
-      String precinctId = null;
-      HashMap precinctSplit = (HashMap) cvrData.get("PrecinctSplit");
-      if (precinctSplit != null) {
-        precinctName = (String) precinctSplit.get("Name");
-        precinctId = (String) precinctSplit.get("ID");
-      }
-      extraCvrData.add(precinctName);
-      extraCvrData.add(precinctId);
-
-      String partyName = null;
-      String partyId = null;
-      HashMap party = (HashMap) cvrData.get("Party");
-      if (party != null) {
-        partyName = (String) party.get("Name");
-        partyId = (String) party.get("ID");
-      }
-      extraCvrData.add(partyName);
-      extraCvrData.add(partyId);
-
-      String batchNumber = (String) cvrData.get("BatchNumber");
-      String cvrId = (String) cvrData.get("CvrGuid");
-      HashMap contests = (HashMap) cvrData.get("Contests");
-      for (Object contestObject : contests.values()) {
-        HashMap contest = (HashMap) contestObject;
-        String contestName = (String) contest.get("Name");
-        // TODO: once implemented change to config.contestID
-        if (!contestName.equals(contestConfig.getContestName())) {
+      for (Contest contest : xmlCvr.Contests) {
+        // TODO: use contest Id
+        if (!contest.Name.equals(contestConfig.getContestName())) {
           continue;
         }
-        String contestId = (String) contest.get("Id");
-        Boolean invalidVote = (Boolean) contest.get("InvalidVote");
-        if (invalidVote != null && invalidVote == false) {
+        if (contest.Options == null) {
+          // undervoted
           continue;
         }
 
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
-        HashMap contestOptions = (HashMap) contest.get("Options");
-        if (contestOptions != null) {
-          for (Object optionObject : contestOptions.values()) {
-            HashMap option = (HashMap) optionObject;
-            String optionName = (String) option.get("Name");
-            String optionId = (String) option.get("Id");
-            if (!this.contestConfig.getCandidateCodeList().contains(optionId)) {
-              Logger.log(
-                  Level.SEVERE,
-                  "Candidate ID: \"%s\" name: \"%s\" from CVR is not in the config file!",
-                  optionId, optionName);
-              throw new CvrParseException();
-            }
+        for (Option option : contest.Options) {
+          if (option.WriteInData != null) {
+            Logger.log(Level.WARNING, "");
+          }
 
-            String optionValue = (String) option.get("Value");
-            // for RCV elections ranks are indicated by a '1' digit in each place where an option
-            // was selected.  so the value 0101 indicates ranks 2 and 3 are selected (an overvote)
-            for (int i = 0; i < optionValue.length(); i++) {
-              String rankValue = optionValue.substring(i, i + 1);
-              if (rankValue.equals("1")) {
-                rankings.add(new Pair<>(i + 1, optionId));
-              }
+          if (!this.contestConfig.getCandidateCodeList().contains(option.Id)) {
+            Logger.log(
+                Level.SEVERE,
+                "Candidate ID: \"%s\" name: \"%s\" from CVR is not in the config file!",
+                option.Id, option.Name);
+            throw new CvrParseException();
+          }
+
+          // Hart RCV election ranks are indicated by a string read left to right:
+          // each digit corresponds to a rank and is set to 1 if that rank was voted.  For example:
+          // 0101 indicates ranks 2 and 4 are voted for this option (overvote)
+          // 00   indicates no rank was voted
+          // 010  indicates rank 2 was voted
+          for (int rank = 1; rank < option.Value.length() + 1; rank++) {
+            String rankValue = option.Value.substring(rank - 1, rank);
+            if (rankValue.equals("1")) {
+              rankings.add(new Pair<>(rank, option.Id));
             }
           }
         }
 
         CastVoteRecord cvr = new CastVoteRecord(
-            contestId,
+            contest.Id,
             null,
-            batchNumber,
-            cvrId,
-            precinctName,
-            precinctId,
+            xmlCvr.BatchNumber,
+            xmlCvr.CvrGuid,
+            xmlCvr.PrecinctSplit.Name,
+            xmlCvr.PrecinctSplit.Id,
             null,
-            rankings,
-            extraCvrData);
+            rankings);
         castVoteRecords.add(cvr);
 
         // provide some user feedback on the Cvr count
@@ -148,6 +117,52 @@ class HartCvrReader {
       Logger.log(Level.SEVERE, "Error parsing cast vote record:\n%s", e.toString());
       throw e;
     }
+  }
+
+  static class WriteInData {
+
+    public String ImageId;
+    public String WriteInDataStatus;
+  }
+
+  // a voter selection
+  static class Option {
+
+    public String Name;
+    public String Id;
+    public String Value;
+    public WriteInData WriteInData;
+  }
+
+  // voter selections for a contest
+  static class Contest {
+
+    public String Name;
+    public String Id;
+    public ArrayList<Option> Options;
+  }
+
+  static class PrecinctSplit {
+
+    public String Name;
+    public String Id;
+  }
+
+  static class Party {
+
+    public String Name;
+    public String ID;
+  }
+
+  static class HartCvrXml {
+
+    public String BatchSequence;
+    public String SheetNumber;
+    public String BatchNumber;
+    public String CvrGuid;
+    public PrecinctSplit PrecinctSplit;
+    public Party Party;
+    public ArrayList<Contest> Contests;
   }
 
 }
