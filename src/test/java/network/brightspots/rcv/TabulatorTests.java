@@ -212,6 +212,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Hart - Cedar Park School Board")
+  void testHartCedarParkSchoolBoard() {
+    runTabulationTest("hart_cedar_park_school_board");
+  }
+
+  @Test
   @DisplayName("Dominion Cvr conversion test - Alaska test data")
   void testDominionCvrConversionAlaska() {
     runDominionCvrConversionTest("dominion_cvr_conversion_alaska");
