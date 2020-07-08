@@ -14,19 +14,28 @@
  -->
 
 <module name="Checker">
+  <module name="BeforeExecutionExclusionFileFilter">
+    <property name="fileNamePattern" value="module\-info\.java$"/>
+  </module>
+
   <module name="SuppressionFilter">
     <property default="checkstyle-suppressions.xml" name="file"
       value="${org.checkstyle.google.suppressionfilter.config}"/>
     <property name="optional" value="true"/>
   </module>
 
+  <module name="FileTabCharacter">
+    <property name="eachLine" value="true"/>
+  </module>
+  <!-- Excludes all 'module-info.java' files              -->
+  <!-- See https://checkstyle.org/config_filefilters.html -->
   <module name="LineLength">
     <property name="fileExtensions" value="java"/>
     <property name="max" value="100"/>
     <property name="ignorePattern"
       value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
   </module>
-
+  <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
   <module name="TreeWalker">
     <module name="OuterTypeFilename"/>
     <module name="IllegalTokenText">
@@ -74,13 +83,18 @@
       <property name="option" value="alone"/>
       <property name="tokens"
         value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT,
-                    INSTANCE_INIT, ANNOTATION_DEF, ENUM_DEF"/>
+                    INSTANCE_INIT, ANNOTATION_DEF, ENUM_DEF, INTERFACE_DEF"/>
     </module>
     <module name="SuppressionXpathSingleFilter">
       <!-- suppresion is required till https://github.com/checkstyle/checkstyle/issues/7541 -->
       <property name="id" value="RightCurlyAlone"/>
       <property name="query" value="//RCURLY[parent::SLIST[count(./*)=1]
                                                  or preceding-sibling::*[last()][self::LCURLY]]"/>
+    </module>
+    <module name="WhitespaceAfter">
+      <property name="tokens"
+        value="COMMA, SEMI, TYPECAST, LITERAL_IF, LITERAL_ELSE,
+                    LITERAL_WHILE, LITERAL_DO, LITERAL_FOR, DO_WHILE"/>
     </module>
     <module name="WhitespaceAround">
       <property name="allowEmptyConstructors" value="true"/>
@@ -232,7 +246,8 @@
     </module>
     <module name="NoWhitespaceBefore">
       <property name="tokens"
-        value="COMMA, SEMI, POST_INC, POST_DEC, DOT, ELLIPSIS, METHOD_REF"/>
+        value="COMMA, SEMI, POST_INC, POST_DEC, DOT,
+                    LABELED_STAT, METHOD_REF"/>
       <property name="allowLineBreaks" value="true"/>
     </module>
     <module name="ParenPad">
@@ -305,21 +320,12 @@
       <property name="optional" value="true"/>
     </module>
   </module>
-  <!-- Excludes all 'module-info.java' files              -->
-  <!-- See https://checkstyle.org/config_filefilters.html -->
-  <module name="BeforeExecutionExclusionFileFilter">
-    <property name="fileNamePattern" value="module\-info\.java$"/>
-  </module>
-  <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
-  <property name="charset" value="UTF-8"/>
 
   <!-- Checks for whitespace                               -->
   <!-- See http://checkstyle.org/config_whitespace.html -->
-  <module name="FileTabCharacter">
-    <property name="eachLine" value="true"/>
-  </module>
+  <property name="fileExtensions" value="java, properties, xml"/>
+
+  <property name="charset" value="UTF-8"/>
 
   <property name="severity" value="warning"/>
-
-  <property name="fileExtensions" value="java, properties, xml"/>
 </module>

@@ -3,8 +3,8 @@ plugins {
     id "checkstyle"
     id "idea"
     id "java"
-    id "org.openjfx.javafxplugin" version "0.0.8"
-    id "org.beryx.jlink" version "2.17.2"
+    id "org.openjfx.javafxplugin" version "0.0.9"
+    id "org.beryx.jlink" version "2.20.0"
 }
 
 repositories {
@@ -14,11 +14,11 @@ repositories {
 dependencies {
     compile "org.apache.commons:commons-csv:1.8"
     compile "org.apache.poi:poi-ooxml:4.1.2"
-    compile "com.fasterxml.jackson.core:jackson-core:2.10.2"
-    compile "com.fasterxml.jackson.core:jackson-annotations:2.10.2"
-    compile "com.fasterxml.jackson.core:jackson-databind:2.10.2"
-    testCompile "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.5.0-M1"
+    compile "com.fasterxml.jackson.core:jackson-core:2.11.1"
+    compile "com.fasterxml.jackson.core:jackson-annotations:2.11.1"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.11.1"
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.6.2"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.6.2"
 }
 
 // ### Application plugin settings
@@ -34,10 +34,10 @@ application {
 
 // ### Checkstyle plugin settings
 checkstyle {
-    toolVersion = "8.30"
+    toolVersion = "8.34"
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
-    // https://github.com/checkstyle/checkstyle/blob/checkstyle-8.23/src/main/resources/google_checks.xml
+    // https://github.com/checkstyle/checkstyle/blob/checkstyle-8.34/src/main/resources/google_checks.xml
     configFile = file("${configDir}/google_checks.xml")
 }
 
@@ -64,7 +64,7 @@ test {
 
 // ### JavaFX plugin settings
 javafx {
-    version = "13.0.2"
+    version = "14.0.1"
     modules = ["javafx.controls", "javafx.fxml"]
 }
 
