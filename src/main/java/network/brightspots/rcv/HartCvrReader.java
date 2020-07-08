@@ -44,7 +44,7 @@ class HartCvrReader {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     for (File child : children) {
-      if (child.getName().endsWith("xml")) {
+      if (child.getName().toLowerCase().endsWith("xml")) {
         readCastVoteRecord(castVoteRecords, child.toPath());
       }
     }
@@ -66,34 +66,28 @@ class HartCvrReader {
         if (!contest.Name.equals(contestConfig.getContestName())) {
           continue;
         }
-        if (contest.Options == null) {
-          // undervoted
-          continue;
-        }
 
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
-        for (Option option : contest.Options) {
-          if (option.WriteInData != null) {
-            Logger.log(Level.WARNING, "");
-          }
+        if (contest.Options != null) {
+          for (Option option : contest.Options) {
+            if (!this.contestConfig.getCandidateCodeList().contains(option.Id)) {
+              Logger.log(
+                  Level.SEVERE,
+                  "Candidate ID: \"%s\" name: \"%s\" from CVR is not in the config file!",
+                  option.Id, option.Name);
+              throw new CvrParseException();
+            }
 
-          if (!this.contestConfig.getCandidateCodeList().contains(option.Id)) {
-            Logger.log(
-                Level.SEVERE,
-                "Candidate ID: \"%s\" name: \"%s\" from CVR is not in the config file!",
-                option.Id, option.Name);
-            throw new CvrParseException();
-          }
-
-          // Hart RCV election ranks are indicated by a string read left to right:
-          // each digit corresponds to a rank and is set to 1 if that rank was voted.  For example:
-          // 0101 indicates ranks 2 and 4 are voted for this option (overvote)
-          // 00   indicates no rank was voted
-          // 010  indicates rank 2 was voted
-          for (int rank = 1; rank < option.Value.length() + 1; rank++) {
-            String rankValue = option.Value.substring(rank - 1, rank);
-            if (rankValue.equals("1")) {
-              rankings.add(new Pair<>(rank, option.Id));
+            // Hart RCV election ranks are indicated by a string read left to right:
+            // each digit corresponds to a rank and is set to 1 if that rank was voted:
+            // 0100 indicates rank 2 was voted
+            // 0000 indicates no rank was voted (undervote)
+            // 0101 indicates ranks 2 and 4 are voted (overvote)
+            for (int rank = 1; rank < option.Value.length() + 1; rank++) {
+              String rankValue = option.Value.substring(rank - 1, rank);
+              if (rankValue.equals("1")) {
+                rankings.add(new Pair<>(rank, option.Id));
+              }
             }
           }
         }
