@@ -23,7 +23,7 @@ dependencies {
 
 // ### Application plugin settings
 application {
-    mainClassName = "$moduleName/network.brightspots.rcv.Main"
+    mainClassName = "${moduleName}.Main"
 }
 
 // Uncomment below to simulate running from the CLI
@@ -38,7 +38,7 @@ checkstyle {
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-8.34/src/main/resources/google_checks.xml
-    configFile = file("$rootProject.projectDir/config/checkstyle/google_checks.xml")
+    configFile = file("$projectDir/config/checkstyle/google_checks.xml")
 }
 
 // ### Idea plugin settings
@@ -51,6 +51,7 @@ idea {
 // ### Java plugin settings
 sourceCompatibility = JavaVersion.VERSION_14
 
+compileJava.dependsOn(clean)
 compileJava {
     options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
