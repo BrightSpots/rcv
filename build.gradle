@@ -71,7 +71,7 @@ test {
 // ### JavaFX plugin settings
 javafx {
     version = "14.0.1"
-    modules = ["javafx.controls", "javafx.fxml"]
+    modules = ["javafx.base", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
 def JLINK_DIR = "$buildDir/rcv"
