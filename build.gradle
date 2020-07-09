@@ -49,13 +49,18 @@ idea {
 }
 
 // ### Java plugin settings
-sourceCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_14
 
 compileJava {
     options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
 
 test {
+    moduleOptions {
+        addExports = ["org.junit.platform.commons/org.junit.platform.commons.util": "ALL-UNNAMED",
+                      "org.junit.platform.commons/org.junit.platform.commons.logging": "ALL-UNNAMED"]
+    }
+    maxHeapSize = "2056m"
     useJUnitPlatform()
     testLogging {
         events "PASSED", "FAILED", "SKIPPED"
