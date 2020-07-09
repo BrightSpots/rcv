@@ -51,6 +51,10 @@ class DominionCvrReader {
     this.manifestFolder = manifestFolder;
   }
 
+  Map<Integer, Contest> getContests() {
+    return contests;
+  }
+
   // returns map of contestId to Contest parsed from input file
   private static Map<Integer, Contest> getContests(String contestPath) {
     Map<Integer, Contest> contests = new HashMap<>();
@@ -114,10 +118,6 @@ class DominionCvrReader {
       candidates = null;
     }
     return candidates;
-  }
-
-  Map<Integer, Contest> getContests() {
-    return contests;
   }
 
   // parse Cvr json into CastVoteRecord objects and add them to the input list

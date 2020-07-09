@@ -464,8 +464,8 @@ class Tabulator {
           selectedWinners.addAll(currentRoundCandidateToTally.keySet());
         } else if (!config.isMultiSeatBottomsUpEnabled()) {
           // We see if anyone has met/exceeded the threshold (unless bottoms-up is enabled, in which
-          // case we just wait until there are numWinners candidates remaining and then declare all of
-          // them as winners simultaneously).
+          // case we just wait until there are numWinners candidates remaining and then declare all
+          // of them as winners simultaneously).
           // tally indexes over all tallies to find any winners
           for (BigDecimal tally : currentRoundTallyToCandidates.keySet()) {
             if (tally.compareTo(winningThreshold) >= 0) {

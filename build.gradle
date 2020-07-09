@@ -38,7 +38,7 @@ checkstyle {
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-8.34/src/main/resources/google_checks.xml
-    configFile = file("${configDirectory}/google_checks.xml")
+    configFile = file("$rootProject.projectDir/config/checkstyle/google_checks.xml")
 }
 
 // ### Idea plugin settings
