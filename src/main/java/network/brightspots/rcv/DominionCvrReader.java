@@ -56,7 +56,7 @@ class DominionCvrReader {
   }
 
   // returns map of contestId to Contest parsed from input file
-  private static Map<Integer, Contest> getContests(String contestPath) {
+  private static Map<Integer, Contest> parseContestData(String contestPath) {
     Map<Integer, Contest> contests = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(contestPath, HashMap.class);
@@ -136,7 +136,7 @@ class DominionCvrReader {
       throw new CvrParseException();
     }
     Path contestPath = Paths.get(manifestFolder, CONTEST_MANIFEST);
-    this.contests = getContests(contestPath.toString());
+    this.contests = parseContestData(contestPath.toString());
     if (this.contests == null) {
       Logger.log(Level.SEVERE, "No contest data found!");
       throw new CvrParseException();
