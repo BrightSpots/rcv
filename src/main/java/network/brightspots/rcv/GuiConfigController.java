@@ -409,8 +409,7 @@ public class GuiConfigController implements Initializable {
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
     fc.getExtensionFilters()
-        .add(new ExtensionFilter("Excel, JSON, and XML files", "*.xls", "*.xlsx", "*.json",
-            "*.xml"));
+        .add(new ExtensionFilter("Excel and JSON files", "*.xls", "*.xlsx", "*.json"));
     fc.setTitle("Select cast vote record file");
 
     File openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
