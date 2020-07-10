@@ -43,10 +43,16 @@ class HartCvrReader {
       throws IOException, CvrParseException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
-    for (File child : children) {
-      if (child.getName().toLowerCase().endsWith("xml")) {
-        readCastVoteRecord(castVoteRecords, child.toPath());
+    if (children != null) {
+      for (File child : children) {
+        if (child.getName().toLowerCase().endsWith("xml")) {
+          readCastVoteRecord(castVoteRecords, child.toPath());
+        }
       }
+    } else {
+      Logger.log(Level.SEVERE, "Unable to find any files in directory: %s",
+          cvrRoot.getAbsolutePath());
+      throw new IOException();
     }
   }
 
