@@ -62,11 +62,11 @@ class CastVoteRecord {
   // contest associated with this CVR
   private String contestId;
   // tabulatorId parsed from Dominion CVR data
-  private Integer tabulatorId;
+  private String tabulatorId;
   // batchId parsed from Dominion CVR data
   private String batchId;
   // ballotTypeId parsed from Dominion CVR data
-  private Integer ballotTypeId;
+  private String ballotTypeId;
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
@@ -75,12 +75,12 @@ class CastVoteRecord {
   // Dominion and Hart use this constructor
   CastVoteRecord(
       String contestId,
-      Integer tabulatorId,
+      String tabulatorId,
       String batchId,
       String suppliedId,
       String precinct,
       String precinctPortion,
-      Integer ballotTypeId,
+      String ballotTypeId,
       List<Pair<Integer, String>> rankings) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
@@ -113,7 +113,7 @@ class CastVoteRecord {
     return contestId;
   }
 
-  Integer getTabulatorId() {
+  String getTabulatorId() {
     return tabulatorId;
   }
 
@@ -121,7 +121,7 @@ class CastVoteRecord {
     return batchId;
   }
 
-  Integer getBallotTypeId() {
+  String getBallotTypeId() {
     return ballotTypeId;
   }
 

@@ -180,7 +180,7 @@ class DominionCvrReader {
       for (Object sessionObject : sessions) {
         HashMap session = (HashMap) sessionObject;
         // extract various ids
-        Integer tabulatorId = (Integer) session.get("TabulatorId");
+        String tabulatorId = session.get("TabulatorId").toString();
         String batchId = session.get("BatchId").toString();
         Integer recordId = (Integer) session.get("RecordId");
         String suppliedId = recordId.toString();
@@ -193,7 +193,7 @@ class DominionCvrReader {
           } else {
             Logger.log(Level.WARNING,
                 "CVR has no adjudicated rankings, skipping: "
-                    + "Tabulator ID: %d Batch ID: %d Record ID: %d",
+                    + "Tabulator ID: %s Batch ID: %s Record ID: %d",
                 tabulatorId, batchId, recordId);
             continue;
           }
@@ -218,7 +218,7 @@ class DominionCvrReader {
           throw new CvrParseException();
         }
         String precinctPortion = this.precinctPortions.get(precinctPortionId);
-        Integer ballotTypeId = (Integer) adjudicatedData.get("BallotTypeId");
+        String ballotTypeId = adjudicatedData.get("BallotTypeId").toString();
 
         ArrayList contests;
         // sometimes there is a "Cards" object at this level
