@@ -19,6 +19,7 @@ package network.brightspots.rcv;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,7 +60,10 @@ class HartCvrReader {
       XmlMapper xmlMapper = new XmlMapper();
       xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       String xmlString = new String(Files.readAllBytes(path));
-      HartCvrXml xmlCvr = xmlMapper.readValue(xmlString, HartCvrXml.class);
+      String cleanedXml = xmlString.replace("\ufeff", "");
+      HartCvrXml xmlCvr = xmlMapper.readValue(cleanedXml, HartCvrXml.class);
+      FileInputStream inputStream = new FileInputStream(path.toFile());
+      HartCvrXml xmlCvr2 = xmlMapper.readValue(inputStream, HartCvrXml.class);
 
       for (Contest contest : xmlCvr.Contests) {
         // TODO: use contest Id (blocked by #456)
