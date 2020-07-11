@@ -51,8 +51,12 @@ class DominionCvrReader {
     this.manifestFolder = manifestFolder;
   }
 
+  Map<String, Contest> getContests() {
+    return contests;
+  }
+
   // returns map of contestId to Contest parsed from input file
-  private static Map<String, Contest> getContests(String contestPath) {
+  private static Map<String, Contest> parseContestData(String contestPath) {
     Map<String, Contest> contests = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(contestPath, HashMap.class);
@@ -116,10 +120,6 @@ class DominionCvrReader {
     return candidates;
   }
 
-  Map<String, Contest> getContests() {
-    return contests;
-  }
-
   // parse Cvr json into CastVoteRecord objects and add them to the input list
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
     // read metadata files for precincts, precinct portions, contest, and candidates
@@ -136,7 +136,7 @@ class DominionCvrReader {
       throw new CvrParseException();
     }
     Path contestPath = Paths.get(manifestFolder, CONTEST_MANIFEST);
-    this.contests = getContests(contestPath.toString());
+    this.contests = parseContestData(contestPath.toString());
     if (this.contests == null) {
       Logger.log(Level.SEVERE, "No contest data found!");
       throw new CvrParseException();
