@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
+import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
@@ -105,17 +106,21 @@ class TabulatorSession {
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
-        ResultsWriter writer =
-            new ResultsWriter()
-                .setNumRounds(0)
-                .setContestConfig(config)
-                .setTimestampString(timestampString)
-                .setPrecinctIds(precinctIds);
-        try {
-          writer.generateCdfJson(castVoteRecords);
-        } catch (RoundSnapshotDataMissingException e) {
-          // This will never actually happen because no snapshots are involved when you're just
-          // translating the input to CDF, not the tabulation results.
+        if (castVoteRecords == null) {
+          Logger.log(Level.SEVERE, "Aborting conversion due to cast vote record errors!");
+        } else {
+          ResultsWriter writer =
+              new ResultsWriter()
+                  .setNumRounds(0)
+                  .setContestConfig(config)
+                  .setTimestampString(timestampString)
+                  .setPrecinctIds(precinctIds);
+          try {
+            writer.generateCdfJson(castVoteRecords);
+          } catch (RoundSnapshotDataMissingException e) {
+            // This will never actually happen because no snapshots are involved when you're just
+            // translating the input to CDF, not the tabulation results.
+          }
         }
       } catch (IOException | UnableToCreateDirectoryException exception) {
         Logger.log(Level.SEVERE, "CDF JSON generation failed.");
@@ -262,12 +267,22 @@ class TabulatorSession {
     // At each iteration of the following loop, we add records from another source file.
     for (RawContestConfig.CvrSource source : config.rawConfig.cvrFileSources) {
       String cvrPath = config.resolveConfigPath(source.getFilePath());
-      Logger.log(Level.INFO, "Reading cast vote record file: %s...", cvrPath);
       try {
         if (ContestConfig.isCdf(source)) {
+          Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
           reader.parseCvrFile(castVoteRecords);
+        } else if (ContestConfig.isHart(source)) {
+          HartCvrReader reader = new HartCvrReader(cvrPath, config);
+          try {
+            Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
+            reader.readCastVoteRecordsFromFolder(castVoteRecords);
+          } catch (CvrParseException exception) {
+            Logger.log(Level.SEVERE, "Exception parsing Hart CVR!");
+            encounteredSourceProblem = true;
+          }
         } else {
+          Logger.log(Level.INFO, "Reading ES&S cast vote record file: %s...", cvrPath);
           new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
         }
       } catch (UnrecognizedCandidatesException exception) {

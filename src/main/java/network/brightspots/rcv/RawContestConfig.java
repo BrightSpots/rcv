@@ -50,6 +50,7 @@ public class RawContestConfig {
     public String contestDate;
     public String contestJurisdiction;
     public String contestOffice;
+    public String contestId;
     public boolean tabulateByPrecinct;
     public boolean generateCdfJson;
   }
@@ -143,7 +144,7 @@ public class RawContestConfig {
     private String name;
     private String code;
     private boolean excluded;
-    private Integer contestId;
+    private String contestId;
 
     Candidate() {
     }
@@ -154,7 +155,7 @@ public class RawContestConfig {
       this.excluded = excluded;
     }
 
-    Candidate(String name, String code, boolean excluded, Integer contestId) {
+    Candidate(String name, String code, boolean excluded, String contestId) {
       this.name = name;
       this.code = code;
       this.excluded = excluded;
@@ -185,7 +186,7 @@ public class RawContestConfig {
       this.excluded = excluded;
     }
 
-    public Integer getContestId() {
+    public String getContestId() {
       return contestId;
     }
   }
