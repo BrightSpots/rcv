@@ -1,0 +1,26 @@
+{
+  "config" : {
+    "contest" : "CEDAR PARK SCHOOL BOARD",
+    "date" : "",
+    "jurisdiction" : "",
+    "office" : "",
+    "threshold" : "4"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "99cefa84-bad0-4d6b-a916-e606bd43f9cd" : "0",
+      "April King" : "0",
+      "Barb Yarusso" : "1",
+      "Betty McCollum" : "0",
+      "Bev Scalze" : "1",
+      "Russ Bertsch" : "0",
+      "Steve Carlson" : "5",
+      "Tony Hernandez" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "Steve Carlson",
+      "transfers" : { }
+    } ]
+  } ]
+}
