@@ -51,7 +51,7 @@ class DominionCvrReader {
     this.manifestFolder = manifestFolder;
   }
 
-  Map<Integer, Contest> getContests() {
+  Map<String, Contest> getContests() {
     return contests;
   }
 
