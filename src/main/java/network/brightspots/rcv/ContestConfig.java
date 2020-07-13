@@ -82,8 +82,7 @@ class ContestConfig {
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
 
   static boolean isCdf(CvrSource source) {
-    return source.getProvider() != null
-        && Provider.getByLabel(source.getProvider()) == Provider.CDF
+    return getProvider(source) == Provider.CDF
         && source.getFilePath() != null
         && source.getFilePath().toLowerCase().endsWith(JSON_EXTENSION);
   }
@@ -146,11 +145,6 @@ class ContestConfig {
 
   static ContestConfig loadContestConfig(String configPath) {
     return loadContestConfig(configPath, false);
-  }
-
-  static boolean isHart(CvrSource source) {
-    return source.getProvider() != null
-        && Provider.getByLabel(source.getProvider()) == Provider.HART;
   }
 
   static boolean passesBasicCvrSourceValidation(CvrSource source) {
@@ -839,11 +833,11 @@ class ContestConfig {
   }
 
   enum Provider {
-    ESS("ES&S"),
-    DOMINION("Dominion"),
-    HART("Hart"),
     CDF("CDF"),
-    PROVIDER_UNKNOWN("Provider Unknown");
+    ESS("ES&S"),
+    GENERIC("Generic format"),
+    HART("Hart"),
+    PROVIDER_UNKNOWN("Provider unknown");
 
     private final String label;
 

@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
+import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
@@ -272,7 +273,13 @@ class TabulatorSession {
           Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
           reader.parseCvrFile(castVoteRecords);
-        } else if (ContestConfig.isHart(source)) {
+        } else if (ContestConfig.getProvider(source) == Provider.ESS) {
+          Logger.log(Level.INFO, "Reading ES&S cast vote record file: %s...", cvrPath);
+          new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
+        } else if (ContestConfig.getProvider(source) == Provider.GENERIC) {
+          Logger.log(Level.INFO, "Reading generic format cast vote record file: %s...", cvrPath);
+          new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
+        } else if (ContestConfig.getProvider(source) == Provider.HART) {
           HartCvrReader reader = new HartCvrReader(cvrPath, config);
           try {
             Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
@@ -281,9 +288,6 @@ class TabulatorSession {
             Logger.log(Level.SEVERE, "Exception parsing Hart CVR!");
             encounteredSourceProblem = true;
           }
-        } else {
-          Logger.log(Level.INFO, "Reading ES&S cast vote record file: %s...", cvrPath);
-          new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
         }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.log(Level.SEVERE, "Source file contains unrecognized candidate(s): %s", cvrPath);
