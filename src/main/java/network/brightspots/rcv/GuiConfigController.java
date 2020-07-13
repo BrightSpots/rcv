@@ -93,6 +93,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldContestName;
   @FXML
+  private TextField textFieldContestId;
+  @FXML
   private TextField textFieldOutputDirectory;
   @FXML
   private DatePicker datePickerContestDate;
@@ -568,6 +570,7 @@ public class GuiConfigController implements Initializable {
 
   private void clearConfig() {
     textFieldContestName.clear();
+    textFieldContestId.clear();
     textFieldOutputDirectory.clear();
     datePickerContestDate.setValue(null);
     textFieldContestJurisdiction.clear();
@@ -821,6 +824,7 @@ public class GuiConfigController implements Initializable {
     migrateConfigVersion(config);
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
+    textFieldContestId.setText(outputSettings.contestId);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
     if (!isNullOrBlank(outputSettings.contestDate)) {
       try {
@@ -878,6 +882,7 @@ public class GuiConfigController implements Initializable {
     config.tabulatorVersion = Main.APP_VERSION;
     OutputSettings outputSettings = new OutputSettings();
     outputSettings.contestName = getTextOrEmptyString(textFieldContestName);
+    outputSettings.contestId = getTextOrEmptyString(textFieldContestId);
     outputSettings.outputDirectory = getTextOrEmptyString(textFieldOutputDirectory);
     outputSettings.contestDate =
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";

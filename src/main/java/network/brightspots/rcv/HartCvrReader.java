@@ -68,8 +68,7 @@ class HartCvrReader {
       HartCvrXml xmlCvr = xmlMapper.readValue(inputStream, HartCvrXml.class);
 
       for (Contest contest : xmlCvr.Contests) {
-        // TODO: use contest Id (blocked by #456)
-        if (!contest.Name.equals(contestConfig.getContestName())) {
+        if (!contest.Id.equals(contestConfig.getContestId())) {
           continue;
         }
 

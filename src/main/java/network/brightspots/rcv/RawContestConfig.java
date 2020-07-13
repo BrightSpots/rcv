@@ -46,11 +46,11 @@ public class RawContestConfig {
   public static class OutputSettings {
 
     public String contestName;
+    public String contestId;
     public String outputDirectory;
     public String contestDate;
     public String contestJurisdiction;
     public String contestOffice;
-    public String contestId;
     public boolean tabulateByPrecinct;
     public boolean generateCdfJson;
   }
