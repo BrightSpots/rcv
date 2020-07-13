@@ -208,6 +208,11 @@ class ContestConfig {
           source.getFilePath())) {
         sourceValid = false;
       }
+
+      if (!sourceValid) {
+        Logger.log(Level.SEVERE, "The above error(s) pertain(s) to cast vote record source: %s",
+            source.getFilePath());
+      }
     }
     return sourceValid;
   }
