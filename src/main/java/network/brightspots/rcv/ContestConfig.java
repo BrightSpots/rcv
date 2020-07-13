@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -75,12 +76,17 @@ class ContestConfig {
   private static final int MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 100;
   private static final long MIN_RANDOM_SEED = -140737488355328L;
   private static final long MAX_RANDOM_SEED = 140737488355327L;
-  private static final String CDF_PROVIDER = "CDF";
-  private static final String HART_PROVIDER = "HART";
   private static final String JSON_EXTENSION = ".json";
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
+
+  static boolean isCdf(CvrSource source) {
+    return source.getProvider() != null
+        && Provider.getByLabel(source.getProvider()) == Provider.CDF
+        && source.getFilePath() != null
+        && source.getFilePath().toLowerCase().endsWith(JSON_EXTENSION);
+  }
 
   // underlying rawConfig object data
   final RawContestConfig rawConfig;
@@ -142,15 +148,68 @@ class ContestConfig {
     return loadContestConfig(configPath, false);
   }
 
-  static boolean isCdf(CvrSource source) {
+  static boolean isHart(CvrSource source) {
     return source.getProvider() != null
-        && source.getProvider().toUpperCase().equals(CDF_PROVIDER)
-        && source.getFilePath() != null
-        && source.getFilePath().toLowerCase().endsWith(JSON_EXTENSION);
+        && Provider.getByLabel(source.getProvider()) == Provider.HART;
   }
 
-  static boolean isHart(CvrSource source) {
-    return source.getProvider() != null && source.getProvider().toUpperCase().equals(HART_PROVIDER);
+  static boolean passesBasicCvrSourceValidation(CvrSource source) {
+    boolean sourceValid = true;
+    // perform checks on source input path
+    if (isNullOrBlank(source.getFilePath())) {
+      sourceValid = false;
+      Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
+    } else {
+      if (getProvider(source) == Provider.PROVIDER_UNKNOWN) {
+        sourceValid = false;
+        Logger.log(Level.SEVERE, "Invalid provider!");
+      }
+
+      // ensure valid first vote column value
+      if (fieldOutOfRangeOrNotInteger(
+          source.getFirstVoteColumnIndex(),
+          "firstVoteColumnIndex",
+          MIN_COLUMN_INDEX,
+          MAX_COLUMN_INDEX,
+          !isCdf(source),
+          source.getFilePath())) {
+        sourceValid = false;
+      }
+
+      // ensure valid first vote row value
+      if (fieldOutOfRangeOrNotInteger(
+          source.getFirstVoteRowIndex(),
+          "firstVoteRowIndex",
+          MIN_ROW_INDEX,
+          MAX_ROW_INDEX,
+          !isCdf(source),
+          source.getFilePath())) {
+        sourceValid = false;
+      }
+
+      // ensure valid id column value
+      if (fieldOutOfRangeOrNotInteger(
+          source.getIdColumnIndex(),
+          "idColumnIndex",
+          MIN_COLUMN_INDEX,
+          MAX_COLUMN_INDEX,
+          false,
+          source.getFilePath())) {
+        sourceValid = false;
+      }
+
+      // ensure valid precinct column value
+      if (fieldOutOfRangeOrNotInteger(
+          source.getPrecinctColumnIndex(),
+          "precinctColumnIndex",
+          MIN_COLUMN_INDEX,
+          MAX_COLUMN_INDEX,
+          false,
+          source.getFilePath())) {
+        sourceValid = false;
+      }
+    }
+    return sourceValid;
   }
 
   // function: stringMatchesAnotherFieldValue(
@@ -230,58 +289,9 @@ class ContestConfig {
     return !stringValid;
   }
 
-  static boolean passesBasicCvrSourceValidation(CvrSource source) {
-    boolean sourceValid = true;
-    // perform checks on source input path
-    if (isNullOrBlank(source.getFilePath())) {
-      sourceValid = false;
-      Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
-    } else {
-      // ensure valid first vote column value
-      if (fieldOutOfRangeOrNotInteger(
-          source.getFirstVoteColumnIndex(),
-          "firstVoteColumnIndex",
-          MIN_COLUMN_INDEX,
-          MAX_COLUMN_INDEX,
-          !isCdf(source),
-          source.getFilePath())) {
-        sourceValid = false;
-      }
-
-      // ensure valid first vote row value
-      if (fieldOutOfRangeOrNotInteger(
-          source.getFirstVoteRowIndex(),
-          "firstVoteRowIndex",
-          MIN_ROW_INDEX,
-          MAX_ROW_INDEX,
-          !isCdf(source),
-          source.getFilePath())) {
-        sourceValid = false;
-      }
-
-      // ensure valid id column value
-      if (fieldOutOfRangeOrNotInteger(
-          source.getIdColumnIndex(),
-          "idColumnIndex",
-          MIN_COLUMN_INDEX,
-          MAX_COLUMN_INDEX,
-          false,
-          source.getFilePath())) {
-        sourceValid = false;
-      }
-
-      // ensure valid precinct column value
-      if (fieldOutOfRangeOrNotInteger(
-          source.getPrecinctColumnIndex(),
-          "precinctColumnIndex",
-          MIN_COLUMN_INDEX,
-          MAX_COLUMN_INDEX,
-          false,
-          source.getFilePath())) {
-        sourceValid = false;
-      }
-    }
-    return sourceValid;
+  static Provider getProvider(CvrSource cvrSource) {
+    Provider provider = Provider.getByLabel(cvrSource.getProvider());
+    return provider == null ? Provider.PROVIDER_UNKNOWN : provider;
   }
 
   static boolean passesBasicCandidateValidation(Candidate candidate) {
@@ -821,6 +831,32 @@ class ContestConfig {
       }
     }
     return intValue;
+  }
+
+  enum Provider {
+    ESS("ES&S"),
+    DOMINION("Dominion"),
+    HART("Hart"),
+    CDF("CDF"),
+    PROVIDER_UNKNOWN("Provider Unknown");
+
+    private final String label;
+
+    Provider(String label) {
+      this.label = label;
+    }
+
+    static Provider getByLabel(String labelLookup) {
+      return Arrays.stream(Provider.values())
+          .filter(v -> v.label.equals(labelLookup))
+          .findAny()
+          .orElse(null);
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
   }
 
   private String getMaxRankingsAllowedRaw() {

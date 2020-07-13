@@ -61,6 +61,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
+import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -129,7 +130,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCvrPrecinctCol;
   @FXML
-  private TextField textFieldCvrProvider;
+  private ChoiceBox<Provider> choiceCvrProvider;
   @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
@@ -427,15 +428,15 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCvrFirstVoteRow),
             getTextOrEmptyString(textFieldCvrIdCol),
             getTextOrEmptyString(textFieldCvrPrecinctCol),
-            getTextOrEmptyString(textFieldCvrProvider));
+            getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN));
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
+      choiceCvrProvider.setValue(null);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
       textFieldCvrFirstVoteRow.clear();
       textFieldCvrIdCol.clear();
       textFieldCvrPrecinctCol.clear();
-      textFieldCvrProvider.clear();
     }
   }
 
@@ -575,12 +576,12 @@ public class GuiConfigController implements Initializable {
     checkBoxTabulateByPrecinct.setSelected(false);
     checkBoxGenerateCdfJson.setSelected(false);
 
+    choiceCvrProvider.setValue(null);
     textFieldCvrFilePath.clear();
     textFieldCvrFirstVoteCol.clear();
     textFieldCvrFirstVoteRow.clear();
     textFieldCvrIdCol.clear();
     textFieldCvrPrecinctCol.clear();
-    textFieldCvrProvider.clear();
     tableViewCvrFiles.getItems().clear();
 
     textFieldCandidateName.clear();
@@ -744,6 +745,8 @@ public class GuiConfigController implements Initializable {
           }
         });
 
+    choiceCvrProvider.getItems().addAll(Provider.values());
+    choiceCvrProvider.getItems().remove(Provider.PROVIDER_UNKNOWN);
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
     tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
