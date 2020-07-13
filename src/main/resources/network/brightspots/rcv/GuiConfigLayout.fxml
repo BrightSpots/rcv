@@ -119,17 +119,17 @@
               <HBox alignment="CENTER_LEFT" spacing="4.0">
                 <VBox spacing="4.0">
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
+                    <Label text="Provider *"/>
+                    <ChoiceBox maxWidth="250.0" prefWidth="120.0" fx:id="choiceCvrProvider"/>
                     <Button mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add"/>
                     <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
                       text="Delete Selected"/>
-                    <ChoiceBox maxWidth="250.0" prefWidth="100.0" fx:id="choiceCvrProvider"/>
-                    <Label text="Provider *"/>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
-                      text="Select"/>
                     <TextField prefHeight="25.0" prefWidth="396.0" promptText="File Path *"
                       fx:id="textFieldCvrFilePath"/>
+                    <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
+                      text="Select"/>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
                     <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Col Index"
