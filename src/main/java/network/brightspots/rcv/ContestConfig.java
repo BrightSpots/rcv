@@ -447,6 +447,18 @@ class ContestConfig {
                 cvrPath);
           }
         }
+
+        if (isNullOrBlank(getContestId()) && isHart(source)) {
+          isValid = false;
+          Logger.log(
+              Level.SEVERE,
+              "contestId is required for Hart files.");
+        } else if (!isNullOrBlank(getContestId()) && !isHart(source)) {
+          isValid = false;
+          Logger.log(
+              Level.SEVERE,
+              "contestId may not be used with this type of CVR file.");
+        }
       }
     }
   }

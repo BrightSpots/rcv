@@ -78,6 +78,8 @@
             <VBox spacing="8.0">
               <Label text="Contest Name *"/>
               <TextField fx:id="textFieldContestName" maxWidth="220.0" promptText="Contest Name *"/>
+              <Label text="Contest ID"/>
+              <TextField fx:id="textFieldContestId" maxWidth="220.0" promptText="Contest ID"/>
               <Label text="Output Directory"/>
               <HBox alignment="CENTER_LEFT" spacing="8.0">
                 <TextField fx:id="textFieldOutputDirectory" prefWidth="400.0"

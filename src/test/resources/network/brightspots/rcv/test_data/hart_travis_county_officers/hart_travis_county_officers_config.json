@@ -2,6 +2,7 @@
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
     "contestName" : "TRAVIS COUNTY OFFICERS",
+    "contestId" : "e9ca8235-893e-43df-93eb-3cc61eeb133c",
     "outputDirectory" : "output",
     "contestDate" : "",
     "contestJurisdiction" : "",
@@ -19,10 +20,10 @@
   } ],
   "candidates" : [
     {
-    "name" : "Michael Gottner",
-    "code" : "bdc77efc-2f86-48d0-a0de-2efb02e1f4d9",
-    "excluded" : false
-  },
+      "name" : "Michael Gottner",
+      "code" : "bdc77efc-2f86-48d0-a0de-2efb02e1f4d9",
+      "excluded" : false
+    },
     {
       "name" : "Jim Sylvester",
       "code" : "bfb4eda8-35e8-4d13-b152-99b8e5d6b777",
