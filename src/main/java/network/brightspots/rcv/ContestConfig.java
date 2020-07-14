@@ -457,12 +457,12 @@ class ContestConfig {
           }
         }
 
-        if (isNullOrBlank(getContestId()) && isHart(source)) {
+        if (isNullOrBlank(getContestId()) && getProvider(source) == Provider.HART) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
               "contestId is required for Hart files.");
-        } else if (!isNullOrBlank(getContestId()) && !isHart(source)) {
+        } else if (!isNullOrBlank(getContestId()) && getProvider(source) != Provider.HART) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
