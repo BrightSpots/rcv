@@ -21,10 +21,10 @@
 
   "candidates" : [
     {
-    "name" : "Tony Hernandez",
-    "code" : "6f2df7d3-5c83-4fc7-b4a5-c2eca9e5fdb4",
-    "excluded" : false
-  },
+      "name" : "Tony Hernandez",
+      "code" : "6f2df7d3-5c83-4fc7-b4a5-c2eca9e5fdb4",
+      "excluded" : false
+    },
     {
       "name" : "Betty McCollum",
       "code" : "5f1a7e93-d5d7-498d-94d5-101356477f30",
