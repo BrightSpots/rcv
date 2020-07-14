@@ -279,10 +279,6 @@ class TabulatorSession {
           Logger.log(Level.INFO, "Reading ES&S cast vote record file: %s...", cvrPath);
           new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
           continue;
-        } else if (ContestConfig.getProvider(source) == Provider.GENERIC) {
-          Logger.log(Level.INFO, "Reading generic format cast vote record file: %s...", cvrPath);
-          new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
-          continue;
         } else if (ContestConfig.getProvider(source) == Provider.HART) {
           HartCvrReader reader = new HartCvrReader(cvrPath, config);
           Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);

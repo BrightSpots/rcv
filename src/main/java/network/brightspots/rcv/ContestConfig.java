@@ -835,7 +835,6 @@ class ContestConfig {
   enum Provider {
     CDF("CDF"),
     ESS("ES&S"),
-    GENERIC("Generic format"),
     HART("Hart"),
     PROVIDER_UNKNOWN("Provider unknown");
 
