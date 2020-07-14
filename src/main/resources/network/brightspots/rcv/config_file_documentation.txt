@@ -17,7 +17,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         example: "Portland Mayoral Race 2017"
         value: text string of length [1..1000]
 
-      "contestId" required when CVR source files are from Hart
+      "contestId" required when CVR source files are from Hart; must be blank otherwise
         the ID of the contest to tabulate, as represented in the CVR file(s)
         example: "b651b997-417a-46d9-a676-a43d4df94ddc"
         value: text string of length [1..1000]
