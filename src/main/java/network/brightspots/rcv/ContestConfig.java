@@ -858,6 +858,10 @@ class ContestConfig {
     }
   }
 
+  static class UnrecognizedProviderException extends Exception {
+
+  }
+
   private String getMaxRankingsAllowedRaw() {
     return rawConfig.rules.maxRankingsAllowed;
   }
