@@ -121,33 +121,28 @@
               <HBox alignment="CENTER_LEFT" spacing="4.0">
                 <VBox spacing="4.0">
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <TextField fx:id="textFieldCvrFilePath" prefHeight="25.0" prefWidth="396.0"
-                      promptText="File Path *"/>
+                    <Label text="Provider *"/>
+                    <ChoiceBox maxWidth="250.0" prefWidth="120.0" fx:id="choiceCvrProvider"/>
+                    <Button mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add"/>
+                    <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
+                      text="Delete Selected"/>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" spacing="4.0">
+                    <TextField prefHeight="25.0" prefWidth="396.0" promptText="File Path *"
+                      fx:id="textFieldCvrFilePath"/>
                     <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
                       text="Select"/>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <TextField fx:id="textFieldCvrFirstVoteCol" prefHeight="25.0" prefWidth="160.0"
-                      promptText="First Vote Col Index"/>
-                    <TextField fx:id="textFieldCvrFirstVoteRow" prefHeight="25.0" prefWidth="160.0"
-                      promptText="First Vote Row Index"/>
-                    <TextField fx:id="textFieldCvrIdCol" prefHeight="25.0" prefWidth="120.0"
-                      promptText="ID Col Index"/>
-                  </HBox>
-                  <HBox alignment="CENTER_LEFT" spacing="4.0">
+                    <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Col Index"
+                      fx:id="textFieldCvrFirstVoteCol"/>
+                    <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Row Index"
+                      fx:id="textFieldCvrFirstVoteRow"/>
+                    <TextField prefHeight="25.0" prefWidth="120.0" promptText="ID Col Index"
+                      fx:id="textFieldCvrIdCol"/>
                     <TextField fx:id="textFieldCvrPrecinctCol" prefHeight="25.0" prefWidth="175.0"
                       promptText="Precinct Col Index"/>
-                    <TextField fx:id="textFieldCvrProvider" maxWidth="250.0" prefHeight="25.0"
-                      prefWidth="175.0" promptText="Provider"/>
                   </HBox>
-                </VBox>
-                <VBox alignment="BOTTOM_LEFT" spacing="4.0">
-                  <padding>
-                    <Insets left="4.0" right="4.0" top="4.0"/>
-                  </padding>
-                  <Button mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add"/>
-                  <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
-                    text="Delete Selected"/>
                 </VBox>
                 <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>

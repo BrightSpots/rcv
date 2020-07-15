@@ -60,6 +60,11 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
     list of input cast vote record (CVR) file paths and their associated parameters
     each "cvrFileSources" list item contains the following parameters:
 
+      "provider" required
+        text description of the vendor / machine which generated this file
+        if set to "CDF" (and the filePath is ".json") the CVR file will be read as NIST Common Data Format (CDF)
+        value: "CDF" | "ES&S" | "Hart"
+
       "filePath" required
         location of the CVR file
         if this is a ".json" file (and the provider is "CDF") the CVR file will be read as NIST Common Data Format (CDF)
@@ -85,13 +90,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         index of the column (starting from 1) that contains the precinct name for each CVR
         example: 2
         value: [1..1000]
-
-      "provider" optional
-        text description of the vendor / machine which generated this file
-        if set to "CDF" (and the filePath is ".json") the CVR file will be read as NIST Common Data Format (CDF)
-        example: "ES&S"
-        value: text string of length [1..1000]
-        if not supplied: file will be read as ES&S format
 
   "candidates" required
     list of registered candidate names and associated candidate code (note: leave empty when CVR is in Common Data Format)

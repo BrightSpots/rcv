@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -61,6 +61,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
+import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -131,7 +132,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCvrPrecinctCol;
   @FXML
-  private TextField textFieldCvrProvider;
+  private ChoiceBox<Provider> choiceCvrProvider;
   @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
@@ -429,15 +430,15 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCvrFirstVoteRow),
             getTextOrEmptyString(textFieldCvrIdCol),
             getTextOrEmptyString(textFieldCvrPrecinctCol),
-            getTextOrEmptyString(textFieldCvrProvider));
+            getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN));
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
+      choiceCvrProvider.setValue(null);
       textFieldCvrFilePath.clear();
       textFieldCvrFirstVoteCol.clear();
       textFieldCvrFirstVoteRow.clear();
       textFieldCvrIdCol.clear();
       textFieldCvrPrecinctCol.clear();
-      textFieldCvrProvider.clear();
     }
   }
 
@@ -578,12 +579,12 @@ public class GuiConfigController implements Initializable {
     checkBoxTabulateByPrecinct.setSelected(false);
     checkBoxGenerateCdfJson.setSelected(false);
 
+    choiceCvrProvider.setValue(null);
     textFieldCvrFilePath.clear();
     textFieldCvrFirstVoteCol.clear();
     textFieldCvrFirstVoteRow.clear();
     textFieldCvrIdCol.clear();
     textFieldCvrPrecinctCol.clear();
-    textFieldCvrProvider.clear();
     tableViewCvrFiles.getItems().clear();
 
     textFieldCandidateName.clear();
@@ -747,6 +748,8 @@ public class GuiConfigController implements Initializable {
           }
         });
 
+    choiceCvrProvider.getItems().addAll(Provider.values());
+    choiceCvrProvider.getItems().remove(Provider.PROVIDER_UNKNOWN);
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
     tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
@@ -776,8 +779,7 @@ public class GuiConfigController implements Initializable {
           checkBox
               .selectedProperty()
               .addListener((ov, oldVal, newVal) -> candidate.setExcluded(newVal));
-          //noinspection unchecked
-          return new SimpleObjectProperty(checkBox);
+          return new SimpleBooleanProperty(checkBox.isSelected());
         });
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);

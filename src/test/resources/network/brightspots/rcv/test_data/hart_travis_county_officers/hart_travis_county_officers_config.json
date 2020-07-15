@@ -16,7 +16,7 @@
     "firstVoteRowIndex" : "1",
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "1",
-    "provider" : "HART"
+    "provider": "Hart"
   } ],
   "candidates" : [
     {

@@ -16,7 +16,7 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
-    "provider" : "ESS"
+    "provider": "ES&S"
   } ],
   "candidates" : [ {
     "name" : "A",

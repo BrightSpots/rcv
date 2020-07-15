@@ -42,6 +42,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
+import network.brightspots.rcv.ContestConfig.Provider;
+import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
@@ -272,19 +274,18 @@ class TabulatorSession {
           Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
           reader.parseCvrFile(castVoteRecords);
-        } else if (ContestConfig.isHart(source)) {
-          HartCvrReader reader = new HartCvrReader(cvrPath, config);
-          try {
-            Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
-            reader.readCastVoteRecordsFromFolder(castVoteRecords);
-          } catch (CvrParseException exception) {
-            Logger.log(Level.SEVERE, "Exception parsing Hart CVR!");
-            encounteredSourceProblem = true;
-          }
-        } else {
+          continue;
+        } else if (ContestConfig.getProvider(source) == Provider.ESS) {
           Logger.log(Level.INFO, "Reading ES&S cast vote record file: %s...", cvrPath);
           new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
+          continue;
+        } else if (ContestConfig.getProvider(source) == Provider.HART) {
+          HartCvrReader reader = new HartCvrReader(cvrPath, config);
+          Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
+          reader.readCastVoteRecordsFromFolder(castVoteRecords);
+          continue;
         }
+        throw new UnrecognizedProviderException();
       } catch (UnrecognizedCandidatesException exception) {
         Logger.log(Level.SEVERE, "Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
@@ -320,6 +321,12 @@ class TabulatorSession {
       } catch (CvrDataFormatException e) {
         Logger.log(Level.SEVERE, "Data format error while parsing source file: %s", cvrPath);
         Logger.log(Level.INFO, "See the log for details.");
+        encounteredSourceProblem = true;
+      } catch (UnrecognizedProviderException e) {
+        Logger.log(Level.SEVERE, "Unrecognized provider \"%s\" in source file: %s",
+            source.getProvider(), cvrPath);
+        encounteredSourceProblem = true;
+      } catch (CvrParseException e) {
         encounteredSourceProblem = true;
       }
     }
