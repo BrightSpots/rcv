@@ -41,6 +41,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -122,7 +123,13 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrProvider;
   @FXML
+  private ChoiceBox<Provider> choiceCvrProvider;
+  @FXML
+  private Button buttonAddCvrFile;
+  @FXML
   private TextField textFieldCvrFilePath;
+  @FXML
+  private Button buttonCvrFilePath;
   @FXML
   private TextField textFieldCvrFirstVoteCol;
   @FXML
@@ -131,8 +138,6 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldCvrIdCol;
   @FXML
   private TextField textFieldCvrPrecinctCol;
-  @FXML
-  private ChoiceBox<Provider> choiceCvrProvider;
   @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
@@ -409,13 +414,37 @@ public class GuiConfigController implements Initializable {
 
   /** Action when CVR file path button is clicked. */
   public void buttonCvrFilePathClicked() {
-    FileChooser fc = new FileChooser();
-    fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-    fc.getExtensionFilters()
-        .add(new ExtensionFilter("Excel and JSON files", "*.xls", "*.xlsx", "*.json"));
-    fc.setTitle("Select cast vote record file");
+    File openFile = null;
 
-    File openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+    switch (getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN)) {
+      case "CDF": {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+        fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
+        fc.setTitle("Select CDF Cast Vote Record File");
+        openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+        break;
+      }
+      case "ES&S": {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+        fc.getExtensionFilters()
+            .add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
+        fc.setTitle("Select ES&S Cast Vote Record File");
+        openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+        break;
+      }
+      case "Hart": {
+        DirectoryChooser dc = new DirectoryChooser();
+        dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+        dc.setTitle("Select Hart Cast Vote Record Folder");
+        openFile = dc.showDialog(GuiContext.getInstance().getMainWindow());
+        break;
+      }
+      default:
+        // Do nothing for unhandled providers
+    }
+
     if (openFile != null) {
       textFieldCvrFilePath.setText(openFile.getAbsolutePath());
     }
@@ -434,22 +463,37 @@ public class GuiConfigController implements Initializable {
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
       choiceCvrProvider.setValue(null);
-      textFieldCvrFilePath.clear();
-      textFieldCvrFirstVoteCol.clear();
-      textFieldCvrFirstVoteRow.clear();
-      textFieldCvrIdCol.clear();
-      textFieldCvrPrecinctCol.clear();
+      clearAndDisableCvrFilesTabFields();
     }
   }
 
-  /** Action when delete CVR file button is clicked. */
+  private void clearAndDisableCvrFilesTabFields() {
+    buttonAddCvrFile.setDisable(true);
+    textFieldCvrFilePath.clear();
+    textFieldCvrFilePath.setDisable(true);
+    buttonCvrFilePath.setDisable(true);
+    textFieldCvrFirstVoteCol.clear();
+    textFieldCvrFirstVoteCol.setDisable(true);
+    textFieldCvrFirstVoteRow.clear();
+    textFieldCvrFirstVoteRow.setDisable(true);
+    textFieldCvrIdCol.clear();
+    textFieldCvrIdCol.setDisable(true);
+    textFieldCvrPrecinctCol.clear();
+    textFieldCvrPrecinctCol.setDisable(true);
+  }
+
+  /**
+   * Action when delete CVR file button is clicked.
+   */
   public void buttonDeleteCvrFileClicked() {
     tableViewCvrFiles
         .getItems()
         .removeAll(tableViewCvrFiles.getSelectionModel().getSelectedItems());
   }
 
-  /** Action when CVR file path is changed. */
+  /**
+   * Action when CVR file path is changed.
+   */
   public void changeCvrFilePath(CellEditEvent cellEditEvent) {
     tableViewCvrFiles
         .getSelectionModel()
@@ -458,7 +502,9 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.refresh();
   }
 
-  /** Action when CVR first vote col is changed. */
+  /**
+   * Action when CVR first vote col is changed.
+   */
   public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
     tableViewCvrFiles
         .getSelectionModel()
@@ -467,7 +513,9 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.refresh();
   }
 
-  /** Action when CVR first vote row is changed. */
+  /**
+   * Action when CVR first vote row is changed.
+   */
   public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
     tableViewCvrFiles
         .getSelectionModel()
@@ -580,11 +628,7 @@ public class GuiConfigController implements Initializable {
     checkBoxGenerateCdfJson.setSelected(false);
 
     choiceCvrProvider.setValue(null);
-    textFieldCvrFilePath.clear();
-    textFieldCvrFirstVoteCol.clear();
-    textFieldCvrFirstVoteRow.clear();
-    textFieldCvrIdCol.clear();
-    textFieldCvrPrecinctCol.clear();
+    clearAndDisableCvrFilesTabFields();
     tableViewCvrFiles.getItems().clear();
 
     textFieldCandidateName.clear();
@@ -750,6 +794,24 @@ public class GuiConfigController implements Initializable {
 
     choiceCvrProvider.getItems().addAll(Provider.values());
     choiceCvrProvider.getItems().remove(Provider.PROVIDER_UNKNOWN);
+    choiceCvrProvider.setOnAction(event -> {
+      clearAndDisableCvrFilesTabFields();
+      String provider = getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN);
+      if (provider.equals("ES&S")) {
+        buttonAddCvrFile.setDisable(false);
+        textFieldCvrFilePath.setDisable(false);
+        buttonCvrFilePath.setDisable(false);
+        textFieldCvrFirstVoteCol.setDisable(false);
+        textFieldCvrFirstVoteRow.setDisable(false);
+        textFieldCvrIdCol.setDisable(false);
+        textFieldCvrPrecinctCol.setDisable(false);
+      } else if (provider.equals("CDF") || provider.equals("Hart")) {
+        buttonAddCvrFile.setDisable(false);
+        textFieldCvrFilePath.setDisable(false);
+        buttonCvrFilePath.setDisable(false);
+      }
+    });
+    clearAndDisableCvrFilesTabFields();
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
     tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
