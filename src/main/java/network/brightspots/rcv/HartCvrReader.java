@@ -67,19 +67,19 @@ class HartCvrReader {
       FileInputStream inputStream = new FileInputStream(path.toFile());
       HartCvrXml xmlCvr = xmlMapper.readValue(inputStream, HartCvrXml.class);
 
-      for (Contest contest : xmlCvr.Contests) {
-        if (!contest.Id.equals(contestConfig.getContestId())) {
+      for (Contest contest : xmlCvr.contests) {
+        if (!contest.id.equals(contestConfig.getContestId())) {
           continue;
         }
 
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
-        if (contest.Options != null) {
-          for (Option option : contest.Options) {
-            if (!this.contestConfig.getCandidateCodeList().contains(option.Id)) {
+        if (contest.options != null) {
+          for (Option option : contest.options) {
+            if (!this.contestConfig.getCandidateCodeList().contains(option.id)) {
               Logger.log(
                   Level.SEVERE,
                   "Candidate ID: \"%s\" name: \"%s\" from CVR is not in the config file!",
-                  option.Id, option.Name);
+                  option.id, option.name);
               throw new CvrParseException();
             }
 
@@ -88,22 +88,22 @@ class HartCvrReader {
             // 0100 indicates rank 2 was voted
             // 0000 indicates no rank was voted (undervote)
             // 0101 indicates ranks 2 and 4 are voted (overvote)
-            for (int rank = 1; rank < option.Value.length() + 1; rank++) {
-              String rankValue = option.Value.substring(rank - 1, rank);
+            for (int rank = 1; rank < option.value.length() + 1; rank++) {
+              String rankValue = option.value.substring(rank - 1, rank);
               if (rankValue.equals("1")) {
-                rankings.add(new Pair<>(rank, option.Id));
+                rankings.add(new Pair<>(rank, option.id));
               }
             }
           }
         }
 
         CastVoteRecord cvr = new CastVoteRecord(
-            contest.Id,
+            contest.id,
             null,
-            xmlCvr.BatchNumber,
-            xmlCvr.CvrGuid,
-            xmlCvr.PrecinctSplit.Name,
-            xmlCvr.PrecinctSplit.Id,
+            xmlCvr.batchNumber,
+            xmlCvr.cvrGuid,
+            xmlCvr.precinctSplit.name,
+            xmlCvr.precinctSplit.id,
             null,
             rankings);
         castVoteRecords.add(cvr);
@@ -121,48 +121,48 @@ class HartCvrReader {
 
   static class WriteInData {
 
-    public String ImageId;
-    public String WriteInDataStatus;
+    public String imageId;
+    public String writeInDataStatus;
   }
 
   // a voter selection
   static class Option {
 
-    public String Name;
-    public String Id;
-    public String Value;
-    public WriteInData WriteInData;
+    public String name;
+    public String id;
+    public String value;
+    public WriteInData writeInData;
   }
 
   // voter selections for a contest
   static class Contest {
 
-    public String Name;
-    public String Id;
-    public ArrayList<Option> Options;
+    public String name;
+    public String id;
+    public ArrayList<Option> options;
   }
 
   static class PrecinctSplit {
 
-    public String Name;
-    public String Id;
+    public String name;
+    public String id;
   }
 
   static class Party {
 
-    public String Name;
-    public String ID;
+    public String name;
+    public String id;
   }
 
   static class HartCvrXml {
 
-    public String BatchSequence;
-    public String SheetNumber;
-    public String BatchNumber;
-    public String CvrGuid;
-    public PrecinctSplit PrecinctSplit;
-    public Party Party;
-    public ArrayList<Contest> Contests;
+    public String batchSequence;
+    public String sheetNumber;
+    public String batchNumber;
+    public String cvrGuid;
+    public PrecinctSplit precinctSplit;
+    public Party party;
+    public ArrayList<Contest> contests;
   }
 
 }
