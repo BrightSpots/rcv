@@ -154,58 +154,86 @@ class ContestConfig {
       sourceValid = false;
       Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
     } else {
-      if (getProvider(source) == Provider.PROVIDER_UNKNOWN) {
+      Provider provider = getProvider(source);
+      if (provider == Provider.PROVIDER_UNKNOWN) {
         sourceValid = false;
-        Logger.log(Level.SEVERE, "Invalid provider!");
-      }
+        Logger.log(Level.SEVERE, "Invalid provider for source: %s", source.getFilePath());
+      } else if (provider == Provider.ESS) {
+        // ensure valid first vote column value
+        if (fieldOutOfRangeOrNotInteger(
+            source.getFirstVoteColumnIndex(),
+            "firstVoteColumnIndex",
+            MIN_COLUMN_INDEX,
+            MAX_COLUMN_INDEX,
+            true,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
 
-      // ensure valid first vote column value
-      if (fieldOutOfRangeOrNotInteger(
-          source.getFirstVoteColumnIndex(),
-          "firstVoteColumnIndex",
-          MIN_COLUMN_INDEX,
-          MAX_COLUMN_INDEX,
-          !isCdf(source),
-          source.getFilePath())) {
-        sourceValid = false;
-      }
+        // ensure valid first vote row value
+        if (fieldOutOfRangeOrNotInteger(
+            source.getFirstVoteRowIndex(),
+            "firstVoteRowIndex",
+            MIN_ROW_INDEX,
+            MAX_ROW_INDEX,
+            true,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
 
-      // ensure valid first vote row value
-      if (fieldOutOfRangeOrNotInteger(
-          source.getFirstVoteRowIndex(),
-          "firstVoteRowIndex",
-          MIN_ROW_INDEX,
-          MAX_ROW_INDEX,
-          !isCdf(source),
-          source.getFilePath())) {
-        sourceValid = false;
-      }
+        // ensure valid id column value
+        if (fieldOutOfRangeOrNotInteger(
+            source.getIdColumnIndex(),
+            "idColumnIndex",
+            MIN_COLUMN_INDEX,
+            MAX_COLUMN_INDEX,
+            false,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
 
-      // ensure valid id column value
-      if (fieldOutOfRangeOrNotInteger(
-          source.getIdColumnIndex(),
-          "idColumnIndex",
-          MIN_COLUMN_INDEX,
-          MAX_COLUMN_INDEX,
-          false,
-          source.getFilePath())) {
-        sourceValid = false;
-      }
+        // ensure valid precinct column value
+        if (fieldOutOfRangeOrNotInteger(
+            source.getPrecinctColumnIndex(),
+            "precinctColumnIndex",
+            MIN_COLUMN_INDEX,
+            MAX_COLUMN_INDEX,
+            false,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
+      } else {
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getFirstVoteColumnIndex(),
+            "firstVoteColumnIndex",
+            provider,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
 
-      // ensure valid precinct column value
-      if (fieldOutOfRangeOrNotInteger(
-          source.getPrecinctColumnIndex(),
-          "precinctColumnIndex",
-          MIN_COLUMN_INDEX,
-          MAX_COLUMN_INDEX,
-          false,
-          source.getFilePath())) {
-        sourceValid = false;
-      }
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getFirstVoteRowIndex(),
+            "firstVoteRowIndex",
+            provider,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
 
-      if (!sourceValid) {
-        Logger.log(Level.SEVERE, "The above error(s) pertain(s) to cast vote record source: %s",
-            source.getFilePath());
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getIdColumnIndex(),
+            "idColumnIndex",
+            provider,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
+
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getPrecinctColumnIndex(),
+            "precinctColumnIndex",
+            provider,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
       }
     }
     return sourceValid;
@@ -287,6 +315,19 @@ class ContestConfig {
     }
     return !stringValid;
   }
+
+  private static boolean fieldIsDefinedButShouldNotBeForProvider(String value, String fieldName,
+      Provider provider, String inputLocation) {
+    boolean stringValid = true;
+    if (!isNullOrBlank(value)) {
+      stringValid = false;
+      logErrorWithLocation(String
+          .format("%s should not be defined for CVR source with provider \"%s\"", fieldName,
+              provider.toString()), inputLocation);
+    }
+    return !stringValid;
+  }
+
 
   static Provider getProvider(CvrSource cvrSource) {
     Provider provider = Provider.getByLabel(cvrSource.getProvider());

@@ -11,11 +11,11 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "CVRArchive_18_9_0_6298/",
-    "firstVoteColumnIndex" : "1",
-    "firstVoteRowIndex" : "1",
-    "idColumnIndex" : "1",
-    "precinctColumnIndex" : "1",
+    "filePath": "CVRArchive_18_9_0_6298/",
+    "firstVoteColumnIndex": "",
+    "firstVoteRowIndex": "",
+    "idColumnIndex": "",
+    "precinctColumnIndex": "",
     "provider": "Hart"
   } ],
 
