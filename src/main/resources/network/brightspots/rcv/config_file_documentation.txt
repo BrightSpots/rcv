@@ -71,22 +71,22 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         example: /Users/test_data/2015-portland-mayor-cvr.xlsx
         value: string of length [1..1000]
 
-      "firstVoteColumnIndex" required unless source is CDF
+      "firstVoteColumnIndex" required and used if and only if provider is ES&S
         index of the column (starting from 1) that contains the top-ranked candidate for each CVR
         example: 3
         value: [1..1000]
 
-      "firstVoteRowIndex" required unless source is CDF
+      "firstVoteRowIndex" required and used if and only if provider is ES&S
         index of the row (starting from 1) that contains the rankings for the first CVR
         example: 2
         value: [1..100000]
 
-      "idColumnIndex" optional
+      "idColumnIndex" optional and used if and only if provider is ES&S
         index of the column (starting from 1) that contains the unique ID for each CVR
         example: 1
         value: [1..1000]
 
-      "precinctColumnIndex" required when "tabulateByPrecinct" is enabled
+      "precinctColumnIndex" required and used if and only if "tabulateByPrecinct" is enabled and provider is ES&S
         index of the column (starting from 1) that contains the precinct name for each CVR
         example: 2
         value: [1..1000]
