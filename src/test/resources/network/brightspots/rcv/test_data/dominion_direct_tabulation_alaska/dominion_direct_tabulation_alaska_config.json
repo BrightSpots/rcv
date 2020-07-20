@@ -12,7 +12,7 @@
   },
   "cvrFileSources" : [ {
     "filePath" : "alaska_input_data",
-    "provider" : "DOMINION"
+    "provider" : "Dominion"
   } ],
   "candidates" : [ {
     "name" : "Joseph R. Biden",

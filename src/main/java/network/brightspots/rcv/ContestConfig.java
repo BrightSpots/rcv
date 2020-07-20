@@ -893,7 +893,7 @@ class ContestConfig {
 
   enum Provider {
     CDF("CDF"),
-    DOMINION("DOMINION"),
+    DOMINION("Dominion"),
     ESS("ES&S"),
     HART("Hart"),
     PROVIDER_UNKNOWN("Provider unknown");
