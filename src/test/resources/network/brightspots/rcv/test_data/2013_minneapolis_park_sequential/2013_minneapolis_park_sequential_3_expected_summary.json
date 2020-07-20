@@ -17,10 +17,10 @@
       "MEG FORNEY" : "10994",
       "STEVE BARLAND" : "4546",
       "TOM NORDYKE" : "11939",
-      "UWI" : "381"
+      "Undeclared Write-ins" : "381"
     },
     "tallyResults" : [ {
-      "eliminated" : "UWI",
+      "eliminated" : "Undeclared Write-ins",
       "transfers" : {
         "CASPER HILL" : "5",
         "HASHIM YONIS" : "7",

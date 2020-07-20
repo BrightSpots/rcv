@@ -236,6 +236,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Dominion direct tabulation test - Alaska test data")
+  void testDominionDirectTabulationAlaska() {
+    runTabulationTest("dominion_direct_tabulation_alaska");
+  }
+
+  @Test
   @DisplayName("test invalid params in config file")
   void invalidParamsTest() {
     String configPath = getTestFilePath("invalid_params_test", "_config.json");

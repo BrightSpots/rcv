@@ -269,19 +269,24 @@ class TabulatorSession {
     // At each iteration of the following loop, we add records from another source file.
     for (RawContestConfig.CvrSource source : config.rawConfig.cvrFileSources) {
       String cvrPath = config.resolveConfigPath(source.getFilePath());
+      Provider provider = ContestConfig.getProvider(source);
       try {
         if (ContestConfig.isCdf(source)) {
           Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
           CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, config);
           reader.parseCvrFile(castVoteRecords);
           continue;
-        } else if (ContestConfig.getProvider(source) == Provider.ESS) {
+        } else if (provider == Provider.DOMINION) {
+          Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
+          new DominionCvrReader(cvrPath).readCastVoteRecords(castVoteRecords);
+          continue;
+        } else if (provider == Provider.ESS) {
           Logger.log(Level.INFO, "Reading ES&S cast vote record file: %s...", cvrPath);
           new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
           continue;
-        } else if (ContestConfig.getProvider(source) == Provider.HART) {
-          HartCvrReader reader = new HartCvrReader(cvrPath, config);
+        } else if (provider == Provider.HART) {
           Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
+          HartCvrReader reader = new HartCvrReader(cvrPath, config);
           reader.readCastVoteRecordsFromFolder(castVoteRecords);
           continue;
         }

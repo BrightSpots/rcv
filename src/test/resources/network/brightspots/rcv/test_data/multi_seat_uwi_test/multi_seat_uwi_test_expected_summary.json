@@ -12,7 +12,7 @@
       "A" : "6",
       "B" : "3",
       "C" : "2",
-      "UWI" : "4"
+      "Undeclared Write-ins" : "4"
     },
     "tallyResults" : [ {
       "elected" : "A",
@@ -24,10 +24,10 @@
       "A" : "6.0000",
       "B" : "3",
       "C" : "2",
-      "UWI" : "4"
+      "Undeclared Write-ins" : "4"
     },
     "tallyResults" : [ {
-      "eliminated" : "UWI",
+      "eliminated" : "Undeclared Write-ins",
       "transfers" : {
         "exhausted" : "4"
       }

@@ -158,7 +158,6 @@ class DominionCvrReader {
 
   // parse the given file into a List of CastVoteRecords for tabulation
   private void parseCvrFile(String filePath, List<CastVoteRecord> castVoteRecords) {
-
     // build a lookup map for candidates codes to optimize Cvr parsing
     Map<String, Set<String>> contestIdToCandidateCodes = new HashMap<>();
     for (Candidate candidate : this.candidates) {

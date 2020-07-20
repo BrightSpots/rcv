@@ -81,6 +81,8 @@ class ContestConfig {
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
 
+  static final String UNDECLARED_WRITE_INS = "Undeclared Write-ins";
+
   static boolean isCdf(CvrSource source) {
     return getProvider(source) == Provider.CDF
         && source.getFilePath() != null
@@ -498,12 +500,16 @@ class ContestConfig {
           }
         }
 
-        if (isNullOrBlank(getContestId()) && getProvider(source) == Provider.HART) {
+        Provider provider = getProvider(source);
+
+        if (isNullOrBlank(getContestId()) &&
+            (provider == Provider.DOMINION || provider == Provider.HART)) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
-              "contestId is required for Hart files.");
-        } else if (!isNullOrBlank(getContestId()) && getProvider(source) != Provider.HART) {
+              "contestId is required for Dominion and Hart files.");
+        } else if (!isNullOrBlank(getContestId()) &&
+            !(provider == Provider.DOMINION || provider == Provider.HART)) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
@@ -887,6 +893,7 @@ class ContestConfig {
 
   enum Provider {
     CDF("CDF"),
+    DOMINION("DOMINION"),
     ESS("ES&S"),
     HART("Hart"),
     PROVIDER_UNKNOWN("Provider unknown");
@@ -1065,7 +1072,7 @@ class ContestConfig {
 
     String uwiLabel = getUndeclaredWriteInLabel();
     if (!isNullOrBlank(uwiLabel)) {
-      candidateCodeToNameMap.put(uwiLabel, uwiLabel);
+      candidateCodeToNameMap.put(uwiLabel, UNDECLARED_WRITE_INS);
     }
   }
 }
