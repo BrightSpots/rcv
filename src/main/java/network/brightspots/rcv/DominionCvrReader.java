@@ -121,7 +121,9 @@ class DominionCvrReader {
   }
 
   // parse Cvr json into CastVoteRecord objects and add them to the input list
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
+  // (If contestId is specified, we'll only load CVRs for that contest.)
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
+      throws CvrParseException {
     // read metadata files for precincts, precinct portions, contest, and candidates
     Path precinctPath = Paths.get(manifestFolder, PRECINCT_MANIFEST);
     this.precincts = getPrecinctData(precinctPath.toString());
@@ -149,7 +151,7 @@ class DominionCvrReader {
     }
     // parse the cvr
     Path cvrPath = Paths.get(manifestFolder, CVR_EXPORT);
-    parseCvrFile(cvrPath.toString(), castVoteRecords);
+    parseCvrFile(cvrPath.toString(), castVoteRecords, contestId);
     if (castVoteRecords.isEmpty()) {
       Logger.log(Level.SEVERE, "No cast vote record data found!");
       throw new CvrParseException();
@@ -157,7 +159,8 @@ class DominionCvrReader {
   }
 
   // parse the given file into a List of CastVoteRecords for tabulation
-  private void parseCvrFile(String filePath, List<CastVoteRecord> castVoteRecords) {
+  private void parseCvrFile(String filePath, List<CastVoteRecord> castVoteRecords,
+      String contestIdToLoad) {
     // build a lookup map for candidates codes to optimize Cvr parsing
     Map<String, Set<String>> contestIdToCandidateCodes = new HashMap<>();
     for (Candidate candidate : this.candidates) {
@@ -233,6 +236,10 @@ class DominionCvrReader {
         for (Object contestObject : contests) {
           HashMap contest = (HashMap) contestObject;
           String contestId = contest.get("Id").toString();
+          // skip this CVR if it's not for the contest we're interested in
+          if (contestIdToLoad != null && !contestId.equals(contestIdToLoad)) {
+            continue;
+          }
           // validate contest id
           if (!this.contests.containsKey(contestId)
               || !contestIdToCandidateCodes.containsKey(contestId)) {

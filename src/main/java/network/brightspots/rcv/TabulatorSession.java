@@ -78,7 +78,7 @@ class TabulatorSession {
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     List<String> filesWritten;
     try {
-      dominionCvrReader.readCastVoteRecords(castVoteRecords);
+      dominionCvrReader.readCastVoteRecords(castVoteRecords, null);
       ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
       filesWritten = writer
           .writeGenericCvrCsv(castVoteRecords, dominionCvrReader.getContests().values(),
@@ -283,7 +283,7 @@ class TabulatorSession {
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
           DominionCvrReader reader = new DominionCvrReader(cvrPath);
-          reader.readCastVoteRecords(castVoteRecords);
+          reader.readCastVoteRecords(castVoteRecords, config.getContestId());
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
             ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
