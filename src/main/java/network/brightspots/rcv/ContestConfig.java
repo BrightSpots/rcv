@@ -507,9 +507,16 @@ class ContestConfig {
           isValid = false;
           Logger.log(
               Level.SEVERE,
-              "contestId is required for Dominion and Hart files.");
-        } else if (!isNullOrBlank(getContestId()) &&
-            !(provider == Provider.DOMINION || provider == Provider.HART)) {
+              String.format("contestId must be defined for CVR source with provider \"%s\"!",
+                  getProvider(source).toString()));
+        } else if (
+            !(provider == Provider.DOMINION || provider == Provider.HART) &&
+                fieldIsDefinedButShouldNotBeForProvider(
+                    getContestId(),
+                    "contestId",
+                    provider,
+                    source.getFilePath())
+        ) {
           isValid = false;
           Logger.log(
               Level.SEVERE,

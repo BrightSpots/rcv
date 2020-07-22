@@ -496,13 +496,18 @@ class ResultsWriter {
 
   // write CastVoteRecords for all contests to the provided folder
   // returns a list of files written
-  List<String> writeGenericCvrCsv(List<CastVoteRecord> castVoteRecords,
+  List<String> writeGenericCvrCsv(
+      List<CastVoteRecord> castVoteRecords,
       Collection<Contest> contests,
-      String csvOutputFolder)
-      throws IOException {
+      String csvOutputFolder,
+      String contestId
+  ) throws IOException {
     List<String> filesWritten = new ArrayList<>();
     try {
       for (Contest contest : contests) {
+        if (!isNullOrBlank(contestId) && !contest.getId().equals(contestId)) {
+          continue;
+        }
         Path outputPath = Paths.get(
             getOutputFilePath(csvOutputFolder, "dominion_conversion_contest", timestampString,
                 contest.getId()) + ".csv");

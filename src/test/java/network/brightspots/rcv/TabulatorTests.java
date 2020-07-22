@@ -34,8 +34,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.logging.Level;
+import network.brightspots.rcv.ContestConfig.Provider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -114,14 +114,14 @@ class TabulatorTests {
         .toString();
   }
 
-  // helper function test Dominion CVR conversion routine
+  // helper function to test Dominion CVR conversion routine
   private static void runDominionCvrConversionTest(String stem) {
     String dominionDataFolder = Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem)
         .toAbsolutePath().toString();
     TabulatorSession session = new TabulatorSession(null);
-    List<String> filesWritten = session.convertDominionCvrJsonToGenericCsv(dominionDataFolder);
+    session.convertDominionCvrJsonToGenericCsv(dominionDataFolder);
 
-    for (String convertedFile : filesWritten) {
+    for (String convertedFile : session.getConvertedFilesWritten()) {
       String contestNumber = convertedFile
           .substring(convertedFile.lastIndexOf('_') + 1, convertedFile.lastIndexOf('.'));
       String expectedPath = Paths
@@ -153,6 +153,15 @@ class TabulatorTests {
       }
     } else {
       compareJsons(config, stem, timestampString, null);
+    }
+
+    // If this is a Dominion tabulation test, also check the converted output file.
+    boolean isDominion = config.rawConfig.cvrFileSources.stream().anyMatch(source ->
+        ContestConfig.getProvider(source) == Provider.DOMINION);
+    if (isDominion) {
+      String expectedPath = getTestFilePath(stem,
+          "_contest_" + config.getContestId() + "_expected.csv");
+      assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
     }
 
     // test passed so cleanup test output folder
