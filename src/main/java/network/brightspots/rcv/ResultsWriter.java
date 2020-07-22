@@ -494,15 +494,22 @@ class ResultsWriter {
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
-  // write CastVoteRecords for all contests to the provided folder
+  // write CastVoteRecords for all contests (or the one specified) to the provided folder
   // returns a list of files written
-  List<String> writeGenericCvrCsv(List<CastVoteRecord> castVoteRecords,
+  List<String> writeGenericCvrCsv(
+      List<CastVoteRecord> castVoteRecords,
       Collection<Contest> contests,
-      String csvOutputFolder)
-      throws IOException {
+      String csvOutputFolder,
+      String contestId
+  ) throws IOException {
     List<String> filesWritten = new ArrayList<>();
     try {
       for (Contest contest : contests) {
+        if (!isNullOrBlank(contestId) && !contest.getId().equals(contestId)) {
+          // We already skipped loading CVRs for the other contests. This just ensures that we
+          // don't generate empty CSVs for them.
+          continue;
+        }
         Path outputPath = Paths.get(
             getOutputFilePath(csvOutputFolder, "dominion_conversion_contest", timestampString,
                 contest.getId()) + ".csv");

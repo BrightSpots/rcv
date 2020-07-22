@@ -44,10 +44,10 @@
       "STEPHANIE WOODRUFF" : "13156",
       "TONY LANE" : "2847",
       "TROY BENJEGERDES" : "1937",
-      "UWI" : "1521"
+      "Undeclared Write-ins" : "1521"
     },
     "tallyResults" : [ {
-      "eliminated" : "UWI",
+      "eliminated" : "Undeclared Write-ins",
       "transfers" : {
         "ABDUL M RAHAMAN THE ROCK" : "13",
         "ALICIA K. BENNETT" : "13",

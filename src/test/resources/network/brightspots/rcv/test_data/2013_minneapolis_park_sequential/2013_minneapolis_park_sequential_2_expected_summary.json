@@ -18,10 +18,10 @@
       "MEG FORNEY" : "8827",
       "STEVE BARLAND" : "4104",
       "TOM NORDYKE" : "10594",
-      "UWI" : "356"
+      "Undeclared Write-ins" : "356"
     },
     "tallyResults" : [ {
-      "eliminated" : "UWI",
+      "eliminated" : "Undeclared Write-ins",
       "transfers" : {
         "ANNIE YOUNG" : "9",
         "CASPER HILL" : "4",

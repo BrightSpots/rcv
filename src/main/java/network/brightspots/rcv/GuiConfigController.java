@@ -416,33 +416,32 @@ public class GuiConfigController implements Initializable {
   public void buttonCvrFilePathClicked() {
     File openFile = null;
 
-    switch (getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN)) {
-      case "CDF": {
+    String providerName = getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN);
+    switch (providerName) {
+      case "CDF" -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
         fc.setTitle("Select CDF Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
-        break;
       }
-      case "ES&S": {
+      case "Dominion", "Hart" -> {
+        DirectoryChooser dc = new DirectoryChooser();
+        dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+        dc.setTitle("Select " + providerName + " Cast Vote Record Folder");
+        openFile = dc.showDialog(GuiContext.getInstance().getMainWindow());
+      }
+      case "ES&S" -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters()
             .add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
         fc.setTitle("Select ES&S Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
-        break;
       }
-      case "Hart": {
-        DirectoryChooser dc = new DirectoryChooser();
-        dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-        dc.setTitle("Select Hart Cast Vote Record Folder");
-        openFile = dc.showDialog(GuiContext.getInstance().getMainWindow());
-        break;
-      }
-      default:
+      default -> {
         // Do nothing for unhandled providers
+      }
     }
 
     if (openFile != null) {
@@ -805,7 +804,7 @@ public class GuiConfigController implements Initializable {
         textFieldCvrFirstVoteRow.setDisable(false);
         textFieldCvrIdCol.setDisable(false);
         textFieldCvrPrecinctCol.setDisable(false);
-      } else if (provider.equals("CDF") || provider.equals("Hart")) {
+      } else if (provider.equals("CDF") || provider.equals("Dominion") || provider.equals("Hart")) {
         buttonAddCvrFile.setDisable(false);
         textFieldCvrFilePath.setDisable(false);
         buttonCvrFilePath.setDisable(false);
