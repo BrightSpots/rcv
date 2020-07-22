@@ -517,10 +517,8 @@ class ContestConfig {
                     provider,
                     source.getFilePath())
         ) {
+          // helper will log error
           isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "contestId may not be used with this type of CVR file.");
         }
       }
     }
