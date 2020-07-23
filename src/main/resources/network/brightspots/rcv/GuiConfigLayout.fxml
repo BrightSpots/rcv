@@ -78,8 +78,6 @@
             <VBox spacing="8.0">
               <Label text="Contest Name *"/>
               <TextField fx:id="textFieldContestName" maxWidth="220.0" promptText="Contest Name *"/>
-              <Label text="Contest ID"/>
-              <TextField fx:id="textFieldContestId" maxWidth="220.0" promptText="Contest ID"/>
               <Label text="Output Directory"/>
               <HBox alignment="CENTER_LEFT" spacing="8.0">
                 <TextField fx:id="textFieldOutputDirectory" prefWidth="400.0"
@@ -129,10 +127,12 @@
                       text="Delete Selected"/>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <TextField prefHeight="25.0" prefWidth="396.0" promptText="File Path *"
+                    <TextField prefHeight="25.0" prefWidth="300.0" promptText="File Path *"
                       fx:id="textFieldCvrFilePath"/>
                     <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
                       text="Select" fx:id="buttonCvrFilePath"/>
+                    <TextField prefHeight="25.0" maxWidth="160.0" promptText="Contest ID"
+                      fx:id="textFieldCvrContestId"/>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
                     <TextField prefHeight="25.0" prefWidth="160.0" promptText="First Vote Col Index"
@@ -159,18 +159,20 @@
                 <columns>
                   <TableColumn fx:id="tableColumnCvrFilePath" minWidth="20.0"
                     onEditCommit="#changeCvrFilePath" prefWidth="190.0" text="File Path"/>
-                  <TableColumn fx:id="tableColumnCvrFirstVoteCol" minWidth="20.0"
+                  <TableColumn fx:id="tableColumnCvrFirstVoteCol" minWidth="20.0" prefWidth="60.0"
                     onEditCommit="#changeCvrFirstVoteCol" text="First Vote&#10;Column&#10;Index"/>
-                  <TableColumn fx:id="tableColumnCvrFirstVoteRow" minWidth="20.0"
+                  <TableColumn fx:id="tableColumnCvrFirstVoteRow" minWidth="20.0" prefWidth="60.0"
                     onEditCommit="#changeCvrFirstVoteRow" text="First Vote&#10;Row&#10;Index"/>
                   <TableColumn fx:id="tableColumnCvrIdCol" minWidth="20.0"
-                    onEditCommit="#changeCvrIdColIndex" prefWidth="70.0"
+                    onEditCommit="#changeCvrIdColIndex" prefWidth="60.0"
                     text="ID&#10;Column&#10;Index"/>
                   <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0"
-                    onEditCommit="#changeCvrPrecinctColIndex" prefWidth="70.0"
+                    onEditCommit="#changeCvrPrecinctColIndex" prefWidth="60.0"
                     text="Precinct&#10;Column&#10;Index"/>
                   <TableColumn fx:id="tableColumnCvrProvider" minWidth="20.0"
-                    onEditCommit="#changeCvrProvider" prefWidth="110.0" text="Provider"/>
+                    onEditCommit="#changeCvrProvider" prefWidth="80.0" text="Provider"/>
+                  <TableColumn fx:id="tableColumnCvrContestId" minWidth="20.0"
+                    onEditCommit="#changeCvrContestId" prefWidth="80.0" text="Contest ID"/>
                 </columns>
               </TableView>
               <padding>
