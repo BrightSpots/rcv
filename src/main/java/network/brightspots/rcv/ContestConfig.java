@@ -237,6 +237,25 @@ class ContestConfig {
           sourceValid = false;
         }
       }
+
+      if (isNullOrBlank(source.getContestId()) &&
+          (provider == Provider.DOMINION || provider == Provider.HART)) {
+        sourceValid = false;
+        Logger.log(
+            Level.SEVERE,
+            String.format("contestId must be defined for CVR source with provider \"%s\"!",
+                getProvider(source).toString()));
+      } else if (
+          !(provider == Provider.DOMINION || provider == Provider.HART) &&
+              fieldIsDefinedButShouldNotBeForProvider(
+                  source.getContestId(),
+                  "contestId",
+                  provider,
+                  source.getFilePath())
+      ) {
+        // helper will log error
+        sourceValid = false;
+      }
     }
     return sourceValid;
   }
@@ -498,27 +517,6 @@ class ContestConfig {
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
                 cvrPath);
           }
-        }
-
-        Provider provider = getProvider(source);
-
-        if (isNullOrBlank(getContestId()) &&
-            (provider == Provider.DOMINION || provider == Provider.HART)) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              String.format("contestId must be defined for CVR source with provider \"%s\"!",
-                  getProvider(source).toString()));
-        } else if (
-            !(provider == Provider.DOMINION || provider == Provider.HART) &&
-                fieldIsDefinedButShouldNotBeForProvider(
-                    getContestId(),
-                    "contestId",
-                    provider,
-                    source.getFilePath())
-        ) {
-          // helper will log error
-          isValid = false;
         }
       }
     }
@@ -853,10 +851,6 @@ class ContestConfig {
 
   String getContestName() {
     return rawConfig.outputSettings.contestName;
-  }
-
-  String getContestId() {
-    return rawConfig.outputSettings.contestId;
   }
 
   String getContestJurisdiction() {

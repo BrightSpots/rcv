@@ -31,10 +31,12 @@ import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 class HartCvrReader {
 
   private final String cvrPath;
+  private final String contestId;
   private final ContestConfig contestConfig;
 
-  HartCvrReader(String cvrPath, ContestConfig contestConfig) {
+  HartCvrReader(String cvrPath, String contestId, ContestConfig contestConfig) {
     this.cvrPath = cvrPath;
+    this.contestId = contestId;
     this.contestConfig = contestConfig;
   }
 
@@ -68,7 +70,7 @@ class HartCvrReader {
       HartCvrXml xmlCvr = xmlMapper.readValue(inputStream, HartCvrXml.class);
 
       for (Contest contest : xmlCvr.Contests) {
-        if (!contest.Id.equals(contestConfig.getContestId())) {
+        if (!contest.Id.equals(this.contestId)) {
           continue;
         }
 

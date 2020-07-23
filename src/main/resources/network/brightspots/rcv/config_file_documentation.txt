@@ -17,11 +17,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         example: "Portland Mayoral Race 2017"
         value: text string of length [1..1000]
 
-      "contestId" required when CVR source files are from Dominion or Hart; must be blank otherwise
-        the ID of the contest to tabulate, as represented in the CVR file(s)
-        example: "b651b997-417a-46d9-a676-a43d4df94ddc"
-        value: text string of length [1..1000]
-
       "outputDirectory" optional
         directory for output files
         if a relative path is supplied it will be appended to the current working directory
@@ -70,6 +65,11 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         if this is a ".json" file (and the provider is "CDF") the CVR file will be read as NIST Common Data Format (CDF)
         example: /Users/test_data/2015-portland-mayor-cvr.xlsx
         value: string of length [1..1000]
+
+      "contestId" required when CVR source files are from Dominion or Hart; must be blank otherwise
+        the ID of the contest to tabulate, as represented in the CVR file(s)
+        example: "b651b997-417a-46d9-a676-a43d4df94ddc"
+        value: text string of length [1..1000]
 
       "firstVoteColumnIndex" required and used if and only if provider is ES&S
         index of the column (starting from 1) that contains the top-ranked candidate for each CVR
