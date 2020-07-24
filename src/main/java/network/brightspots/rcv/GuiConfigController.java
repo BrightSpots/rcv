@@ -95,8 +95,6 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldContestName;
   @FXML
-  private TextField textFieldContestId;
-  @FXML
   private TextField textFieldOutputDirectory;
   @FXML
   private DatePicker datePickerContestDate;
@@ -123,11 +121,15 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrProvider;
   @FXML
+  private TableColumn<CvrSource, String> tableColumnCvrContestId;
+  @FXML
   private ChoiceBox<Provider> choiceCvrProvider;
   @FXML
   private Button buttonAddCvrFile;
   @FXML
   private TextField textFieldCvrFilePath;
+  @FXML
+  private TextField textFieldCvrContestId;
   @FXML
   private Button buttonCvrFilePath;
   @FXML
@@ -458,7 +460,8 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCvrFirstVoteRow),
             getTextOrEmptyString(textFieldCvrIdCol),
             getTextOrEmptyString(textFieldCvrPrecinctCol),
-            getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN));
+            getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN),
+            getTextOrEmptyString(textFieldCvrContestId));
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
       choiceCvrProvider.setValue(null);
@@ -479,6 +482,8 @@ public class GuiConfigController implements Initializable {
     textFieldCvrIdCol.setDisable(true);
     textFieldCvrPrecinctCol.clear();
     textFieldCvrPrecinctCol.setDisable(true);
+    textFieldCvrContestId.clear();
+    textFieldCvrContestId.setDisable(true);
   }
 
   /**
@@ -532,7 +537,9 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.refresh();
   }
 
-  /** Action when CVR precinct col index is changed. */
+  /**
+   * Action when CVR precinct col index is changed.
+   */
   public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
     tableViewCvrFiles
         .getSelectionModel()
@@ -541,7 +548,9 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.refresh();
   }
 
-  /** Action when CVR provider is changed. */
+  /**
+   * Action when CVR provider is changed.
+   */
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
     tableViewCvrFiles
         .getSelectionModel()
@@ -550,7 +559,20 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.refresh();
   }
 
-  /** Action when add candidate button is clicked. */
+  /**
+   * Action when CVR contest ID is changed.
+   */
+  public void changeCvrContestId(CellEditEvent cellEditEvent) {
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
+        .setContestId(cellEditEvent.getNewValue().toString().trim());
+    tableViewCvrFiles.refresh();
+  }
+
+  /**
+   * Action when add candidate button is clicked.
+   */
   public void buttonAddCandidateClicked() {
     Candidate candidate =
         new Candidate(
@@ -618,7 +640,6 @@ public class GuiConfigController implements Initializable {
 
   private void clearConfig() {
     textFieldContestName.clear();
-    textFieldContestId.clear();
     textFieldOutputDirectory.clear();
     datePickerContestDate.setValue(null);
     textFieldContestJurisdiction.clear();
@@ -796,18 +817,27 @@ public class GuiConfigController implements Initializable {
     choiceCvrProvider.setOnAction(event -> {
       clearAndDisableCvrFilesTabFields();
       String provider = getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN);
-      if (provider.equals("ES&S")) {
-        buttonAddCvrFile.setDisable(false);
-        textFieldCvrFilePath.setDisable(false);
-        buttonCvrFilePath.setDisable(false);
-        textFieldCvrFirstVoteCol.setDisable(false);
-        textFieldCvrFirstVoteRow.setDisable(false);
-        textFieldCvrIdCol.setDisable(false);
-        textFieldCvrPrecinctCol.setDisable(false);
-      } else if (provider.equals("CDF") || provider.equals("Dominion") || provider.equals("Hart")) {
-        buttonAddCvrFile.setDisable(false);
-        textFieldCvrFilePath.setDisable(false);
-        buttonCvrFilePath.setDisable(false);
+      switch (provider) {
+        case "ES&S" -> {
+          buttonAddCvrFile.setDisable(false);
+          textFieldCvrFilePath.setDisable(false);
+          buttonCvrFilePath.setDisable(false);
+          textFieldCvrFirstVoteCol.setDisable(false);
+          textFieldCvrFirstVoteRow.setDisable(false);
+          textFieldCvrIdCol.setDisable(false);
+          textFieldCvrPrecinctCol.setDisable(false);
+        }
+        case "CDF" -> {
+          buttonAddCvrFile.setDisable(false);
+          textFieldCvrFilePath.setDisable(false);
+          buttonCvrFilePath.setDisable(false);
+        }
+        case "Dominion", "Hart" -> {
+          buttonAddCvrFile.setDisable(false);
+          textFieldCvrFilePath.setDisable(false);
+          buttonCvrFilePath.setDisable(false);
+          textFieldCvrContestId.setDisable(false);
+        }
       }
     });
     clearAndDisableCvrFilesTabFields();
@@ -825,6 +855,8 @@ public class GuiConfigController implements Initializable {
     tableColumnCvrPrecinctCol.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
     tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCvrContestId.setCellValueFactory(new PropertyValueFactory<>("contestId"));
+    tableColumnCvrContestId.setCellFactory(TextFieldTableCell.forTableColumn());
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCvrFiles.setEditable(true);
 
@@ -887,7 +919,6 @@ public class GuiConfigController implements Initializable {
     migrateConfigVersion(config);
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
-    textFieldContestId.setText(outputSettings.contestId);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
     if (!isNullOrBlank(outputSettings.contestDate)) {
       try {
@@ -945,7 +976,6 @@ public class GuiConfigController implements Initializable {
     config.tabulatorVersion = Main.APP_VERSION;
     OutputSettings outputSettings = new OutputSettings();
     outputSettings.contestName = getTextOrEmptyString(textFieldContestName);
-    outputSettings.contestId = getTextOrEmptyString(textFieldContestId);
     outputSettings.outputDirectory = getTextOrEmptyString(textFieldOutputDirectory);
     outputSettings.contestDate =
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
@@ -963,6 +993,7 @@ public class GuiConfigController implements Initializable {
       source.setPrecinctColumnIndex(
           source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex().trim() : "");
       source.setProvider(source.getProvider() != null ? source.getProvider().trim() : "");
+      source.setContestId(source.getContestId() != null ? source.getContestId().trim() : "");
     }
     config.cvrFileSources = cvrSources;
 

@@ -2,7 +2,6 @@
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
     "contestName" : "TRAVIS COUNTY OFFICERS",
-    "contestId" : "e9ca8235-893e-43df-93eb-3cc61eeb133c",
     "outputDirectory" : "output",
     "contestDate" : "",
     "contestJurisdiction" : "",
@@ -16,7 +15,8 @@
     "firstVoteRowIndex": "",
     "idColumnIndex": "",
     "precinctColumnIndex": "",
-    "provider": "Hart"
+    "provider": "Hart",
+    "contestId": "e9ca8235-893e-43df-93eb-3cc61eeb133c"
   } ],
   "candidates" : [
     {
