@@ -280,6 +280,11 @@ class TabulatorSession {
           Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
           new CommonDataFormatReader(cvrPath, config).parseCvrFile(castVoteRecords);
           continue;
+        } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
+          ClearBallotCvrReader reader = new ClearBallotCvrReader(cvrPath, config);
+          Logger.log(Level.INFO, "Reading Clear Ballot cast vote records from folder: %s...", cvrPath);
+          reader.readCastVoteRecords(castVoteRecords);
+          continue;
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
           DominionCvrReader reader = new DominionCvrReader(cvrPath);

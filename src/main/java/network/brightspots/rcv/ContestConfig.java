@@ -503,14 +503,14 @@ class ContestConfig {
         Provider provider = getProvider(source);
 
         if (isNullOrBlank(getContestId()) &&
-            (provider == Provider.DOMINION || provider == Provider.HART)) {
+            (provider == Provider.DOMINION || provider == Provider.HART || provider == Provider.CLEAR_BALLOT)) {
           isValid = false;
           Logger.log(
               Level.SEVERE,
               String.format("contestId must be defined for CVR source with provider \"%s\"!",
                   getProvider(source).toString()));
         } else if (
-            !(provider == Provider.DOMINION || provider == Provider.HART) &&
+            !(provider == Provider.DOMINION || provider == Provider.HART || provider == Provider.CLEAR_BALLOT) &&
                 fieldIsDefinedButShouldNotBeForProvider(
                     getContestId(),
                     "contestId",
@@ -898,6 +898,7 @@ class ContestConfig {
 
   enum Provider {
     CDF("CDF"),
+    CLEAR_BALLOT("Clear Ballot"),
     DOMINION("Dominion"),
     ESS("ES&S"),
     HART("Hart"),

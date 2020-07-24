@@ -215,6 +215,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Clear Ballot - Kansas Primary")
+  void testClearBallotKansasPrimary() {
+    runTabulationTest("clear_ballot_kansas_primary");
+  }
+
+  @Test
   @DisplayName("Hart - Travis County Officers")
   void testHartTravisCountyOfficers() {
     runTabulationTest("hart_travis_county_officers");
