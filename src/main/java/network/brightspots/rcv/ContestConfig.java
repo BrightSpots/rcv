@@ -61,6 +61,7 @@ class ContestConfig {
   static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final WinnerElectionMode SUGGESTED_WINNER_ELECTION_MODE = WinnerElectionMode.STANDARD;
+  static final String UNDECLARED_WRITE_INS = "Undeclared Write-ins";
   private static final int MIN_COLUMN_INDEX = 1;
   private static final int MAX_COLUMN_INDEX = 1000;
   private static final int MIN_ROW_INDEX = 1;
@@ -80,15 +81,6 @@ class ContestConfig {
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
-
-  static final String UNDECLARED_WRITE_INS = "Undeclared Write-ins";
-
-  static boolean isCdf(CvrSource source) {
-    return getProvider(source) == Provider.CDF
-        && source.getFilePath() != null
-        && source.getFilePath().toLowerCase().endsWith(JSON_EXTENSION);
-  }
-
   // underlying rawConfig object data
   final RawContestConfig rawConfig;
   // this is used if we have a permutation-based tie-break mode
@@ -102,10 +94,15 @@ class ContestConfig {
   private Map<String, String> candidateCodeToNameMap;
   // whether or not there are any validation errors
   private boolean isValid;
-
   private ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     this.rawConfig = rawConfig;
     this.sourceDirectory = sourceDirectory;
+  }
+
+  static boolean isCdf(CvrSource source) {
+    return getProvider(source) == Provider.CDF
+        && source.getFilePath() != null
+        && source.getFilePath().toLowerCase().endsWith(JSON_EXTENSION);
   }
 
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
@@ -236,6 +233,27 @@ class ContestConfig {
             source.getFilePath())) {
           sourceValid = false;
         }
+      }
+
+      if (isNullOrBlank(source.getContestId()) &&
+          (provider == Provider.DOMINION || provider == Provider.HART
+              || provider == Provider.CLEAR_BALLOT)) {
+        sourceValid = false;
+        Logger.log(
+            Level.SEVERE,
+            String.format("contestId must be defined for CVR source with provider \"%s\"!",
+                getProvider(source).toString()));
+      } else if (
+          !(provider == Provider.DOMINION || provider == Provider.HART
+              || provider == Provider.CLEAR_BALLOT) &&
+              fieldIsDefinedButShouldNotBeForProvider(
+                  source.getContestId(),
+                  "contestId",
+                  provider,
+                  source.getFilePath())
+      ) {
+        // helper will log error
+        sourceValid = false;
       }
     }
     return sourceValid;
@@ -498,27 +516,6 @@ class ContestConfig {
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
                 cvrPath);
           }
-        }
-
-        Provider provider = getProvider(source);
-
-        if (isNullOrBlank(getContestId()) &&
-            (provider == Provider.DOMINION || provider == Provider.HART || provider == Provider.CLEAR_BALLOT)) {
-          isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              String.format("contestId must be defined for CVR source with provider \"%s\"!",
-                  getProvider(source).toString()));
-        } else if (
-            !(provider == Provider.DOMINION || provider == Provider.HART || provider == Provider.CLEAR_BALLOT) &&
-                fieldIsDefinedButShouldNotBeForProvider(
-                    getContestId(),
-                    "contestId",
-                    provider,
-                    source.getFilePath())
-        ) {
-          // helper will log error
-          isValid = false;
         }
       }
     }
@@ -855,10 +852,6 @@ class ContestConfig {
     return rawConfig.outputSettings.contestName;
   }
 
-  String getContestId() {
-    return rawConfig.outputSettings.contestId;
-  }
-
   String getContestJurisdiction() {
     return rawConfig.outputSettings.contestJurisdiction;
   }
@@ -894,37 +887,6 @@ class ContestConfig {
       }
     }
     return intValue;
-  }
-
-  enum Provider {
-    CDF("CDF"),
-    CLEAR_BALLOT("Clear Ballot"),
-    DOMINION("Dominion"),
-    ESS("ES&S"),
-    HART("Hart"),
-    PROVIDER_UNKNOWN("Provider unknown");
-
-    private final String label;
-
-    Provider(String label) {
-      this.label = label;
-    }
-
-    static Provider getByLabel(String labelLookup) {
-      return Arrays.stream(Provider.values())
-          .filter(v -> v.label.equals(labelLookup))
-          .findAny()
-          .orElse(null);
-    }
-
-    @Override
-    public String toString() {
-      return label;
-    }
-  }
-
-  static class UnrecognizedProviderException extends Exception {
-
   }
 
   private String getMaxRankingsAllowedRaw() {
@@ -1080,5 +1042,36 @@ class ContestConfig {
     if (!isNullOrBlank(uwiLabel)) {
       candidateCodeToNameMap.put(uwiLabel, UNDECLARED_WRITE_INS);
     }
+  }
+
+  enum Provider {
+    CDF("CDF"),
+    CLEAR_BALLOT("Clear Ballot"),
+    DOMINION("Dominion"),
+    ESS("ES&S"),
+    HART("Hart"),
+    PROVIDER_UNKNOWN("Provider unknown");
+
+    private final String label;
+
+    Provider(String label) {
+      this.label = label;
+    }
+
+    static Provider getByLabel(String labelLookup) {
+      return Arrays.stream(Provider.values())
+          .filter(v -> v.label.equals(labelLookup))
+          .findAny()
+          .orElse(null);
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
+  }
+
+  static class UnrecognizedProviderException extends Exception {
+
   }
 }

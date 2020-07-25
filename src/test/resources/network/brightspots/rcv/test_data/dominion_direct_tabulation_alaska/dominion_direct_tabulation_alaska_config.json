@@ -1,39 +1,46 @@
 {
-  "tabulatorVersion" : "TEST",
-  "outputSettings" : {
-    "contestName" : "Alaska Dominion test",
-    "contestId" : "1",
-    "outputDirectory" : "output",
-    "contestDate" : "2020-07-19",
-    "contestJurisdiction" : "Alaska",
-    "contestOffice" : "Democratic Primary",
-    "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "Alaska Dominion test",
+    "outputDirectory": "output",
+    "contestDate": "2020-07-19",
+    "contestJurisdiction": "Alaska",
+    "contestOffice": "Democratic Primary",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
   },
-  "cvrFileSources" : [ {
-    "filePath" : "alaska_input_data",
-    "provider" : "Dominion"
-  } ],
-  "candidates" : [ {
-    "name" : "Joseph R. Biden",
-    "code" : "1",
-    "excluded" : false
-  }, {
-    "name" : "Tom Steyer",
-    "code" : "3",
-    "excluded" : false
-  }, {
-    "name" : "Bernie Sanders",
-    "code" : "4",
-    "excluded" : false
-  }, {
-    "name" : "Amy Klobuchar",
-    "code" : "5",
-    "excluded" : false
-  }, {
-    "name" : "Tulsi Gabbard",
-    "code" : "7",
-    "excluded" : false
+  "cvrFileSources": [
+    {
+      "filePath": "alaska_input_data",
+      "provider": "Dominion",
+      "contestId": "1"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Joseph R. Biden",
+      "code": "1",
+      "excluded": false
+    },
+    {
+      "name": "Tom Steyer",
+      "code": "3",
+      "excluded": false
+    },
+    {
+      "name": "Bernie Sanders",
+      "code": "4",
+      "excluded": false
+    },
+    {
+      "name": "Amy Klobuchar",
+      "code": "5",
+      "excluded": false
+    },
+    {
+      "name": "Tulsi Gabbard",
+      "code": "7",
+      "excluded": false
   }, {
     "name" : "Elizabeth Warren",
     "code" : "8",

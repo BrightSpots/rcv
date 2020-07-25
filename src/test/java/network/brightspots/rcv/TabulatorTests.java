@@ -148,8 +148,8 @@ class TabulatorTests {
     assertNotNull(config);
 
     if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
-      for (Integer i = 1; i <= config.getNumberOfWinners(); i++) {
-        compareJsons(config, stem, timestampString, i.toString());
+      for (int i = 1; i <= config.getNumberOfWinners(); i++) {
+        compareJsons(config, stem, timestampString, Integer.toString(i));
       }
     } else {
       compareJsons(config, stem, timestampString, null);
@@ -160,7 +160,7 @@ class TabulatorTests {
         ContestConfig.getProvider(source) == Provider.DOMINION);
     if (isDominion) {
       String expectedPath = getTestFilePath(stem,
-          "_contest_" + config.getContestId() + "_expected.csv");
+          "_contest_" + config.rawConfig.cvrFileSources.get(0).getContestId() + "_expected.csv");
       assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
     }
 

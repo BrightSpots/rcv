@@ -46,7 +46,6 @@ public class RawContestConfig {
   public static class OutputSettings {
 
     public String contestName;
-    public String contestId;
     public String outputDirectory;
     public String contestDate;
     public String contestJurisdiction;
@@ -63,6 +62,7 @@ public class RawContestConfig {
   public static class CvrSource {
 
     private String filePath;
+    private String contestId;
     private String firstVoteColumnIndex;
     private String firstVoteRowIndex;
     private String idColumnIndex;
@@ -78,13 +78,15 @@ public class RawContestConfig {
         String firstVoteRowIndex,
         String idColumnIndex,
         String precinctColumnIndex,
-        String provider) {
+        String provider,
+        String contestId) {
       this.filePath = filePath;
       this.firstVoteColumnIndex = firstVoteColumnIndex;
       this.firstVoteRowIndex = firstVoteRowIndex;
       this.idColumnIndex = idColumnIndex;
       this.precinctColumnIndex = precinctColumnIndex;
       this.provider = provider;
+      this.contestId = contestId;
     }
 
     public String getFilePath() {
@@ -93,6 +95,14 @@ public class RawContestConfig {
 
     public void setFilePath(String filePath) {
       this.filePath = filePath;
+    }
+
+    public String getContestId() {
+      return contestId;
+    }
+
+    public void setContestId(String contestId) {
+      this.contestId = contestId;
     }
 
     public String getFirstVoteColumnIndex() {

@@ -41,7 +41,8 @@ class ClearBallotCvrReader {
 
   // parse Cvr json into CastVoteRecord objects and append them to the input castVoteRecords list
   // see Clear Ballot 2.1 RCV Format Specification for details
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
+      throws CvrParseException {
     BufferedReader csvReader;
     try {
       csvReader = new BufferedReader(new FileReader(this.cvrPath));
@@ -65,7 +66,7 @@ class ClearBallotCvrReader {
         String[] choiceFields = choiceColumnHeader.split(":");
         // filter by contest
         String contestName = choiceFields[RcvChoiceHeaderField.CONTEST_NAME.ordinal()];
-        if (!contestName.equals(this.contestConfig.getContestId())) {
+        if (!contestName.equals(contestId)) {
           continue;
         }
         // validate and store the ranking associated with this choice column
@@ -100,7 +101,7 @@ class ClearBallotCvrReader {
           }
         }
         // create the cast vote record
-        CastVoteRecord castVoteRecord = new CastVoteRecord(this.contestConfig.getContestId(),
+        CastVoteRecord castVoteRecord = new CastVoteRecord(contestId,
             cvrData[CvrColumnField.ScanComputerName.ordinal()],
             null,
             cvrData[CvrColumnField.BallotID.ordinal()],

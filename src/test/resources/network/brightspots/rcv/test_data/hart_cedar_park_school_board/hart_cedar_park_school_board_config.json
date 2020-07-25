@@ -2,7 +2,6 @@
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
     "contestName" : "CEDAR PARK SCHOOL BOARD",
-    "contestId" : "b651b997-417a-46d9-a676-a43d4df94ddc",
     "outputDirectory" : "output",
     "contestDate" : "",
     "contestJurisdiction" : "",
@@ -16,7 +15,8 @@
     "firstVoteRowIndex": "",
     "idColumnIndex": "",
     "precinctColumnIndex": "",
-    "provider": "Hart"
+    "provider": "Hart",
+    "contestId": "b651b997-417a-46d9-a676-a43d4df94ddc"
   } ],
 
   "candidates" : [

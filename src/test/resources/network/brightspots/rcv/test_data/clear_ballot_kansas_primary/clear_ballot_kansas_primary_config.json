@@ -16,7 +16,8 @@
     "firstVoteRowIndex" : "",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "Clear Ballot"
+    "provider" : "Clear Ballot",
+    "contestId": "Democratic Primary"
   } ],
   "candidates" : [ {
     "name" : "Michael Bennet",

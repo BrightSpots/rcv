@@ -285,12 +285,12 @@ class TabulatorSession {
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
           Logger
               .log(Level.INFO, "Reading Clear Ballot cast vote records from file: %s...", cvrPath);
-          new ClearBallotCvrReader(cvrPath, config).readCastVoteRecords(castVoteRecords);
+          new ClearBallotCvrReader(cvrPath, config).readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
           DominionCvrReader reader = new DominionCvrReader(cvrPath);
-          reader.readCastVoteRecords(castVoteRecords, config.getContestId());
+          reader.readCastVoteRecords(castVoteRecords, source.getContestId());
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
             ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
@@ -298,7 +298,7 @@ class TabulatorSession {
                 castVoteRecords,
                 reader.getContests().values(),
                 config.getOutputDirectory(),
-                config.getContestId());
+                source.getContestId());
           } catch (IOException e) {
             // error already logged in ResultsWriter
           }
@@ -309,7 +309,8 @@ class TabulatorSession {
           continue;
         } else if (provider == Provider.HART) {
           Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
-          new HartCvrReader(cvrPath, config).readCastVoteRecordsFromFolder(castVoteRecords);
+          new HartCvrReader(cvrPath, source.getContestId(), config)
+              .readCastVoteRecordsFromFolder(castVoteRecords);
           continue;
         }
         throw new UnrecognizedProviderException();
