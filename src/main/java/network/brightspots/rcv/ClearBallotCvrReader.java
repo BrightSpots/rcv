@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javafx.util.Pair;
-
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 
 
@@ -42,11 +41,11 @@ class ClearBallotCvrReader {
 
   // parse Cvr json into CastVoteRecord objects and append them to the input castVoteRecords list
   // see Clear Ballot 2.1 RCV Format Specification for details
-void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
     BufferedReader csvReader;
     try {
       csvReader = new BufferedReader(new FileReader(this.cvrPath));
-      // each "choice column" in the input Csv corresponds to a particular ranking: candidate+rank pair
+      // each "choice column" in the input Csv corresponds to a unique ranking: candidate+rank pair
       // we parse these rankings from the header row into a map for lookup during CVR parsing
       String firstRow = csvReader.readLine();
       if (firstRow == null) {
@@ -55,10 +54,13 @@ void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseEx
       }
       String[] headerData = firstRow.split(",");
       if (headerData.length < CvrColumnField.ChoicesBegin.ordinal()) {
-        Logger.log(Level.SEVERE, "No choice columns found in cast vote record file: %s", this.cvrPath);
+        Logger.log(Level.SEVERE, "No choice columns found in cast vote record file: %s",
+            this.cvrPath);
+        throw new CvrParseException();
       }
       Map<Integer, Pair<Integer, String>> columnIndexToRanking = new HashMap<>();
-      for (int columnIndex = CvrColumnField.ChoicesBegin.ordinal(); columnIndex < headerData.length; columnIndex++) {
+      for (int columnIndex = CvrColumnField.ChoicesBegin.ordinal(); columnIndex < headerData.length;
+          columnIndex++) {
         String choiceColumnHeader = headerData[columnIndex];
         String[] choiceFields = choiceColumnHeader.split(":");
         // filter by contest
@@ -69,10 +71,16 @@ void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseEx
         // validate and store the ranking associated with this choice column
         String choiceName = choiceFields[RcvChoiceHeaderField.CHOICE_NAME.ordinal()];
         if (!this.contestConfig.getCandidateCodeList().contains(choiceName)) {
-          Logger.log(Level.SEVERE, "Candidate: %s from cast vote record not found in config!", choiceName);
+          Logger.log(Level.SEVERE, "Candidate: %s from cast vote record not found in config!",
+              choiceName);
           throw new CvrParseException();
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
+        if (rank > this.contestConfig.getMaxRankingsAllowed()) {
+          Logger.log(Level.SEVERE, "Rank: %d exceeds max rankings allowed in config: %d", rank,
+              this.contestConfig.getMaxRankingsAllowed());
+          throw new CvrParseException();
+        }
         columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
       }
       // read all remaining rows and create CastVoteRecords for each one
@@ -84,7 +92,7 @@ void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseEx
         // parse rankings
         String[] cvrData = row.split(",");
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
-        for (int columnIndex = CvrColumnField.ChoicesBegin.ordinal(); columnIndex < cvrData.length; columnIndex++) {
+        for (int columnIndex : columnIndexToRanking.keySet()) {
           if (Integer.parseInt(cvrData[columnIndex]) == 1) {
             // user marked this column
             Pair<Integer, String> ranking = columnIndexToRanking.get(columnIndex);

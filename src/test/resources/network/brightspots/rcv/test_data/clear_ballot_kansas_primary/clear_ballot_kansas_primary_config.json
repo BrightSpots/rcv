@@ -16,7 +16,7 @@
     "firstVoteRowIndex" : "",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "Clear Vote"
+    "provider" : "Clear Ballot"
   } ],
   "candidates" : [ {
     "name" : "Michael Bennet",
@@ -69,7 +69,7 @@
     "decimalPlacesForVoteArithmetic" : "4",
     "minimumVoteThreshold" : "0",
     "maxSkippedRanksAllowed" : "1",
-    "maxRankingsAllowed" : "3",
+    "maxRankingsAllowed" : "5",
     "nonIntegerWinningThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : true,
