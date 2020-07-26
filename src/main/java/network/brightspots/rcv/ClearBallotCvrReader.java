@@ -64,6 +64,13 @@ class ClearBallotCvrReader {
           columnIndex++) {
         String choiceColumnHeader = headerData[columnIndex];
         String[] choiceFields = choiceColumnHeader.split(":");
+        // validate field count
+        if (choiceFields.length != RcvChoiceHeaderField.FIELD_COUNT.ordinal()) {
+          Logger.log(Level.SEVERE,
+              "Wrong number of choice header fields in cast vote record file: %s",
+              this.cvrPath);
+          throw new CvrParseException();
+        }
         // filter by contest
         String contestName = choiceFields[RcvChoiceHeaderField.CONTEST_NAME.ordinal()];
         if (!contestName.equals(contestId)) {
