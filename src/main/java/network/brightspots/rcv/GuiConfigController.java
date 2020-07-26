@@ -427,6 +427,13 @@ public class GuiConfigController implements Initializable {
         fc.setTitle("Select CDF Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       }
+      case "Clear Ballot" -> {
+        FileChooser fc = new FileChooser();
+        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+        fc.getExtensionFilters().add(new ExtensionFilter("CSV files", "*.csv"));
+        fc.setTitle("Select Clear Ballot Cast Vote Record File");
+        openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+      }
       case "Dominion", "Hart" -> {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -832,7 +839,7 @@ public class GuiConfigController implements Initializable {
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
         }
-        case "Dominion", "Hart" -> {
+        case "Clear Ballot", "Dominion", "Hart" -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
