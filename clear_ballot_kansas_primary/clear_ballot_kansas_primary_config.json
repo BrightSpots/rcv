@@ -2,7 +2,6 @@
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
     "contestName" : "Democratic Primary",
-    "contestId" : "Democratic Primary",
     "outputDirectory" : "output",
     "contestDate" : "",
     "contestJurisdiction" : "Kansas",
