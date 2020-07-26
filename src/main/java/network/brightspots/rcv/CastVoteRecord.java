@@ -72,7 +72,6 @@ class CastVoteRecord {
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
-  // Dominion and Hart use this constructor
   CastVoteRecord(
       String contestId,
       String tabulatorId,
@@ -94,7 +93,6 @@ class CastVoteRecord {
     sortRankings(rankings);
   }
 
-  // CDF and ES&S use this constructor
   CastVoteRecord(
       String computedId,
       String suppliedId,

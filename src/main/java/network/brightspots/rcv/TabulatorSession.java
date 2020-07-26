@@ -104,7 +104,9 @@ class TabulatorSession {
 
   // Visible for testing
   @SuppressWarnings("unused")
-  List<String> getConvertedFilesWritten() { return convertedFilesWritten; }
+  List<String> getConvertedFilesWritten() {
+    return convertedFilesWritten;
+  }
 
   // special mode to just export the CVR as CDF JSON instead of tabulating
   void convertToCdf() {
@@ -279,6 +281,11 @@ class TabulatorSession {
         if (ContestConfig.isCdf(source)) {
           Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
           new CommonDataFormatReader(cvrPath, config).parseCvrFile(castVoteRecords);
+          continue;
+        } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
+          Logger
+              .log(Level.INFO, "Reading Clear Ballot cast vote records from file: %s...", cvrPath);
+          new ClearBallotCvrReader(cvrPath, config).readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
