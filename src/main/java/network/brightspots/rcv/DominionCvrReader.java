@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
-import network.brightspots.rcv.RawContestConfig.Candidate;
 
 class DominionCvrReader {
 
@@ -37,7 +36,6 @@ class DominionCvrReader {
   private static final String CANDIDATE_MANIFEST = "CandidateManifest.json";
   private static final String CONTEST_MANIFEST = "ContestManifest.json";
   private static final String CVR_EXPORT = "CvrExport.json";
-
   private final String manifestFolder;
   // map of precinct Id to precinct description
   private Map<Integer, String> precincts;
@@ -49,10 +47,6 @@ class DominionCvrReader {
 
   DominionCvrReader(String manifestFolder) {
     this.manifestFolder = manifestFolder;
-  }
-
-  Map<String, Contest> getContests() {
-    return contests;
   }
 
   // returns map of contestId to Contest parsed from input file
@@ -110,7 +104,7 @@ class DominionCvrReader {
         Integer id = (Integer) candidateMap.get("Id");
         String code = id.toString();
         String contestId = candidateMap.get("ContestId").toString();
-        Candidate newCandidate = new Candidate(name, code, false, contestId);
+        Candidate newCandidate = new Candidate(name, code, contestId);
         candidates.add(newCandidate);
       }
     } catch (Exception e) {
@@ -118,6 +112,10 @@ class DominionCvrReader {
       candidates = null;
     }
     return candidates;
+  }
+
+  Map<String, Contest> getContests() {
+    return contests;
   }
 
   // parse Cvr json into CastVoteRecord objects and add them to the input list
@@ -290,7 +288,29 @@ class DominionCvrReader {
     }
   }
 
-  // Simple container class for contest data
+  // Candidate data from a Dominion candidate manifest Json
+  static class Candidate {
+
+    private String name;
+    private String code;
+    private String contestId;
+
+    Candidate(String name, String code, String contestId) {
+      this.name = name;
+      this.code = code;
+      this.contestId = contestId;
+    }
+
+    public String getCode() {
+      return code;
+    }
+
+    public String getContestId() {
+      return contestId;
+    }
+  }
+
+  // Contest data from a Dominion contest manifest Json
   static class Contest {
 
     private final String name;
