@@ -154,7 +154,6 @@ public class RawContestConfig {
     private String name;
     private String code;
     private boolean excluded;
-    private String contestId;
 
     Candidate() {
     }
@@ -163,13 +162,6 @@ public class RawContestConfig {
       this.name = name;
       this.code = code;
       this.excluded = excluded;
-    }
-
-    Candidate(String name, String code, boolean excluded, String contestId) {
-      this.name = name;
-      this.code = code;
-      this.excluded = excluded;
-      this.contestId = contestId;
     }
 
     public String getName() {
@@ -196,9 +188,6 @@ public class RawContestConfig {
       this.excluded = excluded;
     }
 
-    public String getContestId() {
-      return contestId;
-    }
   }
 
   // ContestRules: encapsulates the set of rules required to perform contest tabulation
