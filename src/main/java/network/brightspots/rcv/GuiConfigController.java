@@ -640,8 +640,6 @@ public class GuiConfigController implements Initializable {
         String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
     textFieldMaxSkippedRanksAllowed.setText(
         String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
-    textFieldMinimumVoteThreshold.setText(
-        String.valueOf(ContestConfig.SUGGESTED_MINIMUM_VOTE_THRESHOLD));
     textFieldMaxRankingsAllowed.setText(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED);
   }
 
