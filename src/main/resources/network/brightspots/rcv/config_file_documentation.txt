@@ -184,10 +184,11 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         number of rounding decimal places when computing winning thresholds and fractional vote transfers
         value: [1..20]
 
-      "minimumVoteThreshold" required
-        the minimum number of votes a candidate must receive in the first round to avoid automatic elimination
+      "minimumVoteThreshold" optional
+        if a candidate receives fewer than this number of votes in the first round, they are automatically eliminated
         example: 150
         value: [0..1000000]
+        if not supplied: no automatic elimination occurs (equivalent to setting it to 0)
 
       "maxSkippedRanksAllowed" required
         maximum number of skipped ranks (undervotes) on a ballot before the ballot should be considered exhausted; if "unlimited" is entered, a ballot will never be considered exhausted due to skipped ranks

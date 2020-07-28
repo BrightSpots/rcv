@@ -234,7 +234,7 @@
                 <Label text="Decimal Places for Vote Arithmetic *"/>
                 <TextField fx:id="textFieldDecimalPlacesForVoteArithmetic" maxWidth="220.0"
                   promptText="Decimal Places for Vote Arithmetic"/>
-                <Label text="Minimum Vote Threshold *"/>
+                <Label text="Minimum Vote Threshold"/>
                 <TextField fx:id="textFieldMinimumVoteThreshold" maxWidth="220.0"
                   promptText="Minimum Vote Threshold"/>
                 <Label text="Max Skipped Ranks Allowed *"/>

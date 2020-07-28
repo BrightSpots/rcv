@@ -58,7 +58,6 @@ class ContestConfig {
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_NUMBER_OF_WINNERS = 1;
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
-  static final BigDecimal SUGGESTED_MINIMUM_VOTE_THRESHOLD = BigDecimal.ZERO;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final WinnerElectionMode SUGGESTED_WINNER_ELECTION_MODE = WinnerElectionMode.STANDARD;
   static final String UNDECLARED_WRITE_INS = "Undeclared Write-ins";
@@ -644,7 +643,7 @@ class ContestConfig {
         "minimumVoteThreshold",
         MIN_MINIMUM_VOTE_THRESHOLD,
         MAX_MINIMUM_VOTE_THRESHOLD,
-        true)) {
+        false)) {
       isValid = false;
     }
 
@@ -931,7 +930,8 @@ class ContestConfig {
   }
 
   BigDecimal getMinimumVoteThreshold() {
-    return new BigDecimal(getMinimumVoteThresholdRaw());
+    return isNullOrBlank(getMinimumVoteThresholdRaw()) ? BigDecimal.ZERO
+        : new BigDecimal(getMinimumVoteThresholdRaw());
   }
 
   private String getMaxSkippedRanksAllowedRaw() {
