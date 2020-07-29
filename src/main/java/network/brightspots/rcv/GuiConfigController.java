@@ -153,6 +153,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCandidateCode;
   @FXML
+  private CheckBox checkBoxCandidateExcluded;
+  @FXML
   private ChoiceBox<TieBreakMode> choiceTiebreakMode;
   @FXML
   private ChoiceBox<OvervoteRule> choiceOvervoteRule;
@@ -590,22 +592,33 @@ public class GuiConfigController implements Initializable {
         new Candidate(
             getTextOrEmptyString(textFieldCandidateName),
             getTextOrEmptyString(textFieldCandidateCode),
-            ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+            checkBoxCandidateExcluded.isSelected());
     if (ContestConfig.passesBasicCandidateValidation(candidate)) {
       tableViewCandidates.getItems().add(candidate);
       textFieldCandidateName.clear();
       textFieldCandidateCode.clear();
+      checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
     }
   }
 
-  /** Action when delete candidate button is clicked. */
+  public void buttonClearCandidateClicked() {
+    textFieldCandidateName.clear();
+    textFieldCandidateCode.clear();
+    checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+  }
+
+  /**
+   * Action when delete candidate button is clicked.
+   */
   public void buttonDeleteCandidateClicked() {
     tableViewCandidates
         .getItems()
         .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
   }
 
-  /** Action when candidate name is changed. */
+  /**
+   * Action when candidate name is changed.
+   */
   public void changeCandidateName(CellEditEvent cellEditEvent) {
     tableViewCandidates
         .getSelectionModel()
@@ -625,6 +638,8 @@ public class GuiConfigController implements Initializable {
 
   private void setDefaultValues() {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
+
+    checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
 
     choiceWinnerElectionMode.setValue(ContestConfig.SUGGESTED_WINNER_ELECTION_MODE);
 
@@ -663,6 +678,7 @@ public class GuiConfigController implements Initializable {
 
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
+    checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
     choiceTiebreakMode.setValue(null);

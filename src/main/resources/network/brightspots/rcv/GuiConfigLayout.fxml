@@ -39,11 +39,11 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-  prefHeight="810.0" prefWidth="900.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
+  prefHeight="955.0" prefWidth="1165.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
   xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="network.brightspots.rcv.GuiConfigController">
   <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    prefHeight="810.0" prefWidth="900.0">
+    prefHeight="955.0" prefWidth="1165.0">
     <top>
       <VBox BorderPane.alignment="TOP_LEFT">
         <MenuBar fx:id="menuBar">
@@ -102,62 +102,87 @@
           </Tab>
           <Tab text="CVR Files">
             <VBox>
-              <HBox alignment="CENTER_LEFT" spacing="4.0">
-                <Label text="Add CVR File" style="-fx-font-weight: bold"/>
-                <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
-                <Button mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add"
-                  fx:id="buttonAddCvrFile"/>
-                <Button mnemonicParsing="false" onAction="#buttonClearCvrFieldsClicked"
-                  text="Clear"/>
-                <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0"/>
-                </padding>
-              </HBox>
-              <Separator/>
-              <HBox alignment="CENTER_LEFT" spacing="4.0">
-                <VBox spacing="4.0">
-                  <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <Label text="Provider *"/>
-                    <ChoiceBox maxWidth="250.0" prefWidth="120.0" fx:id="choiceCvrProvider"/>
-                    <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
-                    <Label text="Path *"/>
-                    <TextField prefHeight="25.0" prefWidth="300.0" fx:id="textFieldCvrFilePath"/>
-                    <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
-                      text="Select" fx:id="buttonCvrFilePath"/>
-                  </HBox>
-                  <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <VBox spacing="4.0">
-                      <HBox alignment="CENTER_LEFT" spacing="4.0">
-                        <Label text="Contest ID *" prefWidth="110.0"/>
-                        <TextField prefHeight="25.0" maxWidth="160.0"
-                          fx:id="textFieldCvrContestId"/>
-                      </HBox>
-                      <HBox alignment="CENTER_LEFT" spacing="4.0">
-                        <Label text="First Vote Column *" prefWidth="110.0"/>
-                        <TextField prefHeight="25.0" prefWidth="30.0"
-                          fx:id="textFieldCvrFirstVoteCol"/>
-                      </HBox>
-                      <HBox alignment="CENTER_LEFT" spacing="4.0">
-                        <Label text="First Vote Row *" prefWidth="110.0"/>
-                        <TextField prefHeight="25.0" prefWidth="30.0"
-                          fx:id="textFieldCvrFirstVoteRow"/>
-                      </HBox>
-                      <HBox alignment="CENTER_LEFT" spacing="4.0">
-                        <Label text="ID Column" prefWidth="110.0"/>
-                        <TextField prefHeight="25.0" prefWidth="30.0" fx:id="textFieldCvrIdCol"/>
-                      </HBox>
-                      <HBox alignment="CENTER_LEFT" spacing="4.0">
-                        <Label text="Precinct Column" prefWidth="110.0"/>
-                        <TextField prefHeight="25.0" prefWidth="30.0"
-                          fx:id="textFieldCvrPrecinctCol"/>
-                      </HBox>
-                    </VBox>
-                  </HBox>
-                </VBox>
+              <VBox styleClass="bordered-box" maxWidth="700.0">
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <Label text="Add CVR File" style="-fx-font-weight: bold"/>
+                  <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
+                  <Button mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add"
+                    fx:id="buttonAddCvrFile"/>
+                  <Button mnemonicParsing="false" onAction="#buttonClearCvrFieldsClicked"
+                    text="Clear"/>
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
+                </HBox>
+                <Separator/>
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <VBox spacing="4.0">
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label text="Provider *" prefWidth="110.0"/>
+                      <ChoiceBox prefWidth="160.0" fx:id="choiceCvrProvider"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label text="Contest ID *" prefWidth="110.0"/>
+                      <TextField prefHeight="25.0" prefWidth="160.0"
+                        fx:id="textFieldCvrContestId"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label text="First Vote Column *" prefWidth="110.0"/>
+                      <TextField prefHeight="25.0" prefWidth="40.0"
+                        fx:id="textFieldCvrFirstVoteCol"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label text="First Vote Row *" prefWidth="110.0"/>
+                      <TextField prefHeight="25.0" prefWidth="40.0"
+                        fx:id="textFieldCvrFirstVoteRow"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label text="ID Column" prefWidth="110.0"/>
+                      <TextField prefHeight="25.0" prefWidth="40.0" fx:id="textFieldCvrIdCol"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label text="Precinct Column" prefWidth="110.0"/>
+                      <TextField prefHeight="25.0" prefWidth="40.0"
+                        fx:id="textFieldCvrPrecinctCol"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                  </VBox>
+                  <VBox spacing="4.0">
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label text="Path *"/>
+                      <TextField prefHeight="25.0" prefWidth="300.0" fx:id="textFieldCvrFilePath"/>
+                      <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
+                        text="Select" fx:id="buttonCvrFilePath"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                  </VBox>
+                </HBox>
                 <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                 </padding>
-              </HBox>
+                <VBox.margin>
+                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                </VBox.margin>
+              </VBox>
               <Separator/>
               <HBox alignment="CENTER_LEFT" spacing="4.0">
                 <Label
@@ -176,17 +201,17 @@
               <TableView fx:id="tableViewCvrFiles">
                 <columns>
                   <TableColumn fx:id="tableColumnCvrFilePath" minWidth="20.0"
-                    onEditCommit="#changeCvrFilePath" prefWidth="220.0" text="Path"/>
+                    onEditCommit="#changeCvrFilePath" prefWidth="300.0" text="Path"/>
                   <TableColumn fx:id="tableColumnCvrProvider" minWidth="20.0"
-                    onEditCommit="#changeCvrProvider" prefWidth="95.0" text="Provider"/>
+                    onEditCommit="#changeCvrProvider" prefWidth="110.0" text="Provider"/>
                   <TableColumn fx:id="tableColumnCvrContestId" minWidth="20.0"
-                    onEditCommit="#changeCvrContestId" prefWidth="95.0" text="Contest ID"/>
-                  <TableColumn fx:id="tableColumnCvrFirstVoteCol" minWidth="20.0" prefWidth="45.0"
+                    onEditCommit="#changeCvrContestId" prefWidth="110.0" text="Contest ID"/>
+                  <TableColumn fx:id="tableColumnCvrFirstVoteCol" minWidth="20.0" prefWidth="50.0"
                     onEditCommit="#changeCvrFirstVoteCol" text="First&#10;Vote&#10;Col"/>
-                  <TableColumn fx:id="tableColumnCvrFirstVoteRow" minWidth="20.0" prefWidth="45.0"
+                  <TableColumn fx:id="tableColumnCvrFirstVoteRow" minWidth="20.0" prefWidth="50.0"
                     onEditCommit="#changeCvrFirstVoteRow" text="First&#10;Vote&#10;Row"/>
                   <TableColumn fx:id="tableColumnCvrIdCol" minWidth="20.0"
-                    onEditCommit="#changeCvrIdColIndex" prefWidth="45.0"
+                    onEditCommit="#changeCvrIdColIndex" prefWidth="50.0"
                     text="ID&#10;Col"/>
                   <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0"
                     onEditCommit="#changeCvrPrecinctColIndex" prefWidth="50.0"
@@ -200,23 +225,65 @@
           </Tab>
           <Tab text="Candidates">
             <VBox>
+              <VBox styleClass="bordered-box" maxWidth="400.0">
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <Label text="Add Candidate" style="-fx-font-weight: bold"/>
+                  <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
+                  <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>
+                  <Button mnemonicParsing="false" onAction="#buttonClearCandidateClicked"
+                    text="Clear"/>
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
+                </HBox>
+                <Separator/>
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <Label text="Name *" prefWidth="50.0"/>
+                  <TextField prefHeight="25.0" prefWidth="300.0" fx:id="textFieldCandidateName"/>
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <Label text="Code" prefWidth="50.0"/>
+                  <TextField prefHeight="25.0" prefWidth="100.0" fx:id="textFieldCandidateCode"/>
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <CheckBox fx:id="checkBoxCandidateExcluded" mnemonicParsing="false"
+                    text="Excluded">
+                    <VBox.margin>
+                      <Insets top="10.0"/>
+                    </VBox.margin>
+                  </CheckBox>
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
+                </HBox>
+                <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                </padding>
+                <VBox.margin>
+                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                </VBox.margin>
+              </VBox>
+              <Separator/>
               <HBox alignment="CENTER_LEFT" spacing="4.0">
-                <TextField fx:id="textFieldCandidateName" promptText="Name *"/>
-                <TextField fx:id="textFieldCandidateCode" maxWidth="100.0" promptText="Code"/>
-                <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>
-                <Region prefHeight="25.0" prefWidth="39.0"/>
+                <Label
+                  text="Note: double-click existing entries below to edit and press Enter to save changes.">
+                  <padding>
+                    <Insets left="2.0"/>
+                  </padding>
+                </Label>
+                <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
                 <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
                   text="Delete Selected"/>
                 <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                 </padding>
               </HBox>
-              <Label
-                text="Note: double-click existing entries below to edit and press Enter to save changes.">
-                <padding>
-                  <Insets bottom="2.0" left="6.0"/>
-                </padding>
-              </Label>
               <TableView fx:id="tableViewCandidates" prefHeight="414.0" prefWidth="600.0">
                 <columns>
                   <TableColumn fx:id="tableColumnCandidateName" minWidth="20.0"
