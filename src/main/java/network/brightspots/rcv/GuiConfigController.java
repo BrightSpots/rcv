@@ -476,6 +476,11 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  public void buttonClearCvrFieldsClicked() {
+    choiceCvrProvider.setValue(null);
+    clearAndDisableCvrFilesTabFields();
+  }
+
   private void clearAndDisableCvrFilesTabFields() {
     buttonAddCvrFile.setDisable(true);
     textFieldCvrFilePath.clear();
