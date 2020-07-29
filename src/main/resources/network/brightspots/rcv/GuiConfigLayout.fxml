@@ -74,41 +74,29 @@
     <center>
       <VBox BorderPane.alignment="CENTER">
         <TabPane fx:id="tabPane" minHeight="450.0" tabClosingPolicy="UNAVAILABLE">
-          <Tab text="Output">
+          <Tab text="Contest Info">
             <VBox spacing="8.0">
-              <Label text="Contest Name *"/>
-              <TextField fx:id="textFieldContestName" maxWidth="220.0" promptText="Contest Name *"/>
-              <Label text="Output Directory"/>
               <HBox alignment="CENTER_LEFT" spacing="8.0">
-                <TextField fx:id="textFieldOutputDirectory" prefWidth="400.0"
-                  promptText="Output Directory"/>
-                <Button mnemonicParsing="false" onAction="#buttonOutputDirectoryClicked"
-                  text="Select"/>
+                <Label text="Contest Name *" prefWidth="110"/>
+                <TextField fx:id="textFieldContestName" prefWidth="300.0"
+                  promptText="Contest Name *"/>
               </HBox>
-              <Label text="Contest Date"/>
-              <HBox spacing="8.0">
+              <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <Label text="Contest Date" prefWidth="110"/>
                 <DatePicker fx:id="datePickerContestDate" editable="false" prefWidth="150.0"/>
                 <Button mnemonicParsing="false" onAction="#buttonClearDatePickerContestDateClicked"
                   text="Clear"/>
               </HBox>
-              <Label text="Contest Jurisdiction"/>
-              <TextField fx:id="textFieldContestJurisdiction" maxWidth="220.0"
-                promptText="Contest Jurisdiction"/>
-              <Label text="Contest Office"/>
-              <TextField fx:id="textFieldContestOffice" maxWidth="220.0"
-                promptText="Contest Office"/>
-              <CheckBox fx:id="checkBoxTabulateByPrecinct" mnemonicParsing="false"
-                text="Tabulate by Precinct">
-                <VBox.margin>
-                  <Insets top="10.0"/>
-                </VBox.margin>
-              </CheckBox>
-              <CheckBox fx:id="checkBoxGenerateCdfJson" mnemonicParsing="false"
-                text="Generate CDF JSON">
-                <VBox.margin>
-                  <Insets top="10.0"/>
-                </VBox.margin>
-              </CheckBox>
+              <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <Label text="Contest Jurisdiction" prefWidth="110"/>
+                <TextField fx:id="textFieldContestJurisdiction" prefWidth="300.0"
+                  promptText="Contest Jurisdiction"/>
+              </HBox>
+              <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <Label text="Contest Office" prefWidth="110"/>
+                <TextField fx:id="textFieldContestOffice" prefWidth="300.0"
+                  promptText="Contest Office"/>
+              </HBox>
               <padding>
                 <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
               </padding>
@@ -308,6 +296,32 @@
                 </padding>
               </VBox>
             </HBox>
+          </Tab>
+          <Tab text="Output">
+            <VBox spacing="8.0">
+              <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <Label text="Output Directory"/>
+                <TextField fx:id="textFieldOutputDirectory" prefWidth="400.0"
+                  promptText="Output Directory"/>
+                <Button mnemonicParsing="false" onAction="#buttonOutputDirectoryClicked"
+                  text="Select"/>
+              </HBox>
+              <CheckBox fx:id="checkBoxTabulateByPrecinct" mnemonicParsing="false"
+                text="Tabulate by Precinct">
+                <VBox.margin>
+                  <Insets top="10.0"/>
+                </VBox.margin>
+              </CheckBox>
+              <CheckBox fx:id="checkBoxGenerateCdfJson" mnemonicParsing="false"
+                text="Generate CDF JSON">
+                <VBox.margin>
+                  <Insets top="10.0"/>
+                </VBox.margin>
+              </CheckBox>
+              <padding>
+                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+              </padding>
+            </VBox>
           </Tab>
         </TabPane>
         <Region/>
