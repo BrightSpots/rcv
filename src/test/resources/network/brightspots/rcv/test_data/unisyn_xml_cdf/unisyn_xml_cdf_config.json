@@ -1,0 +1,49 @@
+{
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "unisyn xml cdf",
+    "outputDirectory": "output",
+    "contestDate": "2019-03-06",
+    "contestJurisdiction": "",
+    "contestOffice": "",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": true
+  },
+  "cvrFileSources": [
+    {
+    "filePath" : "unisyn_xml_cdf_cvr.xml",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "provider" : "CDF"
+  } ],
+  "candidates" : [ {
+    "name" : "AGAINST",
+    "code" : "Candidate_113",
+    "excluded" : false
+  }, {
+    "name" : "FOR",
+    "code" : "Candidate_112",
+    "excluded" : false
+  }
+  ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "standard",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "4",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : "Skiptonext_exhaustatovervote"
+  }
+},

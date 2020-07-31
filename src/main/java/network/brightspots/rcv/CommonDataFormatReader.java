@@ -22,13 +22,19 @@
 
 package network.brightspots.rcv;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javafx.util.Pair;
+import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 
 class CommonDataFormatReader {
 
@@ -113,12 +119,37 @@ class CommonDataFormatReader {
     return rankings;
   }
 
-  // parse the given file into a List of CastVoteRecords for tabulation
-  void parseCvrFile(List<CastVoteRecord> castVoteRecords) {
+    void parseXML(List<CastVoteRecord> castVoteRecords) {
+
+    try {
+      XmlMapper xmlMapper = new XmlMapper();
+      xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      FileInputStream inputStream = new FileInputStream(new File(filePath));
+      CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
+      Logger.log(Level.INFO, "bla");
+    }
+    catch (Exception e) {
+      Logger.log(Level.INFO, "bla" + e.toString());
+
+    }
+
+  }
+
+  void parseCvrFile(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
+    if (filePath.endsWith(".xml")) {
+      parseXML(castVoteRecords);
+    } else if (filePath.endsWith(".json")) {
+      parseJson(castVoteRecords);
+    } else {
+      Logger.log(Level.SEVERE, "Unexpected file extension: %s.  CDF source files must be .xml or .json", this.filePath );
+      throw new CvrParseException();
+    }
+  }
+
+  void parseJson(List<CastVoteRecord> castVoteRecords) {
     // cvrIndex and fileName are used to generate IDs for cvrs
     int cvrIndex = 0;
     String fileName = new File(filePath).getName();
-
     try {
       HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
       // we expect a top-level "CVR" object containing a list of CVR objects
@@ -152,5 +183,171 @@ class CommonDataFormatReader {
     } catch (Exception e) {
       Logger.log(Level.SEVERE, "Error parsing CDF data:\n%s", e.toString());
     }
+  }
+
+  static class ContestSelection {
+    @JacksonXmlProperty(isAttribute = true)
+    String ObjectId;
+    @JacksonXmlProperty(isAttribute = true)
+    String type;
+  }
+
+  // a voter selection
+  static class SelectionPosition {
+    @JacksonXmlProperty()
+    String HasIndication;
+    @JacksonXmlProperty()
+    String NumberVotes;
+    @JacksonXmlProperty()
+    String Position;
+  }
+
+  static class CVRContestSelection {
+    @JacksonXmlProperty()
+    String ContestSelectionId;
+    @JacksonXmlProperty()
+    String Rank;
+    @JacksonXmlProperty()
+    SelectionPosition SelectionPosition;
+    @JacksonXmlProperty()
+    String TotalNumberVotes;
+  }
+
+  static class CVRContest {
+    @JacksonXmlProperty()
+    String ContestId;
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    CVRContestSelection[] CVRContestSelection;
+    @JacksonXmlProperty()
+    String Overvotes;
+    @JacksonXmlProperty()
+    String Selections;
+    @JacksonXmlProperty()
+    String Undervotes;
+    @JacksonXmlProperty()
+    String WriteIns;
+
+  }
+
+  static class CVRSnapshot {
+    @JacksonXmlProperty(isAttribute = true)
+    String ObjectId;
+    @JacksonXmlProperty()
+    CVRContest CVRContest;
+    @JacksonXmlProperty()
+    String Type;
+  }
+
+  static class Image {
+    @JacksonXmlProperty(isAttribute = true)
+    String MimeType;
+    @JacksonXmlProperty(isAttribute = true)
+    String FileName;
+  }
+
+  static class BallotImage {
+    @JacksonXmlProperty()
+    Image Image;
+    @JacksonXmlProperty()
+    String Location;
+  }
+
+  static class Party {
+    @JacksonXmlProperty(isAttribute = true)
+    String ObjectId;
+    @JacksonXmlProperty()
+    String Abbreviation;
+    @JacksonXmlProperty()
+    String Name;
+  }
+
+  static class ReportingDevice {
+    @JacksonXmlProperty(isAttribute = true)
+    String ObjectId;
+  }
+
+  static class GpUnit {
+    @JacksonXmlProperty(isAttribute = true)
+    String ObjectId;
+  }
+
+  static class Candidate {
+    @JacksonXmlProperty(isAttribute = true)
+    String ObjectId;
+    @JacksonXmlProperty()
+    String Name;
+    @JacksonXmlProperty()
+    String PartyId;
+  }
+
+  static class Contest {
+    @JacksonXmlProperty(isAttribute = true)
+    String ObjectId;
+    @JacksonXmlProperty(isAttribute = true)
+    String type;
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    ContestSelection[] ContestSelection;
+  }
+
+  static class Election {
+    @JacksonXmlProperty(isAttribute = true)
+    String ObjectId;
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    Candidate[] Candidate;
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    Contest[] Contest;
+    @JacksonXmlProperty(isAttribute = true)
+    String ElectionScopeId;
+    @JacksonXmlProperty(isAttribute = true)
+    String Name;
+  }
+
+  static class CVR {
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    BallotImage[] BallotImage;
+    @JacksonXmlProperty(isAttribute = true)
+    String BallotStyleId;
+    @JacksonXmlProperty(isAttribute = true)
+    String CreatingDeviceId;
+    @JacksonXmlProperty(isAttribute = true)
+    String CurrentSnapshotId;
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    CVRSnapshot[] CVRSnapshot;
+    @JacksonXmlProperty(isAttribute = true)
+    String ElectionId;
+    @JacksonXmlProperty(isAttribute = true)
+    String PartyIds;
+    @JacksonXmlProperty(isAttribute = true)
+    String UniqueId;
+  }
+
+  // top-level cdf structure
+  static class CastVoteRecordReport {
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    CVR[] CVR;
+    @JacksonXmlProperty()
+    Election Election;
+    @JacksonXmlProperty()
+    String GeneratedDate;
+    @JacksonXmlProperty()
+    GpUnit GpUnit;
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    CommonDataFormatReader.Party[] Party;
+    @JacksonXmlProperty()
+    String ReportGeneratingDeviceIds;
+    @JacksonXmlProperty()
+    ReportingDevice ReportingDevice;
+    @JacksonXmlProperty()
+    String ReportType;
+    @JacksonXmlProperty()
+    String Version;
   }
 }

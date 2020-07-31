@@ -215,6 +215,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Unisyn xml cdf")
+  void testUnisynXmlCdf() {
+    runTabulationTest("unisyn_xml_cdf");
+  }
+
+  @Test
   @DisplayName("Clear Ballot - Kansas Primary")
   void testClearBallotKansasPrimary() {
     runTabulationTest("clear_ballot_kansas_primary");

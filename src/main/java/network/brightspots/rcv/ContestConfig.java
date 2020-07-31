@@ -76,7 +76,6 @@ class ContestConfig {
   private static final int MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 100;
   private static final long MIN_RANDOM_SEED = -140737488355328L;
   private static final long MAX_RANDOM_SEED = 140737488355327L;
-  private static final String JSON_EXTENSION = ".json";
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
@@ -99,9 +98,7 @@ class ContestConfig {
   }
 
   static boolean isCdf(CvrSource source) {
-    return getProvider(source) == Provider.CDF
-        && source.getFilePath() != null
-        && source.getFilePath().toLowerCase().endsWith(JSON_EXTENSION);
+    return getProvider(source) == Provider.CDF;
   }
 
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
