@@ -61,8 +61,6 @@
           <Menu mnemonicParsing="false" text="Conversion">
             <MenuItem mnemonicParsing="false" onAction="#menuItemConvertToCdfClicked"
               text="Convert CVRs in Current Config to CDF"/>
-            <MenuItem mnemonicParsing="false" onAction="#menuItemConvertDominionClicked"
-              text="Convert Dominion to Generic Format..."/>
           </Menu>
         </MenuBar>
         <Label fx:id="labelCurrentlyLoaded">

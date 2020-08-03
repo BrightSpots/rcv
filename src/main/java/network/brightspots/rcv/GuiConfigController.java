@@ -362,24 +362,6 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Convert Dominion files in specified folder to generic .csv format.
-   * - Require user to specify a Dominion data folder path.
-   * - Create and launch ConvertDominionService given the provided path.
-   */
-  public void menuItemConvertDominionClicked() {
-    DirectoryChooser dc = new DirectoryChooser();
-    dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-    dc.setTitle("Dominion Data Folder");
-    File dominionDataFolderPath = dc.showDialog(GuiContext.getInstance().getMainWindow());
-    if (dominionDataFolderPath != null) {
-      setGuiIsBusy(true);
-      ConvertDominionService service = new ConvertDominionService(
-          dominionDataFolderPath.getAbsolutePath());
-      setUpAndStartService(service);
-    }
-  }
-
   private void setUpAndStartService(Service<Void> service) {
     service.setOnSucceeded(event -> setGuiIsBusy(false));
     service.setOnCancelled(event -> setGuiIsBusy(false));
@@ -1285,36 +1267,6 @@ public class GuiConfigController implements Initializable {
               Logger.log(
                   Level.SEVERE,
                   "Error when attempting to convert to CDF:\n%s\nConversion failed!",
-                  task.getException().toString()));
-      return task;
-    }
-  }
-
-  // ConvertDominionService runs a Dominion conversion in the background
-  private static class ConvertDominionService extends Service<Void> {
-
-    private final String dominionDataFolderPath;
-
-    ConvertDominionService(String dominionDataFolderPath) {
-      this.dominionDataFolderPath = dominionDataFolderPath;
-    }
-
-    @Override
-    protected Task<Void> createTask() {
-      Task<Void> task =
-          new Task<>() {
-            @Override
-            protected Void call() {
-              TabulatorSession session = new TabulatorSession(null);
-              session.convertDominionCvrJsonToGenericCsv(dominionDataFolderPath);
-              return null;
-            }
-          };
-      task.setOnFailed(
-          arg0 ->
-              Logger.log(
-                  Level.SEVERE,
-                  "Error when attempting to convert Dominion files:\n%s\nConversion failed!",
                   task.getException().toString()));
       return task;
     }
