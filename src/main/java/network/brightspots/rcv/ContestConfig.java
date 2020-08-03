@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
@@ -231,17 +232,19 @@ class ContestConfig {
         }
       }
 
-      if (isNullOrBlank(source.getContestId()) &&
-          (provider == Provider.DOMINION || provider == Provider.HART
-              || provider == Provider.CLEAR_BALLOT)) {
+      boolean providerRequiesContestId = provider == Provider.DOMINION ||
+          provider == Provider.HART ||
+          provider == Provider.CLEAR_BALLOT ||
+          provider == Provider.CDF;
+
+      if (isNullOrBlank(source.getContestId()) && providerRequiesContestId) {
         sourceValid = false;
         Logger.log(
             Level.SEVERE,
             String.format("contestId must be defined for CVR source with provider \"%s\"!",
                 getProvider(source).toString()));
       } else if (
-          !(provider == Provider.DOMINION || provider == Provider.HART
-              || provider == Provider.CLEAR_BALLOT) &&
+          !(providerRequiesContestId) &&
               fieldIsDefinedButShouldNotBeForProvider(
                   source.getContestId(),
                   "contestId",
@@ -1005,14 +1008,14 @@ class ContestConfig {
   // 1) if there are any CDF input sources extract candidates names from them
   // 2) build map of candidate ID to candidate name
   // 3) generate tie-break ordering if needed
-  private void processCandidateData() {
+  private void processCandidateData() throws CvrParseException {
     candidateCodeToNameMap = new HashMap<>();
 
     for (RawContestConfig.CvrSource source : rawConfig.cvrFileSources) {
-      // for any CDF sources extract candidate names
+      // for any CDF sources we extract candidate data
       if (isCdf(source)) {
         String cvrPath = resolveConfigPath(source.getFilePath());
-        CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this);
+        CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this, source);
         candidateCodeToNameMap = reader.getCandidates();
         candidatePermutation.addAll(candidateCodeToNameMap.keySet());
       }

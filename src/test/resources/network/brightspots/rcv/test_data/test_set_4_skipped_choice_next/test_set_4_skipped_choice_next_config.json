@@ -14,7 +14,8 @@
     "filePath" : "test_set_4_skipped_choice_next_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "CDF",
+    "contestId": "contest-001"
   } ],
   "candidates" : [ ],
   "rules" : {

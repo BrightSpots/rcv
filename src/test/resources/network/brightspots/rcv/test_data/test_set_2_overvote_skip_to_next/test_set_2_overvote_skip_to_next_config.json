@@ -14,7 +14,8 @@
     "filePath" : "test_set_2_overvote_skip_to_next_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "CDF",
+    "contestId": "contest-001"
   } ],
   "candidates" : [ ],
   "rules" : {

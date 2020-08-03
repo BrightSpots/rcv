@@ -14,7 +14,8 @@
     "filePath" : "test_set_6_duplicate_exhaust_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "CDF",
+    "contestId": "contest-001"
   } ],
   "candidates" : [ ],
   "rules" : {

@@ -14,7 +14,8 @@
     "filePath" : "test_set_multi_winner_fractional_threshold_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "CDF",
+    "contestId": "contest-001"
   } ],
   "candidates" : [ ],
   "rules" : {

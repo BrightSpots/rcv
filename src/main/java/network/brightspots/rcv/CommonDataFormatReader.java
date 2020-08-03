@@ -35,19 +35,74 @@ import java.util.Map;
 import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
+import network.brightspots.rcv.RawContestConfig.CvrSource;
 
 class CommonDataFormatReader {
 
   private final String filePath;
   private final ContestConfig config;
+  private final CvrSource source;
 
-  CommonDataFormatReader(String filePath, ContestConfig config) {
+  CommonDataFormatReader(String filePath, ContestConfig config, CvrSource source) {
     this.filePath = filePath;
     this.config = config;
+    this.source = source;
   }
 
-  // returns map from candidate ID to name parsed from CDF election json
-  Map<String, String> getCandidates() {
+  Map<String, String> getCandidates() throws CvrParseException {
+    Map<String, String> candidates;
+    if (filePath.endsWith(".xml")) {
+      candidates = getCandidatesXml();
+    } else if (filePath.endsWith(".json")) {
+      candidates = getCandidatesJson();
+    } else {
+      Logger.log(Level.SEVERE,
+          "Unexpected file extension: %s.  CDF source files must be .xml or .json", this.filePath);
+      throw new CvrParseException();
+    }
+    return candidates;
+  }
+
+  Map<String, String> getCandidatesXml() throws CvrParseException {
+    Map<String, String> candidates = new HashMap<>();
+    try {
+      XmlMapper xmlMapper = new XmlMapper();
+      xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      FileInputStream inputStream = new FileInputStream(new File(filePath));
+      CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
+      for (Contest contest : cvrReport.Election.Contest) {
+        if (!contest.ObjectId.equals(source.getContestId())) {
+          continue;
+        }
+        for (ContestSelection contestSelection : contest.ContestSelection) {
+          String candidateId = contestSelection.ObjectId;
+          // lookup the Candidate name
+          String candidateName = null;
+          for (Candidate candidate : cvrReport.Election.Candidate) {
+            if (candidate.ObjectId.equals(candidateId)) {
+              candidateName = candidate.Name;
+              // fallback to Code.Value
+              if (candidateName == null && candidate.Code != null && candidate.Code.Value != null) {
+                candidateName = candidate.Code.Value;
+              }
+              break;
+            }
+          }
+          if (candidateName == null) {
+            Logger.log(Level.WARNING, "No name found for CandidateId: %s", candidateId);
+            candidateName = candidateId;
+          }
+          candidates.put(candidateId, candidateName);
+        }
+      }
+    } catch (Exception e) {
+      Logger.log(Level.SEVERE, "Error parsing CDF data:\n%s", e.toString());
+      throw new CvrParseException();
+    }
+      return candidates;
+  }
+    // returns map from candidate ID to name parsed from CDF election json
+  Map<String, String> getCandidatesJson() {
     Map<String, String> candidates = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
@@ -61,7 +116,11 @@ class CommonDataFormatReader {
         assert contestArray.size() == 1;
         for (Object contestObject : contestArray) {
           HashMap contest = (HashMap) contestObject;
-          // for each contest get the contest selections
+          // filter by contest ID
+          if (!contest.get("@id").equals(source.getContestId())) {
+            continue;
+          }
+            // for each contest get the contest selections
           ArrayList contestSelectionArray = (ArrayList) contest.get("ContestSelection");
           for (Object contestSelectionObject : contestSelectionArray) {
             HashMap contestSelection = (HashMap) contestSelectionObject;
@@ -95,6 +154,10 @@ class CommonDataFormatReader {
     ArrayList cvrContests = (ArrayList) snapshot.get("CVRContest");
     for (Object contestObject : cvrContests) {
       HashMap cvrContest = (HashMap) contestObject;
+      // filter by contest ID
+      if (!cvrContest.get("ContestId").equals(source.getContestId())) {
+        continue;
+      }
       // each contest contains contestSelections
       ArrayList contestSelections = (ArrayList) cvrContest.get("CVRContestSelection");
       for (Object contestSelectionObject : contestSelections) {
@@ -119,20 +182,74 @@ class CommonDataFormatReader {
     return rankings;
   }
 
-    void parseXML(List<CastVoteRecord> castVoteRecords) {
-
+  void parseXML(List<CastVoteRecord> castVoteRecords) {
     try {
       XmlMapper xmlMapper = new XmlMapper();
       xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       FileInputStream inputStream = new FileInputStream(new File(filePath));
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
-      Logger.log(Level.INFO, "bla");
-    }
-    catch (Exception e) {
-      Logger.log(Level.INFO, "bla" + e.toString());
+      for (CVR cvr : cvrReport.CVR) {
+        String currentSnapshotId = cvr.CurrentSnapshotId;
+        for (CVRSnapshot cvrSnapshot : cvr.CVRSnapshot) {
+          // only use the current snapshot
+          if (!cvrSnapshot.ObjectId.equals(currentSnapshotId)) {
+            continue;
+          }
+          // filter by contest Id
+          CVRContest contest = cvrSnapshot.CVRContest;
+          if (!contest.ContestId.equals(source.getContestId())) {
+            continue;
+          }
+          // parse rankings
+          List<Pair<Integer, String>> rankings = new ArrayList<>();
+          for (CVRContestSelection cvrContestSelection : contest.CVRContestSelection) {
+            String selectionId = cvrContestSelection.ContestSelectionId;
+            if (cvrContestSelection.ContestSelectionId.equals(config.getOvervoteLabel())) {
+              selectionId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+            }
 
-    }
+            if (!config.getCandidateCodeList().contains(selectionId)) {
+              Logger.log(
+                  Level.SEVERE,
+                  "Contest Selection: \"%s\" from CVR is not in the config file!", selectionId);
+              throw new CvrParseException();
+            }
 
+
+            // TODO: verify with John D. this is the correct logic
+            if (cvrContestSelection.Rank == null) {
+              for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
+                if (selectionPosition.Rank == null) {
+                  Logger.log(Level.SEVERE, "No Rank found on CVR %s Contest %s!", cvr.UniqueId,
+                      contest.ContestId);
+                  throw new CvrParseException();
+                }
+                Integer rank = Integer.parseInt(selectionPosition.Rank);
+                rankings.add(new Pair<>(rank, selectionId));
+              }
+            } else {
+              Integer rank = Integer.parseInt(cvrContestSelection.Rank);
+              rankings.add(new Pair<>(rank, selectionId));
+            }
+            // create the new CastVoteRecord
+            CastVoteRecord newRecord =
+                new CastVoteRecord(null, /* computed Id */
+                    cvr.UniqueId, /* supplied Id */
+                    cvrReport.GpUnit.ObjectId, /* precinct */
+                    null,
+                    rankings);
+            castVoteRecords.add(newRecord);
+
+            // provide some user feedback on the CVR count
+            if (castVoteRecords.size() % 50000 == 0) {
+              Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
+            }
+          }
+        }
+      }
+    } catch (Exception e) {
+      Logger.log(Level.SEVERE, "Error parsing CDF data:\n%s", e.toString());
+    }
   }
 
   void parseCvrFile(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
@@ -141,7 +258,8 @@ class CommonDataFormatReader {
     } else if (filePath.endsWith(".json")) {
       parseJson(castVoteRecords);
     } else {
-      Logger.log(Level.SEVERE, "Unexpected file extension: %s.  CDF source files must be .xml or .json", this.filePath );
+      Logger.log(Level.SEVERE,
+          "Unexpected file extension: %s.  CDF source files must be .xml or .json", this.filePath);
       throw new CvrParseException();
     }
   }
@@ -186,6 +304,7 @@ class CommonDataFormatReader {
   }
 
   static class ContestSelection {
+
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
     @JacksonXmlProperty(isAttribute = true)
@@ -194,26 +313,32 @@ class CommonDataFormatReader {
 
   // a voter selection
   static class SelectionPosition {
+
     @JacksonXmlProperty()
     String HasIndication;
     @JacksonXmlProperty()
     String NumberVotes;
     @JacksonXmlProperty()
     String Position;
+    @JacksonXmlProperty()
+    String Rank;
   }
 
   static class CVRContestSelection {
+
     @JacksonXmlProperty()
     String ContestSelectionId;
     @JacksonXmlProperty()
     String Rank;
     @JacksonXmlProperty()
-    SelectionPosition SelectionPosition;
+    @JacksonXmlElementWrapper(useWrapping = false)
+    SelectionPosition[] SelectionPosition;
     @JacksonXmlProperty()
     String TotalNumberVotes;
   }
 
   static class CVRContest {
+
     @JacksonXmlProperty()
     String ContestId;
     @JacksonXmlProperty()
@@ -231,6 +356,7 @@ class CommonDataFormatReader {
   }
 
   static class CVRSnapshot {
+
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
     @JacksonXmlProperty()
@@ -240,6 +366,7 @@ class CommonDataFormatReader {
   }
 
   static class Image {
+
     @JacksonXmlProperty(isAttribute = true)
     String MimeType;
     @JacksonXmlProperty(isAttribute = true)
@@ -247,6 +374,7 @@ class CommonDataFormatReader {
   }
 
   static class BallotImage {
+
     @JacksonXmlProperty()
     Image Image;
     @JacksonXmlProperty()
@@ -254,6 +382,7 @@ class CommonDataFormatReader {
   }
 
   static class Party {
+
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
     @JacksonXmlProperty()
@@ -263,13 +392,24 @@ class CommonDataFormatReader {
   }
 
   static class ReportingDevice {
+
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
   }
 
   static class GpUnit {
+
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
+  }
+
+  static class Code {
+    @JacksonXmlProperty()
+    String Type;
+    @JacksonXmlProperty()
+    String Value;
+    @JacksonXmlProperty()
+    String OtherType;
   }
 
   static class Candidate {
@@ -279,9 +419,12 @@ class CommonDataFormatReader {
     String Name;
     @JacksonXmlProperty()
     String PartyId;
+    @JacksonXmlProperty()
+    Code Code;
   }
 
   static class Contest {
+
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
     @JacksonXmlProperty(isAttribute = true)
@@ -292,6 +435,7 @@ class CommonDataFormatReader {
   }
 
   static class Election {
+
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
     @JacksonXmlProperty()
@@ -307,6 +451,7 @@ class CommonDataFormatReader {
   }
 
   static class CVR {
+
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     BallotImage[] BallotImage;
@@ -329,6 +474,7 @@ class CommonDataFormatReader {
 
   // top-level cdf structure
   static class CastVoteRecordReport {
+
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     CVR[] CVR;
