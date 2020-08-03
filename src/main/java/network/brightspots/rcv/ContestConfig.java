@@ -1010,17 +1010,6 @@ class ContestConfig {
   // 3) generate tie-break ordering if needed
   private void processCandidateData() throws CvrParseException {
     candidateCodeToNameMap = new HashMap<>();
-
-    for (RawContestConfig.CvrSource source : rawConfig.cvrFileSources) {
-      // for any CDF sources we extract candidate data
-      if (isCdf(source)) {
-        String cvrPath = resolveConfigPath(source.getFilePath());
-        CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this, source);
-        candidateCodeToNameMap = reader.getCandidates();
-        candidatePermutation.addAll(candidateCodeToNameMap.keySet());
-      }
-    }
-
     if (rawConfig.candidates != null) {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
         String code = candidate.getCode();

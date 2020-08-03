@@ -17,7 +17,23 @@
     "provider" : "CDF",
     "contestId": "contest-001"
   } ],
-  "candidates" : [ ],
+  "candidates" : [ {
+    "name" : "A",
+    "code" : "cs-a",
+    "excluded" : false
+  }, {
+    "name" : "B",
+    "code" : "cs-b",
+    "excluded" : false
+  }, {
+    "name" : "C",
+    "code" : "cs-c",
+    "excluded" : false
+  }, {
+    "name" : "D",
+    "code" : "cs-d",
+    "excluded" : false
+  }],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "alwaysSkipToNextRank",
