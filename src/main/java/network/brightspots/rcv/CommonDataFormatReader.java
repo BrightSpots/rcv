@@ -49,6 +49,9 @@ class CommonDataFormatReader {
     this.source = source;
   }
 
+  // This method will extract candidate data from a CDF file for the contestID specified in
+  // our CvrSource.  It is currently un-used but will be handy for automating
+  // config file creation when we are ready to implement that.
   Map<String, String> getCandidates() throws CvrParseException {
     Map<String, String> candidates;
     if (filePath.endsWith(".xml")) {
@@ -99,9 +102,10 @@ class CommonDataFormatReader {
       Logger.log(Level.SEVERE, "Error parsing CDF data:\n%s", e.toString());
       throw new CvrParseException();
     }
-      return candidates;
+    return candidates;
   }
-    // returns map from candidate ID to name parsed from CDF election json
+
+  // returns map from candidate ID to name parsed from CDF election json
   Map<String, String> getCandidatesJson() {
     Map<String, String> candidates = new HashMap<>();
     try {
@@ -120,7 +124,7 @@ class CommonDataFormatReader {
           if (!contest.get("@id").equals(source.getContestId())) {
             continue;
           }
-            // for each contest get the contest selections
+          // for each contest get the contest selections
           ArrayList contestSelectionArray = (ArrayList) contest.get("ContestSelection");
           for (Object contestSelectionObject : contestSelectionArray) {
             HashMap contestSelection = (HashMap) contestSelectionObject;
@@ -188,10 +192,21 @@ class CommonDataFormatReader {
       xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       FileInputStream inputStream = new FileInputStream(new File(filePath));
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
+      // build a map from contestSelectionId to CandidateId for lookup during parsing
+      HashMap<String, String> contestSelectionIdToCandidateId = new HashMap<>();
+      for (Contest contest : cvrReport.Election.Contest) {
+        if (contest.ObjectId.equals(source.getContestId())) {
+          for (ContestSelection contestSelection : contest.ContestSelection) {
+            contestSelectionIdToCandidateId
+                .put(contestSelection.ObjectId, contestSelection.CandidateIds);
+          }
+        }
+      }
+
       for (CVR cvr : cvrReport.CVR) {
         String currentSnapshotId = cvr.CurrentSnapshotId;
         for (CVRSnapshot cvrSnapshot : cvr.CVRSnapshot) {
-          // only use the current snapshot
+          // filter by currentSnapshotId 
           if (!cvrSnapshot.ObjectId.equals(currentSnapshotId)) {
             continue;
           }
@@ -200,36 +215,45 @@ class CommonDataFormatReader {
           if (!contest.ContestId.equals(source.getContestId())) {
             continue;
           }
-          // parse rankings
+          // parse contest selections
           List<Pair<Integer, String>> rankings = new ArrayList<>();
           for (CVRContestSelection cvrContestSelection : contest.CVRContestSelection) {
-            String selectionId = cvrContestSelection.ContestSelectionId;
-            if (cvrContestSelection.ContestSelectionId.equals(config.getOvervoteLabel())) {
-              selectionId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-            }
-
-            if (!config.getCandidateCodeList().contains(selectionId)) {
+            String contestSelectionId = cvrContestSelection.ContestSelectionId;
+            String candidateId = contestSelectionIdToCandidateId.get(contestSelectionId);
+            if (candidateId == null) {
               Logger.log(
                   Level.SEVERE,
-                  "Contest Selection: \"%s\" from CVR is not in the config file!", selectionId);
+                  "Candidate objectId: \"%s\" from CVR not found!", candidateId);
               throw new CvrParseException();
             }
-
-
-            // TODO: verify with John D. this is the correct logic
+            if (candidateId.equals(config.getOvervoteLabel())) {
+              candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+            }
+            if (!config.getCandidateCodeList().contains(candidateId)) {
+              Logger.log(
+                  Level.SEVERE,
+                  "Contest Selection: \"%s\" from CVR is not in the config file!", candidateId);
+              throw new CvrParseException();
+            }
             if (cvrContestSelection.Rank == null) {
               for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
+                // ignore if no indication is present (NIST 1500-103 section 3.4.2)
+                if (selectionPosition.HasIndication != null && selectionPosition.HasIndication
+                    .equals("no")) {
+                  continue;
+                }
+
                 if (selectionPosition.Rank == null) {
                   Logger.log(Level.SEVERE, "No Rank found on CVR %s Contest %s!", cvr.UniqueId,
                       contest.ContestId);
                   throw new CvrParseException();
                 }
                 Integer rank = Integer.parseInt(selectionPosition.Rank);
-                rankings.add(new Pair<>(rank, selectionId));
+                rankings.add(new Pair<>(rank, candidateId));
               }
             } else {
               Integer rank = Integer.parseInt(cvrContestSelection.Rank);
-              rankings.add(new Pair<>(rank, selectionId));
+              rankings.add(new Pair<>(rank, candidateId));
             }
             // create the new CastVoteRecord
             CastVoteRecord newRecord =
@@ -309,13 +333,16 @@ class CommonDataFormatReader {
     String ObjectId;
     @JacksonXmlProperty(isAttribute = true)
     String type;
+    @JacksonXmlProperty()
+    String CandidateIds;
   }
 
-  // a voter selection
   static class SelectionPosition {
 
     @JacksonXmlProperty()
     String HasIndication;
+    @JacksonXmlProperty()
+    String IsAllocable;
     @JacksonXmlProperty()
     String NumberVotes;
     @JacksonXmlProperty()
@@ -404,6 +431,7 @@ class CommonDataFormatReader {
   }
 
   static class Code {
+
     @JacksonXmlProperty()
     String Type;
     @JacksonXmlProperty()
@@ -413,6 +441,7 @@ class CommonDataFormatReader {
   }
 
   static class Candidate {
+
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
     @JacksonXmlProperty()
