@@ -473,8 +473,7 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCvrContestId));
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
-      choiceCvrProvider.setValue(null);
-      clearAndDisableCvrFilesTabFields();
+      textFieldCvrFilePath.clear();
     }
   }
 
