@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,7 +48,6 @@ import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
-import network.brightspots.rcv.StreamingCvrReader.UnrecognizedCandidatesException;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -74,7 +74,8 @@ class TabulatorSession {
   // write CastVoteRecords to generic cvr csv files: one per contest
   // return list of files written or null if there was a problem
   void convertDominionCvrJsonToGenericCsv(String dominionDataFolder) {
-    DominionCvrReader dominionCvrReader = new DominionCvrReader(dominionDataFolder);
+    // passing null for config here because I'm killing this function in a separate PR anyway
+    DominionCvrReader dominionCvrReader = new DominionCvrReader(null, dominionDataFolder);
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     List<String> filesWritten;
     try {
@@ -289,7 +290,7 @@ class TabulatorSession {
           continue;
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
-          DominionCvrReader reader = new DominionCvrReader(cvrPath);
+          DominionCvrReader reader = new DominionCvrReader(config, cvrPath);
           reader.readCastVoteRecords(castVoteRecords, source.getContestId());
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
@@ -369,5 +370,15 @@ class TabulatorSession {
       Logger.log(Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
     }
     return castVoteRecords;
+  }
+
+  static class UnrecognizedCandidatesException extends Exception {
+
+    // count of how many times each unrecognized candidate was encountered during CVR parsing
+    final Map<String, Integer> candidateCounts;
+
+    UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
+      this.candidateCounts = candidateCounts;
+    }
   }
 }

@@ -37,6 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
+import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
@@ -325,15 +326,5 @@ class StreamingCvrReader {
 
   static class CvrDataFormatException extends Exception {
 
-  }
-
-  static class UnrecognizedCandidatesException extends Exception {
-
-    // count of how many times each unrecognized candidate was encountered during CVR parsing
-    final Map<String, Integer> candidateCounts;
-
-    UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
-      this.candidateCounts = candidateCounts;
-    }
   }
 }
