@@ -16,6 +16,7 @@
 
 package network.brightspots.rcv;
 
+import static javafx.collections.FXCollections.observableArrayList;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,13 +29,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -78,6 +80,23 @@ public class GuiConfigController implements Initializable {
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String CONFIG_FILE_DOCUMENTATION_FILENAME =
       "network/brightspots/rcv/config_file_documentation.txt";
+  private static final List WINNER_ELECTION_MODE_VALUES = List.of(
+      "Single-winner majority determines winner",
+      "Multi-winner allow only one winner per round",
+      "Multi-winner allow multiple winners per round",
+      "Bottoms-up",
+      "Bottoms-up using percentage threshold",
+      "Multi-pass IRV"
+  );
+  private static final Map<String, String> WINNER_ELECTION_MODE_VALUE_MAP = Map.of(
+      "Single-winner majority determines winner", WinnerElectionMode.STANDARD.toString(),
+      "Multi-winner allow only one winner per round",
+      WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString(),
+      "Multi-winner allow multiple winners per round", WinnerElectionMode.STANDARD.toString(),
+      "Bottoms-up", WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString(),
+      "Bottoms-up using percentage threshold", WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString(),
+      "Multi-pass IRV", WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString()
+  );
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
@@ -159,7 +178,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ChoiceBox<OvervoteRule> choiceOvervoteRule;
   @FXML
-  private ChoiceBox<WinnerElectionMode> choiceWinnerElectionMode;
+  private ChoiceBox<String> choiceWinnerElectionMode;
   @FXML
   private TextField textFieldRandomSeed;
   @FXML
@@ -940,14 +959,13 @@ public class GuiConfigController implements Initializable {
     });
     choiceOvervoteRule.getItems().addAll(OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(OvervoteRule.RULE_UNKNOWN);
-    choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
-    choiceWinnerElectionMode.getItems().remove(WinnerElectionMode.MODE_UNKNOWN);
+    choiceWinnerElectionMode.getItems().addAll(WINNER_ELECTION_MODE_VALUES);
     choiceWinnerElectionMode.setOnAction(event -> {
       clearAndDisableWinningRuleFields();
       setWinningRulesDefaultValues();
       String mode = getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN);
       switch (mode) {
-        case "standard", "singleSeatContinueUntilTwoCandidatesRemain" -> {
+        case "Single-winner majority determines winner" -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
@@ -956,7 +974,7 @@ public class GuiConfigController implements Initializable {
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
         }
-        case "multiSeatAllowOnlyOneWinnerPerRound", "multiSeatSequentialWinnerTakesAll" -> {
+        case "Multi-winner allow only one winner per round", "Multi-winner allow multiple winners per round", "Bottoms-up", "Multi-pass IRV" -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
@@ -965,7 +983,7 @@ public class GuiConfigController implements Initializable {
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
-        case "multiSeatBottomsUp" -> {
+        case "Bottoms-up using percentage threshold" -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
@@ -1029,21 +1047,21 @@ public class GuiConfigController implements Initializable {
     checkBoxGenerateCdfJson.setSelected(outputSettings.generateCdfJson);
 
     if (rawConfig.cvrFileSources != null) {
-      tableViewCvrFiles.setItems(FXCollections.observableArrayList(rawConfig.cvrFileSources));
+      tableViewCvrFiles.setItems(observableArrayList(rawConfig.cvrFileSources));
     }
 
     if (rawConfig.candidates != null) {
-      tableViewCandidates.setItems(FXCollections.observableArrayList(rawConfig.candidates));
+      tableViewCandidates.setItems(observableArrayList(rawConfig.candidates));
     }
 
+    choiceWinnerElectionMode.setValue(
+        config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN
+            ? null
+            : convertConfigWinnerElectionModeToGuiText(config));
     choiceTiebreakMode.setValue(
         config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
     choiceOvervoteRule.setValue(
         config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
-    choiceWinnerElectionMode.setValue(
-        config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN
-            ? null
-            : config.getWinnerElectionMode());
 
     ContestRules rules = rawConfig.rules;
     textFieldRandomSeed.setText(rules.randomSeed);
@@ -1063,6 +1081,30 @@ public class GuiConfigController implements Initializable {
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
+  }
+
+  private static String convertConfigWinnerElectionModeToGuiText(ContestConfig config) {
+    switch (config.getWinnerElectionMode().toString()) {
+      case "standard" -> {
+        return config.getNumberOfWinners() > 1 ? "Multi-winner allow multiple winners per round"
+            : "Single-winner majority determines winner";
+      }
+      case "singleSeatContinueUntilTwoCandidatesRemain" -> {
+        return "Single-winner majority determines winner";
+      }
+      case "multiSeatAllowOnlyOneWinnerPerRound" -> {
+        return "Multi-winner allow only one winner per round";
+      }
+      case "multiSeatBottomsUp" -> {
+        return config.getNumberOfWinners() == 0
+            || config.getMultiSeatBottomsUpPercentageThreshold() != null
+            ? "Bottoms-up using percentage threshold" : "Bottoms-up";
+      }
+      case "multiSeatSequentialWinnerTakesAll" -> {
+        return "Multi-pass IRV";
+      }
+    }
+    return null;
   }
 
   private RawContestConfig createRawContestConfig() {
@@ -1101,8 +1143,9 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
-    rules.winnerElectionMode =
-        getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN);
+    rules.winnerElectionMode = WINNER_ELECTION_MODE_VALUE_MAP
+        .getOrDefault(getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN),
+            WinnerElectionMode.MODE_UNKNOWN.toString());
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
     rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
     rules.multiSeatBottomsUpPercentageThreshold = getTextOrEmptyString(
