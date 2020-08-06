@@ -424,7 +424,6 @@
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
                     </HBox>
-                    <!--                  TODO: These two checkboxes to be converted to radio buttons -->
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <CheckBox fx:id="checkBoxNonIntegerWinningThreshold" mnemonicParsing="false"
                         text="Non-Integer Winning Threshold">

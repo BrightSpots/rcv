@@ -248,6 +248,30 @@ public class GuiConfigController implements Initializable {
     return textField.getText() != null ? textField.getText().trim() : "";
   }
 
+  private static String convertConfigWinnerElectionModeToGuiText(ContestConfig config) {
+    switch (config.getWinnerElectionMode().toString()) {
+      case "standard" -> {
+        return config.getNumberOfWinners() > 1 ? "Multi-winner allow multiple winners per round"
+            : "Single-winner majority determines winner";
+      }
+      case "singleSeatContinueUntilTwoCandidatesRemain" -> {
+        return "Single-winner majority determines winner";
+      }
+      case "multiSeatAllowOnlyOneWinnerPerRound" -> {
+        return "Multi-winner allow only one winner per round";
+      }
+      case "multiSeatBottomsUp" -> {
+        return config.getNumberOfWinners() == 0
+            || config.getMultiSeatBottomsUpPercentageThreshold() != null
+            ? "Bottoms-up using percentage threshold" : "Bottoms-up";
+      }
+      case "multiSeatSequentialWinnerTakesAll" -> {
+        return "Multi-pass IRV";
+      }
+    }
+    return null;
+  }
+
   /**
    * Action when new config menu item is clicked.
    */
@@ -1106,30 +1130,6 @@ public class GuiConfigController implements Initializable {
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
-  }
-
-  private static String convertConfigWinnerElectionModeToGuiText(ContestConfig config) {
-    switch (config.getWinnerElectionMode().toString()) {
-      case "standard" -> {
-        return config.getNumberOfWinners() > 1 ? "Multi-winner allow multiple winners per round"
-            : "Single-winner majority determines winner";
-      }
-      case "singleSeatContinueUntilTwoCandidatesRemain" -> {
-        return "Single-winner majority determines winner";
-      }
-      case "multiSeatAllowOnlyOneWinnerPerRound" -> {
-        return "Multi-winner allow only one winner per round";
-      }
-      case "multiSeatBottomsUp" -> {
-        return config.getNumberOfWinners() == 0
-            || config.getMultiSeatBottomsUpPercentageThreshold() != null
-            ? "Bottoms-up using percentage threshold" : "Bottoms-up";
-      }
-      case "multiSeatSequentialWinnerTakesAll" -> {
-        return "Multi-pass IRV";
-      }
-    }
-    return null;
   }
 
   private RawContestConfig createRawContestConfig() {
