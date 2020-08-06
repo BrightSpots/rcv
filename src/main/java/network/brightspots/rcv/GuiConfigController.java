@@ -88,15 +88,39 @@ public class GuiConfigController implements Initializable {
       "Bottoms-up using percentage threshold",
       "Multi-pass IRV"
   );
-  private static final Map<String, String> WINNER_ELECTION_MODE_VALUE_MAP = Map.of(
-      "Single-winner majority determines winner", WinnerElectionMode.STANDARD.toString(),
-      "Multi-winner allow only one winner per round",
-      WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString(),
-      "Multi-winner allow multiple winners per round", WinnerElectionMode.STANDARD.toString(),
-      "Bottoms-up", WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString(),
-      "Bottoms-up using percentage threshold", WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString(),
-      "Multi-pass IRV", WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString()
+  private static final Map<String, String> WINNER_ELECTION_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP = Map
+      .of(
+          "Single-winner majority determines winner", WinnerElectionMode.STANDARD.toString(),
+          "Multi-winner allow only one winner per round",
+          WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString(),
+          "Multi-winner allow multiple winners per round", WinnerElectionMode.STANDARD.toString(),
+          "Bottoms-up", WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString(),
+          "Bottoms-up using percentage threshold",
+          WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString(),
+          "Multi-pass IRV", WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString()
+      );
+  private static final List TIEBREAK_MODE_VALUES = List.of(
+      "Random",
+      "Stop counting and ask",
+      "Previous round counts (then random)",
+      "Previous round counts (then stop counting and ask)",
+      "Use order of candidates list",
+      "Generate permutation"
   );
+  private static final Map<String, String> TIEBREAK_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP = Map.of(
+      "Random", TieBreakMode.RANDOM.toString(),
+      "Stop counting and ask", TieBreakMode.INTERACTIVE.toString(),
+      "Previous round counts (then random)",
+      TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM.toString(),
+      "Previous round counts (then stop counting and ask)",
+      TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE.toString(),
+      "Use order of candidates list", TieBreakMode.USE_PERMUTATION_IN_CONFIG.toString(),
+      "Generate permutation", TieBreakMode.GENERATE_PERMUTATION.toString()
+  );
+  private static final Map<String, String> TIEBREAK_MODE_CONFIG_VALUE_TO_GUI_TEXT_MAP =
+      TIEBREAK_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP.entrySet()
+          .stream()
+          .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
@@ -174,7 +198,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxCandidateExcluded;
   @FXML
-  private ChoiceBox<TieBreakMode> choiceTiebreakMode;
+  private ChoiceBox<String> choiceTiebreakMode;
   @FXML
   private ChoiceBox<OvervoteRule> choiceOvervoteRule;
   @FXML
@@ -947,13 +971,12 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.setEditable(true);
 
     clearAndDisableWinningRuleFields();
-    choiceTiebreakMode.getItems().addAll(TieBreakMode.values());
-    choiceTiebreakMode.getItems().remove(TieBreakMode.MODE_UNKNOWN);
+    choiceTiebreakMode.getItems().addAll(TIEBREAK_MODE_VALUES);
     choiceTiebreakMode.setOnAction(event -> {
       clearAndDisableTiebreakFields();
       String mode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
       switch (mode) {
-        case "random", "previousRoundCountsThenRandom", "generatePermutation" -> textFieldRandomSeed
+        case "Random", "Previous round counts (then random)", "Generate permutation" -> textFieldRandomSeed
             .setDisable(false);
       }
     });
@@ -1059,7 +1082,9 @@ public class GuiConfigController implements Initializable {
             ? null
             : convertConfigWinnerElectionModeToGuiText(config));
     choiceTiebreakMode.setValue(
-        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
+        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null
+            : TIEBREAK_MODE_CONFIG_VALUE_TO_GUI_TEXT_MAP
+                .getOrDefault(config.getTiebreakMode().toString(), null));
     choiceOvervoteRule.setValue(
         config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
 
@@ -1141,9 +1166,11 @@ public class GuiConfigController implements Initializable {
     config.candidates = candidates;
 
     ContestRules rules = new ContestRules();
-    rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
+    rules.tiebreakMode = TIEBREAK_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP
+        .getOrDefault(getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN),
+            TieBreakMode.MODE_UNKNOWN.toString());
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
-    rules.winnerElectionMode = WINNER_ELECTION_MODE_VALUE_MAP
+    rules.winnerElectionMode = WINNER_ELECTION_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP
         .getOrDefault(getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN),
             WinnerElectionMode.MODE_UNKNOWN.toString());
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
