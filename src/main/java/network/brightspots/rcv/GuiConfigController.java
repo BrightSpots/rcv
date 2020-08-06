@@ -594,9 +594,7 @@ public class GuiConfigController implements Initializable {
             checkBoxCandidateExcluded.isSelected());
     if (ContestConfig.passesBasicCandidateValidation(candidate)) {
       tableViewCandidates.getItems().add(candidate);
-      textFieldCandidateName.clear();
-      textFieldCandidateCode.clear();
-      checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+      buttonClearCandidateClicked();
     }
   }
 
@@ -626,7 +624,9 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.refresh();
   }
 
-  /** Action when candidate code is changed. */
+  /**
+   * Action when candidate code is changed.
+   */
   public void changeCandidateCode(CellEditEvent cellEditEvent) {
     tableViewCandidates
         .getSelectionModel()
@@ -635,41 +635,70 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.refresh();
   }
 
+  private void clearAndDisableWinningRuleFields() {
+    textFieldMaxRankingsAllowed.clear();
+    textFieldMaxRankingsAllowed.setDisable(true);
+    textFieldMinimumVoteThreshold.clear();
+    textFieldMinimumVoteThreshold.setDisable(true);
+    checkBoxBatchElimination.setSelected(false);
+    checkBoxBatchElimination.setDisable(true);
+    choiceTiebreakMode.setValue(null);
+    choiceTiebreakMode.setDisable(true);
+    clearAndDisableTiebreakFields();
+    textFieldNumberOfWinners.clear();
+    textFieldNumberOfWinners.setDisable(true);
+    textFieldMultiSeatBottomsUpPercentageThreshold.clear();
+    textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(true);
+    checkBoxNonIntegerWinningThreshold.setSelected(false);
+    checkBoxNonIntegerWinningThreshold.setDisable(true);
+    checkBoxHareQuota.setSelected(false);
+    checkBoxHareQuota.setDisable(true);
+    textFieldDecimalPlacesForVoteArithmetic.clear();
+    textFieldDecimalPlacesForVoteArithmetic.setDisable(true);
+  }
+
+  private void clearAndDisableTiebreakFields() {
+    textFieldRandomSeed.clear();
+    textFieldRandomSeed.setDisable(true);
+  }
+
+  private void setWinningRulesDefaultValues() {
+    checkBoxNonIntegerWinningThreshold.setSelected(
+        ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
+    checkBoxHareQuota.setSelected(ContestConfig.SUGGESTED_HARE_QUOTA);
+    checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
+    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.SUGGESTED_NUMBER_OF_WINNERS));
+    textFieldDecimalPlacesForVoteArithmetic.setText(
+        String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+    textFieldMaxRankingsAllowed.setText(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED);
+  }
+
   private void setDefaultValues() {
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
 
-    choiceWinnerElectionMode.setValue(ContestConfig.SUGGESTED_WINNER_ELECTION_MODE);
-
-    checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
-    checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
-    checkBoxNonIntegerWinningThreshold.setSelected(
-        ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
-    checkBoxHareQuota.setSelected(ContestConfig.SUGGESTED_HARE_QUOTA);
-    checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
-    checkBoxExhaustOnDuplicateCandidate.setSelected(
-        ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
         ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
 
-    textFieldOutputDirectory.setText(ContestConfig.SUGGESTED_OUTPUT_DIRECTORY);
-    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.SUGGESTED_NUMBER_OF_WINNERS));
-    textFieldDecimalPlacesForVoteArithmetic.setText(
-        String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+    setWinningRulesDefaultValues();
+
     textFieldMaxSkippedRanksAllowed.setText(
         String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
-    textFieldMaxRankingsAllowed.setText(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED);
+    checkBoxExhaustOnDuplicateCandidate.setSelected(
+        ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
+
+    textFieldOutputDirectory.setText(ContestConfig.SUGGESTED_OUTPUT_DIRECTORY);
+    checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
+    checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
   }
 
   private void clearConfig() {
     textFieldContestName.clear();
-    textFieldOutputDirectory.clear();
     datePickerContestDate.setValue(null);
     textFieldContestJurisdiction.clear();
     textFieldContestOffice.clear();
-    checkBoxTabulateByPrecinct.setSelected(false);
-    checkBoxGenerateCdfJson.setSelected(false);
+    textFieldRulesDescription.clear();
 
     choiceCvrProvider.setValue(null);
     clearAndDisableCvrFilesTabFields();
@@ -680,25 +709,21 @@ public class GuiConfigController implements Initializable {
     checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
-    choiceTiebreakMode.setValue(null);
-    choiceOvervoteRule.setValue(null);
     choiceWinnerElectionMode.setValue(null);
-    textFieldRandomSeed.clear();
-    textFieldNumberOfWinners.clear();
-    textFieldMultiSeatBottomsUpPercentageThreshold.clear();
-    textFieldDecimalPlacesForVoteArithmetic.clear();
-    textFieldMinimumVoteThreshold.clear();
-    textFieldMaxSkippedRanksAllowed.clear();
-    textFieldMaxRankingsAllowed.clear();
+    clearAndDisableWinningRuleFields();
+
     textFieldOvervoteLabel.clear();
     textFieldUndervoteLabel.clear();
     textFieldUndeclaredWriteInLabel.clear();
-    textFieldRulesDescription.clear();
-    checkBoxNonIntegerWinningThreshold.setSelected(false);
-    checkBoxHareQuota.setSelected(false);
-    checkBoxBatchElimination.setSelected(false);
-    checkBoxExhaustOnDuplicateCandidate.setSelected(false);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(false);
+
+    choiceOvervoteRule.setValue(null);
+    textFieldMaxSkippedRanksAllowed.clear();
+    checkBoxExhaustOnDuplicateCandidate.setSelected(false);
+
+    textFieldOutputDirectory.clear();
+    checkBoxTabulateByPrecinct.setSelected(false);
+    checkBoxGenerateCdfJson.setSelected(false);
 
     setDefaultValues();
   }
@@ -837,6 +862,7 @@ public class GuiConfigController implements Initializable {
           }
         });
 
+    clearAndDisableCvrFilesTabFields();
     choiceCvrProvider.getItems().addAll(Provider.values());
     choiceCvrProvider.getItems().remove(Provider.PROVIDER_UNKNOWN);
     choiceCvrProvider.setOnAction(event -> {
@@ -865,7 +891,6 @@ public class GuiConfigController implements Initializable {
         }
       }
     });
-    clearAndDisableCvrFilesTabFields();
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
     tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
@@ -902,12 +927,56 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
 
+    clearAndDisableWinningRuleFields();
     choiceTiebreakMode.getItems().addAll(TieBreakMode.values());
     choiceTiebreakMode.getItems().remove(TieBreakMode.MODE_UNKNOWN);
+    choiceTiebreakMode.setOnAction(event -> {
+      clearAndDisableTiebreakFields();
+      String mode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
+      switch (mode) {
+        case "random", "previousRoundCountsThenRandom", "generatePermutation" -> textFieldRandomSeed
+            .setDisable(false);
+      }
+    });
     choiceOvervoteRule.getItems().addAll(OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(OvervoteRule.RULE_UNKNOWN);
     choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
     choiceWinnerElectionMode.getItems().remove(WinnerElectionMode.MODE_UNKNOWN);
+    choiceWinnerElectionMode.setOnAction(event -> {
+      clearAndDisableWinningRuleFields();
+      setWinningRulesDefaultValues();
+      String mode = getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN);
+      switch (mode) {
+        case "standard", "singleSeatContinueUntilTwoCandidatesRemain" -> {
+          textFieldMaxRankingsAllowed.setDisable(false);
+          textFieldMinimumVoteThreshold.setDisable(false);
+          choiceTiebreakMode.setDisable(false);
+          checkBoxNonIntegerWinningThreshold.setDisable(false);
+          checkBoxHareQuota.setDisable(false);
+          textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
+          checkBoxBatchElimination.setDisable(false);
+        }
+        case "multiSeatAllowOnlyOneWinnerPerRound", "multiSeatSequentialWinnerTakesAll" -> {
+          textFieldMaxRankingsAllowed.setDisable(false);
+          textFieldMinimumVoteThreshold.setDisable(false);
+          choiceTiebreakMode.setDisable(false);
+          checkBoxNonIntegerWinningThreshold.setDisable(false);
+          checkBoxHareQuota.setDisable(false);
+          textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
+          textFieldNumberOfWinners.setDisable(false);
+        }
+        case "multiSeatBottomsUp" -> {
+          textFieldMaxRankingsAllowed.setDisable(false);
+          textFieldMinimumVoteThreshold.setDisable(false);
+          choiceTiebreakMode.setDisable(false);
+          checkBoxNonIntegerWinningThreshold.setDisable(false);
+          checkBoxHareQuota.setDisable(false);
+          textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
+          textFieldNumberOfWinners.setDisable(false);
+          textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
+        }
+      }
+    });
 
     setDefaultValues();
 
