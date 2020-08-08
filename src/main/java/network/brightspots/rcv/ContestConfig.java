@@ -54,6 +54,7 @@ class ContestConfig {
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
+  static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_NUMBER_OF_WINNERS = 1;
@@ -666,12 +667,11 @@ class ContestConfig {
         }
 
         if (getNumberOfWinners() > 1) {
-          if (isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
+          if (isContinueUntilTwoCandidatesRemainEnabled()) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
-                "winnerElectionMode can't be singleSeatContinueUntilTwoCandidatesRemain in a "
-                    + "multi-seat contest!");
+                "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest!");
           }
 
           if (isBatchEliminationEnabled()) {
@@ -791,11 +791,6 @@ class ContestConfig {
     return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
   }
 
-  boolean isSingleSeatContinueUntilTwoCandidatesRemainEnabled() {
-    return getWinnerElectionMode()
-        == WinnerElectionMode.SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN;
-  }
-
   boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {
     return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND;
   }
@@ -900,6 +895,10 @@ class ContestConfig {
 
   boolean isBatchEliminationEnabled() {
     return rawConfig.rules.batchElimination;
+  }
+
+  boolean isContinueUntilTwoCandidatesRemainEnabled() {
+    return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
 
   int getNumDeclaredCandidates() {

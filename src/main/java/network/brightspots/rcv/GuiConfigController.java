@@ -210,6 +210,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxBatchElimination;
   @FXML
+  private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
+  @FXML
   private CheckBox checkBoxExhaustOnDuplicateCandidate;
   @FXML
   private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
@@ -687,6 +689,8 @@ public class GuiConfigController implements Initializable {
     textFieldMinimumVoteThreshold.setDisable(true);
     checkBoxBatchElimination.setSelected(false);
     checkBoxBatchElimination.setDisable(true);
+    checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
+    checkBoxContinueUntilTwoCandidatesRemain.setDisable(true);
     choiceTiebreakMode.setValue(null);
     choiceTiebreakMode.setDisable(true);
     clearAndDisableTiebreakFields();
@@ -712,6 +716,8 @@ public class GuiConfigController implements Initializable {
         ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
     checkBoxHareQuota.setSelected(ContestConfig.SUGGESTED_HARE_QUOTA);
     checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
+    checkBoxContinueUntilTwoCandidatesRemain
+        .setSelected(ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
     textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.SUGGESTED_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic.setText(
         String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
@@ -999,6 +1005,7 @@ public class GuiConfigController implements Initializable {
           checkBoxHareQuota.setDisable(false);
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
+          checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
         }
         case "Multi-winner allow only one winner per round", "Multi-winner allow multiple winners per round", "Bottoms-up", "Multi-pass IRV" -> {
           textFieldMaxRankingsAllowed.setDisable(false);
@@ -1126,6 +1133,7 @@ public class GuiConfigController implements Initializable {
     checkBoxNonIntegerWinningThreshold.setSelected(rules.nonIntegerWinningThreshold);
     checkBoxHareQuota.setSelected(rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
+    checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
   }
@@ -1181,6 +1189,7 @@ public class GuiConfigController implements Initializable {
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
     rules.hareQuota = checkBoxHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
+    rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
     rules.treatBlankAsUndeclaredWriteIn = checkBoxTreatBlankAsUndeclaredWriteIn.isSelected();
     rules.overvoteLabel = getTextOrEmptyString(textFieldOvervoteLabel);

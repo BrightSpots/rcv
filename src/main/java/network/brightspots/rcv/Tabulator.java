@@ -196,7 +196,7 @@ class Tabulator {
           }
         }
       } else if (winnerToRound.size() < config.getNumberOfWinners()
-          || (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()
+          || (config.isContinueUntilTwoCandidatesRemainEnabled()
           && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)
           || config.isMultiSeatBottomsUpWithThresholdEnabled()) {
         // We need to make more eliminations if
@@ -389,7 +389,7 @@ class Tabulator {
     int numEliminatedCandidates = candidateToRoundEliminated.keySet().size();
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
-    if (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
+    if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
@@ -415,7 +415,7 @@ class Tabulator {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING
         || (status == CandidateStatus.WINNER
-        && config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled());
+        && config.isContinueUntilTwoCandidatesRemainEnabled());
   }
 
   // returns candidate status (continuing, eliminated or winner)
@@ -759,7 +759,7 @@ class Tabulator {
         eliminations = newEliminations;
       }
     }
-    if (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()
+    if (config.isContinueUntilTwoCandidatesRemainEnabled()
         && eliminations.size() + candidateToRoundEliminated.size()
         == config.getNumCandidates() - 1) {
       // See the caveat above about continueUntilTwoCandidatesRemain. In this situation, we need to

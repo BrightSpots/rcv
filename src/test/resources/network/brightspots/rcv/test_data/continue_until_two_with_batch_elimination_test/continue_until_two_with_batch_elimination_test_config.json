@@ -49,7 +49,7 @@
   "rules" : {
     "tiebreakMode": "Use candidate order in the config file",
     "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleSeatContinueUntilTwoCandidatesRemain",
+    "winnerElectionMode": "Single-winner majority determines winner",
     "randomSeed": "",
     "numberOfWinners": "1",
     "multiSeatBottomsUpPercentageThreshold": "",
@@ -60,6 +60,7 @@
     "nonIntegerWinningThreshold": false,
     "hareQuota": false,
     "batchElimination": true,
+    "continueUntilTwoCandidatesRemain": true,
     "exhaustOnDuplicateCandidate": false,
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
