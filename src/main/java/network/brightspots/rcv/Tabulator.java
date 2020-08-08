@@ -1098,13 +1098,13 @@ class Tabulator {
 
   // TieBreakMode determines how ties will be handled
   enum TieBreakMode {
-    RANDOM("random"),
-    INTERACTIVE("interactive"),
-    PREVIOUS_ROUND_COUNTS_THEN_RANDOM("previousRoundCountsThenRandom"),
-    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("previousRoundCountsThenInteractive"),
-    USE_PERMUTATION_IN_CONFIG("usePermutationInConfig"),
-    GENERATE_PERMUTATION("generatePermutation"),
-    MODE_UNKNOWN("modeUnknown");
+    RANDOM("Random"),
+    INTERACTIVE("Stop counting and ask"),
+    PREVIOUS_ROUND_COUNTS_THEN_RANDOM("Previous round counts (then random)"),
+    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("Previous round counts (then stop counting and ask)"),
+    USE_PERMUTATION_IN_CONFIG("Use candidate order in the config file"),
+    GENERATE_PERMUTATION("Generate permutation"),
+    MODE_UNKNOWN("Unknown mode");
 
     private final String label;
 

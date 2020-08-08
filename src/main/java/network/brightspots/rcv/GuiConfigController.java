@@ -99,28 +99,6 @@ public class GuiConfigController implements Initializable {
           WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString(),
           "Multi-pass IRV", WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString()
       );
-  private static final List TIEBREAK_MODE_VALUES = List.of(
-      "Random",
-      "Stop counting and ask",
-      "Previous round counts (then random)",
-      "Previous round counts (then stop counting and ask)",
-      "Use order of candidates list",
-      "Generate permutation"
-  );
-  private static final Map<String, String> TIEBREAK_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP = Map.of(
-      "Random", TieBreakMode.RANDOM.toString(),
-      "Stop counting and ask", TieBreakMode.INTERACTIVE.toString(),
-      "Previous round counts (then random)",
-      TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM.toString(),
-      "Previous round counts (then stop counting and ask)",
-      TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE.toString(),
-      "Use order of candidates list", TieBreakMode.USE_PERMUTATION_IN_CONFIG.toString(),
-      "Generate permutation", TieBreakMode.GENERATE_PERMUTATION.toString()
-  );
-  private static final Map<String, String> TIEBREAK_MODE_CONFIG_VALUE_TO_GUI_TEXT_MAP =
-      TIEBREAK_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP.entrySet()
-          .stream()
-          .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
@@ -198,7 +176,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxCandidateExcluded;
   @FXML
-  private ChoiceBox<String> choiceTiebreakMode;
+  private ChoiceBox<TieBreakMode> choiceTiebreakMode;
   @FXML
   private ChoiceBox<OvervoteRule> choiceOvervoteRule;
   @FXML
@@ -995,7 +973,8 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.setEditable(true);
 
     clearAndDisableWinningRuleFields();
-    choiceTiebreakMode.getItems().addAll(TIEBREAK_MODE_VALUES);
+    choiceTiebreakMode.getItems().addAll(TieBreakMode.values());
+    choiceTiebreakMode.getItems().remove(TieBreakMode.MODE_UNKNOWN);
     choiceTiebreakMode.setOnAction(event -> {
       clearAndDisableTiebreakFields();
       String mode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
@@ -1063,6 +1042,27 @@ public class GuiConfigController implements Initializable {
     if (config.rawConfig.tabulatorVersion == null
         || !config.rawConfig.tabulatorVersion.equals(Main.APP_VERSION)) {
       // Any necessary future version migration logic goes here
+      if (config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
+        Map<String, String> tiebreakModeMigrationMap = Map.of(
+            "random", TieBreakMode.RANDOM.toString(),
+            "interactive", TieBreakMode.INTERACTIVE.toString(),
+            "previousRoundCountsThenRandom",
+            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM.toString(),
+            "previousRoundCountsThenInteractive",
+            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE.toString(),
+            "usePermutationInConfig", TieBreakMode.USE_PERMUTATION_IN_CONFIG.toString(),
+            "generatePermutation", TieBreakMode.GENERATE_PERMUTATION.toString()
+        );
+        String oldTiebreakMode = config.rawConfig.rules.tiebreakMode;
+        if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
+          config.rawConfig.rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode);
+        } else {
+          Logger.log(Level.WARNING,
+              "tiebreakMode \"%s\" is unrecognized! Please supply a valid tiebreakMode.",
+              oldTiebreakMode);
+          config.rawConfig.rules.tiebreakMode = null;
+        }
+      }
       Logger.log(
           Level.INFO,
           "Migrated tabulator config version from %s to %s.",
@@ -1106,9 +1106,7 @@ public class GuiConfigController implements Initializable {
             ? null
             : convertConfigWinnerElectionModeToGuiText(config));
     choiceTiebreakMode.setValue(
-        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null
-            : TIEBREAK_MODE_CONFIG_VALUE_TO_GUI_TEXT_MAP
-                .getOrDefault(config.getTiebreakMode().toString(), null));
+        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
     choiceOvervoteRule.setValue(
         config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
 
@@ -1166,9 +1164,7 @@ public class GuiConfigController implements Initializable {
     config.candidates = candidates;
 
     ContestRules rules = new ContestRules();
-    rules.tiebreakMode = TIEBREAK_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP
-        .getOrDefault(getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN),
-            TieBreakMode.MODE_UNKNOWN.toString());
+    rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
     rules.winnerElectionMode = WINNER_ELECTION_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP
         .getOrDefault(getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN),
