@@ -38,7 +38,7 @@
   "rules" : {
     "tiebreakMode": "Stop counting and ask",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "standard",
+    "winnerElectionMode": "Single-winner majority determines winner",
     "randomSeed": "",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "4",

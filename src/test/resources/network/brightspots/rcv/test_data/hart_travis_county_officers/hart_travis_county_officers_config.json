@@ -48,7 +48,7 @@
   "rules" : {
     "tiebreakMode": "Random",
     "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "standard",
+    "winnerElectionMode": "Single-winner majority determines winner",
     "randomSeed": "9",
     "numberOfWinners": "1",
     "multiSeatBottomsUpPercentageThreshold": "",

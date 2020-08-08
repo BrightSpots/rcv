@@ -62,7 +62,7 @@
   "rules" : {
     "tiebreakMode": "Random",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiSeatSequentialWinnerTakesAll",
+    "winnerElectionMode": "Multi-pass IRV",
     "randomSeed": "0",
     "numberOfWinners": "3",
     "decimalPlacesForVoteArithmetic": "4",

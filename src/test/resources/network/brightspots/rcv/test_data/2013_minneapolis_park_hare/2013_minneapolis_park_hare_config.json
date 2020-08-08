@@ -62,7 +62,7 @@
   "rules" : {
     "tiebreakMode": "Random",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "standard",
+    "winnerElectionMode": "Multi-winner allow multiple winners per round",
     "randomSeed": "0",
     "numberOfWinners": "3",
     "decimalPlacesForVoteArithmetic": "4",

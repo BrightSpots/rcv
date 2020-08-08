@@ -38,7 +38,7 @@
   "rules" : {
     "tiebreakMode": "Use candidate order in the config file",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "standard",
+    "winnerElectionMode": "Single-winner majority determines winner",
     "numberOfWinners": 1,
     "decimalPlacesForVoteArithmetic": 4,
     "minimumVoteThreshold": 0,

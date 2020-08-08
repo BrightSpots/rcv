@@ -33,7 +33,7 @@
   "rules" : {
     "tiebreakMode": "Use candidate order in the config file",
     "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "standard",
+    "winnerElectionMode": "Multi-winner allow multiple winners per round",
     "randomSeed": "",
     "numberOfWinners": "2",
     "multiSeatBottomsUpPercentageThreshold": "",

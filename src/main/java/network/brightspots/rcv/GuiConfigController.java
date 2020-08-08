@@ -29,7 +29,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -80,25 +79,6 @@ public class GuiConfigController implements Initializable {
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String CONFIG_FILE_DOCUMENTATION_FILENAME =
       "network/brightspots/rcv/config_file_documentation.txt";
-  private static final List WINNER_ELECTION_MODE_VALUES = List.of(
-      "Single-winner majority determines winner",
-      "Multi-winner allow only one winner per round",
-      "Multi-winner allow multiple winners per round",
-      "Bottoms-up",
-      "Bottoms-up using percentage threshold",
-      "Multi-pass IRV"
-  );
-  private static final Map<String, String> WINNER_ELECTION_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP = Map
-      .of(
-          "Single-winner majority determines winner", WinnerElectionMode.STANDARD.toString(),
-          "Multi-winner allow only one winner per round",
-          WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString(),
-          "Multi-winner allow multiple winners per round", WinnerElectionMode.STANDARD.toString(),
-          "Bottoms-up", WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString(),
-          "Bottoms-up using percentage threshold",
-          WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString(),
-          "Multi-pass IRV", WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString()
-      );
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
@@ -180,7 +160,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ChoiceBox<OvervoteRule> choiceOvervoteRule;
   @FXML
-  private ChoiceBox<String> choiceWinnerElectionMode;
+  private ChoiceBox<WinnerElectionMode> choiceWinnerElectionMode;
   @FXML
   private TextField textFieldRandomSeed;
   @FXML
@@ -226,30 +206,6 @@ public class GuiConfigController implements Initializable {
 
   private static String getTextOrEmptyString(TextField textField) {
     return textField.getText() != null ? textField.getText().trim() : "";
-  }
-
-  private static String convertConfigWinnerElectionModeToGuiText(ContestConfig config) {
-    switch (config.getWinnerElectionMode().toString()) {
-      case "standard" -> {
-        return config.getNumberOfWinners() > 1 ? "Multi-winner allow multiple winners per round"
-            : "Single-winner majority determines winner";
-      }
-      case "singleSeatContinueUntilTwoCandidatesRemain" -> {
-        return "Single-winner majority determines winner";
-      }
-      case "multiSeatAllowOnlyOneWinnerPerRound" -> {
-        return "Multi-winner allow only one winner per round";
-      }
-      case "multiSeatBottomsUp" -> {
-        return config.getNumberOfWinners() == 0
-            || config.getMultiSeatBottomsUpPercentageThreshold() != null
-            ? "Bottoms-up using percentage threshold" : "Bottoms-up";
-      }
-      case "multiSeatSequentialWinnerTakesAll" -> {
-        return "Multi-pass IRV";
-      }
-    }
-    return null;
   }
 
   /**
@@ -991,7 +947,8 @@ public class GuiConfigController implements Initializable {
     });
     choiceOvervoteRule.getItems().addAll(OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(OvervoteRule.RULE_UNKNOWN);
-    choiceWinnerElectionMode.getItems().addAll(WINNER_ELECTION_MODE_VALUES);
+    choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
+    choiceWinnerElectionMode.getItems().remove(WinnerElectionMode.MODE_UNKNOWN);
     choiceWinnerElectionMode.setOnAction(event -> {
       clearAndDisableWinningRuleFields();
       setWinningRulesDefaultValues();
@@ -1049,6 +1006,36 @@ public class GuiConfigController implements Initializable {
     if (config.rawConfig.tabulatorVersion == null
         || !config.rawConfig.tabulatorVersion.equals(Main.APP_VERSION)) {
       // Any necessary future version migration logic goes here
+
+      if (config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
+        String oldWinnerElectionMode = config.rawConfig.rules.winnerElectionMode;
+        switch (oldWinnerElectionMode) {
+          case "standard" -> config.rawConfig.rules.winnerElectionMode =
+              config.getNumberOfWinners() > 1
+                  ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND.toString()
+                  : WinnerElectionMode.STANDARD.toString();
+          case "singleSeatContinueUntilTwoCandidatesRemain" -> {
+            config.rawConfig.rules.winnerElectionMode = WinnerElectionMode.STANDARD.toString();
+            config.rawConfig.rules.continueUntilTwoCandidatesRemain = true;
+          }
+          case "multiSeatAllowOnlyOneWinnerPerRound" -> config.rawConfig.rules.winnerElectionMode =
+              WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString();
+          case "multiSeatBottomsUp" -> config.rawConfig.rules.winnerElectionMode =
+              config.getNumberOfWinners() == 0
+                  || config.getMultiSeatBottomsUpPercentageThreshold() != null
+                  ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD.toString()
+                  : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString();
+          case "multiSeatSequentialWinnerTakesAll" -> config.rawConfig.rules.winnerElectionMode =
+              WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString();
+          default -> {
+            Logger.log(Level.WARNING,
+                "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
+                    + "winnerElectionMode.", oldWinnerElectionMode);
+            config.rawConfig.rules.winnerElectionMode = null;
+          }
+        }
+      }
+
       if (config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
         Map<String, String> tiebreakModeMigrationMap = Map.of(
             "random", TieBreakMode.RANDOM.toString(),
@@ -1070,6 +1057,7 @@ public class GuiConfigController implements Initializable {
           config.rawConfig.rules.tiebreakMode = null;
         }
       }
+
       Logger.log(
           Level.INFO,
           "Migrated tabulator config version from %s to %s.",
@@ -1111,7 +1099,7 @@ public class GuiConfigController implements Initializable {
     choiceWinnerElectionMode.setValue(
         config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN
             ? null
-            : convertConfigWinnerElectionModeToGuiText(config));
+            : config.getWinnerElectionMode());
     choiceTiebreakMode.setValue(
         config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
     choiceOvervoteRule.setValue(
@@ -1174,9 +1162,8 @@ public class GuiConfigController implements Initializable {
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
     rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
-    rules.winnerElectionMode = WINNER_ELECTION_MODE_GUI_TEXT_TO_CONFIG_VALUE_MAP
-        .getOrDefault(getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN),
-            WinnerElectionMode.MODE_UNKNOWN.toString());
+    rules.winnerElectionMode = getChoiceElse(choiceWinnerElectionMode,
+        WinnerElectionMode.MODE_UNKNOWN);
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
     rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
     rules.multiSeatBottomsUpPercentageThreshold = getTextOrEmptyString(

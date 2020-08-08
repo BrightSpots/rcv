@@ -38,7 +38,7 @@
   "rules" : {
     "tiebreakMode": "Use candidate order in the config file",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiSeatAllowOnlyOneWinnerPerRound",
+    "winnerElectionMode": "Multi-winner allow only one winner per round",
     "randomSeed": "",
     "numberOfWinners": "3",
     "decimalPlacesForVoteArithmetic": "4",

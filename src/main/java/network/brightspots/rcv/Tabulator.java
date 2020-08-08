@@ -1126,12 +1126,15 @@ class Tabulator {
   }
 
   enum WinnerElectionMode {
-    STANDARD("standard"),
-    SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN("singleSeatContinueUntilTwoCandidatesRemain"),
-    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("multiSeatAllowOnlyOneWinnerPerRound"),
-    MULTI_SEAT_BOTTOMS_UP("multiSeatBottomsUp"),
-    MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("multiSeatSequentialWinnerTakesAll"),
-    MODE_UNKNOWN("modeUnknown");
+    STANDARD("Single-winner majority determines winner"),
+    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("Multi-winner allow only one winner per round"),
+    // TODO: Need to implement below (concerned that no tests are failing as a result of this being unimplemented)
+    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("Multi-winner allow multiple winners per round"),
+    MULTI_SEAT_BOTTOMS_UP("Bottoms-up"),
+    // TODO: Need to implement below
+    MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD("Bottoms-up using percentage threshold"),
+    MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("Multi-pass IRV"),
+    MODE_UNKNOWN("Unknown mode");
 
     private final String label;
 
