@@ -54,6 +54,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.DominionCvrReader.Contest;
+import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -202,7 +203,8 @@ class ResultsWriter {
 
   private String getOutputFilePathFromInstance(String outputType) {
     String tabulationSequenceId = null;
-    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
+    if (config.getWinnerElectionMode()
+        == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL) {
       Integer sequence = config.getSequentialWinners().size() + 1;
       tabulationSequenceId = sequence.toString();
     }

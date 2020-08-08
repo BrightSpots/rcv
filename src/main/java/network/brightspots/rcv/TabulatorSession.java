@@ -49,6 +49,7 @@ import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
 import network.brightspots.rcv.StreamingCvrReader.UnrecognizedCandidatesException;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
+import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
@@ -160,7 +161,8 @@ class TabulatorSession {
         Logger.log(Level.SEVERE, "Error logging config file: %s\n%s", configPath, e.toString());
       }
       Logger.log(Level.INFO, "Tabulating '%s'...", config.getContestName());
-      if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
+      if (config.getWinnerElectionMode()
+          == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL) {
         Logger.log(Level.INFO, "This is a sequential multi-seat contest.");
         int numWinners = config.getNumberOfWinners();
         // temporarily set config to single-seat so we can run sequential elections
@@ -285,7 +287,8 @@ class TabulatorSession {
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
           Logger
               .log(Level.INFO, "Reading Clear Ballot cast vote records from file: %s...", cvrPath);
-          new ClearBallotCvrReader(cvrPath, config).readCastVoteRecords(castVoteRecords, source.getContestId());
+          new ClearBallotCvrReader(cvrPath, config)
+              .readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
