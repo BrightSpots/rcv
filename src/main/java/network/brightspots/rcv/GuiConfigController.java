@@ -200,8 +200,25 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TabPane tabPane;
 
-  private static String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
-    return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
+  private static Provider getProviderChoice(ChoiceBox<Provider> choiceBox) {
+    return choiceBox.getValue() != null ? Provider.getByLabel(choiceBox.getValue().toString())
+        : Provider.PROVIDER_UNKNOWN;
+  }
+
+  private static WinnerElectionMode getWinnerElectionModeChoice(
+      ChoiceBox<WinnerElectionMode> choiceBox) {
+    return choiceBox.getValue() != null ? WinnerElectionMode
+        .getByLabel(choiceBox.getValue().toString()) : WinnerElectionMode.MODE_UNKNOWN;
+  }
+
+  private static TieBreakMode getTiebreakModeChoice(ChoiceBox<TieBreakMode> choiceBox) {
+    return choiceBox.getValue() != null ? TieBreakMode.getByLabel(choiceBox.getValue().toString())
+        : TieBreakMode.MODE_UNKNOWN;
+  }
+
+  private static OvervoteRule getOvervoteRuleChoice(ChoiceBox<OvervoteRule> choiceBox) {
+    return choiceBox.getValue() != null ? OvervoteRule.getByLabel(choiceBox.getValue().toString())
+        : OvervoteRule.RULE_UNKNOWN;
   }
 
   private static String getTextOrEmptyString(TextField textField) {
@@ -423,34 +440,34 @@ public class GuiConfigController implements Initializable {
   public void buttonCvrFilePathClicked() {
     File openFile = null;
 
-    String providerName = getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN);
-    switch (providerName) {
-      case "CDF" -> {
+    Provider provider = getProviderChoice(choiceCvrProvider);
+    switch (provider) {
+      case CDF -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
-        fc.setTitle("Select CDF Cast Vote Record File");
+        fc.setTitle("Select " + provider + " Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       }
-      case "Clear Ballot" -> {
+      case CLEAR_BALLOT -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters().add(new ExtensionFilter("CSV files", "*.csv"));
-        fc.setTitle("Select Clear Ballot Cast Vote Record File");
+        fc.setTitle("Select " + provider + " Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       }
-      case "Dominion", "Hart" -> {
+      case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-        dc.setTitle("Select " + providerName + " Cast Vote Record Folder");
+        dc.setTitle("Select " + provider + " Cast Vote Record Folder");
         openFile = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
-      case "ES&S" -> {
+      case ESS -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters()
             .add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
-        fc.setTitle("Select ES&S Cast Vote Record File");
+        fc.setTitle("Select " + provider + " Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       }
       default -> {
@@ -472,7 +489,7 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCvrFirstVoteRow),
             getTextOrEmptyString(textFieldCvrIdCol),
             getTextOrEmptyString(textFieldCvrPrecinctCol),
-            getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN),
+            getProviderChoice(choiceCvrProvider).toString(),
             getTextOrEmptyString(textFieldCvrContestId));
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
@@ -874,9 +891,8 @@ public class GuiConfigController implements Initializable {
     choiceCvrProvider.getItems().remove(Provider.PROVIDER_UNKNOWN);
     choiceCvrProvider.setOnAction(event -> {
       clearAndDisableCvrFilesTabFields();
-      String provider = getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN);
-      switch (provider) {
-        case "ES&S" -> {
+      switch (getProviderChoice(choiceCvrProvider)) {
+        case ESS -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
@@ -885,12 +901,12 @@ public class GuiConfigController implements Initializable {
           textFieldCvrIdCol.setDisable(false);
           textFieldCvrPrecinctCol.setDisable(false);
         }
-        case "CDF" -> {
+        case CDF -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
         }
-        case "Clear Ballot", "Dominion", "Hart" -> {
+        case CLEAR_BALLOT, DOMINION, HART -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
@@ -939,9 +955,8 @@ public class GuiConfigController implements Initializable {
     choiceTiebreakMode.getItems().remove(TieBreakMode.MODE_UNKNOWN);
     choiceTiebreakMode.setOnAction(event -> {
       clearAndDisableTiebreakFields();
-      String mode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
-      switch (mode) {
-        case "Random", "Previous round counts (then random)", "Generate permutation" -> textFieldRandomSeed
+      switch (getTiebreakModeChoice(choiceTiebreakMode)) {
+        case RANDOM, PREVIOUS_ROUND_COUNTS_THEN_RANDOM, GENERATE_PERMUTATION -> textFieldRandomSeed
             .setDisable(false);
       }
     });
@@ -952,9 +967,8 @@ public class GuiConfigController implements Initializable {
     choiceWinnerElectionMode.setOnAction(event -> {
       clearAndDisableWinningRuleFields();
       setWinningRulesDefaultValues();
-      String mode = getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN);
-      switch (mode) {
-        case "Single-winner majority determines winner" -> {
+      switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
+        case STANDARD -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
@@ -964,7 +978,7 @@ public class GuiConfigController implements Initializable {
           checkBoxBatchElimination.setDisable(false);
           checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
         }
-        case "Multi-winner allow only one winner per round", "Multi-winner allow multiple winners per round", "Bottoms-up", "Multi-pass IRV" -> {
+        case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND, MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND, MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
@@ -973,7 +987,7 @@ public class GuiConfigController implements Initializable {
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
-        case "Bottoms-up using percentage threshold" -> {
+        case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
@@ -1160,10 +1174,9 @@ public class GuiConfigController implements Initializable {
     config.candidates = candidates;
 
     ContestRules rules = new ContestRules();
-    rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
-    rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
-    rules.winnerElectionMode = getChoiceElse(choiceWinnerElectionMode,
-        WinnerElectionMode.MODE_UNKNOWN);
+    rules.tiebreakMode = getTiebreakModeChoice(choiceTiebreakMode).toString();
+    rules.overvoteRule = getOvervoteRuleChoice(choiceOvervoteRule).toString();
+    rules.winnerElectionMode = getWinnerElectionModeChoice(choiceWinnerElectionMode).toString();
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
     rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
     rules.multiSeatBottomsUpPercentageThreshold = getTextOrEmptyString(
