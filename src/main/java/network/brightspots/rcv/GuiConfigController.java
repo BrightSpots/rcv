@@ -1024,7 +1024,7 @@ public class GuiConfigController implements Initializable {
               config.getNumberOfWinners() == 0
                   || config.getMultiSeatBottomsUpPercentageThreshold() != null
                   ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD.toString()
-                  : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP.toString();
+                  : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.toString();
           case "multiSeatSequentialWinnerTakesAll" -> config.rawConfig.rules.winnerElectionMode =
               WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString();
           default -> {

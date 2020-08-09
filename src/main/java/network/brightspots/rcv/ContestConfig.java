@@ -574,7 +574,7 @@ class ContestConfig {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "When tiebreakMode involves a random element, randomSeed must be supplied.");
+          "When tiebreakMode involves a random element, randomSeed must be supplied!");
     }
     if (fieldOutOfRangeOrNotInteger(
         getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, MAX_RANDOM_SEED, false)) {
@@ -659,10 +659,9 @@ class ContestConfig {
     }
 
     WinnerElectionMode winnerMode = getWinnerElectionMode();
-
     if (Utils.isInt(getNumberOfWinnersRaw())) {
       if (getNumberOfWinners() > 0) {
-        if (winnerMode == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD) {
+        if (isMultiSeatBottomsUpWithThresholdEnabled()) {
           isValid = false;
           Logger.log(Level.SEVERE, "numberOfWinners must be zero if winnerElectionMode is \"%s\"!",
               winnerMode.toString());
@@ -681,10 +680,10 @@ class ContestConfig {
             Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
           }
         } else { // numberOfWinners == 1
-          if (winnerMode == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL ||
-              winnerMode == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP ||
-              winnerMode == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND ||
-              winnerMode == WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND) {
+          if (isMultiSeatSequentialWinnerTakesAllEnabled() ||
+              isMultiSeatBottomsUpUntilNWinnersEnabled() ||
+              isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() ||
+              isMultiSeatAllowMultipleWinnersPerRoundEnabled()) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
@@ -699,19 +698,17 @@ class ContestConfig {
           }
         }
       } else { // numberOfWinners == 0
-        if (winnerMode != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD ||
-            getMultiSeatBottomsUpPercentageThreshold() == null) {
+        if (!isMultiSeatBottomsUpWithThresholdEnabled()
+            || getMultiSeatBottomsUpPercentageThreshold() == null) {
           isValid = false;
           Logger.log(Level.SEVERE,
-              "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and multiSeatBottomsUpPercentageThreshold must be specified.",
+              "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and multiSeatBottomsUpPercentageThreshold must be specified!",
               winnerMode.toString());
         }
       }
     }
 
-    // TODO: maybe revert back helper functions like isMultiSeatSequentialWinnerTakesAllEnabled()
-    if (isBatchEliminationEnabled() &&
-        winnerMode == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD) {
+    if (isMultiSeatBottomsUpWithThresholdEnabled() && isBatchEliminationEnabled()) {
       isValid = false;
       Logger.log(Level.SEVERE, "batchElimination can't be true when winnerElectionMode is \"%s\"!",
           winnerMode.toString());
@@ -780,6 +777,28 @@ class ContestConfig {
   WinnerElectionMode getWinnerElectionMode() {
     WinnerElectionMode mode = WinnerElectionMode.getByLabel(rawConfig.rules.winnerElectionMode);
     return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
+  }
+
+  boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND;
+  }
+
+  boolean isMultiSeatAllowMultipleWinnersPerRoundEnabled() {
+    return getWinnerElectionMode()
+        == WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND;
+  }
+
+  boolean isMultiSeatBottomsUpUntilNWinnersEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS;
+  }
+
+  boolean isMultiSeatBottomsUpWithThresholdEnabled() {
+    return getWinnerElectionMode()
+        == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD;
+  }
+
+  boolean isMultiSeatSequentialWinnerTakesAllEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL;
   }
 
   boolean isNonIntegerWinningThresholdEnabled() {

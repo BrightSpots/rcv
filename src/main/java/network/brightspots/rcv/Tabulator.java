@@ -173,8 +173,7 @@ class Tabulator {
         }
         // In multi-seat contests, we always redistribute the surplus (if any) unless bottoms-up
         // is enabled.
-        if (config.getNumberOfWinners() > 1 &&
-            config.getWinnerElectionMode() != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP) {
+        if (config.getNumberOfWinners() > 1 && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
           for (String winner : winners) {
             BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
             // number that were surplus (beyond the required threshold)
@@ -199,8 +198,7 @@ class Tabulator {
       } else if (winnerToRound.size() < config.getNumberOfWinners()
           || (config.isContinueUntilTwoCandidatesRemainEnabled()
           && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)
-          || config.getWinnerElectionMode()
-          == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD) {
+          || config.isMultiSeatBottomsUpWithThresholdEnabled()) {
         // We need to make more eliminations if
         // a) we haven't found all the winners yet, or
         // b) we've found our winner, but we're continuing until we have only two candidates
@@ -359,8 +357,7 @@ class Tabulator {
       currentRoundTotalVotes = currentRoundTotalVotes.add(numVotes);
     }
 
-    if (config.getWinnerElectionMode()
-        == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD) {
+    if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       winningThreshold =
           currentRoundTotalVotes.multiply(config.getMultiSeatBottomsUpPercentageThreshold());
     } else {
@@ -397,8 +394,7 @@ class Tabulator {
       // round after we've made our final elimination.
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
           || candidateToRoundEliminated.containsValue(currentRound);
-    } else if (config.getWinnerElectionMode()
-        == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD) {
+    } else if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       // in this mode, we're done as soon as we've declared any winners
       return numWinnersDeclared == 0;
     } else {
@@ -409,7 +405,7 @@ class Tabulator {
       return numWinnersDeclared < config.getNumberOfWinners()
           || (config.getNumberOfWinners() > 1
           && winnerToRound.containsValue(currentRound)
-          && config.getWinnerElectionMode() != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP);
+          && !config.isMultiSeatBottomsUpUntilNWinnersEnabled());
     }
   }
 
@@ -447,8 +443,7 @@ class Tabulator {
       throws TabulationCancelledException {
     List<String> selectedWinners = new LinkedList<>();
 
-    if (config.getWinnerElectionMode()
-        == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD) {
+    if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       // if everyone meets the threshold, select them all as winners
       boolean allMeet = true;
       for (BigDecimal tally : currentRoundCandidateToTally.values()) {
@@ -467,7 +462,7 @@ class Tabulator {
         if (currentRoundCandidateToTally.size()
             == config.getNumberOfWinners() - winnerToRound.size()) {
           selectedWinners.addAll(currentRoundCandidateToTally.keySet());
-        } else if (config.getWinnerElectionMode() != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP) {
+        } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
           // We see if anyone has met/exceeded the threshold (unless bottoms-up is enabled, in which
           // case we just wait until there are numWinners candidates remaining and then declare all
           // of them as winners simultaneously).
@@ -490,9 +485,7 @@ class Tabulator {
       // Edge case: if we've identified multiple winners in this round but we're only supposed to
       // elect one winner per round, pick the top vote-getter and defer the others to subsequent
       // rounds.
-      if (config.getWinnerElectionMode()
-          == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND
-          && selectedWinners.size() > 1) {
+      if (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
         selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
@@ -1136,7 +1129,7 @@ class Tabulator {
     STANDARD("Single-winner majority determines winner"),
     MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("Multi-winner allow only one winner per round"),
     MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("Multi-winner allow multiple winners per round"),
-    MULTI_SEAT_BOTTOMS_UP("Bottoms-up"),
+    MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS("Bottoms-up"),
     MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD("Bottoms-up using percentage threshold"),
     MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("Multi-pass IRV"),
     MODE_UNKNOWN("Unknown mode");
