@@ -127,10 +127,10 @@ class Tabulator {
     logSummaryInfo();
 
     // Loop until we've found our winner(s), with a couple exceptions:
-    // - If singleSeatContinueUntilTwoCandidatesRemain mode is active, we loop until only two
+    // - If continueUntilTwoCandidatesRemain is true, we loop until only two
     // candidates remain even if we've already found our winner.
-    // - If multiSeatBottomsUp mode is active and multiSeatBottomsUpPercentageThreshold is set,
-    // we loop until all remaining candidates have vote shares that meet or exceed that threshold.
+    // - If winnerElectionMode is "Bottoms-up using percentage threshold", we loop until all
+    // remaining candidates have vote shares that meet or exceed that threshold.
     //
     // At each iteration, we'll either a) identify one or more
     // winners and transfer their votes to the remaining candidates (if we still need to find more
@@ -387,7 +387,7 @@ class Tabulator {
   }
 
   // determine if we should continue tabulating based on how many winners have been
-  // selected and if singleSeatContinueUntilTwoCandidatesRemain mode is enabled.
+  // selected and if continueUntilTwoCandidatesRemain is true.
   private boolean shouldContinueTabulating() {
     int numEliminatedCandidates = candidateToRoundEliminated.keySet().size();
     int numWinnersDeclared = winnerToRound.size();
@@ -414,7 +414,7 @@ class Tabulator {
   }
 
   // This handles continued tabulation after a winner has been chosen when
-  // singleSeatContinueUntilTwoCandidatesRemain mode is enabled.
+  // continueUntilTwoCandidatesRemain is true.
   private boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING
@@ -715,8 +715,8 @@ class Tabulator {
   //   In this algorithm we sum candidate vote totals (low to high) and find where this leapfrogging
   //   is impossible: that is, when the sum of all batch-eliminated candidates' votes fails to equal
   //   or exceed the next-lowest candidate vote total.
-  //   One additional caveat when we're in singleSeatContinueUntilTwoCandidatesRemain mode: make
-  //   sure we don't batch-eliminate too many candidates and end up with just the winner.
+  //   One additional caveat when continueUntilTwoCandidatesRemain is true: make sure we don't
+  //   batch-eliminate too many candidates and end up with just the winner.
   //
   // param: currentRoundTallyToCandidates map from vote tally to candidates with that tally
   // returns: list of BatchElimination objects, one for each batch-eliminated candidate

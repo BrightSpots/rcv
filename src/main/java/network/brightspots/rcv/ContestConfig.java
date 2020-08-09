@@ -564,7 +564,6 @@ class ContestConfig {
   }
 
   private void validateRules() {
-    WinnerElectionMode winnerMode = getWinnerElectionMode();
 
     if (getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
       isValid = false;
@@ -659,14 +658,14 @@ class ContestConfig {
       isValid = false;
     }
 
+    WinnerElectionMode winnerMode = getWinnerElectionMode();
+
     if (Utils.isInt(getNumberOfWinnersRaw())) {
       if (getNumberOfWinners() > 0) {
         if (winnerMode == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "numberOfWinners must be zero if winnerElectionMode is "
-                  + "multiSeatBottomsUpUsingPercentageThreshold!");
+          Logger.log(Level.SEVERE, "numberOfWinners must be zero if winnerElectionMode is \"%s\"!",
+              winnerMode.toString());
         }
 
         if (getNumberOfWinners() > 1) {
@@ -689,7 +688,7 @@ class ContestConfig {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
-                "winnerElectionMode can't be %s in a single-seat contest!",
+                "winnerElectionMode can't be \n%s\n in a single-seat contest!",
                 winnerMode.toString()
             );
           }
@@ -703,22 +702,19 @@ class ContestConfig {
         if (winnerMode != WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD ||
             getMultiSeatBottomsUpPercentageThreshold() == null) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "If numberOfWinners is zero, winnerElectionMode must be " +
-                  "multiSeatBottomsUpUsingPercentageThreshold and " +
-                  "multiSeatBottomsUpPercentageThreshold must be specified.");
+          Logger.log(Level.SEVERE,
+              "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and multiSeatBottomsUpPercentageThreshold must be specified.",
+              winnerMode.toString());
         }
       }
     }
 
+    // TODO: maybe revert back helper functions like isMultiSeatSequentialWinnerTakesAllEnabled()
     if (isBatchEliminationEnabled() &&
         winnerMode == WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD) {
       isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "batchElimination can't be true when winnerElectionMode is " +
-              "multiSeatBottomsUpUsingPercentageThreshold!");
+      Logger.log(Level.SEVERE, "batchElimination can't be true when winnerElectionMode is \"%s\"!",
+          winnerMode.toString());
     }
 
     if (!isNullOrBlank(getOvervoteLabel())
