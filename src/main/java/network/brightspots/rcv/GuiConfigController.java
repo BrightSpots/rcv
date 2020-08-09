@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -945,7 +945,8 @@ public class GuiConfigController implements Initializable {
           checkBox
               .selectedProperty()
               .addListener((ov, oldVal, newVal) -> candidate.setExcluded(newVal));
-          return new SimpleBooleanProperty(checkBox.isSelected());
+          //noinspection unchecked
+          return new SimpleObjectProperty(checkBox);
         });
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
