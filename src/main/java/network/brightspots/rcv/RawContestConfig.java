@@ -208,6 +208,7 @@ public class RawContestConfig {
     public boolean nonIntegerWinningThreshold;
     public boolean hareQuota;
     public boolean batchElimination;
+    public boolean continueUntilTwoCandidatesRemain;
     public boolean exhaustOnDuplicateCandidate;
     public boolean treatBlankAsUndeclaredWriteIn;
     public String overvoteLabel;

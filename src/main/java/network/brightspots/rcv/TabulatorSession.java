@@ -286,7 +286,8 @@ class TabulatorSession {
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
           Logger
               .log(Level.INFO, "Reading Clear Ballot cast vote records from file: %s...", cvrPath);
-          new ClearBallotCvrReader(cvrPath, config).readCastVoteRecords(castVoteRecords, source.getContestId());
+          new ClearBallotCvrReader(cvrPath, config)
+              .readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
