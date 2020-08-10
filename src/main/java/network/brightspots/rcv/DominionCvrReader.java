@@ -127,10 +127,6 @@ class DominionCvrReader {
   // them to the input list
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
       throws CvrParseException, UnrecognizedCandidatesException {
-    if (contestId == null) {
-      Logger.log(Level.SEVERE, "contestId must be specified when parsing Dominion CVRs!");
-      throw new CvrParseException();
-    }
     // read metadata files for precincts, precinct portions, contest, and candidates
     Path precinctPath = Paths.get(manifestFolder, PRECINCT_MANIFEST);
     this.precincts = getPrecinctData(precinctPath.toString());
