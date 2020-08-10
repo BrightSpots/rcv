@@ -68,29 +68,6 @@ class TabulatorSession {
     timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
-  // given a dominion style folder path:
-  // read associated manifest data
-  // read Dominion cvr json into CastVoteRecords
-  // write CastVoteRecords to generic cvr csv files: one per contest
-  // return list of files written or null if there was a problem
-  void convertDominionCvrJsonToGenericCsv(String dominionDataFolder) {
-    // passing null for config here because I'm killing this function in a separate PR anyway
-    DominionCvrReader dominionCvrReader = new DominionCvrReader(null, dominionDataFolder);
-    List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    List<String> filesWritten;
-    try {
-      dominionCvrReader.readCastVoteRecords(castVoteRecords, null);
-      ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
-      filesWritten = writer
-          .writeGenericCvrCsv(castVoteRecords, dominionCvrReader.getContests().values(),
-              dominionDataFolder, null);
-    } catch (Exception exception) {
-      Logger.log(Level.SEVERE, "Failed to convert Dominion CVR to CSV:\n%s", exception.toString());
-      filesWritten = null;
-    }
-    this.convertedFilesWritten = filesWritten;
-  }
-
   // Visible for testing
   @SuppressWarnings("unused")
   String getOutputPath() {

@@ -494,7 +494,7 @@ class ResultsWriter {
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
-  // write CastVoteRecords for all contests (or the one specified) to the provided folder
+  // write CastVoteRecords for the specified contest to the provided folder
   // returns a list of files written
   List<String> writeGenericCvrCsv(
       List<CastVoteRecord> castVoteRecords,
@@ -505,7 +505,7 @@ class ResultsWriter {
     List<String> filesWritten = new ArrayList<>();
     try {
       for (Contest contest : contests) {
-        if (!isNullOrBlank(contestId) && !contest.getId().equals(contestId)) {
+        if (!contest.getId().equals(contestId)) {
           // We already skipped loading CVRs for the other contests. This just ensures that we
           // don't generate empty CSVs for them.
           continue;

@@ -123,8 +123,8 @@ class DominionCvrReader {
     return contests;
   }
 
-  // parse Cvr json into CastVoteRecord objects and add them to the input list
-  // (If contestId is specified, we'll only load CVRs for that contest.)
+  // parse CVR JSON for records matching the specified contestId into CastVoteRecord objects and add
+  // them to the input list
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
       throws CvrParseException, UnrecognizedCandidatesException {
     // read metadata files for precincts, precinct portions, contest, and candidates
@@ -243,7 +243,7 @@ class DominionCvrReader {
           HashMap contest = (HashMap) contestObject;
           String contestId = contest.get("Id").toString();
           // skip this CVR if it's not for the contest we're interested in
-          if (contestIdToLoad != null && !contestId.equals(contestIdToLoad)) {
+          if (!contestId.equals(contestIdToLoad)) {
             continue;
           }
           // validate contest id
