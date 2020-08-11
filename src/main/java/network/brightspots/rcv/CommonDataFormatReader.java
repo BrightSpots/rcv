@@ -29,11 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javafx.util.Pair;
+import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 class CommonDataFormatReader {
 
   private final String filePath;
   private final ContestConfig config;
+  private Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
   CommonDataFormatReader(String filePath, ContestConfig config) {
     this.filePath = filePath;
@@ -83,7 +85,8 @@ class CommonDataFormatReader {
   }
 
   // parse a list of contest selection rankings from a NIST "Snapshot" HashMap
-  private List<Pair<Integer, String>> parseRankingsFromSnapshot(HashMap snapshot) {
+  private List<Pair<Integer, String>> parseRankingsFromSnapshot(HashMap snapshot,
+      Map<String, String> candidates) {
     List<Pair<Integer, String>> rankings = new ArrayList<>();
     // at the top level is a list of contests each of which contains selections
     ArrayList cvrContests = (ArrayList) snapshot.get("CVRContest");
@@ -97,6 +100,8 @@ class CommonDataFormatReader {
         String selectionId = (String) contestSelection.get("ContestSelectionId");
         if (selectionId.equals(config.getOvervoteLabel())) {
           selectionId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+        } else if (!candidates.containsKey(selectionId)) {
+          unrecognizedCandidateCounts.merge(selectionId, 1, Integer::sum);
         }
         // extract all the positions (ranks) which this selection has been assigned
         ArrayList selectionPositions = (ArrayList) contestSelection.get("SelectionPosition");
@@ -114,13 +119,15 @@ class CommonDataFormatReader {
   }
 
   // parse the given file into a List of CastVoteRecords for tabulation
-  void parseCvrFile(List<CastVoteRecord> castVoteRecords) {
+  void parseCvrFile(List<CastVoteRecord> castVoteRecords) throws UnrecognizedCandidatesException {
     // cvrIndex and fileName are used to generate IDs for cvrs
     int cvrIndex = 0;
     String fileName = new File(filePath).getName();
 
     try {
       HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
+      Map<String, String> candidates = getCandidates();
+
       // we expect a top-level "CVR" object containing a list of CVR objects
       ArrayList cvrs = (ArrayList) json.get("CVR");
       // for each CVR object extract the current snapshot
@@ -138,7 +145,7 @@ class CommonDataFormatReader {
           }
 
           // we found the current CVR snapshot so get rankings and create a new cvr
-          List<Pair<Integer, String>> rankings = parseRankingsFromSnapshot(snapshot);
+          List<Pair<Integer, String>> rankings = parseRankingsFromSnapshot(snapshot, candidates);
           CastVoteRecord newRecord =
               new CastVoteRecord(computedCastVoteRecordId, ballotId, null, null, rankings);
           castVoteRecords.add(newRecord);
@@ -151,6 +158,10 @@ class CommonDataFormatReader {
       }
     } catch (Exception e) {
       Logger.log(Level.SEVERE, "Error parsing CDF data:\n%s", e.toString());
+    }
+
+    if (unrecognizedCandidateCounts.size() > 0) {
+      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 }
