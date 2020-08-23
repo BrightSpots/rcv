@@ -127,10 +127,10 @@ class Tabulator {
     logSummaryInfo();
 
     // Loop until we've found our winner(s), with a couple exceptions:
-    // - If singleSeatContinueUntilTwoCandidatesRemain mode is active, we loop until only two
+    // - If continueUntilTwoCandidatesRemain is true, we loop until only two
     // candidates remain even if we've already found our winner.
-    // - If multiSeatBottomsUp mode is active and multiSeatBottomsUpPercentageThreshold is set,
-    // we loop until all remaining candidates have vote shares that meet or exceed that threshold.
+    // - If winnerElectionMode is "Bottoms-up using percentage threshold", we loop until all
+    // remaining candidates have vote shares that meet or exceed that threshold.
     //
     // At each iteration, we'll either a) identify one or more
     // winners and transfer their votes to the remaining candidates (if we still need to find more
@@ -173,7 +173,7 @@ class Tabulator {
         }
         // In multi-seat contests, we always redistribute the surplus (if any) unless bottoms-up
         // is enabled.
-        if (config.getNumberOfWinners() > 1 && !config.isMultiSeatBottomsUpEnabled()) {
+        if (config.getNumberOfWinners() > 1 && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
           for (String winner : winners) {
             BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
             // number that were surplus (beyond the required threshold)
@@ -196,7 +196,7 @@ class Tabulator {
           }
         }
       } else if (winnerToRound.size() < config.getNumberOfWinners()
-          || (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()
+          || (config.isContinueUntilTwoCandidatesRemainEnabled()
           && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)
           || config.isMultiSeatBottomsUpWithThresholdEnabled()) {
         // We need to make more eliminations if
@@ -384,12 +384,12 @@ class Tabulator {
   }
 
   // determine if we should continue tabulating based on how many winners have been
-  // selected and if singleSeatContinueUntilTwoCandidatesRemain mode is enabled.
+  // selected and if continueUntilTwoCandidatesRemain is true.
   private boolean shouldContinueTabulating() {
     int numEliminatedCandidates = candidateToRoundEliminated.keySet().size();
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
-    if (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()) {
+    if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
       return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
@@ -405,17 +405,17 @@ class Tabulator {
       return numWinnersDeclared < config.getNumberOfWinners()
           || (config.getNumberOfWinners() > 1
           && winnerToRound.containsValue(currentRound)
-          && !config.isMultiSeatBottomsUpEnabled());
+          && !config.isMultiSeatBottomsUpUntilNWinnersEnabled());
     }
   }
 
   // This handles continued tabulation after a winner has been chosen when
-  // singleSeatContinueUntilTwoCandidatesRemain mode is enabled.
+  // continueUntilTwoCandidatesRemain is true.
   private boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING
         || (status == CandidateStatus.WINNER
-        && config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled());
+        && config.isContinueUntilTwoCandidatesRemainEnabled());
   }
 
   // returns candidate status (continuing, eliminated or winner)
@@ -462,7 +462,7 @@ class Tabulator {
         if (currentRoundCandidateToTally.size()
             == config.getNumberOfWinners() - winnerToRound.size()) {
           selectedWinners.addAll(currentRoundCandidateToTally.keySet());
-        } else if (!config.isMultiSeatBottomsUpEnabled()) {
+        } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
           // We see if anyone has met/exceeded the threshold (unless bottoms-up is enabled, in which
           // case we just wait until there are numWinners candidates remaining and then declare all
           // of them as winners simultaneously).
@@ -708,8 +708,8 @@ class Tabulator {
   //   In this algorithm we sum candidate vote totals (low to high) and find where this leapfrogging
   //   is impossible: that is, when the sum of all batch-eliminated candidates' votes fails to equal
   //   or exceed the next-lowest candidate vote total.
-  //   One additional caveat when we're in singleSeatContinueUntilTwoCandidatesRemain mode: make
-  //   sure we don't batch-eliminate too many candidates and end up with just the winner.
+  //   One additional caveat when continueUntilTwoCandidatesRemain is true: make sure we don't
+  //   batch-eliminate too many candidates and end up with just the winner.
   //
   // param: currentRoundTallyToCandidates map from vote tally to candidates with that tally
   // returns: list of BatchElimination objects, one for each batch-eliminated candidate
@@ -759,7 +759,7 @@ class Tabulator {
         eliminations = newEliminations;
       }
     }
-    if (config.isSingleSeatContinueUntilTwoCandidatesRemainEnabled()
+    if (config.isContinueUntilTwoCandidatesRemainEnabled()
         && eliminations.size() + candidateToRoundEliminated.size()
         == config.getNumCandidates() - 1) {
       // See the caveat above about continueUntilTwoCandidatesRemain. In this situation, we need to
@@ -1098,13 +1098,13 @@ class Tabulator {
 
   // TieBreakMode determines how ties will be handled
   enum TieBreakMode {
-    RANDOM("random"),
-    INTERACTIVE("interactive"),
-    PREVIOUS_ROUND_COUNTS_THEN_RANDOM("previousRoundCountsThenRandom"),
-    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("previousRoundCountsThenInteractive"),
-    USE_PERMUTATION_IN_CONFIG("usePermutationInConfig"),
-    GENERATE_PERMUTATION("generatePermutation"),
-    MODE_UNKNOWN("modeUnknown");
+    RANDOM("Random"),
+    INTERACTIVE("Stop counting and ask"),
+    PREVIOUS_ROUND_COUNTS_THEN_RANDOM("Previous round counts (then random)"),
+    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("Previous round counts (then stop counting and ask)"),
+    USE_PERMUTATION_IN_CONFIG("Use candidate order in the config file"),
+    GENERATE_PERMUTATION("Generate permutation"),
+    MODE_UNKNOWN("Unknown mode");
 
     private final String label;
 
@@ -1126,12 +1126,13 @@ class Tabulator {
   }
 
   enum WinnerElectionMode {
-    STANDARD("standard"),
-    SINGLE_SEAT_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN("singleSeatContinueUntilTwoCandidatesRemain"),
-    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("multiSeatAllowOnlyOneWinnerPerRound"),
-    MULTI_SEAT_BOTTOMS_UP("multiSeatBottomsUp"),
-    MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("multiSeatSequentialWinnerTakesAll"),
-    MODE_UNKNOWN("modeUnknown");
+    STANDARD("Single-winner majority determines winner"),
+    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("Multi-winner allow only one winner per round"),
+    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("Multi-winner allow multiple winners per round"),
+    MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS("Bottoms-up"),
+    MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD("Bottoms-up using percentage threshold"),
+    MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("Multi-pass IRV"),
+    MODE_UNKNOWN("Unknown mode");
 
     private final String label;
 

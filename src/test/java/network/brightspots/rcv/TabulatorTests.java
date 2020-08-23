@@ -114,29 +114,6 @@ class TabulatorTests {
         .toString();
   }
 
-  // helper function to test Dominion CVR conversion routine
-  private static void runDominionCvrConversionTest(String stem) {
-    String dominionDataFolder = Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem)
-        .toAbsolutePath().toString();
-    TabulatorSession session = new TabulatorSession(null);
-    session.convertDominionCvrJsonToGenericCsv(dominionDataFolder);
-
-    for (String convertedFile : session.getConvertedFilesWritten()) {
-      String contestNumber = convertedFile
-          .substring(convertedFile.lastIndexOf('_') + 1, convertedFile.lastIndexOf('.'));
-      String expectedPath = Paths
-          .get(dominionDataFolder, stem + "_contest_" + contestNumber + "_expected.csv")
-          .toAbsolutePath().toString();
-      assertTrue(fileCompare(convertedFile, expectedPath));
-      // Clean up test file(s)
-      try {
-        Files.delete(Paths.get(convertedFile));
-      } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", convertedFile, e.toString());
-      }
-    }
-  }
-
   // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
@@ -239,27 +216,21 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("Dominion Cvr conversion test - Alaska test data")
-  void testDominionCvrConversionAlaska() {
-    runDominionCvrConversionTest("dominion_cvr_conversion_alaska");
+  @DisplayName("Dominion test - Alaska test data")
+  void testDominionAlaska() {
+    runTabulationTest("dominion_alaska");
   }
 
   @Test
-  @DisplayName("Dominion Cvr conversion test - Kansas test data")
-  void testDominionCvrConversionKansas() {
-    runDominionCvrConversionTest("dominion_cvr_conversion_kansas");
+  @DisplayName("Dominion test - Kansas test data")
+  void testDominionKansas() {
+    runTabulationTest("dominion_kansas");
   }
 
   @Test
-  @DisplayName("Dominion Cvr conversion test - Wyoming fake test data")
-  void testDominionCvrConversionWyoming() {
-    runDominionCvrConversionTest("dominion_cvr_conversion_wyoming");
-  }
-
-  @Test
-  @DisplayName("Dominion direct tabulation test - Alaska test data")
-  void testDominionDirectTabulationAlaska() {
-    runTabulationTest("dominion_direct_tabulation_alaska");
+  @DisplayName("Dominion test - Wyoming test data")
+  void testDominionWyoming() {
+    runTabulationTest("dominion_wyoming");
   }
 
   @Test

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
+import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 
 class ClearBallotCvrReader {
@@ -42,8 +43,10 @@ class ClearBallotCvrReader {
   // parse Cvr json into CastVoteRecord objects and append them to the input castVoteRecords list
   // see Clear Ballot 2.1 RCV Format Specification for details
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
-      throws CvrParseException {
+      throws CvrParseException, UnrecognizedCandidatesException {
     BufferedReader csvReader;
+    // map for tracking unrecognized candidates during parsing
+    Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
     try {
       csvReader = new BufferedReader(new FileReader(this.cvrPath));
       // each "choice column" in the input Csv corresponds to a unique ranking: candidate+rank pair
@@ -78,10 +81,9 @@ class ClearBallotCvrReader {
         }
         // validate and store the ranking associated with this choice column
         String choiceName = choiceFields[RcvChoiceHeaderField.CHOICE_NAME.ordinal()];
-        if (!this.contestConfig.getCandidateCodeList().contains(choiceName)) {
-          Logger.log(Level.SEVERE, "Candidate: %s from cast vote record not found in config!",
-              choiceName);
-          throw new CvrParseException();
+        if (!contestConfig.getCandidateCodeList().contains(choiceName)
+            && !choiceName.equals(contestConfig.getUndeclaredWriteInLabel())) {
+          unrecognizedCandidateCounts.merge(choiceName, 1, Integer::sum);
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
         if (rank > this.contestConfig.getMaxRankingsAllowed()) {
@@ -129,6 +131,10 @@ class ClearBallotCvrReader {
       Logger.log(Level.SEVERE, "Cast vote record file not found!\n%s", e.toString());
     } catch (IOException e) {
       Logger.log(Level.SEVERE, "Error reading file!\n%s", e.toString());
+    }
+
+    if (unrecognizedCandidateCounts.size() > 0) {
+      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 

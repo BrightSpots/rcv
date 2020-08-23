@@ -23,16 +23,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
+import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 class HartCvrReader {
 
   private final String cvrPath;
   private final String contestId;
   private final ContestConfig contestConfig;
+  // map for tracking unrecognized candidates during parsing
+  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
   HartCvrReader(String cvrPath, String contestId, ContestConfig contestConfig) {
     this.cvrPath = cvrPath;
@@ -42,7 +47,7 @@ class HartCvrReader {
 
   // iterate all xml files in the source input folder
   void readCastVoteRecordsFromFolder(List<CastVoteRecord> castVoteRecords)
-      throws IOException, CvrParseException {
+      throws IOException, CvrParseException, UnrecognizedCandidatesException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
@@ -55,6 +60,10 @@ class HartCvrReader {
       Logger.log(Level.SEVERE, "Unable to find any files in directory: %s",
           cvrRoot.getAbsolutePath());
       throw new IOException();
+    }
+
+    if (unrecognizedCandidateCounts.size() > 0) {
+      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 
@@ -77,14 +86,10 @@ class HartCvrReader {
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         if (contest.Options != null) {
           for (Option option : contest.Options) {
-            if (!this.contestConfig.getCandidateCodeList().contains(option.Id)) {
-              Logger.log(
-                  Level.SEVERE,
-                  "Candidate ID: \"%s\" name: \"%s\" from CVR is not in the config file!",
-                  option.Id, option.Name);
-              throw new CvrParseException();
+            if (!contestConfig.getCandidateCodeList().contains(option.Id)
+                && !option.Id.equals(contestConfig.getUndeclaredWriteInLabel())) {
+              unrecognizedCandidateCounts.merge(option.Id, 1, Integer::sum);
             }
-
             // Hart RCV election ranks are indicated by a string read left to right:
             // each digit corresponds to a rank and is set to 1 if that rank was voted:
             // 0100 indicates rank 2 was voted

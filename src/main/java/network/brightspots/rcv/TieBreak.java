@@ -258,7 +258,8 @@ class TieBreak {
     return tiedCandidates.get(randomCandidateIndex);
   }
 
-  // select candidate based on previous round tallies (fallback to interactive or random)
+  // select candidate based on previous round tallies (fall back to "Stop counting and ask" or
+  // "Random" tiebreakMode)
   private String doPreviousRounds(List<String> tiedCandidates) throws TabulationCancelledException {
     String selection = null;
     List<String> candidatesInContention = tiedCandidates;
@@ -284,8 +285,8 @@ class TieBreak {
       } // else keep looping
     }
 
-    // if 2 or more candidates are still tied, we fall back to interactive or random with the
-    // remaining candidates
+    // if 2 or more candidates are still tied, we fall back to "Stop counting and ask" or "Random"
+    // tiebreakMode with the remaining candidates
     if (candidatesInContention.size() > 1) {
       String explanationPrefix =
           String.format(

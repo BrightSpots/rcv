@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,7 +48,6 @@ import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
-import network.brightspots.rcv.StreamingCvrReader.UnrecognizedCandidatesException;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -66,28 +66,6 @@ class TabulatorSession {
     this.configPath = configPath;
     // current date-time formatted as a string used for creating unique output files names
     timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-  }
-
-  // given a dominion style folder path:
-  // read associated manifest data
-  // read Dominion cvr json into CastVoteRecords
-  // write CastVoteRecords to generic cvr csv files: one per contest
-  // return list of files written or null if there was a problem
-  void convertDominionCvrJsonToGenericCsv(String dominionDataFolder) {
-    DominionCvrReader dominionCvrReader = new DominionCvrReader(dominionDataFolder);
-    List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    List<String> filesWritten;
-    try {
-      dominionCvrReader.readCastVoteRecords(castVoteRecords, null);
-      ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
-      filesWritten = writer
-          .writeGenericCvrCsv(castVoteRecords, dominionCvrReader.getContests().values(),
-              dominionDataFolder, null);
-    } catch (Exception exception) {
-      Logger.log(Level.SEVERE, "Failed to convert Dominion CVR to CSV:\n%s", exception.toString());
-      filesWritten = null;
-    }
-    this.convertedFilesWritten = filesWritten;
   }
 
   // Visible for testing
@@ -285,11 +263,12 @@ class TabulatorSession {
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
           Logger
               .log(Level.INFO, "Reading Clear Ballot cast vote records from file: %s...", cvrPath);
-          new ClearBallotCvrReader(cvrPath, config).readCastVoteRecords(castVoteRecords, source.getContestId());
+          new ClearBallotCvrReader(cvrPath, config)
+              .readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
-          DominionCvrReader reader = new DominionCvrReader(cvrPath);
+          DominionCvrReader reader = new DominionCvrReader(config, cvrPath);
           reader.readCastVoteRecords(castVoteRecords, source.getContestId());
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
@@ -369,5 +348,15 @@ class TabulatorSession {
       Logger.log(Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
     }
     return castVoteRecords;
+  }
+
+  static class UnrecognizedCandidatesException extends Exception {
+
+    // count of how many times each unrecognized candidate was encountered during CVR parsing
+    final Map<String, Integer> candidateCounts;
+
+    UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
+      this.candidateCounts = candidateCounts;
+    }
   }
 }

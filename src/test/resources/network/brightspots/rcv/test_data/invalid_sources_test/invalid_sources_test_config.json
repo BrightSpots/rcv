@@ -40,8 +40,8 @@
     }
   ],
   "rules": {
-    "tiebreakMode": "random",
-    "random Seed" : 0,
+    "tiebreakMode": "Random",
+    "random Seed": 0,
     "overvoteRule": "exhaustImmediately",
     "maxRankingsAllowed": 3,
     "maxSkippedRanksAllowed": 1,

@@ -16,6 +16,7 @@
 
 package network.brightspots.rcv;
 
+import static javafx.collections.FXCollections.observableArrayList;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,13 +29,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -153,6 +154,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCandidateCode;
   @FXML
+  private CheckBox checkBoxCandidateExcluded;
+  @FXML
   private ChoiceBox<TieBreakMode> choiceTiebreakMode;
   @FXML
   private ChoiceBox<OvervoteRule> choiceOvervoteRule;
@@ -187,6 +190,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxBatchElimination;
   @FXML
+  private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
+  @FXML
   private CheckBox checkBoxExhaustOnDuplicateCandidate;
   @FXML
   private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
@@ -195,8 +200,25 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TabPane tabPane;
 
-  private static String getChoiceElse(ChoiceBox choiceBox, Enum defaultValue) {
-    return choiceBox.getValue() != null ? choiceBox.getValue().toString() : defaultValue.toString();
+  private static Provider getProviderChoice(ChoiceBox<Provider> choiceBox) {
+    return choiceBox.getValue() != null ? Provider.getByLabel(choiceBox.getValue().toString())
+        : Provider.PROVIDER_UNKNOWN;
+  }
+
+  private static WinnerElectionMode getWinnerElectionModeChoice(
+      ChoiceBox<WinnerElectionMode> choiceBox) {
+    return choiceBox.getValue() != null ? WinnerElectionMode
+        .getByLabel(choiceBox.getValue().toString()) : WinnerElectionMode.MODE_UNKNOWN;
+  }
+
+  private static TieBreakMode getTiebreakModeChoice(ChoiceBox<TieBreakMode> choiceBox) {
+    return choiceBox.getValue() != null ? TieBreakMode.getByLabel(choiceBox.getValue().toString())
+        : TieBreakMode.MODE_UNKNOWN;
+  }
+
+  private static OvervoteRule getOvervoteRuleChoice(ChoiceBox<OvervoteRule> choiceBox) {
+    return choiceBox.getValue() != null ? OvervoteRule.getByLabel(choiceBox.getValue().toString())
+        : OvervoteRule.RULE_UNKNOWN;
   }
 
   private static String getTextOrEmptyString(TextField textField) {
@@ -340,24 +362,6 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Convert Dominion files in specified folder to generic .csv format.
-   * - Require user to specify a Dominion data folder path.
-   * - Create and launch ConvertDominionService given the provided path.
-   */
-  public void menuItemConvertDominionClicked() {
-    DirectoryChooser dc = new DirectoryChooser();
-    dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-    dc.setTitle("Dominion Data Folder");
-    File dominionDataFolderPath = dc.showDialog(GuiContext.getInstance().getMainWindow());
-    if (dominionDataFolderPath != null) {
-      setGuiIsBusy(true);
-      ConvertDominionService service = new ConvertDominionService(
-          dominionDataFolderPath.getAbsolutePath());
-      setUpAndStartService(service);
-    }
-  }
-
   private void setUpAndStartService(Service<Void> service) {
     service.setOnSucceeded(event -> setGuiIsBusy(false));
     service.setOnCancelled(event -> setGuiIsBusy(false));
@@ -418,34 +422,34 @@ public class GuiConfigController implements Initializable {
   public void buttonCvrFilePathClicked() {
     File openFile = null;
 
-    String providerName = getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN);
-    switch (providerName) {
-      case "CDF" -> {
+    Provider provider = getProviderChoice(choiceCvrProvider);
+    switch (provider) {
+      case CDF -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
-        fc.setTitle("Select CDF Cast Vote Record File");
+        fc.setTitle("Select " + provider + " Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       }
-      case "Clear Ballot" -> {
+      case CLEAR_BALLOT -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters().add(new ExtensionFilter("CSV files", "*.csv"));
-        fc.setTitle("Select Clear Ballot Cast Vote Record File");
+        fc.setTitle("Select " + provider + " Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       }
-      case "Dominion", "Hart" -> {
+      case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-        dc.setTitle("Select " + providerName + " Cast Vote Record Folder");
+        dc.setTitle("Select " + provider + " Cast Vote Record Folder");
         openFile = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
-      case "ES&S" -> {
+      case ESS -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters()
             .add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
-        fc.setTitle("Select ES&S Cast Vote Record File");
+        fc.setTitle("Select " + provider + " Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       }
       default -> {
@@ -467,13 +471,17 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCvrFirstVoteRow),
             getTextOrEmptyString(textFieldCvrIdCol),
             getTextOrEmptyString(textFieldCvrPrecinctCol),
-            getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN),
+            getProviderChoice(choiceCvrProvider).toString(),
             getTextOrEmptyString(textFieldCvrContestId));
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
-      choiceCvrProvider.setValue(null);
-      clearAndDisableCvrFilesTabFields();
+      textFieldCvrFilePath.clear();
     }
+  }
+
+  public void buttonClearCvrFieldsClicked() {
+    choiceCvrProvider.setValue(null);
+    clearAndDisableCvrFilesTabFields();
   }
 
   private void clearAndDisableCvrFilesTabFields() {
@@ -585,22 +593,31 @@ public class GuiConfigController implements Initializable {
         new Candidate(
             getTextOrEmptyString(textFieldCandidateName),
             getTextOrEmptyString(textFieldCandidateCode),
-            ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+            checkBoxCandidateExcluded.isSelected());
     if (ContestConfig.passesBasicCandidateValidation(candidate)) {
       tableViewCandidates.getItems().add(candidate);
-      textFieldCandidateName.clear();
-      textFieldCandidateCode.clear();
+      buttonClearCandidateClicked();
     }
   }
 
-  /** Action when delete candidate button is clicked. */
+  public void buttonClearCandidateClicked() {
+    textFieldCandidateName.clear();
+    textFieldCandidateCode.clear();
+    checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+  }
+
+  /**
+   * Action when delete candidate button is clicked.
+   */
   public void buttonDeleteCandidateClicked() {
     tableViewCandidates
         .getItems()
         .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
   }
 
-  /** Action when candidate name is changed. */
+  /**
+   * Action when candidate name is changed.
+   */
   public void changeCandidateName(CellEditEvent cellEditEvent) {
     tableViewCandidates
         .getSelectionModel()
@@ -609,7 +626,9 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.refresh();
   }
 
-  /** Action when candidate code is changed. */
+  /**
+   * Action when candidate code is changed.
+   */
   public void changeCandidateCode(CellEditEvent cellEditEvent) {
     tableViewCandidates
         .getSelectionModel()
@@ -618,39 +637,74 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.refresh();
   }
 
-  private void setDefaultValues() {
-    labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
+  private void clearAndDisableWinningRuleFields() {
+    textFieldMaxRankingsAllowed.clear();
+    textFieldMaxRankingsAllowed.setDisable(true);
+    textFieldMinimumVoteThreshold.clear();
+    textFieldMinimumVoteThreshold.setDisable(true);
+    checkBoxBatchElimination.setSelected(false);
+    checkBoxBatchElimination.setDisable(true);
+    checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
+    checkBoxContinueUntilTwoCandidatesRemain.setDisable(true);
+    choiceTiebreakMode.setValue(null);
+    choiceTiebreakMode.setDisable(true);
+    clearAndDisableTiebreakFields();
+    textFieldNumberOfWinners.clear();
+    textFieldNumberOfWinners.setDisable(true);
+    textFieldMultiSeatBottomsUpPercentageThreshold.clear();
+    textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(true);
+    checkBoxNonIntegerWinningThreshold.setSelected(false);
+    checkBoxNonIntegerWinningThreshold.setDisable(true);
+    checkBoxHareQuota.setSelected(false);
+    checkBoxHareQuota.setDisable(true);
+    textFieldDecimalPlacesForVoteArithmetic.clear();
+    textFieldDecimalPlacesForVoteArithmetic.setDisable(true);
+  }
 
-    choiceWinnerElectionMode.setValue(ContestConfig.SUGGESTED_WINNER_ELECTION_MODE);
+  private void clearAndDisableTiebreakFields() {
+    textFieldRandomSeed.clear();
+    textFieldRandomSeed.setDisable(true);
+  }
 
-    checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
-    checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
+  private void setWinningRulesDefaultValues() {
     checkBoxNonIntegerWinningThreshold.setSelected(
         ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
     checkBoxHareQuota.setSelected(ContestConfig.SUGGESTED_HARE_QUOTA);
     checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
-    checkBoxExhaustOnDuplicateCandidate.setSelected(
-        ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
-    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
-        ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
-
-    textFieldOutputDirectory.setText(ContestConfig.SUGGESTED_OUTPUT_DIRECTORY);
+    checkBoxContinueUntilTwoCandidatesRemain
+        .setSelected(ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
     textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.SUGGESTED_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic.setText(
         String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
+    textFieldMaxRankingsAllowed.setText(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED);
+  }
+
+  private void setDefaultValues() {
+    labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
+
+    checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
+
+    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
+        ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
+
+    setWinningRulesDefaultValues();
+
     textFieldMaxSkippedRanksAllowed.setText(
         String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
-    textFieldMaxRankingsAllowed.setText(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED);
+    checkBoxExhaustOnDuplicateCandidate.setSelected(
+        ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
+
+    textFieldOutputDirectory.setText(ContestConfig.SUGGESTED_OUTPUT_DIRECTORY);
+    checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
+    checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
   }
 
   private void clearConfig() {
     textFieldContestName.clear();
-    textFieldOutputDirectory.clear();
     datePickerContestDate.setValue(null);
     textFieldContestJurisdiction.clear();
     textFieldContestOffice.clear();
-    checkBoxTabulateByPrecinct.setSelected(false);
-    checkBoxGenerateCdfJson.setSelected(false);
+    textFieldRulesDescription.clear();
 
     choiceCvrProvider.setValue(null);
     clearAndDisableCvrFilesTabFields();
@@ -658,27 +712,24 @@ public class GuiConfigController implements Initializable {
 
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
+    checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
-    choiceTiebreakMode.setValue(null);
-    choiceOvervoteRule.setValue(null);
     choiceWinnerElectionMode.setValue(null);
-    textFieldRandomSeed.clear();
-    textFieldNumberOfWinners.clear();
-    textFieldMultiSeatBottomsUpPercentageThreshold.clear();
-    textFieldDecimalPlacesForVoteArithmetic.clear();
-    textFieldMinimumVoteThreshold.clear();
-    textFieldMaxSkippedRanksAllowed.clear();
-    textFieldMaxRankingsAllowed.clear();
+    clearAndDisableWinningRuleFields();
+
     textFieldOvervoteLabel.clear();
     textFieldUndervoteLabel.clear();
     textFieldUndeclaredWriteInLabel.clear();
-    textFieldRulesDescription.clear();
-    checkBoxNonIntegerWinningThreshold.setSelected(false);
-    checkBoxHareQuota.setSelected(false);
-    checkBoxBatchElimination.setSelected(false);
-    checkBoxExhaustOnDuplicateCandidate.setSelected(false);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(false);
+
+    choiceOvervoteRule.setValue(null);
+    textFieldMaxSkippedRanksAllowed.clear();
+    checkBoxExhaustOnDuplicateCandidate.setSelected(false);
+
+    textFieldOutputDirectory.clear();
+    checkBoxTabulateByPrecinct.setSelected(false);
+    checkBoxGenerateCdfJson.setSelected(false);
 
     setDefaultValues();
   }
@@ -817,13 +868,13 @@ public class GuiConfigController implements Initializable {
           }
         });
 
+    clearAndDisableCvrFilesTabFields();
     choiceCvrProvider.getItems().addAll(Provider.values());
     choiceCvrProvider.getItems().remove(Provider.PROVIDER_UNKNOWN);
     choiceCvrProvider.setOnAction(event -> {
       clearAndDisableCvrFilesTabFields();
-      String provider = getChoiceElse(choiceCvrProvider, Provider.PROVIDER_UNKNOWN);
-      switch (provider) {
-        case "ES&S" -> {
+      switch (getProviderChoice(choiceCvrProvider)) {
+        case ESS -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
@@ -832,12 +883,12 @@ public class GuiConfigController implements Initializable {
           textFieldCvrIdCol.setDisable(false);
           textFieldCvrPrecinctCol.setDisable(false);
         }
-        case "CDF" -> {
+        case CDF -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
         }
-        case "Clear Ballot", "Dominion", "Hart" -> {
+        case CLEAR_BALLOT, DOMINION, HART -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
@@ -845,7 +896,6 @@ public class GuiConfigController implements Initializable {
         }
       }
     });
-    clearAndDisableCvrFilesTabFields();
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
     tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
@@ -877,17 +927,61 @@ public class GuiConfigController implements Initializable {
           checkBox
               .selectedProperty()
               .addListener((ov, oldVal, newVal) -> candidate.setExcluded(newVal));
-          return new SimpleBooleanProperty(checkBox.isSelected());
+          //noinspection unchecked
+          return new SimpleObjectProperty(checkBox);
         });
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
 
+    clearAndDisableWinningRuleFields();
     choiceTiebreakMode.getItems().addAll(TieBreakMode.values());
     choiceTiebreakMode.getItems().remove(TieBreakMode.MODE_UNKNOWN);
+    choiceTiebreakMode.setOnAction(event -> {
+      clearAndDisableTiebreakFields();
+      switch (getTiebreakModeChoice(choiceTiebreakMode)) {
+        case RANDOM, PREVIOUS_ROUND_COUNTS_THEN_RANDOM, GENERATE_PERMUTATION -> textFieldRandomSeed
+            .setDisable(false);
+      }
+    });
     choiceOvervoteRule.getItems().addAll(OvervoteRule.values());
     choiceOvervoteRule.getItems().remove(OvervoteRule.RULE_UNKNOWN);
     choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
     choiceWinnerElectionMode.getItems().remove(WinnerElectionMode.MODE_UNKNOWN);
+    choiceWinnerElectionMode.setOnAction(event -> {
+      clearAndDisableWinningRuleFields();
+      setWinningRulesDefaultValues();
+      switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
+        case STANDARD -> {
+          textFieldMaxRankingsAllowed.setDisable(false);
+          textFieldMinimumVoteThreshold.setDisable(false);
+          choiceTiebreakMode.setDisable(false);
+          checkBoxNonIntegerWinningThreshold.setDisable(false);
+          checkBoxHareQuota.setDisable(false);
+          textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
+          checkBoxBatchElimination.setDisable(false);
+          checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
+        }
+        case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND, MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND, MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> {
+          textFieldMaxRankingsAllowed.setDisable(false);
+          textFieldMinimumVoteThreshold.setDisable(false);
+          choiceTiebreakMode.setDisable(false);
+          checkBoxNonIntegerWinningThreshold.setDisable(false);
+          checkBoxHareQuota.setDisable(false);
+          textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
+          textFieldNumberOfWinners.setDisable(false);
+        }
+        case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
+          textFieldMaxRankingsAllowed.setDisable(false);
+          textFieldMinimumVoteThreshold.setDisable(false);
+          choiceTiebreakMode.setDisable(false);
+          checkBoxNonIntegerWinningThreshold.setDisable(false);
+          checkBoxHareQuota.setDisable(false);
+          textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
+          textFieldNumberOfWinners.setDisable(false);
+          textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
+        }
+      }
+    });
 
     setDefaultValues();
 
@@ -909,6 +1003,58 @@ public class GuiConfigController implements Initializable {
     if (config.rawConfig.tabulatorVersion == null
         || !config.rawConfig.tabulatorVersion.equals(Main.APP_VERSION)) {
       // Any necessary future version migration logic goes here
+
+      if (config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
+        String oldWinnerElectionMode = config.rawConfig.rules.winnerElectionMode;
+        switch (oldWinnerElectionMode) {
+          case "standard" -> config.rawConfig.rules.winnerElectionMode =
+              config.getNumberOfWinners() > 1
+                  ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND.toString()
+                  : WinnerElectionMode.STANDARD.toString();
+          case "singleSeatContinueUntilTwoCandidatesRemain" -> {
+            config.rawConfig.rules.winnerElectionMode = WinnerElectionMode.STANDARD.toString();
+            config.rawConfig.rules.continueUntilTwoCandidatesRemain = true;
+          }
+          case "multiSeatAllowOnlyOneWinnerPerRound" -> config.rawConfig.rules.winnerElectionMode =
+              WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString();
+          case "multiSeatBottomsUp" -> config.rawConfig.rules.winnerElectionMode =
+              config.getNumberOfWinners() == 0
+                  || config.getMultiSeatBottomsUpPercentageThreshold() != null
+                  ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD.toString()
+                  : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.toString();
+          case "multiSeatSequentialWinnerTakesAll" -> config.rawConfig.rules.winnerElectionMode =
+              WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString();
+          default -> {
+            Logger.log(Level.WARNING,
+                "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
+                    + "winnerElectionMode.", oldWinnerElectionMode);
+            config.rawConfig.rules.winnerElectionMode = null;
+          }
+        }
+      }
+
+      if (config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
+        Map<String, String> tiebreakModeMigrationMap = Map.of(
+            "random", TieBreakMode.RANDOM.toString(),
+            "interactive", TieBreakMode.INTERACTIVE.toString(),
+            "previousRoundCountsThenRandom",
+            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM.toString(),
+            "previousRoundCountsThenInteractive",
+            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE.toString(),
+            "usePermutationInConfig", TieBreakMode.USE_PERMUTATION_IN_CONFIG.toString(),
+            "generatePermutation", TieBreakMode.GENERATE_PERMUTATION.toString()
+        );
+        String oldTiebreakMode = config.rawConfig.rules.tiebreakMode;
+        if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
+          config.rawConfig.rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode);
+        } else {
+          Logger.log(Level.WARNING,
+              "tiebreakMode \"%s\" is unrecognized! Please supply a valid tiebreakMode.",
+              oldTiebreakMode);
+          config.rawConfig.rules.tiebreakMode = null;
+        }
+      }
+
       Logger.log(
           Level.INFO,
           "Migrated tabulator config version from %s to %s.",
@@ -940,21 +1086,21 @@ public class GuiConfigController implements Initializable {
     checkBoxGenerateCdfJson.setSelected(outputSettings.generateCdfJson);
 
     if (rawConfig.cvrFileSources != null) {
-      tableViewCvrFiles.setItems(FXCollections.observableArrayList(rawConfig.cvrFileSources));
+      tableViewCvrFiles.setItems(observableArrayList(rawConfig.cvrFileSources));
     }
 
     if (rawConfig.candidates != null) {
-      tableViewCandidates.setItems(FXCollections.observableArrayList(rawConfig.candidates));
+      tableViewCandidates.setItems(observableArrayList(rawConfig.candidates));
     }
 
-    choiceTiebreakMode.setValue(
-        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
-    choiceOvervoteRule.setValue(
-        config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
     choiceWinnerElectionMode.setValue(
         config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN
             ? null
             : config.getWinnerElectionMode());
+    choiceTiebreakMode.setValue(
+        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
+    choiceOvervoteRule.setValue(
+        config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
 
     ContestRules rules = rawConfig.rules;
     textFieldRandomSeed.setText(rules.randomSeed);
@@ -972,6 +1118,7 @@ public class GuiConfigController implements Initializable {
     checkBoxNonIntegerWinningThreshold.setSelected(rules.nonIntegerWinningThreshold);
     checkBoxHareQuota.setSelected(rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
+    checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
   }
@@ -1010,10 +1157,9 @@ public class GuiConfigController implements Initializable {
     config.candidates = candidates;
 
     ContestRules rules = new ContestRules();
-    rules.tiebreakMode = getChoiceElse(choiceTiebreakMode, TieBreakMode.MODE_UNKNOWN);
-    rules.overvoteRule = getChoiceElse(choiceOvervoteRule, OvervoteRule.RULE_UNKNOWN);
-    rules.winnerElectionMode =
-        getChoiceElse(choiceWinnerElectionMode, WinnerElectionMode.MODE_UNKNOWN);
+    rules.tiebreakMode = getTiebreakModeChoice(choiceTiebreakMode).toString();
+    rules.overvoteRule = getOvervoteRuleChoice(choiceOvervoteRule).toString();
+    rules.winnerElectionMode = getWinnerElectionModeChoice(choiceWinnerElectionMode).toString();
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
     rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
     rules.multiSeatBottomsUpPercentageThreshold = getTextOrEmptyString(
@@ -1026,6 +1172,7 @@ public class GuiConfigController implements Initializable {
     rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
     rules.hareQuota = checkBoxHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
+    rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
     rules.treatBlankAsUndeclaredWriteIn = checkBoxTreatBlankAsUndeclaredWriteIn.isSelected();
     rules.overvoteLabel = getTextOrEmptyString(textFieldOvervoteLabel);
@@ -1120,36 +1267,6 @@ public class GuiConfigController implements Initializable {
               Logger.log(
                   Level.SEVERE,
                   "Error when attempting to convert to CDF:\n%s\nConversion failed!",
-                  task.getException().toString()));
-      return task;
-    }
-  }
-
-  // ConvertDominionService runs a Dominion conversion in the background
-  private static class ConvertDominionService extends Service<Void> {
-
-    private final String dominionDataFolderPath;
-
-    ConvertDominionService(String dominionDataFolderPath) {
-      this.dominionDataFolderPath = dominionDataFolderPath;
-    }
-
-    @Override
-    protected Task<Void> createTask() {
-      Task<Void> task =
-          new Task<>() {
-            @Override
-            protected Void call() {
-              TabulatorSession session = new TabulatorSession(null);
-              session.convertDominionCvrJsonToGenericCsv(dominionDataFolderPath);
-              return null;
-            }
-          };
-      task.setOnFailed(
-          arg0 ->
-              Logger.log(
-                  Level.SEVERE,
-                  "Error when attempting to convert Dominion files:\n%s\nConversion failed!",
                   task.getException().toString()));
       return task;
     }
