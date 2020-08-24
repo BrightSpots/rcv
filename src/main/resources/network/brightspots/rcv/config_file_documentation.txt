@@ -89,6 +89,11 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         example: 2
         value: [1..1000]
 
+      "overvoteDelimiter" optional and used if and only if provider is ES&S
+        string that will be used to split a cell into multiple candidate strings in the case of an overvote
+        example: //
+        value: any string that contains at least one character that is not a letter, number, hyphen, period, comma, apostrophe, quote, or space
+
   "candidates" required
     list of registered candidate names and associated candidate code (note: leave empty when CVR is in Common Data Format)
     each "candidates" list item has the following parameters:

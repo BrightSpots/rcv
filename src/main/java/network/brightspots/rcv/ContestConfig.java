@@ -507,7 +507,9 @@ class ContestConfig {
             isValid = false;
             Logger.log(Level.SEVERE, "tabulateByPrecinct may not be used with CDF files.");
           }
-        } else {
+        }
+
+        if (getProvider(source) == Provider.ESS) {
           // perform ES&S checks
           if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
             isValid = false;
@@ -515,6 +517,28 @@ class ContestConfig {
                 Level.SEVERE,
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
                 cvrPath);
+          }
+          if (!isNullOrBlank(source.getOvervoteDelimiter())) {
+            if (!isNullOrBlank(getOvervoteLabel())) {
+              isValid = false;
+              Logger.log(
+                  Level.SEVERE,
+                  "overvoteDelimiter must be blank when overvoteLabel is provided.");
+            }
+            if (source.getOvervoteDelimiter().matches("[a-zA-Z0-9.',\\-\\s]+")) {
+              isValid = false;
+              Logger.log(
+                  Level.SEVERE,
+                  "overvoteDelimiter is invalid.");
+            }
+          }
+        } else {
+          if (!isNullOrBlank(source.getOvervoteDelimiter())) {
+            isValid = false;
+            Logger.log(
+                Level.SEVERE,
+                "overvoteDelimiter must be blank for this provider: %s",
+                source.getProvider());
           }
         }
       }
@@ -687,7 +711,7 @@ class ContestConfig {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
-                "winnerElectionMode can't be \n%s\n in a single-seat contest!",
+                "winnerElectionMode can't be \"%s\" in a single-seat contest!",
                 winnerMode.toString()
             );
           }

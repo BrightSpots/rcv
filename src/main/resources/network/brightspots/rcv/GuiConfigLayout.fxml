@@ -188,6 +188,14 @@
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <Label text="Precinct Column" prefWidth="110.0"/>
                       <TextField prefHeight="25.0" prefWidth="40.0"
+                        fx:id="textFieldCvrOvervoteDelimiter"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label prefWidth="110.0" text="Overvote Delimiter"/>
+                      <TextField prefHeight="25.0" prefWidth="40.0"
                         fx:id="textFieldCvrPrecinctCol"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
@@ -246,6 +254,9 @@
                     <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0"
                       onEditCommit="#changeCvrPrecinctColIndex" prefWidth="50.0"
                       text="Precinct&#10;Column"/>
+                    <TableColumn minWidth="20.0" onEditCommit="#changeCvrOvervoteDelimiter"
+                      prefWidth="50.0" text="Overvote&#10;Delimiter"
+                      fx:id="tableColumnCvrOvervoteDelimiter"/>
                   </columns>
                 </TableView>
                 <padding>
@@ -426,7 +437,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Percentage Threshold *" prefWidth="196.0"/>
+                      <Label prefWidth="196.0" text="Percentage Threshold"/>
                       <TextField fx:id="textFieldMultiSeatBottomsUpPercentageThreshold"
                         maxWidth="220.0"/>
                       <Label text=" &#37;" prefWidth="18.0"/>

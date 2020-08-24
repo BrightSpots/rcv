@@ -69,6 +69,8 @@ class StreamingCvrReader {
   private final Integer idColumnIndex;
   // 1-based column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
+  // optional delimiter for cells that contain multiple candidates
+  private final String overvoteDelimiter;
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // used for generating CVR IDs
@@ -106,6 +108,7 @@ class StreamingCvrReader {
         !isNullOrBlank(source.getPrecinctColumnIndex())
             ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
             : null;
+    this.overvoteDelimiter = source.getOvervoteDelimiter();
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -223,24 +226,34 @@ class StreamingCvrReader {
     // see if this column is in the ranking range
     if (col >= firstVoteColumnIndex
         && col < firstVoteColumnIndex + config.getMaxRankingsAllowed()) {
-
       int currentRank = col - firstVoteColumnIndex + 1;
       // handle any empty cells which may exist between this cell and any previous one
       handleEmptyCells(currentRank);
-      String candidate = cellData.trim();
-      // skip undervotes
-      if (!candidate.equals(config.getUndervoteLabel())) {
-        // map overvotes to our internal overvote string
-        if (candidate.equals(config.getOvervoteLabel())) {
-          candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-        } else if (!config.getCandidateCodeList().contains(candidate)
-            && !candidate.equals(config.getUndeclaredWriteInLabel())) {
-          // this is an unrecognized candidate so add it to the unrecognized candidate map
-          // this helps identify problems with CVRs
-          unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
+      String cellString = cellData.trim();
+
+      // There may be multiple candidates in this cell (i.e. an overvote).
+      String[] candidates;
+      if (!isNullOrBlank(overvoteDelimiter)) {
+        candidates = cellString.split(overvoteDelimiter);
+      } else {
+        candidates = new String[]{cellString};
+      }
+
+      for (String candidate : candidates) {
+        // skip undervotes
+        if (!candidate.equals(config.getUndervoteLabel())) {
+          // map overvotes to our internal overvote string
+          if (candidate.equals(config.getOvervoteLabel())) {
+            candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+          } else if (!config.getCandidateCodeList().contains(candidate)
+              && !candidate.equals(config.getUndeclaredWriteInLabel())) {
+            // this is an unrecognized candidate so add it to the unrecognized candidate map
+            // this helps identify problems with CVRs
+            unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
+          }
+          Pair<Integer, String> ranking = new Pair<>(currentRank, candidate);
+          currentRankings.add(ranking);
         }
-        Pair<Integer, String> ranking = new Pair<>(currentRank, candidate);
-        currentRankings.add(ranking);
       }
       // update lastRankSeen - used to handle empty ranking cells
       lastRankSeen = currentRank;

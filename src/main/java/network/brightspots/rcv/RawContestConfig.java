@@ -67,6 +67,7 @@ public class RawContestConfig {
     private String firstVoteRowIndex;
     private String idColumnIndex;
     private String precinctColumnIndex;
+    private String overvoteDelimiter;
     private String provider;
 
     CvrSource() {
@@ -78,6 +79,7 @@ public class RawContestConfig {
         String firstVoteRowIndex,
         String idColumnIndex,
         String precinctColumnIndex,
+        String overvoteDelimiter,
         String provider,
         String contestId) {
       this.filePath = filePath;
@@ -85,6 +87,7 @@ public class RawContestConfig {
       this.firstVoteRowIndex = firstVoteRowIndex;
       this.idColumnIndex = idColumnIndex;
       this.precinctColumnIndex = precinctColumnIndex;
+      this.overvoteDelimiter = overvoteDelimiter;
       this.provider = provider;
       this.contestId = contestId;
     }
@@ -135,6 +138,14 @@ public class RawContestConfig {
 
     public void setPrecinctColumnIndex(String precinctColumnIndex) {
       this.precinctColumnIndex = precinctColumnIndex;
+    }
+
+    public String getOvervoteDelimiter() {
+      return overvoteDelimiter;
+    }
+
+    public void setOvervoteDelimiter(String overvoteDelimiter) {
+      this.overvoteDelimiter = overvoteDelimiter;
     }
 
     public String getProvider() {

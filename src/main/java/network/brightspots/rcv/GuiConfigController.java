@@ -120,6 +120,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrPrecinctCol;
   @FXML
+  private TableColumn<CvrSource, String> tableColumnCvrOvervoteDelimiter;
+  @FXML
   private TableColumn<CvrSource, String> tableColumnCvrProvider;
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrContestId;
@@ -141,6 +143,8 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldCvrIdCol;
   @FXML
   private TextField textFieldCvrPrecinctCol;
+  @FXML
+  private TextField textFieldCvrOvervoteDelimiter;
   @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
@@ -471,6 +475,7 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCvrFirstVoteRow),
             getTextOrEmptyString(textFieldCvrIdCol),
             getTextOrEmptyString(textFieldCvrPrecinctCol),
+            getTextOrEmptyString(textFieldCvrOvervoteDelimiter),
             getProviderChoice(choiceCvrProvider).toString(),
             getTextOrEmptyString(textFieldCvrContestId));
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
@@ -497,6 +502,8 @@ public class GuiConfigController implements Initializable {
     textFieldCvrIdCol.setDisable(true);
     textFieldCvrPrecinctCol.clear();
     textFieldCvrPrecinctCol.setDisable(true);
+    textFieldCvrOvervoteDelimiter.clear();
+    textFieldCvrOvervoteDelimiter.setDisable(true);
     textFieldCvrContestId.clear();
     textFieldCvrContestId.setDisable(true);
   }
@@ -560,6 +567,17 @@ public class GuiConfigController implements Initializable {
         .getSelectionModel()
         .getSelectedItem()
         .setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
+    tableViewCvrFiles.refresh();
+  }
+
+  /**
+   * Action when CVR overvote delimiter is changed.
+   */
+  public void changeCvrOvervoteDelimiter(CellEditEvent cellEditEvent) {
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
+        .setOvervoteDelimiter(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
 
@@ -882,6 +900,7 @@ public class GuiConfigController implements Initializable {
           textFieldCvrFirstVoteRow.setDisable(false);
           textFieldCvrIdCol.setDisable(false);
           textFieldCvrPrecinctCol.setDisable(false);
+          textFieldCvrOvervoteDelimiter.setDisable(false);
         }
         case CDF -> {
           buttonAddCvrFile.setDisable(false);
@@ -908,6 +927,9 @@ public class GuiConfigController implements Initializable {
     tableColumnCvrPrecinctCol.setCellValueFactory(
         new PropertyValueFactory<>("precinctColumnIndex"));
     tableColumnCvrPrecinctCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCvrOvervoteDelimiter.setCellValueFactory(
+        new PropertyValueFactory<>("overvoteDelimiter"));
+    tableColumnCvrOvervoteDelimiter.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
     tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrContestId.setCellValueFactory(new PropertyValueFactory<>("contestId"));
@@ -1144,6 +1166,8 @@ public class GuiConfigController implements Initializable {
           source.getIdColumnIndex() != null ? source.getIdColumnIndex().trim() : "");
       source.setPrecinctColumnIndex(
           source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex().trim() : "");
+      source.setOvervoteDelimiter(
+          source.getOvervoteDelimiter() != null ? source.getOvervoteDelimiter().trim() : "");
       source.setProvider(source.getProvider() != null ? source.getProvider().trim() : "");
       source.setContestId(source.getContestId() != null ? source.getContestId().trim() : "");
     }

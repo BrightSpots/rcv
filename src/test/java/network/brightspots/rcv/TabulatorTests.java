@@ -473,4 +473,10 @@ class TabulatorTests {
   void multiSeatUwiTest() {
     runTabulationTest("multi_seat_uwi_test");
   }
+
+  @Test
+  @DisplayName("overvote delimiter test")
+  void overvoteDelimiterTest() {
+    runTabulationTest("test_set_overvote_delimiter");
+  }
 }
