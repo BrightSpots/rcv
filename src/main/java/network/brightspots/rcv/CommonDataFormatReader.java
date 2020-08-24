@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javafx.util.Pair;
-
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
@@ -76,7 +75,7 @@ class CommonDataFormatReader {
       xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       FileInputStream inputStream = new FileInputStream(new File(filePath));
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
-      for (Contest contest : cvrReport.Election.Contest) {
+      for (Contest contest : cvrReport.Election[0].Contest) {
         if (!contest.ObjectId.equals(source.getContestId())) {
           continue;
         }
@@ -84,7 +83,7 @@ class CommonDataFormatReader {
           String candidateId = contestSelection.ObjectId;
           // lookup the Candidate name
           String candidateName = null;
-          for (Candidate candidate : cvrReport.Election.Candidate) {
+          for (Candidate candidate : cvrReport.Election[0].Candidate) {
             if (candidate.ObjectId.equals(candidateId)) {
               candidateName = candidate.Name;
               // fallback to Code.Value
@@ -192,6 +191,36 @@ class CommonDataFormatReader {
     return rankings;
   }
 
+  // helper to extract the required CVRContest from the input CVR
+  CVRContest getContest(CVR cvr, CastVoteRecordReport cvrReport) {
+    // find current snapshot
+    CVRSnapshot currentSnapshot = null;
+    for (CVRSnapshot cvrSnapshot : cvr.CVRSnapshot) {
+      if (cvrSnapshot.ObjectId.equals(cvr.CurrentSnapshotId)) {
+        currentSnapshot = cvrSnapshot;
+        break;
+      }
+    }
+    // lookup Contest object which each CVRContest object is referencing
+    Contest linkedContest = null;
+    CVRContest contestToTabulate = null;
+    for (CVRContest cvrContest : currentSnapshot.CVRContest) {
+      // lookup contest object
+      for (Contest contest : cvrReport.Election[0].Contest) {
+        if (contest.ObjectId.equals(cvrContest.ContestId)) {
+          linkedContest = contest;
+          break;
+        }
+      }
+      // see if it matches
+      if (linkedContest.Name.equals(source.getContestId())) {
+        contestToTabulate = cvrContest;
+        break;
+      }
+    }
+    return contestToTabulate;
+  }
+
   void parseXML(List<CastVoteRecord> castVoteRecords) {
     try {
       XmlMapper xmlMapper = new XmlMapper();
@@ -200,27 +229,17 @@ class CommonDataFormatReader {
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
       // build a map from contestSelectionId to CandidateId for lookup during parsing
       HashMap<String, String> contestSelectionIdToCandidateId = new HashMap<>();
-      for (Contest contest : cvrReport.Election.Contest) {
+      for (Contest contest : cvrReport.Election[0].Contest) {
         if (contest.ObjectId.equals(source.getContestId())) {
           for (ContestSelection contestSelection : contest.ContestSelection) {
             contestSelectionIdToCandidateId
-                .put(contestSelection.ObjectId, contestSelection.CandidateIds);
+                .put(contestSelection.ObjectId, contestSelection.CandidateIds[0]);
           }
         }
       }
 
       for (CVR cvr : cvrReport.CVR) {
-        String currentSnapshotId = cvr.CurrentSnapshotId;
-        for (CVRSnapshot cvrSnapshot : cvr.CVRSnapshot) {
-          // filter by currentSnapshotId 
-          if (!cvrSnapshot.ObjectId.equals(currentSnapshotId)) {
-            continue;
-          }
-          // filter by contest Id
-          CVRContest contest = cvrSnapshot.CVRContest;
-          if (!contest.ContestId.equals(source.getContestId())) {
-            continue;
-          }
+        CVRContest contest = getContest(cvr, cvrReport);
           // parse contest selections
           List<Pair<Integer, String>> rankings = new ArrayList<>();
           for (CVRContestSelection cvrContestSelection : contest.CVRContestSelection) {
@@ -265,7 +284,7 @@ class CommonDataFormatReader {
             CastVoteRecord newRecord =
                 new CastVoteRecord(null, /* computed Id */
                     cvr.UniqueId, /* supplied Id */
-                    cvrReport.GpUnit.ObjectId, /* precinct */
+                    cvrReport.GpUnit[0].ObjectId, /* precinct */
                     null,
                     rankings);
             castVoteRecords.add(newRecord);
@@ -275,7 +294,6 @@ class CommonDataFormatReader {
               Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
             }
           }
-        }
       }
     } catch (Exception e) {
       Logger.log(Level.SEVERE, "Error parsing CDF data:\n%s", e.toString());
@@ -340,14 +358,36 @@ class CommonDataFormatReader {
     }
   }
 
+  // The following classes are based on the NIST 1500-103 UML structure.
+  // Many of the elements represented here will not be present on any particular implementation of
+  // a Cdf Cvr report.  Many of these elements are also irrelevant for tabulation purposes.
+  // However they are included here for completeness and to aid in interpreting the UML.
   static class ContestSelection {
 
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
+    // type indicates the ContestSelection subclass
     @JacksonXmlProperty(isAttribute = true)
     String type;
+
+    // CandidateSelection fields
+    // CandidateIds is plural to support "party ticket" options which can include multiple
+    // candidates.  In practice there will typically be just one Id here.
     @JacksonXmlProperty()
-    String CandidateIds;
+    @JacksonXmlElementWrapper(useWrapping = false)
+    String[] CandidateIds;
+    // boolean (yes, no, 1, 0)
+    @JacksonXmlProperty()
+    String isWriteIn;
+
+    // PartySelection fields
+    @JacksonXmlProperty()
+    String[] PartyIds;
+
+    // BallotMeasureSelection fields
+    @JacksonXmlProperty()
+    String Selection;
+
   }
 
   static class SelectionPosition {
@@ -392,33 +432,22 @@ class CommonDataFormatReader {
     String Undervotes;
     @JacksonXmlProperty()
     String WriteIns;
-
   }
 
   static class CVRSnapshot {
 
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
+
+    @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty()
-    CVRContest CVRContest;
+    CVRContest[] CVRContest;
+    @JacksonXmlProperty()
+    String Status;
+    @JacksonXmlProperty()
+    String OtherStatus;
     @JacksonXmlProperty()
     String Type;
-  }
-
-  static class Image {
-
-    @JacksonXmlProperty(isAttribute = true)
-    String MimeType;
-    @JacksonXmlProperty(isAttribute = true)
-    String FileName;
-  }
-
-  static class BallotImage {
-
-    @JacksonXmlProperty()
-    Image Image;
-    @JacksonXmlProperty()
-    String Location;
   }
 
   static class Party {
@@ -435,12 +464,36 @@ class CommonDataFormatReader {
 
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
+    @JacksonXmlProperty()
+    String Application;
+    @JacksonXmlProperty()
+    Code Code;
+    @JacksonXmlProperty()
+    String Manufacturer;
+    @JacksonXmlProperty()
+    String MarkMetricType;
+    @JacksonXmlProperty()
+    String Model;
+    @JacksonXmlProperty()
+    String Notes;
+    @JacksonXmlProperty()
+    String SerialNumber;
   }
 
   static class GpUnit {
 
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
+    @JacksonXmlProperty()
+    Code Code;
+    @JacksonXmlProperty()
+    String Name;
+    @JacksonXmlProperty()
+    String Type;
+    @JacksonXmlProperty()
+    String OtherType;
+    @JacksonXmlProperty()
+    ReportingDevice[] ReportingDevice;
   }
 
   static class Code {
@@ -472,8 +525,30 @@ class CommonDataFormatReader {
     @JacksonXmlProperty(isAttribute = true)
     String type;
     @JacksonXmlProperty()
+    String Abbreviation;
+    @JacksonXmlProperty()
+    Code Code;
+    @JacksonXmlProperty()
+    String Name;
+    @JacksonXmlProperty()
+    String VoteVariation;
+    @JacksonXmlProperty()
+    String OtherVoteVariation;
+    @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     ContestSelection[] ContestSelection;
+
+    // CandidateContest fields
+    @JacksonXmlProperty()
+    Integer NumberElected;
+    @JacksonXmlProperty()
+    Integer VotesAllowed;
+    @JacksonXmlProperty()
+    String PrimaryPartyId;
+
+    // RetentionContest fields
+    @JacksonXmlProperty()
+    String CandidateId;
   }
 
   static class Election {
@@ -495,22 +570,33 @@ class CommonDataFormatReader {
   static class CVR {
 
     @JacksonXmlProperty()
-    @JacksonXmlElementWrapper(useWrapping = false)
-    BallotImage[] BallotImage;
-    @JacksonXmlProperty(isAttribute = true)
-    String BallotStyleId;
-    @JacksonXmlProperty(isAttribute = true)
+    String ElectionId;
+    // GpUnit
+    @JacksonXmlProperty()
+    String BallotStyleUnitId;
+    // ReportingDevice
+    @JacksonXmlProperty()
     String CreatingDeviceId;
-    @JacksonXmlProperty(isAttribute = true)
+    @JacksonXmlProperty()
+    String PartyId;
+    @JacksonXmlProperty()
     String CurrentSnapshotId;
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     CVRSnapshot[] CVRSnapshot;
-    @JacksonXmlProperty(isAttribute = true)
-    String ElectionId;
-    @JacksonXmlProperty(isAttribute = true)
-    String PartyIds;
-    @JacksonXmlProperty(isAttribute = true)
+    @JacksonXmlProperty()
+    String BallotAuditId;
+    @JacksonXmlProperty()
+    String BallotPrePrintedId;
+    @JacksonXmlProperty()
+    String BatchSequenceId;
+    @JacksonXmlProperty()
+    String BallotSheetId;
+    @JacksonXmlProperty()
+    String BallotStyleId;
+    @JacksonXmlProperty()
+    String BatchId;
+    @JacksonXmlProperty()
     String UniqueId;
   }
 
@@ -518,24 +604,44 @@ class CommonDataFormatReader {
   static class CastVoteRecordReport {
 
     @JacksonXmlProperty()
-    @JacksonXmlElementWrapper(useWrapping = false)
-    CVR[] CVR;
-    @JacksonXmlProperty()
-    Election Election;
-    @JacksonXmlProperty()
     String GeneratedDate;
     @JacksonXmlProperty()
-    GpUnit GpUnit;
-    @JacksonXmlProperty()
-    @JacksonXmlElementWrapper(useWrapping = false)
-    CommonDataFormatReader.Party[] Party;
-    @JacksonXmlProperty()
-    String ReportGeneratingDeviceIds;
-    @JacksonXmlProperty()
-    ReportingDevice ReportingDevice;
+    String Notes;
     @JacksonXmlProperty()
     String ReportType;
     @JacksonXmlProperty()
+    String OtherReportType;
+    @JacksonXmlProperty()
     String Version;
+
+    // Cvr records
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    CVR[] CVR;
+
+    // Cdf supports multiple Elections however we only tabulate the first one
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    Election[] Election;
+
+    // Cdf supports multiple GpUnits at the report level
+    @JacksonXmlElementWrapper(useWrapping = false)
+    @JacksonXmlProperty()
+    GpUnit[] GpUnit;
+
+    // all Party objects which may appear throughout the report
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    CommonDataFormatReader.Party[] Party;
+
+    // report level ReportGeneratingDevices
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    String[] ReportGeneratingDeviceIds;
+
+    // All Reporting Devices which may appear in this report  
+    @JacksonXmlProperty()
+    @JacksonXmlElementWrapper(useWrapping = false)
+    ReportingDevice[] ReportingDevice;
   }
 }
