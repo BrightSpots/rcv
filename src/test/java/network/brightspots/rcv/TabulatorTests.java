@@ -192,6 +192,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("NIST XML CDF 2")
+  void testNistXmlCdf_2() {
+    runTabulationTest("nist_xml_cdf_2");
+  }
+
+  @Test
   @DisplayName("Unisyn xml cdf")
   void testUnisynXmlCdf() {
     runTabulationTest("unisyn_xml_cdf");

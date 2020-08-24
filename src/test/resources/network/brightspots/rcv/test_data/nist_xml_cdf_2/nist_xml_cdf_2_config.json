@@ -1,0 +1,58 @@
+{
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "NIST example 2 XML CDF",
+    "outputDirectory": "output",
+    "contestDate": "2019-03-06",
+    "contestJurisdiction": "",
+    "contestOffice": "",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": true
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "nist_xml_cdf_2.xml",
+      "idColumnIndex": "",
+      "precinctColumnIndex": "",
+      "provider": "CDF",
+      "contestId": "_C1"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "_C1CN1",
+      "code": "_C1CN1",
+      "excluded": false
+    },
+    {
+      "name": "_C1CN2",
+      "code": "_C1CN2",
+      "excluded": false
+    },
+    {
+      "name": "_C1CN3",
+      "code": "_C1CN3",
+      "excluded": false
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "Random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "Single-winner majority determines winner",
+    "randomSeed": "0",
+    "numberOfWinners": "1",
+    "decimalPlacesForVoteArithmetic": "1",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "4",
+    "maxRankingsAllowed": "4",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": "",
+    "rulesDescription": "Skiptonext_exhaustatovervote"
+  }
+}
