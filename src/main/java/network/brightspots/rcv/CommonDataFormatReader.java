@@ -192,7 +192,8 @@ class CommonDataFormatReader {
   }
 
   // helper to extract the required CVRContest from the input CVR
-  CVRContest getContest(CVR cvr, CastVoteRecordReport cvrReport) {
+  CVRContest getCvrContest(CVR cvr, Contest contestToTabulate) {
+    CVRContest cvrContestToTabulate = null;
     // find current snapshot
     CVRSnapshot currentSnapshot = null;
     for (CVRSnapshot cvrSnapshot : cvr.CVRSnapshot) {
@@ -201,76 +202,82 @@ class CommonDataFormatReader {
         break;
       }
     }
-    // lookup Contest object which each CVRContest object is referencing
-    Contest linkedContest = null;
-    CVRContest contestToTabulate = null;
+    // find CVRContest which matches the Contest we are tabulating
     for (CVRContest cvrContest : currentSnapshot.CVRContest) {
-      // lookup contest object
-      for (Contest contest : cvrReport.Election[0].Contest) {
-        if (contest.ObjectId.equals(cvrContest.ContestId)) {
-          linkedContest = contest;
-          break;
-        }
-      }
-      // see if it matches
-      if (linkedContest.Name.equals(source.getContestId())) {
-        contestToTabulate = cvrContest;
+      if (cvrContest.ContestId.equals(contestToTabulate.ObjectId)) {
+        cvrContestToTabulate = cvrContest;
         break;
       }
     }
-    return contestToTabulate;
+    return cvrContestToTabulate;
   }
 
   void parseXML(List<CastVoteRecord> castVoteRecords) {
     try {
+      // parse XML into memory
       XmlMapper xmlMapper = new XmlMapper();
       xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       FileInputStream inputStream = new FileInputStream(new File(filePath));
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
-      // build a map from contestSelectionId to CandidateId for lookup during parsing
-      HashMap<String, String> contestSelectionIdToCandidateId = new HashMap<>();
+      if (cvrReport.Election.length > 1) {
+        Logger.warning("Multiple Election objects found.  Only the first one will be processed.");
+      }
+      // build a map from CandidateObjectId to Candidate object
+      HashMap<String, Candidate> candidateObjectIdToCandidate = new HashMap<>();
+      for (Candidate candidate : cvrReport.Election[0].Candidate) {
+        candidateObjectIdToCandidate.put(candidate.ObjectId, candidate);
+      }
+      // extract the contest for tabulation
+      Contest contestToTabulate = null;
       for (Contest contest : cvrReport.Election[0].Contest) {
-        if (contest.ObjectId.equals(source.getContestId())) {
-          for (ContestSelection contestSelection : contest.ContestSelection) {
-            contestSelectionIdToCandidateId
-                .put(contestSelection.ObjectId, contestSelection.CandidateIds[0]);
-          }
+        if (contest.Name.equals(source.getContestId())) {
+          contestToTabulate = contest;
+          break;
         }
       }
+      if (contestToTabulate == null) {
+        Logger.severe("Contest \"%s\" from config file not found!", source.getContestId());
+        throw new CvrParseException();
+      }
+      // build a map from contestSelectionId to Candidate
+      HashMap<String, Candidate> contestSelectionIdToCandidate = new HashMap<>();
+      for (ContestSelection contestSelection : contestToTabulate.ContestSelection) {
+        if (contestSelection.CandidateIds.length > 1) {
+          Logger.warning("Multiple CandidateIds found in ContestSelection \"%s\".  Only the first one will be processed.", contestSelection.ObjectId);
+        }
+        Candidate candidate = candidateObjectIdToCandidate.get(contestSelection.CandidateIds[0]);
+        if (candidate == null) {
+          Logger.severe("CandidateId \"%s\" from ContestSelection \"%s\" not found!", contestSelection.CandidateIds[0], contestSelection.ObjectId);
+          throw new CvrParseException();
+        }
+        contestSelectionIdToCandidate.put(contestSelection.ObjectId, candidate);
+      }
 
+      // process the Cvrs
       for (CVR cvr : cvrReport.CVR) {
-        CVRContest contest = getContest(cvr, cvrReport);
+        CVRContest contest = getCvrContest(cvr, contestToTabulate);
           // parse contest selections
           List<Pair<Integer, String>> rankings = new ArrayList<>();
           for (CVRContestSelection cvrContestSelection : contest.CVRContestSelection) {
             String contestSelectionId = cvrContestSelection.ContestSelectionId;
-            String candidateId = contestSelectionIdToCandidateId.get(contestSelectionId);
-            if (candidateId == null) {
-              Logger.log(
-                  Level.SEVERE,
-                  "Candidate objectId: \"%s\" from CVR not found!", candidateId);
-              throw new CvrParseException();
-            }
+            Candidate candidate = contestSelectionIdToCandidate.get(contestSelectionId);
+            String candidateId = candidate.Name;
             if (candidateId.equals(config.getOvervoteLabel())) {
               candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
             }
             if (!config.getCandidateCodeList().contains(candidateId)) {
-              Logger.log(
-                  Level.SEVERE,
-                  "Contest Selection: \"%s\" from CVR is not in the config file!", candidateId);
+              Logger.severe("Contest Selection CandidateId: \"%s\" from CVR is not in the config file!", candidateId);
               throw new CvrParseException();
             }
             if (cvrContestSelection.Rank == null) {
               for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
                 // ignore if no indication is present (NIST 1500-103 section 3.4.2)
-                if (selectionPosition.HasIndication != null && selectionPosition.HasIndication
-                    .equals("no")) {
+                if (selectionPosition.HasIndication != null && selectionPosition.HasIndication.equals("no")) {
                   continue;
                 }
 
                 if (selectionPosition.Rank == null) {
-                  Logger.log(Level.SEVERE, "No Rank found on CVR %s Contest %s!", cvr.UniqueId,
-                      contest.ContestId);
+                  Logger.severe("No Rank found on CVR %s Contest %s!", cvr.UniqueId, contest.ContestId);
                   throw new CvrParseException();
                 }
                 Integer rank = Integer.parseInt(selectionPosition.Rank);
@@ -372,7 +379,7 @@ class CommonDataFormatReader {
 
     // CandidateSelection fields
     // CandidateIds is plural to support "party ticket" options which can include multiple
-    // candidates.  In practice there will typically be just one Id here.
+    // candidates.  We do not support this yet.
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     String[] CandidateIds;
