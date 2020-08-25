@@ -240,15 +240,22 @@ class StreamingCvrReader {
       }
 
       for (String candidate : candidates) {
-        // skip undervotes
-        if (!candidate.equals(config.getUndervoteLabel())) {
+        candidate = candidate.trim();
+        if (candidates.length > 1 &&
+            (candidate.equals("") || candidate.equals(config.getUndervoteLabel()))) {
+          Logger.log(
+              Level.SEVERE,
+              "If a cell contains multiple candidates split by the overvote delimiter, it's not "
+                  + "valid for any of them to be blank or an explicit undervote.");
+          encounteredDataErrors = true;
+        } else if (!candidate.equals(config.getUndervoteLabel())) {
           // map overvotes to our internal overvote string
           if (candidate.equals(config.getOvervoteLabel())) {
             candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           } else if (!config.getCandidateCodeList().contains(candidate)
               && !candidate.equals(config.getUndeclaredWriteInLabel())) {
-            // this is an unrecognized candidate so add it to the unrecognized candidate map
-            // this helps identify problems with CVRs
+            // This is an unrecognized candidate, so add it to the unrecognized candidate map.
+            // This helps identify problems with CVRs.
             unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
           }
           Pair<Integer, String> ranking = new Pair<>(currentRank, candidate);

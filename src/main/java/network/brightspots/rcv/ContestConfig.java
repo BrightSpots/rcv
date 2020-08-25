@@ -201,6 +201,13 @@ class ContestConfig {
             source.getFilePath())) {
           sourceValid = false;
         }
+
+        // See the config file documentation for an explanation of this regex.
+        if (!isNullOrBlank(source.getOvervoteDelimiter()) &&
+            source.getOvervoteDelimiter().matches(".*\\\\.*|[a-zA-Z0-9.',\\-\"\\s]+")) {
+          sourceValid = false;
+          Logger.log(Level.SEVERE, "overvoteDelimiter is invalid.");
+        }
       } else {
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getFirstVoteColumnIndex(),
@@ -229,6 +236,14 @@ class ContestConfig {
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getPrecinctColumnIndex(),
             "precinctColumnIndex",
+            provider,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
+
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getOvervoteDelimiter(),
+            "overvoteDelimiter",
             provider,
             source.getFilePath())) {
           sourceValid = false;
@@ -507,9 +522,7 @@ class ContestConfig {
             isValid = false;
             Logger.log(Level.SEVERE, "tabulateByPrecinct may not be used with CDF files.");
           }
-        }
-
-        if (getProvider(source) == Provider.ESS) {
+        } else if (getProvider(source) == Provider.ESS) {
           // perform ES&S checks
           if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
             isValid = false;
@@ -525,20 +538,12 @@ class ContestConfig {
                   Level.SEVERE,
                   "overvoteDelimiter must be blank when overvoteLabel is provided.");
             }
-            if (source.getOvervoteDelimiter().matches("[a-zA-Z0-9.',\\-\\s]+")) {
-              isValid = false;
-              Logger.log(
-                  Level.SEVERE,
-                  "overvoteDelimiter is invalid.");
-            }
-          }
-        } else {
-          if (!isNullOrBlank(source.getOvervoteDelimiter())) {
+          } else if (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
-                "overvoteDelimiter must be blank for this provider: %s",
-                source.getProvider());
+                "overvoteDelimiter is required for an ES&S CVR source when overvoteRule is set "
+                    + "to exhaustIfMultipleContinuing.");
           }
         }
       }
