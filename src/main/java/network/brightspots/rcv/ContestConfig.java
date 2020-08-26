@@ -536,7 +536,7 @@ class ContestConfig {
               isValid = false;
               Logger.log(
                   Level.SEVERE,
-                  "overvoteDelimiter must be blank when overvoteLabel is provided.");
+                  "overvoteDelimiter and overvoteLabel can't both be supplied.");
             }
           } else if (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
             isValid = false;

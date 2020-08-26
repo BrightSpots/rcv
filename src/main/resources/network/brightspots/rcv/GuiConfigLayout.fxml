@@ -255,7 +255,7 @@
                       onEditCommit="#changeCvrPrecinctColIndex" prefWidth="50.0"
                       text="Precinct&#10;Column"/>
                     <TableColumn minWidth="20.0" onEditCommit="#changeCvrOvervoteDelimiter"
-                      prefWidth="50.0" text="Overvote&#10;Delimiter"
+                      prefWidth="60.0" text="Overvote&#10;Delimiter"
                       fx:id="tableColumnCvrOvervoteDelimiter"/>
                   </columns>
                 </TableView>
@@ -437,7 +437,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="196.0" text="Percentage Threshold"/>
+                      <Label text="Percentage Threshold *" prefWidth="196.0"/>
                       <TextField fx:id="textFieldMultiSeatBottomsUpPercentageThreshold"
                         maxWidth="220.0"/>
                       <Label text=" &#37;" prefWidth="18.0"/>
