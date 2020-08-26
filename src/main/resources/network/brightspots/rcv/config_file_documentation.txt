@@ -79,7 +79,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         example: 2
         value: [1..100000]
 
-      "idColumnIndex" optional and used if and only if provider is ES&S
+      "idColumnIndex" optional and can be used only if provider is ES&S
         index of the column (starting from 1) that contains the unique ID for each CVR
         example: 1
         value: [1..1000]
@@ -88,6 +88,11 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         index of the column (starting from 1) that contains the precinct name for each CVR
         example: 2
         value: [1..1000]
+
+      "overvoteDelimiter" optional and can be used only if provider is ES&S; must be blank when overvoteLabel is provided
+        string that will be used to split a cell into multiple candidate strings in the case of an overvote
+        example: //
+        value: any string that contains no backslashes and at least one character that is not a letter, number, hyphen, period, comma, apostrophe, quote, or space
 
   "candidates" required
     list of registered candidate names and associated candidate code (note: leave empty when CVR is in Common Data Format)
@@ -162,6 +167,9 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
       "overvoteRule" required
         how the program should handle an overvote when it encounters one
         value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
+        "alwaysSkipToNextRank": when we encounter an overvote, ignore this rank and look at the next rank in the cast vote record
+        "exhaustImmediately": exhaust a ballot as soon as we encounter an overvote
+        "exhaustIfMultipleContinuing": if more than one candidate in an overvote are continuing, exhaust the ballot; if only one, assign the vote to them; if none, continue to the next rank (not valid with an ES&S source unless overvoteDelimiter is supplied)
 
       "winnerElectionMode" required
         whether the program should apply a special process for selecting the winner(s)
