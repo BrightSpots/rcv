@@ -57,7 +57,7 @@ class CommonDataFormatReader {
     this.config = config;
     this.source = source;
   }
-  
+
   // This method will extract candidate data from a CDF file for the contestID specified in
   // our CvrSource.  It is currently un-used but will be handy for automating
   // config file creation when we are ready to implement that.
@@ -221,7 +221,8 @@ class CommonDataFormatReader {
 
   void parseXML(List<CastVoteRecord> castVoteRecords) {
     try {
-      // parse XML into memory
+
+      // load XML
       XmlMapper xmlMapper = new XmlMapper();
       xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       FileInputStream inputStream = new FileInputStream(new File(filePath));
@@ -229,12 +230,8 @@ class CommonDataFormatReader {
       if (cvrReport.Election.length > 1) {
         Logger.warning("Multiple Election objects found.  Only the first one will be processed.");
       }
-      // build a map from CandidateId to Candidate object
-      HashMap<String, Candidate> candidateById = new HashMap<>();
-      for (Candidate candidate : cvrReport.Election[0].Candidate) {
-        candidateById.put(candidate.ObjectId, candidate);
-      }
-      // extract the contest for tabulation
+
+      // Find the contest for tabulation
       Contest contestToTabulate = null;
       for (Contest contest : cvrReport.Election[0].Contest) {
         if (contest.Name.equals(source.getContestId())) {
@@ -247,7 +244,13 @@ class CommonDataFormatReader {
         throw new CvrParseException();
       }
 
-      // build a map from contestSelectionId to ContestSelection
+      // build a map of Candidates
+      HashMap<String, Candidate> candidateById = new HashMap<>();
+      for (Candidate candidate : cvrReport.Election[0].Candidate) {
+        candidateById.put(candidate.ObjectId, candidate);
+      }
+
+      // build a map of ContestSelections
       HashMap<String, ContestSelection> contestSelectionById = new HashMap<>();
       for (ContestSelection contestSelection : contestToTabulate.ContestSelection) {
         if (contestSelection.CandidateIds.length > 1) {
@@ -257,6 +260,12 @@ class CommonDataFormatReader {
               contestSelection.ObjectId);
         }
         contestSelectionById.put(contestSelection.ObjectId, contestSelection);
+      }
+
+      // build a map of GpUnits (aka precinct or district)
+      HashMap<String, GpUnit> gpUnitById = new HashMap<>();
+      for (GpUnit gpUnit : cvrReport.GpUnit) {
+        gpUnitById.put(gpUnit.ObjectId, gpUnit);
       }
 
       // process the Cvrs
@@ -339,12 +348,24 @@ class CommonDataFormatReader {
           }
         }
 
+        // Extract GPUnit if provided
+        String precinctId = null;
+        if (cvr.BallotStyleUnitId != null) {
+          GpUnit unit = gpUnitById.get(cvr.BallotStyleUnitId);
+          if (unit == null) {
+            Logger.severe("GpUnit \"%s\" for CVR \"%s\" not found!", cvr.BallotStyleUnitId,
+                cvr.UniqueId);
+            throw new CvrParseException();
+          }
+          precinctId = unit.Name;
+        }
+
         // create the new CastVoteRecord
         CastVoteRecord newRecord =
-            new CastVoteRecord(null, /* computed Id */
-                cvr.UniqueId, /* supplied Id */
-                null, /* precinct */
-                null, /* full Cvr data */
+            new CastVoteRecord(null,
+                cvr.UniqueId,
+                precinctId,
+                null, 
                 rankings);
         castVoteRecords.add(newRecord);
 
