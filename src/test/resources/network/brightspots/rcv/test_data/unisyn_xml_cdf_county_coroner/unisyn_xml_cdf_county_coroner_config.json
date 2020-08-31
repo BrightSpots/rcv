@@ -1,0 +1,83 @@
+{
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "For County Coroner (1/2)",
+    "outputDirectory": "output",
+    "contestDate": "2019-03-06",
+    "contestJurisdiction": "",
+    "contestOffice": "",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": true
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "unisyn_xml_cdf_county_coroner.xml",
+      "idColumnIndex": "",
+      "precinctColumnIndex": "",
+      "provider": "CDF",
+      "contestId": "For County Coroner (1/2)"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Andrea Doria",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Jimmy Hendriks",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Emily Steffan",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Laura Brown",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Kay Daniels",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Niels Larson",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Walter Gerber",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Willy Wonka",
+      "code": "",
+      "excluded": false
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "Random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "Single-winner majority determines winner",
+    "randomSeed": "0",
+    "numberOfWinners": "1",
+    "decimalPlacesForVoteArithmetic": "1",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "4",
+    "maxRankingsAllowed": "4",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": "",
+    "rulesDescription": "Skiptonext_exhaustatovervote"
+  }
+}

@@ -203,6 +203,19 @@ class TabulatorTests {
     runTabulationTest("unisyn_xml_cdf");
   }
 
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_city_coroner")
+  void unisyn_xml_cdf_city_coroner() {
+    runTabulationTest("unisyn_xml_cdf_city_coroner");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_county_coroner")
+  void unisyn_xml_cdf_county_coroner() {
+    runTabulationTest("unisyn_xml_cdf_county_coroner");
+  }
+
   @Test
   @DisplayName("Clear Ballot - Kansas Primary")
   void testClearBallotKansasPrimary() {
