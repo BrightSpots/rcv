@@ -193,6 +193,14 @@
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
                     </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label prefWidth="110.0" text="Overvote Delimiter"/>
+                      <TextField prefHeight="25.0" prefWidth="40.0"
+                        fx:id="textFieldCvrOvervoteDelimiter"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
                   </VBox>
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
@@ -246,6 +254,9 @@
                     <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0"
                       onEditCommit="#changeCvrPrecinctColIndex" prefWidth="50.0"
                       text="Precinct&#10;Column"/>
+                    <TableColumn minWidth="20.0" onEditCommit="#changeCvrOvervoteDelimiter"
+                      prefWidth="60.0" text="Overvote&#10;Delimiter"
+                      fx:id="tableColumnCvrOvervoteDelimiter"/>
                   </columns>
                 </TableView>
                 <padding>
