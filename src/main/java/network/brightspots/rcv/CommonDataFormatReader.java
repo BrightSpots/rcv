@@ -41,9 +41,11 @@ import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 class CommonDataFormatReader {
 
   private final String STATUS_NEEDS_ADJUDICATION = "needs-adjudication";
-  private final String STATUS_TRUE = "yes";
-  private final String STATUS_FALSE = "no";
+  private final String STATUS_YES = "yes";
+  private final String STATUS_NO = "no";
   private final String STATUS_UNKNOWN = "unknown";
+  private final String BOOLEAN_TRUE = "true";
+  private final String BOOLEAN_FALSE = "false";
 
   private final String filePath;
   private final ContestConfig config;
@@ -55,7 +57,7 @@ class CommonDataFormatReader {
     this.config = config;
     this.source = source;
   }
-
+  
   // This method will extract candidate data from a CDF file for the contestID specified in
   // our CvrSource.  It is currently un-used but will be handy for automating
   // config file creation when we are ready to implement that.
@@ -227,10 +229,10 @@ class CommonDataFormatReader {
       if (cvrReport.Election.length > 1) {
         Logger.warning("Multiple Election objects found.  Only the first one will be processed.");
       }
-      // build a map from CandidateObjectId to Candidate object
-      HashMap<String, Candidate> candidateObjectIdToCandidate = new HashMap<>();
+      // build a map from CandidateId to Candidate object
+      HashMap<String, Candidate> candidateById = new HashMap<>();
       for (Candidate candidate : cvrReport.Election[0].Candidate) {
-        candidateObjectIdToCandidate.put(candidate.ObjectId, candidate);
+        candidateById.put(candidate.ObjectId, candidate);
       }
       // extract the contest for tabulation
       Contest contestToTabulate = null;
@@ -244,8 +246,9 @@ class CommonDataFormatReader {
         Logger.severe("Contest \"%s\" from config file not found!", source.getContestId());
         throw new CvrParseException();
       }
-      // build a map from contestSelectionId to Candidate
-      HashMap<String, Candidate> contestSelectionIdToCandidate = new HashMap<>();
+
+      // build a map from contestSelectionId to ContestSelection
+      HashMap<String, ContestSelection> contestSelectionById = new HashMap<>();
       for (ContestSelection contestSelection : contestToTabulate.ContestSelection) {
         if (contestSelection.CandidateIds.length > 1) {
           Logger.warning(
@@ -253,13 +256,7 @@ class CommonDataFormatReader {
                   + " Only the first one will be processed.",
               contestSelection.ObjectId);
         }
-        Candidate candidate = candidateObjectIdToCandidate.get(contestSelection.CandidateIds[0]);
-        if (candidate == null) {
-          Logger.severe("CandidateId \"%s\" from ContestSelection \"%s\" not found!",
-              contestSelection.CandidateIds[0], contestSelection.ObjectId);
-          throw new CvrParseException();
-        }
-        contestSelectionIdToCandidate.put(contestSelection.ObjectId, candidate);
+        contestSelectionById.put(contestSelection.ObjectId, contestSelection);
       }
 
       // process the Cvrs
@@ -270,52 +267,66 @@ class CommonDataFormatReader {
           continue;
         }
         List<Pair<Integer, String>> rankings = new ArrayList<>();
-        // parse CVRContestSelections into rankings - they will be null for an overvote
+        // parse CVRContestSelections into rankings
+        // they will be null for an undervote
         if (contest.CVRContestSelection != null) {
           for (CVRContestSelection cvrContestSelection : contest.CVRContestSelection) {
-            if (cvrContestSelection.Status != null && cvrContestSelection.Status.equals(STATUS_NEEDS_ADJUDICATION)) {
+            if (cvrContestSelection.Status != null && cvrContestSelection.Status
+                .equals(STATUS_NEEDS_ADJUDICATION)) {
               Logger.info("Contest Selection needs adjudication.  Skipping.");
               continue;
             }
-
-            // TODO: check for write-in here:
             String contestSelectionId = cvrContestSelection.ContestSelectionId;
-            if (contestSelectionId == null) {
-              contestSelectionId = null;
-            }
-            Candidate candidate = contestSelectionIdToCandidate.get(contestSelectionId);
-            if (candidate == null) {
-              candidate = null;
-            }
-            String candidateId = candidate.Name;
-            if (candidateId == null) {
-              candidateId = null;
-            }
-
-            if (candidateId.equals(config.getOvervoteLabel())) {
-              candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-            }
-            if (!config.getCandidateCodeList().contains(candidateId)) {
-              Logger
-                  .severe("Contest Selection CandidateId: \"%s\" from CVR is not in the config file!",
-                      candidateId);
+            ContestSelection contestSelection = contestSelectionById
+                .get(contestSelectionId);
+            if (contestSelection == null) {
+              Logger.severe("ContestSelection \"%s\" from CVR not found!", contestSelectionId);
               throw new CvrParseException();
             }
+            String candidateId;
+            // check for declared write-in:
+            if (contestSelection.IsWriteIn != null && contestSelection.IsWriteIn
+                .equals(BOOLEAN_TRUE)) {
+              candidateId = this.config.getUndeclaredWriteInLabel();
+            } else {
+              Candidate candidate = candidateById
+                  .get(contestSelection.CandidateIds[0]);
+              if (candidate == null) {
+                Logger.severe("CandidateId \"%s\" from ContestSelectionId \"%s\" not found!",
+                    contestSelection.CandidateIds[0], contestSelection.ObjectId);
+                throw new CvrParseException();
+              }
+              candidateId = candidate.Name;
+              if (candidateId.equals(config.getOvervoteLabel())) {
+                candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+              }
+              if (!config.getCandidateCodeList().contains(candidateId)) {
+                Logger
+                    .severe(
+                        "Contest Selection CandidateId: \"%s\" from CVR is not in the config file!",
+                        candidateId);
+                throw new CvrParseException();
+              }
+            }
+
             if (cvrContestSelection.Rank == null) {
               for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
                 if (selectionPosition.CVRWriteIn != null) {
-                  selectionPosition.CVRWriteIn = selectionPosition.CVRWriteIn;
+                  candidateId = this.config.getUndeclaredWriteInLabel();
                 }
-
                 // ignore if no indication is present (NIST 1500-103 section 3.4.2)
                 if (selectionPosition.HasIndication != null && selectionPosition.HasIndication
-                    .equals(STATUS_FALSE)) {
+                    .equals(STATUS_NO)) {
                   continue;
                 }
-
+                // skip if not allocable
+                if (selectionPosition.IsAllocable.equals(STATUS_NO)) {
+                  continue;
+                }
                 if (selectionPosition.Rank == null) {
                   Logger
-                      .severe("No Rank found on CVR %s Contest %s!", cvr.UniqueId, contest.ContestId);
+                      .severe("No Rank found on CVR %s Contest %s!", cvr.UniqueId,
+                          contest.ContestId);
                   throw new CvrParseException();
                 }
                 Integer rank = Integer.parseInt(selectionPosition.Rank);
@@ -426,7 +437,7 @@ class CommonDataFormatReader {
     String[] CandidateIds;
     // boolean-like
     @JacksonXmlProperty()
-    String isWriteIn;
+    String IsWriteIn;
 
     // PartySelection fields
     @JacksonXmlProperty()
@@ -439,6 +450,7 @@ class CommonDataFormatReader {
   }
 
   static class CVRWriteIn {
+
     @JacksonXmlProperty()
     String Text;
   }

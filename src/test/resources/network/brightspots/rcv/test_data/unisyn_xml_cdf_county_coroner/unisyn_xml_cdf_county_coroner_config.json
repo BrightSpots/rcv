@@ -77,7 +77,7 @@
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
     "undervoteLabel": "",
-    "undeclaredWriteInLabel": "",
+    "undeclaredWriteInLabel": "UWI",
     "rulesDescription": "Skiptonext_exhaustatovervote"
   }
 }
