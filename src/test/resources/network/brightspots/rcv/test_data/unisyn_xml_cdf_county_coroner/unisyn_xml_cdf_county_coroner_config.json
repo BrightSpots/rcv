@@ -7,7 +7,7 @@
     "contestJurisdiction": "",
     "contestOffice": "",
     "tabulateByPrecinct": false,
-    "generateCdfJson": true
+    "generateCdfJson": false
   },
   "cvrFileSources": [
     {
