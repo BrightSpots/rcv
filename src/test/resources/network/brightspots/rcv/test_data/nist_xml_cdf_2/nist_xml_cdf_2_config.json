@@ -1,13 +1,13 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "NIST example 2 XML CDF",
+    "contestName": "For Governor and Lieutenant Governor",
     "outputDirectory": "output",
     "contestDate": "2019-03-06",
     "contestJurisdiction": "",
     "contestOffice": "",
     "tabulateByPrecinct": false,
-    "generateCdfJson": true
+    "generateCdfJson": false
   },
   "cvrFileSources": [
     {
@@ -15,23 +15,23 @@
       "idColumnIndex": "",
       "precinctColumnIndex": "",
       "provider": "CDF",
-      "contestId": "_C1"
+      "contestId": "For Governor and Lieutenant Governor"
     }
   ],
   "candidates": [
     {
-      "name": "_C1CN1",
-      "code": "_C1CN1",
+      "name": "Edward FitzGerald and Sharen Swartz Neuhardt",
+      "code": "",
       "excluded": false
     },
     {
-      "name": "_C1CN2",
-      "code": "_C1CN2",
+      "name": "John Kasich and Mary Taylor",
+      "code": "",
       "excluded": false
     },
     {
-      "name": "_C1CN3",
-      "code": "_C1CN3",
+      "name": "Anita Rios and Bob Fitrakis",
+      "code": "",
       "excluded": false
     }
   ],
