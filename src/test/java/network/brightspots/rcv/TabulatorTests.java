@@ -193,26 +193,19 @@ class TabulatorTests {
 
   @Test
   @DisplayName("NIST XML CDF 2")
-  void testNistXmlCdf_2() {
+  void nistXmlCdf2() {
     runTabulationTest("nist_xml_cdf_2");
   }
 
   @Test
-  @DisplayName("Unisyn xml cdf")
-  void testUnisynXmlCdf() {
-    runTabulationTest("unisyn_xml_cdf");
-  }
-
-
-  @Test
   @DisplayName("unisyn_xml_cdf_city_coroner")
-  void unisyn_xml_cdf_city_coroner() {
+  void unisynXmlDdfCityCoroner() {
     runTabulationTest("unisyn_xml_cdf_city_coroner");
   }
 
   @Test
   @DisplayName("unisyn_xml_cdf_county_coroner")
-  void unisyn_xml_cdf_county_coroner() {
+  void unisynXmlCdfCountyCoroner() {
     runTabulationTest("unisyn_xml_cdf_county_coroner");
   }
 
