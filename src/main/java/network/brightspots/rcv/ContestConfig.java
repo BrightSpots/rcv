@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
@@ -248,19 +247,19 @@ class ContestConfig {
         }
       }
 
-      boolean providerRequiesContestId = provider == Provider.DOMINION ||
+      boolean providerRequiresContestId = provider == Provider.DOMINION ||
           provider == Provider.HART ||
           provider == Provider.CLEAR_BALLOT ||
           provider == Provider.CDF;
 
-      if (isNullOrBlank(source.getContestId()) && providerRequiesContestId) {
+      if (isNullOrBlank(source.getContestId()) && providerRequiresContestId) {
         sourceValid = false;
         Logger.log(
             Level.SEVERE,
             String.format("contestId must be defined for CVR source with provider \"%s\"!",
                 getProvider(source).toString()));
       } else if (
-          !(providerRequiesContestId) &&
+          !(providerRequiresContestId) &&
               fieldIsDefinedButShouldNotBeForProvider(
                   source.getContestId(),
                   "contestId",
@@ -517,6 +516,12 @@ class ContestConfig {
           if (rawConfig.cvrFileSources.size() != 1) {
             isValid = false;
             Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
+          }
+          if (!source.getFilePath().endsWith(".xml") && !source.getFilePath().endsWith(".json")) {
+            Logger.log(Level.SEVERE,
+                "Unexpected file extension: %s.  CDF source files must be .xml or .json",
+                source.getFilePath());
+            isValid = false;
           }
           if (isTabulateByPrecinctEnabled()) {
             isValid = false;
@@ -1025,10 +1030,10 @@ class ContestConfig {
   }
 
   // perform pre-processing on candidates:
-  // 1) if there are any CDF input sources extract candidates names from them
-  // 2) build map of candidate ID to candidate name
-  // 3) generate tie-break ordering if needed
-  private void processCandidateData() throws CvrParseException {
+  // 1) build map of candidate ID to candidate name
+  // 2) generate tie-break ordering if needed
+  // 3) add uwi candidate if needed
+  private void processCandidateData() {
     candidateCodeToNameMap = new HashMap<>();
     if (rawConfig.candidates != null) {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {

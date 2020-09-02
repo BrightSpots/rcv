@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
-import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 class CommonDataFormatReader {
@@ -49,28 +48,23 @@ class CommonDataFormatReader {
 
   private final String filePath;
   private final ContestConfig config;
-  private final CvrSource source;
-  private Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
+  private final String contestId;
+  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  CommonDataFormatReader(String filePath, ContestConfig config, CvrSource source) {
+  CommonDataFormatReader(String filePath, ContestConfig config, String contestId) {
     this.filePath = filePath;
     this.config = config;
-    this.source = source;
+    this.contestId = contestId;
   }
 
   // This method will extract candidate data from a CDF file for the contestID specified in
-  // our CvrSource.  It is currently un-used but will be handy for automating
-  // config file creation when we are ready to implement that.
+  // our CvrSource.
   Map<String, String> getCandidates() throws CvrParseException {
-    Map<String, String> candidates;
+    Map<String, String> candidates = null;
     if (filePath.endsWith(".xml")) {
       candidates = getCandidatesXml();
     } else if (filePath.endsWith(".json")) {
       candidates = getCandidatesJson();
-    } else {
-      Logger.log(Level.SEVERE,
-          "Unexpected file extension: %s.  CDF source files must be .xml or .json", this.filePath);
-      throw new CvrParseException();
     }
     return candidates;
   }
@@ -83,7 +77,7 @@ class CommonDataFormatReader {
       FileInputStream inputStream = new FileInputStream(new File(filePath));
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
       for (Contest contest : cvrReport.Election[0].Contest) {
-        if (!contest.ObjectId.equals(source.getContestId())) {
+        if (!contest.ObjectId.equals(this.contestId)) {
           continue;
         }
         for (ContestSelection contestSelection : contest.ContestSelection) {
@@ -130,7 +124,7 @@ class CommonDataFormatReader {
         for (Object contestObject : contestArray) {
           HashMap contest = (HashMap) contestObject;
           // filter by contest ID
-          if (!contest.get("@id").equals(source.getContestId())) {
+          if (!contest.get("@id").equals(this.contestId)) {
             continue;
           }
           // for each contest get the contest selections
@@ -169,7 +163,7 @@ class CommonDataFormatReader {
     for (Object contestObject : cvrContests) {
       HashMap cvrContest = (HashMap) contestObject;
       // filter by contest ID
-      if (!cvrContest.get("ContestId").equals(source.getContestId())) {
+      if (!cvrContest.get("ContestId").equals(this.contestId)) {
         continue;
       }
       // each contest contains contestSelections
@@ -203,23 +197,27 @@ class CommonDataFormatReader {
     CVRContest cvrContestToTabulate = null;
     // find current snapshot
     CVRSnapshot currentSnapshot = null;
-    for (CVRSnapshot cvrSnapshot : cvr.CVRSnapshot) {
-      if (cvrSnapshot.ObjectId.equals(cvr.CurrentSnapshotId)) {
-        currentSnapshot = cvrSnapshot;
-        break;
+    if (cvr.CVRSnapshot != null) {
+      for (CVRSnapshot cvrSnapshot : cvr.CVRSnapshot) {
+        if (cvrSnapshot.ObjectId.equals(cvr.CurrentSnapshotId)) {
+          currentSnapshot = cvrSnapshot;
+          break;
+        }
       }
     }
     // find CVRContest which matches the Contest we are tabulating
-    for (CVRContest cvrContest : currentSnapshot.CVRContest) {
-      if (cvrContest.ContestId.equals(contestToTabulate.ObjectId)) {
-        cvrContestToTabulate = cvrContest;
-        break;
+    if (currentSnapshot.CVRContest != null) {
+      for (CVRContest cvrContest : currentSnapshot.CVRContest) {
+        if (cvrContest.ContestId.equals(contestToTabulate.ObjectId)) {
+          cvrContestToTabulate = cvrContest;
+          break;
+        }
       }
     }
     return cvrContestToTabulate;
   }
 
-  void parseXML(List<CastVoteRecord> castVoteRecords) {
+  void parseXml(List<CastVoteRecord> castVoteRecords) {
     try {
 
       // load XML
@@ -234,13 +232,13 @@ class CommonDataFormatReader {
       // Find the contest for tabulation
       Contest contestToTabulate = null;
       for (Contest contest : cvrReport.Election[0].Contest) {
-        if (contest.Name.equals(source.getContestId())) {
+        if (contest.Name.equals(this.contestId)) {
           contestToTabulate = contest;
           break;
         }
       }
       if (contestToTabulate == null) {
-        Logger.severe("Contest \"%s\" from config file not found!", source.getContestId());
+        Logger.severe("Contest \"%s\" from config file not found!", this.contestId);
         throw new CvrParseException();
       }
 
@@ -334,7 +332,7 @@ class CommonDataFormatReader {
                 }
                 if (selectionPosition.Rank == null) {
                   Logger
-                      .severe("No Rank found on CVR %s Contest %s!", cvr.UniqueId,
+                      .severe("No Rank found on CVR \"%s\" Contest \"%s\"!", cvr.UniqueId,
                           contest.ContestId);
                   throw new CvrParseException();
                 }
@@ -379,16 +377,11 @@ class CommonDataFormatReader {
     }
   }
 
-  void parseCvrFile(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException, UnrecognizedCandidatesException {
+  void parseCvrFile(List<CastVoteRecord> castVoteRecords) throws UnrecognizedCandidatesException {
     if (filePath.endsWith(".xml")) {
-      parseXML(castVoteRecords);
+      parseXml(castVoteRecords);
     } else if (filePath.endsWith(".json")) {
       parseJson(castVoteRecords);
-    } else {
-      Logger.log(Level.SEVERE,
-          "Unexpected file extension: %s.  CDF source files must be .xml or .json", this.filePath);
-      throw new CvrParseException();
     }
   }
 
