@@ -199,7 +199,7 @@ class TabulatorTests {
 
   @Test
   @DisplayName("unisyn_xml_cdf_city_coroner")
-  void unisynXmlDdfCityCoroner() {
+  void unisynXmlCdfCityCoroner() {
     runTabulationTest("unisyn_xml_cdf_city_coroner");
   }
 

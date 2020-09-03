@@ -8,6 +8,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\2526b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_2526</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_2526">
@@ -245,6 +246,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\9264b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_9264</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_9264">
@@ -482,6 +484,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\6266b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_6266</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_6266">
@@ -539,6 +542,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\3283b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_3283</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_3283">
@@ -776,6 +780,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\7965b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_7965</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_7965">
@@ -1013,6 +1018,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\8042b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_8042</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_8042">
@@ -1070,6 +1076,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\857b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_857</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_857">
@@ -1307,6 +1314,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\5313b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_5313</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_5313">
@@ -1544,6 +1552,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\4628b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_4628</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_4628">
@@ -1781,6 +1790,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\9778b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_9778</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_9778">
@@ -2018,6 +2028,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\317b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_317</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_317">
@@ -2255,6 +2266,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\8264b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_8264</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_8264">
@@ -2492,6 +2504,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\3656b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_3656</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_3656">
@@ -2733,6 +2746,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\5110b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_5110</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_5110">
@@ -2974,6 +2988,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\7013b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_7013</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_7013">
@@ -3211,6 +3226,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\4855b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_4855</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_4855">
@@ -3448,6 +3464,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\4699b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_4699</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_4699">
@@ -3685,6 +3702,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\3963b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_3963</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_3963">
@@ -3922,6 +3940,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\6844b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_6844</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_6844">
@@ -4159,6 +4178,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\8348b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_8348</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_8348">
@@ -4396,6 +4416,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\9786b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_9786</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_9786">
@@ -4637,6 +4658,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\8824b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_8824</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_8824">
@@ -4694,6 +4716,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\6675b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_6675</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_6675">
@@ -4928,6 +4951,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\4814b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_4814</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_4814">
@@ -4985,6 +5009,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\1191b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_1191</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_1191">
@@ -5226,6 +5251,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\5618b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_5618</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_5618">
@@ -5467,6 +5493,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\9821b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_9821</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_9821">
@@ -5704,6 +5731,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\5646b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_5646</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_5646">
@@ -5941,6 +5969,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\395b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_395</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_395">
@@ -6178,6 +6207,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\4120b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_4120</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_4120">
@@ -6415,6 +6445,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\7023b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_7023</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_7023">
@@ -6472,6 +6503,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\4358b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_4358</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_4358">
@@ -6709,6 +6741,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\287b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_287</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_287">
@@ -6939,6 +6972,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\3951b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_3951</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_3951">
@@ -7176,6 +7210,7 @@
             <Location>\OVCSData\101\CVT_TEST_3_UNIOVS2103\Images\2878b.png</Location>
         </BallotImage>
         <BallotStyleId>1</BallotStyleId>
+        <BallotStyleUnitId>PREC_01000</BallotStyleUnitId>
         <CreatingDeviceId>UNIOVS210</CreatingDeviceId>
         <CurrentSnapshotId>CVRS_2878</CurrentSnapshotId>
         <CVRSnapshot ObjectId="CVRS_2878">
@@ -7686,12 +7721,100 @@
             </ContestSelection>
             <Name>Statewide Public Question</Name>
         </Contest>
-        <ElectionScopeId>Election_SID_101</ElectionScopeId>
+        <ElectionScopeId>ELECTION_SID_101</ElectionScopeId>
         <Name>General Election RCV Tally DELL 5590</Name>
     </Election>
-    <GeneratedDate>2020-08-28T08:06:55.241-07:00</GeneratedDate>
-    <GpUnit ObjectId="Election_SID_101">
+    <GeneratedDate>2020-08-31T16:33:24.121-07:00</GeneratedDate>
+    <GpUnit ObjectId="ELECTION_SID_101">
         <Type>vote-center</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_07000">
+        <Name>Precinct 7</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_01000">
+        <Name>Precinct 1</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_04100">
+        <Name>Precinct 4A</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_90000">
+        <Name>Precinct 11</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_08000">
+        <Name>Precinct 8</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_10000">
+        <Name>Precinct 10</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_02000">
+        <Name>Precinct 2</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_08200">
+        <Name>Precinct 8B</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_09000">
+        <Name>Precinct 9</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_02200">
+        <Name>Precinct 2B</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_06100">
+        <Name>Precinct 6A</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_03000">
+        <Name>Precinct 3</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_99993">
+        <Name>Precinct 12C</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_99991">
+        <Name>Precinct 12A</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_99990">
+        <Name>Precinct 12</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_04000">
+        <Name>Precinct 4</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_04200">
+        <Name>Precinct 4B</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_05000">
+        <Name>Precinct 5</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_08100">
+        <Name>Precinct 8A</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_02100">
+        <Name>Precinct 2A</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_06000">
+        <Name>Precinct 6</Name>
+        <Type>precinct</Type>
+    </GpUnit>
+    <GpUnit ObjectId="PREC_02300">
+        <Name>Precinct 2C</Name>
+        <Type>precinct</Type>
     </GpUnit>
     <Party ObjectId="Party_9">
         <Abbreviation>NL</Abbreviation>
