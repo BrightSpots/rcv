@@ -225,18 +225,18 @@ class CommonDataFormatReader {
       xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       FileInputStream inputStream = new FileInputStream(new File(filePath));
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
-      if (cvrReport.Election.length > 1) {
-        Logger.warning("Multiple Election objects found.  Only the first one will be processed.");
-      }
 
       // Find the contest for tabulation
       Contest contestToTabulate = null;
-      for (Contest contest : cvrReport.Election[0].Contest) {
-        if (contest.Name.equals(this.contestId)) {
-          contestToTabulate = contest;
-          break;
+      for (Election election : cvrReport.Election) {
+        for (Contest contest : election.Contest) {
+          if (contest.Name.equals(this.contestId)) {
+            contestToTabulate = contest;
+            break;
+          }
         }
       }
+
       if (contestToTabulate == null) {
         Logger.severe("Contest \"%s\" from config file not found!", this.contestId);
         throw new CvrParseException();
@@ -244,8 +244,10 @@ class CommonDataFormatReader {
 
       // build a map of Candidates
       HashMap<String, Candidate> candidateById = new HashMap<>();
-      for (Candidate candidate : cvrReport.Election[0].Candidate) {
-        candidateById.put(candidate.ObjectId, candidate);
+      for (Election election : cvrReport.Election) {
+        for (Candidate candidate : election.Candidate) {
+          candidateById.put(candidate.ObjectId, candidate);
+        }
       }
 
       // build a map of ContestSelections
