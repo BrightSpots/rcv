@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "unisyn_xml_cdf_county_coroner.xml",
+      "filePath": "../unisyn_cvrs/101-RCV-CVT_TEST_3_UNIOVS2103-2.xml",
       "idColumnIndex": "",
       "precinctColumnIndex": "",
       "provider": "CDF",

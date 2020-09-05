@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "For County Coroner (1/2)",
+    "contestName": "For City C Mayor (1/3)",
     "outputDirectory": "output",
     "contestDate": "2019-03-06",
     "contestJurisdiction": "",
@@ -15,37 +15,67 @@
       "idColumnIndex": "",
       "precinctColumnIndex": "",
       "provider": "CDF",
-      "contestId": "For City C Coroner (1/3)"
+      "contestId": "For City C Mayor (1/3)"
     }
   ],
   "candidates": [
     {
-      "name": "Emily Van Zandt",
+      "name": "Karen Petersen",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Terry Halloran",
+      "name": "Jon Miller",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Ullrike Winterhausen",
+      "name": "Jerry Meyer",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Susan Brown",
+      "name": "Jerry Lang",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Angela Thompson",
+      "name": "Tess Soto",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Esteban Ferraro",
+      "name": "Josh Bennett",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Terry Landon",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Steven Wilkins",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Nadia Freeman",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Danielle Davis",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Carrol Wilson",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Chelsey Williams",
       "code": "",
       "excluded": false
     }

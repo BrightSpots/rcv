@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "For County Coroner (1/2)",
+    "contestName": "For County Sheriff (1/3)",
     "outputDirectory": "output",
     "contestDate": "2019-03-06",
     "contestJurisdiction": "",
@@ -15,37 +15,42 @@
       "idColumnIndex": "",
       "precinctColumnIndex": "",
       "provider": "CDF",
-      "contestId": "For City C Coroner (1/3)"
+      "contestId": "For County Sheriff (1/3)"
     }
   ],
   "candidates": [
     {
-      "name": "Emily Van Zandt",
+      "name": "Beth Small",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Terry Halloran",
+      "name": "Terry Baker",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Ullrike Winterhausen",
+      "name": "John Wayne Jr.",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Susan Brown",
+      "name": "Warren Norell",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Angela Thompson",
+      "name": "Tony Seiler",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Esteban Ferraro",
+      "name": "Thomas Soto",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Sandra Williams",
       "code": "",
       "excluded": false
     }

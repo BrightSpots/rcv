@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "For County Coroner (1/2)",
+    "contestName": "For City C Council Member (1/3)",
     "outputDirectory": "output",
     "contestDate": "2019-03-06",
     "contestJurisdiction": "",
@@ -15,40 +15,51 @@
       "idColumnIndex": "",
       "precinctColumnIndex": "",
       "provider": "CDF",
-      "contestId": "For City C Coroner (1/3)"
+      "contestId": "For City C Council Member (1/3)"
     }
   ],
   "candidates": [
     {
-      "name": "Emily Van Zandt",
+      "name": "Fred Wallace",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Terry Halloran",
+      "name": "Sylvia Vaugn",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Ullrike Winterhausen",
+      "name": "Stephen Miller",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Susan Brown",
+      "name": "Carrie Underwood",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Angela Thompson",
+      "name": "Nolan Ryder",
       "code": "",
       "excluded": false
     },
     {
-      "name": "Esteban Ferraro",
+      "name": "Terry Williams",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Lonnie Alsup",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Hal Newman",
       "code": "",
       "excluded": false
     }
+
   ],
   "rules": {
     "tiebreakMode": "Random",
