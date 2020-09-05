@@ -902,12 +902,7 @@ public class GuiConfigController implements Initializable {
           textFieldCvrPrecinctCol.setDisable(false);
           textFieldCvrOvervoteDelimiter.setDisable(false);
         }
-        case CDF -> {
-          buttonAddCvrFile.setDisable(false);
-          textFieldCvrFilePath.setDisable(false);
-          buttonCvrFilePath.setDisable(false);
-        }
-        case CLEAR_BALLOT, DOMINION, HART -> {
+        case CLEAR_BALLOT, DOMINION, HART, CDF -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);

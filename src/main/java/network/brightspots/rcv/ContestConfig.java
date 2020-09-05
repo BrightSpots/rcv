@@ -206,6 +206,14 @@ class ContestConfig {
           Logger.log(Level.SEVERE, "overvoteDelimiter is invalid.");
         }
       } else {
+        if (provider == Provider.CDF) {
+          if (!source.getFilePath().endsWith(".xml") && !source.getFilePath().endsWith(".json")) {
+            Logger.log(Level.SEVERE,
+                "Unexpected file extension: %s.  CDF source files must be .xml or .json",
+                source.getFilePath());
+            sourceValid = false;
+          }
+        }
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getFirstVoteColumnIndex(),
             "firstVoteColumnIndex",
@@ -518,9 +526,9 @@ class ContestConfig {
             Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
           }
           if (!source.getFilePath().endsWith(".xml") && !source.getFilePath().endsWith(".json")) {
-            Logger.log(Level.SEVERE,
-                "Unexpected file extension: %s.  CDF source files must be .xml or .json",
-                source.getFilePath());
+            Logger
+                .severe("CDF source files must be .json or .xml! Unexpected file extension for: %s",
+                    source.getFilePath());
             isValid = false;
           }
           if (isTabulateByPrecinctEnabled()) {

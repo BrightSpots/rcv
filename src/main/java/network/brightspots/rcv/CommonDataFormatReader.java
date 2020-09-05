@@ -40,11 +40,8 @@ import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 class CommonDataFormatReader {
 
   private final String STATUS_NEEDS_ADJUDICATION = "needs-adjudication";
-  private final String STATUS_YES = "yes";
   private final String STATUS_NO = "no";
-  private final String STATUS_UNKNOWN = "unknown";
   private final String BOOLEAN_TRUE = "true";
-  private final String BOOLEAN_FALSE = "false";
 
   private final String filePath;
   private final ContestConfig config;
@@ -206,7 +203,7 @@ class CommonDataFormatReader {
       }
     }
     // find CVRContest which matches the Contest we are tabulating
-    if (currentSnapshot.CVRContest != null) {
+    if (currentSnapshot != null && currentSnapshot.CVRContest != null) {
       for (CVRContest cvrContest : currentSnapshot.CVRContest) {
         if (cvrContest.ContestId.equals(contestToTabulate.ObjectId)) {
           cvrContestToTabulate = cvrContest;
