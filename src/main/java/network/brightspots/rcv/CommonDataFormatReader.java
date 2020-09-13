@@ -318,7 +318,7 @@ class CommonDataFormatReader {
       // CDF allows multiple candidate Ids to support party ticket voting options
       // but in practice this is always a single candidate id
       ArrayList candidateIds = (ArrayList) contestSelection.get("CandidateIds");
-      if (candidateIds == null || candidateIds.size() != 0) {
+      if (candidateIds == null || candidateIds.size() == 0) {
         Logger.severe("CandidateSelection \"%s\" has no CandidateIds!", selectionObjectId);
         throw new CvrParseException();
       }
