@@ -769,45 +769,44 @@
   "Election" : [ {
     "@id" : "election-001",
     "@type" : "CVR.Election",
+    "Candidate" : [
+      {
+        "@id" : "candidate-a",
+        "Name" : "Candidate A Name"
+      },
+      {
+        "@id" : "candidate-b",
+        "Name" : "Candidate B Name"
+      },
+      {
+        "@id" : "candidate-c",
+        "Name" : "Candidate C Name"
+      },
+      {
+        "@id" : "candidate-d",
+        "Name" : "Candidate D Name"
+      }
+    ],
     "Contest" : [ {
       "@id" : "contest-001",
-      "@type" : "CVR.CandidateContest",
+      "@type" : "CandidateContest",
+      "Name" : "test set 5",
       "ContestSelection" : [ {
         "@id" : "cs-a",
-        "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "A"
-        } ]
+        "@type" : "CandidateSelection",
+        "CandidateIds" : [ "candidate-a" ]
       }, {
         "@id" : "cs-b",
-        "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "B"
-        } ]
+        "@type" : "CandidateSelection",
+        "CandidateIds" : [ "candidate-b" ]
       }, {
         "@id" : "cs-c",
-        "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "C"
-        } ]
+        "@type" : "CandidateSelection",
+        "CandidateIds" : [ "candidate-c" ]
       }, {
         "@id" : "cs-d",
-        "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "D"
-        } ]
+        "@type" : "CandidateSelection",
+        "CandidateIds" : [ "candidate-d" ]
       } ]
     } ],
     "ElectionScopeId" : "gpu-election"

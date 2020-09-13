@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "Multi_winner2",
+    "contestName": "test set multi winner whole",
     "outputDirectory": "output",
     "contestDate": "2019-01-18",
     "contestJurisdiction": "Multi-winner",
@@ -15,32 +15,32 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "CDF",
-    "contestId": "contest-001"
+    "contestId": "test set multi winner whole"
   } ],
   "candidates" : [ {
-    "name" : "A",
-    "code" : "cs-a",
+    "name" : "Candidate A Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "B",
-    "code" : "cs-b",
+    "name" : "Candidate B Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "C",
-    "code" : "cs-c",
+    "name" : "Candidate C Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "D",
-    "code" : "cs-d",
+    "name" : "Candidate D Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "E",
-    "code" : "cs-e",
+    "name" : "Candidate E Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "F",
-    "code" : "cs-f",
-    "excluded" : false
+    "name": "Candidate F Name",
+    "code": "",
+    "excluded": false
   }],
   "rules" : {
     "tiebreakMode": "Stop counting and ask",

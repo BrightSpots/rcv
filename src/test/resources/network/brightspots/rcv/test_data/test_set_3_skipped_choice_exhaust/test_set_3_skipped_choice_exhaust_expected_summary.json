@@ -1,6 +1,6 @@
 {
   "config" : {
-    "contest" : "ExhaustSkip",
+    "contest" : "test set 3",
     "date" : "2018-08-06",
     "jurisdiction" : "Funkytown, USA",
     "office" : "Exhausted",
@@ -9,39 +9,39 @@
   "results" : [ {
     "round" : 1,
     "tally" : {
-      "A" : "5",
-      "B" : "6",
-      "C" : "2",
-      "D" : "1"
+      "Candidate A Name" : "5",
+      "Candidate B Name" : "6",
+      "Candidate C Name" : "2",
+      "Candidate D Name" : "1"
     },
     "tallyResults" : [ {
-      "eliminated" : "D",
+      "eliminated" : "Candidate D Name",
       "transfers" : {
-        "C" : "1"
+        "Candidate C Name" : "1"
       }
     } ]
   }, {
     "round" : 2,
     "tally" : {
-      "A" : "5",
-      "B" : "6",
-      "C" : "3"
+      "Candidate A Name" : "5",
+      "Candidate B Name" : "6",
+      "Candidate C Name" : "3"
     },
     "tallyResults" : [ {
-      "eliminated" : "C",
+      "eliminated" : "Candidate C Name",
       "transfers" : {
-        "B" : "1",
+        "Candidate B Name" : "1",
         "exhausted" : "2"
       }
     } ]
   }, {
     "round" : 3,
     "tally" : {
-      "A" : "5",
-      "B" : "7"
+      "Candidate A Name" : "5",
+      "Candidate B Name" : "7"
     },
     "tallyResults" : [ {
-      "elected" : "B",
+      "elected" : "Candidate B Name",
       "transfers" : { }
     } ]
   } ]
