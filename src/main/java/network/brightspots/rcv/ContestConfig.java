@@ -207,10 +207,11 @@ class ContestConfig {
         }
       } else {
         if (provider == Provider.CDF) {
-          if (!source.getFilePath().endsWith(".xml") && !source.getFilePath().endsWith(".json")) {
-            Logger.log(Level.SEVERE,
-                "Unexpected file extension: %s.  CDF source files must be .xml or .json",
-                source.getFilePath());
+          if (!source.getFilePath().toLowerCase().endsWith(".xml") && !source.getFilePath()
+              .toLowerCase().endsWith(".json")) {
+            Logger
+                .severe("CDF source files must be .json or .xml! Unexpected file extension for: %s",
+                    source.getFilePath());
             sourceValid = false;
           }
         }
@@ -524,12 +525,6 @@ class ContestConfig {
           if (rawConfig.cvrFileSources.size() != 1) {
             isValid = false;
             Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
-          }
-          if (!source.getFilePath().endsWith(".xml") && !source.getFilePath().endsWith(".json")) {
-            Logger
-                .severe("CDF source files must be .json or .xml! Unexpected file extension for: %s",
-                    source.getFilePath());
-            isValid = false;
           }
           if (isTabulateByPrecinctEnabled()) {
             isValid = false;
