@@ -2404,11 +2404,12 @@
         "@id" : "cs-candidate_d_name",
         "@type" : "CVR.ContestSelection",
         "CandidateIds" : [ "c-candidate_d_name" ]
-      } ]
+      } ],
+      "Name" : "Test Set 0"
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2020-09-12T10:36:50-07:00",
+  "GeneratedDate" : "2020-09-13T09:12:30-07:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
     "@type" : "CVR.GpUnit",
