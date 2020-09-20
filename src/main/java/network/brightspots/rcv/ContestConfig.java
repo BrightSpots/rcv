@@ -57,9 +57,15 @@ class ContestConfig {
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
+  static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
+  static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
+  static final int SUGGESTED_CVR_ID_COLUMN = 1;
+  static final int SUGGESTED_CVR_PRECINCT_COLUMN = 2;
   static final int SUGGESTED_NUMBER_OF_WINNERS = 1;
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
+  static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
+  static final String SUGGESTED_UNDERVOTE_LABEL = "undervote";
   static final String UNDECLARED_WRITE_INS = "Undeclared Write-ins";
   private static final int MIN_COLUMN_INDEX = 1;
   private static final int MAX_COLUMN_INDEX = 1000;

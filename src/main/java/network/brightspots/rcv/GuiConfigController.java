@@ -706,6 +706,8 @@ public class GuiConfigController implements Initializable {
         ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
 
     setWinningRulesDefaultValues();
+    textFieldOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
+    textFieldUndervoteLabel.setText(ContestConfig.SUGGESTED_UNDERVOTE_LABEL);
 
     textFieldMaxSkippedRanksAllowed.setText(
         String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
@@ -897,9 +899,16 @@ public class GuiConfigController implements Initializable {
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
           textFieldCvrFirstVoteCol.setDisable(false);
+          textFieldCvrFirstVoteCol
+              .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_COLUMN));
           textFieldCvrFirstVoteRow.setDisable(false);
+          textFieldCvrFirstVoteRow
+              .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
           textFieldCvrIdCol.setDisable(false);
+          textFieldCvrIdCol.setText(String.valueOf(ContestConfig.SUGGESTED_CVR_ID_COLUMN));
           textFieldCvrPrecinctCol.setDisable(false);
+          textFieldCvrPrecinctCol
+              .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_PRECINCT_COLUMN));
           textFieldCvrOvervoteDelimiter.setDisable(false);
         }
         case CLEAR_BALLOT, DOMINION, HART, CDF -> {
