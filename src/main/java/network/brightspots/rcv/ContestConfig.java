@@ -306,7 +306,7 @@ class ContestConfig {
   }
 
   private static void logErrorWithLocation(String message, String inputLocation) {
-    message += inputLocation == null ? "!" : ": " + inputLocation;
+    message += inputLocation == null ? "!" : "for file source: " + inputLocation;
     Logger.log(Level.SEVERE, message);
   }
 
