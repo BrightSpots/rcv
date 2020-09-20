@@ -1,40 +1,41 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "Test Set 1",
+    "contestName": "For Governor and Lieutenant Governor",
     "outputDirectory": "output",
     "contestDate": "2019-03-06",
-    "contestJurisdiction": "TestSets_Single_winner",
+    "contestJurisdiction": "",
     "contestOffice": "",
     "tabulateByPrecinct": false,
-    "generateCdfJson": true
+    "generateCdfJson": false
   },
   "cvrFileSources": [
     {
-    "filePath" : "test_set_1_exhaust_at_overvote_cvr.json",
-    "idColumnIndex" : "",
-    "precinctColumnIndex" : "",
-    "provider" : "CDF",
-    "contestId": "contest-001"
-  } ],
-  "candidates" : [ {
-    "name" : "A",
-    "code" : "cs-a",
-    "excluded" : false
-  }, {
-    "name" : "B",
-    "code" : "cs-b",
-    "excluded" : false
-  }, {
-    "name" : "C",
-    "code" : "cs-c",
-    "excluded" : false
-  }, {
-    "name" : "D",
-    "code" : "cs-d",
-    "excluded" : false
-  }],
-  "rules" : {
+      "filePath": "nist_xml_cdf_2.xml",
+      "idColumnIndex": "",
+      "precinctColumnIndex": "",
+      "provider": "CDF",
+      "contestId": "For Governor and Lieutenant Governor"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Edward FitzGerald and Sharen Swartz Neuhardt",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "John Kasich and Mary Taylor",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Anita Rios and Bob Fitrakis",
+      "code": "",
+      "excluded": false
+    }
+  ],
+  "rules": {
     "tiebreakMode": "Random",
     "overvoteRule": "exhaustImmediately",
     "winnerElectionMode": "Single-winner majority determines winner",
@@ -52,6 +53,6 @@
     "overvoteLabel": "",
     "undervoteLabel": "",
     "undeclaredWriteInLabel": "",
-    "rulesDescription": "exhaustatovervote"
+    "rulesDescription": "Skiptonext_exhaustatovervote"
   }
 }

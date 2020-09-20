@@ -14,9 +14,34 @@
     "filePath" : "test_set_multi_winner_whole_threshold_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "CDF",
+    "contestId": "contest-001"
   } ],
-  "candidates" : [ ],
+  "candidates" : [ {
+    "name" : "A",
+    "code" : "cs-a",
+    "excluded" : false
+  }, {
+    "name" : "B",
+    "code" : "cs-b",
+    "excluded" : false
+  }, {
+    "name" : "C",
+    "code" : "cs-c",
+    "excluded" : false
+  }, {
+    "name" : "D",
+    "code" : "cs-d",
+    "excluded" : false
+  }, {
+    "name" : "E",
+    "code" : "cs-e",
+    "excluded" : false
+  }, {
+    "name" : "F",
+    "code" : "cs-f",
+    "excluded" : false
+  }],
   "rules" : {
     "tiebreakMode": "Stop counting and ask",
     "overvoteRule": "alwaysSkipToNextRank",
