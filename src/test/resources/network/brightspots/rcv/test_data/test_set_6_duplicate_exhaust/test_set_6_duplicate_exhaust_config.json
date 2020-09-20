@@ -14,9 +14,26 @@
     "filePath" : "test_set_6_duplicate_exhaust_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "CDF",
+    "contestId": "contest-001"
   } ],
-  "candidates" : [ ],
+  "candidates" : [ {
+    "name" : "A",
+    "code" : "cs-a",
+    "excluded" : false
+  }, {
+    "name" : "B",
+    "code" : "cs-b",
+    "excluded" : false
+  }, {
+    "name" : "C",
+    "code" : "cs-c",
+    "excluded" : false
+  }, {
+    "name" : "D",
+    "code" : "cs-d",
+    "excluded" : false
+  }],
   "rules" : {
     "tiebreakMode": "Random",
     "overvoteRule": "alwaysSkipToNextRank",

@@ -76,7 +76,6 @@ class ContestConfig {
   private static final int MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 100;
   private static final long MIN_RANDOM_SEED = -140737488355328L;
   private static final long MAX_RANDOM_SEED = 140737488355327L;
-  private static final String JSON_EXTENSION = ".json";
   private static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   private static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   static final String SUGGESTED_MAX_RANKINGS_ALLOWED = MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION;
@@ -100,9 +99,7 @@ class ContestConfig {
   }
 
   static boolean isCdf(CvrSource source) {
-    return getProvider(source) == Provider.CDF
-        && source.getFilePath() != null
-        && source.getFilePath().toLowerCase().endsWith(JSON_EXTENSION);
+    return getProvider(source) == Provider.CDF;
   }
 
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
@@ -209,6 +206,15 @@ class ContestConfig {
           Logger.log(Level.SEVERE, "overvoteDelimiter is invalid.");
         }
       } else {
+        if (provider == Provider.CDF) {
+          if (!source.getFilePath().toLowerCase().endsWith(".xml") && !source.getFilePath()
+              .toLowerCase().endsWith(".json")) {
+            Logger
+                .severe("CDF source files must be .json or .xml! Unexpected file extension for: %s",
+                    source.getFilePath());
+            sourceValid = false;
+          }
+        }
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getFirstVoteColumnIndex(),
             "firstVoteColumnIndex",
@@ -250,17 +256,19 @@ class ContestConfig {
         }
       }
 
-      if (isNullOrBlank(source.getContestId()) &&
-          (provider == Provider.DOMINION || provider == Provider.HART
-              || provider == Provider.CLEAR_BALLOT)) {
+      boolean providerRequiresContestId = provider == Provider.DOMINION ||
+          provider == Provider.HART ||
+          provider == Provider.CLEAR_BALLOT ||
+          provider == Provider.CDF;
+
+      if (isNullOrBlank(source.getContestId()) && providerRequiresContestId) {
         sourceValid = false;
         Logger.log(
             Level.SEVERE,
             String.format("contestId must be defined for CVR source with provider \"%s\"!",
                 getProvider(source).toString()));
       } else if (
-          !(provider == Provider.DOMINION || provider == Provider.HART
-              || provider == Provider.CLEAR_BALLOT) &&
+          !(providerRequiresContestId) &&
               fieldIsDefinedButShouldNotBeForProvider(
                   source.getContestId(),
                   "contestId",
@@ -1025,22 +1033,11 @@ class ContestConfig {
   }
 
   // perform pre-processing on candidates:
-  // 1) if there are any CDF input sources extract candidates names from them
-  // 2) build map of candidate ID to candidate name
-  // 3) generate tie-break ordering if needed
+  // 1) build map of candidate ID to candidate name
+  // 2) generate tie-break ordering if needed
+  // 3) add uwi candidate if needed
   private void processCandidateData() {
     candidateCodeToNameMap = new HashMap<>();
-
-    for (RawContestConfig.CvrSource source : rawConfig.cvrFileSources) {
-      // for any CDF sources extract candidate names
-      if (isCdf(source)) {
-        String cvrPath = resolveConfigPath(source.getFilePath());
-        CommonDataFormatReader reader = new CommonDataFormatReader(cvrPath, this);
-        candidateCodeToNameMap = reader.getCandidates();
-        candidatePermutation.addAll(candidateCodeToNameMap.keySet());
-      }
-    }
-
     if (rawConfig.candidates != null) {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
         String code = candidate.getCode();

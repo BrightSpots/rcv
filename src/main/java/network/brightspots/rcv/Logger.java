@@ -122,6 +122,18 @@ class Logger {
     logger.log(level, String.format(format, obj));
   }
 
+  static void info(String format, Object... obj) {
+    logger.log(Level.INFO, String.format(format, obj));
+  }
+
+  static void warning(String format, Object... obj) {
+    logger.log(Level.WARNING, String.format(format, obj));
+  }
+
+  static void severe(String format, Object... obj) {
+    logger.log(Level.SEVERE, String.format(format, obj));
+  }
+
   // add logging to the provided text area for display to user in the GUI
   static void addGuiLogging(TextArea textArea) {
     java.util.logging.Handler guiHandler =

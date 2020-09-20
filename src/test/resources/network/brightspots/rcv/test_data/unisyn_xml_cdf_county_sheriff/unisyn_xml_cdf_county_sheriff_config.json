@@ -1,0 +1,78 @@
+{
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "For County Sheriff (1/3)",
+    "outputDirectory": "output",
+    "contestDate": "2019-03-06",
+    "contestJurisdiction": "",
+    "contestOffice": "",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "../unisyn_cvrs/101-RCV-CVT_TEST_3_UNIOVS2103-2.xml",
+      "idColumnIndex": "",
+      "precinctColumnIndex": "",
+      "provider": "CDF",
+      "contestId": "For County Sheriff (1/3)"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "Beth Small",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Terry Baker",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "John Wayne Jr.",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Warren Norell",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Tony Seiler",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Thomas Soto",
+      "code": "",
+      "excluded": false
+    },
+    {
+      "name": "Sandra Williams",
+      "code": "",
+      "excluded": false
+    }
+  ],
+  "rules": {
+    "tiebreakMode": "Random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "Single-winner majority determines winner",
+    "randomSeed": "0",
+    "numberOfWinners": "1",
+    "decimalPlacesForVoteArithmetic": "1",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "4",
+    "maxRankingsAllowed": "4",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": false,
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": "UWI",
+    "rulesDescription": "Skiptonext_exhaustatovervote"
+  }
+}

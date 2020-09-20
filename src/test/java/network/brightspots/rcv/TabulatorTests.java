@@ -192,6 +192,54 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("NIST XML CDF 2")
+  void nistXmlCdf2() {
+    runTabulationTest("nist_xml_cdf_2");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_city_tax_collector")
+  void unisynXmlCdfCityTaxCollector() {
+    runTabulationTest("unisyn_xml_cdf_city_tax_collector");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_city_mayor")
+  void unisynXmlCdfCityMayor() {
+    runTabulationTest("unisyn_xml_cdf_city_mayor");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_city_council_member")
+  void unisynXmlCdfCityCouncilMember() {
+    runTabulationTest("unisyn_xml_cdf_city_council_member");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_city_chief_of_police")
+  void unisynXmlCdfCityChiefOfPolice() {
+    runTabulationTest("unisyn_xml_cdf_city_chief_of_police");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_city_coroner")
+  void unisynXmlCdfCityCoroner() {
+    runTabulationTest("unisyn_xml_cdf_city_coroner");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_county_sheriff")
+  void unisynXmlCdfCountySheriff() {
+    runTabulationTest("unisyn_xml_cdf_county_sheriff");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_county_coroner")
+  void unisynXmlCdfCountyCoroner() {
+    runTabulationTest("unisyn_xml_cdf_county_coroner");
+  }
+
+  @Test
   @DisplayName("Clear Ballot - Kansas Primary")
   void testClearBallotKansasPrimary() {
     runTabulationTest("clear_ballot_kansas_primary");

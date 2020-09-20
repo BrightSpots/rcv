@@ -258,7 +258,8 @@ class TabulatorSession {
       try {
         if (ContestConfig.isCdf(source)) {
           Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
-          new CommonDataFormatReader(cvrPath, config).parseCvrFile(castVoteRecords);
+          new CommonDataFormatReader(cvrPath, config, source.getContestId())
+              .parseCvrFile(castVoteRecords);
           continue;
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
           Logger

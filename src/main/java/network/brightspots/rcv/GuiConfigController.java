@@ -431,7 +431,7 @@ public class GuiConfigController implements Initializable {
       case CDF -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-        fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
+        fc.getExtensionFilters().add(new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
         fc.setTitle("Select " + provider + " Cast Vote Record File");
         openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
       }
@@ -902,12 +902,7 @@ public class GuiConfigController implements Initializable {
           textFieldCvrPrecinctCol.setDisable(false);
           textFieldCvrOvervoteDelimiter.setDisable(false);
         }
-        case CDF -> {
-          buttonAddCvrFile.setDisable(false);
-          textFieldCvrFilePath.setDisable(false);
-          buttonCvrFilePath.setDisable(false);
-        }
-        case CLEAR_BALLOT, DOMINION, HART -> {
+        case CLEAR_BALLOT, DOMINION, HART, CDF -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
