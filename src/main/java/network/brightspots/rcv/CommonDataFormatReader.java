@@ -261,7 +261,7 @@ class CommonDataFormatReader {
     }
   }
 
-  HashMap getCvrContestJson(HashMap cvr, String contestIdToTabulate) {
+  private HashMap getCvrContestJson(HashMap cvr, String contestIdToTabulate) {
     HashMap cvrContestToTabulate = null;
     String currentSnapshotId = (String) cvr.get("CurrentSnapshotId");
     ArrayList cvrSnapshots = (ArrayList) cvr.get("CVRSnapshot");

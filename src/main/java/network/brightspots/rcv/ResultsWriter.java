@@ -138,7 +138,7 @@ class ResultsWriter {
   }
 
   // generates an internal ContestSelectionId based on a candidate code
-  private static String getContestSelectionIdForCandidateCode(String code) {
+  private static String getCvrContestSelectionIdForCandidateCode(String code) {
     String id = candidateCodeToContestSelectionId.get(code);
     if (id == null) {
       id = String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
@@ -148,7 +148,7 @@ class ResultsWriter {
   }
 
   // generates an internal CandidateId based on a candidate code
-  private static String getCandidateIdForCandidateCode(String code) {
+  private static String getCvrCandidateIdForCandidateCode(String code) {
     String id = candidateCodeToCandidateId.get(code);
     if (id == null) {
       id = String.format("c-%s", sanitizeStringForOutput(code).toLowerCase());
@@ -761,7 +761,7 @@ class ResultsWriter {
 
       selectionMapList.add(
           Map.ofEntries(
-              entry("ContestSelectionId", getContestSelectionIdForCandidateCode(candidateCode)),
+              entry("ContestSelectionId", getCvrContestSelectionIdForCandidateCode(candidateCode)),
               entry("SelectionPosition", selectionPositionMapList),
               entry("@type", "CVR.CVRContestSelection")));
     }
@@ -792,14 +792,14 @@ class ResultsWriter {
     for (String candidateCode : candidateCodes) {
       candidates.add(
           Map.ofEntries(
-              entry("@id", getCandidateIdForCandidateCode(candidateCode)),
+              entry("@id", getCvrCandidateIdForCandidateCode(candidateCode)),
               entry("Name", candidateCode)));
 
       contestSelections.add(
           Map.ofEntries(
-              entry("@id", getContestSelectionIdForCandidateCode(candidateCode)),
+              entry("@id", getCvrContestSelectionIdForCandidateCode(candidateCode)),
               entry("@type", "CVR.ContestSelection"),
-              entry("CandidateIds", new String[]{getCandidateIdForCandidateCode(candidateCode)})));
+              entry("CandidateIds", new String[]{getCvrCandidateIdForCandidateCode(candidateCode)})));
     }
 
     Map<String, Object> contestJson =
