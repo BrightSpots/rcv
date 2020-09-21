@@ -166,10 +166,10 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
       "overvoteRule" required
         how the program should handle an overvote when it encounters one
-        value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
-        "alwaysSkipToNextRank": when we encounter an overvote, ignore this rank and look at the next rank in the cast vote record
-        "exhaustImmediately": exhaust a ballot as soon as we encounter an overvote
-        "exhaustIfMultipleContinuing": if more than one candidate in an overvote are continuing, exhaust the ballot; if only one, assign the vote to them; if none, continue to the next rank (not valid with an ES&S source unless overvoteDelimiter is supplied)
+        value: "Always skip to next rank" | "Exhaust immediately" | "Exhaust if multiple continuing"
+        "Always skip to next rank": when we encounter an overvote, ignore this rank and look at the next rank in the cast vote record
+        "Exhaust immediately": exhaust a ballot as soon as we encounter an overvote
+        "Exhaust if multiple continuing": if more than one candidate in an overvote are continuing, exhaust the ballot; if only one, assign the vote to them; if none, continue to the next rank (not valid with an ES&S source unless overvoteDelimiter is supplied)
 
       "winnerElectionMode" required
         whether the program should apply a special process for selecting the winner(s)
@@ -212,7 +212,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         value: [-140737488355328..140737488355327]
 
       "overvoteLabel" optional
-        label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "alwaysSkipToNextRank" or "exhaustImmediately" (because the other option, exhaustIfMultipleContinuing, relies on knowing which specific candidates were involved in each overvote)
+        label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "Always skip to next rank" or "Exhaust immediately" (because the other option, "Exhaust if multiple continuing", relies on knowing which specific candidates were involved in each overvote)
         example: "OVERVOTE"
         value: string of length [1..1000]
 

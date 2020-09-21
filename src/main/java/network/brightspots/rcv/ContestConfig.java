@@ -557,7 +557,7 @@ class ContestConfig {
             Logger.log(
                 Level.SEVERE,
                 "overvoteDelimiter is required for an ES&S CVR source when overvoteRule is set "
-                    + "to exhaustIfMultipleContinuing.");
+                    + "to \"Exhaust if multiple continuing\".");
           }
         }
       }
@@ -633,8 +633,7 @@ class ContestConfig {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately "
-              + "or alwaysSkipToNextRank!");
+          "When overvoteLabel is supplied, overvoteRule must be either \"Exhaust if multiple continuing\" or \"Always skip to next rank\"!");
     }
 
     if (getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {

@@ -1065,10 +1065,10 @@ class Tabulator {
 
   // OvervoteRule determines how overvotes are handled
   enum OvervoteRule {
-    EXHAUST_IMMEDIATELY("exhaustImmediately"),
-    ALWAYS_SKIP_TO_NEXT_RANK("alwaysSkipToNextRank"),
-    EXHAUST_IF_MULTIPLE_CONTINUING("exhaustIfMultipleContinuing"),
-    RULE_UNKNOWN("ruleUnknown");
+    ALWAYS_SKIP_TO_NEXT_RANK("Always skip to next rank"),
+    EXHAUST_IMMEDIATELY("Exhaust immediately"),
+    EXHAUST_IF_MULTIPLE_CONTINUING("Exhaust if multiple continuing"),
+    RULE_UNKNOWN("Unknown rule");
 
     private final String label;
 

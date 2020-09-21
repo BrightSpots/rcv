@@ -50,6 +50,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -162,7 +163,11 @@ public class GuiConfigController implements Initializable {
   @FXML
   private ChoiceBox<TieBreakMode> choiceTiebreakMode;
   @FXML
-  private ChoiceBox<OvervoteRule> choiceOvervoteRule;
+  private RadioButton radioOvervoteAlwaysSkip;
+  @FXML
+  private RadioButton radioOvervoteExhaustImmediately;
+  @FXML
+  private RadioButton radioOvervoteExhaustIfMultiple;
   @FXML
   private ChoiceBox<WinnerElectionMode> choiceWinnerElectionMode;
   @FXML
@@ -220,9 +225,16 @@ public class GuiConfigController implements Initializable {
         : TieBreakMode.MODE_UNKNOWN;
   }
 
-  private static OvervoteRule getOvervoteRuleChoice(ChoiceBox<OvervoteRule> choiceBox) {
-    return choiceBox.getValue() != null ? OvervoteRule.getByLabel(choiceBox.getValue().toString())
-        : OvervoteRule.RULE_UNKNOWN;
+  private String getOvervoteRuleChoice() {
+    String overvoteRuleString = OvervoteRule.RULE_UNKNOWN.toString();
+    if (radioOvervoteAlwaysSkip.isSelected()) {
+      overvoteRuleString = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK.toString();
+    } else if (radioOvervoteExhaustImmediately.isSelected()) {
+      overvoteRuleString = OvervoteRule.EXHAUST_IMMEDIATELY.toString();
+    } else if (radioOvervoteExhaustIfMultiple.isSelected()) {
+      overvoteRuleString = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING.toString();
+    }
+    return overvoteRuleString;
   }
 
   private static String getTextOrEmptyString(TextField textField) {
@@ -743,7 +755,9 @@ public class GuiConfigController implements Initializable {
     textFieldUndeclaredWriteInLabel.clear();
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(false);
 
-    choiceOvervoteRule.setValue(null);
+    radioOvervoteAlwaysSkip.setSelected(false);
+    radioOvervoteExhaustImmediately.setSelected(false);
+    radioOvervoteExhaustIfMultiple.setSelected(false);
     textFieldMaxSkippedRanksAllowed.clear();
     checkBoxExhaustOnDuplicateCandidate.setSelected(false);
 
@@ -969,8 +983,6 @@ public class GuiConfigController implements Initializable {
             .setDisable(false);
       }
     });
-    choiceOvervoteRule.getItems().addAll(OvervoteRule.values());
-    choiceOvervoteRule.getItems().remove(OvervoteRule.RULE_UNKNOWN);
     choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
     choiceWinnerElectionMode.getItems().remove(WinnerElectionMode.MODE_UNKNOWN);
     choiceWinnerElectionMode.setOnAction(event -> {
@@ -1081,6 +1093,24 @@ public class GuiConfigController implements Initializable {
         }
       }
 
+      if (config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
+        String oldOvervoteRule = config.rawConfig.rules.overvoteRule;
+        switch (oldOvervoteRule) {
+          case "alwaysSkipToNextRank" -> config.rawConfig.rules.overvoteRule = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
+              .toString();
+          case "exhaustImmediately" -> config.rawConfig.rules.overvoteRule = OvervoteRule.EXHAUST_IMMEDIATELY
+              .toString();
+          case "exhaustIfMultipleContinuing" -> config.rawConfig.rules.overvoteRule = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING
+              .toString();
+          default -> {
+            Logger.log(Level.WARNING,
+                "overvoteRule \"%s\" is unrecognized! Please supply a valid overvoteRule.",
+                oldOvervoteRule);
+            config.rawConfig.rules.overvoteRule = null;
+          }
+        }
+      }
+
       Logger.log(
           Level.INFO,
           "Migrated tabulator config version from %s to %s.",
@@ -1125,8 +1155,7 @@ public class GuiConfigController implements Initializable {
             : config.getWinnerElectionMode());
     choiceTiebreakMode.setValue(
         config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
-    choiceOvervoteRule.setValue(
-        config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN ? null : config.getOvervoteRule());
+    setOvervoteRuleRadioButton(config.getOvervoteRule());
 
     ContestRules rules = rawConfig.rules;
     textFieldRandomSeed.setText(rules.randomSeed);
@@ -1147,6 +1176,17 @@ public class GuiConfigController implements Initializable {
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
+  }
+
+  private void setOvervoteRuleRadioButton(OvervoteRule overvoteRule) {
+    switch (overvoteRule) {
+      case ALWAYS_SKIP_TO_NEXT_RANK -> radioOvervoteAlwaysSkip.setSelected(true);
+      case EXHAUST_IMMEDIATELY -> radioOvervoteExhaustImmediately.setSelected(true);
+      case EXHAUST_IF_MULTIPLE_CONTINUING -> radioOvervoteExhaustIfMultiple.setSelected(true);
+      case RULE_UNKNOWN -> {
+        // Do nothing for unknown overvote rules
+      }
+    }
   }
 
   private RawContestConfig createRawContestConfig() {
@@ -1186,7 +1226,7 @@ public class GuiConfigController implements Initializable {
 
     ContestRules rules = new ContestRules();
     rules.tiebreakMode = getTiebreakModeChoice(choiceTiebreakMode).toString();
-    rules.overvoteRule = getOvervoteRuleChoice(choiceOvervoteRule).toString();
+    rules.overvoteRule = getOvervoteRuleChoice();
     rules.winnerElectionMode = getWinnerElectionModeChoice(choiceWinnerElectionMode).toString();
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
     rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
