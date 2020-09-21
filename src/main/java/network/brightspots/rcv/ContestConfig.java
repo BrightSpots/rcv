@@ -633,7 +633,8 @@ class ContestConfig {
       isValid = false;
       Logger.log(
           Level.SEVERE,
-          "When overvoteLabel is supplied, overvoteRule must be either \"Exhaust if multiple continuing\" or \"Always skip to next rank\"!");
+          "When overvoteLabel is supplied, overvoteRule must be either \"Exhaust if "
+              + "multiple continuing\" or \"Always skip to next rank\"!");
     }
 
     if (getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
