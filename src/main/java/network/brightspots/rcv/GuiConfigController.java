@@ -993,13 +993,11 @@ public class GuiConfigController implements Initializable {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
-          checkBoxNonIntegerWinningThreshold.setDisable(false);
           checkBoxHareQuota.setDisable(false);
-          textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
           checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
         }
-        case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND, MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND, MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> {
+        case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND, MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
@@ -1008,13 +1006,18 @@ public class GuiConfigController implements Initializable {
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
+        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> {
+          textFieldMaxRankingsAllowed.setDisable(false);
+          textFieldMinimumVoteThreshold.setDisable(false);
+          choiceTiebreakMode.setDisable(false);
+          checkBoxHareQuota.setDisable(false);
+          textFieldNumberOfWinners.setDisable(false);
+        }
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
-          checkBoxNonIntegerWinningThreshold.setDisable(false);
           checkBoxHareQuota.setDisable(false);
-          textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
         }
