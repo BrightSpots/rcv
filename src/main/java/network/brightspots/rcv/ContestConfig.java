@@ -554,10 +554,9 @@ class ContestConfig {
             }
           } else if (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
             isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "overvoteDelimiter is required for an ES&S CVR source when overvoteRule is set "
-                    + "to \"Exhaust if multiple continuing\".");
+            Logger.log(Level.SEVERE,
+                "overvoteDelimiter is required for an ES&S CVR source when overvoteRule is set to \"%s\".",
+                Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
           }
         }
       }
@@ -631,10 +630,10 @@ class ContestConfig {
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "When overvoteLabel is supplied, overvoteRule must be either \"Exhaust if "
-              + "multiple continuing\" or \"Always skip to next rank\"!");
+      Logger.log(Level.SEVERE,
+          "When overvoteLabel is supplied, overvoteRule must be either \"%s\" or \"%s\"!",
+          Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT,
+          Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
     }
 
     if (getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
