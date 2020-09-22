@@ -44,7 +44,7 @@
   }],
   "rules" : {
     "tiebreakMode": "Stop counting and ask",
-    "overvoteRule": "alwaysSkipToNextRank",
+    "overvoteRule": "Always skip to next rank",
     "winnerElectionMode": "Multi-winner allow multiple winners per round",
     "randomSeed": "",
     "numberOfWinners": "3",

@@ -61,7 +61,7 @@
   } ],
   "rules" : {
     "tiebreakMode": "Random",
-    "overvoteRule": "alwaysSkipToNextRank",
+    "overvoteRule": "Always skip to next rank",
     "winnerElectionMode": "Multi-pass IRV",
     "randomSeed": "0",
     "numberOfWinners": "3",

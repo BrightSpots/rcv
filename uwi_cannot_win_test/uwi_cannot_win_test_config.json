@@ -28,7 +28,7 @@
   } ],
   "rules" : {
     "tiebreakMode": "Use candidate order in the config file",
-    "overvoteRule": "exhaustImmediately",
+    "overvoteRule": "Exhaust immediately",
     "winnerElectionMode": "Single-winner majority determines winner",
     "randomSeed": "",
     "numberOfWinners": "1",

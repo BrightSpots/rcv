@@ -42,7 +42,7 @@
   "rules": {
     "tiebreakMode": "Random",
     "random Seed": 0,
-    "overvoteRule": "exhaustImmediately",
+    "overvoteRule": "Exhaust immediately",
     "maxRankingsAllowed": 3,
     "maxSkippedRanksAllowed": 1,
     "numberOfWinners": 1,

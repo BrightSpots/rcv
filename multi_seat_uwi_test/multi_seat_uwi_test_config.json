@@ -32,7 +32,7 @@
   } ],
   "rules" : {
     "tiebreakMode": "Use candidate order in the config file",
-    "overvoteRule": "exhaustImmediately",
+    "overvoteRule": "Exhaust immediately",
     "winnerElectionMode": "Multi-winner allow multiple winners per round",
     "randomSeed": "",
     "numberOfWinners": "2",

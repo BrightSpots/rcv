@@ -53,7 +53,7 @@
   } ],
   "rules" : {
     "tiebreakMode": "Stop counting and ask",
-    "overvoteRule": "exhaustImmediately",
+    "overvoteRule": "Exhaust immediately",
     "winnerElectionMode": "Single-winner majority determines winner",
     "randomSeed": "",
     "numberOfWinners": "1",
