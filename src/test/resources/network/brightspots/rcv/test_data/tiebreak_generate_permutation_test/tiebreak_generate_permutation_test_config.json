@@ -37,7 +37,7 @@
   } ],
   "rules" : {
     "tiebreakMode": "Generate permutation",
-    "overvoteRule": "alwaysSkipToNextRank",
+    "overvoteRule": "Always skip to next rank",
     "winnerElectionMode": "Single-winner majority determines winner",
     "randomSeed": "12345",
     "numberOfWinners": "1",

@@ -57,9 +57,15 @@ class ContestConfig {
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
+  static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
+  static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
+  static final int SUGGESTED_CVR_ID_COLUMN = 1;
+  static final int SUGGESTED_CVR_PRECINCT_COLUMN = 2;
   static final int SUGGESTED_NUMBER_OF_WINNERS = 1;
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
+  static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
+  static final String SUGGESTED_UNDERVOTE_LABEL = "undervote";
   static final String UNDECLARED_WRITE_INS = "Undeclared Write-ins";
   private static final int MIN_COLUMN_INDEX = 1;
   private static final int MAX_COLUMN_INDEX = 1000;
@@ -306,7 +312,7 @@ class ContestConfig {
   }
 
   private static void logErrorWithLocation(String message, String inputLocation) {
-    message += inputLocation == null ? "!" : ": " + inputLocation;
+    message += inputLocation == null ? "!" : "for file source: " + inputLocation;
     Logger.log(Level.SEVERE, message);
   }
 
@@ -548,10 +554,9 @@ class ContestConfig {
             }
           } else if (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
             isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "overvoteDelimiter is required for an ES&S CVR source when overvoteRule is set "
-                    + "to exhaustIfMultipleContinuing.");
+            Logger.log(Level.SEVERE,
+                "overvoteDelimiter is required for an ES&S CVR source when overvoteRule is set to \"%s\".",
+                Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
           }
         }
       }
@@ -625,10 +630,10 @@ class ContestConfig {
         && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
         && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
       isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "When overvoteLabel is supplied, overvoteRule must be either exhaustImmediately "
-              + "or alwaysSkipToNextRank!");
+      Logger.log(Level.SEVERE,
+          "When overvoteLabel is supplied, overvoteRule must be either \"%s\" or \"%s\"!",
+          Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT,
+          Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
     }
 
     if (getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {

@@ -53,7 +53,7 @@
   } ],
   "rules" : {
     "tiebreakMode": "Use candidate order in the config file",
-    "overvoteRule": "exhaustImmediately",
+    "overvoteRule": "Exhaust immediately",
     "winnerElectionMode": "Bottoms-up using percentage threshold",
     "randomSeed": "",
     "numberOfWinners": "0",

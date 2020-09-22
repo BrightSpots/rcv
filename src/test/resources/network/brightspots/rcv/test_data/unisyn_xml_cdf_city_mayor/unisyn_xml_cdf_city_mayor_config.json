@@ -82,7 +82,7 @@
   ],
   "rules": {
     "tiebreakMode": "Random",
-    "overvoteRule": "exhaustImmediately",
+    "overvoteRule": "Exhaust immediately",
     "winnerElectionMode": "Single-winner majority determines winner",
     "randomSeed": "0",
     "numberOfWinners": "1",
