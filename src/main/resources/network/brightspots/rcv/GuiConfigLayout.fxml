@@ -536,17 +536,15 @@
                 <HBox spacing="4.0">
                   <Label text="Overvote Rule *" prefWidth="160.0"/>
                   <VBox spacing="4.0">
-                    <RadioButton mnemonicParsing="false" text="Always skip to next rank"
-                      toggleGroup="$overvoteRuleToggleGroup" fx:id="radioOvervoteAlwaysSkip"/>
-                    <RadioButton mnemonicParsing="false" text="Exhaust immediately"
-                      toggleGroup="$overvoteRuleToggleGroup"
-                      fx:id="radioOvervoteExhaustImmediately"/>
-                    <RadioButton mnemonicParsing="false" text="Exhaust if multiple continuing"
-                      toggleGroup="$overvoteRuleToggleGroup"
-                      fx:id="radioOvervoteExhaustIfMultiple"/>
                     <fx:define>
                       <ToggleGroup fx:id="overvoteRuleToggleGroup"/>
                     </fx:define>
+                    <RadioButton mnemonicParsing="false" toggleGroup="$overvoteRuleToggleGroup"
+                      fx:id="radioOvervoteAlwaysSkip"/>
+                    <RadioButton mnemonicParsing="false" toggleGroup="$overvoteRuleToggleGroup"
+                      fx:id="radioOvervoteExhaustImmediately"/>
+                    <RadioButton mnemonicParsing="false" toggleGroup="$overvoteRuleToggleGroup"
+                      fx:id="radioOvervoteExhaustIfMultiple"/>
                   </VBox>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
