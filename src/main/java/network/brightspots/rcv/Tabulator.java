@@ -44,6 +44,9 @@ import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 
 class Tabulator {
 
+  static final String OVERVOTE_RULE_ALWAYS_SKIP_TEXT = "Always skip to next rank";
+  static final String OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT = "Exhaust immediately";
+  static final String OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT = "Exhaust if multiple continuing";
   // When the CVR contains an overvote we "normalize" it to use this string
   static final String EXPLICIT_OVERVOTE_LABEL = "overvote";
   // cast vote records parsed from CVR input files
@@ -1065,10 +1068,10 @@ class Tabulator {
 
   // OvervoteRule determines how overvotes are handled
   enum OvervoteRule {
-    EXHAUST_IMMEDIATELY("exhaustImmediately"),
-    ALWAYS_SKIP_TO_NEXT_RANK("alwaysSkipToNextRank"),
-    EXHAUST_IF_MULTIPLE_CONTINUING("exhaustIfMultipleContinuing"),
-    RULE_UNKNOWN("ruleUnknown");
+    ALWAYS_SKIP_TO_NEXT_RANK(OVERVOTE_RULE_ALWAYS_SKIP_TEXT),
+    EXHAUST_IMMEDIATELY(OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT),
+    EXHAUST_IF_MULTIPLE_CONTINUING(OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT),
+    RULE_UNKNOWN("Unknown rule");
 
     private final String label;
 

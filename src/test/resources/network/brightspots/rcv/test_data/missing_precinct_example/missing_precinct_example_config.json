@@ -93,7 +93,7 @@
   } ],
   "rules" : {
     "tiebreakMode": "Use candidate order in the config file",
-    "overvoteRule": "alwaysSkipToNextRank",
+    "overvoteRule": "Always skip to next rank",
     "winnerElectionMode": "Single-winner majority determines winner",
     "randomSeed": "",
     "numberOfWinners": "1",
