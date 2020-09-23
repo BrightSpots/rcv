@@ -392,8 +392,9 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Convert CVRs in current config to CDF. - Require user to save if there are unsaved changes. -
-   * Create and launch ConvertToCdfService from the saved config path.
+   * Convert CVRs in current config to CDF.
+   * - Require user to save if there are unsaved changes.
+   * - Create and launch ConvertToCdfService from the saved config path.
    */
   public void menuItemConvertToCdfClicked() {
     if (checkForSaveAndExecute()) {
