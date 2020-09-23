@@ -337,7 +337,8 @@ class TabulatorSession {
       } catch (CvrParseException e) {
         encounteredSourceProblem = true;
       } catch (Exception exception) {
-        Logger.severe("Unexpected error parsing source file %s", cvrPath);
+        Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath,
+            exception.toString());
         encounteredSourceProblem = true;
       }
   }

@@ -65,8 +65,8 @@ class ResultsWriter {
   private static final String CDF_GPU_ID_FORMAT = "gpu-%d";
   private static final String CDF_REPORTING_DEVICE_ID = "rd-001";
 
-  private static final Map<String, String> candidateCodeToContestSelectionId = new HashMap<>();
-  private static final Map<String, String> candidateCodeToCandidateId = new HashMap<>();
+  private static final Map<String, String> cdfCandidateCodeToContestSelectionId = new HashMap<>();
+  private static final Map<String, String> cdfCandidateCodeToCandidateId = new HashMap<>();
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
@@ -138,21 +138,21 @@ class ResultsWriter {
   }
 
   // generates an internal ContestSelectionId based on a candidate code
-  private static String getCvrContestSelectionIdForCandidateCode(String code) {
-    String id = candidateCodeToContestSelectionId.get(code);
+  private static String getCdfContestSelectionIdForCandidateCode(String code) {
+    String id = cdfCandidateCodeToContestSelectionId.get(code);
     if (id == null) {
       id = String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
-      candidateCodeToContestSelectionId.put(code, id);
+      cdfCandidateCodeToContestSelectionId.put(code, id);
     }
     return id;
   }
 
   // generates an internal CandidateId based on a candidate code
-  private static String getCvrCandidateIdForCandidateCode(String code) {
-    String id = candidateCodeToCandidateId.get(code);
+  private static String getCdfCandidateIdForCandidateCode(String code) {
+    String id = cdfCandidateCodeToCandidateId.get(code);
     if (id == null) {
       id = String.format("c-%s", sanitizeStringForOutput(code).toLowerCase());
-      candidateCodeToCandidateId.put(code, id);
+      cdfCandidateCodeToCandidateId.put(code, id);
     }
     return id;
   }
@@ -761,7 +761,7 @@ class ResultsWriter {
 
       selectionMapList.add(
           Map.ofEntries(
-              entry("ContestSelectionId", getCvrContestSelectionIdForCandidateCode(candidateCode)),
+              entry("ContestSelectionId", getCdfContestSelectionIdForCandidateCode(candidateCode)),
               entry("SelectionPosition", selectionPositionMapList),
               entry("@type", "CVR.CVRContestSelection")));
     }
@@ -792,14 +792,14 @@ class ResultsWriter {
     for (String candidateCode : candidateCodes) {
       candidates.add(
           Map.ofEntries(
-              entry("@id", getCvrCandidateIdForCandidateCode(candidateCode)),
+              entry("@id", getCdfCandidateIdForCandidateCode(candidateCode)),
               entry("Name", candidateCode)));
 
       contestSelections.add(
           Map.ofEntries(
-              entry("@id", getCvrContestSelectionIdForCandidateCode(candidateCode)),
+              entry("@id", getCdfContestSelectionIdForCandidateCode(candidateCode)),
               entry("@type", "CVR.ContestSelection"),
-              entry("CandidateIds", new String[]{getCvrCandidateIdForCandidateCode(candidateCode)})));
+              entry("CandidateIds", new String[]{getCdfCandidateIdForCandidateCode(candidateCode)})));
     }
 
     Map<String, Object> contestJson =

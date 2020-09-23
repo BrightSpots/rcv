@@ -130,6 +130,8 @@ class CommonDataFormatReader {
     }
 
     // process the Cvrs
+    int cvrIndex = 0;
+    String fileName = new File(filePath).getName();
     for (CVR cvr : cvrReport.CVR) {
       CVRContest contest = getCvrContestXml(cvr, contestToTabulate);
       if (contest == null) {
@@ -183,8 +185,7 @@ class CommonDataFormatReader {
             candidateId = candidate.Name;
             if (candidateId.equals(config.getOvervoteLabel())) {
               candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-            }
-            if (!config.getCandidateCodeList().contains(candidateId)) {
+            } else if (!config.getCandidateCodeList().contains(candidateId)) {
               Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
               unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
             }
@@ -232,13 +233,13 @@ class CommonDataFormatReader {
         precinctId = unit.Name;
       }
 
+      String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
       // create the new CastVoteRecord
-      CastVoteRecord newRecord =
-          new CastVoteRecord(null,
-              cvr.UniqueId,
-              precinctId,
-              null,
-              rankings);
+      CastVoteRecord newRecord = new CastVoteRecord(computedCastVoteRecordId,
+          cvr.UniqueId,
+          precinctId,
+          null,
+          rankings);
       castVoteRecords.add(newRecord);
 
       // provide some user feedback on the CVR count
@@ -261,7 +262,8 @@ class CommonDataFormatReader {
     }
   }
 
-  private HashMap getCvrContestJson(HashMap cvr, String contestIdToTabulate) {
+  private HashMap getCvrContestJson(HashMap cvr, String contestIdToTabulate)
+      throws CvrParseException {
     HashMap cvrContestToTabulate = null;
     String currentSnapshotId = (String) cvr.get("CurrentSnapshotId");
     ArrayList cvrSnapshots = (ArrayList) cvr.get("CVRSnapshot");
@@ -274,6 +276,10 @@ class CommonDataFormatReader {
       }
     }
     // find the cvr contest in this snapshot
+    if (!currentSnapshot.containsKey("CVRContest")) {
+      Logger.severe("Current snapshot has no CVRContests.");
+      throw new CvrParseException();
+    }
     ArrayList cvrContests = (ArrayList) currentSnapshot.get("CVRContest");
     for (Object contestObject : cvrContests) {
       HashMap cvrContest = (HashMap) contestObject;
@@ -377,12 +383,11 @@ class CommonDataFormatReader {
                 + "Only the first one will be processed.", contestSelectionId);
           }
           String candidateObjectId = (String) candidateIds.get(0);
-          HashMap Candidate = (HashMap) candidates.get(candidateObjectId);
-          candidateId = (String) Candidate.get("Name");
+          HashMap candidate = (HashMap) candidates.get(candidateObjectId);
+          candidateId = (String) candidate.get("Name");
           if (candidateId.equals(config.getOvervoteLabel())) {
             candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-          }
-          if (!this.config.getCandidateCodeList().contains(candidateId)) {
+          } else if (!this.config.getCandidateCodeList().contains(candidateId)) {
             Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
             unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
           }
@@ -420,11 +425,26 @@ class CommonDataFormatReader {
         }
       } // for (Object cvrContestSelectionObject : cvrContestSelections) {
 
+      // Extract GPUnit if provided
+      String precinctId = null;
+      if (cvr.containsKey("BallotStyleUnitId")) {
+        String unitId = (String) cvr.get("BallotStyleUnitId");
+        if (gpuUnits.containsKey(unitId)) {
+          HashMap unit = (HashMap) gpuUnits.get(cvr.get("BallotStyleUnitId"));
+          precinctId = (String) unit.get("Name");
+        } else {
+          Logger.severe("GpUnit \"%s\" not found!", unitId);
+        }
+      }
+
       String ballotId = (String) cvr.get("BallotPrePrintedId");
       String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
       // create the new CastVoteRecord
-      CastVoteRecord newRecord =
-          new CastVoteRecord(computedCastVoteRecordId, ballotId, null, null, rankings);
+      CastVoteRecord newRecord = new CastVoteRecord(computedCastVoteRecordId,
+          ballotId,
+          precinctId,
+          null,
+          rankings);
       castVoteRecords.add(newRecord);
       // provide some user feedback on the CVR count
       if (castVoteRecords.size() % 50000 == 0) {
