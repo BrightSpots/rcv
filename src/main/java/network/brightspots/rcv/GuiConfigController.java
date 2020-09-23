@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.time.LocalDate;
@@ -38,6 +39,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -72,6 +74,7 @@ import network.brightspots.rcv.RawContestConfig.OutputSettings;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
+import org.apache.commons.lang3.SystemUtils;
 
 @SuppressWarnings("WeakerAccess")
 public class GuiConfigController implements Initializable {
@@ -225,6 +228,10 @@ public class GuiConfigController implements Initializable {
         : TieBreakMode.MODE_UNKNOWN;
   }
 
+  private static String getTextOrEmptyString(TextField textField) {
+    return textField.getText() != null ? textField.getText().trim() : "";
+  }
+
   private String getOvervoteRuleChoice() {
     String overvoteRuleString = OvervoteRule.RULE_UNKNOWN.toString();
     if (radioOvervoteAlwaysSkip.isSelected()) {
@@ -237,8 +244,35 @@ public class GuiConfigController implements Initializable {
     return overvoteRuleString;
   }
 
-  private static String getTextOrEmptyString(TextField textField) {
-    return textField.getText() != null ? textField.getText().trim() : "";
+  /**
+   * Action when help menu item is clicked. Try to open the local help manual.
+   */
+  public void menuItemOpenHelpClicked(ActionEvent actionEvent) {
+    URL helpFileUrl = ClassLoader.getSystemResource(CONFIG_FILE_DOCUMENTATION_FILENAME);
+    String command = null;
+    if (SystemUtils.IS_OS_WINDOWS) {
+      command = String.format("start \"Help\" \"%s\"", helpFileUrl);
+    } else if (SystemUtils.IS_OS_MAC_OSX) {
+      command = String.format("open %s", helpFileUrl);
+    } else if (SystemUtils.IS_OS_LINUX) {
+      command = String.format("xdg-open \"%s\"", helpFileUrl);
+    } else {
+      Logger.info("Unknown Operating System.  Try opening the Help Manual manually: %s",
+          helpFileUrl);
+    }
+    if (command != null) {
+      try {
+        Process process = Runtime.getRuntime().exec(command);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+          Logger.info(line);
+        }
+        reader.close();
+      } catch (IOException e) {
+        Logger.severe("Error opening help file: %s", e.toString());
+      }
+    }
   }
 
   /**
@@ -342,9 +376,8 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Tabulate whatever is currently entered into the GUI.
-   * - Require user to save if there are unsaved changes.
-   * - Create and launch TabulatorService from the saved config path.
+   * Tabulate whatever is currently entered into the GUI. - Require user to save if there are
+   * unsaved changes. - Create and launch TabulatorService from the saved config path.
    */
   public void menuItemTabulateClicked() {
     if (checkForSaveAndExecute()) {
@@ -360,9 +393,8 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Convert CVRs in current config to CDF.
-   * - Require user to save if there are unsaved changes.
-   * - Create and launch ConvertToCdfService from the saved config path.
+   * Convert CVRs in current config to CDF. - Require user to save if there are unsaved changes. -
+   * Create and launch ConvertToCdfService from the saved config path.
    */
   public void menuItemConvertToCdfClicked() {
     if (checkForSaveAndExecute()) {
@@ -429,12 +461,16 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /** Action when clear button is clicked for contest date. */
+  /**
+   * Action when clear button is clicked for contest date.
+   */
   public void buttonClearDatePickerContestDateClicked() {
     datePickerContestDate.setValue(null);
   }
 
-  /** Action when CVR file path button is clicked. */
+  /**
+   * Action when CVR file path button is clicked.
+   */
   public void buttonCvrFilePathClicked() {
     File openFile = null;
 
@@ -478,7 +514,9 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /** Action when add CVR file button is clicked. */
+  /**
+   * Action when add CVR file button is clicked.
+   */
   public void buttonAddCvrFileClicked() {
     CvrSource cvrSource =
         new CvrSource(
@@ -499,6 +537,7 @@ public class GuiConfigController implements Initializable {
   public void buttonClearCvrFieldsClicked() {
     choiceCvrProvider.setValue(null);
     clearAndDisableCvrFilesTabFields();
+
   }
 
   private void clearAndDisableCvrFilesTabFields() {
@@ -562,7 +601,9 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.refresh();
   }
 
-  /** Action when CVR ID col index is changed. */
+  /**
+   * Action when CVR ID col index is changed.
+   */
   public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
     tableViewCvrFiles
         .getSelectionModel()
@@ -1258,6 +1299,7 @@ public class GuiConfigController implements Initializable {
 
     return config;
   }
+
 
   private static class ValidatorService extends Service<Void> {
 
