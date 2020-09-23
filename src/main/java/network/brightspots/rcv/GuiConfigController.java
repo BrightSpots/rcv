@@ -39,7 +39,6 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -74,7 +73,6 @@ import network.brightspots.rcv.RawContestConfig.OutputSettings;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
-import org.apache.commons.lang3.SystemUtils;
 
 @SuppressWarnings("WeakerAccess")
 public class GuiConfigController implements Initializable {
@@ -247,18 +245,18 @@ public class GuiConfigController implements Initializable {
   /**
    * Action when help menu item is clicked. Try to open the local help manual.
    */
-  public void menuItemOpenHelpClicked(ActionEvent actionEvent) {
+  public void menuItemOpenHelpClicked() {
     URL helpFileUrl = ClassLoader.getSystemResource(CONFIG_FILE_DOCUMENTATION_FILENAME);
     String command = null;
-    if (SystemUtils.IS_OS_WINDOWS) {
-      command = String.format("start \"Help\" \"%s\"", helpFileUrl);
-    } else if (SystemUtils.IS_OS_MAC_OSX) {
+    if (Utils.IS_OS_WINDOWS) {
+      command = String.format("cmd /c start \"Help\" \"%s\"", helpFileUrl);
+    } else if (Utils.IS_OS_MAC) {
       command = String.format("open %s", helpFileUrl);
-    } else if (SystemUtils.IS_OS_LINUX) {
+    } else if (Utils.IS_OS_LINUX) {
       command = String.format("xdg-open \"%s\"", helpFileUrl);
     } else {
-      Logger.info("Unknown Operating System.  Try opening the Help Manual manually: %s",
-          helpFileUrl);
+      Logger.info("Unable to determine operating system. Try opening the documentation "
+          + "manually at: %s", helpFileUrl);
     }
     if (command != null) {
       try {
@@ -271,6 +269,7 @@ public class GuiConfigController implements Initializable {
         reader.close();
       } catch (IOException e) {
         Logger.severe("Error opening help file: %s", e.toString());
+        Logger.info("Try opening the documentation manually at: %s", helpFileUrl);
       }
     }
   }
