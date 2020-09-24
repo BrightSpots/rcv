@@ -160,6 +160,12 @@ class CommonDataFormatReader {
           if (contestSelection.IsWriteIn != null && contestSelection.IsWriteIn
               .equals(BOOLEAN_TRUE)) {
             candidateId = this.config.getUndeclaredWriteInLabel();
+            if (candidateId == null || candidateId.isEmpty()) {
+              Logger.severe(
+                  "Undeclared write-in candidate found while parsing CVR, however undeclared "
+                      + "write-in label has not been defined in config.");
+              throw new CvrParseException();
+            }
           } else {
             // validate candidate Ids:
             // CDF allows multiple candidate Ids to support party ticket voting options
@@ -195,6 +201,12 @@ class CommonDataFormatReader {
             for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
               if (selectionPosition.CVRWriteIn != null) {
                 candidateId = this.config.getUndeclaredWriteInLabel();
+                if (candidateId == null || candidateId.isEmpty()) {
+                  Logger.severe(
+                      "Undeclared write-in candidate found while parsing CVR, however undeclared "
+                          + "write-in label has not been defined in config.");
+                  throw new CvrParseException();
+                }
               }
               // ignore if no indication is present (NIST 1500-103 section 3.4.2)
               if (selectionPosition.HasIndication != null && selectionPosition.HasIndication
@@ -371,6 +383,12 @@ class CommonDataFormatReader {
             .equals(BOOLEAN_TRUE)) {
           // this is a write-in
           candidateId = this.config.getUndeclaredWriteInLabel();
+          if (candidateId == null || candidateId.isEmpty()) {
+            Logger.severe(
+                "Undeclared write-in candidate found while parsing CVR, however undeclared "
+                    + "write-in label has not been defined in config.");
+            throw new CvrParseException();
+          }
         } else {
           // lookup Candidate Name
           ArrayList candidateIds = (ArrayList) contestSelection.get("CandidateIds");
@@ -407,6 +425,12 @@ class CommonDataFormatReader {
             // WriteIn can be linked at the selection position level
             if (selectionPosition.containsKey("CVRWriteIn")) {
               candidateId = this.config.getUndeclaredWriteInLabel();
+              if (candidateId == null || candidateId.isEmpty()) {
+                Logger.severe(
+                    "Undeclared write-in candidate found while parsing CVR, however undeclared "
+                        + "write-in label has not been defined in config.");
+                throw new CvrParseException();
+              }
             }
             // ignore if no indication is present (NIST 1500-103 section 3.4.2)
             if (selectionPosition.containsKey("HasIndication") && selectionPosition
