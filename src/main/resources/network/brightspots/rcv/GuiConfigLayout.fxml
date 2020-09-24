@@ -64,6 +64,10 @@
             <MenuItem mnemonicParsing="false" onAction="#menuItemConvertToCdfClicked"
               text="Convert CVRs in Current Config to CDF"/>
           </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <MenuItem mnemonicParsing="false" onAction="#menuItemOpenHelpClicked"
+              text="Open Help Manual"/>
+          </Menu>
         </MenuBar>
         <Label fx:id="labelCurrentlyLoaded">
           <padding>
