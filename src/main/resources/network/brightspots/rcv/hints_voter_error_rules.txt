@@ -1,0 +1,14 @@
+Hints for this tab
+
+The tabulator needs to know how to handle voter errors in your jurisdiction. These requirements are typically included in statute or regulation.
+
+Overvote Rule (required): How to handle a ballot where a voter has marked multiple candidates at the same ranking when that ballot is encountered in the round-by-round count. This rule relies on overvote labels as filled out in a different tab.
+  * Always skip to next rank: Skips over an overvote and goes to the next validly-marked ranking on a ballot.
+  * Exhaust immediately: A ballot with an overvote exhausts when that overvote is encountered in the rounds of counting.
+  * Exhaust if multiple continuing: If a voter has an overvote but only one candidate at that overvote is still in the race when that overvote is encountered, the ballot counts for that candidate. If multiple candidates at the overvote are still in the race, the ballot exhausts.
+
+How Many Consecutive Skipped Ranks Are Allowed (required): How many rankings in a row can a voter skip and still have later rankings count? 0 allows no skipped rankings. 1 allows voters to skip rankings one at a time, but not more than 1 in a row, and so on.
+  Example: A voter could rank in 1, 3, 5 and not exhaust under this rule, for example. Implementation of this rule depends on the undervote labels as filled out in a different tab.
+
+Exhaust on Multiple Ranks for the Same Candidate: When checked, the tabulator will exhaust a ballot that includes multiple rankings for the same candidate when that repeat ranking is reached.
+  Example: A voter ranks the same candidate 1st and 3rd, a different candidate 2nd, and another candidate 4th. If their original first choice and their second choice are eliminated, the ballot exhausts when it reaches the repeat ranking in rank 3. The ranking in the 4th rank does not count.

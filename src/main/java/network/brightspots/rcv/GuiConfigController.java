@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -53,6 +54,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -81,6 +83,12 @@ public class GuiConfigController implements Initializable {
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String CONFIG_FILE_DOCUMENTATION_FILENAME =
       "network/brightspots/rcv/config_file_documentation.txt";
+  private static final String HINTS_CONTEST_INFO_FILENAME = "network/brightspots/rcv/hints_contest_info.txt";
+  private static final String HINTS_CVR_FILES_FILENAME = "network/brightspots/rcv/hints_cvr_files.txt";
+  private static final String HINTS_CANDIDATES_FILENAME = "network/brightspots/rcv/hints_candidates.txt";
+  private static final String HINTS_WINNING_RULES_FILENAME = "network/brightspots/rcv/hints_winning_rules.txt";
+  private static final String HINTS_VOTER_ERROR_RULES_FILENAME = "network/brightspots/rcv/hints_voter_error_rules.txt";
+  private static final String HINTS_OUTPUT_FILENAME = "network/brightspots/rcv/hints_output.txt";
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
@@ -209,6 +217,18 @@ public class GuiConfigController implements Initializable {
   private MenuBar menuBar;
   @FXML
   private TabPane tabPane;
+  @FXML
+  private Tab tabContestInfo;
+  @FXML
+  private Tab tabCvrFiles;
+  @FXML
+  private Tab tabCandidates;
+  @FXML
+  private Tab tabWinningRules;
+  @FXML
+  private Tab tabVoterErrorRules;
+  @FXML
+  private Tab tabOutput;
 
   private static Provider getProviderChoice(ChoiceBox<Provider> choiceBox) {
     return choiceBox.getValue() != null ? Provider.getByLabel(choiceBox.getValue().toString())
@@ -894,6 +914,29 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
+  private static String loadTxtFileIntoString(String configFileDocumentationFilename) {
+    String text;
+    try {
+      text =
+          new BufferedReader(
+              new InputStreamReader(
+                  Objects.requireNonNull(
+                      ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename))))
+              .lines()
+              .collect(Collectors.joining("\n"));
+    } catch (Exception exception) {
+      Logger.log(
+          Level.SEVERE,
+          "Error loading text file: %s\n%s",
+          configFileDocumentationFilename,
+          exception.toString());
+      text =
+          String.format(
+              "<Error loading text file: %s>", configFileDocumentationFilename);
+    }
+    return text;
+  }
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
@@ -908,26 +951,14 @@ public class GuiConfigController implements Initializable {
               exitGui();
             });
 
-    String helpText;
-    try {
-      //noinspection ConstantConditions
-      helpText =
-          new BufferedReader(
-              new InputStreamReader(
-                  ClassLoader.getSystemResourceAsStream(CONFIG_FILE_DOCUMENTATION_FILENAME)))
-              .lines()
-              .collect(Collectors.joining("\n"));
-    } catch (Exception exception) {
-      Logger.log(
-          Level.SEVERE,
-          "Error loading config file documentation: %s\n%s",
-          CONFIG_FILE_DOCUMENTATION_FILENAME,
-          exception.toString());
-      helpText =
-          String.format(
-              "<Error loading config file documentation: %s>", CONFIG_FILE_DOCUMENTATION_FILENAME);
-    }
-    textAreaHelp.setText(helpText);
+    setUpHintsForTab(tabContestInfo, HINTS_CONTEST_INFO_FILENAME);
+    setUpHintsForTab(tabCvrFiles, HINTS_CVR_FILES_FILENAME);
+    setUpHintsForTab(tabCandidates, HINTS_CANDIDATES_FILENAME);
+    setUpHintsForTab(tabWinningRules, HINTS_WINNING_RULES_FILENAME);
+    setUpHintsForTab(tabVoterErrorRules, HINTS_VOTER_ERROR_RULES_FILENAME);
+    setUpHintsForTab(tabOutput, HINTS_OUTPUT_FILENAME);
+    // Necessary because the initial load doesn't count as a "selectionChanged" event
+    textAreaHelp.setText(loadTxtFileIntoString(HINTS_CONTEST_INFO_FILENAME));
 
     datePickerContestDate.setConverter(
         new StringConverter<>() {
@@ -1082,6 +1113,15 @@ public class GuiConfigController implements Initializable {
           "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
           exception.toString());
     }
+  }
+
+  private void setUpHintsForTab(Tab tab, String hintsFilename) {
+    String hints = loadTxtFileIntoString(hintsFilename);
+    tab.setOnSelectionChanged(e -> {
+      if (tab.isSelected()) {
+        textAreaHelp.setText(hints);
+      }
+    });
   }
 
   private void migrateConfigVersion(ContestConfig config) {
