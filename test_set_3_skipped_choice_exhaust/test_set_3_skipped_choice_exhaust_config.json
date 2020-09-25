@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "ExhaustSkip",
+    "contestName": "test set 3",
     "outputDirectory": "output",
     "contestDate": "2018-08-06",
     "contestJurisdiction": "Funkytown, USA",
@@ -15,23 +15,23 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "CDF",
-    "contestId": "contest-001"
+    "contestId": "test set 3"
   } ],
   "candidates" : [ {
-    "name" : "A",
-    "code" : "cs-a",
+    "name" : "Candidate A Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "B",
-    "code" : "cs-b",
+    "name" : "Candidate B Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "C",
-    "code" : "cs-c",
+    "name" : "Candidate C Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "D",
-    "code" : "cs-d",
+    "name" : "Candidate D Name",
+    "code" : "",
     "excluded" : false
   }],
   "rules" : {

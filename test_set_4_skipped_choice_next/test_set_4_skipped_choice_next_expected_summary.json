@@ -1,6 +1,6 @@
 {
   "config" : {
-    "contest" : "Test Set 4",
+    "contest" : "test set 4",
     "date" : "2019-03-06",
     "jurisdiction" : "TestSets_Single_winner",
     "office" : "Skipped choice_skip to next",
@@ -9,38 +9,38 @@
   "results" : [ {
     "round" : 1,
     "tally" : {
-      "A" : "5",
-      "B" : "7",
-      "C" : "2",
-      "D" : "1"
+      "Candidate A Name" : "5",
+      "Candidate B Name" : "7",
+      "Candidate C Name" : "2",
+      "Candidate D Name" : "1"
     },
     "tallyResults" : [ {
-      "eliminated" : "D",
+      "eliminated" : "Candidate D Name",
       "transfers" : {
-        "C" : "1"
+        "Candidate C Name" : "1"
       }
     } ]
   }, {
     "round" : 2,
     "tally" : {
-      "A" : "5",
-      "B" : "7",
-      "C" : "3"
+      "Candidate A Name" : "5",
+      "Candidate B Name" : "7",
+      "Candidate C Name" : "3"
     },
     "tallyResults" : [ {
-      "eliminated" : "C",
+      "eliminated" : "Candidate C Name",
       "transfers" : {
-        "B" : "3"
+        "Candidate B Name" : "3"
       }
     } ]
   }, {
     "round" : 3,
     "tally" : {
-      "A" : "5",
-      "B" : "10"
+      "Candidate A Name" : "5",
+      "Candidate B Name" : "10"
     },
     "tallyResults" : [ {
-      "elected" : "B",
+      "elected" : "Candidate B Name",
       "transfers" : { }
     } ]
   } ]

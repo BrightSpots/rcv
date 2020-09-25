@@ -20516,185 +20516,149 @@
   "Election" : [ {
     "@id" : "election-001",
     "@type" : "CVR.Election",
+    "Candidate" : [ {
+      "@id" : "c-al_flowers",
+      "Name" : "Al Flowers"
+    }, {
+      "@id" : "c-aswar_rahman",
+      "Name" : "Aswar Rahman"
+    }, {
+      "@id" : "c-betsy_hodges",
+      "Name" : "Betsy Hodges"
+    }, {
+      "@id" : "c-captain_jack_sparrow",
+      "Name" : "Captain Jack Sparrow"
+    }, {
+      "@id" : "c-charlie_gers",
+      "Name" : "Charlie Gers"
+    }, {
+      "@id" : "c-christopher_zimmerman",
+      "Name" : "Christopher Zimmerman"
+    }, {
+      "@id" : "c-david_john_wilson",
+      "Name" : "David John Wilson"
+    }, {
+      "@id" : "c-david_rosenfeld",
+      "Name" : "David Rosenfeld"
+    }, {
+      "@id" : "c-gregg_a._iverson",
+      "Name" : "Gregg A. Iverson"
+    }, {
+      "@id" : "c-ian_simpson",
+      "Name" : "Ian Simpson"
+    }, {
+      "@id" : "c-jacob_frey",
+      "Name" : "Jacob Frey"
+    }, {
+      "@id" : "c-l.a._nik",
+      "Name" : "L.A. Nik"
+    }, {
+      "@id" : "c-nekima_levy-pounds",
+      "Name" : "Nekima Levy-Pounds"
+    }, {
+      "@id" : "c-raymond_dehn",
+      "Name" : "Raymond Dehn"
+    }, {
+      "@id" : "c-ronald_lischeid",
+      "Name" : "Ronald Lischeid"
+    }, {
+      "@id" : "c-theron_preston_washington",
+      "Name" : "Theron Preston Washington"
+    }, {
+      "@id" : "c-tom_hoch",
+      "Name" : "Tom Hoch"
+    }, {
+      "@id" : "c-troy_benjegerdes",
+      "Name" : "Troy Benjegerdes"
+    }, {
+      "@id" : "c-uwi",
+      "Name" : "UWI"
+    } ],
     "Contest" : [ {
       "@id" : "contest-001",
       "@type" : "CVR.CandidateContest",
       "ContestSelection" : [ {
         "@id" : "cs-al_flowers",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Al Flowers"
-        } ]
+        "CandidateIds" : [ "c-al_flowers" ]
       }, {
         "@id" : "cs-aswar_rahman",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Aswar Rahman"
-        } ]
+        "CandidateIds" : [ "c-aswar_rahman" ]
       }, {
         "@id" : "cs-betsy_hodges",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Betsy Hodges"
-        } ]
+        "CandidateIds" : [ "c-betsy_hodges" ]
       }, {
         "@id" : "cs-captain_jack_sparrow",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Captain Jack Sparrow"
-        } ]
+        "CandidateIds" : [ "c-captain_jack_sparrow" ]
       }, {
         "@id" : "cs-charlie_gers",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Charlie Gers"
-        } ]
+        "CandidateIds" : [ "c-charlie_gers" ]
       }, {
         "@id" : "cs-christopher_zimmerman",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Christopher Zimmerman"
-        } ]
+        "CandidateIds" : [ "c-christopher_zimmerman" ]
       }, {
         "@id" : "cs-david_john_wilson",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "David John Wilson"
-        } ]
+        "CandidateIds" : [ "c-david_john_wilson" ]
       }, {
         "@id" : "cs-david_rosenfeld",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "David Rosenfeld"
-        } ]
+        "CandidateIds" : [ "c-david_rosenfeld" ]
       }, {
         "@id" : "cs-gregg_a._iverson",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Gregg A. Iverson"
-        } ]
+        "CandidateIds" : [ "c-gregg_a._iverson" ]
       }, {
         "@id" : "cs-ian_simpson",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Ian Simpson"
-        } ]
+        "CandidateIds" : [ "c-ian_simpson" ]
       }, {
         "@id" : "cs-jacob_frey",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Jacob Frey"
-        } ]
+        "CandidateIds" : [ "c-jacob_frey" ]
       }, {
         "@id" : "cs-l.a._nik",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "L.A. Nik"
-        } ]
+        "CandidateIds" : [ "c-l.a._nik" ]
       }, {
         "@id" : "cs-nekima_levy-pounds",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Nekima Levy-Pounds"
-        } ]
+        "CandidateIds" : [ "c-nekima_levy-pounds" ]
       }, {
         "@id" : "cs-raymond_dehn",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Raymond Dehn"
-        } ]
+        "CandidateIds" : [ "c-raymond_dehn" ]
       }, {
         "@id" : "cs-ronald_lischeid",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Ronald Lischeid"
-        } ]
+        "CandidateIds" : [ "c-ronald_lischeid" ]
       }, {
         "@id" : "cs-theron_preston_washington",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Theron Preston Washington"
-        } ]
+        "CandidateIds" : [ "c-theron_preston_washington" ]
       }, {
         "@id" : "cs-tom_hoch",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Tom Hoch"
-        } ]
+        "CandidateIds" : [ "c-tom_hoch" ]
       }, {
         "@id" : "cs-troy_benjegerdes",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Troy Benjegerdes"
-        } ]
+        "CandidateIds" : [ "c-troy_benjegerdes" ]
       }, {
         "@id" : "cs-uwi",
         "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "Undeclared Write-ins"
-        } ]
-      } ]
+        "CandidateIds" : [ "c-uwi" ]
+      } ],
+      "Name" : "Precinct example"
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2019-05-01T17:44:26-07:00",
+  "GeneratedDate" : "2020-09-13T15:19:21-07:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
     "@type" : "CVR.GpUnit",
