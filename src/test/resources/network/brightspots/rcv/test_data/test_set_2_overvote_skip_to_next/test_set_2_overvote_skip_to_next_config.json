@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "Test Set 3",
+    "contestName": "overvote skips to next rank",
     "outputDirectory": "output",
     "contestDate": "2019-03-06",
     "contestJurisdiction": "TestSets_Single_winner",
@@ -15,23 +15,23 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "CDF",
-    "contestId": "contest-001"
+    "contestId": "overvote skips to next rank"
   } ],
   "candidates" : [ {
-    "name" : "A",
-    "code" : "cs-a",
+    "name" : "Candidate A Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "B",
-    "code" : "cs-b",
+    "name" : "Candidate B Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "C",
-    "code" : "cs-c",
+    "name" : "Candidate C Name",
+    "code" : "",
     "excluded" : false
   }, {
-    "name" : "D",
-    "code" : "cs-d",
+    "name" : "Candidate D Name",
+    "code" : "",
     "excluded" : false
   }],
   "rules" : {

@@ -336,8 +336,12 @@ class TabulatorSession {
         encounteredSourceProblem = true;
       } catch (CvrParseException e) {
         encounteredSourceProblem = true;
+      } catch (Exception exception) {
+        Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath,
+            exception.toString());
+        encounteredSourceProblem = true;
       }
-    }
+  }
 
     if (encounteredSourceProblem) {
       Logger.log(Level.SEVERE, "Parsing cast vote records failed!");

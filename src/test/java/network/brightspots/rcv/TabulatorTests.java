@@ -26,6 +26,7 @@ package network.brightspots.rcv;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -117,9 +118,10 @@ class TabulatorTests {
   // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
+    Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
     session.tabulate();
-
+    Logger.info("Examining tabulation test results...");
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
@@ -140,7 +142,6 @@ class TabulatorTests {
           "_contest_" + config.rawConfig.cvrFileSources.get(0).getContestId() + "_expected.csv");
       assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
     }
-
     // test passed so cleanup test output folder
     File outputFolder = new File(session.getOutputPath());
     if (outputFolder.listFiles() != null) {
@@ -156,6 +157,7 @@ class TabulatorTests {
         }
       }
     }
+    Logger.info("Test complete.");
   }
 
   private static void compareJsons(
@@ -183,7 +185,13 @@ class TabulatorTests {
                 + "_expected_"
                 + jsonType
                 + ".json");
-    assertTrue(fileCompare(expectedPath, actualOutputPath));
+    Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
+    if (fileCompare(expectedPath, actualOutputPath)) {
+      Logger.info("Files are equal.");
+    } else {
+      Logger.info("Files are different.");
+      fail();
+    }
   }
 
   @BeforeAll

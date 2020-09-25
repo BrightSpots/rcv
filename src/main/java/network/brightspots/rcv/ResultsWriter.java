@@ -65,7 +65,8 @@ class ResultsWriter {
   private static final String CDF_GPU_ID_FORMAT = "gpu-%d";
   private static final String CDF_REPORTING_DEVICE_ID = "rd-001";
 
-  private static final Map<String, String> candidateCodeToCdfId = new HashMap<>();
+  private static final Map<String, String> cdfCandidateCodeToContestSelectionId = new HashMap<>();
+  private static final Map<String, String> cdfCandidateCodeToCandidateId = new HashMap<>();
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
@@ -136,17 +137,26 @@ class ResultsWriter {
         : String.format("ballot-%s", cvrId);
   }
 
-  private static String getCdfIdForCandidateCode(String code) {
-    String id = candidateCodeToCdfId.get(code);
+  // generates an internal ContestSelectionId based on a candidate code
+  private static String getCdfContestSelectionIdForCandidateCode(String code) {
+    String id = cdfCandidateCodeToContestSelectionId.get(code);
     if (id == null) {
-      id =
-          code.startsWith("cs-")
-              ? code
-              : String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
-      candidateCodeToCdfId.put(code, id);
+      id = String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
+      cdfCandidateCodeToContestSelectionId.put(code, id);
     }
     return id;
   }
+
+  // generates an internal CandidateId based on a candidate code
+  private static String getCdfCandidateIdForCandidateCode(String code) {
+    String id = cdfCandidateCodeToCandidateId.get(code);
+    if (id == null) {
+      id = String.format("c-%s", sanitizeStringForOutput(code).toLowerCase());
+      cdfCandidateCodeToCandidateId.put(code, id);
+    }
+    return id;
+  }
+
 
   // Instead of a map from rank to list of candidates, we need a sorted list of candidates
   // with the ranks they were given. (Ordinarily a candidate will have only a single rank, but they
@@ -751,7 +761,7 @@ class ResultsWriter {
 
       selectionMapList.add(
           Map.ofEntries(
-              entry("ContestSelectionId", getCdfIdForCandidateCode(candidateCode)),
+              entry("ContestSelectionId", getCdfContestSelectionIdForCandidateCode(candidateCode)),
               entry("SelectionPosition", selectionPositionMapList),
               entry("@type", "CVR.CVRContestSelection")));
     }
@@ -772,31 +782,36 @@ class ResultsWriter {
   private Map<String, Object> generateCdfMapForElection() {
     HashMap<String, Object> electionMap = new HashMap<>();
 
+    // containers for election-level data
     List<Map<String, Object>> contestSelections = new LinkedList<>();
+    List<Map<String, Object>> candidates = new LinkedList<>();
+
+    // iterate all candidates and create Candidate and ContestSelection objects for them
     List<String> candidateCodes = new LinkedList<>(config.getCandidateCodeList());
     Collections.sort(candidateCodes);
     for (String candidateCode : candidateCodes) {
-      Map<String, String> codeMap =
+      candidates.add(
           Map.ofEntries(
-              entry("@type", "CVR.Code"),
-              entry("Type", "other"),
-              entry("OtherType", "vendor-label"),
-              entry("Value", config.getNameForCandidateCode(candidateCode)));
+              entry("@id", getCdfCandidateIdForCandidateCode(candidateCode)),
+              entry("Name", candidateCode)));
 
       contestSelections.add(
           Map.ofEntries(
-              entry("@id", getCdfIdForCandidateCode(candidateCode)),
+              entry("@id", getCdfContestSelectionIdForCandidateCode(candidateCode)),
               entry("@type", "CVR.ContestSelection"),
-              entry("Code", new Map[]{codeMap})));
+              entry("CandidateIds", new String[]{getCdfCandidateIdForCandidateCode(candidateCode)})));
     }
 
     Map<String, Object> contestJson =
         Map.ofEntries(
             entry("@id", CDF_CONTEST_ID),
+            entry("@type", "CVR.CandidateContest"),
             entry("ContestSelection", contestSelections),
-            entry("@type", "CVR.CandidateContest"));
+            entry("Name", config.getContestName())
+        );
 
     electionMap.put("@id", CDF_ELECTION_ID);
+    electionMap.put("Candidate", candidates);
     electionMap.put("Contest", new Map[]{contestJson});
     electionMap.put("ElectionScopeId", CDF_GPU_ID);
     electionMap.put("@type", "CVR.Election");
