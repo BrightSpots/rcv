@@ -79,7 +79,7 @@
     <center>
       <VBox BorderPane.alignment="CENTER">
         <TabPane fx:id="tabPane" minHeight="450.0" tabClosingPolicy="UNAVAILABLE">
-          <Tab text="Contest Info">
+          <Tab text="Contest Info" fx:id="tabContestInfo">
             <VBox>
               <VBox styleClass="bordered-box" maxWidth="450.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
@@ -132,7 +132,7 @@
               </padding>
             </VBox>
           </Tab>
-          <Tab text="CVR Files">
+          <Tab text="CVR Files" fx:id="tabCvrFiles">
             <VBox>
               <VBox styleClass="bordered-box" maxWidth="700.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
@@ -277,7 +277,7 @@
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Candidates">
+          <Tab text="Candidates" fx:id="tabCandidates">
             <VBox>
               <VBox styleClass="bordered-box" maxWidth="400.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
@@ -364,7 +364,7 @@
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Winning Rules">
+          <Tab text="Winning Rules" fx:id="tabWinningRules">
             <VBox>
               <VBox styleClass="bordered-box" maxWidth="820.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
@@ -534,7 +534,7 @@
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Voter Error Rules">
+          <Tab text="Voter Error Rules" fx:id="tabVoterErrorRules">
             <VBox>
               <VBox styleClass="bordered-box" maxWidth="418.0">
                 <HBox spacing="4.0">
@@ -585,7 +585,7 @@
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Output">
+          <Tab text="Output" fx:id="tabOutput">
             <VBox>
               <VBox styleClass="bordered-box" maxWidth="580.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">

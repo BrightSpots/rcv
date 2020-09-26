@@ -1,0 +1,20 @@
+Hints for this tab
+
+The tabulator calculates results for one contest at a time, rather than the results of several contests for an election all at once. The information on this tab is for the particular contest you will be tabulating.
+
+These fields do not influence the computations. They are shown in the final output file(s) to help connect the data (results) with the contest the results belong to. 
+
+* Think long term, e.g. from the perspective of looking at the results files 6 months after the election and wanting to be clear what contest the results belong to.
+
+* You may find it helpful to revisit this tab once you have done a few test runs and see what the output looks like.
+
+Contest Name (required): Enter a name to identify it.
+  Examples: City Council 2018, Board of Election Ward13 2017, Mayor, Referendum 289b
+
+Contest Date (optional): The date on which the election for this contest was run.
+
+Contest Jurisdiction (optional): E.g.: Minneapolis, Eastpointe
+  Whether this is helpful may depend on what you put into the Contest Name field
+
+Contest Office (optional): E.g.: Mayor, County Clerk
+  Whether this is helpful may depend on what you put into the Contest Name field

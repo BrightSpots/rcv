@@ -22,6 +22,8 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
@@ -33,11 +35,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
+@SuppressWarnings("rawtypes")
 class CommonDataFormatReader {
 
   private final String STATUS_NEEDS_ADJUDICATION = "needs-adjudication";
@@ -77,6 +81,55 @@ class CommonDataFormatReader {
           cvrContestToTabulate = cvrContest;
           break;
         }
+      }
+    }
+    return cvrContestToTabulate;
+  }
+
+  private static void throwIfNoUwiLabel(String candidateId) throws CvrParseException {
+    if (isNullOrBlank(candidateId)) {
+      Logger.severe(
+          "Undeclared write-in candidate found while parsing CVR, however undeclared write-in "
+              + "label has not been defined in config!");
+      throw new CvrParseException();
+    }
+  }
+
+  void parseCvrFile(List<CastVoteRecord> castVoteRecords)
+      throws UnrecognizedCandidatesException, IOException, CvrParseException {
+    if (filePath.endsWith(".xml")) {
+      parseXml(castVoteRecords);
+    } else if (filePath.endsWith(".json")) {
+      parseJson(castVoteRecords);
+    }
+  }
+
+  private HashMap getCvrContestJson(HashMap cvr, String contestIdToTabulate)
+      throws CvrParseException {
+    HashMap cvrContestToTabulate = null;
+    String currentSnapshotId = (String) cvr.get("CurrentSnapshotId");
+    ArrayList cvrSnapshots = (ArrayList) cvr.get("CVRSnapshot");
+    HashMap currentSnapshot = null;
+    for (Object snapshotObject : cvrSnapshots) {
+      HashMap snapshot = (HashMap) snapshotObject;
+      if (snapshot.get("@id").equals(currentSnapshotId)) {
+        currentSnapshot = snapshot;
+        break;
+      }
+    }
+    // find the cvr contest in this snapshot
+    if (!Objects.requireNonNull(currentSnapshot).containsKey("CVRContest")) {
+      Logger.severe("Current snapshot has no CVRContests.");
+      throw new CvrParseException();
+    }
+    ArrayList cvrContests = (ArrayList) currentSnapshot.get("CVRContest");
+    for (Object contestObject : cvrContests) {
+      HashMap cvrContest = (HashMap) contestObject;
+      // filter by contest ID
+      String contestId = (String) cvrContest.get("ContestId");
+      if (contestId.equals(contestIdToTabulate)) {
+        cvrContestToTabulate = cvrContest;
+        break;
       }
     }
     return cvrContestToTabulate;
@@ -160,12 +213,7 @@ class CommonDataFormatReader {
           if (contestSelection.IsWriteIn != null && contestSelection.IsWriteIn
               .equals(BOOLEAN_TRUE)) {
             candidateId = this.config.getUndeclaredWriteInLabel();
-            if (candidateId == null || candidateId.isEmpty()) {
-              Logger.severe(
-                  "Undeclared write-in candidate found while parsing CVR, however undeclared "
-                      + "write-in label has not been defined in config.");
-              throw new CvrParseException();
-            }
+            throwIfNoUwiLabel(candidateId);
           } else {
             // validate candidate Ids:
             // CDF allows multiple candidate Ids to support party ticket voting options
@@ -201,12 +249,7 @@ class CommonDataFormatReader {
             for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
               if (selectionPosition.CVRWriteIn != null) {
                 candidateId = this.config.getUndeclaredWriteInLabel();
-                if (candidateId == null || candidateId.isEmpty()) {
-                  Logger.severe(
-                      "Undeclared write-in candidate found while parsing CVR, however undeclared "
-                          + "write-in label has not been defined in config.");
-                  throw new CvrParseException();
-                }
+                throwIfNoUwiLabel(candidateId);
               }
               // ignore if no indication is present (NIST 1500-103 section 3.4.2)
               if (selectionPosition.HasIndication != null && selectionPosition.HasIndication
@@ -265,46 +308,6 @@ class CommonDataFormatReader {
 
   }
 
-  void parseCvrFile(List<CastVoteRecord> castVoteRecords)
-      throws UnrecognizedCandidatesException, IOException, CvrParseException {
-    if (filePath.endsWith(".xml")) {
-      parseXml(castVoteRecords);
-    } else if (filePath.endsWith(".json")) {
-      parseJson(castVoteRecords);
-    }
-  }
-
-  private HashMap getCvrContestJson(HashMap cvr, String contestIdToTabulate)
-      throws CvrParseException {
-    HashMap cvrContestToTabulate = null;
-    String currentSnapshotId = (String) cvr.get("CurrentSnapshotId");
-    ArrayList cvrSnapshots = (ArrayList) cvr.get("CVRSnapshot");
-    HashMap currentSnapshot = null;
-    for (Object snapshotObject : cvrSnapshots) {
-      HashMap snapshot = (HashMap) snapshotObject;
-      if (snapshot.get("@id").equals(currentSnapshotId)) {
-        currentSnapshot = snapshot;
-        break;
-      }
-    }
-    // find the cvr contest in this snapshot
-    if (!currentSnapshot.containsKey("CVRContest")) {
-      Logger.severe("Current snapshot has no CVRContests.");
-      throw new CvrParseException();
-    }
-    ArrayList cvrContests = (ArrayList) currentSnapshot.get("CVRContest");
-    for (Object contestObject : cvrContests) {
-      HashMap cvrContest = (HashMap) contestObject;
-      // filter by contest ID
-      String contestId = (String) cvrContest.get("ContestId");
-      if (contestId.equals(contestIdToTabulate)) {
-        cvrContestToTabulate = cvrContest;
-        break;
-      }
-    }
-    return cvrContestToTabulate;
-  }
-
   // parse cdf json CastVoteRecordReport into CastVoteRecords and append them to input list
   void parseJson(List<CastVoteRecord> castVoteRecords)
       throws CvrParseException, UnrecognizedCandidatesException {
@@ -313,8 +316,8 @@ class CommonDataFormatReader {
     HashMap<Object, Object> candidates = new HashMap<>();
     HashMap<Object, Object> gpuUnits = new HashMap<>();
     HashMap<Object, Object> contestSelections = new HashMap<>();
-    HashMap<Object, Object> contestToTabulate = null;
-    HashMap<Object, Object> json = JsonParser.readFromFile(filePath, HashMap.class);
+    HashMap contestToTabulate = null;
+    HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
 
     // GpUnits
     ArrayList gpUnitArray = (ArrayList) json.get("GpUnit");
@@ -383,12 +386,7 @@ class CommonDataFormatReader {
             .equals(BOOLEAN_TRUE)) {
           // this is a write-in
           candidateId = this.config.getUndeclaredWriteInLabel();
-          if (candidateId == null || candidateId.isEmpty()) {
-            Logger.severe(
-                "Undeclared write-in candidate found while parsing CVR, however undeclared "
-                    + "write-in label has not been defined in config.");
-            throw new CvrParseException();
-          }
+          throwIfNoUwiLabel(candidateId);
         } else {
           // lookup Candidate Name
           ArrayList candidateIds = (ArrayList) contestSelection.get("CandidateIds");
@@ -425,12 +423,7 @@ class CommonDataFormatReader {
             // WriteIn can be linked at the selection position level
             if (selectionPosition.containsKey("CVRWriteIn")) {
               candidateId = this.config.getUndeclaredWriteInLabel();
-              if (candidateId == null || candidateId.isEmpty()) {
-                Logger.severe(
-                    "Undeclared write-in candidate found while parsing CVR, however undeclared "
-                        + "write-in label has not been defined in config.");
-                throw new CvrParseException();
-              }
+              throwIfNoUwiLabel(candidateId);
             }
             // ignore if no indication is present (NIST 1500-103 section 3.4.2)
             if (selectionPosition.containsKey("HasIndication") && selectionPosition
@@ -480,7 +473,6 @@ class CommonDataFormatReader {
       throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
-
 
   // The following classes are based on the NIST 1500-103 UML structure.
   // Many of the elements represented here will not be present on any particular implementation of

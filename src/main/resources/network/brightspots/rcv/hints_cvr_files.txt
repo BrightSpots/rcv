@@ -1,0 +1,19 @@
+Hints for this tab
+
+The tabulator needs to know where each of your CVR files is and how to interpret each of them. As you add files, it will build up a list of files to use when it tabulates the results of this contest.
+
+For each of your CVR files, provide the necessary information and then use the Add button to add it to the list.
+
+Provider (required): The vendor/machine that generated (produced) the file. After you select the field, the tabulator will fill in as many of the other fields as it can based on what it knows about that provider. You can adjust those values as necessary.
+
+File (required): Location of the CVR file.
+  * Example: /Users/test data/2015-portland-mayor-cvr.xlsx
+  * Example: C:\Users\test data\precinct14.json
+
+First Vote Column (required for ES&S): the column where the first vote record is.
+
+First Vote Row (required for ES&S): the row where the first vote record.
+
+ID Column (optional): The column the IDs are in. Not all CVR files contain an ID column.
+
+Precinct Column: The column that contains the precinct. Required if you want to tabulate by precinct (if the CVR file is from ES&S).

@@ -1,0 +1,9 @@
+Hints for this tab
+
+Fill in the fields and click the Add button:
+
+Name (required): E.g.: Dave Harris.
+
+Code (optional): Some CVR files use codes in lieu of full candidate name. E.g.: "JCD" or "14".
+
+Excluded (optional): When checked, the candidate will be ignored during tabulation. An example of when this might be used: a candidate dropped out after the ballots were printed.

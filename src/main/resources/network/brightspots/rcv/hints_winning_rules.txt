@@ -1,0 +1,17 @@
+Hints for this tab
+
+Winner Election Mode (required): What process to use for selecting winner(s) for this contest).
+  * Single-winner majority determines winner: Elects one winner. Eliminate candidates one-by-one or using batch elimination until only two candidates remain. Candidate with the most votes at the end wins.
+  * Multi-winner allow only one winner per round: Elects multiple winners. Elect and transfer the surplus vote of only the candidate with the most votes if multiple candidates exceed the winning threshold in a round of counting.
+  * Multi-winner allow multiple winners per round: Elects multiple winners. Elect and transfer the surplus vote of all candidates crossing the winning threshold if multiple candidates exceed the winning threshold in a round of counting.
+  * Bottoms-up: Eliminate candidates until the desired number of winners is reached, then stop. Bottoms up does not transfer surplus votes.
+  * Bottoms-up using percentage threshold: Elects multiple winners. Eliminate candidates until the remaining candidates have a vote share equal to or greater than a specified percentage of the vote.
+  * Multi-pass IRV: Elects multiple winners. Eliminate candidates one-by-one or using batch elimination until only two candidates remain. Candidate with the most votes at the end wins. Run a new set of rounds with any winning candidates ignored.
+
+Overvote Label: Some CVRs used a particular word to indicate an overvote.
+
+Undervote Label: Some CVRs used a particular word to indicate an undervote.
+
+Undeclared Write-in Label: Some CVRs used a particular word to indicate a write-in.
+
+Treat Blank as Undeclared Write-in: When checked, the tabulator will interpret blank cells in the CVRs as a votes for an undeclared write-ins.
