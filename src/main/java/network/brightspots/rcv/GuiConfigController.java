@@ -202,9 +202,11 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldRulesDescription;
   @FXML
-  private CheckBox checkBoxNonIntegerWinningThreshold;
+  private RadioButton radioThresholdMostCommon;
   @FXML
-  private CheckBox checkBoxHareQuota;
+  private RadioButton radioThresholdHbQuota;
+  @FXML
+  private RadioButton radioThresholdHareQuota;
   @FXML
   private CheckBox checkBoxBatchElimination;
   @FXML
@@ -743,10 +745,12 @@ public class GuiConfigController implements Initializable {
     textFieldNumberOfWinners.setDisable(true);
     textFieldMultiSeatBottomsUpPercentageThreshold.clear();
     textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(true);
-    checkBoxNonIntegerWinningThreshold.setSelected(false);
-    checkBoxNonIntegerWinningThreshold.setDisable(true);
-    checkBoxHareQuota.setSelected(false);
-    checkBoxHareQuota.setDisable(true);
+    radioThresholdMostCommon.setSelected(false);
+    radioThresholdMostCommon.setDisable(true);
+    radioThresholdHbQuota.setSelected(false);
+    radioThresholdHbQuota.setDisable(true);
+    radioThresholdHareQuota.setSelected(false);
+    radioThresholdHareQuota.setDisable(true);
     textFieldDecimalPlacesForVoteArithmetic.clear();
     textFieldDecimalPlacesForVoteArithmetic.setDisable(true);
   }
@@ -757,13 +761,11 @@ public class GuiConfigController implements Initializable {
   }
 
   private void setWinningRulesDefaultValues() {
-    checkBoxNonIntegerWinningThreshold.setSelected(
-        ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD);
-    checkBoxHareQuota.setSelected(ContestConfig.SUGGESTED_HARE_QUOTA);
+    setThresholdCalculationMethodRadioButton(ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD,
+        ContestConfig.SUGGESTED_HARE_QUOTA);
     checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
     checkBoxContinueUntilTwoCandidatesRemain
         .setSelected(ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
-    textFieldNumberOfWinners.setText(String.valueOf(ContestConfig.SUGGESTED_NUMBER_OF_WINNERS));
     textFieldDecimalPlacesForVoteArithmetic.setText(
         String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
     textFieldMaxRankingsAllowed.setText(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED);
@@ -1063,17 +1065,18 @@ public class GuiConfigController implements Initializable {
         case STANDARD -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
-          choiceTiebreakMode.setDisable(false);
-          checkBoxHareQuota.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
           checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
+          choiceTiebreakMode.setDisable(false);
+          textFieldNumberOfWinners.setText("1");
         }
         case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND, MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
-          checkBoxNonIntegerWinningThreshold.setDisable(false);
-          checkBoxHareQuota.setDisable(false);
+          radioThresholdMostCommon.setDisable(false);
+          radioThresholdHbQuota.setDisable(false);
+          radioThresholdHareQuota.setDisable(false);
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
@@ -1081,7 +1084,6 @@ public class GuiConfigController implements Initializable {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
-          checkBoxHareQuota.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
@@ -1256,12 +1258,22 @@ public class GuiConfigController implements Initializable {
     textFieldUndervoteLabel.setText(rules.undervoteLabel);
     textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
     textFieldRulesDescription.setText(rules.rulesDescription);
-    checkBoxNonIntegerWinningThreshold.setSelected(rules.nonIntegerWinningThreshold);
-    checkBoxHareQuota.setSelected(rules.hareQuota);
+    setThresholdCalculationMethodRadioButton(rules.nonIntegerWinningThreshold, rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
     checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
+  }
+
+  private void setThresholdCalculationMethodRadioButton(boolean nonIntegerWinningThreshold,
+      boolean hareQuota) {
+    if (!nonIntegerWinningThreshold && !hareQuota) {
+      radioThresholdMostCommon.setSelected(true);
+    } else if (nonIntegerWinningThreshold && !hareQuota) {
+      radioThresholdHbQuota.setSelected(true);
+    } else if (!nonIntegerWinningThreshold) {
+      radioThresholdHareQuota.setSelected(true);
+    }  // If both are true, don't select any option since this should no longer be valid
   }
 
   private void setOvervoteRuleRadioButton(OvervoteRule overvoteRule) {
@@ -1323,8 +1335,8 @@ public class GuiConfigController implements Initializable {
     rules.minimumVoteThreshold = getTextOrEmptyString(textFieldMinimumVoteThreshold);
     rules.maxSkippedRanksAllowed = getTextOrEmptyString(textFieldMaxSkippedRanksAllowed);
     rules.maxRankingsAllowed = getTextOrEmptyString(textFieldMaxRankingsAllowed);
-    rules.nonIntegerWinningThreshold = checkBoxNonIntegerWinningThreshold.isSelected();
-    rules.hareQuota = checkBoxHareQuota.isSelected();
+    rules.nonIntegerWinningThreshold = radioThresholdHbQuota.isSelected();
+    rules.hareQuota = radioThresholdHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
