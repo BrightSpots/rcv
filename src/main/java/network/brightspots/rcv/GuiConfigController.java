@@ -76,7 +76,7 @@ import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "rawtypes"})
 public class GuiConfigController implements Initializable {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
@@ -1088,8 +1088,7 @@ public class GuiConfigController implements Initializable {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
-          checkBoxHareQuota.setDisable(false);
-          textFieldNumberOfWinners.setDisable(false);
+          textFieldNumberOfWinners.setText("0");
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
         }
       }

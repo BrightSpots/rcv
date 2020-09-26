@@ -740,12 +740,18 @@ class ContestConfig {
           }
         }
       } else { // numberOfWinners == 0
-        if (!isMultiSeatBottomsUpWithThresholdEnabled()
-            || getMultiSeatBottomsUpPercentageThreshold() == null) {
+        if (!isMultiSeatBottomsUpWithThresholdEnabled()) {
           isValid = false;
           Logger.log(Level.SEVERE,
               "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and multiSeatBottomsUpPercentageThreshold must be specified!",
-              winnerMode.toString());
+              WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
+        } else {
+          if (getMultiSeatBottomsUpPercentageThreshold() == null) {
+            isValid = false;
+            Logger.log(Level.SEVERE,
+                "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold must be specified!",
+                winnerMode.toString());
+          }
         }
       }
     }
