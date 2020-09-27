@@ -1129,7 +1129,7 @@ class Tabulator {
   }
 
   enum WinnerElectionMode {
-    STANDARD("Single-winner majority determines winner"),
+    STANDARD_SINGLE_WINNER("Single-winner majority determines winner"),
     MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("Multi-winner allow only one winner per round"),
     MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("Multi-winner allow multiple winners per round"),
     MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS("Bottoms-up"),

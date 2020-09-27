@@ -736,13 +736,11 @@ class ContestConfig {
           Logger.log(Level.SEVERE,
               "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and multiSeatBottomsUpPercentageThreshold must be specified!",
               WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
-        } else {
-          if (getMultiSeatBottomsUpPercentageThreshold() == null) {
-            isValid = false;
-            Logger.log(Level.SEVERE,
-                "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold must be specified!",
-                winnerMode.toString());
-          }
+        } else if (getMultiSeatBottomsUpPercentageThreshold() == null) {
+          isValid = false;
+          Logger.log(Level.SEVERE,
+              "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold must be specified!",
+              winnerMode.toString());
         }
       }
     }
@@ -841,7 +839,7 @@ class ContestConfig {
   }
 
   boolean isSingleWinnerEnabled() {
-    return getWinnerElectionMode() == WinnerElectionMode.STANDARD;
+    return getWinnerElectionMode() == WinnerElectionMode.STANDARD_SINGLE_WINNER;
   }
 
   boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {

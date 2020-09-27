@@ -463,7 +463,7 @@
                       <RadioButton alignment="TOP_LEFT" mnemonicParsing="false"
                         toggleGroup="$thresholdCalculationMethodToggleGroup"
                         fx:id="radioThresholdHbQuota"
-                        text="Compute using HB Quota&#xD;  > (Votes / (Seats +1))"/>
+                        text="Compute using HB Quota&#xD;  > (Votes / (Seats + 1))"/>
                       <RadioButton alignment="TOP_LEFT" mnemonicParsing="false"
                         toggleGroup="$thresholdCalculationMethodToggleGroup"
                         fx:id="radioThresholdHareQuota"

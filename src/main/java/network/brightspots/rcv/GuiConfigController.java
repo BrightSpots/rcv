@@ -1062,7 +1062,7 @@ public class GuiConfigController implements Initializable {
       clearAndDisableWinningRuleFields();
       setWinningRulesDefaultValues();
       switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
-        case STANDARD -> {
+        case STANDARD_SINGLE_WINNER -> {
           textFieldMaxRankingsAllowed.setDisable(false);
           textFieldMinimumVoteThreshold.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
@@ -1136,9 +1136,10 @@ public class GuiConfigController implements Initializable {
           case "standard" -> config.rawConfig.rules.winnerElectionMode =
               config.getNumberOfWinners() > 1
                   ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND.toString()
-                  : WinnerElectionMode.STANDARD.toString();
+                  : WinnerElectionMode.STANDARD_SINGLE_WINNER.toString();
           case "singleSeatContinueUntilTwoCandidatesRemain" -> {
-            config.rawConfig.rules.winnerElectionMode = WinnerElectionMode.STANDARD.toString();
+            config.rawConfig.rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER
+                .toString();
             config.rawConfig.rules.continueUntilTwoCandidatesRemain = true;
           }
           case "multiSeatAllowOnlyOneWinnerPerRound" -> config.rawConfig.rules.winnerElectionMode =
