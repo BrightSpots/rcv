@@ -61,7 +61,6 @@ class ContestConfig {
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
   static final int SUGGESTED_CVR_ID_COLUMN = 1;
   static final int SUGGESTED_CVR_PRECINCT_COLUMN = 2;
-  static final int SUGGESTED_NUMBER_OF_WINNERS = 1;
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
@@ -722,10 +721,7 @@ class ContestConfig {
             Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
           }
         } else { // numberOfWinners == 1
-          if (isMultiSeatSequentialWinnerTakesAllEnabled() ||
-              isMultiSeatBottomsUpUntilNWinnersEnabled() ||
-              isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() ||
-              isMultiSeatAllowMultipleWinnersPerRoundEnabled()) {
+          if (!isSingleWinnerEnabled()) {
             isValid = false;
             Logger.log(
                 Level.SEVERE,
@@ -733,18 +729,17 @@ class ContestConfig {
                 winnerMode.toString()
             );
           }
-
-          if (isHareQuotaEnabled()) {
-            isValid = false;
-            Logger.log(Level.SEVERE, "hareQuota can only be true in a multi-seat contest!");
-          }
         }
       } else { // numberOfWinners == 0
-        if (!isMultiSeatBottomsUpWithThresholdEnabled()
-            || getMultiSeatBottomsUpPercentageThreshold() == null) {
+        if (!isMultiSeatBottomsUpWithThresholdEnabled()) {
           isValid = false;
           Logger.log(Level.SEVERE,
               "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and multiSeatBottomsUpPercentageThreshold must be specified!",
+              WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
+        } else if (getMultiSeatBottomsUpPercentageThreshold() == null) {
+          isValid = false;
+          Logger.log(Level.SEVERE,
+              "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold must be specified!",
               winnerMode.toString());
         }
       }
@@ -754,6 +749,28 @@ class ContestConfig {
       isValid = false;
       Logger.log(Level.SEVERE, "batchElimination can't be true when winnerElectionMode is \"%s\"!",
           winnerMode.toString());
+    }
+
+    // nonIntegerWinningThreshold and hareQuota are only allowed for multi-seat elections
+    if (!isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
+        && !isMultiSeatAllowMultipleWinnersPerRoundEnabled()) {
+      if (isNonIntegerWinningThresholdEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE,
+            "nonIntegerWinningThreshold can't be true when winnerElectionMode is \"%s\"!",
+            winnerMode.toString());
+      }
+      if (isHareQuotaEnabled()) {
+        isValid = false;
+        Logger.log(Level.SEVERE, "hareQuota can't be true when winnerElectionMode is \"%s\"!",
+            winnerMode.toString());
+      }
+    }
+
+    if (isNonIntegerWinningThresholdEnabled() && isHareQuotaEnabled()) {
+      isValid = false;
+      Logger.log(Level.SEVERE,
+          "nonIntegerWinningThreshold and hareQuota can't both be true at the same time!");
     }
 
     if (!isNullOrBlank(getOvervoteLabel())
@@ -819,6 +836,10 @@ class ContestConfig {
   WinnerElectionMode getWinnerElectionMode() {
     WinnerElectionMode mode = WinnerElectionMode.getByLabel(rawConfig.rules.winnerElectionMode);
     return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
+  }
+
+  boolean isSingleWinnerEnabled() {
+    return getWinnerElectionMode() == WinnerElectionMode.STANDARD_SINGLE_WINNER;
   }
 
   boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {
