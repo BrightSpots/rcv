@@ -753,6 +753,7 @@ class ContestConfig {
           winnerMode.toString());
     }
 
+    // nonIntegerWinningThreshold and hareQuota are only allowed for multi-seat elections
     if (!isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
         && !isMultiSeatAllowMultipleWinnersPerRoundEnabled()) {
       if (isNonIntegerWinningThresholdEnabled()) {
