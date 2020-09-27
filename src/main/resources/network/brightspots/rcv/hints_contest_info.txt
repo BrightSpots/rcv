@@ -18,3 +18,5 @@ Contest Jurisdiction (optional): E.g.: Minneapolis, Eastpointe
 
 Contest Office (optional): E.g.: Mayor, County Clerk
   Whether this is helpful may depend on what you put into the Contest Name field
+
+Rules Description (optional): What short description of this configuration would help you remember in, say, six months what election this specific rule configuration is for?

@@ -1,12 +1,56 @@
 Hints for this tab
 
 Winner Election Mode (required): What process to use for selecting winner(s) for this contest).
+
   * Single-winner majority determines winner: Elects one winner. Eliminate candidates one-by-one or using batch elimination until only two candidates remain. Candidate with the most votes at the end wins.
+
   * Multi-winner allow only one winner per round: Elects multiple winners. Elect and transfer the surplus vote of only the candidate with the most votes if multiple candidates exceed the winning threshold in a round of counting.
+
   * Multi-winner allow multiple winners per round: Elects multiple winners. Elect and transfer the surplus vote of all candidates crossing the winning threshold if multiple candidates exceed the winning threshold in a round of counting.
+
   * Bottoms-up: Eliminate candidates until the desired number of winners is reached, then stop. Bottoms up does not transfer surplus votes.
+
   * Bottoms-up using percentage threshold: Elects multiple winners. Eliminate candidates until the remaining candidates have a vote share equal to or greater than a specified percentage of the vote.
+
   * Multi-pass IRV: Elects multiple winners. Eliminate candidates one-by-one or using batch elimination until only two candidates remain. Candidate with the most votes at the end wins. Run a new set of rounds with any winning candidates ignored.
+
+Maximum Number of Candidates That Can Be Ranked: How many rankings each voter has in this contest.
+
+Minimum Vote Threshold: The number of first-choice votes a candidate must receive in order to remain in the race. Most jurisdictions do not set a minimum vote threshold.
+
+Use Batch Elimination: Batch elimination, or simultaneous elimination of all candidates for whom it is mathematically impossible to be elected, eliminates all candidates who cannot receive enough votes to surpass the candidate with the next highest number of votes. Example: in a six candidate contest with 200 votes, Candidate A has 80 votes, Candidate B has 70, and the other four combined have 50. Because those four candidates can never combine their votes to surpass Candidate B, they can be batch eliminated.
+
+Continue until Two Candidates Remain: Single-winner ranked-choice voting elections can stop as soon as a candidate receives a majority of votes, even though 3 or more candidates may still be in the race. Selecting this option will run the round-by-round count until only two candidates remain, regardless of when a candidate wins a majority of votes.
+
+Tiebreak mode (required): Tiebreak procedures are set in law, either in the ranked-choice voting law used in your jurisdiction or in the elections code more generally. Select the option from this list that complies with law and procedure in your jurisdiction.
+
+  * Random: Randomly select a tied candidate to eliminate. Requires a random seed.
+
+  * Stop counting and ask: Pause count when a tie is reached. User is prompted to select any tied candidate to eliminate.
+
+  * Previous round counts (then random): The tied candidate with the least votes in the previous round loses the tie. If there is a tie in the previous round, the tie is broken randomly. Requires a random seed.
+
+  * Previous round counts (then stop counting and ask): The tied candidate with the least votes in the previous round loses the tie. If there is a tie in the previous round, user is prompted to select any tied candidate to eliminate.
+
+  * Use candidate order in the config file: Use the order of candidates in the config file to determine ties. Candidates lower in the list are eliminated in case of a tie.
+
+  * Generate permutation: Generate a randomly ordered list of candidates in the contest. Candidates lower in the permutation are eliminated in case of a tie. Requires a random seed.
+
+Random seed (required if Tiebreak Mode is "Random", "Previous round counts (then random)", or "Generate permutation"): Enter a positive or negative integer to generate random orders.
+
+Number of Winners: The number of seats to be filled in the contest.
+
+Percentage Threshold: The share of votes a candidate must have in order to win. Candidates falling below this threshold are eliminated one-by-one beginning with the candidate with the fewest votes.
+
+Threshold Calculation Method: The threshold of election is the number of votes a candidate must receive in order to win election. There are three primary ways to calculate the threshold of election in multi-winner RCV contests. This will be set in law (either by statute or regulation) in your jurisdiction.
+
+  * Compute using most common threshold formula: The most common threshold formula is calculated by dividing the number of votes by the number of seats plus one, then adding one to that number. Fractions are disregarded. This is also known as the Droop quota. Candidates must receive this number of votes (or more) to win.
+
+  * Compute using HB Quota: The HB, or Hagenbach-Bischoff, Quota divides the number of votes by the number of seats plus one, leaving fractions. Candidates must receive more than this number of votes to win.
+
+  * Compute using Hare Quota: The Hare quota divides the number of votes by the number of seats. It requires candidates to receive that number of votes (or more) to win.
+
+Decimal Places for Vote Arithmetic (Multi-Winner Only): Sets how many decimal places after the decimal point are used in surplus transfers and in calculating the threshold.
 
 Overvote Label: Some CVRs used a particular word to indicate an overvote.
 
