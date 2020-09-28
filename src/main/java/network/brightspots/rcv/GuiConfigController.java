@@ -192,7 +192,11 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldMaxSkippedRanksAllowed;
   @FXML
+  private CheckBox checkBoxMaxSkippedRanksAllowedUnlimited;
+  @FXML
   private TextField textFieldMaxRankingsAllowed;
+  @FXML
+  private CheckBox checkBoxMaxRankingsAllowedMax;
   @FXML
   private TextField textFieldOvervoteLabel;
   @FXML
@@ -732,6 +736,8 @@ public class GuiConfigController implements Initializable {
   private void clearAndDisableWinningRuleFields() {
     textFieldMaxRankingsAllowed.clear();
     textFieldMaxRankingsAllowed.setDisable(true);
+    checkBoxMaxRankingsAllowedMax.setSelected(false);
+    checkBoxMaxRankingsAllowedMax.setDisable(true);
     textFieldMinimumVoteThreshold.clear();
     textFieldMinimumVoteThreshold.setDisable(true);
     checkBoxBatchElimination.setSelected(false);
@@ -768,7 +774,7 @@ public class GuiConfigController implements Initializable {
         .setSelected(ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
     textFieldDecimalPlacesForVoteArithmetic.setText(
         String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
-    textFieldMaxRankingsAllowed.setText(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED);
+    checkBoxMaxRankingsAllowedMax.setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
   }
 
   private void setDefaultValues() {
@@ -785,6 +791,8 @@ public class GuiConfigController implements Initializable {
 
     textFieldMaxSkippedRanksAllowed.setText(
         String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
+    checkBoxMaxSkippedRanksAllowedUnlimited
+        .setSelected(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED);
     checkBoxExhaustOnDuplicateCandidate.setSelected(
         ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
 
@@ -821,6 +829,8 @@ public class GuiConfigController implements Initializable {
     radioOvervoteExhaustImmediately.setSelected(false);
     radioOvervoteExhaustIfMultiple.setSelected(false);
     textFieldMaxSkippedRanksAllowed.clear();
+    textFieldMaxSkippedRanksAllowed.setDisable(false);
+    checkBoxMaxSkippedRanksAllowedUnlimited.setSelected(false);
     checkBoxExhaustOnDuplicateCandidate.setSelected(false);
 
     textFieldOutputDirectory.clear();
@@ -1063,7 +1073,9 @@ public class GuiConfigController implements Initializable {
       setWinningRulesDefaultValues();
       switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
         case STANDARD_SINGLE_WINNER -> {
-          textFieldMaxRankingsAllowed.setDisable(false);
+          checkBoxMaxRankingsAllowedMax.setDisable(false);
+          checkBoxMaxRankingsAllowedMax
+              .setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
           textFieldMinimumVoteThreshold.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
           checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
@@ -1071,7 +1083,9 @@ public class GuiConfigController implements Initializable {
           textFieldNumberOfWinners.setText("1");
         }
         case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND, MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND -> {
-          textFieldMaxRankingsAllowed.setDisable(false);
+          checkBoxMaxRankingsAllowedMax.setDisable(false);
+          checkBoxMaxRankingsAllowedMax
+              .setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
           radioThresholdMostCommon.setDisable(false);
@@ -1081,13 +1095,17 @@ public class GuiConfigController implements Initializable {
           textFieldNumberOfWinners.setDisable(false);
         }
         case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> {
-          textFieldMaxRankingsAllowed.setDisable(false);
+          checkBoxMaxRankingsAllowedMax.setDisable(false);
+          checkBoxMaxRankingsAllowedMax
+              .setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
-          textFieldMaxRankingsAllowed.setDisable(false);
+          checkBoxMaxRankingsAllowedMax.setDisable(false);
+          checkBoxMaxRankingsAllowedMax
+              .setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
           textFieldMinimumVoteThreshold.setDisable(false);
           choiceTiebreakMode.setDisable(false);
           textFieldNumberOfWinners.setText("0");
@@ -1095,10 +1113,20 @@ public class GuiConfigController implements Initializable {
         }
       }
     });
+    checkBoxMaxRankingsAllowedMax.setOnAction(event -> {
+      textFieldMaxRankingsAllowed.clear();
+      textFieldMaxRankingsAllowed.setDisable(
+          checkBoxMaxRankingsAllowedMax.isSelected());
+    });
 
     radioOvervoteAlwaysSkip.setText(Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT);
     radioOvervoteExhaustImmediately.setText(Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
     radioOvervoteExhaustIfMultiple.setText(Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
+    checkBoxMaxSkippedRanksAllowedUnlimited.setOnAction(event -> {
+      textFieldMaxSkippedRanksAllowed.clear();
+      textFieldMaxSkippedRanksAllowed.setDisable(
+          checkBoxMaxSkippedRanksAllowedUnlimited.isSelected());
+    });
 
     setDefaultValues();
 
@@ -1253,8 +1281,27 @@ public class GuiConfigController implements Initializable {
         .setText(rules.multiSeatBottomsUpPercentageThreshold);
     textFieldDecimalPlacesForVoteArithmetic.setText(rules.decimalPlacesForVoteArithmetic);
     textFieldMinimumVoteThreshold.setText(rules.minimumVoteThreshold);
-    textFieldMaxSkippedRanksAllowed.setText(rules.maxSkippedRanksAllowed);
-    textFieldMaxRankingsAllowed.setText(rules.maxRankingsAllowed);
+    if (rules.maxSkippedRanksAllowed
+        .equalsIgnoreCase(ContestConfig.MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION)) {
+      checkBoxMaxSkippedRanksAllowedUnlimited.setSelected(true);
+      textFieldMaxSkippedRanksAllowed.clear();
+      textFieldMaxSkippedRanksAllowed.setDisable(true);
+    } else {
+      checkBoxMaxSkippedRanksAllowedUnlimited.setSelected(false);
+      textFieldMaxSkippedRanksAllowed.setText(rules.maxSkippedRanksAllowed);
+      textFieldMaxSkippedRanksAllowed.setDisable(false);
+    }
+    if (rules.maxRankingsAllowed
+        .equalsIgnoreCase(ContestConfig.MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION)) {
+      checkBoxMaxRankingsAllowedMax.setSelected(true);
+      checkBoxMaxRankingsAllowedMax.setDisable(false);
+      textFieldMaxRankingsAllowed.clear();
+      textFieldMaxRankingsAllowed.setDisable(true);
+    } else {
+      checkBoxMaxRankingsAllowedMax.setSelected(false);
+      textFieldMaxRankingsAllowed.setText(rules.maxRankingsAllowed);
+      textFieldMaxRankingsAllowed.setDisable(false);
+    }
     textFieldOvervoteLabel.setText(rules.overvoteLabel);
     textFieldUndervoteLabel.setText(rules.undervoteLabel);
     textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
@@ -1334,8 +1381,12 @@ public class GuiConfigController implements Initializable {
     rules.decimalPlacesForVoteArithmetic =
         getTextOrEmptyString(textFieldDecimalPlacesForVoteArithmetic);
     rules.minimumVoteThreshold = getTextOrEmptyString(textFieldMinimumVoteThreshold);
-    rules.maxSkippedRanksAllowed = getTextOrEmptyString(textFieldMaxSkippedRanksAllowed);
-    rules.maxRankingsAllowed = getTextOrEmptyString(textFieldMaxRankingsAllowed);
+    rules.maxSkippedRanksAllowed = checkBoxMaxSkippedRanksAllowedUnlimited.isSelected()
+        ? ContestConfig.MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION
+        : getTextOrEmptyString(textFieldMaxSkippedRanksAllowed);
+    rules.maxRankingsAllowed = checkBoxMaxRankingsAllowedMax.isSelected()
+        ? ContestConfig.MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION
+        : getTextOrEmptyString(textFieldMaxRankingsAllowed);
     rules.nonIntegerWinningThreshold = radioThresholdHbQuota.isSelected();
     rules.hareQuota = radioThresholdHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
