@@ -256,6 +256,29 @@ public class GuiConfigController implements Initializable {
     return textField.getText() != null ? textField.getText().trim() : "";
   }
 
+  private static String loadTxtFileIntoString(String configFileDocumentationFilename) {
+    String text;
+    try {
+      text =
+          new BufferedReader(
+              new InputStreamReader(
+                  Objects.requireNonNull(
+                      ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename))))
+              .lines()
+              .collect(Collectors.joining("\n"));
+    } catch (Exception exception) {
+      Logger.log(
+          Level.SEVERE,
+          "Error loading text file: %s\n%s",
+          configFileDocumentationFilename,
+          exception.toString());
+      text =
+          String.format(
+              "<Error loading text file: %s>", configFileDocumentationFilename);
+    }
+    return text;
+  }
+
   private String getOvervoteRuleChoice() {
     String overvoteRuleString = OvervoteRule.RULE_UNKNOWN.toString();
     if (radioOvervoteAlwaysSkip.isSelected()) {
@@ -926,29 +949,6 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private static String loadTxtFileIntoString(String configFileDocumentationFilename) {
-    String text;
-    try {
-      text =
-          new BufferedReader(
-              new InputStreamReader(
-                  Objects.requireNonNull(
-                      ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename))))
-              .lines()
-              .collect(Collectors.joining("\n"));
-    } catch (Exception exception) {
-      Logger.log(
-          Level.SEVERE,
-          "Error loading text file: %s\n%s",
-          configFileDocumentationFilename,
-          exception.toString());
-      text =
-          String.format(
-              "<Error loading text file: %s>", configFileDocumentationFilename);
-    }
-    return text;
-  }
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
@@ -1071,43 +1071,25 @@ public class GuiConfigController implements Initializable {
     choiceWinnerElectionMode.setOnAction(event -> {
       clearAndDisableWinningRuleFields();
       setWinningRulesDefaultValues();
+      checkBoxMaxRankingsAllowedMax.setDisable(false);
+      textFieldMinimumVoteThreshold.setDisable(false);
+      choiceTiebreakMode.setDisable(false);
       switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
         case STANDARD_SINGLE_WINNER -> {
-          checkBoxMaxRankingsAllowedMax.setDisable(false);
-          checkBoxMaxRankingsAllowedMax
-              .setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
-          textFieldMinimumVoteThreshold.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
           checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
-          choiceTiebreakMode.setDisable(false);
           textFieldNumberOfWinners.setText("1");
         }
         case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND, MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND -> {
-          checkBoxMaxRankingsAllowedMax.setDisable(false);
-          checkBoxMaxRankingsAllowedMax
-              .setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
-          textFieldMinimumVoteThreshold.setDisable(false);
-          choiceTiebreakMode.setDisable(false);
           radioThresholdMostCommon.setDisable(false);
           radioThresholdHbQuota.setDisable(false);
           radioThresholdHareQuota.setDisable(false);
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
-        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> {
-          checkBoxMaxRankingsAllowedMax.setDisable(false);
-          checkBoxMaxRankingsAllowedMax
-              .setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
-          textFieldMinimumVoteThreshold.setDisable(false);
-          choiceTiebreakMode.setDisable(false);
-          textFieldNumberOfWinners.setDisable(false);
-        }
+        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> textFieldNumberOfWinners
+            .setDisable(false);
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
-          checkBoxMaxRankingsAllowedMax.setDisable(false);
-          checkBoxMaxRankingsAllowedMax
-              .setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
-          textFieldMinimumVoteThreshold.setDisable(false);
-          choiceTiebreakMode.setDisable(false);
           textFieldNumberOfWinners.setText("0");
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
         }
