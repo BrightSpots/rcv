@@ -18,31 +18,31 @@ Maximum Number of Candidates That Can Be Ranked: How many rankings each voter ha
 
 Minimum Vote Threshold: The number of first-choice votes a candidate must receive in order to remain in the race. Most jurisdictions do not set a minimum vote threshold.
 
-Use Batch Elimination: Batch elimination, or simultaneous elimination of all candidates for whom it is mathematically impossible to be elected, eliminates all candidates who cannot receive enough votes to surpass the candidate with the next highest number of votes. Example: in a six candidate contest with 200 votes, Candidate A has 80 votes, Candidate B has 70, and the other four combined have 50. Because those four candidates can never combine their votes to surpass Candidate B, they can be batch eliminated.
+Use Batch Elimination: Batch elimination, or simultaneous elimination of all candidates for whom it is mathematically impossible to be elected, eliminates all candidates who cannot receive enough votes to surpass the candidate with the next highest number of votes. Example: in a six candidate contest with 200 votes, Candidate A has 80 votes, Candidate B has 70, and the other four combined have 50. Because those four candidates can never combine their votes to surpass Candidate B, they can be batch eliminated. Available only when Winner Election Mode is "Single-winner majority determines winner".
 
 Continue until Two Candidates Remain: Single-winner ranked-choice voting elections can stop as soon as a candidate receives a majority of votes, even though 3 or more candidates may still be in the race. Selecting this option will run the round-by-round count until only two candidates remain, regardless of when a candidate wins a majority of votes.
 
-Tiebreak mode (required): Tiebreak procedures are set in law, either in the ranked-choice voting law used in your jurisdiction or in the elections code more generally. Select the option from this list that complies with law and procedure in your jurisdiction.
+Tiebreak Mode (required): Ties in ranked-choice voting contests can occur when eliminating candidates or when electing candidates. Multi-winner contests can have ties between candidates who have both crossed the threshold of election; in that case ties are broken to determine whose surplus vote value transfers first. Tiebreak procedures are set in law, either in the ranked-choice voting law used in your jurisdiction or in the elections code more generally. Select the option from this list that complies with law and procedure in your jurisdiction.
 
-  * Random: Randomly select a tied candidate to eliminate. Requires a random seed.
+  * Random: Randomly select a tied candidate to eliminate or, in multi-winner contests only, elect. Requires a random seed.
 
-  * Stop counting and ask: Pause count when a tie is reached. User is prompted to select any tied candidate to eliminate.
+  * Stop counting and ask: Pause count when a tie is reached. User is prompted to select any tied candidate to eliminate or, in multi-winner contests only, elect.
 
   * Previous round counts (then random): The tied candidate with the least votes in the previous round loses the tie. If there is a tie in the previous round, the tie is broken randomly. Requires a random seed.
 
-  * Previous round counts (then stop counting and ask): The tied candidate with the least votes in the previous round loses the tie. If there is a tie in the previous round, user is prompted to select any tied candidate to eliminate.
+  * Previous round counts (then stop counting and ask): The tied candidate with the least votes in the previous round loses the tie. If there is a tie in the previous round, user is prompted to select any tied candidate to eliminate or, in multi-winner contests only, elect.
 
-  * Use candidate order in the config file: Use the order of candidates in the config file to determine ties. Candidates lower in the list are eliminated in case of a tie.
+  * Use candidate order in the config file: Use the order of candidates in the config file to determine tiebreak results. Candidates lower in the list lose the tiebreaker.
 
-  * Generate permutation: Generate a randomly ordered list of candidates in the contest. Candidates lower in the permutation are eliminated in case of a tie. Requires a random seed.
+  * Generate permutation: Generate a randomly ordered list of candidates in the contest. Candidates lower in the permutation lose the tiebreaker. Requires a random seed.
 
-Random seed (required if Tiebreak Mode is "Random", "Previous round counts (then random)", or "Generate permutation"): Enter a positive or negative integer to generate random orders.
+Random Seed (required if Tiebreak Mode is "Random", "Previous round counts (then random)", or "Generate permutation"): Enter a positive or negative integer to generate random orders.
 
 Number of Winners: The number of seats to be filled in the contest.
 
-Percentage Threshold: The share of votes a candidate must have in order to win. Candidates falling below this threshold are eliminated one-by-one beginning with the candidate with the fewest votes.
+Percentage Threshold: The share of votes a candidate must have in order to win. Candidates falling below this threshold are eliminated one-by-one beginning with the candidate with the fewest votes. Available only when Winner Election Mode is "Bottoms-up using percentage threshold".
 
-Threshold Calculation Method: The threshold of election is the number of votes a candidate must receive in order to win election. There are three primary ways to calculate the threshold of election in multi-winner RCV contests. This will be set in law (either by statute or regulation) in your jurisdiction.
+Threshold Calculation Method: The threshold of election is the number of votes a candidate must receive in order to win election. There are three primary ways to calculate the threshold of election in multi-winner RCV contests. This will be set in law (either by statute or regulation) in your jurisdiction. Available only when Winner Election Mode is "Multi-winner allow only one winner per round" or "Multi-winner allow multiple winners per round".
 
   * Compute using most common threshold formula: The most common threshold formula is calculated by dividing the number of votes by the number of seats plus one, then adding one to that number. Fractions are disregarded. This is also known as the Droop quota. Candidates must receive this number of votes (or more) to win.
 
