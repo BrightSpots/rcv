@@ -95,6 +95,12 @@ Or, again, if you're compiling and running using Gradle:
 
 `$ gradlew run --args="-cli path/to/config  convert-to-cdf"`
 
+Finally, there's a `convert-dominion-to-generic-csv` option as well for converting Dominion JSON CVRs into a standardized, generic .csv format:
+
+`$ rcv -cli path/to/folder/containing/jsons convert-dominion-to-generic-csv`
+
+This option is available in the GUI by selecting the "Conversion > Convert Dominion to Generic Format..." menu option.
+
 ## Viewing Tabulator Output
 
 Tabulator output file names automatically include the current date and time, e.g. `2019-06-25_17-19-28_summary.csv`. This keeps them separate if you tabulate the same contest multiple times.
