@@ -1135,94 +1135,10 @@ public class GuiConfigController implements Initializable {
     });
   }
 
-  private void migrateConfigVersion(ContestConfig config) {
-    if (config.rawConfig.tabulatorVersion == null
-        || !config.rawConfig.tabulatorVersion.equals(Main.APP_VERSION)) {
-      // Any necessary future version migration logic goes here
-
-      if (config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
-        String oldWinnerElectionMode = config.rawConfig.rules.winnerElectionMode;
-        switch (oldWinnerElectionMode) {
-          case "standard" -> config.rawConfig.rules.winnerElectionMode =
-              config.getNumberOfWinners() > 1
-                  ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND.toString()
-                  : WinnerElectionMode.STANDARD_SINGLE_WINNER.toString();
-          case "singleSeatContinueUntilTwoCandidatesRemain" -> {
-            config.rawConfig.rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER
-                .toString();
-            config.rawConfig.rules.continueUntilTwoCandidatesRemain = true;
-          }
-          case "multiSeatAllowOnlyOneWinnerPerRound" -> config.rawConfig.rules.winnerElectionMode =
-              WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString();
-          case "multiSeatBottomsUp" -> config.rawConfig.rules.winnerElectionMode =
-              config.getNumberOfWinners() == 0
-                  || config.getMultiSeatBottomsUpPercentageThreshold() != null
-                  ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD.toString()
-                  : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.toString();
-          case "multiSeatSequentialWinnerTakesAll" -> config.rawConfig.rules.winnerElectionMode =
-              WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString();
-          default -> {
-            Logger.log(Level.WARNING,
-                "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
-                    + "winnerElectionMode.", oldWinnerElectionMode);
-            config.rawConfig.rules.winnerElectionMode = null;
-          }
-        }
-      }
-
-      if (config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
-        Map<String, String> tiebreakModeMigrationMap = Map.of(
-            "random", TieBreakMode.RANDOM.toString(),
-            "interactive", TieBreakMode.INTERACTIVE.toString(),
-            "previousRoundCountsThenRandom",
-            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM.toString(),
-            "previousRoundCountsThenInteractive",
-            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE.toString(),
-            "usePermutationInConfig", TieBreakMode.USE_PERMUTATION_IN_CONFIG.toString(),
-            "generatePermutation", TieBreakMode.GENERATE_PERMUTATION.toString()
-        );
-        String oldTiebreakMode = config.rawConfig.rules.tiebreakMode;
-        if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
-          config.rawConfig.rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode);
-        } else {
-          Logger.log(Level.WARNING,
-              "tiebreakMode \"%s\" is unrecognized! Please supply a valid tiebreakMode.",
-              oldTiebreakMode);
-          config.rawConfig.rules.tiebreakMode = null;
-        }
-      }
-
-      if (config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
-        String oldOvervoteRule = config.rawConfig.rules.overvoteRule;
-        switch (oldOvervoteRule) {
-          case "alwaysSkipToNextRank" -> config.rawConfig.rules.overvoteRule = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-              .toString();
-          case "exhaustImmediately" -> config.rawConfig.rules.overvoteRule = OvervoteRule.EXHAUST_IMMEDIATELY
-              .toString();
-          case "exhaustIfMultipleContinuing" -> config.rawConfig.rules.overvoteRule = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING
-              .toString();
-          default -> {
-            Logger.log(Level.WARNING,
-                "overvoteRule \"%s\" is unrecognized! Please supply a valid overvoteRule.",
-                oldOvervoteRule);
-            config.rawConfig.rules.overvoteRule = null;
-          }
-        }
-      }
-
-      Logger.log(
-          Level.INFO,
-          "Migrated tabulator config version from %s to %s.",
-          config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
-          Main.APP_VERSION);
-      config.rawConfig.tabulatorVersion = Main.APP_VERSION;
-    }
-  }
-
   private void loadConfig(ContestConfig config) {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
-    migrateConfigVersion(config);
+    ContestConfigMigration.migrateConfigVersion(config);
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
