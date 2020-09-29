@@ -68,6 +68,20 @@ class TabulatorSession {
     timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
+  // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI here also
+  private static void checkConfigVersionMatchesApp(ContestConfig config) {
+    String version = config.getRawConfig().tabulatorVersion;
+
+    if (ContestConfigMigration.isConfigVersionNewerThanAppVersion(version)) {
+      // It will log a severe message already, so no need to add one here.
+    } else if (ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
+      Logger.severe(
+          "Can't use a config with older version %s in newer version %s of the app! Use the " +
+              "graphical version of the app to migrate the config to the current version.",
+          version, Main.APP_VERSION);
+    }
+  }
+
   // Visible for testing
   @SuppressWarnings("unused")
   String getOutputPath() {
@@ -90,6 +104,7 @@ class TabulatorSession {
   void convertToCdf() {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate()) {
+      checkConfigVersionMatchesApp(config);
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
@@ -120,6 +135,7 @@ class TabulatorSession {
   void tabulate() {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
     if (config != null && config.validate() && setUpLogging(config)) {
       try {
@@ -341,7 +357,7 @@ class TabulatorSession {
             exception.toString());
         encounteredSourceProblem = true;
       }
-  }
+    }
 
     if (encounteredSourceProblem) {
       Logger.log(Level.SEVERE, "Parsing cast vote records failed!");

@@ -68,6 +68,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
+import network.brightspots.rcv.ContestConfigMigration.ConfigVersionIsNewerThanAppVersionException;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -1138,7 +1139,11 @@ public class GuiConfigController implements Initializable {
   private void loadConfig(ContestConfig config) {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
-    ContestConfigMigration.migrateConfigVersion(config);
+    try {
+      ContestConfigMigration.migrateConfigVersion(config);
+    } catch (ConfigVersionIsNewerThanAppVersionException e) {
+      return;
+    }
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
