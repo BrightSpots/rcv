@@ -137,6 +137,14 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrContestId;
   @FXML
+  private TableColumn<CvrSource, String> tableColumnCvrOvervoteLabel;
+  @FXML
+  private TableColumn<CvrSource, String> tableColumnCvrUndervoteLabel;
+  @FXML
+  private TableColumn<CvrSource, String> tableColumnCvrUndeclaredWriteInLabel;
+  @FXML
+  private TableColumn<CvrSource, Boolean> tableColumnCvrTreatBlankAsUndeclaredWriteIn;
+  @FXML
   private ChoiceBox<Provider> choiceCvrProvider;
   @FXML
   private Button buttonAddCvrFile;
@@ -156,6 +164,14 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldCvrPrecinctCol;
   @FXML
   private TextField textFieldCvrOvervoteDelimiter;
+  @FXML
+  private TextField textFieldCvrOvervoteLabel;
+  @FXML
+  private TextField textFieldCvrUndervoteLabel;
+  @FXML
+  private TextField textFieldCvrUndeclaredWriteInLabel;
+  @FXML
+  private CheckBox checkBoxCvrTreatBlankAsUndeclaredWriteIn;
   @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
@@ -199,12 +215,6 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxMaxRankingsAllowedMax;
   @FXML
-  private TextField textFieldOvervoteLabel;
-  @FXML
-  private TextField textFieldUndervoteLabel;
-  @FXML
-  private TextField textFieldUndeclaredWriteInLabel;
-  @FXML
   private TextField textFieldRulesDescription;
   @FXML
   private RadioButton radioThresholdMostCommon;
@@ -218,8 +228,6 @@ public class GuiConfigController implements Initializable {
   private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
   @FXML
   private CheckBox checkBoxExhaustOnDuplicateCandidate;
-  @FXML
-  private CheckBox checkBoxTreatBlankAsUndeclaredWriteIn;
   @FXML
   private MenuBar menuBar;
   @FXML
@@ -576,7 +584,12 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCvrPrecinctCol),
             getTextOrEmptyString(textFieldCvrOvervoteDelimiter),
             getProviderChoice(choiceCvrProvider).toString(),
-            getTextOrEmptyString(textFieldCvrContestId));
+            getTextOrEmptyString(textFieldCvrContestId),
+            getTextOrEmptyString(textFieldCvrOvervoteLabel),
+            getTextOrEmptyString(textFieldCvrUndervoteLabel),
+            getTextOrEmptyString(textFieldCvrUndeclaredWriteInLabel),
+            checkBoxCvrTreatBlankAsUndeclaredWriteIn.isSelected()
+        );
     if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
       tableViewCvrFiles.getItems().add(cvrSource);
       textFieldCvrFilePath.clear();
@@ -606,6 +619,14 @@ public class GuiConfigController implements Initializable {
     textFieldCvrOvervoteDelimiter.setDisable(true);
     textFieldCvrContestId.clear();
     textFieldCvrContestId.setDisable(true);
+    textFieldCvrOvervoteLabel.clear();
+    textFieldCvrOvervoteLabel.setDisable(true);
+    textFieldCvrUndervoteLabel.clear();
+    textFieldCvrUndervoteLabel.setDisable(true);
+    textFieldCvrUndeclaredWriteInLabel.clear();
+    textFieldCvrUndeclaredWriteInLabel.setDisable(true);
+    checkBoxCvrTreatBlankAsUndeclaredWriteIn.setSelected(false);
+    checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(true);
   }
 
   /**
@@ -704,6 +725,32 @@ public class GuiConfigController implements Initializable {
         .setContestId(cellEditEvent.getNewValue().toString().trim());
     tableViewCvrFiles.refresh();
   }
+
+  public void changeCvrOvervoteLabel(CellEditEvent cellEditEvent) {
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
+        .setOvervoteLabel(cellEditEvent.getNewValue().toString().trim());
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrUndervoteLabel(CellEditEvent cellEditEvent) {
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
+        .setUndervoteLabel(cellEditEvent.getNewValue().toString().trim());
+    tableViewCvrFiles.refresh();
+  }
+
+  public void changeCvrUndeclaredWriteInLabel(CellEditEvent cellEditEvent) {
+    tableViewCvrFiles
+        .getSelectionModel()
+        .getSelectedItem()
+        .setUndeclaredWriteInLabel(cellEditEvent.getNewValue().toString().trim());
+    tableViewCvrFiles.refresh();
+  }
+
+  // louis
 
   /**
    * Action when add candidate button is clicked.
@@ -806,12 +853,7 @@ public class GuiConfigController implements Initializable {
 
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
 
-    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(
-        ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
-
     setWinningRulesDefaultValues();
-    textFieldOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
-    textFieldUndervoteLabel.setText(ContestConfig.SUGGESTED_UNDERVOTE_LABEL);
 
     textFieldMaxSkippedRanksAllowed.setText(
         String.valueOf(ContestConfig.SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED));
@@ -843,11 +885,6 @@ public class GuiConfigController implements Initializable {
 
     choiceWinnerElectionMode.setValue(null);
     clearAndDisableWinningRuleFields();
-
-    textFieldOvervoteLabel.clear();
-    textFieldUndervoteLabel.clear();
-    textFieldUndeclaredWriteInLabel.clear();
-    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(false);
 
     radioOvervoteAlwaysSkip.setSelected(false);
     radioOvervoteExhaustImmediately.setSelected(false);
@@ -991,6 +1028,7 @@ public class GuiConfigController implements Initializable {
     choiceCvrProvider.getItems().remove(Provider.PROVIDER_UNKNOWN);
     choiceCvrProvider.setOnAction(event -> {
       clearAndDisableCvrFilesTabFields();
+      textFieldCvrUndeclaredWriteInLabel.setDisable(false);
       switch (getProviderChoice(choiceCvrProvider)) {
         case ESS -> {
           buttonAddCvrFile.setDisable(false);
@@ -1008,12 +1046,26 @@ public class GuiConfigController implements Initializable {
           textFieldCvrPrecinctCol
               .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_PRECINCT_COLUMN));
           textFieldCvrOvervoteDelimiter.setDisable(false);
+          textFieldCvrOvervoteLabel.setDisable(false);
+          textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
+          textFieldCvrUndervoteLabel.setDisable(false);
+          textFieldCvrUndervoteLabel.setText(ContestConfig.SUGGESTED_UNDERVOTE_LABEL);
+          checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(false);
+          checkBoxCvrTreatBlankAsUndeclaredWriteIn.setSelected(ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
         }
-        case CLEAR_BALLOT, DOMINION, HART, CDF -> {
+        case CLEAR_BALLOT, DOMINION, HART -> {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
           textFieldCvrContestId.setDisable(false);
+        }
+        case CDF -> {
+          buttonAddCvrFile.setDisable(false);
+          textFieldCvrFilePath.setDisable(false);
+          buttonCvrFilePath.setDisable(false);
+          textFieldCvrContestId.setDisable(false);
+          textFieldCvrOvervoteLabel.setDisable(false);
+          textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
         }
       }
     });
@@ -1036,6 +1088,23 @@ public class GuiConfigController implements Initializable {
     tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrContestId.setCellValueFactory(new PropertyValueFactory<>("contestId"));
     tableColumnCvrContestId.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCvrOvervoteLabel.setCellValueFactory(new PropertyValueFactory<>("overvoteLabel"));
+    tableColumnCvrOvervoteLabel.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCvrUndervoteLabel.setCellValueFactory(new PropertyValueFactory<>("undervoteLabel"));
+    tableColumnCvrUndervoteLabel.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCvrUndeclaredWriteInLabel.setCellValueFactory(new PropertyValueFactory<>("undeclaredWriteInLabel"));
+    tableColumnCvrUndeclaredWriteInLabel.setCellFactory(TextFieldTableCell.forTableColumn());
+    tableColumnCvrTreatBlankAsUndeclaredWriteIn.setCellValueFactory(
+        c -> {
+          CvrSource source = c.getValue();
+          CheckBox checkBox = new CheckBox();
+          checkBox.selectedProperty().setValue(source.isTreatBlankAsUndeclaredWriteInEnabled());
+          checkBox
+              .selectedProperty()
+              .addListener((ov, oldVal, newVal) -> source.setTreatBlankAsUndeclaredWriteIn(newVal));
+          //noinspection unchecked
+          return new SimpleObjectProperty(checkBox);
+        });
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCvrFiles.setEditable(true);
 
@@ -1205,15 +1274,11 @@ public class GuiConfigController implements Initializable {
       textFieldMaxRankingsAllowed.setText(rules.maxRankingsAllowed);
       textFieldMaxRankingsAllowed.setDisable(false);
     }
-    textFieldOvervoteLabel.setText(rules.overvoteLabel);
-    textFieldUndervoteLabel.setText(rules.undervoteLabel);
-    textFieldUndeclaredWriteInLabel.setText(rules.undeclaredWriteInLabel);
     textFieldRulesDescription.setText(rules.rulesDescription);
     setThresholdCalculationMethodRadioButton(rules.nonIntegerWinningThreshold, rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
-    checkBoxTreatBlankAsUndeclaredWriteIn.setSelected(rules.treatBlankAsUndeclaredWriteIn);
   }
 
   private void setThresholdCalculationMethodRadioButton(boolean nonIntegerWinningThreshold,
@@ -1263,6 +1328,9 @@ public class GuiConfigController implements Initializable {
           source.getOvervoteDelimiter() != null ? source.getOvervoteDelimiter().trim() : "");
       source.setProvider(source.getProvider() != null ? source.getProvider().trim() : "");
       source.setContestId(source.getContestId() != null ? source.getContestId().trim() : "");
+      source.setOvervoteLabel(source.getOvervoteLabel() != null ? source.getOvervoteLabel().trim() : "");
+      source.setUndervoteLabel(source.getUndervoteLabel() != null ? source.getUndervoteLabel().trim() : "");
+      source.setUndeclaredWriteInLabel(source.getUndeclaredWriteInLabel() != null ? source.getUndeclaredWriteInLabel().trim() : "");
     }
     config.cvrFileSources = cvrSources;
 
@@ -1295,10 +1363,6 @@ public class GuiConfigController implements Initializable {
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
-    rules.treatBlankAsUndeclaredWriteIn = checkBoxTreatBlankAsUndeclaredWriteIn.isSelected();
-    rules.overvoteLabel = getTextOrEmptyString(textFieldOvervoteLabel);
-    rules.undervoteLabel = getTextOrEmptyString(textFieldUndervoteLabel);
-    rules.undeclaredWriteInLabel = getTextOrEmptyString(textFieldUndeclaredWriteInLabel);
     rules.rulesDescription = getTextOrEmptyString(textFieldRulesDescription);
     config.rules = rules;
 

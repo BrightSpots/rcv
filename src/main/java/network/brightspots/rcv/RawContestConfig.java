@@ -70,6 +70,12 @@ public class RawContestConfig {
     private String overvoteDelimiter;
     private String provider;
 
+    // These used to be defined at the config level, but now they're per-source.
+    public String overvoteLabel;
+    public String undervoteLabel;
+    public String undeclaredWriteInLabel;
+    public boolean treatBlankAsUndeclaredWriteIn;
+
     CvrSource() {
     }
 
@@ -81,7 +87,11 @@ public class RawContestConfig {
         String precinctColumnIndex,
         String overvoteDelimiter,
         String provider,
-        String contestId) {
+        String contestId,
+        String overvoteLabel,
+        String undervoteLabel,
+        String undeclaredWriteInLabel,
+        boolean treatBlankAsUndeclaredWriteIn) {
       this.filePath = filePath;
       this.firstVoteColumnIndex = firstVoteColumnIndex;
       this.firstVoteRowIndex = firstVoteRowIndex;
@@ -90,6 +100,10 @@ public class RawContestConfig {
       this.overvoteDelimiter = overvoteDelimiter;
       this.provider = provider;
       this.contestId = contestId;
+      this.overvoteLabel = overvoteLabel;
+      this.undervoteLabel = undervoteLabel;
+      this.undeclaredWriteInLabel = undeclaredWriteInLabel;
+      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
 
     public String getFilePath() {
@@ -154,6 +168,38 @@ public class RawContestConfig {
 
     public void setProvider(String provider) {
       this.provider = provider;
+    }
+
+    public String getOvervoteLabel() {
+      return overvoteLabel;
+    }
+
+    public void setOvervoteLabel(String overvoteLabel) {
+      this.overvoteLabel = overvoteLabel;
+    }
+
+    public String getUndervoteLabel() {
+      return undervoteLabel;
+    }
+
+    public void setUndervoteLabel(String undervoteLabel) {
+      this.undervoteLabel = undervoteLabel;
+    }
+
+    public String getUndeclaredWriteInLabel() {
+      return undeclaredWriteInLabel;
+    }
+
+    public void setUndeclaredWriteInLabel(String undeclaredWriteInLabel) {
+      this.undeclaredWriteInLabel = undeclaredWriteInLabel;
+    }
+
+    public boolean isTreatBlankAsUndeclaredWriteInEnabled() {
+      return treatBlankAsUndeclaredWriteIn;
+    }
+
+    public void setTreatBlankAsUndeclaredWriteIn(boolean treatBlankAsUndeclaredWriteIn) {
+      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
   }
 
@@ -221,10 +267,13 @@ public class RawContestConfig {
     public boolean batchElimination;
     public boolean continueUntilTwoCandidatesRemain;
     public boolean exhaustOnDuplicateCandidate;
+    public String rulesDescription;
+
+    // These are deprecated (moved to individual CVRs), but we need to leave them in place here for
+    // the purpose of supporting automatic migration from older config versions.
     public boolean treatBlankAsUndeclaredWriteIn;
     public String overvoteLabel;
     public String undervoteLabel;
     public String undeclaredWriteInLabel;
-    public String rulesDescription;
   }
 }

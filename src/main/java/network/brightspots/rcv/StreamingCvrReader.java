@@ -71,6 +71,10 @@ class StreamingCvrReader {
   private final Integer precinctColumnIndex;
   // optional delimiter for cells that contain multiple candidates
   private final String overvoteDelimiter;
+  private final String overvoteLabel;
+  private final String undervoteLabel;
+  private final String undeclaredWriteInLabel;
+  private final boolean treatBlankAsUndeclaredWriteIn;
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // used for generating CVR IDs
@@ -109,6 +113,10 @@ class StreamingCvrReader {
             ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
             : null;
     this.overvoteDelimiter = source.getOvervoteDelimiter();
+    this.overvoteLabel = source.getOvervoteLabel();
+    this.undervoteLabel = source.getUndervoteLabel();
+    this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
+    this.treatBlankAsUndeclaredWriteIn = source.isTreatBlankAsUndeclaredWriteInEnabled();
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -152,8 +160,8 @@ class StreamingCvrReader {
     for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {
       currentCvrData.add("empty cell");
       // add UWI ranking if required by settings
-      if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
-        currentRankings.add(new Pair<>(rank, config.getUndeclaredWriteInLabel()));
+      if (treatBlankAsUndeclaredWriteIn) {
+        currentRankings.add(new Pair<>(rank, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL));
       }
     }
   }
@@ -242,18 +250,19 @@ class StreamingCvrReader {
       for (String candidate : candidates) {
         candidate = candidate.trim();
         if (candidates.length > 1 &&
-            (candidate.equals("") || candidate.equals(config.getUndervoteLabel()))) {
+            (candidate.equals("") || candidate.equals(undervoteLabel))) {
           Logger.log(
               Level.SEVERE,
               "If a cell contains multiple candidates split by the overvote delimiter, it's not "
                   + "valid for any of them to be blank or an explicit undervote.");
           encounteredDataErrors = true;
-        } else if (!candidate.equals(config.getUndervoteLabel())) {
+        } else if (!candidate.equals(undervoteLabel)) {
           // map overvotes to our internal overvote string
-          if (candidate.equals(config.getOvervoteLabel())) {
+          if (candidate.equals(overvoteLabel)) {
             candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-          } else if (!config.getCandidateCodeList().contains(candidate)
-              && !candidate.equals(config.getUndeclaredWriteInLabel())) {
+          } else if (candidate.equals(undeclaredWriteInLabel)) {
+            candidate = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+          } else if (!config.getCandidateCodeList().contains(candidate)) {
             // This is an unrecognized candidate, so add it to the unrecognized candidate map.
             // This helps identify problems with CVRs.
             unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);

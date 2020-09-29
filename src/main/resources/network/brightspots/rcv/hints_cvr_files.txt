@@ -21,3 +21,11 @@ ID Column (optional): The column the IDs are in. Not all CVR files contain an ID
 Precinct Column (required for ES&S if you want to tabulate by precinct): The column that contains the precinct.
 
 Overvote Delimiter (optional, but must be blank if "Overvote Label" is provided): If using a CVR in ES&S style, overvotes can be reflected in a CVR by displaying all candidates marked at a ranking. Those candidate names will be differentiated from each other by a delimiter, something like a vertical bar | or a slash /. If your overvotes are delimited like this, enter the delimiter used in this field. Note that ES&S files may include only the label "overvote" and no additional information, in which case the "Overvote Label" field should be used instead.
+
+Overvote Label: Some CVRs used a particular word/phrase to indicate an overvote.
+
+Undervote Label: Some CVRs used a particular word/phrase to indicate an undervote.
+
+Undeclared Write-in Label: Some CVRs used a particular word/phrase to indicate a write-in.
+
+Treat Blank as Undeclared Write-in: When checked, the tabulator will interpret blank cells in the CVRs as votes for undeclared write-ins.

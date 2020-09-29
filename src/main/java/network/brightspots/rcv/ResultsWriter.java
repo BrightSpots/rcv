@@ -477,9 +477,9 @@ class ResultsWriter {
     entries.sort(
         (firstObject, secondObject) -> {
           int ret;
-          if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+          if (firstObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             ret = 1;
-          } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+          } else if (secondObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             ret = -1;
           } else {
             ret = (secondObject.getValue()).compareTo(firstObject.getValue());

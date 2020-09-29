@@ -67,7 +67,6 @@ class ContestConfig {
   static final boolean SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED = false;
   static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
   static final String SUGGESTED_UNDERVOTE_LABEL = "undervote";
-  static final String UNDECLARED_WRITE_INS = "Undeclared Write-ins";
   static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   private static final int MIN_COLUMN_INDEX = 1;
@@ -210,6 +209,13 @@ class ContestConfig {
             source.getOvervoteDelimiter().matches(".*\\\\.*|[a-zA-Z0-9.',\\-\"\\s]+")) {
           sourceValid = false;
           Logger.log(Level.SEVERE, "overvoteDelimiter is invalid.");
+        }
+
+        if (source.isTreatBlankAsUndeclaredWriteInEnabled() && isNullOrBlank(source.getUndeclaredWriteInLabel())) {
+          sourceValid = false;
+          Logger.log(
+              Level.SEVERE,
+              "undeclaredWriteInLabel must be supplied if treatBlankAsUndeclaredWriteIn is true!");
         }
       } else {
         if (provider == Provider.CDF) {
@@ -455,27 +461,32 @@ class ContestConfig {
     }
   }
 
-  // function: stringAlreadyInUseElsewhere
-  // purpose: Checks to make sure string isn't reserved or used by other fields
-  // param: string string to check
-  // param: field field name of provided string
-  private boolean stringAlreadyInUseElsewhere(String string, String field) {
-    boolean inUse = false;
+  private boolean stringConflictsWithReservedString(String string, String field) {
+    boolean reserved = false;
     for (String reservedString : TallyTransfers.RESERVED_STRINGS) {
       if (string.equalsIgnoreCase(reservedString)) {
-        inUse = true;
+        reserved = true;
         Logger.log(
             Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", string, field);
         break;
       }
     }
+    return reserved;
+  }
+
+  // function: stringAlreadyInUseElsewhere
+  // purpose: Checks to make sure string isn't reserved or used by other fields
+  // param: string string to check
+  // param: field field name of provided string
+  private boolean stringAlreadyInUseElsewhereInSource(String string, CvrSource source, String field) {
+    boolean inUse = stringConflictsWithReservedString(string, field);
     if (!inUse) {
       inUse =
-          stringMatchesAnotherFieldValue(string, field, getOvervoteLabel(), "overvoteLabel")
+          stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, getUndervoteLabel(), "undervoteLabel")
+              string, field, source.getUndervoteLabel(), "undervoteLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
+              string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
     }
     return inUse;
   }
@@ -486,13 +497,19 @@ class ContestConfig {
   // param: candidateStringsSeen is a running set of names/codes we've already encountered
   private boolean candidateStringAlreadyInUseElsewhere(
       String candidateString, String field, Set<String> candidateStringsSeen) {
-    boolean inUse;
+    boolean inUse = false;
     if (candidateStringsSeen.contains(candidateString)) {
       inUse = true;
       Logger.log(
           Level.SEVERE, "Duplicate candidate %ss are not allowed: %s", field, candidateString);
     } else {
-      inUse = stringAlreadyInUseElsewhere(candidateString, "a candidate " + field);
+      for (CvrSource source : getRawConfig().cvrFileSources) {
+        inUse = stringAlreadyInUseElsewhereInSource(candidateString, source,
+            "a candidate " + field);
+        if (inUse) {
+          break;
+        }
+      }
     }
     return inUse;
   }
@@ -526,6 +543,29 @@ class ContestConfig {
           Logger.log(Level.SEVERE, "Cast vote record file not found: %s", cvrPath);
         }
 
+        if (!isNullOrBlank(source.getOvervoteLabel())
+            && stringAlreadyInUseElsewhereInSource(source.getOvervoteLabel(), source, "overvoteLabel")) {
+          isValid = false;
+        }
+        if (!isNullOrBlank(source.getUndervoteLabel())
+            && stringAlreadyInUseElsewhereInSource(source.getUndervoteLabel(), source, "undervoteLabel")) {
+          isValid = false;
+        }
+        if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
+            && stringAlreadyInUseElsewhereInSource(source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
+          isValid = false;
+        }
+
+        if (!isNullOrBlank(source.getOvervoteLabel())
+            && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
+            && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
+          isValid = false;
+          Logger.log(Level.SEVERE,
+              "When overvoteLabel is supplied, overvoteRule must be either \"%s\" or \"%s\"!",
+              Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT,
+              Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
+        }
+
         if (isCdf(source)) {
           // perform CDF checks
           if (rawConfig.cvrFileSources.size() != 1) {
@@ -546,7 +586,7 @@ class ContestConfig {
                 cvrPath);
           }
           if (!isNullOrBlank(source.getOvervoteDelimiter())) {
-            if (!isNullOrBlank(getOvervoteLabel())) {
+            if (!isNullOrBlank(source.getOvervoteLabel())) {
               isValid = false;
               Logger.log(
                   Level.SEVERE,
@@ -626,14 +666,6 @@ class ContestConfig {
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
       Logger.log(Level.SEVERE, "Invalid overvoteRule!");
-    } else if (!isNullOrBlank(getOvervoteLabel())
-        && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
-        && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
-      isValid = false;
-      Logger.log(Level.SEVERE,
-          "When overvoteLabel is supplied, overvoteRule must be either \"%s\" or \"%s\"!",
-          Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT,
-          Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
     }
 
     if (getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
@@ -772,26 +804,6 @@ class ContestConfig {
       isValid = false;
       Logger.log(Level.SEVERE,
           "nonIntegerWinningThreshold and hareQuota can't both be true at the same time!");
-    }
-
-    if (!isNullOrBlank(getOvervoteLabel())
-        && stringAlreadyInUseElsewhere(getOvervoteLabel(), "overvoteLabel")) {
-      isValid = false;
-    }
-    if (!isNullOrBlank(getUndervoteLabel())
-        && stringAlreadyInUseElsewhere(getUndervoteLabel(), "undervoteLabel")) {
-      isValid = false;
-    }
-    if (!isNullOrBlank(getUndeclaredWriteInLabel())
-        && stringAlreadyInUseElsewhere(getUndeclaredWriteInLabel(), "undeclaredWriteInLabel")) {
-      isValid = false;
-    }
-
-    if (isTreatBlankAsUndeclaredWriteInEnabled() && isNullOrBlank(getUndeclaredWriteInLabel())) {
-      isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "undeclaredWriteInLabel must be supplied if treatBlankAsUndeclaredWriteIn is true!");
     }
   }
 
@@ -959,12 +971,8 @@ class ContestConfig {
   }
 
   int getNumDeclaredCandidates() {
-    int num = getCandidateCodeList().size();
-    if (!isNullOrBlank(getUndeclaredWriteInLabel())
-        && getCandidateCodeList().contains(getUndeclaredWriteInLabel())) {
-      num--;
-    }
-    return num;
+    // we subtract one for UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+    return getCandidateCodeList().size() - 1;
   }
 
   int getNumCandidates() {
@@ -1000,18 +1008,6 @@ class ContestConfig {
         Integer.MAX_VALUE);
   }
 
-  String getUndeclaredWriteInLabel() {
-    return rawConfig.rules.undeclaredWriteInLabel;
-  }
-
-  String getOvervoteLabel() {
-    return rawConfig.rules.overvoteLabel;
-  }
-
-  String getUndervoteLabel() {
-    return rawConfig.rules.undervoteLabel;
-  }
-
   TieBreakMode getTiebreakMode() {
     TieBreakMode mode = TieBreakMode.getByLabel(rawConfig.rules.tiebreakMode);
     return mode == null ? TieBreakMode.MODE_UNKNOWN : mode;
@@ -1029,10 +1025,6 @@ class ContestConfig {
     return getTiebreakMode() == TieBreakMode.RANDOM
         || getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
         || getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION;
-  }
-
-  boolean isTreatBlankAsUndeclaredWriteInEnabled() {
-    return rawConfig.rules.treatBlankAsUndeclaredWriteIn;
   }
 
   boolean isExhaustOnDuplicateCandidateEnabled() {
@@ -1082,9 +1074,18 @@ class ContestConfig {
       }
     }
 
-    String uwiLabel = getUndeclaredWriteInLabel();
-    if (!isNullOrBlank(uwiLabel)) {
-      candidateCodeToNameMap.put(uwiLabel, UNDECLARED_WRITE_INS);
+    // If any of the sources support undeclared write-ins, we need to recognize them as a valid
+    // "candidate" option.
+    boolean includeUwi = false;
+    for (CvrSource source : rawConfig.cvrFileSources) {
+      if (!isNullOrBlank(source.getUndeclaredWriteInLabel()) || source.isTreatBlankAsUndeclaredWriteInEnabled()) {
+        includeUwi = true;
+        break;
+      }
+    }
+    if (includeUwi) {
+      candidateCodeToNameMap.put(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL,
+          Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
     }
   }
 

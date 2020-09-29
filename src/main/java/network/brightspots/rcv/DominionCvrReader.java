@@ -39,6 +39,7 @@ class DominionCvrReader {
   private static final String CVR_EXPORT = "CvrExport.json";
   private final ContestConfig config;
   private final String manifestFolder;
+  private final String undeclaredWriteInLabel;
   // map of precinct Id to precinct description
   private Map<Integer, String> precincts;
   // map of precinct portion Id to precinct portion description
@@ -49,9 +50,10 @@ class DominionCvrReader {
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  DominionCvrReader(ContestConfig config, String manifestFolder) {
+  DominionCvrReader(ContestConfig config, String manifestFolder, String undeclaredWriteInLabel) {
     this.config = config;
     this.manifestFolder = manifestFolder;
+    this.undeclaredWriteInLabel = undeclaredWriteInLabel;
   }
 
   // returns map of contestId to Contest parsed from input file
@@ -275,8 +277,9 @@ class DominionCvrReader {
             }
             // We also need to throw an error if this candidate doesn't appear in the tabulator's
             // config file for this contest.
-            if (!config.getCandidateCodeList().contains(candidateCode)
-                && !candidateCode.equals(config.getUndeclaredWriteInLabel())) {
+            if (candidateCode.equals(undeclaredWriteInLabel)) {
+              candidateCode = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+            } else if (!config.getCandidateCodeList().contains(candidateCode)) {
               unrecognizedCandidateCounts.merge(candidateCode, 1, Integer::sum);
             }
 

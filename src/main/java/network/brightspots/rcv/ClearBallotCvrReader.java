@@ -34,10 +34,12 @@ class ClearBallotCvrReader {
 
   private final String cvrPath;
   private final ContestConfig contestConfig;
+  private final String undeclaredWriteInLabel;
 
-  ClearBallotCvrReader(String cvrPath, ContestConfig contestConfig) {
+  ClearBallotCvrReader(String cvrPath, ContestConfig contestConfig, String undeclaredWriteInLabel) {
     this.cvrPath = cvrPath;
     this.contestConfig = contestConfig;
+    this.undeclaredWriteInLabel = undeclaredWriteInLabel;
   }
 
   // parse Cvr json into CastVoteRecord objects and append them to the input castVoteRecords list
@@ -82,8 +84,11 @@ class ClearBallotCvrReader {
         // validate and store the ranking associated with this choice column
         String choiceName = choiceFields[RcvChoiceHeaderField.CHOICE_NAME.ordinal()];
         if (!contestConfig.getCandidateCodeList().contains(choiceName)
-            && !choiceName.equals(contestConfig.getUndeclaredWriteInLabel())) {
+            && !choiceName.equals(undeclaredWriteInLabel)) {
           unrecognizedCandidateCounts.merge(choiceName, 1, Integer::sum);
+        }
+        if (choiceName.equals(undeclaredWriteInLabel)) {
+          choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
         if (rank > this.contestConfig.getMaxRankingsAllowed()) {

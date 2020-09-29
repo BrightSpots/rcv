@@ -35,14 +35,16 @@ class HartCvrReader {
 
   private final String cvrPath;
   private final String contestId;
+  private final String undeclaredWriteInLabel;
   private final ContestConfig contestConfig;
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  HartCvrReader(String cvrPath, String contestId, ContestConfig contestConfig) {
+  HartCvrReader(String cvrPath, String contestId, ContestConfig contestConfig, String undeclaredWriteInLabel) {
     this.cvrPath = cvrPath;
     this.contestId = contestId;
     this.contestConfig = contestConfig;
+    this.undeclaredWriteInLabel = undeclaredWriteInLabel;
   }
 
   // iterate all xml files in the source input folder
@@ -86,9 +88,11 @@ class HartCvrReader {
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         if (contest.Options != null) {
           for (Option option : contest.Options) {
-            if (!contestConfig.getCandidateCodeList().contains(option.Id)
-                && !option.Id.equals(contestConfig.getUndeclaredWriteInLabel())) {
-              unrecognizedCandidateCounts.merge(option.Id, 1, Integer::sum);
+            String candidateId = option.Id;
+            if (candidateId.equals(undeclaredWriteInLabel)) {
+              candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+            } else if (!contestConfig.getCandidateCodeList().contains(candidateId)) {
+              unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
             }
             // Hart RCV election ranks are indicated by a string read left to right:
             // each digit corresponds to a rank and is set to 1 if that rank was voted:
@@ -98,7 +102,7 @@ class HartCvrReader {
             for (int rank = 1; rank < option.Value.length() + 1; rank++) {
               String rankValue = option.Value.substring(rank - 1, rank);
               if (rankValue.equals("1")) {
-                rankings.add(new Pair<>(rank, option.Id));
+                rankings.add(new Pair<>(rank, candidateId));
               }
             }
           }

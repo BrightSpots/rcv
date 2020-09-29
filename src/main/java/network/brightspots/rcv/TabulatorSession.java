@@ -274,18 +274,19 @@ class TabulatorSession {
       try {
         if (ContestConfig.isCdf(source)) {
           Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
-          new CommonDataFormatReader(cvrPath, config, source.getContestId())
+          new CommonDataFormatReader(cvrPath, config, source.getContestId(),
+              source.getOvervoteLabel())
               .parseCvrFile(castVoteRecords);
           continue;
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
           Logger
               .log(Level.INFO, "Reading Clear Ballot cast vote records from file: %s...", cvrPath);
-          new ClearBallotCvrReader(cvrPath, config)
+          new ClearBallotCvrReader(cvrPath, config, source.getUndeclaredWriteInLabel())
               .readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
-          DominionCvrReader reader = new DominionCvrReader(config, cvrPath);
+          DominionCvrReader reader = new DominionCvrReader(config, cvrPath, source.getUndeclaredWriteInLabel());
           reader.readCastVoteRecords(castVoteRecords, source.getContestId());
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
@@ -305,7 +306,7 @@ class TabulatorSession {
           continue;
         } else if (provider == Provider.HART) {
           Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
-          new HartCvrReader(cvrPath, source.getContestId(), config)
+          new HartCvrReader(cvrPath, source.getContestId(), config, source.getUndeclaredWriteInLabel())
               .readCastVoteRecordsFromFolder(castVoteRecords);
           continue;
         }

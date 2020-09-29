@@ -218,6 +218,41 @@
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
                     </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label prefWidth="160.0" text="Overvote Label"/>
+                      <TextField prefHeight="25.0" prefWidth="200.0"
+                        fx:id="textFieldCvrOvervoteLabel"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label prefWidth="160.0" text="Undervote Label"/>
+                      <TextField prefHeight="25.0" prefWidth="200.0"
+                        fx:id="textFieldCvrUndervoteLabel"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label prefWidth="160.0" text="Undeclared Write-In Label"/>
+                      <TextField prefHeight="25.0" prefWidth="200.0"
+                        fx:id="textFieldCvrUndeclaredWriteInLabel"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <CheckBox fx:id="checkBoxCvrTreatBlankAsUndeclaredWriteIn"
+                        mnemonicParsing="false" text="Treat Blank as Undeclared Write-in">
+                        <VBox.margin>
+                          <Insets top="8.0" bottom="8.0"/>
+                        </VBox.margin>
+                      </CheckBox>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
                   </VBox>
                 </HBox>
                 <padding>
@@ -263,6 +298,17 @@
                     <TableColumn minWidth="20.0" onEditCommit="#changeCvrOvervoteDelimiter"
                       prefWidth="60.0" text="Overvote&#10;Delimiter"
                       fx:id="tableColumnCvrOvervoteDelimiter"/>
+                    <TableColumn minWidth="20.0" onEditCommit="#changeCvrOvervoteLabel"
+                      prefWidth="60.0" text="Overvote&#10;Label"
+                      fx:id="tableColumnCvrOvervoteLabel"/>
+                    <TableColumn minWidth="20.0" onEditCommit="#changeCvrUndervoteLabel"
+                      prefWidth="60.0" text="Undervote&#10;Label"
+                      fx:id="tableColumnCvrUndervoteLabel"/>
+                    <TableColumn minWidth="20.0" onEditCommit="#changeCvrUndeclaredWriteInLabel"
+                      prefWidth="60.0" text="Undeclared&#10;Write-In&#10;Label"
+                      fx:id="tableColumnCvrUndeclaredWriteInLabel"/>
+                    <TableColumn fx:id="tableColumnCvrTreatBlankAsUndeclaredWriteIn" minWidth="20.0"
+                      prefWidth="100.0" text="Treat Blank&#10;As Undeclared&#10;Write-In"/>
                   </columns>
                 </TableView>
                 <padding>
@@ -487,46 +533,6 @@
                       </padding>
                     </HBox>
                   </VBox>
-                </HBox>
-                <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                </padding>
-                <VBox.margin>
-                  <Insets bottom="8.0" left="8.0" right="4.0"/>
-                </VBox.margin>
-              </VBox>
-              <VBox styleClass="bordered-box" maxWidth="400.0">
-                <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Overvote Label" prefWidth="150.0"/>
-                  <TextField fx:id="textFieldOvervoteLabel" prefWidth="210.0"/>
-                  <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                  </padding>
-                </HBox>
-                <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Undervote Label" prefWidth="150.0"/>
-                  <TextField fx:id="textFieldUndervoteLabel" prefWidth="210.0"/>
-                  <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                  </padding>
-                </HBox>
-                <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Undeclared Write-in Label" prefWidth="150.0"/>
-                  <TextField fx:id="textFieldUndeclaredWriteInLabel" prefWidth="210.0"/>
-                  <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                  </padding>
-                </HBox>
-                <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <CheckBox fx:id="checkBoxTreatBlankAsUndeclaredWriteIn" mnemonicParsing="false"
-                    text="Treat Blank as Undeclared Write-in">
-                    <VBox.margin>
-                      <Insets top="8.0" bottom="8.0"/>
-                    </VBox.margin>
-                  </CheckBox>
-                  <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                  </padding>
                 </HBox>
                 <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>

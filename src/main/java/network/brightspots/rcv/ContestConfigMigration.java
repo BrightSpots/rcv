@@ -16,10 +16,14 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import network.brightspots.rcv.RawContestConfig.ContestRules;
+import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
@@ -99,33 +103,35 @@ class ContestConfigMigration {
     }
 
     // Any necessary future version migration logic goes here
+    RawContestConfig rawConfig = config.getRawConfig();
+    ContestRules rules = rawConfig.rules;
 
     if (config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
-      String oldWinnerElectionMode = config.rawConfig.rules.winnerElectionMode;
+      String oldWinnerElectionMode = rules.winnerElectionMode;
       switch (oldWinnerElectionMode) {
-        case "standard" -> config.rawConfig.rules.winnerElectionMode =
+        case "standard" -> rules.winnerElectionMode =
             config.getNumberOfWinners() > 1
                 ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND.toString()
                 : WinnerElectionMode.STANDARD_SINGLE_WINNER.toString();
         case "singleSeatContinueUntilTwoCandidatesRemain" -> {
-          config.rawConfig.rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER
+          rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER
               .toString();
-          config.rawConfig.rules.continueUntilTwoCandidatesRemain = true;
+          rules.continueUntilTwoCandidatesRemain = true;
         }
-        case "multiSeatAllowOnlyOneWinnerPerRound" -> config.rawConfig.rules.winnerElectionMode =
+        case "multiSeatAllowOnlyOneWinnerPerRound" -> rules.winnerElectionMode =
             WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString();
-        case "multiSeatBottomsUp" -> config.rawConfig.rules.winnerElectionMode =
+        case "multiSeatBottomsUp" -> rules.winnerElectionMode =
             config.getNumberOfWinners() == 0
                 || config.getMultiSeatBottomsUpPercentageThreshold() != null
                 ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD.toString()
                 : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.toString();
-        case "multiSeatSequentialWinnerTakesAll" -> config.rawConfig.rules.winnerElectionMode =
+        case "multiSeatSequentialWinnerTakesAll" -> rules.winnerElectionMode =
             WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString();
         default -> {
           Logger.warning(
               "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
                   + "winnerElectionMode.", oldWinnerElectionMode);
-          config.rawConfig.rules.winnerElectionMode = null;
+          rules.winnerElectionMode = null;
         }
       }
     }
@@ -141,32 +147,58 @@ class ContestConfigMigration {
           "usePermutationInConfig", TieBreakMode.USE_PERMUTATION_IN_CONFIG.toString(),
           "generatePermutation", TieBreakMode.GENERATE_PERMUTATION.toString()
       );
-      String oldTiebreakMode = config.rawConfig.rules.tiebreakMode;
+      String oldTiebreakMode = rules.tiebreakMode;
       if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
-        config.rawConfig.rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode);
+        rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode);
       } else {
         Logger.warning(
             "tiebreakMode \"%s\" is unrecognized! Please supply a valid tiebreakMode.",
             oldTiebreakMode);
-        config.rawConfig.rules.tiebreakMode = null;
+        rules.tiebreakMode = null;
       }
     }
 
     if (config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
-      String oldOvervoteRule = config.rawConfig.rules.overvoteRule;
+      String oldOvervoteRule = rules.overvoteRule;
       switch (oldOvervoteRule) {
-        case "alwaysSkipToNextRank" -> config.rawConfig.rules.overvoteRule = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
+        case "alwaysSkipToNextRank" -> rules.overvoteRule = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
             .toString();
-        case "exhaustImmediately" -> config.rawConfig.rules.overvoteRule = OvervoteRule.EXHAUST_IMMEDIATELY
+        case "exhaustImmediately" -> rules.overvoteRule = OvervoteRule.EXHAUST_IMMEDIATELY
             .toString();
-        case "exhaustIfMultipleContinuing" -> config.rawConfig.rules.overvoteRule = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING
+        case "exhaustIfMultipleContinuing" -> rules.overvoteRule = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING
             .toString();
         default -> {
           Logger.warning(
               "overvoteRule \"%s\" is unrecognized! Please supply a valid overvoteRule.",
               oldOvervoteRule);
-          config.rawConfig.rules.overvoteRule = null;
+          rules.overvoteRule = null;
         }
+      }
+    }
+
+    // These four fields were previously at the config level, but are now set on a per-source basis.
+
+    if (!isNullOrBlank(rules.overvoteLabel)) {
+      for (CvrSource source : rawConfig.cvrFileSources) {
+        source.setOvervoteLabel(rules.overvoteLabel);
+      }
+    }
+
+    if (!isNullOrBlank(rules.undervoteLabel)) {
+      for (CvrSource source : rawConfig.cvrFileSources) {
+        source.setUndervoteLabel(rules.undervoteLabel);
+      }
+    }
+
+    if (!isNullOrBlank(rules.undeclaredWriteInLabel)) {
+      for (CvrSource source : rawConfig.cvrFileSources) {
+        source.setUndeclaredWriteInLabel(rules.undeclaredWriteInLabel);
+      }
+    }
+
+    if (rules.treatBlankAsUndeclaredWriteIn) {
+      for (CvrSource source : rawConfig.cvrFileSources) {
+        source.setTreatBlankAsUndeclaredWriteIn(rules.treatBlankAsUndeclaredWriteIn);
       }
     }
 
