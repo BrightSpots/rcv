@@ -713,7 +713,6 @@ public class GuiConfigController implements Initializable {
    * Action when CVR provider is changed.
    */
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
-    // TODO maybe just don't allow this to be edited at all?
     tableViewCvrFiles
         .getSelectionModel()
         .getSelectedItem()
