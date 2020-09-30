@@ -76,8 +76,9 @@ class TabulatorSession {
       // It will log a severe message already, so no need to add one here.
     } else if (ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
       Logger.severe(
-          "Can't use a config with older version %s in newer version %s of the app! Use the " +
-              "graphical version of the app to migrate the config to the current version.",
+          "Can't use a config with older version %s in newer version %s of the app! To " +
+              "automatically migrate the config to the newer version, load it in the graphical " +
+              "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
           version, Main.APP_VERSION);
     }
   }

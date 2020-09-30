@@ -116,7 +116,7 @@ class StreamingCvrReader {
     this.overvoteLabel = source.getOvervoteLabel();
     this.undervoteLabel = source.getUndervoteLabel();
     this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
-    this.treatBlankAsUndeclaredWriteIn = source.isTreatBlankAsUndeclaredWriteInEnabled();
+    this.treatBlankAsUndeclaredWriteIn = source.isTreatBlankAsUndeclaredWriteIn();
   }
 
   // given Excel-style address string return the cell address as a pair of Integers

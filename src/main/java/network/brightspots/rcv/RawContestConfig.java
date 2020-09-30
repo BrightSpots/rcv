@@ -70,7 +70,6 @@ public class RawContestConfig {
     private String overvoteDelimiter;
     private String provider;
 
-    // These used to be defined at the config level, but now they're per-source.
     public String overvoteLabel;
     public String undervoteLabel;
     public String undeclaredWriteInLabel;
@@ -194,7 +193,7 @@ public class RawContestConfig {
       this.undeclaredWriteInLabel = undeclaredWriteInLabel;
     }
 
-    public boolean isTreatBlankAsUndeclaredWriteInEnabled() {
+    public boolean isTreatBlankAsUndeclaredWriteIn() {
       return treatBlankAsUndeclaredWriteIn;
     }
 

@@ -47,27 +47,29 @@ class ContestConfigMigration {
 
   // not intended to be used if either version is null
   private static boolean isVersionNewer(String version1, String version2) {
-    if (version1.equals(version2)) {
-      return false;
+    boolean isNewer = false;
+    if (!version1.equals(version2)) {
+      ArrayList<Integer> version1Parsed = parseVersionString(version1);
+      ArrayList<Integer> version2Parsed = parseVersionString(version2);
+
+      for (int i = 0; i < version1Parsed.size(); i++) {
+        if (version2Parsed.size() <= i) {
+          isNewer = true;
+          break;
+        }
+        int version1Num = version1Parsed.get(i);
+        int version2Num = version2Parsed.get(i);
+        if (version1Num > version2Num) {
+          isNewer = true;
+          break;
+        } else if (version2Num > version1Num) {
+          isNewer = false;
+          break;
+        }
+      }
     }
 
-    ArrayList<Integer> version1Parsed = parseVersionString(version1);
-    ArrayList<Integer> version2Parsed = parseVersionString(version2);
-
-    for (int i = 0; i < version1Parsed.size(); i++) {
-      if (version2Parsed.size() <= i) {
-        return true;
-      }
-      int version1Num = version1Parsed.get(i);
-      int version2Num = version2Parsed.get(i);
-      if (version1Num > version2Num) {
-        return true;
-      } else if (version2Num > version1Num) {
-        return false;
-      }
-    }
-
-    return false;
+    return isNewer;
   }
 
   static boolean isConfigVersionOlderThanAppVersion(String configVersion) {
@@ -75,139 +77,137 @@ class ContestConfigMigration {
   }
 
   static boolean isConfigVersionNewerThanAppVersion(String configVersion) {
-    if (configVersion == null) {
-      return false;
+    boolean isNewer = false;
+    if (configVersion != null) {
+      if (isVersionNewer(configVersion, Main.APP_VERSION)) {
+        Logger.severe(
+            "Unable to process a config file with version %s using older version %s of the app!",
+            configVersion, Main.APP_VERSION);
+        isNewer = true;
+      }
     }
 
-    if (isVersionNewer(configVersion, Main.APP_VERSION)) {
-      Logger.severe(
-          "Unable to process a config file with version %s using older version %s of the app!",
-          configVersion, Main.APP_VERSION);
-      return true;
-    }
-
-    return false;
+    return isNewer;
   }
 
   static void migrateConfigVersion(ContestConfig config)
       throws ConfigVersionIsNewerThanAppVersionException {
     String version = config.rawConfig.tabulatorVersion;
-    if (version != null &&
-        (version.equals(Main.APP_VERSION) || version
-            .equals(ContestConfig.AUTOMATED_TEST_VERSION))) {
-      return;
-    }
+    boolean needsMigration = version == null ||
+        (!version.equals(Main.APP_VERSION) && !version
+            .equals(ContestConfig.AUTOMATED_TEST_VERSION));
+    if (needsMigration) {
+      if (isConfigVersionNewerThanAppVersion(version)) {
+        throw new ConfigVersionIsNewerThanAppVersionException();
+      }
 
-    if (isConfigVersionNewerThanAppVersion(version)) {
-      throw new ConfigVersionIsNewerThanAppVersionException();
-    }
+      // Any necessary future version migration logic goes here
+      RawContestConfig rawConfig = config.getRawConfig();
+      ContestRules rules = rawConfig.rules;
 
-    // Any necessary future version migration logic goes here
-    RawContestConfig rawConfig = config.getRawConfig();
-    ContestRules rules = rawConfig.rules;
+      if (config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
+        String oldWinnerElectionMode = rules.winnerElectionMode;
+        switch (oldWinnerElectionMode) {
+          case "standard" -> rules.winnerElectionMode =
+              config.getNumberOfWinners() > 1
+                  ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND.toString()
+                  : WinnerElectionMode.STANDARD_SINGLE_WINNER.toString();
+          case "singleSeatContinueUntilTwoCandidatesRemain" -> {
+            rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER
+                .toString();
+            rules.continueUntilTwoCandidatesRemain = true;
+          }
+          case "multiSeatAllowOnlyOneWinnerPerRound" -> rules.winnerElectionMode =
+              WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString();
+          case "multiSeatBottomsUp" -> rules.winnerElectionMode =
+              config.getNumberOfWinners() == 0
+                  || config.getMultiSeatBottomsUpPercentageThreshold() != null
+                  ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD.toString()
+                  : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.toString();
+          case "multiSeatSequentialWinnerTakesAll" -> rules.winnerElectionMode =
+              WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString();
+          default -> {
+            Logger.warning(
+                "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
+                    + "winnerElectionMode.", oldWinnerElectionMode);
+            rules.winnerElectionMode = null;
+          }
+        }
+      }
 
-    if (config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
-      String oldWinnerElectionMode = rules.winnerElectionMode;
-      switch (oldWinnerElectionMode) {
-        case "standard" -> rules.winnerElectionMode =
-            config.getNumberOfWinners() > 1
-                ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND.toString()
-                : WinnerElectionMode.STANDARD_SINGLE_WINNER.toString();
-        case "singleSeatContinueUntilTwoCandidatesRemain" -> {
-          rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER
+      if (config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
+        Map<String, String> tiebreakModeMigrationMap = Map.of(
+            "random", TieBreakMode.RANDOM.toString(),
+            "interactive", TieBreakMode.INTERACTIVE.toString(),
+            "previousRoundCountsThenRandom",
+            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM.toString(),
+            "previousRoundCountsThenInteractive",
+            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE.toString(),
+            "usePermutationInConfig", TieBreakMode.USE_PERMUTATION_IN_CONFIG.toString(),
+            "generatePermutation", TieBreakMode.GENERATE_PERMUTATION.toString()
+        );
+        String oldTiebreakMode = rules.tiebreakMode;
+        if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
+          rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode);
+        } else {
+          Logger.warning(
+              "tiebreakMode \"%s\" is unrecognized! Please supply a valid tiebreakMode.",
+              oldTiebreakMode);
+          rules.tiebreakMode = null;
+        }
+      }
+
+      if (config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
+        String oldOvervoteRule = rules.overvoteRule;
+        switch (oldOvervoteRule) {
+          case "alwaysSkipToNextRank" -> rules.overvoteRule = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
               .toString();
-          rules.continueUntilTwoCandidatesRemain = true;
-        }
-        case "multiSeatAllowOnlyOneWinnerPerRound" -> rules.winnerElectionMode =
-            WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString();
-        case "multiSeatBottomsUp" -> rules.winnerElectionMode =
-            config.getNumberOfWinners() == 0
-                || config.getMultiSeatBottomsUpPercentageThreshold() != null
-                ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD.toString()
-                : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.toString();
-        case "multiSeatSequentialWinnerTakesAll" -> rules.winnerElectionMode =
-            WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString();
-        default -> {
-          Logger.warning(
-              "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
-                  + "winnerElectionMode.", oldWinnerElectionMode);
-          rules.winnerElectionMode = null;
+          case "exhaustImmediately" -> rules.overvoteRule = OvervoteRule.EXHAUST_IMMEDIATELY
+              .toString();
+          case "exhaustIfMultipleContinuing" -> rules.overvoteRule = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING
+              .toString();
+          default -> {
+            Logger.warning(
+                "overvoteRule \"%s\" is unrecognized! Please supply a valid overvoteRule.",
+                oldOvervoteRule);
+            rules.overvoteRule = null;
+          }
         }
       }
-    }
 
-    if (config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
-      Map<String, String> tiebreakModeMigrationMap = Map.of(
-          "random", TieBreakMode.RANDOM.toString(),
-          "interactive", TieBreakMode.INTERACTIVE.toString(),
-          "previousRoundCountsThenRandom",
-          TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM.toString(),
-          "previousRoundCountsThenInteractive",
-          TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE.toString(),
-          "usePermutationInConfig", TieBreakMode.USE_PERMUTATION_IN_CONFIG.toString(),
-          "generatePermutation", TieBreakMode.GENERATE_PERMUTATION.toString()
-      );
-      String oldTiebreakMode = rules.tiebreakMode;
-      if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
-        rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode);
-      } else {
-        Logger.warning(
-            "tiebreakMode \"%s\" is unrecognized! Please supply a valid tiebreakMode.",
-            oldTiebreakMode);
-        rules.tiebreakMode = null;
-      }
-    }
+      // These four fields were previously at the config level, but are now set on a per-source basis.
 
-    if (config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
-      String oldOvervoteRule = rules.overvoteRule;
-      switch (oldOvervoteRule) {
-        case "alwaysSkipToNextRank" -> rules.overvoteRule = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-            .toString();
-        case "exhaustImmediately" -> rules.overvoteRule = OvervoteRule.EXHAUST_IMMEDIATELY
-            .toString();
-        case "exhaustIfMultipleContinuing" -> rules.overvoteRule = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING
-            .toString();
-        default -> {
-          Logger.warning(
-              "overvoteRule \"%s\" is unrecognized! Please supply a valid overvoteRule.",
-              oldOvervoteRule);
-          rules.overvoteRule = null;
+      if (!isNullOrBlank(rules.overvoteLabel)) {
+        for (CvrSource source : rawConfig.cvrFileSources) {
+          source.setOvervoteLabel(rules.overvoteLabel);
         }
       }
-    }
 
-    // These four fields were previously at the config level, but are now set on a per-source basis.
-
-    if (!isNullOrBlank(rules.overvoteLabel)) {
-      for (CvrSource source : rawConfig.cvrFileSources) {
-        source.setOvervoteLabel(rules.overvoteLabel);
+      if (!isNullOrBlank(rules.undervoteLabel)) {
+        for (CvrSource source : rawConfig.cvrFileSources) {
+          source.setUndervoteLabel(rules.undervoteLabel);
+        }
       }
-    }
 
-    if (!isNullOrBlank(rules.undervoteLabel)) {
-      for (CvrSource source : rawConfig.cvrFileSources) {
-        source.setUndervoteLabel(rules.undervoteLabel);
+      if (!isNullOrBlank(rules.undeclaredWriteInLabel)) {
+        for (CvrSource source : rawConfig.cvrFileSources) {
+          source.setUndeclaredWriteInLabel(rules.undeclaredWriteInLabel);
+        }
       }
-    }
 
-    if (!isNullOrBlank(rules.undeclaredWriteInLabel)) {
-      for (CvrSource source : rawConfig.cvrFileSources) {
-        source.setUndeclaredWriteInLabel(rules.undeclaredWriteInLabel);
+      if (rules.treatBlankAsUndeclaredWriteIn) {
+        for (CvrSource source : rawConfig.cvrFileSources) {
+          source.setTreatBlankAsUndeclaredWriteIn(rules.treatBlankAsUndeclaredWriteIn);
+        }
       }
+
+      Logger.info(
+          "Migrated tabulator config version from %s to %s.",
+          config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
+          Main.APP_VERSION);
+
+      config.rawConfig.tabulatorVersion = Main.APP_VERSION;
     }
-
-    if (rules.treatBlankAsUndeclaredWriteIn) {
-      for (CvrSource source : rawConfig.cvrFileSources) {
-        source.setTreatBlankAsUndeclaredWriteIn(rules.treatBlankAsUndeclaredWriteIn);
-      }
-    }
-
-    Logger.info(
-        "Migrated tabulator config version from %s to %s.",
-        config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
-        Main.APP_VERSION);
-
-    config.rawConfig.tabulatorVersion = Main.APP_VERSION;
   }
 
   static class ConfigVersionIsNewerThanAppVersionException extends Exception {

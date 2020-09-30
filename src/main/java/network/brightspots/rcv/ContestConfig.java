@@ -155,6 +155,22 @@ class ContestConfig {
       sourceValid = false;
       Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
     } else {
+      if (!isNullOrBlank(source.getOvervoteLabel())
+          && stringAlreadyInUseElsewhereInSource(source.getOvervoteLabel(), source,
+          "overvoteLabel")) {
+        sourceValid = false;
+      }
+      if (!isNullOrBlank(source.getUndervoteLabel())
+          && stringAlreadyInUseElsewhereInSource(source.getUndervoteLabel(), source,
+          "undervoteLabel")) {
+        sourceValid = false;
+      }
+      if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
+          && stringAlreadyInUseElsewhereInSource(source.getUndeclaredWriteInLabel(), source,
+          "undeclaredWriteInLabel")) {
+        sourceValid = false;
+      }
+
       Provider provider = getProvider(source);
       if (provider == Provider.PROVIDER_UNKNOWN) {
         sourceValid = false;
@@ -211,7 +227,8 @@ class ContestConfig {
           Logger.log(Level.SEVERE, "overvoteDelimiter is invalid.");
         }
 
-        if (source.isTreatBlankAsUndeclaredWriteInEnabled() && isNullOrBlank(source.getUndeclaredWriteInLabel())) {
+        if (source.isTreatBlankAsUndeclaredWriteIn() && isNullOrBlank(
+            source.getUndeclaredWriteInLabel())) {
           sourceValid = false;
           Logger.log(
               Level.SEVERE,
@@ -461,7 +478,7 @@ class ContestConfig {
     }
   }
 
-  private boolean stringConflictsWithReservedString(String string, String field) {
+  private static boolean stringConflictsWithReservedString(String string, String field) {
     boolean reserved = false;
     for (String reservedString : TallyTransfers.RESERVED_STRINGS) {
       if (string.equalsIgnoreCase(reservedString)) {
@@ -478,7 +495,8 @@ class ContestConfig {
   // purpose: Checks to make sure string isn't reserved or used by other fields
   // param: string string to check
   // param: field field name of provided string
-  private boolean stringAlreadyInUseElsewhereInSource(String string, CvrSource source, String field) {
+  private static boolean stringAlreadyInUseElsewhereInSource(String string, CvrSource source,
+      String field) {
     boolean inUse = stringConflictsWithReservedString(string, field);
     if (!inUse) {
       inUse =
@@ -541,19 +559,6 @@ class ContestConfig {
         if (cvrPath != null && !new File(cvrPath).exists()) {
           isValid = false;
           Logger.log(Level.SEVERE, "Cast vote record file not found: %s", cvrPath);
-        }
-
-        if (!isNullOrBlank(source.getOvervoteLabel())
-            && stringAlreadyInUseElsewhereInSource(source.getOvervoteLabel(), source, "overvoteLabel")) {
-          isValid = false;
-        }
-        if (!isNullOrBlank(source.getUndervoteLabel())
-            && stringAlreadyInUseElsewhereInSource(source.getUndervoteLabel(), source, "undervoteLabel")) {
-          isValid = false;
-        }
-        if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-            && stringAlreadyInUseElsewhereInSource(source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
-          isValid = false;
         }
 
         if (!isNullOrBlank(source.getOvervoteLabel())
@@ -971,8 +976,12 @@ class ContestConfig {
   }
 
   int getNumDeclaredCandidates() {
-    // we subtract one for UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-    return getCandidateCodeList().size() - 1;
+    int size = getCandidateCodeList().size();
+    if (undeclaredWriteInsEnabled()) {
+      // we subtract one for UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+      size = size - 1;
+    }
+    return size;
   }
 
   int getNumCandidates() {
@@ -1076,17 +1085,22 @@ class ContestConfig {
 
     // If any of the sources support undeclared write-ins, we need to recognize them as a valid
     // "candidate" option.
+    if (undeclaredWriteInsEnabled()) {
+      candidateCodeToNameMap.put(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL,
+          Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
+    }
+  }
+
+  private boolean undeclaredWriteInsEnabled() {
     boolean includeUwi = false;
     for (CvrSource source : rawConfig.cvrFileSources) {
-      if (!isNullOrBlank(source.getUndeclaredWriteInLabel()) || source.isTreatBlankAsUndeclaredWriteInEnabled()) {
+      if (!isNullOrBlank(source.getUndeclaredWriteInLabel()) || source
+          .isTreatBlankAsUndeclaredWriteIn()) {
         includeUwi = true;
         break;
       }
     }
-    if (includeUwi) {
-      candidateCodeToNameMap.put(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL,
-          Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
-    }
+    return includeUwi;
   }
 
   enum Provider {

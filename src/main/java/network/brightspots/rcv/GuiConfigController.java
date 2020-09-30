@@ -30,7 +30,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -352,8 +351,11 @@ public class GuiConfigController implements Initializable {
         .setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath(), silentMode));
     // if config loaded use it to populate the GUI
     if (GuiContext.getInstance().getConfig() != null) {
-      loadConfig(GuiContext.getInstance().getConfig());
-      labelCurrentlyLoaded.setText("Currently loaded: " + fileToLoad.getAbsolutePath());
+      try {
+        loadConfig(GuiContext.getInstance().getConfig());
+        labelCurrentlyLoaded.setText("Currently loaded: " + fileToLoad.getAbsolutePath());
+      } catch (ConfigVersionIsNewerThanAppVersionException e) {
+      }
     }
   }
 
@@ -1098,7 +1100,7 @@ public class GuiConfigController implements Initializable {
         c -> {
           CvrSource source = c.getValue();
           CheckBox checkBox = new CheckBox();
-          checkBox.selectedProperty().setValue(source.isTreatBlankAsUndeclaredWriteInEnabled());
+          checkBox.selectedProperty().setValue(source.isTreatBlankAsUndeclaredWriteIn());
           checkBox
               .selectedProperty()
               .addListener((ov, oldVal, newVal) -> source.setTreatBlankAsUndeclaredWriteIn(newVal));
@@ -1205,14 +1207,10 @@ public class GuiConfigController implements Initializable {
     });
   }
 
-  private void loadConfig(ContestConfig config) {
+  private void loadConfig(ContestConfig config) throws ConfigVersionIsNewerThanAppVersionException {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
-    try {
-      ContestConfigMigration.migrateConfigVersion(config);
-    } catch (ConfigVersionIsNewerThanAppVersionException e) {
-      return;
-    }
+    ContestConfigMigration.migrateConfigVersion(config);
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());

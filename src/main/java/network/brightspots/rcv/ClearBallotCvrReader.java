@@ -83,12 +83,10 @@ class ClearBallotCvrReader {
         }
         // validate and store the ranking associated with this choice column
         String choiceName = choiceFields[RcvChoiceHeaderField.CHOICE_NAME.ordinal()];
-        if (!contestConfig.getCandidateCodeList().contains(choiceName)
-            && !choiceName.equals(undeclaredWriteInLabel)) {
-          unrecognizedCandidateCounts.merge(choiceName, 1, Integer::sum);
-        }
         if (choiceName.equals(undeclaredWriteInLabel)) {
           choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+        } else if (!contestConfig.getCandidateCodeList().contains(choiceName)) {
+          unrecognizedCandidateCounts.merge(choiceName, 1, Integer::sum);
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
         if (rank > this.contestConfig.getMaxRankingsAllowed()) {
