@@ -298,7 +298,8 @@ class TabulatorSession {
                 castVoteRecords,
                 reader.getContests().values(),
                 config.getOutputDirectory(),
-                source.getContestId());
+                source.getContestId(),
+                source.getUndeclaredWriteInLabel());
           } catch (IOException e) {
             // error already logged in ResultsWriter
           }
