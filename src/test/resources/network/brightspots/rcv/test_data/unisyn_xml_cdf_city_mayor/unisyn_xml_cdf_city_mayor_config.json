@@ -15,7 +15,11 @@
       "idColumnIndex": "",
       "precinctColumnIndex": "",
       "provider": "CDF",
-      "contestId": "For City C Mayor (1/3)"
+      "contestId": "For City C Mayor (1/3)",
+      "treatBlankAsUndeclaredWriteIn": false,
+      "overvoteLabel": "",
+      "undervoteLabel": "",
+      "undeclaredWriteInLabel": "UWI"
     }
   ],
   "candidates": [
@@ -94,10 +98,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "UWI",
     "rulesDescription": "Skiptonext_exhaustatovervote"
   }
 }

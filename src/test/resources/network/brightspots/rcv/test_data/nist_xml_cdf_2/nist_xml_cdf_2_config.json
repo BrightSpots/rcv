@@ -15,7 +15,11 @@
       "idColumnIndex": "",
       "precinctColumnIndex": "",
       "provider": "CDF",
-      "contestId": "For Governor and Lieutenant Governor"
+      "contestId": "For Governor and Lieutenant Governor",
+      "treatBlankAsUndeclaredWriteIn": false,
+      "overvoteLabel": "",
+      "undervoteLabel": "",
+      "undeclaredWriteInLabel": ""
     }
   ],
   "candidates": [
@@ -49,10 +53,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "",
     "rulesDescription": "Skiptonext_exhaustatovervote"
   }
 }

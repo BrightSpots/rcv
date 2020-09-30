@@ -16,7 +16,11 @@
     "idColumnIndex": "",
     "precinctColumnIndex": "",
     "provider": "Hart",
-    "contestId": "b651b997-417a-46d9-a676-a43d4df94ddc"
+    "contestId": "b651b997-417a-46d9-a676-a43d4df94ddc",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": "99cefa84-bad0-4d6b-a916-e606bd43f9cd"
   } ],
 
   "candidates" : [
@@ -71,10 +75,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "99cefa84-bad0-4d6b-a916-e606bd43f9cd",
     "rulesDescription": ""
   }
 }

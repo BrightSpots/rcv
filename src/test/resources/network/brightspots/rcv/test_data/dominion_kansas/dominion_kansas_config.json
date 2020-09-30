@@ -13,7 +13,11 @@
     {
       "filePath": "kansas_input_data",
       "provider": "Dominion",
-      "contestId": "1"
+      "contestId": "1",
+      "treatBlankAsUndeclaredWriteIn" : false,
+      "overvoteLabel" : "overvote",
+      "undervoteLabel" : "undervote",
+      "undeclaredWriteInLabel" : "12"
     }
   ],
   "candidates": [
@@ -69,10 +73,6 @@
     "hareQuota": false,
     "batchElimination" : true,
     "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
-    "undeclaredWriteInLabel" : "12",
     "rulesDescription" : "Kansas Rules"
   }
 }

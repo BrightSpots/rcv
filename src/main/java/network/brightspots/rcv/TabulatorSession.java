@@ -72,14 +72,16 @@ class TabulatorSession {
   private static void checkConfigVersionMatchesApp(ContestConfig config) {
     String version = config.getRawConfig().tabulatorVersion;
 
-    if (ContestConfigMigration.isConfigVersionNewerThanAppVersion(version)) {
-      // It will log a severe message already, so no need to add one here.
-    } else if (ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
-      Logger.severe(
-          "Can't use a config with older version %s in newer version %s of the app! To " +
-              "automatically migrate the config to the newer version, load it in the graphical " +
-              "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
-          version, Main.APP_VERSION);
+    if (!version.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
+      if (ContestConfigMigration.isConfigVersionNewerThanAppVersion(version)) {
+        // It will log a severe message already, so no need to add one here.
+      } else if (ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
+        Logger.severe(
+            "Can't use a config with older version %s in newer version %s of the app! To " +
+                "automatically migrate the config to the newer version, load it in the graphical " +
+                "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
+            version, Main.APP_VERSION);
+      }
     }
   }
 

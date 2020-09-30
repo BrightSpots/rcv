@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
-    "provider": "ES&S"
+    "provider": "ES&S",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "A",
@@ -49,10 +53,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "",
     "rulesDescription": "Allow Only One Winner per Round Test"
   }
 }

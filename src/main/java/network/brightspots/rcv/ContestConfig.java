@@ -226,14 +226,6 @@ class ContestConfig {
           sourceValid = false;
           Logger.log(Level.SEVERE, "overvoteDelimiter is invalid.");
         }
-
-        if (source.isTreatBlankAsUndeclaredWriteIn() && isNullOrBlank(
-            source.getUndeclaredWriteInLabel())) {
-          sourceValid = false;
-          Logger.log(
-              Level.SEVERE,
-              "undeclaredWriteInLabel must be supplied if treatBlankAsUndeclaredWriteIn is true!");
-        }
       } else {
         if (provider == Provider.CDF) {
           if (!source.getFilePath().toLowerCase().endsWith(".xml") && !source.getFilePath()

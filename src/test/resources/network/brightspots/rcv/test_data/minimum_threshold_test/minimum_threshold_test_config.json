@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "ES&S"
+    "provider" : "ES&S",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "Gargamel",
@@ -53,10 +57,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "",
     "rulesDescription": "Doyle Rules"
   }
 }

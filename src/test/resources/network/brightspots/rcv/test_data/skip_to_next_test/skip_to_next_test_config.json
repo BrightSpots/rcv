@@ -21,8 +21,7 @@
     "overvoteLabel" : "overvote",
     "undervoteLabel" : "undervote",
     "undeclaredWriteInLabel" : "",
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "treatBlankAsUndeclaredWriteInEnabled" : false
+    "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
     "name" : "A",

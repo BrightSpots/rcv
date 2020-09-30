@@ -752,8 +752,6 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.refresh();
   }
 
-  // louis
-
   /**
    * Action when add candidate button is clicked.
    */

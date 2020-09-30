@@ -50,7 +50,7 @@ class Tabulator {
   // When the CVR contains an overvote we "normalize" it to use this string
   static final String EXPLICIT_OVERVOTE_LABEL = "overvote";
   // Similarly, we normalize undeclared write-ins to use this string
-  static final String UNDECLARED_WRITE_IN_OUTPUT_LABEL = "Undeclared Write-Ins";
+  static final String UNDECLARED_WRITE_IN_OUTPUT_LABEL = "Undeclared Write-ins";
   // cast vote records parsed from CVR input files
   private final List<CastVoteRecord> castVoteRecords;
   // all candidate IDs for this contest parsed from the contest config

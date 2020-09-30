@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "ES&S"
+    "provider" : "ES&S",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "Carmona, Ralph C.",
@@ -47,10 +51,6 @@
     "batchElimination": false,
     "continueUntilTwoCandidatesRemain": true,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "",
     "rulesDescription": "Continue until Two Candidates Remain Test"
   }
 }

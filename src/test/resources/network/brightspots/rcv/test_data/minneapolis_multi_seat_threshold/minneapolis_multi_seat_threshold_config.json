@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider": "ES&S"
+    "provider": "ES&S",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "A",
@@ -57,10 +61,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "",
     "rulesDescription": "Multi-winner Test2"
   }
 }
