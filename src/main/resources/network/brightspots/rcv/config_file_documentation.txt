@@ -94,6 +94,26 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         example: //
         value: any string that contains no backslashes and at least one character that is not a letter, number, hyphen, period, comma, apostrophe, quote, or space
 
+      "overvoteLabel" optional
+        label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "Always skip to next rank" or "Exhaust immediately" (because the other option, "Exhaust if multiple continuing", relies on knowing which specific candidates were involved in each overvote)
+        example: "OVERVOTE"
+        value: string of length [1..1000]
+
+      "undervoteLabel" optional
+        the special label used in the cast vote records to denote an undervote
+        example: "UNDERVOTE"
+        value: string of length [1..1000]
+
+      "undeclaredWriteInLabel" optional
+        the special label used in the cast vote records to denote a vote for an undeclared write-in
+        example: "UWI"
+        value: string of length [1..1000]
+
+      "treatBlankAsUndeclaredWriteIn" optional and can be used only if provider is ES&S
+        tabulator will interpret a blank cell in a CVR as a vote for an undeclared write-in
+        value: true | false
+        if not supplied: false
+
   "candidates" required
     list of registered candidate names and associated candidate code (note: leave empty when CVR is in Common Data Format)
     each "candidates" list item has the following parameters:
@@ -212,22 +232,6 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         the integer seed for the application's pseudorandom number generator
         value: [-140737488355328..140737488355327]
 
-      "overvoteLabel" optional
-        label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "Always skip to next rank" or "Exhaust immediately" (because the other option, "Exhaust if multiple continuing", relies on knowing which specific candidates were involved in each overvote)
-        example: "OVERVOTE"
-        value: string of length [1..1000]
-
-      "undervoteLabel" optional
-        the special label used in the cast vote records to denote an undervote
-        example: "UNDERVOTE"
-        value: string of length [1..1000]
-
-      "undeclaredWriteInLabel" required if treatBlankAsUndeclaredWriteIn is enabled
-        the special label used in the cast vote records to denote a vote for an undeclared write-in
-        also used to represent undeclared write-ins in the results output
-        example: "UWI"
-        value: string of length [1..1000]
-
       "multiSeatBottomsUpPercentageThreshold" required if winnerElectionMode is "Bottoms-up using percentage threshold" and numberOfWinners is 0
         the percentage threshold used to determine when to stop the tabulation and declare winners
         note: only valid when winnerElectionMode is "Bottoms-up using percentage threshold" and numberOfWinners is 0
@@ -267,10 +271,5 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
       "exhaustOnDuplicateCandidate" optional
         tabulator will exhaust a ballot when it encounters a duplicate candidate (instead of just skipping the duplicate)
-        value: true | false
-        if not supplied: false
-
-      "treatBlankAsUndeclaredWriteIn" optional
-        tabulator will interpret a blank cell in a CVR as a vote for an undeclared write-in
         value: true | false
         if not supplied: false

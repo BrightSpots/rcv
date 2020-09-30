@@ -15,7 +15,11 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "CDF",
-    "contestId": "overvote skips to next rank"
+    "contestId": "overvote skips to next rank",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "Candidate A Name",
@@ -48,10 +52,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "",
     "rulesDescription": "OV_skiptonext"
   }
 }

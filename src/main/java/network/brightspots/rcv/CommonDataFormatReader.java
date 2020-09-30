@@ -51,12 +51,14 @@ class CommonDataFormatReader {
   private final String filePath;
   private final ContestConfig config;
   private final String contestId;
+  private final String overvoteLabel;
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  CommonDataFormatReader(String filePath, ContestConfig config, String contestId) {
+  CommonDataFormatReader(String filePath, ContestConfig config, String contestId, String overvoteLabel) {
     this.filePath = filePath;
     this.config = config;
     this.contestId = contestId;
+    this.overvoteLabel = overvoteLabel;
   }
 
 
@@ -84,15 +86,6 @@ class CommonDataFormatReader {
       }
     }
     return cvrContestToTabulate;
-  }
-
-  private static void throwIfNoUwiLabel(String candidateId) throws CvrParseException {
-    if (isNullOrBlank(candidateId)) {
-      Logger.severe(
-          "Undeclared write-in candidate found while parsing CVR, however undeclared write-in "
-              + "label has not been defined in config!");
-      throw new CvrParseException();
-    }
   }
 
   void parseCvrFile(List<CastVoteRecord> castVoteRecords)
@@ -212,8 +205,7 @@ class CommonDataFormatReader {
           // check for declared write-in:
           if (contestSelection.IsWriteIn != null && contestSelection.IsWriteIn
               .equals(BOOLEAN_TRUE)) {
-            candidateId = this.config.getUndeclaredWriteInLabel();
-            throwIfNoUwiLabel(candidateId);
+            candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
           } else {
             // validate candidate Ids:
             // CDF allows multiple candidate Ids to support party ticket voting options
@@ -237,7 +229,7 @@ class CommonDataFormatReader {
               throw new CvrParseException();
             }
             candidateId = candidate.Name;
-            if (candidateId.equals(config.getOvervoteLabel())) {
+            if (candidateId.equals(overvoteLabel)) {
               candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
             } else if (!config.getCandidateCodeList().contains(candidateId)) {
               Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
@@ -248,8 +240,7 @@ class CommonDataFormatReader {
           if (cvrContestSelection.Rank == null) {
             for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
               if (selectionPosition.CVRWriteIn != null) {
-                candidateId = this.config.getUndeclaredWriteInLabel();
-                throwIfNoUwiLabel(candidateId);
+                candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
               }
               // ignore if no indication is present (NIST 1500-103 section 3.4.2)
               if (selectionPosition.HasIndication != null && selectionPosition.HasIndication
@@ -385,8 +376,7 @@ class CommonDataFormatReader {
         if (contestSelection.containsKey("IsWriteIn") && contestSelection.get("IsWriteIn")
             .equals(BOOLEAN_TRUE)) {
           // this is a write-in
-          candidateId = this.config.getUndeclaredWriteInLabel();
-          throwIfNoUwiLabel(candidateId);
+          candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
         } else {
           // lookup Candidate Name
           ArrayList candidateIds = (ArrayList) contestSelection.get("CandidateIds");
@@ -401,7 +391,7 @@ class CommonDataFormatReader {
           String candidateObjectId = (String) candidateIds.get(0);
           HashMap candidate = (HashMap) candidates.get(candidateObjectId);
           candidateId = (String) candidate.get("Name");
-          if (candidateId.equals(config.getOvervoteLabel())) {
+          if (candidateId.equals(overvoteLabel)) {
             candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           } else if (!this.config.getCandidateCodeList().contains(candidateId)) {
             Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
@@ -422,8 +412,7 @@ class CommonDataFormatReader {
             HashMap selectionPosition = (HashMap) selectionPositionObject;
             // WriteIn can be linked at the selection position level
             if (selectionPosition.containsKey("CVRWriteIn")) {
-              candidateId = this.config.getUndeclaredWriteInLabel();
-              throwIfNoUwiLabel(candidateId);
+              candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             }
             // ignore if no indication is present (NIST 1500-103 section 3.4.2)
             if (selectionPosition.containsKey("HasIndication") && selectionPosition

@@ -15,7 +15,11 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "CDF",
-    "contestId": "test set 7"
+    "contestId": "test set 7",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "Candidate A Name",
@@ -48,10 +52,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "",
     "rulesDescription": "Duplicate choice skip"
   }
 }

@@ -16,7 +16,11 @@
     "idColumnIndex": "",
     "precinctColumnIndex": "",
     "provider": "Hart",
-    "contestId": "e9ca8235-893e-43df-93eb-3cc61eeb133c"
+    "contestId": "e9ca8235-893e-43df-93eb-3cc61eeb133c",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [
     {
@@ -60,10 +64,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "",
     "rulesDescription": ""
   }
 }

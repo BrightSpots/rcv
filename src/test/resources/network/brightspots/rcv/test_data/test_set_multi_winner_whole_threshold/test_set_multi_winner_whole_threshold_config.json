@@ -15,7 +15,11 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "CDF",
-    "contestId": "test set multi winner whole"
+    "contestId": "test set multi winner whole",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "Candidate A Name",
@@ -56,10 +60,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "",
     "rulesDescription": "Multi-winner Test 3"
   }
 }

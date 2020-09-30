@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "1",
-    "provider" : "ES&S"
+    "provider" : "ES&S",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI"
   } ],
   "candidates" : [ {
     "name" : "TROY BENJEGERDES",
@@ -173,10 +177,6 @@
     "hareQuota": false,
     "batchElimination": true,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI",
     "rulesDescription": "Maine Rules"
   }
 }

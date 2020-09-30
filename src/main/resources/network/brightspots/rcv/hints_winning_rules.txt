@@ -51,11 +51,3 @@ Threshold Calculation Method: The threshold of election is the number of votes a
   * Compute using Hare Quota: The Hare quota divides the number of votes by the number of seats. It requires candidates to receive that number of votes (or more) to win.
 
 Decimal Places for Vote Arithmetic (Multi-Winner Only): Sets how many decimal places after the decimal point are used in surplus transfers and in calculating the threshold.
-
-Overvote Label: Some CVRs used a particular word to indicate an overvote.
-
-Undervote Label: Some CVRs used a particular word to indicate an undervote.
-
-Undeclared Write-in Label: Some CVRs used a particular word to indicate a write-in.
-
-Treat Blank as Undeclared Write-in: When checked, the tabulator will interpret blank cells in the CVRs as a votes for an undeclared write-ins.

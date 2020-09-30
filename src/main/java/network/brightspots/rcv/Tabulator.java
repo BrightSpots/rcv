@@ -49,6 +49,8 @@ class Tabulator {
   static final String OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT = "Exhaust if multiple continuing";
   // When the CVR contains an overvote we "normalize" it to use this string
   static final String EXPLICIT_OVERVOTE_LABEL = "overvote";
+  // Similarly, we normalize undeclared write-ins to use this string
+  static final String UNDECLARED_WRITE_IN_OUTPUT_LABEL = "Undeclared Write-ins";
   // cast vote records parsed from CVR input files
   private final List<CastVoteRecord> castVoteRecords;
   // all candidate IDs for this contest parsed from the contest config
@@ -245,7 +247,7 @@ class Tabulator {
         "There are %d declared candidates for this contest:",
         config.getNumDeclaredCandidates());
     for (String candidate : candidateIds) {
-      if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
+      if (!candidate.equals(UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
         Logger.log(
             Level.INFO,
             "%s%s",
@@ -430,7 +432,7 @@ class Tabulator {
       status = CandidateStatus.WINNER;
     } else if (candidateToRoundEliminated.containsKey(candidate)) {
       status = CandidateStatus.ELIMINATED;
-    } else if (candidate.equals(config.getOvervoteLabel())) {
+    } else if (candidate.equals(EXPLICIT_OVERVOTE_LABEL)) {
       status = CandidateStatus.INVALID;
     }
     return status;
@@ -476,7 +478,7 @@ class Tabulator {
               List<String> winningCandidates = currentRoundTallyToCandidates.get(tally);
               for (String candidate : winningCandidates) {
                 // The undeclared write-in placeholder can't win!
-                if (!candidate.equals(config.getUndeclaredWriteInLabel())) {
+                if (!candidate.equals(UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
                   selectedWinners.add(candidate);
                 }
               }
@@ -539,10 +541,8 @@ class Tabulator {
   private List<String> dropUndeclaredWriteIns(
       Map<String, BigDecimal> currentRoundCandidateToTally) {
     List<String> eliminated = new LinkedList<>();
-    // undeclared label
-    String label = config.getUndeclaredWriteInLabel();
-    if (!isNullOrBlank(label)
-        && currentRoundCandidateToTally.get(label) != null
+    String label = UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+    if (currentRoundCandidateToTally.get(label) != null
         && currentRoundCandidateToTally.get(label).signum() == 1) {
       eliminated.add(label);
       Logger.log(

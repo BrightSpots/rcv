@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
-    "provider": "ES&S"
+    "provider": "ES&S",
+    "treatBlankAsUndeclaredWriteIn": true,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI"
   } ],
   "candidates" : [ {
     "name" : "A",
@@ -49,10 +53,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": true,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI",
     "rulesDescription": "test"
   }
 }

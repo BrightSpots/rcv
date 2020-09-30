@@ -477,9 +477,9 @@ class ResultsWriter {
     entries.sort(
         (firstObject, secondObject) -> {
           int ret;
-          if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+          if (firstObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             ret = 1;
-          } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+          } else if (secondObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             ret = -1;
           } else {
             ret = (secondObject.getValue()).compareTo(firstObject.getValue());
@@ -510,7 +510,8 @@ class ResultsWriter {
       List<CastVoteRecord> castVoteRecords,
       Collection<Contest> contests,
       String csvOutputFolder,
-      String contestId
+      String contestId,
+      String undeclaredWriteInLabel
   ) throws IOException {
     List<String> filesWritten = new ArrayList<>();
     try {
@@ -567,6 +568,11 @@ class ResultsWriter {
               assert !candidateSet.isEmpty();
               if (candidateSet.size() == 1) {
                 String selection = candidateSet.iterator().next();
+                // We map all undeclared write-ins to our constant string when we read them in,
+                // so we need to translate it back to the original candidate ID here.
+                if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
+                  selection = undeclaredWriteInLabel;
+                }
                 csvPrinter.print(selection);
               } else {
                 csvPrinter.print("overvote");

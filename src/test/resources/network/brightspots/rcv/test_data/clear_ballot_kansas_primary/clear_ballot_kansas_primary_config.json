@@ -16,7 +16,11 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "Clear Ballot",
-    "contestId": "Democratic Primary"
+    "contestId": "Democratic Primary",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI"
   } ],
   "candidates" : [ {
     "name" : "Michael Bennet",
@@ -74,10 +78,6 @@
     "hareQuota": false,
     "batchElimination": true,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI",
     "rulesDescription": "Kansas Primary Rules"
   }
 }

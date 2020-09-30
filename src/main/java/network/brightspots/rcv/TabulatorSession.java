@@ -68,6 +68,23 @@ class TabulatorSession {
     timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
+  // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI here also
+  private static void checkConfigVersionMatchesApp(ContestConfig config) {
+    String version = config.getRawConfig().tabulatorVersion;
+
+    if (!version.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
+      if (ContestConfigMigration.isConfigVersionNewerThanAppVersion(version)) {
+        // It will log a severe message already, so no need to add one here.
+      } else if (ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
+        Logger.severe(
+            "Can't use a config with older version %s in newer version %s of the app! To " +
+                "automatically migrate the config to the newer version, load it in the graphical " +
+                "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
+            version, Main.APP_VERSION);
+      }
+    }
+  }
+
   // Visible for testing
   @SuppressWarnings("unused")
   String getOutputPath() {
@@ -90,6 +107,7 @@ class TabulatorSession {
   void convertToCdf() {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     if (config != null && config.validate()) {
+      checkConfigVersionMatchesApp(config);
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
@@ -120,6 +138,7 @@ class TabulatorSession {
   void tabulate() {
     Logger.log(Level.INFO, "Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
     if (config != null && config.validate() && setUpLogging(config)) {
       try {
@@ -258,18 +277,19 @@ class TabulatorSession {
       try {
         if (ContestConfig.isCdf(source)) {
           Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
-          new CommonDataFormatReader(cvrPath, config, source.getContestId())
+          new CommonDataFormatReader(cvrPath, config, source.getContestId(),
+              source.getOvervoteLabel())
               .parseCvrFile(castVoteRecords);
           continue;
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
           Logger
               .log(Level.INFO, "Reading Clear Ballot cast vote records from file: %s...", cvrPath);
-          new ClearBallotCvrReader(cvrPath, config)
+          new ClearBallotCvrReader(cvrPath, config, source.getUndeclaredWriteInLabel())
               .readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
         } else if (provider == Provider.DOMINION) {
           Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
-          DominionCvrReader reader = new DominionCvrReader(config, cvrPath);
+          DominionCvrReader reader = new DominionCvrReader(config, cvrPath, source.getUndeclaredWriteInLabel());
           reader.readCastVoteRecords(castVoteRecords, source.getContestId());
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
@@ -278,7 +298,8 @@ class TabulatorSession {
                 castVoteRecords,
                 reader.getContests().values(),
                 config.getOutputDirectory(),
-                source.getContestId());
+                source.getContestId(),
+                source.getUndeclaredWriteInLabel());
           } catch (IOException e) {
             // error already logged in ResultsWriter
           }
@@ -289,7 +310,7 @@ class TabulatorSession {
           continue;
         } else if (provider == Provider.HART) {
           Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
-          new HartCvrReader(cvrPath, source.getContestId(), config)
+          new HartCvrReader(cvrPath, source.getContestId(), config, source.getUndeclaredWriteInLabel())
               .readCastVoteRecordsFromFolder(castVoteRecords);
           continue;
         }
@@ -341,7 +362,7 @@ class TabulatorSession {
             exception.toString());
         encounteredSourceProblem = true;
       }
-  }
+    }
 
     if (encounteredSourceProblem) {
       Logger.log(Level.SEVERE, "Parsing cast vote records failed!");

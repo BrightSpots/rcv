@@ -15,7 +15,11 @@
       "idColumnIndex": "",
       "precinctColumnIndex": "",
       "provider": "CDF",
-      "contestId": "For County Tax Collector (1/3)"
+      "contestId": "For County Tax Collector (1/3)",
+      "treatBlankAsUndeclaredWriteIn": false,
+      "overvoteLabel": "",
+      "undervoteLabel": "",
+      "undeclaredWriteInLabel": "UWI"
     }
   ],
   "candidates": [
@@ -74,10 +78,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "UWI",
     "rulesDescription": "Skiptonext_exhaustatovervote"
   }
 }
