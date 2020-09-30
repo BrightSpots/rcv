@@ -94,12 +94,12 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         example: //
         value: any string that contains no backslashes and at least one character that is not a letter, number, hyphen, period, comma, apostrophe, quote, or space
 
-      "overvoteLabel" optional
+      "overvoteLabel" optional and can be used only if provider is ES&S or CDF
         label used in the CVR to denote an overvote; if this parameter is present overvoteRule must be either "Always skip to next rank" or "Exhaust immediately" (because the other option, "Exhaust if multiple continuing", relies on knowing which specific candidates were involved in each overvote)
         example: "OVERVOTE"
         value: string of length [1..1000]
 
-      "undervoteLabel" optional
+      "undervoteLabel" optional and can be used only if provider is ES&S
         the special label used in the cast vote records to denote an undervote
         example: "UNDERVOTE"
         value: string of length [1..1000]

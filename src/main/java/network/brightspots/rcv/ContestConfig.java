@@ -235,6 +235,14 @@ class ContestConfig {
                     source.getFilePath());
             sourceValid = false;
           }
+        } else {
+          if (fieldIsDefinedButShouldNotBeForProvider(
+              source.getOvervoteLabel(),
+              "overvoteLabel",
+              provider,
+              source.getFilePath())) {
+            sourceValid = false;
+          }
         }
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getFirstVoteColumnIndex(),
@@ -274,6 +282,21 @@ class ContestConfig {
             provider,
             source.getFilePath())) {
           sourceValid = false;
+        }
+
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getUndervoteLabel(),
+            "undervoteLabel",
+            provider,
+            source.getFilePath())) {
+          sourceValid = false;
+        }
+
+        if (source.isTreatBlankAsUndeclaredWriteIn()) {
+          logErrorWithLocation(String
+              .format("treatBlankAsUndeclaredWriteIn should not be true for CVR source with " +
+                      "provider \"%s\"",
+                  provider.toString()), source.getFilePath());
         }
       }
 
@@ -407,6 +430,37 @@ class ContestConfig {
     return candidateValid;
   }
 
+  private static boolean stringConflictsWithReservedString(String string, String field) {
+    boolean reserved = false;
+    for (String reservedString : TallyTransfers.RESERVED_STRINGS) {
+      if (string.equalsIgnoreCase(reservedString)) {
+        reserved = true;
+        Logger.log(
+            Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", string, field);
+        break;
+      }
+    }
+    return reserved;
+  }
+
+  // function: stringAlreadyInUseElsewhere
+  // purpose: Checks to make sure string isn't reserved or used by other fields
+  // param: string string to check
+  // param: field field name of provided string
+  private static boolean stringAlreadyInUseElsewhereInSource(String string, CvrSource source,
+      String field) {
+    boolean inUse = stringConflictsWithReservedString(string, field);
+    if (!inUse) {
+      inUse =
+          stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
+              || stringMatchesAnotherFieldValue(
+              string, field, source.getUndervoteLabel(), "undervoteLabel")
+              || stringMatchesAnotherFieldValue(
+              string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
+    }
+    return inUse;
+  }
+
   // given a relative or absolute path returns absolute path for use in File IO
   String resolveConfigPath(String configPath) {
     File userFile = new File(configPath);
@@ -468,37 +522,6 @@ class ContestConfig {
       isValid = false;
       Logger.log(Level.SEVERE, "contestName is required!");
     }
-  }
-
-  private static boolean stringConflictsWithReservedString(String string, String field) {
-    boolean reserved = false;
-    for (String reservedString : TallyTransfers.RESERVED_STRINGS) {
-      if (string.equalsIgnoreCase(reservedString)) {
-        reserved = true;
-        Logger.log(
-            Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", string, field);
-        break;
-      }
-    }
-    return reserved;
-  }
-
-  // function: stringAlreadyInUseElsewhere
-  // purpose: Checks to make sure string isn't reserved or used by other fields
-  // param: string string to check
-  // param: field field name of provided string
-  private static boolean stringAlreadyInUseElsewhereInSource(String string, CvrSource source,
-      String field) {
-    boolean inUse = stringConflictsWithReservedString(string, field);
-    if (!inUse) {
-      inUse =
-          stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
-              || stringMatchesAnotherFieldValue(
-              string, field, source.getUndervoteLabel(), "undervoteLabel")
-              || stringMatchesAnotherFieldValue(
-              string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
-    }
-    return inUse;
   }
 
   // checks for conflicts between a candidate name and other name/codes or other reserved strings
