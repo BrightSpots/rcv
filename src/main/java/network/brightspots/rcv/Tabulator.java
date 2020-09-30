@@ -1147,7 +1147,7 @@ class Tabulator {
     STANDARD_SINGLE_WINNER("singleSeat", "Single-winner majority determines winner"),
     MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("multiSeatAllowOnlyOneWinnerPerRound",
         "Multi-winner allow only one winner per round"),
-    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("multiSeatAllowMultipleWinnerPerRound",
+    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("multiSeatAllowMultipleWinnersPerRound",
         "Multi-winner allow multiple winners per round"),
     MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS("multiSeatBottomsUp", "Bottoms-up"),
     MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD("multiSeatBottomsUpUsingPercentageThreshold",

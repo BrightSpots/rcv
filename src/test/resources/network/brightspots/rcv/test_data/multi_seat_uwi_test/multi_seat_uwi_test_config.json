@@ -37,7 +37,7 @@
   "rules" : {
     "tiebreakMode": "usePermutationInConfig",
     "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "multiSeatAllowMultipleWinnerPerRound",
+    "winnerElectionMode": "multiSeatAllowMultipleWinnersPerRound",
     "randomSeed": "",
     "numberOfWinners": "2",
     "multiSeatBottomsUpPercentageThreshold": "",

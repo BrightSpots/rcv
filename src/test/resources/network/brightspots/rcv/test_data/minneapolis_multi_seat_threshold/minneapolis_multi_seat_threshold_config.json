@@ -50,7 +50,7 @@
   "rules" : {
     "tiebreakMode": "interactive",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiSeatAllowMultipleWinnerPerRound",
+    "winnerElectionMode": "multiSeatAllowMultipleWinnersPerRound",
     "randomSeed": "",
     "numberOfWinners": "3",
     "decimalPlacesForVoteArithmetic": "4",

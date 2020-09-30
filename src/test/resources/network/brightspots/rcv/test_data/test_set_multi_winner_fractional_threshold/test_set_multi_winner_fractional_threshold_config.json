@@ -49,7 +49,7 @@
   "rules" : {
     "tiebreakMode": "interactive",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiSeatAllowMultipleWinnerPerRound",
+    "winnerElectionMode": "multiSeatAllowMultipleWinnersPerRound",
     "randomSeed": "1",
     "numberOfWinners": "3",
     "decimalPlacesForVoteArithmetic": "4",
