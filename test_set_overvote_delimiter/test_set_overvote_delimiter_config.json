@@ -17,7 +17,11 @@
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "/",
-    "provider" : "ES&S"
+    "provider" : "ES&S",
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : ""
   } ],
   "candidates" : [ {
     "name" : "A",
@@ -52,10 +56,6 @@
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
     "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "",
-    "undervoteLabel" : "",
-    "undeclaredWriteInLabel" : "",
     "rulesDescription" : ""
   }
 }

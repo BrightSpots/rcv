@@ -15,7 +15,11 @@
       "idColumnIndex": "",
       "precinctColumnIndex": "",
       "provider": "CDF",
-      "contestId": "For County Coroner (1/2)"
+      "contestId": "For County Coroner (1/2)",
+      "treatBlankAsUndeclaredWriteIn": false,
+      "overvoteLabel": "",
+      "undervoteLabel": "",
+      "undeclaredWriteInLabel": "UWI"
     }
   ],
   "candidates": [
@@ -74,10 +78,6 @@
     "hareQuota": false,
     "batchElimination": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "undervoteLabel": "",
-    "undeclaredWriteInLabel": "UWI",
     "rulesDescription": "Skiptonext_exhaustatovervote"
   }
 }

@@ -13,22 +13,26 @@
       "firstVoteColumnIndex": 3,
       "firstVoteRowIndex": 2,
       "precinctColumnIndex": 1,
-      "provider": "ES&S"
+      "provider": "ES&S",
+      "treatBlankAsUndeclaredWriteIn": false
     },
     {
       "filePath": "test_data/nonexistent_path2",
-      "provider": "ES&S"
+      "provider": "ES&S",
+      "treatBlankAsUndeclaredWriteIn": false
     },
     {
       "firstVoteColumnIndex": 3,
       "firstVoteRowIndex": 0,
       "precinctColumnIndex": 1,
-      "provider": "ES&S"
+      "provider": "ES&S",
+      "treatBlankAsUndeclaredWriteIn": false
     },
     {
       "filePath": "invalid_sources_test_cvr.xlsx",
       "firstVoteColumnIndex": 2,
-      "provider": "ES&S"
+      "provider": "ES&S",
+      "treatBlankAsUndeclaredWriteIn": false
     }
   ],
   "candidates": [
@@ -51,7 +55,6 @@
     "batchElimination": false,
     "continueUntilTwoCandidatesRemain": false,
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
     "rulesDescription": "Testing our validation logic for sources"
   }
 }
