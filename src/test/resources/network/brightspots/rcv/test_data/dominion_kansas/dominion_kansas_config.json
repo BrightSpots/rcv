@@ -14,10 +14,10 @@
       "filePath": "kansas_input_data",
       "provider": "Dominion",
       "contestId": "1",
-      "treatBlankAsUndeclaredWriteIn" : false,
-      "overvoteLabel" : "overvote",
-      "undervoteLabel" : "undervote",
-      "undeclaredWriteInLabel" : "12"
+      "treatBlankAsUndeclaredWriteIn": false,
+      "overvoteLabel": "",
+      "undervoteLabel": "",
+      "undeclaredWriteInLabel": "12"
     }
   ],
   "candidates": [

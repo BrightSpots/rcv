@@ -15,8 +15,8 @@
       "provider": "Dominion",
       "contestId": "1",
       "treatBlankAsUndeclaredWriteIn": false,
-      "overvoteLabel": "overvote",
-      "undervoteLabel": "undervote",
+      "overvoteLabel": "",
+      "undervoteLabel": "",
       "undeclaredWriteInLabel": "12"
     }
   ],
