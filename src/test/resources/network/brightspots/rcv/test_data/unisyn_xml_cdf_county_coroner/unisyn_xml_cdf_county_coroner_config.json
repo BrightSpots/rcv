@@ -14,7 +14,7 @@
       "filePath": "../unisyn_cvrs/101-RCV-CVT_TEST_3_UNIOVS2103-2.xml",
       "idColumnIndex": "",
       "precinctColumnIndex": "",
-      "provider": "CDF",
+      "provider": "cdf",
       "contestId": "For County Coroner (1/2)",
       "treatBlankAsUndeclaredWriteIn": false,
       "overvoteLabel": "",
@@ -65,9 +65,9 @@
     }
   ],
   "rules": {
-    "tiebreakMode": "Random",
-    "overvoteRule": "Exhaust immediately",
-    "winnerElectionMode": "Single-winner majority determines winner",
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "singleSeat",
     "randomSeed": "0",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "1",

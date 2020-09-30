@@ -15,7 +15,7 @@
     "firstVoteRowIndex": "",
     "idColumnIndex": "",
     "precinctColumnIndex": "",
-    "provider": "Hart",
+    "provider": "hart",
     "contestId": "e9ca8235-893e-43df-93eb-3cc61eeb133c",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
@@ -50,9 +50,9 @@
     }
   ],
   "rules" : {
-    "tiebreakMode": "Random",
-    "overvoteRule": "Exhaust immediately",
-    "winnerElectionMode": "Single-winner majority determines winner",
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "singleSeat",
     "randomSeed": "9",
     "numberOfWinners": "1",
     "multiSeatBottomsUpPercentageThreshold": "",

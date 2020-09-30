@@ -12,7 +12,7 @@
   "cvrFileSources": [
     {
       "filePath": "wyoming_input_data",
-      "provider": "Dominion",
+      "provider": "dominion",
       "contestId": "1",
       "treatBlankAsUndeclaredWriteIn": false,
       "overvoteLabel": "",
@@ -59,9 +59,9 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "Use candidate order in the config file",
-    "overvoteRule": "Exhaust immediately",
-    "winnerElectionMode": "Single-winner majority determines winner",
+    "tiebreakMode": "usePermutationInConfig",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "singleSeat",
     "randomSeed": "",
     "numberOfWinners": "1",
     "multiSeatBottomsUpPercentageThreshold": "",

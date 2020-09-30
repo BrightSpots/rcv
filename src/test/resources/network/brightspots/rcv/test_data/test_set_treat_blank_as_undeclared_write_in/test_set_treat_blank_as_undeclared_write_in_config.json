@@ -16,7 +16,7 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
-    "provider": "ES&S",
+    "provider": "ess",
     "treatBlankAsUndeclaredWriteIn": true,
     "overvoteLabel": "overvote",
     "undervoteLabel": "undervote",
@@ -40,9 +40,9 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "Random",
-    "overvoteRule": "Exhaust immediately",
-    "winnerElectionMode": "Single-winner majority determines winner",
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "singleSeat",
     "randomSeed": "0",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "1",
