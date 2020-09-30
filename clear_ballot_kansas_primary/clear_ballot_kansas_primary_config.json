@@ -10,16 +10,16 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "clear_ballot_kansas_primary.cvr.csv",
-    "firstVoteColumnIndex" : "",
-    "firstVoteRowIndex" : "",
-    "idColumnIndex" : "",
-    "precinctColumnIndex" : "",
-    "provider" : "Clear Ballot",
+    "filePath": "clear_ballot_kansas_primary.cvr.csv",
+    "firstVoteColumnIndex": "",
+    "firstVoteRowIndex": "",
+    "idColumnIndex": "",
+    "precinctColumnIndex": "",
+    "provider": "Clear Ballot",
     "contestId": "Democratic Primary",
     "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
+    "overvoteLabel": "",
+    "undervoteLabel": "",
     "undeclaredWriteInLabel": "UWI"
   } ],
   "candidates" : [ {
