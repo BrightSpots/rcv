@@ -262,7 +262,7 @@
                   <Insets bottom="8.0" left="8.0" right="4.0"/>
                 </VBox.margin>
               </VBox>
-              <VBox styleClass="bordered-box" maxWidth="800.0">
+              <VBox styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <Label
                     text="Note: double-click existing entries below to edit and press Enter to save changes.">
@@ -412,10 +412,10 @@
           </Tab>
           <Tab text="Winning Rules" fx:id="tabWinningRules">
             <VBox>
-              <VBox styleClass="bordered-box" maxWidth="820.0">
+              <VBox styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <Label text="Winner Election Mode *" prefWidth="180.0"/>
-                  <ChoiceBox fx:id="choiceWinnerElectionMode" prefWidth="280.0"/>
+                  <ChoiceBox fx:id="choiceWinnerElectionMode" prefWidth="300.0"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                   </padding>
@@ -428,9 +428,9 @@
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Maximum Number of Candidates&#xD; That Can Be Ranked *"
-                        prefWidth="180.0"/>
-                      <TextField fx:id="textFieldMaxRankingsAllowed" maxWidth="220.0"/>
+                      <Label text="Maximum Number of Candidates&#xD;That Can Be Ranked *"
+                        prefWidth="200.0"/>
+                      <TextField fx:id="textFieldMaxRankingsAllowed" maxWidth="80.0"/>
                       <CheckBox mnemonicParsing="false" text="Maximum"
                         fx:id="checkBoxMaxRankingsAllowedMax">
                         <VBox.margin>
@@ -442,8 +442,8 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Minimum Vote Threshold" prefWidth="180.0"/>
-                      <TextField fx:id="textFieldMinimumVoteThreshold" maxWidth="220.0"/>
+                      <Label text="Minimum Vote Threshold" prefWidth="200.0"/>
+                      <TextField fx:id="textFieldMinimumVoteThreshold" maxWidth="80.0"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
@@ -472,8 +472,8 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Tiebreak Mode *" prefWidth="180.0"/>
-                      <ChoiceBox fx:id="choiceTiebreakMode" prefWidth="220.0"/>
+                      <Label text="Tiebreak Mode *" prefWidth="100.0"/>
+                      <ChoiceBox fx:id="choiceTiebreakMode" prefWidth="320.0"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
@@ -567,10 +567,10 @@
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="How Many Consecutive&#xD; Skipped Ranks Are Allowed *"
-                    prefWidth="160.0"/>
+                  <Label text="How Many Consecutive&#xD;Skipped Ranks Are Allowed *"
+                    prefWidth="220.0"/>
                   <TextField fx:id="textFieldMaxSkippedRanksAllowed" maxWidth="220.0"/>
-                  <CheckBox mnemonicParsing="false" text="Unlimited"
+                  <CheckBox mnemonicParsing="false" text="Unlimited" prefWidth="180.0"
                     fx:id="checkBoxMaxSkippedRanksAllowedUnlimited">
                     <VBox.margin>
                       <Insets bottom="8.0" top="8.0"/>
