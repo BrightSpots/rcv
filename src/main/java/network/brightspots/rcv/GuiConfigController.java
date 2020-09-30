@@ -245,18 +245,21 @@ public class GuiConfigController implements Initializable {
   private Tab tabOutput;
 
   private static Provider getProviderChoice(ChoiceBox<Provider> choiceBox) {
-    return choiceBox.getValue() != null ? Provider.getByLabel(choiceBox.getValue().toString())
+    return choiceBox.getValue() != null ? Provider
+        .getByInternalLabel(choiceBox.getValue().getInternalLabel())
         : Provider.PROVIDER_UNKNOWN;
   }
 
   private static WinnerElectionMode getWinnerElectionModeChoice(
       ChoiceBox<WinnerElectionMode> choiceBox) {
     return choiceBox.getValue() != null ? WinnerElectionMode
-        .getByLabel(choiceBox.getValue().toString()) : WinnerElectionMode.MODE_UNKNOWN;
+        .getByInternalLabel(choiceBox.getValue().getInternalLabel())
+        : WinnerElectionMode.MODE_UNKNOWN;
   }
 
   private static TieBreakMode getTiebreakModeChoice(ChoiceBox<TieBreakMode> choiceBox) {
-    return choiceBox.getValue() != null ? TieBreakMode.getByLabel(choiceBox.getValue().toString())
+    return choiceBox.getValue() != null ? TieBreakMode
+        .getByInternalLabel(choiceBox.getValue().getInternalLabel())
         : TieBreakMode.MODE_UNKNOWN;
   }
 
@@ -288,15 +291,15 @@ public class GuiConfigController implements Initializable {
   }
 
   private String getOvervoteRuleChoice() {
-    String overvoteRuleString = OvervoteRule.RULE_UNKNOWN.toString();
+    OvervoteRule rule = OvervoteRule.RULE_UNKNOWN;
     if (radioOvervoteAlwaysSkip.isSelected()) {
-      overvoteRuleString = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK.toString();
+      rule = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
     } else if (radioOvervoteExhaustImmediately.isSelected()) {
-      overvoteRuleString = OvervoteRule.EXHAUST_IMMEDIATELY.toString();
+      rule = OvervoteRule.EXHAUST_IMMEDIATELY;
     } else if (radioOvervoteExhaustIfMultiple.isSelected()) {
-      overvoteRuleString = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING.toString();
+      rule = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING;
     }
-    return overvoteRuleString;
+    return rule.getInternalLabel();
   }
 
   /**
@@ -585,7 +588,7 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCvrIdCol),
             getTextOrEmptyString(textFieldCvrPrecinctCol),
             getTextOrEmptyString(textFieldCvrOvervoteDelimiter),
-            getProviderChoice(choiceCvrProvider).toString(),
+            getProviderChoice(choiceCvrProvider).getInternalLabel(),
             getTextOrEmptyString(textFieldCvrContestId),
             getTextOrEmptyString(textFieldCvrOvervoteLabel),
             getTextOrEmptyString(textFieldCvrUndervoteLabel),
@@ -710,6 +713,7 @@ public class GuiConfigController implements Initializable {
    * Action when CVR provider is changed.
    */
   public void changeCvrProvider(CellEditEvent cellEditEvent) {
+    // TODO maybe just don't allow this to be edited at all?
     tableViewCvrFiles
         .getSelectionModel()
         .getSelectedItem()
@@ -1338,9 +1342,10 @@ public class GuiConfigController implements Initializable {
     config.candidates = candidates;
 
     ContestRules rules = new ContestRules();
-    rules.tiebreakMode = getTiebreakModeChoice(choiceTiebreakMode).toString();
+    rules.tiebreakMode = getTiebreakModeChoice(choiceTiebreakMode).getInternalLabel();
     rules.overvoteRule = getOvervoteRuleChoice();
-    rules.winnerElectionMode = getWinnerElectionModeChoice(choiceWinnerElectionMode).toString();
+    rules.winnerElectionMode = getWinnerElectionModeChoice(choiceWinnerElectionMode)
+        .getInternalLabel();
     rules.randomSeed = getTextOrEmptyString(textFieldRandomSeed);
     rules.numberOfWinners = getTextOrEmptyString(textFieldNumberOfWinners);
     rules.multiSeatBottomsUpPercentageThreshold = getTextOrEmptyString(

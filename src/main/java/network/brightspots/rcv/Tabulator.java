@@ -1068,27 +1068,34 @@ class Tabulator {
 
   // OvervoteRule determines how overvotes are handled
   enum OvervoteRule {
-    ALWAYS_SKIP_TO_NEXT_RANK(OVERVOTE_RULE_ALWAYS_SKIP_TEXT),
-    EXHAUST_IMMEDIATELY(OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT),
-    EXHAUST_IF_MULTIPLE_CONTINUING(OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT),
-    RULE_UNKNOWN("Unknown rule");
+    ALWAYS_SKIP_TO_NEXT_RANK("alwaysSkipToNextRank", OVERVOTE_RULE_ALWAYS_SKIP_TEXT),
+    EXHAUST_IMMEDIATELY("exhaustImmediately", OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT),
+    EXHAUST_IF_MULTIPLE_CONTINUING("exhaustIfMultipleContinuing",
+        OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT),
+    RULE_UNKNOWN("ruleUnknown", "Unknown rule");
 
-    private final String label;
+    private final String internalLabel;
+    private final String uiLabel;
 
-    OvervoteRule(String label) {
-      this.label = label;
+    OvervoteRule(String internalLabel, String uiLabel) {
+      this.internalLabel = internalLabel;
+      this.uiLabel = uiLabel;
     }
 
-    static OvervoteRule getByLabel(String labelLookup) {
+    static OvervoteRule getByInternalLabel(String labelLookup) {
       return Arrays.stream(OvervoteRule.values())
-          .filter(v -> v.label.equals(labelLookup))
+          .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
           .orElse(null);
     }
 
     @Override
     public String toString() {
-      return label;
+      return uiLabel;
+    }
+
+    public String getInternalLabel() {
+      return internalLabel;
     }
   }
 
@@ -1101,58 +1108,75 @@ class Tabulator {
 
   // TieBreakMode determines how ties will be handled
   enum TieBreakMode {
-    RANDOM("Random"),
-    INTERACTIVE("Stop counting and ask"),
-    PREVIOUS_ROUND_COUNTS_THEN_RANDOM("Previous round counts (then random)"),
-    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("Previous round counts (then stop counting and ask)"),
-    USE_PERMUTATION_IN_CONFIG("Use candidate order in the config file"),
-    GENERATE_PERMUTATION("Generate permutation"),
-    MODE_UNKNOWN("Unknown mode");
+    RANDOM("random", "Random"),
+    INTERACTIVE("interactive", "Stop counting and ask"),
+    PREVIOUS_ROUND_COUNTS_THEN_RANDOM("previousRoundCountsThenRandom",
+        "Previous round counts (then random)"),
+    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("previousRoundCountsThenInteractive",
+        "Previous round counts (then stop counting and ask)"),
+    USE_PERMUTATION_IN_CONFIG("usePermutationInConfig", "Use candidate order in the config file"),
+    GENERATE_PERMUTATION("generatePermutation", "Generate permutation"),
+    MODE_UNKNOWN("modeUnknown", "Unknown mode");
 
-    private final String label;
+    private final String internalLabel;
+    private final String uiLabel;
 
-    TieBreakMode(String label) {
-      this.label = label;
+    TieBreakMode(String internalLabel, String uiLabel) {
+      this.internalLabel = internalLabel;
+      this.uiLabel = uiLabel;
     }
 
-    static TieBreakMode getByLabel(String labelLookup) {
+    static TieBreakMode getByInternalLabel(String labelLookup) {
       return Arrays.stream(TieBreakMode.values())
-          .filter(v -> v.label.equals(labelLookup))
+          .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
           .orElse(null);
     }
 
     @Override
     public String toString() {
-      return label;
+      return uiLabel;
+    }
+
+    public String getInternalLabel() {
+      return internalLabel;
     }
   }
 
   enum WinnerElectionMode {
-    STANDARD_SINGLE_WINNER("Single-winner majority determines winner"),
-    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("Multi-winner allow only one winner per round"),
-    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("Multi-winner allow multiple winners per round"),
-    MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS("Bottoms-up"),
-    MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD("Bottoms-up using percentage threshold"),
-    MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("Multi-pass IRV"),
-    MODE_UNKNOWN("Unknown mode");
+    STANDARD_SINGLE_WINNER("singleSeat", "Single-winner majority determines winner"),
+    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("multiSeatAllowOnlyOneWinnerPerRound",
+        "Multi-winner allow only one winner per round"),
+    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("multiSeatAllowMultipleWinnerPerRound",
+        "Multi-winner allow multiple winners per round"),
+    MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS("multiSeatBottomsUp", "Bottoms-up"),
+    MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD("multiSeatBottomsUpUsingPercentageThreshold",
+        "Bottoms-up using percentage threshold"),
+    MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("multiSeatSequentialWinnerTakesAll", "Multi-pass IRV"),
+    MODE_UNKNOWN("modeUnknown", "Unknown mode");
 
-    private final String label;
+    private final String internalLabel;
+    private final String uiLabel;
 
-    WinnerElectionMode(String label) {
-      this.label = label;
+    WinnerElectionMode(String internalLabel, String uiLabel) {
+      this.internalLabel = internalLabel;
+      this.uiLabel = uiLabel;
     }
 
-    static WinnerElectionMode getByLabel(String labelLookup) {
+    static WinnerElectionMode getByInternalLabel(String labelLookup) {
       return Arrays.stream(WinnerElectionMode.values())
-          .filter(v -> v.label.equals(labelLookup))
+          .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
           .orElse(null);
     }
 
     @Override
     public String toString() {
-      return label;
+      return uiLabel;
+    }
+
+    public String getInternalLabel() {
+      return internalLabel;
     }
   }
 
