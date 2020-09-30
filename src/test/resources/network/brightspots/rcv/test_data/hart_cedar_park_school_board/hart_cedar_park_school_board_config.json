@@ -63,10 +63,10 @@
   "rules" : {
     "tiebreakMode": "random",
     "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleSeat",
+    "winnerElectionMode": "singleWinnerMajority",
     "randomSeed": "9",
     "numberOfWinners": "1",
-    "multiSeatBottomsUpPercentageThreshold": "",
+    "bottomsUpPercentageThreshold": "",
     "decimalPlacesForVoteArithmetic": "4",
     "minimumVoteThreshold": "0",
     "maxSkippedRanksAllowed": "1",

@@ -35,12 +35,12 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "usePermutationInConfig",
+    "tiebreakMode": "useCandidateOrder",
     "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "multiSeatAllowMultipleWinnersPerRound",
+    "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
     "randomSeed": "",
     "numberOfWinners": "2",
-    "multiSeatBottomsUpPercentageThreshold": "",
+    "bottomsUpPercentageThreshold": "",
     "decimalPlacesForVoteArithmetic": "4",
     "minimumVoteThreshold": "0",
     "maxSkippedRanksAllowed": "1",

@@ -40,9 +40,9 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "usePermutationInConfig",
+    "tiebreakMode": "useCandidateOrder",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "singleSeat",
+    "winnerElectionMode": "singleWinnerMajority",
     "numberOfWinners": 1,
     "decimalPlacesForVoteArithmetic": 4,
     "minimumVoteThreshold": 0,

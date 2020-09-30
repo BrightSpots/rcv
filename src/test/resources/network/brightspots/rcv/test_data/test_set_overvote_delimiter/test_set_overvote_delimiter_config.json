@@ -41,12 +41,12 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "usePermutationInConfig",
+    "tiebreakMode": "useCandidateOrder",
     "overvoteRule": "exhaustIfMultipleContinuing",
-    "winnerElectionMode": "singleSeat",
+    "winnerElectionMode": "singleWinnerMajority",
     "randomSeed": "",
     "numberOfWinners": "1",
-    "multiSeatBottomsUpPercentageThreshold": "",
+    "bottomsUpPercentageThreshold": "",
     "decimalPlacesForVoteArithmetic": "4",
     "minimumVoteThreshold": "",
     "maxSkippedRanksAllowed": "1",

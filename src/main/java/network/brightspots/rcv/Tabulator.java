@@ -1109,12 +1109,12 @@ class Tabulator {
   // TieBreakMode determines how ties will be handled
   enum TieBreakMode {
     RANDOM("random", "Random"),
-    INTERACTIVE("interactive", "Stop counting and ask"),
+    INTERACTIVE("stopCountingAndAsk", "Stop counting and ask"),
     PREVIOUS_ROUND_COUNTS_THEN_RANDOM("previousRoundCountsThenRandom",
         "Previous round counts (then random)"),
-    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("previousRoundCountsThenInteractive",
+    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("previousRoundCountsThenAsk",
         "Previous round counts (then stop counting and ask)"),
-    USE_PERMUTATION_IN_CONFIG("usePermutationInConfig", "Use candidate order in the config file"),
+    USE_PERMUTATION_IN_CONFIG("useCandidateOrder", "Use candidate order in the config file"),
     GENERATE_PERMUTATION("generatePermutation", "Generate permutation"),
     MODE_UNKNOWN("modeUnknown", "Unknown mode");
 
@@ -1144,15 +1144,15 @@ class Tabulator {
   }
 
   enum WinnerElectionMode {
-    STANDARD_SINGLE_WINNER("singleSeat", "Single-winner majority determines winner"),
-    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("multiSeatAllowOnlyOneWinnerPerRound",
+    STANDARD_SINGLE_WINNER("singleWinnerMajority", "Single-winner majority determines winner"),
+    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("multiWinnerAllowOnlyOneWinnerPerRound",
         "Multi-winner allow only one winner per round"),
-    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("multiSeatAllowMultipleWinnersPerRound",
+    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("multiWinnerAllowMultipleWinnersPerRound",
         "Multi-winner allow multiple winners per round"),
-    MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS("multiSeatBottomsUp", "Bottoms-up"),
-    MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD("multiSeatBottomsUpUsingPercentageThreshold",
+    MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS("bottomsUp", "Bottoms-up"),
+    MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD("bottomsUpUsingPercentageThreshold",
         "Bottoms-up using percentage threshold"),
-    MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("multiSeatSequentialWinnerTakesAll", "Multi-pass IRV"),
+    MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("multiPassIrv", "Multi-pass IRV"),
     MODE_UNKNOWN("modeUnknown", "Unknown mode");
 
     private final String internalLabel;

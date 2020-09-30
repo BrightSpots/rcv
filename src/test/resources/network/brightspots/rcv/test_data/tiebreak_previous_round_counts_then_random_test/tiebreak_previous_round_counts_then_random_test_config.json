@@ -42,7 +42,7 @@
   "rules" : {
     "tiebreakMode": "previousRoundCountsThenRandom",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "singleSeat",
+    "winnerElectionMode": "singleWinnerMajority",
     "randomSeed": "12345",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "4",

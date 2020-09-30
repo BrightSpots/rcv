@@ -36,9 +36,9 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "interactive",
+    "tiebreakMode": "stopCountingAndAsk",
     "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiSeatSequentialWinnerTakesAll",
+    "winnerElectionMode": "multiPassIrv",
     "randomSeed": "",
     "numberOfWinners": "2",
     "decimalPlacesForVoteArithmetic": "4",

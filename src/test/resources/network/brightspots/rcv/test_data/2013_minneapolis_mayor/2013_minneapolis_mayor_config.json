@@ -166,7 +166,7 @@
   "rules" : {
     "tiebreakMode": "random",
     "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleSeat",
+    "winnerElectionMode": "singleWinnerMajority",
     "randomSeed": "0",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "4",
