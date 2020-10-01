@@ -14,7 +14,7 @@
       "filePath": "nist_xml_cdf_2.xml",
       "idColumnIndex": "",
       "precinctColumnIndex": "",
-      "provider": "CDF",
+      "provider": "cdf",
       "contestId": "For Governor and Lieutenant Governor",
       "treatBlankAsUndeclaredWriteIn": false,
       "overvoteLabel": "",
@@ -40,9 +40,9 @@
     }
   ],
   "rules": {
-    "tiebreakMode": "Random",
-    "overvoteRule": "Exhaust immediately",
-    "winnerElectionMode": "Single-winner majority determines winner",
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "singleWinnerMajority",
     "randomSeed": "0",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "1",

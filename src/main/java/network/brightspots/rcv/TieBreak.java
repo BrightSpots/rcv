@@ -295,8 +295,8 @@ class TieBreak {
               candidatesInContention.size() > 2 ? "among" : "between",
               Utils.listToSentenceWithQuotes(candidatesInContention),
               tieBreakMode == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
-                  ? "random"
-                  : "interactive");
+                  ? TieBreakMode.RANDOM.getInternalLabel()
+                  : TieBreakMode.INTERACTIVE.getInternalLabel());
       if (tieBreakMode == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
         selection = doInteractive(candidatesInContention);
       } else { // PREVIOUS_ROUND_COUNTS_THEN_RANDOM

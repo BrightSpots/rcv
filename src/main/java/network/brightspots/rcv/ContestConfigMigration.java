@@ -110,22 +110,24 @@ class ContestConfigMigration {
         switch (oldWinnerElectionMode) {
           case "standard" -> rules.winnerElectionMode =
               config.getNumberOfWinners() > 1
-                  ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND.toString()
-                  : WinnerElectionMode.STANDARD_SINGLE_WINNER.toString();
+                  ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND
+                  .getInternalLabel()
+                  : WinnerElectionMode.STANDARD_SINGLE_WINNER.getInternalLabel();
           case "singleSeatContinueUntilTwoCandidatesRemain" -> {
             rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER
-                .toString();
+                .getInternalLabel();
             rules.continueUntilTwoCandidatesRemain = true;
           }
           case "multiSeatAllowOnlyOneWinnerPerRound" -> rules.winnerElectionMode =
-              WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.toString();
+              WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.getInternalLabel();
           case "multiSeatBottomsUp" -> rules.winnerElectionMode =
               config.getNumberOfWinners() == 0
                   || config.getMultiSeatBottomsUpPercentageThreshold() != null
-                  ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD.toString()
-                  : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.toString();
+                  ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD
+                  .getInternalLabel()
+                  : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.getInternalLabel();
           case "multiSeatSequentialWinnerTakesAll" -> rules.winnerElectionMode =
-              WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.toString();
+              WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.getInternalLabel();
           default -> {
             Logger.warning(
                 "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
@@ -136,19 +138,19 @@ class ContestConfigMigration {
       }
 
       if (config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
-        Map<String, String> tiebreakModeMigrationMap = Map.of(
-            "random", TieBreakMode.RANDOM.toString(),
-            "interactive", TieBreakMode.INTERACTIVE.toString(),
+        Map<String, TieBreakMode> tiebreakModeMigrationMap = Map.of(
+            "random", TieBreakMode.RANDOM,
+            "interactive", TieBreakMode.INTERACTIVE,
             "previousRoundCountsThenRandom",
-            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM.toString(),
+            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
             "previousRoundCountsThenInteractive",
-            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE.toString(),
-            "usePermutationInConfig", TieBreakMode.USE_PERMUTATION_IN_CONFIG.toString(),
-            "generatePermutation", TieBreakMode.GENERATE_PERMUTATION.toString()
+            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
+            "usePermutationInConfig", TieBreakMode.USE_PERMUTATION_IN_CONFIG,
+            "generatePermutation", TieBreakMode.GENERATE_PERMUTATION
         );
         String oldTiebreakMode = rules.tiebreakMode;
         if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
-          rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode);
+          rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode).getInternalLabel();
         } else {
           Logger.warning(
               "tiebreakMode \"%s\" is unrecognized! Please supply a valid tiebreakMode.",
@@ -157,25 +159,8 @@ class ContestConfigMigration {
         }
       }
 
-      if (config.getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
-        String oldOvervoteRule = rules.overvoteRule;
-        switch (oldOvervoteRule) {
-          case "alwaysSkipToNextRank" -> rules.overvoteRule = OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-              .toString();
-          case "exhaustImmediately" -> rules.overvoteRule = OvervoteRule.EXHAUST_IMMEDIATELY
-              .toString();
-          case "exhaustIfMultipleContinuing" -> rules.overvoteRule = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING
-              .toString();
-          default -> {
-            Logger.warning(
-                "overvoteRule \"%s\" is unrecognized! Please supply a valid overvoteRule.",
-                oldOvervoteRule);
-            rules.overvoteRule = null;
-          }
-        }
-      }
-
-      // These four fields were previously at the config level, but are now set on a per-source basis.
+      // These four fields were previously at the config level, but are now set on a per-source
+      // basis.
 
       if (!isNullOrBlank(rules.overvoteLabel)) {
         for (CvrSource source : rawConfig.cvrFileSources) {

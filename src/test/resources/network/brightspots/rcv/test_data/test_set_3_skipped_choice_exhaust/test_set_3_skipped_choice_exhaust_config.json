@@ -14,7 +14,7 @@
     "filePath" : "test_set_3_skipped_choice_exhaust_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF",
+    "provider" : "cdf",
     "contestId": "test set 3",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
@@ -39,9 +39,9 @@
     "excluded" : false
   }],
   "rules" : {
-    "tiebreakMode": "Random",
-    "overvoteRule": "Always skip to next rank",
-    "winnerElectionMode": "Single-winner majority determines winner",
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "singleWinnerMajority",
     "randomSeed": "0",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "1",

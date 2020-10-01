@@ -16,7 +16,7 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "ES&S"
+    "provider" : "ess"
   } ],
   "candidates" : [ {
     "name" : "Mookie Blaylock",
@@ -36,9 +36,9 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "Stop counting and ask",
-    "overvoteRule": "Always skip to next rank",
-    "winnerElectionMode": "Multi-pass IRV",
+    "tiebreakMode": "stopCountingAndAsk",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "multiPassIrv",
     "randomSeed": "",
     "numberOfWinners": "2",
     "decimalPlacesForVoteArithmetic": "4",

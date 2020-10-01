@@ -417,7 +417,7 @@ class ContestConfig {
 
 
   static Provider getProvider(CvrSource cvrSource) {
-    Provider provider = Provider.getByLabel(cvrSource.getProvider());
+    Provider provider = Provider.getByInternalLabel(cvrSource.getProvider());
     return provider == null ? Provider.PROVIDER_UNKNOWN : provider;
   }
 
@@ -867,7 +867,8 @@ class ContestConfig {
   }
 
   WinnerElectionMode getWinnerElectionMode() {
-    WinnerElectionMode mode = WinnerElectionMode.getByLabel(rawConfig.rules.winnerElectionMode);
+    WinnerElectionMode mode = WinnerElectionMode
+        .getByInternalLabel(rawConfig.rules.winnerElectionMode);
     return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
   }
 
@@ -1008,7 +1009,7 @@ class ContestConfig {
   }
 
   OvervoteRule getOvervoteRule() {
-    OvervoteRule rule = OvervoteRule.getByLabel(rawConfig.rules.overvoteRule);
+    OvervoteRule rule = OvervoteRule.getByInternalLabel(rawConfig.rules.overvoteRule);
     return rule == null ? OvervoteRule.RULE_UNKNOWN : rule;
   }
 
@@ -1033,7 +1034,7 @@ class ContestConfig {
   }
 
   TieBreakMode getTiebreakMode() {
-    TieBreakMode mode = TieBreakMode.getByLabel(rawConfig.rules.tiebreakMode);
+    TieBreakMode mode = TieBreakMode.getByInternalLabel(rawConfig.rules.tiebreakMode);
     return mode == null ? TieBreakMode.MODE_UNKNOWN : mode;
   }
 
@@ -1119,29 +1120,35 @@ class ContestConfig {
   }
 
   enum Provider {
-    CDF("CDF"),
-    CLEAR_BALLOT("Clear Ballot"),
-    DOMINION("Dominion"),
-    ESS("ES&S"),
-    HART("Hart"),
-    PROVIDER_UNKNOWN("Provider unknown");
+    CDF("cdf", "CDF"),
+    CLEAR_BALLOT("clearBallot", "Clear Ballot"),
+    DOMINION("dominion", "Dominion"),
+    ESS("ess", "ES&S"),
+    HART("hart", "Hart"),
+    PROVIDER_UNKNOWN("providerUnknown", "Provider unknown");
 
-    private final String label;
+    private final String internalLabel;
+    private final String guiLabel;
 
-    Provider(String label) {
-      this.label = label;
+    Provider(String internalLabel, String guiLabel) {
+      this.internalLabel = internalLabel;
+      this.guiLabel = guiLabel;
     }
 
-    static Provider getByLabel(String labelLookup) {
+    static Provider getByInternalLabel(String labelLookup) {
       return Arrays.stream(Provider.values())
-          .filter(v -> v.label.equals(labelLookup))
+          .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
           .orElse(null);
     }
 
     @Override
     public String toString() {
-      return label;
+      return guiLabel;
+    }
+
+    public String getInternalLabel() {
+      return internalLabel;
     }
   }
 

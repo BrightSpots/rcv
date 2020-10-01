@@ -13,25 +13,25 @@
       "firstVoteColumnIndex": 3,
       "firstVoteRowIndex": 2,
       "precinctColumnIndex": 1,
-      "provider": "ES&S",
+      "provider": "ess",
       "treatBlankAsUndeclaredWriteIn": false
     },
     {
       "filePath": "test_data/nonexistent_path2",
-      "provider": "ES&S",
+      "provider": "ess",
       "treatBlankAsUndeclaredWriteIn": false
     },
     {
       "firstVoteColumnIndex": 3,
       "firstVoteRowIndex": 0,
       "precinctColumnIndex": 1,
-      "provider": "ES&S",
+      "provider": "ess",
       "treatBlankAsUndeclaredWriteIn": false
     },
     {
       "filePath": "invalid_sources_test_cvr.xlsx",
       "firstVoteColumnIndex": 2,
-      "provider": "ES&S",
+      "provider": "ess",
       "treatBlankAsUndeclaredWriteIn": false
     }
   ],
@@ -44,9 +44,9 @@
     }
   ],
   "rules": {
-    "tiebreakMode": "Random",
+    "tiebreakMode": "random",
     "random Seed": 0,
-    "overvoteRule": "Exhaust immediately",
+    "overvoteRule": "exhaustImmediately",
     "maxRankingsAllowed": 3,
     "maxSkippedRanksAllowed": 1,
     "numberOfWinners": 1,
