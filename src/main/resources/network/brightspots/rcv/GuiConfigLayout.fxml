@@ -264,12 +264,6 @@
               </VBox>
               <VBox styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label
-                    text="Note: double-click existing entries below to edit and press Enter to save changes.">
-                    <padding>
-                      <Insets left="2.0"/>
-                    </padding>
-                  </Label>
                   <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
                   <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
                     text="Delete Selected"/>

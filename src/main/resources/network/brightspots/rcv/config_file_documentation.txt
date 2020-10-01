@@ -234,7 +234,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
       "multiSeatBottomsUpPercentageThreshold" required if winnerElectionMode is "bottomsUpUsingPercentageThreshold" and numberOfWinners is 0
         the percentage threshold used to determine when to stop the tabulation and declare winners
-        note: only valid when winnerElectionMode is "Bottoms-up using percentage threshold" and numberOfWinners is 0
+        note: only valid when winnerElectionMode is "bottomsUpUsingPercentageThreshold" and numberOfWinners is 0
         value: [1..100]
 
       "rulesDescription" optional

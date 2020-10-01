@@ -1128,11 +1128,11 @@ class ContestConfig {
     PROVIDER_UNKNOWN("providerUnknown", "Provider unknown");
 
     private final String internalLabel;
-    private final String uiLabel;
+    private final String guiLabel;
 
-    Provider(String internalLabel, String uiLabel) {
+    Provider(String internalLabel, String guiLabel) {
       this.internalLabel = internalLabel;
-      this.uiLabel = uiLabel;
+      this.guiLabel = guiLabel;
     }
 
     static Provider getByInternalLabel(String labelLookup) {
@@ -1144,7 +1144,7 @@ class ContestConfig {
 
     @Override
     public String toString() {
-      return uiLabel;
+      return guiLabel;
     }
 
     public String getInternalLabel() {

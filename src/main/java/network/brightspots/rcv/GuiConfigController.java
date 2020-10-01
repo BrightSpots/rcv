@@ -37,6 +37,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -358,6 +359,7 @@ public class GuiConfigController implements Initializable {
         loadConfig(GuiContext.getInstance().getConfig());
         labelCurrentlyLoaded.setText("Currently loaded: " + fileToLoad.getAbsolutePath());
       } catch (ConfigVersionIsNewerThanAppVersionException e) {
+        // error is logged; nothing else to do here
       }
     }
   }
@@ -1054,7 +1056,8 @@ public class GuiConfigController implements Initializable {
           textFieldCvrUndervoteLabel.setDisable(false);
           textFieldCvrUndervoteLabel.setText(ContestConfig.SUGGESTED_UNDERVOTE_LABEL);
           checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(false);
-          checkBoxCvrTreatBlankAsUndeclaredWriteIn.setSelected(ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
+          checkBoxCvrTreatBlankAsUndeclaredWriteIn
+              .setSelected(ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
         }
         case CLEAR_BALLOT, DOMINION, HART -> {
           buttonAddCvrFile.setDisable(false);
@@ -1087,7 +1090,10 @@ public class GuiConfigController implements Initializable {
     tableColumnCvrOvervoteDelimiter.setCellValueFactory(
         new PropertyValueFactory<>("overvoteDelimiter"));
     tableColumnCvrOvervoteDelimiter.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCvrProvider.setCellValueFactory(new PropertyValueFactory<>("provider"));
+    tableColumnCvrProvider.setCellValueFactory(
+        c -> new SimpleStringProperty(
+            Provider.getByInternalLabel(c.getValue().getProvider()).toString())
+    );
     tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrContestId.setCellValueFactory(new PropertyValueFactory<>("contestId"));
     tableColumnCvrContestId.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -1095,21 +1101,13 @@ public class GuiConfigController implements Initializable {
     tableColumnCvrOvervoteLabel.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrUndervoteLabel.setCellValueFactory(new PropertyValueFactory<>("undervoteLabel"));
     tableColumnCvrUndervoteLabel.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCvrUndeclaredWriteInLabel.setCellValueFactory(new PropertyValueFactory<>("undeclaredWriteInLabel"));
+    tableColumnCvrUndeclaredWriteInLabel
+        .setCellValueFactory(new PropertyValueFactory<>("undeclaredWriteInLabel"));
     tableColumnCvrUndeclaredWriteInLabel.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCvrTreatBlankAsUndeclaredWriteIn.setCellValueFactory(
-        c -> {
-          CvrSource source = c.getValue();
-          CheckBox checkBox = new CheckBox();
-          checkBox.selectedProperty().setValue(source.isTreatBlankAsUndeclaredWriteIn());
-          checkBox
-              .selectedProperty()
-              .addListener((ov, oldVal, newVal) -> source.setTreatBlankAsUndeclaredWriteIn(newVal));
-          //noinspection unchecked
-          return new SimpleObjectProperty(checkBox);
-        });
+    tableColumnCvrTreatBlankAsUndeclaredWriteIn
+        .setCellValueFactory(new PropertyValueFactory<>("treatBlankAsUndeclaredWriteIn"));
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    tableViewCvrFiles.setEditable(true);
+    tableViewCvrFiles.setEditable(false);
 
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
     tableColumnCandidateName.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -1327,9 +1325,13 @@ public class GuiConfigController implements Initializable {
           source.getOvervoteDelimiter() != null ? source.getOvervoteDelimiter().trim() : "");
       source.setProvider(source.getProvider() != null ? source.getProvider().trim() : "");
       source.setContestId(source.getContestId() != null ? source.getContestId().trim() : "");
-      source.setOvervoteLabel(source.getOvervoteLabel() != null ? source.getOvervoteLabel().trim() : "");
-      source.setUndervoteLabel(source.getUndervoteLabel() != null ? source.getUndervoteLabel().trim() : "");
-      source.setUndeclaredWriteInLabel(source.getUndeclaredWriteInLabel() != null ? source.getUndeclaredWriteInLabel().trim() : "");
+      source.setOvervoteLabel(
+          source.getOvervoteLabel() != null ? source.getOvervoteLabel().trim() : "");
+      source.setUndervoteLabel(
+          source.getUndervoteLabel() != null ? source.getUndervoteLabel().trim() : "");
+      source.setUndeclaredWriteInLabel(
+          source.getUndeclaredWriteInLabel() != null ? source.getUndeclaredWriteInLabel().trim()
+              : "");
     }
     config.cvrFileSources = cvrSources;
 

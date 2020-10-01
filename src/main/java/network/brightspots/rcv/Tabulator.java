@@ -1075,11 +1075,11 @@ class Tabulator {
     RULE_UNKNOWN("ruleUnknown", "Unknown rule");
 
     private final String internalLabel;
-    private final String uiLabel;
+    private final String guiLabel;
 
-    OvervoteRule(String internalLabel, String uiLabel) {
+    OvervoteRule(String internalLabel, String guiLabel) {
       this.internalLabel = internalLabel;
-      this.uiLabel = uiLabel;
+      this.guiLabel = guiLabel;
     }
 
     static OvervoteRule getByInternalLabel(String labelLookup) {
@@ -1091,7 +1091,7 @@ class Tabulator {
 
     @Override
     public String toString() {
-      return uiLabel;
+      return guiLabel;
     }
 
     public String getInternalLabel() {
@@ -1119,11 +1119,11 @@ class Tabulator {
     MODE_UNKNOWN("modeUnknown", "Unknown mode");
 
     private final String internalLabel;
-    private final String uiLabel;
+    private final String guiLabel;
 
-    TieBreakMode(String internalLabel, String uiLabel) {
+    TieBreakMode(String internalLabel, String guiLabel) {
       this.internalLabel = internalLabel;
-      this.uiLabel = uiLabel;
+      this.guiLabel = guiLabel;
     }
 
     static TieBreakMode getByInternalLabel(String labelLookup) {
@@ -1135,7 +1135,7 @@ class Tabulator {
 
     @Override
     public String toString() {
-      return uiLabel;
+      return guiLabel;
     }
 
     public String getInternalLabel() {
@@ -1156,11 +1156,11 @@ class Tabulator {
     MODE_UNKNOWN("modeUnknown", "Unknown mode");
 
     private final String internalLabel;
-    private final String uiLabel;
+    private final String guiLabel;
 
-    WinnerElectionMode(String internalLabel, String uiLabel) {
+    WinnerElectionMode(String internalLabel, String guiLabel) {
       this.internalLabel = internalLabel;
-      this.uiLabel = uiLabel;
+      this.guiLabel = guiLabel;
     }
 
     static WinnerElectionMode getByInternalLabel(String labelLookup) {
@@ -1172,7 +1172,7 @@ class Tabulator {
 
     @Override
     public String toString() {
-      return uiLabel;
+      return guiLabel;
     }
 
     public String getInternalLabel() {
