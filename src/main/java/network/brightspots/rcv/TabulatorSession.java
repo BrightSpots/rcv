@@ -144,6 +144,19 @@ class TabulatorSession {
       Logger.log(Level.INFO, "Computer name: %s", Utils.getComputerName());
       Logger.log(Level.INFO, "User name: %s", Utils.getUserName());
       Logger.log(Level.INFO, "Config file: %s", configPath);
+      try {
+        Logger.log(Level.FINE, "Begin config file contents:");
+        BufferedReader reader = new BufferedReader(new FileReader(configPath));
+        String line = reader.readLine();
+        while (line != null) {
+          Logger.log(Level.FINE, line);
+          line = reader.readLine();
+        }
+        Logger.log(Level.FINE, "End config file contents.");
+        reader.close();
+      } catch (IOException e) {
+        Logger.log(Level.SEVERE, "Error logging config file: %s\n%s", configPath, e.toString());
+      }
       Logger.log(Level.INFO, "Tabulating '%s'...", config.getContestName());
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         Logger.log(Level.INFO, "This is a multi-pass IRV contest.");
