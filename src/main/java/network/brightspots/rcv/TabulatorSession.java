@@ -141,24 +141,12 @@ class TabulatorSession {
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
     if (config != null && config.validate() && setUpLogging(config)) {
-      try {
-        Logger.log(Level.INFO, "Computer name: %s", Utils.getComputerName());
-        Logger.log(Level.INFO, "User name: %s", Utils.getUserName());
-        Logger.log(Level.INFO, "Begin config file contents:");
-        BufferedReader reader = new BufferedReader(new FileReader(configPath));
-        String line = reader.readLine();
-        while (line != null) {
-          Logger.log(Level.INFO, line);
-          line = reader.readLine();
-        }
-        Logger.log(Level.INFO, "End config file contents.");
-        reader.close();
-      } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error logging config file: %s\n%s", configPath, e.toString());
-      }
+      Logger.log(Level.INFO, "Computer name: %s", Utils.getComputerName());
+      Logger.log(Level.INFO, "User name: %s", Utils.getUserName());
+      Logger.log(Level.INFO, "Config file: %s", configPath);
       Logger.log(Level.INFO, "Tabulating '%s'...", config.getContestName());
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
-        Logger.log(Level.INFO, "This is a sequential multi-seat contest.");
+        Logger.log(Level.INFO, "This is a multi-pass IRV contest.");
         int numWinners = config.getNumberOfWinners();
         // temporarily set config to single-seat so we can run sequential elections
         config.setNumberOfWinners(1);
@@ -199,7 +187,7 @@ class TabulatorSession {
         }
         tabulationSuccess = true;
       } else {
-        // normal operation (not sequential multi-seat)
+        // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
         // Read cast vote records and precinct IDs from CVR files
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
         if (castVoteRecords == null) {
