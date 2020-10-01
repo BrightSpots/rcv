@@ -1109,22 +1109,10 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.setEditable(true);
 
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
-    tableColumnCandidateName.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
-    tableColumnCandidateCode.setCellFactory(TextFieldTableCell.forTableColumn());
-    tableColumnCandidateExcluded.setCellValueFactory(
-        c -> {
-          Candidate candidate = c.getValue();
-          CheckBox checkBox = new CheckBox();
-          checkBox.selectedProperty().setValue(candidate.isExcluded());
-          checkBox
-              .selectedProperty()
-              .addListener((ov, oldVal, newVal) -> candidate.setExcluded(newVal));
-          //noinspection unchecked
-          return new SimpleObjectProperty(checkBox);
-        });
+    tableColumnCandidateExcluded.setCellValueFactory(new PropertyValueFactory<>("excluded"));
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    tableViewCandidates.setEditable(true);
+    tableViewCandidates.setEditable(false);
 
     clearAndDisableWinningRuleFields();
     choiceTiebreakMode.getItems().addAll(TieBreakMode.values());
