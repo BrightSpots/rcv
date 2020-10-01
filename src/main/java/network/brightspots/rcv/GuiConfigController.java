@@ -1076,34 +1076,23 @@ public class GuiConfigController implements Initializable {
       }
     });
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
-    tableColumnCvrFilePath.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteCol.setCellValueFactory(
         new PropertyValueFactory<>("firstVoteColumnIndex"));
-    tableColumnCvrFirstVoteCol.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
-    tableColumnCvrFirstVoteRow.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
-    tableColumnCvrIdCol.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrPrecinctCol.setCellValueFactory(
         new PropertyValueFactory<>("precinctColumnIndex"));
-    tableColumnCvrPrecinctCol.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrOvervoteDelimiter.setCellValueFactory(
         new PropertyValueFactory<>("overvoteDelimiter"));
-    tableColumnCvrOvervoteDelimiter.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrProvider.setCellValueFactory(
         c -> new SimpleStringProperty(
             Provider.getByInternalLabel(c.getValue().getProvider()).toString())
     );
-    tableColumnCvrProvider.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrContestId.setCellValueFactory(new PropertyValueFactory<>("contestId"));
-    tableColumnCvrContestId.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrOvervoteLabel.setCellValueFactory(new PropertyValueFactory<>("overvoteLabel"));
-    tableColumnCvrOvervoteLabel.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrUndervoteLabel.setCellValueFactory(new PropertyValueFactory<>("undervoteLabel"));
-    tableColumnCvrUndervoteLabel.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrUndeclaredWriteInLabel
         .setCellValueFactory(new PropertyValueFactory<>("undeclaredWriteInLabel"));
-    tableColumnCvrUndeclaredWriteInLabel.setCellFactory(TextFieldTableCell.forTableColumn());
     tableColumnCvrTreatBlankAsUndeclaredWriteIn
         .setCellValueFactory(new PropertyValueFactory<>("treatBlankAsUndeclaredWriteIn"));
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
