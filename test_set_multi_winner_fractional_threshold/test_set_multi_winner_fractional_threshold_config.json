@@ -14,7 +14,7 @@
     "filePath" : "test_set_multi_winner_fractional_threshold_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF",
+    "provider" : "cdf",
     "contestId": "test set multi winner fractional",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
@@ -47,9 +47,9 @@
     "excluded": false
   }],
   "rules" : {
-    "tiebreakMode": "Stop counting and ask",
-    "overvoteRule": "Always skip to next rank",
-    "winnerElectionMode": "Multi-winner allow multiple winners per round",
+    "tiebreakMode": "stopCountingAndAsk",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
     "randomSeed": "1",
     "numberOfWinners": "3",
     "decimalPlacesForVoteArithmetic": "4",

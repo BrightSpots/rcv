@@ -16,7 +16,7 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "1",
-    "provider" : "ES&S",
+    "provider" : "ess",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "overvote",
     "undervoteLabel": "undervote",
@@ -96,9 +96,9 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "Use candidate order in the config file",
-    "overvoteRule": "Always skip to next rank",
-    "winnerElectionMode": "Single-winner majority determines winner",
+    "tiebreakMode": "useCandidateOrder",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "singleWinnerMajority",
     "randomSeed": "",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "4",

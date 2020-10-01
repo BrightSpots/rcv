@@ -14,7 +14,7 @@
     "filePath" : "test_set_1_exhaust_at_overvote_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF",
+    "provider" : "cdf",
     "contestId": "test set 1",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
@@ -39,9 +39,9 @@
     "excluded" : false
   }],
   "rules" : {
-    "tiebreakMode": "Random",
-    "overvoteRule": "Exhaust immediately",
-    "winnerElectionMode": "Single-winner majority determines winner",
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "singleWinnerMajority",
     "randomSeed": "0",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "1",
