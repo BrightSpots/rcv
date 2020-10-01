@@ -95,6 +95,8 @@ Or, again, if you're compiling and running using Gradle:
 
 `$ gradlew run --args="-cli path/to/config  convert-to-cdf"`
 
+Note: if you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, you'll need to update each label in your new CDF-based config to match the ContestSelection ID assigned to the label in the generated CDF file.
+
 ## Viewing Tabulator Output
 
 Tabulator output file names automatically include the current date and time, e.g. `2019-06-25_17-19-28_summary.csv`. This keeps them separate if you tabulate the same contest multiple times.
