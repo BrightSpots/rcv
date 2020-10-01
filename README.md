@@ -95,6 +95,8 @@ Or, again, if you're compiling and running using Gradle:
 
 `$ gradlew run --args="-cli path/to/config  convert-to-cdf"`
 
+Note: if you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, the label will be represented differently in the generated CDF source file than it was in the original CVR source. When you create a new config using this generated CDF source file and you need to set overvoteLabel, you should use "cs-overvote". If you need to set undeclaredWriteInLabel, you should use "cs-undeclared_write-ins".
+
 ## Viewing Tabulator Output
 
 Tabulator output file names automatically include the current date and time, e.g. `2019-06-25_17-19-28_summary.csv`. This keeps them separate if you tabulate the same contest multiple times.

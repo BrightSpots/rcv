@@ -54,6 +54,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.DominionCvrReader.Contest;
+import network.brightspots.rcv.RawContestConfig.CvrSource;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -794,6 +795,18 @@ class ResultsWriter {
 
     // iterate all candidates and create Candidate and ContestSelection objects for them
     List<String> candidateCodes = new LinkedList<>(config.getCandidateCodeList());
+    // if any of the sources have overvote labels, we also need to register the explicit overvote
+    // as a valid candidate/contest selection
+    boolean includeExplicitOvervote = false;
+    for (CvrSource source : config.getRawConfig().cvrFileSources) {
+      if (!isNullOrBlank(source.getOvervoteLabel())) {
+        includeExplicitOvervote = true;
+        break;
+      }
+    }
+    if (includeExplicitOvervote) {
+      candidateCodes.add(Tabulator.EXPLICIT_OVERVOTE_LABEL);
+    }
     Collections.sort(candidateCodes);
     for (String candidateCode : candidateCodes) {
       candidates.add(
