@@ -121,13 +121,13 @@ class ResultsWriter {
 
     try {
       jsonWriter.writeValue(outFile, json);
-    } catch (IOException exception) {
+    } catch (IOException e) {
       Logger.log(
           Level.SEVERE,
           "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
           path,
-          exception);
-      throw exception;
+          e);
+      throw e;
     }
     Logger.log(Level.INFO, "JSON file generated successfully.");
   }
@@ -332,13 +332,13 @@ class ResultsWriter {
     try {
       BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
-    } catch (IOException exception) {
+    } catch (IOException e) {
       Logger.log(
           Level.SEVERE,
           "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
           csvPath,
-          exception);
-      throw exception;
+          e);
+      throw e;
     }
 
     addHeaderRows(csvPrinter, precinct);
@@ -405,9 +405,9 @@ class ResultsWriter {
     try {
       csvPrinter.flush();
       csvPrinter.close();
-    } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception);
-      throw exception;
+    } catch (IOException e) {
+      Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, e);
+      throw e;
     }
     Logger.log(Level.INFO, "Summary spreadsheet generated successfully.");
   }
@@ -590,12 +590,12 @@ class ResultsWriter {
         filesWritten.add(outputPath.toString());
         Logger.log(Level.INFO, "Successfully wrote: %s", outputPath.toString());
       }
-    } catch (IOException exception) {
+    } catch (IOException e) {
       Logger.log(Level.SEVERE,
           "Error writing cast vote records in generic format from input file: %s\n%s",
           csvOutputFolder,
-          exception);
-      throw exception;
+          e);
+      throw e;
     }
     return filesWritten;
   }

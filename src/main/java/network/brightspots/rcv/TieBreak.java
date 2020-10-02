@@ -187,7 +187,7 @@ class Tiebreak {
           // Convert from 1-indexed list back to 0-indexed list.
           selection = tiedCandidates.get(choice - 1);
         }
-      } catch (NumberFormatException exception) {
+      } catch (NumberFormatException e) {
         // if parseInt failed selection will be null and we will retry
       }
       if (selection == null) {
@@ -227,8 +227,8 @@ class Tiebreak {
         } else {
           selection = guiTiebreakerPromptResponse.selectedCandidate;
         }
-      } catch (InterruptedException | ExecutionException exception) {
-        Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception);
+      } catch (InterruptedException | ExecutionException e) {
+        Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", e);
       }
       if (selection == null) {
         Logger.log(Level.WARNING, "Invalid selection! Please try again.");
@@ -341,10 +341,10 @@ class Tiebreak {
         guiTiebreakerPromptResponse =
             new GuiTiebreakerPromptResponse(
                 controller.getTabulationCancelled(), controller.getSelectedCandidate());
-      } catch (IOException exception) {
+      } catch (IOException e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        exception.printStackTrace(pw);
+        e.printStackTrace(pw);
         Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw);
       }
       return guiTiebreakerPromptResponse;

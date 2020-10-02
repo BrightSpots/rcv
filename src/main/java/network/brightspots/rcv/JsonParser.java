@@ -43,7 +43,7 @@ class JsonParser {
       FileReader fileReader = new FileReader(jsonFilePath);
       ObjectMapper objectMapper = new ObjectMapper();
       createdObject = objectMapper.readValue(fileReader, valueType);
-    } catch (JsonParseException | JsonMappingException exception) {
+    } catch (JsonParseException | JsonMappingException e) {
       if (logsEnabled) {
         Logger.log(
             Level.SEVERE,
@@ -52,17 +52,17 @@ class JsonParser {
                 + "It might help to try surrounding values causing problems with quotes (e.g. "
                 + " \"value\").\nSee config_file_documentation.txt for more details.",
             jsonFilePath,
-            exception);
+            e);
       }
       createdObject = null;
-    } catch (IOException exception) {
+    } catch (IOException e) {
       if (logsEnabled) {
         Logger.log(
             Level.SEVERE,
             "Error opening file: %s\n%s\n"
                 + "Check file path and permissions and make sure they are correct!",
             jsonFilePath,
-            exception);
+            e);
       }
       createdObject = null;
     }
@@ -84,12 +84,12 @@ class JsonParser {
           .withDefaultPrettyPrinter()
           .writeValue(jsonFile, objectToSerialize);
       Logger.log(Level.INFO, "Successfully saved file: %s", jsonFile.getAbsolutePath());
-    } catch (IOException exception) {
+    } catch (IOException e) {
       Logger.log(
           Level.SEVERE,
           "Error saving file: %s\n%s",
           jsonFile.getAbsolutePath(),
-          exception);
+          e);
     }
   }
 }

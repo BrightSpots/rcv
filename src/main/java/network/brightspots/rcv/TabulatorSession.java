@@ -127,7 +127,7 @@ class TabulatorSession {
             // translating the input to CDF, not the tabulation results.
           }
         }
-      } catch (IOException | UnableToCreateDirectoryException exception) {
+      } catch (IOException | UnableToCreateDirectoryException e) {
         Logger.log(Level.SEVERE, "CDF JSON generation failed.");
       }
     } else {
@@ -237,8 +237,8 @@ class TabulatorSession {
       FileUtils.createOutputDirectory(config.getOutputDirectory());
       Logger.addTabulationFileLogging(tabulationLogPath);
       success = true;
-    } catch (UnableToCreateDirectoryException | IOException exception) {
-      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception);
+    } catch (UnableToCreateDirectoryException | IOException e) {
+      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", e);
     }
     if (!success) {
       Logger.log(Level.SEVERE, "Failed to configure logger!");
@@ -311,20 +311,21 @@ class TabulatorSession {
           continue;
         } else if (provider == Provider.HART) {
           Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
-          new HartCvrReader(cvrPath, source.getContestId(), config, source.getUndeclaredWriteInLabel())
+          new HartCvrReader(cvrPath, source.getContestId(), config,
+              source.getUndeclaredWriteInLabel())
               .readCastVoteRecordsFromFolder(castVoteRecords);
           continue;
         }
         throw new UnrecognizedProviderException();
-      } catch (UnrecognizedCandidatesException exception) {
+      } catch (UnrecognizedCandidatesException e) {
         Logger.log(Level.SEVERE, "Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
-        for (String candidate : exception.candidateCounts.keySet()) {
+        for (String candidate : e.candidateCounts.keySet()) {
           Logger.log(
               Level.SEVERE,
               "Unrecognized candidate \"%s\" appears %d time(s)!",
               candidate,
-              exception.candidateCounts.get(candidate));
+              e.candidateCounts.get(candidate));
         }
         // various incorrect settings can lead to UnrecognizedCandidatesException so it's hard
         // to know exactly what the problem is
@@ -358,9 +359,9 @@ class TabulatorSession {
         encounteredSourceProblem = true;
       } catch (CvrParseException e) {
         encounteredSourceProblem = true;
-      } catch (Exception exception) {
+      } catch (Exception e) {
         Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath,
-            exception);
+            e);
         encounteredSourceProblem = true;
       }
     }

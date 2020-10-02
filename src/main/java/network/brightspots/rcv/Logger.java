@@ -84,12 +84,12 @@ class Logger {
               logPath.toString(), LOG_FILE_MAX_SIZE_BYTES, EXECUTION_LOG_FILE_COUNT, true);
       executionHandler.setLevel(Level.INFO);
       logger.addHandler(executionHandler);
-    } catch (IOException exception) {
+    } catch (IOException e) {
       log(
           Level.WARNING,
           "Failed to start system logging!\nMake sure you have write access in %s\n%s.",
           System.getProperty("user.dir"),
-          exception);
+          e);
     }
 
     for (Handler handler : logger.getHandlers()) {

@@ -276,12 +276,12 @@ public class GuiConfigController implements Initializable {
                       ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename))))
               .lines()
               .collect(Collectors.joining("\n"));
-    } catch (Exception exception) {
+    } catch (Exception e) {
       Logger.log(
           Level.SEVERE,
           "Error loading text file: %s\n%s",
           configFileDocumentationFilename,
-          exception);
+          e);
       text =
           String.format(
               "<Error loading text file: %s>", configFileDocumentationFilename);
@@ -926,12 +926,12 @@ public class GuiConfigController implements Initializable {
                         selectedFile.getAbsolutePath(), RawContestConfig.class));
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
-    } catch (JsonProcessingException exception) {
+    } catch (JsonProcessingException e) {
       Logger.log(
           Level.WARNING,
           "Unable tell if saving is necessary, but everything should work fine anyway! Prompting "
               + "for save just in case...\n%s",
-          exception);
+          e);
     }
     return needsSaving;
   }
@@ -1164,11 +1164,11 @@ public class GuiConfigController implements Initializable {
               .writer()
               .withDefaultPrettyPrinter()
               .writeValueAsString(createRawContestConfig());
-    } catch (JsonProcessingException exception) {
+    } catch (JsonProcessingException e) {
       Logger.log(
           Level.WARNING,
           "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
-          exception);
+          e);
     }
   }
 
@@ -1192,7 +1192,7 @@ public class GuiConfigController implements Initializable {
       try {
         datePickerContestDate.setValue(
             LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
-      } catch (DateTimeParseException exception) {
+      } catch (DateTimeParseException e) {
         Logger.log(Level.SEVERE, "Invalid contestDate: %s!", outputSettings.contestDate);
         datePickerContestDate.setValue(null);
       }

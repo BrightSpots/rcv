@@ -43,10 +43,10 @@ public class GuiApplication extends Application {
       Parent root = FXMLLoader.load(getClass().getResource(resourcePath));
       window.setTitle(Main.APP_NAME);
       window.setScene(new Scene(root));
-    } catch (IOException exception) {
+    } catch (IOException e) {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
-      exception.printStackTrace(pw);
+      e.printStackTrace(pw);
       Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw);
     }
 
