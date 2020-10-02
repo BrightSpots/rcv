@@ -60,10 +60,6 @@ public class RawContestConfig {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
 
-    public String overvoteLabel;
-    public String undervoteLabel;
-    public String undeclaredWriteInLabel;
-    public boolean treatBlankAsUndeclaredWriteIn;
     private String filePath;
     private String contestId;
     private String firstVoteColumnIndex;
@@ -72,6 +68,10 @@ public class RawContestConfig {
     private String precinctColumnIndex;
     private String overvoteDelimiter;
     private String provider;
+    private String overvoteLabel;
+    private String undervoteLabel;
+    private String undeclaredWriteInLabel;
+    private boolean treatBlankAsUndeclaredWriteIn;
 
     CvrSource() {
     }
