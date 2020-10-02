@@ -19,7 +19,7 @@
 <module name="Checker">
   <module name="SuppressionFilter">
     <property default="checkstyle-suppressions.xml" name="file"
-      value="${org.checkstyle.google.suppressionfilter.config}"/>
+      value="${config_loc}/checkstyle-suppressions.xml"/>
     <property name="optional" value="true"/>
   </module>
 
