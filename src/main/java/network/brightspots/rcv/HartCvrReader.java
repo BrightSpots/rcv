@@ -38,7 +38,11 @@ class HartCvrReader {
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  HartCvrReader(String cvrPath, String contestId, ContestConfig contestConfig, String undeclaredWriteInLabel) {
+  HartCvrReader(
+      String cvrPath,
+      String contestId,
+      ContestConfig contestConfig,
+      String undeclaredWriteInLabel) {
     this.cvrPath = cvrPath;
     this.contestId = contestId;
     this.contestConfig = contestConfig;
@@ -57,8 +61,7 @@ class HartCvrReader {
         }
       }
     } else {
-      Logger.severe("Unable to find any files in directory: %s",
-          cvrRoot.getAbsolutePath());
+      Logger.severe("Unable to find any files in directory: %s", cvrRoot.getAbsolutePath());
       throw new IOException();
     }
 
@@ -68,8 +71,7 @@ class HartCvrReader {
   }
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
-  void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
-      throws IOException {
+  void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path) throws IOException {
     try {
       Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
@@ -106,15 +108,16 @@ class HartCvrReader {
           }
         }
 
-        CastVoteRecord cvr = new CastVoteRecord(
-            contest.Id,
-            null,
-            xmlCvr.BatchNumber,
-            xmlCvr.CvrGuid,
-            xmlCvr.PrecinctSplit.Name,
-            xmlCvr.PrecinctSplit.Id,
-            null,
-            rankings);
+        CastVoteRecord cvr =
+            new CastVoteRecord(
+                contest.Id,
+                null,
+                xmlCvr.BatchNumber,
+                xmlCvr.CvrGuid,
+                xmlCvr.PrecinctSplit.Name,
+                xmlCvr.PrecinctSplit.Id,
+                null,
+                rankings);
         castVoteRecords.add(cvr);
 
         // provide some user feedback on the Cvr count
@@ -179,5 +182,4 @@ class HartCvrReader {
     public Party Party;
     public ArrayList<Contest> Contests;
   }
-
 }

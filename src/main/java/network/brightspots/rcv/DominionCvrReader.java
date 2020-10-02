@@ -40,6 +40,8 @@ class DominionCvrReader {
   private final ContestConfig config;
   private final String manifestFolder;
   private final String undeclaredWriteInLabel;
+  // map for tracking unrecognized candidates during parsing
+  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // map of precinct Id to precinct description
   private Map<Integer, String> precincts;
   // map of precinct portion Id to precinct portion description
@@ -47,8 +49,6 @@ class DominionCvrReader {
   // map of contest Id to Contest data
   private Map<String, Contest> contests;
   private List<Candidate> candidates;
-  // map for tracking unrecognized candidates during parsing
-  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
   DominionCvrReader(ContestConfig config, String manifestFolder, String undeclaredWriteInLabel) {
     this.config = config;
@@ -167,8 +167,8 @@ class DominionCvrReader {
   }
 
   // parse the given file into a List of CastVoteRecords for tabulation
-  private void parseCvrFile(String filePath, List<CastVoteRecord> castVoteRecords,
-      String contestIdToLoad) {
+  private void parseCvrFile(
+      String filePath, List<CastVoteRecord> castVoteRecords, String contestIdToLoad) {
     // build a lookup map for candidates codes to optimize Cvr parsing
     Map<String, Set<String>> contestIdToCandidateCodes = new HashMap<>();
     for (Candidate candidate : this.candidates) {
@@ -211,9 +211,7 @@ class DominionCvrReader {
         // validate precinct
         Integer precinctId = (Integer) adjudicatedData.get("PrecinctId");
         if (precinctId != null && !this.precincts.containsKey(precinctId)) {
-          Logger.severe(
-              "Precinct ID \"%d\" from CVR not found in manifest data!",
-              precinctId);
+          Logger.severe("Precinct ID \"%d\" from CVR not found in manifest data!", precinctId);
           throw new CvrParseException();
         }
         String precinct = this.precincts.get(precinctId);
@@ -221,8 +219,7 @@ class DominionCvrReader {
         Integer precinctPortionId = (Integer) adjudicatedData.get("PrecinctPortionId");
         if (precinctPortionId != null && !this.precinctPortions.containsKey(precinctPortionId)) {
           Logger.severe(
-              "Precinct portion ID \"%d\" from CVR not found in manifest data!",
-              precinctPortionId);
+              "Precinct portion ID \"%d\" from CVR not found in manifest data!", precinctPortionId);
           throw new CvrParseException();
         }
         String precinctPortion = this.precinctPortions.get(precinctPortionId);
@@ -267,9 +264,7 @@ class DominionCvrReader {
             Set<String> candidates = contestIdToCandidateCodes.get(contestId);
             if (!candidates.contains(candidateCode)) {
               Logger.severe(
-                  "Candidate code '%s' is not valid for contest '%d'!",
-                  candidateCode,
-                  contestId);
+                  "Candidate code '%s' is not valid for contest '%d'!", candidateCode, contestId);
               throw new CvrParseException();
             }
             // We also need to throw an error if this candidate doesn't appear in the tabulator's
@@ -287,8 +282,14 @@ class DominionCvrReader {
           // create the new Cvr
           CastVoteRecord newCvr =
               new CastVoteRecord(
-                  contestId, tabulatorId, batchId, suppliedId, precinct, precinctPortion,
-                  ballotTypeId, rankings);
+                  contestId,
+                  tabulatorId,
+                  batchId,
+                  suppliedId,
+                  precinct,
+                  precinctPortion,
+                  ballotTypeId,
+                  rankings);
           castVoteRecords.add(newCvr);
         }
         // provide some user feedback on the Cvr count

@@ -88,7 +88,6 @@ public class Main extends GuiApplication {
     Logger.info("Launching %s version %s...", APP_NAME, APP_VERSION);
     Logger.info(
         "Host system: %s version %s",
-        System.getProperty("os.name"),
-        System.getProperty("os.version"));
+        System.getProperty("os.name"), System.getProperty("os.version"));
   }
 }

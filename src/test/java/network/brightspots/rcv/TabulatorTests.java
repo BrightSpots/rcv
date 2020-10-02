@@ -133,11 +133,16 @@ class TabulatorTests {
     }
 
     // If this is a Dominion tabulation test, also check the converted output file.
-    boolean isDominion = config.rawConfig.cvrFileSources.stream().anyMatch(source ->
-        ContestConfig.getProvider(source) == Provider.DOMINION);
+    boolean isDominion =
+        config.rawConfig.cvrFileSources.stream()
+            .anyMatch(source -> ContestConfig.getProvider(source) == Provider.DOMINION);
     if (isDominion) {
-      String expectedPath = getTestFilePath(stem,
-          "_contest_" + config.rawConfig.cvrFileSources.get(0).getContestId() + "_expected.csv");
+      String expectedPath =
+          getTestFilePath(
+              stem,
+              "_contest_"
+                  + config.rawConfig.cvrFileSources.get(0).getContestId()
+                  + "_expected.csv");
       assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
     }
     // test passed so cleanup test output folder
@@ -149,8 +154,7 @@ class TabulatorTests {
           try {
             Files.delete(file.toPath());
           } catch (IOException e) {
-            Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(),
-                e);
+            Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), e);
           }
         }
       }

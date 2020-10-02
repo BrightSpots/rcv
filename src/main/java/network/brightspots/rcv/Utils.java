@@ -28,6 +28,9 @@ final class Utils {
 
   private static final Map<String, String> envMap = System.getenv();
 
+  private Utils() {
+  }
+
   static boolean isNullOrBlank(String s) {
     return s == null || s.isBlank();
   }
@@ -87,8 +90,5 @@ final class Utils {
 
   private static boolean osMatchesName(final String osNamePrefix) {
     return System.getProperty("os.name").toUpperCase().startsWith(osNamePrefix.toUpperCase());
-  }
-
-  private Utils() {
   }
 }

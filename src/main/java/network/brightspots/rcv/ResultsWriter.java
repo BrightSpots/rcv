@@ -123,8 +123,7 @@ class ResultsWriter {
     } catch (IOException e) {
       Logger.severe(
           "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
-          path,
-          e);
+          path, e);
       throw e;
     }
     Logger.info("JSON file generated successfully.");
@@ -155,7 +154,6 @@ class ResultsWriter {
     }
     return id;
   }
-
 
   // Instead of a map from rank to list of candidates, we need a sorted list of candidates
   // with the ranks they were given. (Ordinarily a candidate will have only a single rank, but they
@@ -216,10 +214,7 @@ class ResultsWriter {
       tabulationSequenceId = Integer.toString(sequence);
     }
     return getOutputFilePath(
-        config.getOutputDirectory(),
-        outputType,
-        timestampString,
-        tabulationSequenceId);
+        config.getOutputDirectory(), outputType, timestampString, tabulationSequenceId);
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
@@ -333,8 +328,7 @@ class ResultsWriter {
     } catch (IOException e) {
       Logger.severe(
           "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
-          csvPath,
-          e);
+          csvPath, e);
       throw e;
     }
 
@@ -509,8 +503,8 @@ class ResultsWriter {
       Collection<Contest> contests,
       String csvOutputFolder,
       String contestId,
-      String undeclaredWriteInLabel
-  ) throws IOException {
+      String undeclaredWriteInLabel)
+      throws IOException {
     List<String> filesWritten = new ArrayList<>();
     try {
       for (Contest contest : contests) {
@@ -519,12 +513,15 @@ class ResultsWriter {
           // don't generate empty CSVs for them.
           continue;
         }
-        Path outputPath = Paths.get(
-            getOutputFilePath(csvOutputFolder, "dominion_conversion_contest", timestampString,
-                contest.getId()) + ".csv");
-        Logger.info(
-            "Writing cast vote records in generic format to file: %s...",
-            outputPath);
+        Path outputPath =
+            Paths.get(
+                getOutputFilePath(
+                    csvOutputFolder,
+                    "dominion_conversion_contest",
+                    timestampString,
+                    contest.getId())
+                    + ".csv");
+        Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
         CSVPrinter csvPrinter;
         BufferedWriter writer = Files.newBufferedWriter(outputPath);
         csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
@@ -590,13 +587,11 @@ class ResultsWriter {
     } catch (IOException e) {
       Logger.severe(
           "Error writing cast vote records in generic format from input file: %s\n%s",
-          csvOutputFolder,
-          e);
+          csvOutputFolder, e);
       throw e;
     }
     return filesWritten;
   }
-
 
   // create NIST Common Data Format CVR json
   void generateCdfJson(List<CastVoteRecord> castVoteRecords)
@@ -815,7 +810,9 @@ class ResultsWriter {
           Map.ofEntries(
               entry("@id", getCdfContestSelectionIdForCandidateCode(candidateCode)),
               entry("@type", "CVR.ContestSelection"),
-              entry("CandidateIds", new String[]{getCdfCandidateIdForCandidateCode(candidateCode)})));
+              entry(
+                  "CandidateIds",
+                  new String[]{getCdfCandidateIdForCandidateCode(candidateCode)})));
     }
 
     Map<String, Object> contestJson =
@@ -823,8 +820,7 @@ class ResultsWriter {
             entry("@id", CDF_CONTEST_ID),
             entry("@type", "CVR.CandidateContest"),
             entry("ContestSelection", contestSelections),
-            entry("Name", config.getContestName())
-        );
+            entry("Name", config.getContestName()));
 
     electionMap.put("@id", CDF_ELECTION_ID);
     electionMap.put("Candidate", candidates);

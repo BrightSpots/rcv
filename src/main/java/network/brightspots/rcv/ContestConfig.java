@@ -155,18 +155,18 @@ class ContestConfig {
       Logger.severe("filePath is required for each cast vote record file!");
     } else {
       if (!isNullOrBlank(source.getOvervoteLabel())
-          && stringAlreadyInUseElsewhereInSource(source.getOvervoteLabel(), source,
-          "overvoteLabel")) {
+          && stringAlreadyInUseElsewhereInSource(
+          source.getOvervoteLabel(), source, "overvoteLabel")) {
         sourceValid = false;
       }
       if (!isNullOrBlank(source.getUndervoteLabel())
-          && stringAlreadyInUseElsewhereInSource(source.getUndervoteLabel(), source,
-          "undervoteLabel")) {
+          && stringAlreadyInUseElsewhereInSource(
+          source.getUndervoteLabel(), source, "undervoteLabel")) {
         sourceValid = false;
       }
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-          && stringAlreadyInUseElsewhereInSource(source.getUndeclaredWriteInLabel(), source,
-          "undeclaredWriteInLabel")) {
+          && stringAlreadyInUseElsewhereInSource(
+          source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
         sourceValid = false;
       }
 
@@ -220,26 +220,23 @@ class ContestConfig {
         }
 
         // See the config file documentation for an explanation of this regex.
-        if (!isNullOrBlank(source.getOvervoteDelimiter()) &&
-            source.getOvervoteDelimiter().matches(".*\\\\.*|[a-zA-Z0-9.',\\-\"\\s]+")) {
+        if (!isNullOrBlank(source.getOvervoteDelimiter())
+            && source.getOvervoteDelimiter().matches(".*\\\\.*|[a-zA-Z0-9.',\\-\"\\s]+")) {
           sourceValid = false;
           Logger.severe("overvoteDelimiter is invalid.");
         }
       } else {
         if (provider == Provider.CDF) {
-          if (!source.getFilePath().toLowerCase().endsWith(".xml") && !source.getFilePath()
-              .toLowerCase().endsWith(".json")) {
-            Logger
-                .severe("CDF source files must be .json or .xml! Unexpected file extension for: %s",
-                    source.getFilePath());
+          if (!source.getFilePath().toLowerCase().endsWith(".xml")
+              && !source.getFilePath().toLowerCase().endsWith(".json")) {
+            Logger.severe(
+                "CDF source files must be .json or .xml! Unexpected file extension for: %s",
+                source.getFilePath());
             sourceValid = false;
           }
         } else {
           if (fieldIsDefinedButShouldNotBeForProvider(
-              source.getOvervoteLabel(),
-              "overvoteLabel",
-              provider,
-              source.getFilePath())) {
+              source.getOvervoteLabel(), "overvoteLabel", provider, source.getFilePath())) {
             sourceValid = false;
           }
         }
@@ -252,18 +249,12 @@ class ContestConfig {
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getFirstVoteRowIndex(),
-            "firstVoteRowIndex",
-            provider,
-            source.getFilePath())) {
+            source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
           sourceValid = false;
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getIdColumnIndex(),
-            "idColumnIndex",
-            provider,
-            source.getFilePath())) {
+            source.getIdColumnIndex(), "idColumnIndex", provider, source.getFilePath())) {
           sourceValid = false;
         }
 
@@ -276,47 +267,40 @@ class ContestConfig {
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getOvervoteDelimiter(),
-            "overvoteDelimiter",
-            provider,
-            source.getFilePath())) {
+            source.getOvervoteDelimiter(), "overvoteDelimiter", provider, source.getFilePath())) {
           sourceValid = false;
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getUndervoteLabel(),
-            "undervoteLabel",
-            provider,
-            source.getFilePath())) {
+            source.getUndervoteLabel(), "undervoteLabel", provider, source.getFilePath())) {
           sourceValid = false;
         }
 
         if (source.isTreatBlankAsUndeclaredWriteIn()) {
-          logErrorWithLocation(String
-              .format("treatBlankAsUndeclaredWriteIn should not be true for CVR source with " +
-                      "provider \"%s\"",
-                  provider), source.getFilePath());
+          logErrorWithLocation(
+              String.format(
+                  "treatBlankAsUndeclaredWriteIn should not be true for CVR source with "
+                      + "provider \"%s\"",
+                  provider),
+              source.getFilePath());
         }
       }
 
-      boolean providerRequiresContestId = provider == Provider.DOMINION ||
-          provider == Provider.HART ||
-          provider == Provider.CLEAR_BALLOT ||
-          provider == Provider.CDF;
+      boolean providerRequiresContestId =
+          provider == Provider.DOMINION
+              || provider == Provider.HART
+              || provider == Provider.CLEAR_BALLOT
+              || provider == Provider.CDF;
 
       if (isNullOrBlank(source.getContestId()) && providerRequiresContestId) {
         sourceValid = false;
         Logger.severe(
-            String.format("contestId must be defined for CVR source with provider \"%s\"!",
+            String.format(
+                "contestId must be defined for CVR source with provider \"%s\"!",
                 getProvider(source)));
-      } else if (
-          !(providerRequiresContestId) &&
-              fieldIsDefinedButShouldNotBeForProvider(
-                  source.getContestId(),
-                  "contestId",
-                  provider,
-                  source.getFilePath())
-      ) {
+      } else if (!(providerRequiresContestId)
+          && fieldIsDefinedButShouldNotBeForProvider(
+          source.getContestId(), "contestId", provider, source.getFilePath())) {
         // helper will log error
         sourceValid = false;
       }
@@ -337,10 +321,7 @@ class ContestConfig {
       if (!isNullOrBlank(otherFieldValue) && otherFieldValue.equalsIgnoreCase(string)) {
         match = true;
         Logger.severe(
-            "\"%s\" can't be used as %s if it's also being used as %s!",
-            string,
-            field,
-            otherField);
+            "\"%s\" can't be used as %s if it's also being used as %s!", string, field, otherField);
       }
     }
     return match;
@@ -400,18 +381,18 @@ class ContestConfig {
     return !stringValid;
   }
 
-  private static boolean fieldIsDefinedButShouldNotBeForProvider(String value, String fieldName,
-      Provider provider, String inputLocation) {
+  private static boolean fieldIsDefinedButShouldNotBeForProvider(
+      String value, String fieldName, Provider provider, String inputLocation) {
     boolean stringValid = true;
     if (!isNullOrBlank(value)) {
       stringValid = false;
-      logErrorWithLocation(String
-          .format("%s should not be defined for CVR source with provider \"%s\"", fieldName,
-              provider), inputLocation);
+      logErrorWithLocation(
+          String.format(
+              "%s should not be defined for CVR source with provider \"%s\"", fieldName, provider),
+          inputLocation);
     }
     return !stringValid;
   }
-
 
   static Provider getProvider(CvrSource cvrSource) {
     Provider provider = Provider.getByInternalLabel(cvrSource.getProvider());
@@ -443,8 +424,8 @@ class ContestConfig {
   // purpose: Checks to make sure string isn't reserved or used by other fields
   // param: string string to check
   // param: field field name of provided string
-  private static boolean stringAlreadyInUseElsewhereInSource(String string, CvrSource source,
-      String field) {
+  private static boolean stringAlreadyInUseElsewhereInSource(
+      String string, CvrSource source, String field) {
     boolean inUse = stringConflictsWithReservedString(string, field);
     if (!inUse) {
       inUse =
@@ -501,8 +482,8 @@ class ContestConfig {
       Logger.severe("tabulatorVersion is required!");
     } else {
       // ignore this check for test data, but otherwise require version to match current app version
-      if (!getTabulatorVersion().equals(AUTOMATED_TEST_VERSION) && !getTabulatorVersion()
-          .equals(Main.APP_VERSION)) {
+      if (!getTabulatorVersion().equals(AUTOMATED_TEST_VERSION)
+          && !getTabulatorVersion().equals(Main.APP_VERSION)) {
         isValid = false;
         Logger.severe("tabulatorVersion %s not supported!", getTabulatorVersion());
       }
@@ -531,8 +512,8 @@ class ContestConfig {
       Logger.severe("Duplicate candidate %ss are not allowed: %s", field, candidateString);
     } else {
       for (CvrSource source : getRawConfig().cvrFileSources) {
-        inUse = stringAlreadyInUseElsewhereInSource(candidateString, source,
-            "a candidate " + field);
+        inUse =
+            stringAlreadyInUseElsewhereInSource(candidateString, source, "a candidate " + field);
         if (inUse) {
           break;
         }
@@ -594,14 +575,12 @@ class ContestConfig {
           if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
             isValid = false;
             Logger.severe(
-                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
-                cvrPath);
+                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s", cvrPath);
           }
           if (!isNullOrBlank(source.getOvervoteDelimiter())) {
             if (!isNullOrBlank(source.getOvervoteLabel())) {
               isValid = false;
-              Logger.severe(
-                  "overvoteDelimiter and overvoteLabel can't both be supplied.");
+              Logger.severe("overvoteDelimiter and overvoteLabel can't both be supplied.");
             }
           } else if (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
             isValid = false;
@@ -642,8 +621,7 @@ class ContestConfig {
 
     if (candidateCodeSet.size() > 0 && candidateCodeSet.size() != candidateNameSet.size()) {
       isValid = false;
-      Logger.severe(
-          "If candidate codes are used, a unique code is required for each candidate!");
+      Logger.severe("If candidate codes are used, a unique code is required for each candidate!");
     }
 
     if (getNumDeclaredCandidates() < 1) {
@@ -664,8 +642,7 @@ class ContestConfig {
 
     if (needsRandomSeed() && isNullOrBlank(getRandomSeedRaw())) {
       isValid = false;
-      Logger.severe(
-          "When tiebreakMode involves a random element, randomSeed must be supplied!");
+      Logger.severe("When tiebreakMode involves a random element, randomSeed must be supplied!");
     }
     if (fieldOutOfRangeOrNotInteger(
         getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, MAX_RANDOM_SEED, false)) {
@@ -688,9 +665,7 @@ class ContestConfig {
       isValid = false;
       Logger.severe(
           "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
-          MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION,
-          MIN_MAX_RANKINGS_ALLOWED,
-          Integer.MAX_VALUE);
+          MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION, MIN_MAX_RANKINGS_ALLOWED, Integer.MAX_VALUE);
     }
 
     if (getMaxSkippedRanksAllowed() == null
@@ -744,8 +719,8 @@ class ContestConfig {
       if (getNumberOfWinners() > 0) {
         if (isMultiSeatBottomsUpWithThresholdEnabled()) {
           isValid = false;
-          Logger.severe("numberOfWinners must be zero if winnerElectionMode is \"%s\"!",
-              winnerMode);
+          Logger.severe(
+              "numberOfWinners must be zero if winnerElectionMode is \"%s\"!", winnerMode);
         }
 
         if (getNumberOfWinners() > 1) {
@@ -763,9 +738,7 @@ class ContestConfig {
           if (!isSingleWinnerEnabled()) {
             isValid = false;
             Logger.severe(
-                "winnerElectionMode can't be \"%s\" in a single-seat contest!",
-                winnerMode
-            );
+                "winnerElectionMode can't be \"%s\" in a single-seat contest!", winnerMode);
           }
         }
       } else { // numberOfWinners == 0
@@ -785,8 +758,8 @@ class ContestConfig {
 
     if (isMultiSeatBottomsUpWithThresholdEnabled() && isBatchEliminationEnabled()) {
       isValid = false;
-      Logger.severe("batchElimination can't be true when winnerElectionMode is \"%s\"!",
-          winnerMode);
+      Logger.severe(
+          "batchElimination can't be true when winnerElectionMode is \"%s\"!", winnerMode);
     }
 
     // nonIntegerWinningThreshold and hareQuota are only allowed for multi-seat elections
@@ -800,8 +773,7 @@ class ContestConfig {
       }
       if (isHareQuotaEnabled()) {
         isValid = false;
-        Logger.severe("hareQuota can't be true when winnerElectionMode is \"%s\"!",
-            winnerMode);
+        Logger.severe("hareQuota can't be true when winnerElectionMode is \"%s\"!", winnerMode);
       }
     }
 
@@ -852,8 +824,8 @@ class ContestConfig {
   }
 
   WinnerElectionMode getWinnerElectionMode() {
-    WinnerElectionMode mode = WinnerElectionMode
-        .getByInternalLabel(rawConfig.rules.winnerElectionMode);
+    WinnerElectionMode mode =
+        WinnerElectionMode.getByInternalLabel(rawConfig.rules.winnerElectionMode);
     return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
   }
 
@@ -1003,7 +975,8 @@ class ContestConfig {
   }
 
   BigDecimal getMinimumVoteThreshold() {
-    return isNullOrBlank(getMinimumVoteThresholdRaw()) ? BigDecimal.ZERO
+    return isNullOrBlank(getMinimumVoteThresholdRaw())
+        ? BigDecimal.ZERO
         : new BigDecimal(getMinimumVoteThresholdRaw());
   }
 
@@ -1087,16 +1060,16 @@ class ContestConfig {
     // If any of the sources support undeclared write-ins, we need to recognize them as a valid
     // "candidate" option.
     if (undeclaredWriteInsEnabled()) {
-      candidateCodeToNameMap.put(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL,
-          Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
+      candidateCodeToNameMap.put(
+          Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
     }
   }
 
   private boolean undeclaredWriteInsEnabled() {
     boolean includeUwi = false;
     for (CvrSource source : rawConfig.cvrFileSources) {
-      if (!isNullOrBlank(source.getUndeclaredWriteInLabel()) || source
-          .isTreatBlankAsUndeclaredWriteIn()) {
+      if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
+          || source.isTreatBlankAsUndeclaredWriteIn()) {
         includeUwi = true;
         break;
       }

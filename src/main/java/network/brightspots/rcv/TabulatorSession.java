@@ -68,7 +68,8 @@ class TabulatorSession {
     timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
-  // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI here also
+  // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI
+  // here also
   private static void checkConfigVersionMatchesApp(ContestConfig config) {
     String version = config.getRawConfig().tabulatorVersion;
 
@@ -78,9 +79,9 @@ class TabulatorSession {
         // It will log a severe message already, so no need to add one here.
       } else if (ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
         Logger.severe(
-            "Can't use a config with older version %s in newer version %s of the app! To " +
-                "automatically migrate the config to the newer version, load it in the graphical " +
-                "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
+            "Can't use a config with older version %s in newer version %s of the app! To "
+                + "automatically migrate the config to the newer version, load it in the graphical "
+                + "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
             version, Main.APP_VERSION);
       }
     }
@@ -167,8 +168,7 @@ class TabulatorSession {
         config.setNumberOfWinners(1);
         while (config.getSequentialWinners().size() < numWinners) {
           Logger.info(
-              "Beginning tabulation for seat #%d...",
-              config.getSequentialWinners().size() + 1);
+              "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
           // Read cast vote records and precinct IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
           if (castVoteRecords == null) {
@@ -186,9 +186,7 @@ class TabulatorSession {
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
-          Logger.info(
-              "Tabulation for seat #%d completed.",
-              config.getSequentialWinners().size());
+          Logger.info("Tabulation for seat #%d completed.", config.getSequentialWinners().size());
           if (config.getSequentialWinners().size() < numWinners) {
             Logger.info("Excluding %s from the remaining tabulations.", newWinner);
           }
@@ -278,8 +276,8 @@ class TabulatorSession {
       try {
         if (ContestConfig.isCdf(source)) {
           Logger.info("Reading CDF cast vote record file: %s...", cvrPath);
-          new CommonDataFormatReader(cvrPath, config, source.getContestId(),
-              source.getOvervoteLabel())
+          new CommonDataFormatReader(
+              cvrPath, config, source.getContestId(), source.getOvervoteLabel())
               .parseCvrFile(castVoteRecords);
           continue;
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
@@ -289,17 +287,19 @@ class TabulatorSession {
           continue;
         } else if (provider == Provider.DOMINION) {
           Logger.info("Reading Dominion cast vote records from folder: %s...", cvrPath);
-          DominionCvrReader reader = new DominionCvrReader(config, cvrPath, source.getUndeclaredWriteInLabel());
+          DominionCvrReader reader =
+              new DominionCvrReader(config, cvrPath, source.getUndeclaredWriteInLabel());
           reader.readCastVoteRecords(castVoteRecords, source.getContestId());
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
             ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
-            this.convertedFilesWritten = writer.writeGenericCvrCsv(
-                castVoteRecords,
-                reader.getContests().values(),
-                config.getOutputDirectory(),
-                source.getContestId(),
-                source.getUndeclaredWriteInLabel());
+            this.convertedFilesWritten =
+                writer.writeGenericCvrCsv(
+                    castVoteRecords,
+                    reader.getContests().values(),
+                    config.getOutputDirectory(),
+                    source.getContestId(),
+                    source.getUndeclaredWriteInLabel());
           } catch (IOException e) {
             // error already logged in ResultsWriter
           }
@@ -310,8 +310,8 @@ class TabulatorSession {
           continue;
         } else if (provider == Provider.HART) {
           Logger.info("Reading Hart cast vote records from folder: %s...", cvrPath);
-          new HartCvrReader(cvrPath, source.getContestId(), config,
-              source.getUndeclaredWriteInLabel())
+          new HartCvrReader(
+              cvrPath, source.getContestId(), config, source.getUndeclaredWriteInLabel())
               .readCastVoteRecordsFromFolder(castVoteRecords);
           continue;
         }
@@ -322,8 +322,7 @@ class TabulatorSession {
         for (String candidate : e.candidateCounts.keySet()) {
           Logger.severe(
               "Unrecognized candidate \"%s\" appears %d time(s)!",
-              candidate,
-              e.candidateCounts.get(candidate));
+              candidate, e.candidateCounts.get(candidate));
         }
         // various incorrect settings can lead to UnrecognizedCandidatesException so it's hard
         // to know exactly what the problem is
@@ -350,14 +349,13 @@ class TabulatorSession {
         Logger.info("See the log for details.");
         encounteredSourceProblem = true;
       } catch (UnrecognizedProviderException e) {
-        Logger.severe("Unrecognized provider \"%s\" in source file: %s",
-            source.getProvider(), cvrPath);
+        Logger.severe(
+            "Unrecognized provider \"%s\" in source file: %s", source.getProvider(), cvrPath);
         encounteredSourceProblem = true;
       } catch (CvrParseException e) {
         encounteredSourceProblem = true;
       } catch (Exception e) {
-        Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath,
-            e);
+        Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath, e);
         encounteredSourceProblem = true;
       }
     }

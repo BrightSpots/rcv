@@ -28,7 +28,6 @@ import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
-
 class ClearBallotCvrReader {
 
   private final String cvrPath;
@@ -59,20 +58,19 @@ class ClearBallotCvrReader {
       }
       String[] headerData = firstRow.split(",");
       if (headerData.length < CvrColumnField.ChoicesBegin.ordinal()) {
-        Logger.severe("No choice columns found in cast vote record file: %s",
-            this.cvrPath);
+        Logger.severe("No choice columns found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
       }
       Map<Integer, Pair<Integer, String>> columnIndexToRanking = new HashMap<>();
-      for (int columnIndex = CvrColumnField.ChoicesBegin.ordinal(); columnIndex < headerData.length;
+      for (int columnIndex = CvrColumnField.ChoicesBegin.ordinal();
+          columnIndex < headerData.length;
           columnIndex++) {
         String choiceColumnHeader = headerData[columnIndex];
         String[] choiceFields = choiceColumnHeader.split(":");
         // validate field count
         if (choiceFields.length != RcvChoiceHeaderField.FIELD_COUNT.ordinal()) {
           Logger.severe(
-              "Wrong number of choice header fields in cast vote record file: %s",
-              this.cvrPath);
+              "Wrong number of choice header fields in cast vote record file: %s", this.cvrPath);
           throw new CvrParseException();
         }
         // filter by contest
@@ -89,8 +87,9 @@ class ClearBallotCvrReader {
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
         if (rank > this.contestConfig.getMaxRankingsAllowed()) {
-          Logger.severe("Rank: %d exceeds max rankings allowed in config: %d", rank,
-              this.contestConfig.getMaxRankingsAllowed());
+          Logger.severe(
+              "Rank: %d exceeds max rankings allowed in config: %d",
+              rank, this.contestConfig.getMaxRankingsAllowed());
           throw new CvrParseException();
         }
         columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
@@ -112,15 +111,16 @@ class ClearBallotCvrReader {
           }
         }
         // create the cast vote record
-        CastVoteRecord castVoteRecord = new CastVoteRecord(contestId,
-            cvrData[CvrColumnField.ScanComputerName.ordinal()],
-            null,
-            cvrData[CvrColumnField.BallotID.ordinal()],
-            cvrData[CvrColumnField.PrecinctID.ordinal()],
-            null,
-            cvrData[CvrColumnField.BallotStyleID.ordinal()],
-            rankings
-        );
+        CastVoteRecord castVoteRecord =
+            new CastVoteRecord(
+                contestId,
+                cvrData[CvrColumnField.ScanComputerName.ordinal()],
+                null,
+                cvrData[CvrColumnField.BallotID.ordinal()],
+                cvrData[CvrColumnField.PrecinctID.ordinal()],
+                null,
+                cvrData[CvrColumnField.BallotStyleID.ordinal()],
+                rankings);
 
         castVoteRecords.add(castVoteRecord);
         // provide some user feedback on the Cvr count

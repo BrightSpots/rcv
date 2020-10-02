@@ -60,6 +60,10 @@ public class RawContestConfig {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
 
+    public String overvoteLabel;
+    public String undervoteLabel;
+    public String undeclaredWriteInLabel;
+    public boolean treatBlankAsUndeclaredWriteIn;
     private String filePath;
     private String contestId;
     private String firstVoteColumnIndex;
@@ -68,11 +72,6 @@ public class RawContestConfig {
     private String precinctColumnIndex;
     private String overvoteDelimiter;
     private String provider;
-
-    public String overvoteLabel;
-    public String undervoteLabel;
-    public String undeclaredWriteInLabel;
-    public boolean treatBlankAsUndeclaredWriteIn;
 
     CvrSource() {
     }
@@ -242,7 +241,6 @@ public class RawContestConfig {
     public void setExcluded(boolean excluded) {
       this.excluded = excluded;
     }
-
   }
 
   // ContestRules: encapsulates the set of rules required to perform contest tabulation

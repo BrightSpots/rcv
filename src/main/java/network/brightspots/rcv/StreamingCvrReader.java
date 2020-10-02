@@ -187,8 +187,7 @@ class StreamingCvrReader {
       if (currentPrecinct == null) {
         // group precincts with missing Ids here
         Logger.warning(
-            "Precinct identifier not found for cast vote record: %s",
-            computedCastVoteRecordId);
+            "Precinct identifier not found for cast vote record: %s", computedCastVoteRecordId);
         currentPrecinct = MISSING_PRECINCT_ID;
       }
       precinctIds.add(currentPrecinct);
@@ -246,8 +245,7 @@ class StreamingCvrReader {
 
       for (String candidate : candidates) {
         candidate = candidate.trim();
-        if (candidates.length > 1 &&
-            (candidate.equals("") || candidate.equals(undervoteLabel))) {
+        if (candidates.length > 1 && (candidate.equals("") || candidate.equals(undervoteLabel))) {
           Logger.severe(
               "If a cell contains multiple candidates split by the overvote delimiter, it's not "
                   + "valid for any of them to be blank or an explicit undervote.");

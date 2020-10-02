@@ -31,6 +31,9 @@ final class ContestConfigMigration {
 
   private static final Pattern versionNumPattern = Pattern.compile("(\\d+).*");
 
+  private ContestConfigMigration() {
+  }
+
   private static ArrayList<Integer> parseVersionString(String version) {
     ArrayList<Integer> parsed = new ArrayList<>();
     String[] arr = version.split("\\.");
@@ -191,9 +194,6 @@ final class ContestConfigMigration {
 
       config.rawConfig.tabulatorVersion = Main.APP_VERSION;
     }
-  }
-
-  private ContestConfigMigration() {
   }
 
   static class ConfigVersionIsNewerThanAppVersionException extends Exception {

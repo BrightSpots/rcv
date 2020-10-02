@@ -189,8 +189,7 @@ class Tabulator {
                     : BigDecimal.ZERO;
             Logger.info(
                 "Candidate \"%s\" was elected with a surplus fraction of %s.",
-                winner,
-                surplusFraction);
+                winner, surplusFraction);
             for (CastVoteRecord cvr : castVoteRecords) {
               if (winner.equals(cvr.getCurrentRecipientOfVote())) {
                 cvr.recordCurrentRecipientAsWinner(surplusFraction, config);
@@ -240,13 +239,13 @@ class Tabulator {
 
   // log some basic info about the contest before starting tabulation
   private void logSummaryInfo() {
-    Logger.info("There are %d declared candidates for this contest:",
-        config.getNumDeclaredCandidates());
+    Logger.info(
+        "There are %d declared candidates for this contest:", config.getNumDeclaredCandidates());
     for (String candidate : candidateIds) {
       if (!candidate.equals(UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-        Logger.info("%s%s",
-            candidate,
-            config.candidateIsExcluded(candidate) ? " (excluded from tabulation)" : "");
+        Logger.info(
+            "%s%s",
+            candidate, config.candidateIsExcluded(candidate) ? " (excluded from tabulation)" : "");
       }
     }
 
@@ -374,8 +373,8 @@ class Tabulator {
         winningThreshold = config.divide(currentRoundTotalVotes, divisor).add(augend);
       } else {
         // threshold = floor(votes / (num_winners + 1)) + 1
-        winningThreshold = currentRoundTotalVotes.divideToIntegralValue(divisor)
-            .add(BigDecimal.ONE);
+        winningThreshold =
+            currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
       }
     }
     Logger.info("Winning threshold set to %s.", winningThreshold);
@@ -412,8 +411,7 @@ class Tabulator {
   private boolean isCandidateContinuing(String candidate) {
     CandidateStatus status = getCandidateStatus(candidate);
     return status == CandidateStatus.CONTINUING
-        || (status == CandidateStatus.WINNER
-        && config.isContinueUntilTwoCandidatesRemainEnabled());
+        || (status == CandidateStatus.WINNER && config.isContinueUntilTwoCandidatesRemainEnabled());
   }
 
   // returns candidate status (continuing, eliminated or winner)
@@ -517,9 +515,7 @@ class Tabulator {
     for (String winner : selectedWinners) {
       Logger.info(
           "Candidate \"%s\" was elected in round %d with %s votes.",
-          winner,
-          currentRound,
-          currentRoundCandidateToTally.get(winner));
+          winner, currentRound, currentRoundCandidateToTally.get(winner));
     }
 
     return selectedWinners;
@@ -539,9 +535,7 @@ class Tabulator {
       Logger.info(
           "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It "
               + "had %s votes.",
-          label,
-          currentRound,
-          currentRoundCandidateToTally.get(label));
+          label, currentRound, currentRoundCandidateToTally.get(label));
     }
     return eliminated;
   }
@@ -563,10 +557,7 @@ class Tabulator {
             Logger.info(
                 "Eliminated candidate \"%s\" in round %d because they only had %s vote(s), below "
                     + "the minimum threshold of %s.",
-                candidate,
-                currentRound,
-                tally,
-                threshold);
+                candidate, currentRound, tally, threshold);
           }
         } else {
           break;
@@ -638,9 +629,7 @@ class Tabulator {
       eliminatedCandidate = lastPlaceCandidates.getFirst();
       Logger.info(
           "Candidate \"%s\" was eliminated in round %d with %s vote(s).",
-          eliminatedCandidate,
-          currentRound,
-          minVotes);
+          eliminatedCandidate, currentRound, minVotes);
     }
     eliminated.add(eliminatedCandidate);
     return eliminated;
@@ -680,9 +669,7 @@ class Tabulator {
       try {
         writer.generateCdfJson(castVoteRecords);
       } catch (RoundSnapshotDataMissingException e) {
-        Logger.severe(
-            "CDF JSON generation failed due to missing snapshot for %s",
-            e.getCvrId());
+        Logger.severe("CDF JSON generation failed due to missing snapshot for %s", e.getCvrId());
       }
     }
   }
@@ -1055,8 +1042,8 @@ class Tabulator {
   enum OvervoteRule {
     ALWAYS_SKIP_TO_NEXT_RANK("alwaysSkipToNextRank", OVERVOTE_RULE_ALWAYS_SKIP_TEXT),
     EXHAUST_IMMEDIATELY("exhaustImmediately", OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT),
-    EXHAUST_IF_MULTIPLE_CONTINUING("exhaustIfMultipleContinuing",
-        OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT),
+    EXHAUST_IF_MULTIPLE_CONTINUING(
+        "exhaustIfMultipleContinuing", OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT),
     RULE_UNKNOWN("ruleUnknown", "Unknown rule");
 
     private final String internalLabel;
@@ -1095,10 +1082,10 @@ class Tabulator {
   enum TiebreakMode {
     RANDOM("random", "Random"),
     INTERACTIVE("stopCountingAndAsk", "Stop counting and ask"),
-    PREVIOUS_ROUND_COUNTS_THEN_RANDOM("previousRoundCountsThenRandom",
-        "Previous round counts (then random)"),
-    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE("previousRoundCountsThenAsk",
-        "Previous round counts (then stop counting and ask)"),
+    PREVIOUS_ROUND_COUNTS_THEN_RANDOM(
+        "previousRoundCountsThenRandom", "Previous round counts (then random)"),
+    PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE(
+        "previousRoundCountsThenAsk", "Previous round counts (then stop counting and ask)"),
     USE_PERMUTATION_IN_CONFIG("useCandidateOrder", "Use candidate order in the config file"),
     GENERATE_PERMUTATION("generatePermutation", "Generate permutation"),
     MODE_UNKNOWN("modeUnknown", "Unknown mode");
@@ -1130,13 +1117,13 @@ class Tabulator {
 
   enum WinnerElectionMode {
     STANDARD_SINGLE_WINNER("singleWinnerMajority", "Single-winner majority determines winner"),
-    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND("multiWinnerAllowOnlyOneWinnerPerRound",
-        "Multi-winner allow only one winner per round"),
-    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND("multiWinnerAllowMultipleWinnersPerRound",
-        "Multi-winner allow multiple winners per round"),
+    MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND(
+        "multiWinnerAllowOnlyOneWinnerPerRound", "Multi-winner allow only one winner per round"),
+    MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND(
+        "multiWinnerAllowMultipleWinnersPerRound", "Multi-winner allow multiple winners per round"),
     MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS("bottomsUp", "Bottoms-up"),
-    MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD("bottomsUpUsingPercentageThreshold",
-        "Bottoms-up using percentage threshold"),
+    MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD(
+        "bottomsUpUsingPercentageThreshold", "Bottoms-up using percentage threshold"),
     MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL("multiPassIrv", "Multi-pass IRV"),
     MODE_UNKNOWN("modeUnknown", "Unknown mode");
 
