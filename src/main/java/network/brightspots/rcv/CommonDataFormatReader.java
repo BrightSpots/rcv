@@ -38,10 +38,9 @@ import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "unused", "RedundantSuppression"})
 class CommonDataFormatReader {
 
-  private final String STATUS_NEEDS_ADJUDICATION = "needs-adjudication";
   private final String STATUS_NO = "no";
   private final String BOOLEAN_TRUE = "true";
 
@@ -187,7 +186,7 @@ class CommonDataFormatReader {
       if (contest.CVRContestSelection != null) {
         for (CVRContestSelection cvrContestSelection : contest.CVRContestSelection) {
           if (cvrContestSelection.Status != null && cvrContestSelection.Status
-              .equals(STATUS_NEEDS_ADJUDICATION)) {
+              .equals("needs-adjudication")) {
             Logger.info("Contest Selection needs adjudication. Skipping.");
             continue;
           }

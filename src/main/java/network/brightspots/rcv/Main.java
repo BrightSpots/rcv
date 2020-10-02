@@ -37,7 +37,7 @@ public class Main extends GuiApplication {
    * @param args command-line args
    */
   public static void main(String[] args) {
-    System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
+    System.out.printf("%s version %s%n", APP_NAME, APP_VERSION);
     Logger.setup();
     logSystemInfo();
 

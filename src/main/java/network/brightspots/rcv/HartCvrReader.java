@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.util.Pair;
-import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 class HartCvrReader {
@@ -48,7 +47,7 @@ class HartCvrReader {
 
   // iterate all xml files in the source input folder
   void readCastVoteRecordsFromFolder(List<CastVoteRecord> castVoteRecords)
-      throws IOException, CvrParseException, UnrecognizedCandidatesException {
+      throws IOException, UnrecognizedCandidatesException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
@@ -70,7 +69,7 @@ class HartCvrReader {
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
-      throws IOException, CvrParseException {
+      throws IOException {
     try {
       Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
@@ -129,6 +128,7 @@ class HartCvrReader {
     }
   }
 
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class WriteInData {
 
     public String ImageId;
@@ -136,6 +136,7 @@ class HartCvrReader {
   }
 
   // a voter selection
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class Option {
 
     public String Name;
@@ -145,6 +146,7 @@ class HartCvrReader {
   }
 
   // voter selections for a contest
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class Contest {
 
     public String Name;
@@ -152,18 +154,21 @@ class HartCvrReader {
     public ArrayList<Option> Options;
   }
 
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class PrecinctSplit {
 
     public String Name;
     public String Id;
   }
 
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class Party {
 
     public String Name;
     public String ID;
   }
 
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class HartCvrXml {
 
     public String BatchSequence;

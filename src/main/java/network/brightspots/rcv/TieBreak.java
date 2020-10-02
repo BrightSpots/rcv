@@ -114,18 +114,11 @@ class Tiebreak {
   // execute the tiebreak logic given the tiebreak rule in use
   String selectCandidate() throws TabulationCancelledException {
     switch (tiebreakMode) {
-      case INTERACTIVE:
-        selectedCandidate = doInteractive(allTiedCandidates);
-        break;
-      case RANDOM:
-        selectedCandidate = doRandom(allTiedCandidates);
-        break;
-      case GENERATE_PERMUTATION:
-      case USE_PERMUTATION_IN_CONFIG:
-        selectedCandidate = doPermutationSelection(allTiedCandidates);
-        break;
-      default:
-        selectedCandidate = doPreviousRounds(allTiedCandidates);
+      case INTERACTIVE -> selectedCandidate = doInteractive(allTiedCandidates);
+      case RANDOM -> selectedCandidate = doRandom(allTiedCandidates);
+      case GENERATE_PERMUTATION, USE_PERMUTATION_IN_CONFIG -> selectedCandidate = doPermutationSelection(
+          allTiedCandidates);
+      default -> selectedCandidate = doPreviousRounds(allTiedCandidates);
     }
     return selectedCandidate;
   }
@@ -156,10 +149,9 @@ class Tiebreak {
 
   // interactively select the winner/loser of this tiebreak via the command-line interface
   private String doInteractiveCli(List<String> tiedCandidates) throws TabulationCancelledException {
-    System.out.println(
-        String.format(
-            "Tie in round %d for the following candidates, each of whom has %d vote(s): ",
-            round, numVotes.intValue()));
+    System.out.printf(
+        "Tie in round %d for the following candidates, each of whom has %d vote(s): %n",
+        round, numVotes.intValue());
     for (int i = 0; i < tiedCandidates.size(); i++) {
       System.out.println((i + 1) + ". " + tiedCandidates.get(i));
     }

@@ -40,7 +40,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
@@ -53,6 +52,7 @@ import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
+@SuppressWarnings("RedundantSuppression")
 class TabulatorSession {
 
   private final String configPath;
@@ -73,6 +73,7 @@ class TabulatorSession {
     String version = config.getRawConfig().tabulatorVersion;
 
     if (!version.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
+      //noinspection StatementWithEmptyBody
       if (ContestConfigMigration.isConfigVersionNewerThanAppVersion(version)) {
         // It will log a severe message already, so no need to add one here.
       } else if (ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
@@ -140,6 +141,7 @@ class TabulatorSession {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
+    //noinspection ConstantConditions
     if (config != null && config.validate() && setUpLogging(config)) {
       Logger.info("Computer name: %s", Utils.getComputerName());
       Logger.info("User name: %s", Utils.getUserName());
@@ -281,8 +283,7 @@ class TabulatorSession {
               .parseCvrFile(castVoteRecords);
           continue;
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
-          Logger
-              .log(Level.INFO, "Reading Clear Ballot cast vote records from file: %s...", cvrPath);
+          Logger.info("Reading Clear Ballot cast vote records from file: %s...", cvrPath);
           new ClearBallotCvrReader(cvrPath, config, source.getUndeclaredWriteInLabel())
               .readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;

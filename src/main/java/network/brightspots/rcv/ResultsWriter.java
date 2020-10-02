@@ -212,8 +212,8 @@ class ResultsWriter {
   private String getOutputFilePathFromInstance(String outputType) {
     String tabulationSequenceId = null;
     if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
-      Integer sequence = config.getSequentialWinners().size() + 1;
-      tabulationSequenceId = sequence.toString();
+      int sequence = config.getSequentialWinners().size() + 1;
+      tabulationSequenceId = Integer.toString(sequence);
     }
     return getOutputFilePath(
         config.getOutputDirectory(),
@@ -559,7 +559,7 @@ class ResultsWriter {
           } else {
             csvPrinter.print(castVoteRecord.getPrecinctPortion());
           }
-          // for each rank determine what candidate id, overvote, or undervote ocurred
+          // for each rank determine what candidate id, overvote, or undervote occurred
           for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
             if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
               Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);

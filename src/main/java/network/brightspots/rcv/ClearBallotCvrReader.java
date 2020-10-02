@@ -141,6 +141,7 @@ class ClearBallotCvrReader {
   }
 
   // These values correspond to the data in Clear Vote Cvr Csv columns
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   public enum CvrColumnField {
     RowNumber,
     BoxID,
@@ -156,6 +157,7 @@ class ClearBallotCvrReader {
   }
 
   // These values correspond to the data in Clear Vote Rcv choice column header fields
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   public enum RcvChoiceHeaderField {
     HEADER,
     CONTEST_NAME,

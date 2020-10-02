@@ -62,7 +62,6 @@ final class ContestConfigMigration {
           isNewer = true;
           break;
         } else if (version2Num > version1Num) {
-          isNewer = false;
           break;
         }
       }

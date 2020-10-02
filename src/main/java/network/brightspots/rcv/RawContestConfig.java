@@ -56,7 +56,6 @@ public class RawContestConfig {
 
   // CvrSource: encapsulates a source cast vote record file
   // all indexes are 1-based
-  @SuppressWarnings("unused")
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
@@ -247,6 +246,7 @@ public class RawContestConfig {
   }
 
   // ContestRules: encapsulates the set of rules required to perform contest tabulation
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class ContestRules {

@@ -28,6 +28,7 @@ import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
+@SuppressWarnings("rawtypes")
 class DominionCvrReader {
 
   // canonical manifest file names
@@ -302,6 +303,7 @@ class DominionCvrReader {
   }
 
   // Candidate data from a Dominion candidate manifest Json
+  @SuppressWarnings({"FieldCanBeLocal", "unused", "RedundantSuppression"})
   static class Candidate {
 
     private final String name;
@@ -324,6 +326,7 @@ class DominionCvrReader {
   }
 
   // Contest data from a Dominion contest manifest Json
+  @SuppressWarnings({"FieldCanBeLocal", "unused", "RedundantSuppression"})
   static class Contest {
 
     private final String name;

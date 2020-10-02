@@ -115,11 +115,6 @@ class Logger {
     logger.removeHandler(tabulationHandler);
   }
 
-  // logs to default logger
-  static void log(Level level, String message, Object... obj) {
-    logger.log(level, String.format(message, obj));
-  }
-
   static void fine(String message, Object... obj) {
     logger.log(Level.FINE, String.format(message, obj));
   }
