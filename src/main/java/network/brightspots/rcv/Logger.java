@@ -89,7 +89,7 @@ class Logger {
           Level.WARNING,
           "Failed to start system logging!\nMake sure you have write access in %s\n%s.",
           System.getProperty("user.dir"),
-          exception.toString());
+          exception);
     }
 
     for (Handler handler : logger.getHandlers()) {

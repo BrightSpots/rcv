@@ -88,10 +88,10 @@ class TabulatorTests {
         currentLine++;
       }
     } catch (FileNotFoundException e) {
-      Logger.log(Level.SEVERE, "File not found!\n%s", e.toString());
+      Logger.log(Level.SEVERE, "File not found!\n%s", e);
       result = false;
     } catch (IOException e) {
-      Logger.log(Level.SEVERE, "Error reading file!\n%s", e.toString());
+      Logger.log(Level.SEVERE, "Error reading file!\n%s", e);
       result = false;
     } finally {
       try {
@@ -102,7 +102,7 @@ class TabulatorTests {
           fr2.close();
         }
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error closing file!\n%s", e.toString());
+        Logger.log(Level.SEVERE, "Error closing file!\n%s", e);
       }
     }
     return result;
@@ -152,7 +152,7 @@ class TabulatorTests {
             Files.delete(file.toPath());
           } catch (IOException e) {
             Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", file.getAbsolutePath(),
-                e.toString());
+                e);
           }
         }
       }

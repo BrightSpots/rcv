@@ -47,7 +47,7 @@ public class GuiApplication extends Application {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       exception.printStackTrace(pw);
-      Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw.toString());
+      Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw);
     }
 
     // Avoid cutting off the top bar for low resolution displays

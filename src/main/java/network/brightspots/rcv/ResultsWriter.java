@@ -126,7 +126,7 @@ class ResultsWriter {
           Level.SEVERE,
           "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
           path,
-          exception.toString());
+          exception);
       throw exception;
     }
     Logger.log(Level.INFO, "JSON file generated successfully.");
@@ -337,7 +337,7 @@ class ResultsWriter {
           Level.SEVERE,
           "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
           csvPath,
-          exception.toString());
+          exception);
       throw exception;
     }
 
@@ -368,7 +368,7 @@ class ResultsWriter {
         if (thisRoundTally == null) {
           thisRoundTally = BigDecimal.ZERO;
         }
-        csvPrinter.print(thisRoundTally.toString());
+        csvPrinter.print(thisRoundTally);
       }
       csvPrinter.println();
     }
@@ -385,7 +385,7 @@ class ResultsWriter {
         // so we'll just incorporate that part (if any) into the inactive count.
         thisRoundInactive = thisRoundInactive.subtract(roundToResidualSurplus.get(round));
       }
-      csvPrinter.print(thisRoundInactive.toString());
+      csvPrinter.print(thisRoundInactive);
     }
     csvPrinter.println();
 
@@ -397,7 +397,7 @@ class ResultsWriter {
     if (precinct == null && roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
-        csvPrinter.print(roundToResidualSurplus.get(round).toString());
+        csvPrinter.print(roundToResidualSurplus.get(round));
       }
       csvPrinter.println();
     }
@@ -406,7 +406,7 @@ class ResultsWriter {
       csvPrinter.flush();
       csvPrinter.close();
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
+      Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception);
       throw exception;
     }
     Logger.log(Level.INFO, "Summary spreadsheet generated successfully.");
@@ -465,7 +465,7 @@ class ResultsWriter {
       }
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
-    csvPrinter.printRecord("Threshold", winningThreshold.toString());
+    csvPrinter.printRecord("Threshold", winningThreshold);
     if (!isNullOrBlank(precinct)) {
       csvPrinter.printRecord("Precinct", precinct);
     }
@@ -527,7 +527,7 @@ class ResultsWriter {
                 contest.getId()) + ".csv");
         Logger.log(Level.INFO,
             "Writing cast vote records in generic format to file: %s...",
-            outputPath.toString());
+            outputPath);
         CSVPrinter csvPrinter;
         BufferedWriter writer = Files.newBufferedWriter(outputPath);
         csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
@@ -594,7 +594,7 @@ class ResultsWriter {
       Logger.log(Level.SEVERE,
           "Error writing cast vote records in generic format from input file: %s\n%s",
           csvOutputFolder,
-          exception.toString());
+          exception);
       throw exception;
     }
     return filesWritten;

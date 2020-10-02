@@ -155,7 +155,7 @@ class TabulatorSession {
         Logger.log(Level.FINE, "End config file contents.");
         reader.close();
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error logging config file: %s\n%s", configPath, e.toString());
+        Logger.log(Level.SEVERE, "Error logging config file: %s\n%s", configPath, e);
       }
       Logger.log(Level.INFO, "Tabulating '%s'...", config.getContestName());
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
@@ -238,7 +238,7 @@ class TabulatorSession {
       Logger.addTabulationFileLogging(tabulationLogPath);
       success = true;
     } catch (UnableToCreateDirectoryException | IOException exception) {
-      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception.toString());
+      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", exception);
     }
     if (!success) {
       Logger.log(Level.SEVERE, "Failed to configure logger!");
@@ -257,7 +257,7 @@ class TabulatorSession {
     try {
       tabulator.generateSummaryFiles(timestampString);
     } catch (IOException e) {
-      Logger.log(Level.SEVERE, "Error writing summary files:\n%s", e.toString());
+      Logger.log(Level.SEVERE, "Error writing summary files:\n%s", e);
     }
     return winners;
   }
@@ -360,7 +360,7 @@ class TabulatorSession {
         encounteredSourceProblem = true;
       } catch (Exception exception) {
         Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath,
-            exception.toString());
+            exception);
         encounteredSourceProblem = true;
       }
     }

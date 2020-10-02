@@ -73,7 +73,7 @@ class DominionCvrReader {
         contests.put(id, newContest);
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing contest manifest:\n%s", e.toString());
+      Logger.log(Level.SEVERE, "Error parsing contest manifest:\n%s", e);
       contests = null;
     }
     return contests;
@@ -93,7 +93,7 @@ class DominionCvrReader {
         precinctsById.put(id, name);
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing precinct manifest:\n%s", e.toString());
+      Logger.log(Level.SEVERE, "Error parsing precinct manifest:\n%s", e);
       precinctsById = null;
     }
     return precinctsById;
@@ -115,7 +115,7 @@ class DominionCvrReader {
         candidates.add(newCandidate);
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing candidate manifest:\n%s", e.toString());
+      Logger.log(Level.SEVERE, "Error parsing candidate manifest:\n%s", e);
       candidates = null;
     }
     return candidates;
@@ -300,7 +300,7 @@ class DominionCvrReader {
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing cast vote record:\n%s", e.toString());
+      Logger.log(Level.SEVERE, "Error parsing cast vote record:\n%s", e);
       castVoteRecords.clear();
     }
   }

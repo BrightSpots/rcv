@@ -281,7 +281,7 @@ public class GuiConfigController implements Initializable {
           Level.SEVERE,
           "Error loading text file: %s\n%s",
           configFileDocumentationFilename,
-          exception.toString());
+          exception);
       text =
           String.format(
               "<Error loading text file: %s>", configFileDocumentationFilename);
@@ -327,7 +327,7 @@ public class GuiConfigController implements Initializable {
         }
         reader.close();
       } catch (IOException e) {
-        Logger.severe("Error opening help file: %s", e.toString());
+        Logger.severe("Error opening help file: %s", e);
         Logger.info("Try opening the documentation manually at: %s", helpFileUrl);
       }
     }
@@ -931,7 +931,7 @@ public class GuiConfigController implements Initializable {
           Level.WARNING,
           "Unable tell if saving is necessary, but everything should work fine anyway! Prompting "
               + "for save just in case...\n%s",
-          exception.toString());
+          exception);
     }
     return needsSaving;
   }
@@ -1168,7 +1168,7 @@ public class GuiConfigController implements Initializable {
       Logger.log(
           Level.WARNING,
           "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
-          exception.toString());
+          exception);
     }
   }
 
@@ -1370,7 +1370,7 @@ public class GuiConfigController implements Initializable {
               Logger.log(
                   Level.SEVERE,
                   "Error during validation:\n%s\nValidation failed!",
-                  task.getException().toString()));
+                  task.getException()));
       return task;
     }
   }
@@ -1400,7 +1400,7 @@ public class GuiConfigController implements Initializable {
               Logger.log(
                   Level.SEVERE,
                   "Error during tabulation:\n%s\nTabulation failed!",
-                  task.getException().toString()));
+                  task.getException()));
       return task;
     }
   }
@@ -1430,7 +1430,7 @@ public class GuiConfigController implements Initializable {
               Logger.log(
                   Level.SEVERE,
                   "Error when attempting to convert to CDF:\n%s\nConversion failed!",
-                  task.getException().toString()));
+                  task.getException()));
       return task;
     }
   }

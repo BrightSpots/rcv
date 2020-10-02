@@ -125,7 +125,7 @@ class HartCvrReader {
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing cast vote record:\n%s", e.toString());
+      Logger.log(Level.SEVERE, "Error parsing cast vote record:\n%s", e);
       throw e;
     }
   }

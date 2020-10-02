@@ -112,7 +112,7 @@ class ContestConfig {
     try {
       config.processCandidateData();
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error processing candidate data:\n%s", e.toString());
+      Logger.log(Level.SEVERE, "Error processing candidate data:\n%s", e);
       config = null;
     }
     return config;
@@ -296,7 +296,7 @@ class ContestConfig {
           logErrorWithLocation(String
               .format("treatBlankAsUndeclaredWriteIn should not be true for CVR source with " +
                       "provider \"%s\"",
-                  provider.toString()), source.getFilePath());
+                  provider), source.getFilePath());
         }
       }
 
@@ -310,7 +310,7 @@ class ContestConfig {
         Logger.log(
             Level.SEVERE,
             String.format("contestId must be defined for CVR source with provider \"%s\"!",
-                getProvider(source).toString()));
+                getProvider(source)));
       } else if (
           !(providerRequiresContestId) &&
               fieldIsDefinedButShouldNotBeForProvider(
@@ -410,7 +410,7 @@ class ContestConfig {
       stringValid = false;
       logErrorWithLocation(String
           .format("%s should not be defined for CVR source with provider \"%s\"", fieldName,
-              provider.toString()), inputLocation);
+              provider), inputLocation);
     }
     return !stringValid;
   }
@@ -758,7 +758,7 @@ class ContestConfig {
         if (isMultiSeatBottomsUpWithThresholdEnabled()) {
           isValid = false;
           Logger.log(Level.SEVERE, "numberOfWinners must be zero if winnerElectionMode is \"%s\"!",
-              winnerMode.toString());
+              winnerMode);
         }
 
         if (getNumberOfWinners() > 1) {
@@ -779,7 +779,7 @@ class ContestConfig {
             Logger.log(
                 Level.SEVERE,
                 "winnerElectionMode can't be \"%s\" in a single-seat contest!",
-                winnerMode.toString()
+                winnerMode
             );
           }
         }
@@ -793,7 +793,7 @@ class ContestConfig {
           isValid = false;
           Logger.log(Level.SEVERE,
               "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold must be specified!",
-              winnerMode.toString());
+              winnerMode);
         }
       }
     }
@@ -801,7 +801,7 @@ class ContestConfig {
     if (isMultiSeatBottomsUpWithThresholdEnabled() && isBatchEliminationEnabled()) {
       isValid = false;
       Logger.log(Level.SEVERE, "batchElimination can't be true when winnerElectionMode is \"%s\"!",
-          winnerMode.toString());
+          winnerMode);
     }
 
     // nonIntegerWinningThreshold and hareQuota are only allowed for multi-seat elections
@@ -811,12 +811,12 @@ class ContestConfig {
         isValid = false;
         Logger.log(Level.SEVERE,
             "nonIntegerWinningThreshold can't be true when winnerElectionMode is \"%s\"!",
-            winnerMode.toString());
+            winnerMode);
       }
       if (isHareQuotaEnabled()) {
         isValid = false;
         Logger.log(Level.SEVERE, "hareQuota can't be true when winnerElectionMode is \"%s\"!",
-            winnerMode.toString());
+            winnerMode);
       }
     }
 

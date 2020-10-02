@@ -105,7 +105,7 @@ class Tabulator {
     for (String candidate : candidatesToInclude) {
       BigDecimal votes = roundTally.get(candidate);
       if (shouldLog) {
-        Logger.log(Level.INFO, "Candidate \"%s\" got %s vote(s).", candidate, votes.toString());
+        Logger.log(Level.INFO, "Candidate \"%s\" got %s vote(s).", candidate, votes);
       }
       LinkedList<String> candidates =
           tallyToCandidates.computeIfAbsent(votes, k -> new LinkedList<>());
@@ -192,7 +192,7 @@ class Tabulator {
                 Level.INFO,
                 "Candidate \"%s\" was elected with a surplus fraction of %s.",
                 winner,
-                surplusFraction.toString());
+                surplusFraction);
             for (CastVoteRecord cvr : castVoteRecords) {
               if (winner.equals(cvr.getCurrentRecipientOfVote())) {
                 cvr.recordCurrentRecipientAsWinner(surplusFraction, config);
@@ -344,7 +344,7 @@ class Tabulator {
         BigDecimal winnerResidual = winnerTally.subtract(winningThreshold);
         if (winnerResidual.signum() == 1) {
           Logger.log(
-              Level.INFO, "%s had residual surplus of %s.", winner, winnerResidual.toString());
+              Level.INFO, "%s had residual surplus of %s.", winner, winnerResidual);
           roundToResidualSurplus.put(
               currentRound, roundToResidualSurplus.get(currentRound).add(winnerResidual));
           roundTally.put(winner, winningThreshold);
@@ -385,7 +385,7 @@ class Tabulator {
             .add(BigDecimal.ONE);
       }
     }
-    Logger.log(Level.INFO, "Winning threshold set to %s.", winningThreshold.toString());
+    Logger.log(Level.INFO, "Winning threshold set to %s.", winningThreshold);
   }
 
   // determine if we should continue tabulating based on how many winners have been
@@ -516,7 +516,7 @@ class Tabulator {
               winner,
               currentRound,
               tiebreak.nonSelectedCandidateDescription(),
-              maxVotes.toString(),
+              maxVotes,
               tiebreak.getExplanation());
         }
       }
@@ -528,7 +528,7 @@ class Tabulator {
           "Candidate \"%s\" was elected in round %d with %s votes.",
           winner,
           currentRound,
-          currentRoundCandidateToTally.get(winner).toString());
+          currentRoundCandidateToTally.get(winner));
     }
 
     return selectedWinners;
@@ -551,7 +551,7 @@ class Tabulator {
               + "had %s votes.",
           label,
           currentRound,
-          currentRoundCandidateToTally.get(label).toString());
+          currentRoundCandidateToTally.get(label));
     }
     return eliminated;
   }
@@ -576,8 +576,8 @@ class Tabulator {
                     + "the minimum threshold of %s.",
                 candidate,
                 currentRound,
-                tally.toString(),
-                threshold.toString());
+                tally,
+                threshold);
           }
         } else {
           break;
@@ -604,8 +604,8 @@ class Tabulator {
                   + "the next-lowest count was %s vote(s).",
               elimination.candidateId,
               currentRound,
-              elimination.runningTotal.toString(),
-              elimination.nextLowestTally.toString());
+              elimination.runningTotal,
+              elimination.nextLowestTally);
         }
       }
     }
@@ -645,7 +645,7 @@ class Tabulator {
           eliminatedCandidate,
           currentRound,
           tiebreak.nonSelectedCandidateDescription(),
-          minVotes.toString(),
+          minVotes,
           tiebreak.getExplanation());
     } else {
       eliminatedCandidate = lastPlaceCandidates.getFirst();
@@ -654,7 +654,7 @@ class Tabulator {
           "Candidate \"%s\" was eliminated in round %d with %s vote(s).",
           eliminatedCandidate,
           currentRound,
-          minVotes.toString());
+          minVotes);
     }
     eliminated.add(eliminatedCandidate);
     return eliminated;

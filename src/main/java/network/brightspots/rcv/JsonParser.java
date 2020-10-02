@@ -52,7 +52,7 @@ class JsonParser {
                 + "It might help to try surrounding values causing problems with quotes (e.g. "
                 + " \"value\").\nSee config_file_documentation.txt for more details.",
             jsonFilePath,
-            exception.toString());
+            exception);
       }
       createdObject = null;
     } catch (IOException exception) {
@@ -62,7 +62,7 @@ class JsonParser {
             "Error opening file: %s\n%s\n"
                 + "Check file path and permissions and make sure they are correct!",
             jsonFilePath,
-            exception.toString());
+            exception);
       }
       createdObject = null;
     }
@@ -89,7 +89,7 @@ class JsonParser {
           Level.SEVERE,
           "Error saving file: %s\n%s",
           jsonFile.getAbsolutePath(),
-          exception.toString());
+          exception);
     }
   }
 }

@@ -228,7 +228,7 @@ class Tiebreak {
           selection = guiTiebreakerPromptResponse.selectedCandidate;
         }
       } catch (InterruptedException | ExecutionException exception) {
-        Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception.toString());
+        Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", exception);
       }
       if (selection == null) {
         Logger.log(Level.WARNING, "Invalid selection! Please try again.");
@@ -279,7 +279,7 @@ class Tiebreak {
                 "%s had the %s votes (%s) in round %d.",
                 selection,
                 selectingAWinner ? "most" : "fewest",
-                voteTotalForSelection.toString(),
+                voteTotalForSelection,
                 roundToCompare);
         break;
       } // else keep looping
@@ -345,7 +345,7 @@ class Tiebreak {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
-        Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw.toString());
+        Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw);
       }
       return guiTiebreakerPromptResponse;
     }

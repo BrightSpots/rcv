@@ -161,7 +161,7 @@ class CastVoteRecord {
 
     // add vote value if not 1
     if (fractionalTransferValue != null && !fractionalTransferValue.equals(BigDecimal.ONE)) {
-      logStringBuilder.append(" [value] ").append(fractionalTransferValue.toString());
+      logStringBuilder.append(" [value] ").append(fractionalTransferValue);
     }
 
     // add complete data for round 1 only
