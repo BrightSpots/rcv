@@ -28,4 +28,4 @@ Undervote Label (optional): Some ES&S CVRs use a particular word/phrase to indic
 
 Undeclared Write-in Label (optional): Some CVRs use a particular word/phrase to indicate a write-in.
 
-Treat Blank as Undeclared Write-in (optional): When checked, the tabulator will interpret blank cells in ES&S CVRs as votes for undeclared write-ins.
+Treat Blank as Undeclared Write-in (optional): When checked, the tabulator will interpret blank cells in this ES&S CVR as votes for undeclared write-ins.
