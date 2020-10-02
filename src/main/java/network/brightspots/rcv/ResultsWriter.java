@@ -779,8 +779,6 @@ class ResultsWriter {
   }
 
   private Map<String, Object> generateCdfMapForElection() {
-    HashMap<String, Object> electionMap = new HashMap<>();
-
     // containers for election-level data
     List<Map<String, Object>> contestSelections = new LinkedList<>();
     List<Map<String, Object>> candidates = new LinkedList<>();
@@ -822,6 +820,7 @@ class ResultsWriter {
             entry("ContestSelection", contestSelections),
             entry("Name", config.getContestName()));
 
+    HashMap<String, Object> electionMap = new HashMap<>();
     electionMap.put("@id", CDF_ELECTION_ID);
     electionMap.put("Candidate", candidates);
     electionMap.put("Contest", new Map[]{contestJson});

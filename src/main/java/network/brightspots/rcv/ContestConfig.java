@@ -585,7 +585,8 @@ class ContestConfig {
           } else if (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
             isValid = false;
             Logger.severe(
-                "overvoteDelimiter is required for an ES&S CVR source when overvoteRule is set to \"%s\".",
+                "overvoteDelimiter is required for an ES&S CVR source when overvoteRule "
+                    + "is set to \"%s\".",
                 Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
           }
         }
@@ -745,12 +746,14 @@ class ContestConfig {
         if (!isMultiSeatBottomsUpWithThresholdEnabled()) {
           isValid = false;
           Logger.severe(
-              "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and multiSeatBottomsUpPercentageThreshold must be specified!",
+              "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and "
+                  + "multiSeatBottomsUpPercentageThreshold must be specified!",
               WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
         } else if (getMultiSeatBottomsUpPercentageThreshold() == null) {
           isValid = false;
           Logger.severe(
-              "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold must be specified!",
+              "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold "
+                  + "must be specified!",
               winnerMode);
         }
       }

@@ -41,8 +41,8 @@ import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 @SuppressWarnings({"rawtypes", "unused", "RedundantSuppression"})
 class CommonDataFormatReader {
 
-  private final String STATUS_NO = "no";
-  private final String BOOLEAN_TRUE = "true";
+  private static final String STATUS_NO = "no";
+  private static final String BOOLEAN_TRUE = "true";
 
   private final String filePath;
   private final ContestConfig config;

@@ -61,26 +61,26 @@ class Tiebreak {
   // roundTallies: map from round number to map of candidate ID to vote total (for that round)
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
   private final Map<Integer, Map<String, BigDecimal>> roundTallies;
-  private final boolean selectingAWinner;
+  private final boolean isSelectingWinner;
   private String selectedCandidate;
   private String explanation;
 
   // Tiebreak constructor
-  // param: selectingAWinner are we determining a winner or loser
+  // param: isSelectingWinner are we determining a winner or loser
   // param: allTiedCandidates list of all candidate IDs tied at this vote total
   // param: tiebreakMode rule to use for selecting the loser/winner
   // param: round in which this tie occurs
   // param: numVotes tally of votes for tying candidates
   // param: roundTallies map from round number to map of candidate ID to vote total (for that round)
   Tiebreak(
-      boolean selectingAWinner,
+      boolean isSelectingWinner,
       List<String> allTiedCandidates,
       TiebreakMode tiebreakMode,
       int round,
       BigDecimal numVotes,
       Map<Integer, Map<String, BigDecimal>> roundTallies,
       ArrayList<String> candidatePermutation) {
-    this.selectingAWinner = selectingAWinner;
+    this.isSelectingWinner = isSelectingWinner;
     this.allTiedCandidates = allTiedCandidates;
     this.tiebreakMode = tiebreakMode;
     this.round = round;
@@ -128,7 +128,7 @@ class Tiebreak {
     String selection = null;
     Set<String> tiedCandidatesSet = new HashSet<>(tiedCandidates);
     List<String> permutationToSearch = candidatePermutation;
-    if (!selectingAWinner) {
+    if (!isSelectingWinner) {
       // If we're selecting a loser, we should search the list in reverse.
       permutationToSearch = new ArrayList<>(candidatePermutation);
       Collections.reverse(permutationToSearch);
@@ -142,7 +142,7 @@ class Tiebreak {
     }
     explanation =
         "The selected candidate appeared "
-            + (selectingAWinner ? "earliest" : "latest")
+            + (isSelectingWinner ? "earliest" : "latest")
             + " in the tie-breaking permutation list.";
     return selection;
   }
@@ -157,7 +157,7 @@ class Tiebreak {
     }
     final String prompt =
         "Enter the number corresponding to the candidate who should "
-            + (selectingAWinner ? "win" : "lose")
+            + (isSelectingWinner ? "win" : "lose")
             + " this tiebreaker (or "
             + CLI_CANCEL_COMMAND
             + " to cancel): ";
@@ -198,7 +198,7 @@ class Tiebreak {
         numVotes.intValue(),
         String.join(", ", tiedCandidates));
     Logger.info("Please use the pop-up window to select the candidate who should "
-        + (selectingAWinner ? "win" : "lose")
+        + (isSelectingWinner ? "win" : "lose")
         + " this tiebreaker.");
 
     String selection = null;
@@ -258,7 +258,7 @@ class Tiebreak {
           Tabulator.buildTallyToCandidates(
               roundTallies.get(roundToCompare), new HashSet<>(candidatesInContention), false);
       BigDecimal voteTotalForSelection =
-          selectingAWinner ? tallyToCandidates.lastKey() : tallyToCandidates.firstKey();
+          isSelectingWinner ? tallyToCandidates.lastKey() : tallyToCandidates.firstKey();
       candidatesInContention = tallyToCandidates.get(voteTotalForSelection);
       if (candidatesInContention.size() == 1) {
         selection = candidatesInContention.get(0);
@@ -266,7 +266,7 @@ class Tiebreak {
             String.format(
                 "%s had the %s votes (%s) in round %d.",
                 selection,
-                selectingAWinner ? "most" : "fewest",
+                isSelectingWinner ? "most" : "fewest",
                 voteTotalForSelection,
                 roundToCompare);
         break;
@@ -323,7 +323,7 @@ class Tiebreak {
         Parent root = loader.load();
         GuiTiebreakerController controller = loader.getController();
         controller.populateTiedCandidates(tiedCandidates);
-        controller.populateLabelAndButtonText(selectingAWinner);
+        controller.populateLabelAndButtonText(isSelectingWinner);
         window.setScene(new Scene(root));
         window.showAndWait();
         guiTiebreakerPromptResponse =

@@ -94,9 +94,9 @@ final class ContestConfigMigration {
   static void migrateConfigVersion(ContestConfig config)
       throws ConfigVersionIsNewerThanAppVersionException {
     String version = config.rawConfig.tabulatorVersion;
-    boolean needsMigration = version == null ||
-        (!version.equals(Main.APP_VERSION) && !version
-            .equals(ContestConfig.AUTOMATED_TEST_VERSION));
+    boolean needsMigration = version == null
+        || (!version.equals(Main.APP_VERSION) && !version
+        .equals(ContestConfig.AUTOMATED_TEST_VERSION));
     if (needsMigration) {
       if (isConfigVersionNewerThanAppVersion(version)) {
         throw new ConfigVersionIsNewerThanAppVersionException();

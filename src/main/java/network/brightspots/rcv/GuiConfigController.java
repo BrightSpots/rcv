@@ -80,11 +80,16 @@ public class GuiConfigController implements Initializable {
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String CONFIG_FILE_DOCUMENTATION_FILENAME =
       "network/brightspots/rcv/config_file_documentation.txt";
-  private static final String HINTS_CONTEST_INFO_FILENAME = "network/brightspots/rcv/hints_contest_info.txt";
-  private static final String HINTS_CVR_FILES_FILENAME = "network/brightspots/rcv/hints_cvr_files.txt";
-  private static final String HINTS_CANDIDATES_FILENAME = "network/brightspots/rcv/hints_candidates.txt";
-  private static final String HINTS_WINNING_RULES_FILENAME = "network/brightspots/rcv/hints_winning_rules.txt";
-  private static final String HINTS_VOTER_ERROR_RULES_FILENAME = "network/brightspots/rcv/hints_voter_error_rules.txt";
+  private static final String HINTS_CONTEST_INFO_FILENAME =
+      "network/brightspots/rcv/hints_contest_info.txt";
+  private static final String HINTS_CVR_FILES_FILENAME =
+      "network/brightspots/rcv/hints_cvr_files.txt";
+  private static final String HINTS_CANDIDATES_FILENAME =
+      "network/brightspots/rcv/hints_candidates.txt";
+  private static final String HINTS_WINNING_RULES_FILENAME =
+      "network/brightspots/rcv/hints_winning_rules.txt";
+  private static final String HINTS_VOTER_ERROR_RULES_FILENAME =
+      "network/brightspots/rcv/hints_voter_error_rules.txt";
   private static final String HINTS_OUTPUT_FILENAME = "network/brightspots/rcv/hints_output.txt";
 
   // Used to check if changes have been made to a new config
@@ -596,6 +601,9 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when clear CVR file button is clicked.
+   */
   public void buttonClearCvrFieldsClicked() {
     choiceCvrProvider.setValue(null);
     clearAndDisableCvrFilesTabFields();
@@ -653,6 +661,9 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when clear candidate button is clicked.
+   */
   public void buttonClearCandidateClicked() {
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
@@ -931,6 +942,11 @@ public class GuiConfigController implements Initializable {
           textFieldCvrOvervoteLabel.setDisable(false);
           textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
         }
+        case PROVIDER_UNKNOWN -> {
+          // Do nothing
+        }
+        default -> throw new IllegalStateException(
+            "Unexpected value: " + getProviderChoice(choiceCvrProvider));
       }
     });
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
@@ -970,6 +986,12 @@ public class GuiConfigController implements Initializable {
       switch (getTiebreakModeChoice(choiceTiebreakMode)) {
         case RANDOM, PREVIOUS_ROUND_COUNTS_THEN_RANDOM, GENERATE_PERMUTATION -> textFieldRandomSeed
             .setDisable(false);
+        case INTERACTIVE, PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE, USE_PERMUTATION_IN_CONFIG,
+            MODE_UNKNOWN -> {
+          // Do nothing
+        }
+        default -> throw new IllegalStateException("Unexpected value: "
+            + getTiebreakModeChoice(choiceTiebreakMode));
       }
     });
     choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
@@ -986,19 +1008,26 @@ public class GuiConfigController implements Initializable {
           checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
           textFieldNumberOfWinners.setText("1");
         }
-        case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND, MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND -> {
+        case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND,
+            MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND -> {
           radioThresholdMostCommon.setDisable(false);
           radioThresholdHbQuota.setDisable(false);
           radioThresholdHareQuota.setDisable(false);
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
-        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> textFieldNumberOfWinners
+        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS,
+            MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> textFieldNumberOfWinners
             .setDisable(false);
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldNumberOfWinners.setText("0");
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
         }
+        case MODE_UNKNOWN -> {
+          // Do nothing
+        }
+        default -> throw new IllegalStateException("Unexpected value: "
+            + getWinnerElectionModeChoice(choiceWinnerElectionMode));
       }
     });
     checkBoxMaxRankingsAllowedMax.setOnAction(event -> {
@@ -1131,6 +1160,7 @@ public class GuiConfigController implements Initializable {
       case RULE_UNKNOWN -> {
         // Do nothing for unknown overvote rules
       }
+      default -> throw new IllegalStateException("Unexpected value: " + overvoteRule);
     }
   }
 
