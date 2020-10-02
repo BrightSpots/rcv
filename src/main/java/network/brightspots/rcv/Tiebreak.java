@@ -116,8 +116,8 @@ class Tiebreak {
     switch (tiebreakMode) {
       case INTERACTIVE -> selectedCandidate = doInteractive(allTiedCandidates);
       case RANDOM -> selectedCandidate = doRandom(allTiedCandidates);
-      case GENERATE_PERMUTATION, USE_PERMUTATION_IN_CONFIG -> selectedCandidate = doPermutationSelection(
-          allTiedCandidates);
+      case GENERATE_PERMUTATION, USE_PERMUTATION_IN_CONFIG ->
+          selectedCandidate = doPermutationSelection(allTiedCandidates);
       default -> selectedCandidate = doPreviousRounds(allTiedCandidates);
     }
     return selectedCandidate;
