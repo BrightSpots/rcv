@@ -39,7 +39,7 @@ final class Utils {
     boolean isInt = true;
     try {
       Integer.parseInt(s);
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException exception) {
       isInt = false;
     }
     return isInt;
@@ -70,7 +70,7 @@ final class Utils {
     try {
       java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
       computerName = localMachine.getHostName();
-    } catch (UnknownHostException e) {
+    } catch (UnknownHostException exception) {
       if (envMap.containsKey("COMPUTERNAME")) {
         computerName = envMap.get("COMPUTERNAME");
       } else if (envMap.containsKey("HOSTNAME")) {

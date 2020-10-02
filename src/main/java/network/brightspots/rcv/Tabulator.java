@@ -668,8 +668,9 @@ class Tabulator {
     if (config.isGenerateCdfJsonEnabled()) {
       try {
         writer.generateCdfJson(castVoteRecords);
-      } catch (RoundSnapshotDataMissingException e) {
-        Logger.severe("CDF JSON generation failed due to missing snapshot for %s", e.getCvrId());
+      } catch (RoundSnapshotDataMissingException exception) {
+        Logger.severe("CDF JSON generation failed due to missing snapshot for %s",
+            exception.getCvrId());
       }
     }
   }

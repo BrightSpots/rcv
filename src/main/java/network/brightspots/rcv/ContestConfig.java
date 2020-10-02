@@ -110,8 +110,8 @@ class ContestConfig {
     ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
     try {
       config.processCandidateData();
-    } catch (Exception e) {
-      Logger.severe("Error processing candidate data:\n%s", e);
+    } catch (Exception exception) {
+      Logger.severe("Error processing candidate data:\n%s", exception);
       config = null;
     }
     return config;
@@ -370,7 +370,7 @@ class ContestConfig {
           stringValid = false;
           logErrorWithLocation(message, inputLocation);
         }
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException exception) {
         if (!isRequired) {
           message += " if supplied";
         }
@@ -925,7 +925,7 @@ class ContestConfig {
     } else {
       try {
         intValue = Integer.parseInt(rawInput);
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException exception) {
         intValue = null;
       }
     }

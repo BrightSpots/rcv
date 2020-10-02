@@ -279,11 +279,11 @@ public class GuiConfigController implements Initializable {
                       ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename))))
               .lines()
               .collect(Collectors.joining("\n"));
-    } catch (Exception e) {
+    } catch (Exception exception) {
       Logger.severe(
           "Error loading text file: %s\n%s",
           configFileDocumentationFilename,
-          e);
+          exception);
       text =
           String.format(
               "<Error loading text file: %s>", configFileDocumentationFilename);
@@ -328,8 +328,8 @@ public class GuiConfigController implements Initializable {
           Logger.info(line);
         }
         reader.close();
-      } catch (IOException e) {
-        Logger.severe("Error opening help file: %s", e);
+      } catch (IOException exception) {
+        Logger.severe("Error opening help file: %s", exception);
         Logger.info("Try opening the documentation manually at: %s", helpFileUrl);
       }
     }
@@ -358,7 +358,7 @@ public class GuiConfigController implements Initializable {
       try {
         loadConfig(GuiContext.getInstance().getConfig());
         labelCurrentlyLoaded.setText("Currently loaded: " + fileToLoad.getAbsolutePath());
-      } catch (ConfigVersionIsNewerThanAppVersionException e) {
+      } catch (ConfigVersionIsNewerThanAppVersionException exception) {
         // error is logged; nothing else to do here
       }
     }
@@ -798,11 +798,11 @@ public class GuiConfigController implements Initializable {
                         selectedFile.getAbsolutePath(), RawContestConfig.class));
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
-    } catch (JsonProcessingException e) {
+    } catch (JsonProcessingException exception) {
       Logger.warning(
           "Unable tell if saving is necessary, but everything should work fine anyway! Prompting "
               + "for save just in case...\n%s",
-          e);
+          exception);
     }
     return needsSaving;
   }
@@ -1053,10 +1053,10 @@ public class GuiConfigController implements Initializable {
               .writer()
               .withDefaultPrettyPrinter()
               .writeValueAsString(createRawContestConfig());
-    } catch (JsonProcessingException e) {
+    } catch (JsonProcessingException exception) {
       Logger.warning(
           "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
-          e);
+          exception);
     }
   }
 
@@ -1080,7 +1080,7 @@ public class GuiConfigController implements Initializable {
       try {
         datePickerContestDate.setValue(
             LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
-      } catch (DateTimeParseException e) {
+      } catch (DateTimeParseException exception) {
         Logger.severe("Invalid contestDate: %s!", outputSettings.contestDate);
         datePickerContestDate.setValue(null);
       }

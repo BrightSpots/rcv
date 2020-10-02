@@ -129,10 +129,10 @@ class ClearBallotCvrReader {
         }
       }
       csvReader.close();
-    } catch (FileNotFoundException e) {
-      Logger.severe("Cast vote record file not found!\n%s", e);
-    } catch (IOException e) {
-      Logger.severe("Error reading file!\n%s", e);
+    } catch (FileNotFoundException exception) {
+      Logger.severe("Cast vote record file not found!\n%s", exception);
+    } catch (IOException exception) {
+      Logger.severe("Error reading file!\n%s", exception);
     }
 
     if (unrecognizedCandidateCounts.size() > 0) {

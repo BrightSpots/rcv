@@ -124,12 +124,12 @@ class TabulatorSession {
                   .setPrecinctIds(precinctIds);
           try {
             writer.generateCdfJson(castVoteRecords);
-          } catch (RoundSnapshotDataMissingException e) {
+          } catch (RoundSnapshotDataMissingException exception) {
             // This will never actually happen because no snapshots are involved when you're just
             // translating the input to CDF, not the tabulation results.
           }
         }
-      } catch (IOException | UnableToCreateDirectoryException e) {
+      } catch (IOException | UnableToCreateDirectoryException exception) {
         Logger.severe("CDF JSON generation failed.");
       }
     } else {
@@ -157,8 +157,8 @@ class TabulatorSession {
         }
         Logger.fine("End config file contents.");
         reader.close();
-      } catch (IOException e) {
-        Logger.severe("Error logging config file: %s\n%s", configPath, e);
+      } catch (IOException exception) {
+        Logger.severe("Error logging config file: %s\n%s", configPath, exception);
       }
       Logger.info("Tabulating '%s'...", config.getContestName());
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
@@ -178,7 +178,7 @@ class TabulatorSession {
           Set<String> newWinnerSet;
           try {
             newWinnerSet = runTabulationForConfig(config, castVoteRecords);
-          } catch (TabulationCancelledException e) {
+          } catch (TabulationCancelledException exception) {
             Logger.severe("Tabulation was cancelled by the user!");
             break;
           }
@@ -207,7 +207,7 @@ class TabulatorSession {
           try {
             runTabulationForConfig(config, castVoteRecords);
             tabulationSuccess = true;
-          } catch (TabulationCancelledException e) {
+          } catch (TabulationCancelledException exception) {
             Logger.severe("Tabulation was cancelled by the user!");
           }
         }
@@ -235,8 +235,8 @@ class TabulatorSession {
       FileUtils.createOutputDirectory(config.getOutputDirectory());
       Logger.addTabulationFileLogging(tabulationLogPath);
       success = true;
-    } catch (UnableToCreateDirectoryException | IOException e) {
-      Logger.severe("Failed to configure tabulation logger!\n%s", e);
+    } catch (UnableToCreateDirectoryException | IOException exception) {
+      Logger.severe("Failed to configure tabulation logger!\n%s", exception);
     }
     if (!success) {
       Logger.severe("Failed to configure logger!");
@@ -254,8 +254,8 @@ class TabulatorSession {
     winners = tabulator.tabulate();
     try {
       tabulator.generateSummaryFiles(timestampString);
-    } catch (IOException e) {
-      Logger.severe("Error writing summary files:\n%s", e);
+    } catch (IOException exception) {
+      Logger.severe("Error writing summary files:\n%s", exception);
     }
     return winners;
   }
@@ -300,7 +300,7 @@ class TabulatorSession {
                     config.getOutputDirectory(),
                     source.getContestId(),
                     source.getUndeclaredWriteInLabel());
-          } catch (IOException e) {
+          } catch (IOException exception) {
             // error already logged in ResultsWriter
           }
           continue;
@@ -316,13 +316,13 @@ class TabulatorSession {
           continue;
         }
         throw new UnrecognizedProviderException();
-      } catch (UnrecognizedCandidatesException e) {
+      } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
-        for (String candidate : e.candidateCounts.keySet()) {
+        for (String candidate : exception.candidateCounts.keySet()) {
           Logger.severe(
               "Unrecognized candidate \"%s\" appears %d time(s)!",
-              candidate, e.candidateCounts.get(candidate));
+              candidate, exception.candidateCounts.get(candidate));
         }
         // various incorrect settings can lead to UnrecognizedCandidatesException so it's hard
         // to know exactly what the problem is
@@ -331,31 +331,31 @@ class TabulatorSession {
                 + "firstVoteColumnIndex, and precinctColumnIndex to make sure they are correct!");
         Logger.info("See config_file_documentation.txt for more details.");
         encounteredSourceProblem = true;
-      } catch (IOException e) {
+      } catch (IOException exception) {
         Logger.severe("Error opening cast vote record file: %s", cvrPath);
         Logger.info("Check file path and permissions and make sure they are correct!");
         encounteredSourceProblem = true;
       } catch (ParserConfigurationException
           | SAXException
           | OpenXML4JException
-          | POIXMLException e) {
+          | POIXMLException exception) {
         Logger.severe("Error parsing source file %s", cvrPath);
         Logger.info(
             "ES&S cast vote record files must be Microsoft Excel Workbook "
                 + "format.\nStrict Open XML and Open Office are not supported.");
         encounteredSourceProblem = true;
-      } catch (CvrDataFormatException e) {
+      } catch (CvrDataFormatException exception) {
         Logger.severe("Data format error while parsing source file: %s", cvrPath);
         Logger.info("See the log for details.");
         encounteredSourceProblem = true;
-      } catch (UnrecognizedProviderException e) {
+      } catch (UnrecognizedProviderException exception) {
         Logger.severe(
             "Unrecognized provider \"%s\" in source file: %s", source.getProvider(), cvrPath);
         encounteredSourceProblem = true;
-      } catch (CvrParseException e) {
+      } catch (CvrParseException exception) {
         encounteredSourceProblem = true;
-      } catch (Exception e) {
-        Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath, e);
+      } catch (Exception exception) {
+        Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath, exception);
         encounteredSourceProblem = true;
       }
     }

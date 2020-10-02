@@ -125,9 +125,9 @@ class HartCvrReader {
           Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
       }
-    } catch (Exception e) {
-      Logger.severe("Error parsing cast vote record:\n%s", e);
-      throw e;
+    } catch (Exception exception) {
+      Logger.severe("Error parsing cast vote record:\n%s", exception);
+      throw exception;
     }
   }
 
