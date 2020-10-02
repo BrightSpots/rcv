@@ -19,7 +19,7 @@ package network.brightspots.rcv;
 import java.util.List;
 import java.util.Map;
 
-class Utils {
+final class Utils {
 
   static final boolean IS_OS_WINDOWS = osMatchesName("Windows");
   static final boolean IS_OS_MAC = osMatchesName("Mac");
@@ -77,5 +77,8 @@ class Utils {
 
   private static boolean osMatchesName(final String osNamePrefix) {
     return System.getProperty("os.name").toUpperCase().startsWith(osNamePrefix.toUpperCase());
+  }
+
+  private Utils() {
   }
 }

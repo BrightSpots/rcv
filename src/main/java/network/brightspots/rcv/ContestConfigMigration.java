@@ -24,11 +24,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
-import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TieBreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
-class ContestConfigMigration {
+final class ContestConfigMigration {
 
   private static final Pattern versionNumPattern = Pattern.compile("(\\d+).*");
 
@@ -193,6 +192,9 @@ class ContestConfigMigration {
 
       config.rawConfig.tabulatorVersion = Main.APP_VERSION;
     }
+  }
+
+  private ContestConfigMigration() {
   }
 
   static class ConfigVersionIsNewerThanAppVersionException extends Exception {

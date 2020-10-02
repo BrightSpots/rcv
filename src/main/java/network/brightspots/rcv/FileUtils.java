@@ -26,7 +26,7 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.util.logging.Level;
 
-class FileUtils {
+final class FileUtils {
 
   // cache location for finding and creating user files and folders
   private static String userDirectory = null;
@@ -59,5 +59,8 @@ class FileUtils {
     UnableToCreateDirectoryException(String message) {
       super(message);
     }
+  }
+
+  private FileUtils() {
   }
 }
