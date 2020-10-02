@@ -18,7 +18,7 @@
     "precinctColumnIndex" : "1",
     "provider" : "ess",
     "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
+    "overvoteLabel": "",
     "undervoteLabel": "undervote",
     "undeclaredWriteInLabel": "UWI"
   } ],
