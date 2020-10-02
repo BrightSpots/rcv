@@ -91,7 +91,7 @@ class Tabulator {
   }
 
   // Utility function to "invert" the input roundTally map into a sorted map of tally
-  // to List of candidate IDs.  A list is used because multiple candidates may have the same tally.
+  // to List of candidate IDs. A list is used because multiple candidates may have the same tally.
   // This is used to determine when winners are selected and for running tiebreak logic.
   // param: roundTally input map of candidate ID to tally for a particular round
   // param candidatesToInclude: list of candidate IDs which may be included in the output.

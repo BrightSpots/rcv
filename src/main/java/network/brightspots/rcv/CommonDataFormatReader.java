@@ -22,8 +22,6 @@
 
 package network.brightspots.rcv;
 
-import static network.brightspots.rcv.Utils.isNullOrBlank;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
@@ -191,7 +189,7 @@ class CommonDataFormatReader {
         for (CVRContestSelection cvrContestSelection : contest.CVRContestSelection) {
           if (cvrContestSelection.Status != null && cvrContestSelection.Status
               .equals(STATUS_NEEDS_ADJUDICATION)) {
-            Logger.info("Contest Selection needs adjudication.  Skipping.");
+            Logger.info("Contest Selection needs adjudication. Skipping.");
             continue;
           }
           String contestSelectionId = cvrContestSelection.ContestSelectionId;
@@ -217,7 +215,7 @@ class CommonDataFormatReader {
               throw new CvrParseException();
             }
             if (contestSelection.CandidateIds.length > 1) {
-              Logger.warning("CandidateSelection \"%s\" has multiple CandidateIds.  "
+              Logger.warning("CandidateSelection \"%s\" has multiple CandidateIds. "
                   + "Only the first one will be processed.", contestSelection.ObjectId);
             }
 
@@ -385,7 +383,7 @@ class CommonDataFormatReader {
             throw new CvrParseException();
           }
           if (candidateIds.size() > 1) {
-            Logger.warning("CandidateSelection \"%s\" has multiple CandidateIds.  "
+            Logger.warning("CandidateSelection \"%s\" has multiple CandidateIds. "
                 + "Only the first one will be processed.", contestSelectionId);
           }
           String candidateObjectId = (String) candidateIds.get(0);
@@ -465,7 +463,7 @@ class CommonDataFormatReader {
 
   // The following classes are based on the NIST 1500-103 UML structure.
   // Many of the elements represented here will not be present on any particular implementation of
-  // a Cdf Cvr report.  Many of these elements are also irrelevant for tabulation purposes.
+  // a Cdf Cvr report. Many of these elements are also irrelevant for tabulation purposes.
   // However they are included here for completeness and to aid in interpreting the UML.
   // Note that fields identified as "boolean-like" can be (yes, no, 1, 0, or null)
   static class ContestSelection {
@@ -478,7 +476,7 @@ class CommonDataFormatReader {
 
     // CandidateSelection fields
     // CandidateIds is plural to support "party ticket" options which can include multiple
-    // candidates.  We do not support this yet.
+    // candidates. We do not support this yet.
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     String[] CandidateIds;

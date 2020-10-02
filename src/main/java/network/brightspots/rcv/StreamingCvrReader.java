@@ -152,7 +152,7 @@ class StreamingCvrReader {
     return result - 1;
   }
 
-  // purpose: Handle empty cells encountered while parsing a CVR.  Unlike empty rows, empty cells
+  // purpose: Handle empty cells encountered while parsing a CVR. Unlike empty rows, empty cells
   // do not trigger parsing callbacks so their existence must be inferred and handled when they
   // occur in a rankings cell.
   // param: currentRank the rank at which we stop inferring empty cells for this invocation
@@ -199,8 +199,8 @@ class StreamingCvrReader {
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
       Logger.log(
           Level.SEVERE,
-          "Cast vote record identifier missing on row %d in file %s.  This may be due to an "
-              + "incorrectly formatted xlsx file.  Try copying your cvr data into a new xlsx file "
+          "Cast vote record identifier missing on row %d in file %s. This may be due to an "
+              + "incorrectly formatted xlsx file. Try copying your cvr data into a new xlsx file "
               + "to fix this.",
           cvrIndex + firstVoteRowIndex, excelFileName);
       encounteredDataErrors = true;

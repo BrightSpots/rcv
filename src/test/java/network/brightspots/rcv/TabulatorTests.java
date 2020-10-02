@@ -17,7 +17,7 @@
 /*
  * Purpose:
  * These regression tests run various tabulations and compare the generated results to
- * expected results.  Passing these tests ensures that changes to tabulation code have not
+ * expected results. Passing these tests ensures that changes to tabulation code have not
  * altered the results of the tabulation.
  */
 
