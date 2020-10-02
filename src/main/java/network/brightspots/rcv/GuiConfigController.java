@@ -55,7 +55,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -74,7 +73,7 @@ import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
-@SuppressWarnings({"WeakerAccess", "rawtypes"})
+@SuppressWarnings({"WeakerAccess"})
 public class GuiConfigController implements Initializable {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
@@ -640,118 +639,6 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when CVR file path is changed.
-   */
-  public void changeCvrFilePath(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setFilePath(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR first vote col is changed.
-   */
-  public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setFirstVoteColumnIndex(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR first vote row is changed.
-   */
-  public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setFirstVoteRowIndex(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR ID col index is changed.
-   */
-  public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR precinct col index is changed.
-   */
-  public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR overvote delimiter is changed.
-   */
-  public void changeCvrOvervoteDelimiter(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setOvervoteDelimiter(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR provider is changed.
-   */
-  public void changeCvrProvider(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setProvider(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR contest ID is changed.
-   */
-  public void changeCvrContestId(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setContestId(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  public void changeCvrOvervoteLabel(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setOvervoteLabel(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  public void changeCvrUndervoteLabel(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setUndervoteLabel(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  public void changeCvrUndeclaredWriteInLabel(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setUndeclaredWriteInLabel(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
    * Action when add candidate button is clicked.
    */
   public void buttonAddCandidateClicked() {
@@ -779,28 +666,6 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates
         .getItems()
         .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
-  }
-
-  /**
-   * Action when candidate name is changed.
-   */
-  public void changeCandidateName(CellEditEvent cellEditEvent) {
-    tableViewCandidates
-        .getSelectionModel()
-        .getSelectedItem()
-        .setName(cellEditEvent.getNewValue().toString().trim());
-    tableViewCandidates.refresh();
-  }
-
-  /**
-   * Action when candidate code is changed.
-   */
-  public void changeCandidateCode(CellEditEvent cellEditEvent) {
-    tableViewCandidates
-        .getSelectionModel()
-        .getSelectedItem()
-        .setCode(cellEditEvent.getNewValue().toString().trim());
-    tableViewCandidates.refresh();
   }
 
   private void clearAndDisableWinningRuleFields() {
