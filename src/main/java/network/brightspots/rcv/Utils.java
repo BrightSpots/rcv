@@ -16,6 +16,7 @@
 
 package network.brightspots.rcv;
 
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -63,16 +64,25 @@ final class Utils {
 
   static String getComputerName() {
     String computerName = "[unknown]";
-    if (envMap.containsKey("COMPUTERNAME")) {
-      computerName = envMap.get("COMPUTERNAME");
-    } else if (envMap.containsKey("HOSTNAME")) {
-      computerName = envMap.get("HOSTNAME");
+    try {
+      java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
+      computerName = localMachine.getHostName();
+    } catch (UnknownHostException e) {
+      if (envMap.containsKey("COMPUTERNAME")) {
+        computerName = envMap.get("COMPUTERNAME");
+      } else if (envMap.containsKey("HOSTNAME")) {
+        computerName = envMap.get("HOSTNAME");
+      }
     }
     return computerName;
   }
 
   static String getUserName() {
-    return envMap.getOrDefault("USERNAME", "[unknown]");
+    String user = System.getProperty("user.name");
+    if (user == null) {
+      user = envMap.getOrDefault("USERNAME", "[unknown]");
+    }
+    return user;
   }
 
   private static boolean osMatchesName(final String osNamePrefix) {
