@@ -17,7 +17,7 @@
 /*
  * Purpose:
  * These regression tests run various tabulations and compare the generated results to
- * expected results.  Passing these tests ensures that changes to tabulation code have not
+ * expected results. Passing these tests ensures that changes to tabulation code have not
  * altered the results of the tabulation.
  */
 
@@ -35,7 +35,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.logging.Level;
 import network.brightspots.rcv.ContestConfig.Provider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -69,7 +68,7 @@ class TabulatorTests {
         if (line1 == null && line2 == null) {
           break;
         } else if (line1 == null || line2 == null) {
-          Logger.log(Level.SEVERE, "Files are unequal lengths!");
+          Logger.severe("Files are unequal lengths!");
           result = false;
           break;
         }
@@ -79,19 +78,18 @@ class TabulatorTests {
             && !line1.equals(line2)) {
           errorCount++;
           result = false;
-          Logger.log(
-              Level.SEVERE, "Files are not equal (line %d):\n%s\n%s", currentLine, line1, line2);
+          Logger.severe("Files are not equal (line %d):\n%s\n%s", currentLine, line1, line2);
           if (errorCount >= MAX_LOG_ERRORS) {
             break;
           }
         }
         currentLine++;
       }
-    } catch (FileNotFoundException e) {
-      Logger.log(Level.SEVERE, "File not found!\n%s", e.toString());
+    } catch (FileNotFoundException exception) {
+      Logger.severe("File not found!\n%s", exception);
       result = false;
-    } catch (IOException e) {
-      Logger.log(Level.SEVERE, "Error reading file!\n%s", e.toString());
+    } catch (IOException exception) {
+      Logger.severe("Error reading file!\n%s", exception);
       result = false;
     } finally {
       try {
@@ -101,8 +99,8 @@ class TabulatorTests {
         if (fr2 != null) {
           fr2.close();
         }
-      } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error closing file!\n%s", e.toString());
+      } catch (IOException exception) {
+        Logger.severe("Error closing file!\n%s", exception);
       }
     }
     return result;
@@ -135,11 +133,16 @@ class TabulatorTests {
     }
 
     // If this is a Dominion tabulation test, also check the converted output file.
-    boolean isDominion = config.rawConfig.cvrFileSources.stream().anyMatch(source ->
-        ContestConfig.getProvider(source) == Provider.DOMINION);
+    boolean isDominion =
+        config.rawConfig.cvrFileSources.stream()
+            .anyMatch(source -> ContestConfig.getProvider(source) == Provider.DOMINION);
     if (isDominion) {
-      String expectedPath = getTestFilePath(stem,
-          "_contest_" + config.rawConfig.cvrFileSources.get(0).getContestId() + "_expected.csv");
+      String expectedPath =
+          getTestFilePath(
+              stem,
+              "_contest_"
+                  + config.rawConfig.cvrFileSources.get(0).getContestId()
+                  + "_expected.csv");
       assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
     }
     // test passed so cleanup test output folder
@@ -150,9 +153,8 @@ class TabulatorTests {
         if (!file.isDirectory()) {
           try {
             Files.delete(file.toPath());
-          } catch (IOException e) {
-            Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", file.getAbsolutePath(),
-                e.toString());
+          } catch (IOException exception) {
+            Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
           }
         }
       }

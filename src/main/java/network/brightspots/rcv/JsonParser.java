@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Level;
 
 @SuppressWarnings("SameParameterValue")
 class JsonParser {
@@ -45,24 +44,20 @@ class JsonParser {
       createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException exception) {
       if (logsEnabled) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "Error parsing JSON file: %s\n%s\n"
                 + "Check file formatting and values and make sure they are correct!\n"
                 + "It might help to try surrounding values causing problems with quotes (e.g. "
                 + " \"value\").\nSee config_file_documentation.txt for more details.",
-            jsonFilePath,
-            exception.toString());
+            jsonFilePath, exception);
       }
       createdObject = null;
     } catch (IOException exception) {
       if (logsEnabled) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "Error opening file: %s\n%s\n"
                 + "Check file path and permissions and make sure they are correct!",
-            jsonFilePath,
-            exception.toString());
+            jsonFilePath, exception);
       }
       createdObject = null;
     }
@@ -83,13 +78,9 @@ class JsonParser {
           .writer()
           .withDefaultPrettyPrinter()
           .writeValue(jsonFile, objectToSerialize);
-      Logger.log(Level.INFO, "Successfully saved file: %s", jsonFile.getAbsolutePath());
+      Logger.info("Successfully saved file: %s", jsonFile.getAbsolutePath());
     } catch (IOException exception) {
-      Logger.log(
-          Level.SEVERE,
-          "Error saving file: %s\n%s",
-          jsonFile.getAbsolutePath(),
-          exception.toString());
+      Logger.severe("Error saving file: %s\n%s", jsonFile.getAbsolutePath(), exception);
     }
   }
 }

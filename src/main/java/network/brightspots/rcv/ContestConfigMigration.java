@@ -24,13 +24,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
-import network.brightspots.rcv.Tabulator.OvervoteRule;
-import network.brightspots.rcv.Tabulator.TieBreakMode;
+import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
-class ContestConfigMigration {
+final class ContestConfigMigration {
 
   private static final Pattern versionNumPattern = Pattern.compile("(\\d+).*");
+
+  private ContestConfigMigration() {
+  }
 
   private static ArrayList<Integer> parseVersionString(String version) {
     ArrayList<Integer> parsed = new ArrayList<>();
@@ -63,7 +65,6 @@ class ContestConfigMigration {
           isNewer = true;
           break;
         } else if (version2Num > version1Num) {
-          isNewer = false;
           break;
         }
       }
@@ -93,9 +94,9 @@ class ContestConfigMigration {
   static void migrateConfigVersion(ContestConfig config)
       throws ConfigVersionIsNewerThanAppVersionException {
     String version = config.rawConfig.tabulatorVersion;
-    boolean needsMigration = version == null ||
-        (!version.equals(Main.APP_VERSION) && !version
-            .equals(ContestConfig.AUTOMATED_TEST_VERSION));
+    boolean needsMigration = version == null
+        || (!version.equals(Main.APP_VERSION) && !version
+        .equals(ContestConfig.AUTOMATED_TEST_VERSION));
     if (needsMigration) {
       if (isConfigVersionNewerThanAppVersion(version)) {
         throw new ConfigVersionIsNewerThanAppVersionException();
@@ -137,16 +138,16 @@ class ContestConfigMigration {
         }
       }
 
-      if (config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
-        Map<String, TieBreakMode> tiebreakModeMigrationMap = Map.of(
-            "random", TieBreakMode.RANDOM,
-            "interactive", TieBreakMode.INTERACTIVE,
+      if (config.getTiebreakMode() == TiebreakMode.MODE_UNKNOWN) {
+        Map<String, TiebreakMode> tiebreakModeMigrationMap = Map.of(
+            "random", TiebreakMode.RANDOM,
+            "interactive", TiebreakMode.INTERACTIVE,
             "previousRoundCountsThenRandom",
-            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
+            TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
             "previousRoundCountsThenInteractive",
-            TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
-            "usePermutationInConfig", TieBreakMode.USE_PERMUTATION_IN_CONFIG,
-            "generatePermutation", TieBreakMode.GENERATE_PERMUTATION
+            TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
+            "usePermutationInConfig", TiebreakMode.USE_PERMUTATION_IN_CONFIG,
+            "generatePermutation", TiebreakMode.GENERATE_PERMUTATION
         );
         String oldTiebreakMode = rules.tiebreakMode;
         if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {

@@ -56,7 +56,6 @@ public class RawContestConfig {
 
   // CvrSource: encapsulates a source cast vote record file
   // all indexes are 1-based
-  @SuppressWarnings("unused")
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
@@ -69,11 +68,10 @@ public class RawContestConfig {
     private String precinctColumnIndex;
     private String overvoteDelimiter;
     private String provider;
-
-    public String overvoteLabel;
-    public String undervoteLabel;
-    public String undeclaredWriteInLabel;
-    public boolean treatBlankAsUndeclaredWriteIn;
+    private String overvoteLabel;
+    private String undervoteLabel;
+    private String undeclaredWriteInLabel;
+    private boolean treatBlankAsUndeclaredWriteIn;
 
     CvrSource() {
     }
@@ -243,10 +241,10 @@ public class RawContestConfig {
     public void setExcluded(boolean excluded) {
       this.excluded = excluded;
     }
-
   }
 
   // ContestRules: encapsulates the set of rules required to perform contest tabulation
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class ContestRules {

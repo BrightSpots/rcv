@@ -26,9 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javafx.util.Pair;
-import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 class HartCvrReader {
@@ -40,7 +38,11 @@ class HartCvrReader {
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  HartCvrReader(String cvrPath, String contestId, ContestConfig contestConfig, String undeclaredWriteInLabel) {
+  HartCvrReader(
+      String cvrPath,
+      String contestId,
+      ContestConfig contestConfig,
+      String undeclaredWriteInLabel) {
     this.cvrPath = cvrPath;
     this.contestId = contestId;
     this.contestConfig = contestConfig;
@@ -49,7 +51,7 @@ class HartCvrReader {
 
   // iterate all xml files in the source input folder
   void readCastVoteRecordsFromFolder(List<CastVoteRecord> castVoteRecords)
-      throws IOException, CvrParseException, UnrecognizedCandidatesException {
+      throws IOException, UnrecognizedCandidatesException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
@@ -59,8 +61,7 @@ class HartCvrReader {
         }
       }
     } else {
-      Logger.log(Level.SEVERE, "Unable to find any files in directory: %s",
-          cvrRoot.getAbsolutePath());
+      Logger.severe("Unable to find any files in directory: %s", cvrRoot.getAbsolutePath());
       throw new IOException();
     }
 
@@ -70,10 +71,9 @@ class HartCvrReader {
   }
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
-  void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
-      throws IOException, CvrParseException {
+  void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path) throws IOException {
     try {
-      Logger.log(Level.INFO, "Reading Hart cast vote record file: %s...", path.getFileName());
+      Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
       XmlMapper xmlMapper = new XmlMapper();
       xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -108,28 +108,30 @@ class HartCvrReader {
           }
         }
 
-        CastVoteRecord cvr = new CastVoteRecord(
-            contest.Id,
-            null,
-            xmlCvr.BatchNumber,
-            xmlCvr.CvrGuid,
-            xmlCvr.PrecinctSplit.Name,
-            xmlCvr.PrecinctSplit.Id,
-            null,
-            rankings);
+        CastVoteRecord cvr =
+            new CastVoteRecord(
+                contest.Id,
+                null,
+                xmlCvr.BatchNumber,
+                xmlCvr.CvrGuid,
+                xmlCvr.PrecinctSplit.Name,
+                xmlCvr.PrecinctSplit.Id,
+                null,
+                rankings);
         castVoteRecords.add(cvr);
 
         // provide some user feedback on the Cvr count
         if (castVoteRecords.size() % 50000 == 0) {
-          Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
+          Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
       }
-    } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing cast vote record:\n%s", e.toString());
-      throw e;
+    } catch (Exception exception) {
+      Logger.severe("Error parsing cast vote record:\n%s", exception);
+      throw exception;
     }
   }
 
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class WriteInData {
 
     public String ImageId;
@@ -137,6 +139,7 @@ class HartCvrReader {
   }
 
   // a voter selection
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class Option {
 
     public String Name;
@@ -146,6 +149,7 @@ class HartCvrReader {
   }
 
   // voter selections for a contest
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class Contest {
 
     public String Name;
@@ -153,18 +157,21 @@ class HartCvrReader {
     public ArrayList<Option> Options;
   }
 
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class PrecinctSplit {
 
     public String Name;
     public String Id;
   }
 
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class Party {
 
     public String Name;
     public String ID;
   }
 
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   static class HartCvrXml {
 
     public String BatchSequence;
@@ -175,5 +182,4 @@ class HartCvrReader {
     public Party Party;
     public ArrayList<Contest> Contests;
   }
-
 }

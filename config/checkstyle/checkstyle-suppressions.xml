@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+  "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+  "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+  <!--  If we don't name our fields in ways the violate the below checks, the code doesn't function -->
+  <suppress checks="MemberName" files="CommonDataFormatReader.java|HartCvrReader.java"/>
+  <suppress checks="AbbreviationAsWordInNameCheck" files="CommonDataFormatReader.java"
+    message="CVR"/>
+  <suppress checks="AbbreviationAsWordInNameCheck" files="HartCvrReader.java" message="ID"/>
+
+  <!--  Disagree with the check in this case -->
+  <suppress checks="AbbreviationAsWordInNameCheck" files="ContestConfig.java"
+    message="isMultiSeatBottomsUpUntilNWinnersEnabled"/>
+
+</suppressions>

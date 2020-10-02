@@ -85,18 +85,16 @@ class Logger {
       executionHandler.setLevel(Level.INFO);
       logger.addHandler(executionHandler);
     } catch (IOException exception) {
-      log(
-          Level.WARNING,
+      warning(
           "Failed to start system logging!\nMake sure you have write access in %s\n%s.",
-          System.getProperty("user.dir"),
-          exception.toString());
+          System.getProperty("user.dir"), exception);
     }
 
     for (Handler handler : logger.getHandlers()) {
       handler.setFormatter(formatter);
     }
 
-    log(Level.INFO, "Execution logging to: %s", logPath.toString().replace("%g", "*"));
+    info("Execution logging to: %s", logPath.toString().replace("%g", "*"));
   }
 
   // adds file logging for a tabulation run
@@ -107,7 +105,7 @@ class Logger {
     tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
     logger.addHandler(tabulationHandler);
-    log(Level.INFO, "Tabulation logging to: %s", outputPath.replace("%g", "*"));
+    info("Tabulation logging to: %s", outputPath.replace("%g", "*"));
   }
 
   // remove file logging once a tabulation run is completed
@@ -117,21 +115,20 @@ class Logger {
     logger.removeHandler(tabulationHandler);
   }
 
-  // logs to default logger
-  static void log(Level level, String format, Object... obj) {
-    logger.log(level, String.format(format, obj));
+  static void fine(String message, Object... obj) {
+    logger.log(Level.FINE, String.format(message, obj));
   }
 
-  static void info(String format, Object... obj) {
-    logger.log(Level.INFO, String.format(format, obj));
+  static void info(String message, Object... obj) {
+    logger.log(Level.INFO, String.format(message, obj));
   }
 
-  static void warning(String format, Object... obj) {
-    logger.log(Level.WARNING, String.format(format, obj));
+  static void warning(String message, Object... obj) {
+    logger.log(Level.WARNING, String.format(message, obj));
   }
 
-  static void severe(String format, Object... obj) {
-    logger.log(Level.SEVERE, String.format(format, obj));
+  static void severe(String message, Object... obj) {
+    logger.log(Level.SEVERE, String.format(message, obj));
   }
 
   // add logging to the provided text area for display to user in the GUI

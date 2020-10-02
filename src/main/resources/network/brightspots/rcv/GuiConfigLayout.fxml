@@ -16,6 +16,7 @@
   ~ program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<!--suppress JavaFxRedundantPropertyValue -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
@@ -83,14 +84,14 @@
             <VBox>
               <VBox styleClass="bordered-box" maxWidth="450.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Contest Name *" prefWidth="110"/>
+                  <Label prefWidth="130" text="Contest Name *"/>
                   <TextField fx:id="textFieldContestName" prefWidth="300.0"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Contest Date" prefWidth="110"/>
+                  <Label prefWidth="130" text="Contest Date"/>
                   <DatePicker fx:id="datePickerContestDate" editable="false" prefWidth="150.0"/>
                   <Button mnemonicParsing="false"
                     onAction="#buttonClearDatePickerContestDateClicked"
@@ -100,21 +101,21 @@
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Contest Jurisdiction" prefWidth="110"/>
+                  <Label prefWidth="130" text="Contest Jurisdiction"/>
                   <TextField fx:id="textFieldContestJurisdiction" prefWidth="300.0"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Contest Office" prefWidth="110"/>
+                  <Label prefWidth="130" text="Contest Office"/>
                   <TextField fx:id="textFieldContestOffice" prefWidth="300.0"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Rules Description" prefWidth="110.0"/>
+                  <Label prefWidth="130.0" text="Rules Description"/>
                   <TextField fx:id="textFieldRulesDescription" prefWidth="300.0"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
@@ -169,7 +170,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="First Vote Column *" prefWidth="110.0"/>
+                      <Label prefWidth="130.0" text="First Vote Column *"/>
                       <TextField prefHeight="25.0" prefWidth="40.0"
                         fx:id="textFieldCvrFirstVoteCol"/>
                       <padding>
@@ -177,7 +178,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="First Vote Row *" prefWidth="110.0"/>
+                      <Label prefWidth="130.0" text="First Vote Row *"/>
                       <TextField prefHeight="25.0" prefWidth="40.0"
                         fx:id="textFieldCvrFirstVoteRow"/>
                       <padding>
@@ -185,14 +186,14 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="ID Column" prefWidth="110.0"/>
+                      <Label prefWidth="130.0" text="ID Column"/>
                       <TextField prefHeight="25.0" prefWidth="40.0" fx:id="textFieldCvrIdCol"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Precinct Column" prefWidth="110.0"/>
+                      <Label prefWidth="130.0" text="Precinct Column"/>
                       <TextField prefHeight="25.0" prefWidth="40.0"
                         fx:id="textFieldCvrPrecinctCol"/>
                       <padding>
@@ -203,7 +204,7 @@
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <Label text="Path *"/>
-                      <TextField prefHeight="25.0" prefWidth="300.0" fx:id="textFieldCvrFilePath"/>
+                      <TextField prefHeight="25.0" prefWidth="290.0" fx:id="textFieldCvrFilePath"/>
                       <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
                         text="Select" fx:id="buttonCvrFilePath"/>
                       <padding>
@@ -211,7 +212,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="110.0" text="Overvote Delimiter"/>
+                      <Label prefWidth="174.0" text="Overvote Delimiter"/>
                       <TextField prefHeight="25.0" prefWidth="40.0"
                         fx:id="textFieldCvrOvervoteDelimiter"/>
                       <padding>
@@ -219,7 +220,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="160.0" text="Overvote Label"/>
+                      <Label prefWidth="174.0" text="Overvote Label"/>
                       <TextField prefHeight="25.0" prefWidth="200.0"
                         fx:id="textFieldCvrOvervoteLabel"/>
                       <padding>
@@ -227,7 +228,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="160.0" text="Undervote Label"/>
+                      <Label prefWidth="174.0" text="Undervote Label"/>
                       <TextField prefHeight="25.0" prefWidth="200.0"
                         fx:id="textFieldCvrUndervoteLabel"/>
                       <padding>
@@ -235,7 +236,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="160.0" text="Undeclared Write-In Label"/>
+                      <Label prefWidth="174.0" text="Undeclared Write-In Label"/>
                       <TextField prefHeight="25.0" prefWidth="200.0"
                         fx:id="textFieldCvrUndeclaredWriteInLabel"/>
                       <padding>
@@ -274,35 +275,35 @@
                 <TableView fx:id="tableViewCvrFiles">
                   <columns>
                     <TableColumn fx:id="tableColumnCvrFilePath" minWidth="20.0"
-                      onEditCommit="#changeCvrFilePath" prefWidth="300.0" text="Path"/>
+                      prefWidth="300.0" text="Path"/>
                     <TableColumn fx:id="tableColumnCvrProvider" minWidth="20.0"
-                      onEditCommit="#changeCvrProvider" prefWidth="110.0" text="Provider"/>
+                      prefWidth="110.0" text="Provider"/>
                     <TableColumn fx:id="tableColumnCvrContestId" minWidth="20.0"
-                      onEditCommit="#changeCvrContestId" prefWidth="110.0" text="Contest ID"/>
+                      prefWidth="110.0" text="Contest ID"/>
                     <TableColumn fx:id="tableColumnCvrFirstVoteCol" minWidth="20.0" prefWidth="50.0"
-                      onEditCommit="#changeCvrFirstVoteCol" text="First&#10;Vote&#10;Col"/>
+                      text="First&#10;Vote&#10;Col"/>
                     <TableColumn fx:id="tableColumnCvrFirstVoteRow" minWidth="20.0" prefWidth="50.0"
-                      onEditCommit="#changeCvrFirstVoteRow" text="First&#10;Vote&#10;Row"/>
+                      text="First&#10;Vote&#10;Row"/>
                     <TableColumn fx:id="tableColumnCvrIdCol" minWidth="20.0"
-                      onEditCommit="#changeCvrIdColIndex" prefWidth="50.0"
+                      prefWidth="50.0"
                       text="ID&#10;Col"/>
                     <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0"
-                      onEditCommit="#changeCvrPrecinctColIndex" prefWidth="50.0"
+                      prefWidth="70.0"
                       text="Precinct&#10;Column"/>
-                    <TableColumn minWidth="20.0" onEditCommit="#changeCvrOvervoteDelimiter"
-                      prefWidth="60.0" text="Overvote&#10;Delimiter"
+                    <TableColumn minWidth="20.0"
+                      prefWidth="80.0" text="Overvote&#10;Delimiter"
                       fx:id="tableColumnCvrOvervoteDelimiter"/>
-                    <TableColumn minWidth="20.0" onEditCommit="#changeCvrOvervoteLabel"
-                      prefWidth="60.0" text="Overvote&#10;Label"
+                    <TableColumn minWidth="20.0"
+                      prefWidth="80.0" text="Overvote&#10;Label"
                       fx:id="tableColumnCvrOvervoteLabel"/>
-                    <TableColumn minWidth="20.0" onEditCommit="#changeCvrUndervoteLabel"
-                      prefWidth="60.0" text="Undervote&#10;Label"
+                    <TableColumn minWidth="20.0"
+                      prefWidth="90.0" text="Undervote&#10;Label"
                       fx:id="tableColumnCvrUndervoteLabel"/>
-                    <TableColumn minWidth="20.0" onEditCommit="#changeCvrUndeclaredWriteInLabel"
-                      prefWidth="60.0" text="Undeclared&#10;Write-In&#10;Label"
+                    <TableColumn minWidth="20.0"
+                      prefWidth="90.0" text="Undeclared&#10;Write-In&#10;Label"
                       fx:id="tableColumnCvrUndeclaredWriteInLabel"/>
                     <TableColumn fx:id="tableColumnCvrTreatBlankAsUndeclaredWriteIn" minWidth="20.0"
-                      prefWidth="100.0" text="Treat Blank&#10;As Undeclared&#10;Write-In"/>
+                      prefWidth="120.0" text="Treat Blank&#10;As Undeclared&#10;Write-In"/>
                   </columns>
                 </TableView>
                 <padding>
@@ -379,9 +380,9 @@
                 <TableView fx:id="tableViewCandidates" prefHeight="414.0" prefWidth="600.0">
                   <columns>
                     <TableColumn fx:id="tableColumnCandidateName" minWidth="20.0"
-                      onEditCommit="#changeCandidateName" prefWidth="230.0" text="Name"/>
+                      prefWidth="230.0" text="Name"/>
                     <TableColumn fx:id="tableColumnCandidateCode" minWidth="20.0"
-                      onEditCommit="#changeCandidateCode" prefWidth="100.0" text="Code"/>
+                      prefWidth="100.0" text="Code"/>
                     <TableColumn fx:id="tableColumnCandidateExcluded" minWidth="20.0"
                       prefWidth="100.0" text="Excluded"/>
                   </columns>
@@ -403,7 +404,7 @@
               <VBox styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <Label text="Winner Election Mode *" prefWidth="180.0"/>
-                  <ChoiceBox fx:id="choiceWinnerElectionMode" prefWidth="300.0"/>
+                  <ChoiceBox prefWidth="330.0" fx:id="choiceWinnerElectionMode"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                   </padding>
@@ -416,8 +417,8 @@
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Maximum Number of Candidates&#xD;That Can Be Ranked *"
-                        prefWidth="200.0"/>
+                      <Label prefWidth="220.0"
+                        text="Maximum Number of Candidates&#xD;  That Can Be Ranked *"/>
                       <TextField fx:id="textFieldMaxRankingsAllowed" maxWidth="80.0"/>
                       <CheckBox mnemonicParsing="false" text="Maximum"
                         fx:id="checkBoxMaxRankingsAllowedMax">
@@ -430,7 +431,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Minimum Vote Threshold" prefWidth="200.0"/>
+                      <Label prefWidth="220.0" text="Minimum Vote Threshold"/>
                       <TextField fx:id="textFieldMinimumVoteThreshold" maxWidth="80.0"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
@@ -460,15 +461,15 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Tiebreak Mode *" prefWidth="100.0"/>
+                      <Label prefWidth="110.0" text="Tiebreak Mode *"/>
                       <ChoiceBox fx:id="choiceTiebreakMode" prefWidth="320.0"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Random Seed *" prefWidth="180.0"/>
-                      <TextField fx:id="textFieldRandomSeed" maxWidth="220.0"/>
+                      <Label prefWidth="220.0" text="Random Seed *"/>
+                      <TextField maxWidth="160.0" fx:id="textFieldRandomSeed"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
@@ -476,16 +477,16 @@
                   </VBox>
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Number of Winners *" prefWidth="196.0"/>
-                      <TextField fx:id="textFieldNumberOfWinners" maxWidth="220.0"/>
+                      <Label prefWidth="240.0" text="Number of Winners *"/>
+                      <TextField maxWidth="80.0" fx:id="textFieldNumberOfWinners"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Percentage Threshold *" prefWidth="196.0"/>
+                      <Label prefWidth="240.0" text="Percentage Threshold *"/>
                       <TextField fx:id="textFieldMultiSeatBottomsUpPercentageThreshold"
-                        maxWidth="220.0"/>
+                        maxWidth="80.0"/>
                       <Label text=" &#37;" prefWidth="18.0"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
@@ -513,9 +514,9 @@
                       </padding>
                     </VBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="196.0"
-                        text="Decimal Places for Vote Arithmetic&#xD; (Multi-Winner Only) *"/>
-                      <TextField fx:id="textFieldDecimalPlacesForVoteArithmetic" maxWidth="220.0"/>
+                      <Label prefWidth="240.0"
+                        text="Decimal Places for Vote Arithmetic&#xD;  (Multi-Winner Only) *"/>
+                      <TextField maxWidth="80.0" fx:id="textFieldDecimalPlacesForVoteArithmetic"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
@@ -536,9 +537,9 @@
           </Tab>
           <Tab text="Voter Error Rules" fx:id="tabVoterErrorRules">
             <VBox>
-              <VBox styleClass="bordered-box" maxWidth="418.0">
+              <VBox maxWidth="460.0" styleClass="bordered-box">
                 <HBox spacing="4.0">
-                  <Label text="Overvote Rule *" prefWidth="160.0"/>
+                  <Label prefWidth="212.0" text="Overvote Rule *"/>
                   <VBox spacing="4.0">
                     <fx:define>
                       <ToggleGroup fx:id="overvoteRuleToggleGroup"/>
@@ -555,8 +556,8 @@
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="How Many Consecutive&#xD;Skipped Ranks Are Allowed *"
-                    prefWidth="220.0"/>
+                  <Label prefWidth="280.0"
+                    text="How Many Consecutive Skipped&#xD;  Ranks Are Allowed *"/>
                   <TextField fx:id="textFieldMaxSkippedRanksAllowed" maxWidth="220.0"/>
                   <CheckBox mnemonicParsing="false" text="Unlimited" prefWidth="180.0"
                     fx:id="checkBoxMaxSkippedRanksAllowedUnlimited">
@@ -593,9 +594,9 @@
           </Tab>
           <Tab text="Output" fx:id="tabOutput">
             <VBox>
-              <VBox styleClass="bordered-box" maxWidth="580.0">
+              <VBox maxWidth="610.0" styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Output Directory"/>
+                  <Label prefWidth="120.0" text="Output Directory"/>
                   <TextField fx:id="textFieldOutputDirectory" prefWidth="400.0"/>
                   <Button mnemonicParsing="false" onAction="#buttonOutputDirectoryClicked"
                     text="Select"/>

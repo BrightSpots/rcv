@@ -33,10 +33,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -57,12 +55,10 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -74,21 +70,26 @@ import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.RawContestConfig.OutputSettings;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
-import network.brightspots.rcv.Tabulator.TieBreakMode;
+import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
-@SuppressWarnings({"WeakerAccess", "rawtypes"})
+@SuppressWarnings({"WeakerAccess"})
 public class GuiConfigController implements Initializable {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String CONFIG_FILE_DOCUMENTATION_FILENAME =
       "network/brightspots/rcv/config_file_documentation.txt";
-  private static final String HINTS_CONTEST_INFO_FILENAME = "network/brightspots/rcv/hints_contest_info.txt";
-  private static final String HINTS_CVR_FILES_FILENAME = "network/brightspots/rcv/hints_cvr_files.txt";
-  private static final String HINTS_CANDIDATES_FILENAME = "network/brightspots/rcv/hints_candidates.txt";
-  private static final String HINTS_WINNING_RULES_FILENAME = "network/brightspots/rcv/hints_winning_rules.txt";
-  private static final String HINTS_VOTER_ERROR_RULES_FILENAME = "network/brightspots/rcv/hints_voter_error_rules.txt";
+  private static final String HINTS_CONTEST_INFO_FILENAME =
+      "network/brightspots/rcv/hints_contest_info.txt";
+  private static final String HINTS_CVR_FILES_FILENAME =
+      "network/brightspots/rcv/hints_cvr_files.txt";
+  private static final String HINTS_CANDIDATES_FILENAME =
+      "network/brightspots/rcv/hints_candidates.txt";
+  private static final String HINTS_WINNING_RULES_FILENAME =
+      "network/brightspots/rcv/hints_winning_rules.txt";
+  private static final String HINTS_VOTER_ERROR_RULES_FILENAME =
+      "network/brightspots/rcv/hints_voter_error_rules.txt";
   private static final String HINTS_OUTPUT_FILENAME = "network/brightspots/rcv/hints_output.txt";
 
   // Used to check if changes have been made to a new config
@@ -187,7 +188,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxCandidateExcluded;
   @FXML
-  private ChoiceBox<TieBreakMode> choiceTiebreakMode;
+  private ChoiceBox<TiebreakMode> choiceTiebreakMode;
   @FXML
   private RadioButton radioOvervoteAlwaysSkip;
   @FXML
@@ -258,10 +259,10 @@ public class GuiConfigController implements Initializable {
         : WinnerElectionMode.MODE_UNKNOWN;
   }
 
-  private static TieBreakMode getTiebreakModeChoice(ChoiceBox<TieBreakMode> choiceBox) {
-    return choiceBox.getValue() != null ? TieBreakMode
+  private static TiebreakMode getTiebreakModeChoice(ChoiceBox<TiebreakMode> choiceBox) {
+    return choiceBox.getValue() != null ? TiebreakMode
         .getByInternalLabel(choiceBox.getValue().getInternalLabel())
-        : TieBreakMode.MODE_UNKNOWN;
+        : TiebreakMode.MODE_UNKNOWN;
   }
 
   private static String getTextOrEmptyString(TextField textField) {
@@ -279,11 +280,10 @@ public class GuiConfigController implements Initializable {
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception exception) {
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "Error loading text file: %s\n%s",
           configFileDocumentationFilename,
-          exception.toString());
+          exception);
       text =
           String.format(
               "<Error loading text file: %s>", configFileDocumentationFilename);
@@ -328,8 +328,8 @@ public class GuiConfigController implements Initializable {
           Logger.info(line);
         }
         reader.close();
-      } catch (IOException e) {
-        Logger.severe("Error opening help file: %s", e.toString());
+      } catch (IOException exception) {
+        Logger.severe("Error opening help file: %s", exception);
         Logger.info("Try opening the documentation manually at: %s", helpFileUrl);
       }
     }
@@ -340,7 +340,7 @@ public class GuiConfigController implements Initializable {
    */
   public void menuItemNewConfigClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Creating new contest config...");
+      Logger.info("Creating new contest config...");
       GuiContext.getInstance().setConfig(null);
       selectedFile = null;
       clearConfig();
@@ -358,7 +358,7 @@ public class GuiConfigController implements Initializable {
       try {
         loadConfig(GuiContext.getInstance().getConfig());
         labelCurrentlyLoaded.setText("Currently loaded: " + fileToLoad.getAbsolutePath());
-      } catch (ConfigVersionIsNewerThanAppVersionException e) {
+      } catch (ConfigVersionIsNewerThanAppVersionException exception) {
         // error is logged; nothing else to do here
       }
     }
@@ -450,8 +450,7 @@ public class GuiConfigController implements Initializable {
         TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
         setUpAndStartService(service);
       } else {
-        Logger.log(
-            Level.WARNING, "Please load a contest config file before attempting to tabulate!");
+        Logger.warning("Please load a contest config file before attempting to tabulate!");
       }
     }
   }
@@ -467,8 +466,7 @@ public class GuiConfigController implements Initializable {
         ConvertToCdfService service = new ConvertToCdfService(selectedFile.getAbsolutePath());
         setUpAndStartService(service);
       } else {
-        Logger.log(
-            Level.WARNING,
+        Logger.warning(
             "Please load a contest config file before attempting to convert to CDF!");
       }
     }
@@ -493,14 +491,14 @@ public class GuiConfigController implements Initializable {
       if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
         // In case the alert is still displayed when the GUI is no longer busy
         if (guiIsBusy) {
-          Logger.log(Level.SEVERE, "User exited tabulator before it was finished!");
+          Logger.severe("User exited tabulator before it was finished!");
         } else {
-          Logger.log(Level.INFO, "Exiting tabulator GUI...");
+          Logger.info("Exiting tabulator GUI...");
         }
         Platform.exit();
       }
     } else if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Exiting tabulator GUI...");
+      Logger.info("Exiting tabulator GUI...");
       Platform.exit();
     }
   }
@@ -603,6 +601,9 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when clear CVR file button is clicked.
+   */
   public void buttonClearCvrFieldsClicked() {
     choiceCvrProvider.setValue(null);
     clearAndDisableCvrFilesTabFields();
@@ -646,118 +647,6 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when CVR file path is changed.
-   */
-  public void changeCvrFilePath(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setFilePath(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR first vote col is changed.
-   */
-  public void changeCvrFirstVoteCol(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setFirstVoteColumnIndex(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR first vote row is changed.
-   */
-  public void changeCvrFirstVoteRow(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setFirstVoteRowIndex(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR ID col index is changed.
-   */
-  public void changeCvrIdColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setIdColumnIndex(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR precinct col index is changed.
-   */
-  public void changeCvrPrecinctColIndex(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setPrecinctColumnIndex(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR overvote delimiter is changed.
-   */
-  public void changeCvrOvervoteDelimiter(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setOvervoteDelimiter(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR provider is changed.
-   */
-  public void changeCvrProvider(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setProvider(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
-   * Action when CVR contest ID is changed.
-   */
-  public void changeCvrContestId(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setContestId(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  public void changeCvrOvervoteLabel(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setOvervoteLabel(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  public void changeCvrUndervoteLabel(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setUndervoteLabel(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  public void changeCvrUndeclaredWriteInLabel(CellEditEvent cellEditEvent) {
-    tableViewCvrFiles
-        .getSelectionModel()
-        .getSelectedItem()
-        .setUndeclaredWriteInLabel(cellEditEvent.getNewValue().toString().trim());
-    tableViewCvrFiles.refresh();
-  }
-
-  /**
    * Action when add candidate button is clicked.
    */
   public void buttonAddCandidateClicked() {
@@ -772,6 +661,9 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when clear candidate button is clicked.
+   */
   public void buttonClearCandidateClicked() {
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
@@ -785,28 +677,6 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates
         .getItems()
         .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
-  }
-
-  /**
-   * Action when candidate name is changed.
-   */
-  public void changeCandidateName(CellEditEvent cellEditEvent) {
-    tableViewCandidates
-        .getSelectionModel()
-        .getSelectedItem()
-        .setName(cellEditEvent.getNewValue().toString().trim());
-    tableViewCandidates.refresh();
-  }
-
-  /**
-   * Action when candidate code is changed.
-   */
-  public void changeCandidateCode(CellEditEvent cellEditEvent) {
-    tableViewCandidates
-        .getSelectionModel()
-        .getSelectedItem()
-        .setCode(cellEditEvent.getNewValue().toString().trim());
-    tableViewCandidates.refresh();
   }
 
   private void clearAndDisableWinningRuleFields() {
@@ -929,11 +799,10 @@ public class GuiConfigController implements Initializable {
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
     } catch (JsonProcessingException exception) {
-      Logger.log(
-          Level.WARNING,
+      Logger.warning(
           "Unable tell if saving is necessary, but everything should work fine anyway! Prompting "
               + "for save just in case...\n%s",
-          exception.toString());
+          exception);
     }
     return needsSaving;
   }
@@ -995,8 +864,8 @@ public class GuiConfigController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
-    Logger.log(Level.INFO, "Opening tabulator GUI...");
-    Logger.log(Level.INFO, "Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
+    Logger.info("Opening tabulator GUI...");
+    Logger.info("Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
 
     GuiContext.getInstance()
         .getMainWindow()
@@ -1073,6 +942,11 @@ public class GuiConfigController implements Initializable {
           textFieldCvrOvervoteLabel.setDisable(false);
           textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
         }
+        case PROVIDER_UNKNOWN -> {
+          // Do nothing
+        }
+        default -> throw new IllegalStateException(
+            "Unexpected value: " + getProviderChoice(choiceCvrProvider));
       }
     });
     tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
@@ -1105,13 +979,19 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.setEditable(false);
 
     clearAndDisableWinningRuleFields();
-    choiceTiebreakMode.getItems().addAll(TieBreakMode.values());
-    choiceTiebreakMode.getItems().remove(TieBreakMode.MODE_UNKNOWN);
+    choiceTiebreakMode.getItems().addAll(TiebreakMode.values());
+    choiceTiebreakMode.getItems().remove(TiebreakMode.MODE_UNKNOWN);
     choiceTiebreakMode.setOnAction(event -> {
       clearAndDisableTiebreakFields();
       switch (getTiebreakModeChoice(choiceTiebreakMode)) {
         case RANDOM, PREVIOUS_ROUND_COUNTS_THEN_RANDOM, GENERATE_PERMUTATION -> textFieldRandomSeed
             .setDisable(false);
+        case INTERACTIVE, PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE, USE_PERMUTATION_IN_CONFIG,
+            MODE_UNKNOWN -> {
+          // Do nothing
+        }
+        default -> throw new IllegalStateException("Unexpected value: "
+            + getTiebreakModeChoice(choiceTiebreakMode));
       }
     });
     choiceWinnerElectionMode.getItems().addAll(WinnerElectionMode.values());
@@ -1128,19 +1008,26 @@ public class GuiConfigController implements Initializable {
           checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
           textFieldNumberOfWinners.setText("1");
         }
-        case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND, MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND -> {
+        case MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND,
+            MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND -> {
           radioThresholdMostCommon.setDisable(false);
           radioThresholdHbQuota.setDisable(false);
           radioThresholdHareQuota.setDisable(false);
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
-        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> textFieldNumberOfWinners
+        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS,
+            MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> textFieldNumberOfWinners
             .setDisable(false);
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldNumberOfWinners.setText("0");
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
         }
+        case MODE_UNKNOWN -> {
+          // Do nothing
+        }
+        default -> throw new IllegalStateException("Unexpected value: "
+            + getWinnerElectionModeChoice(choiceWinnerElectionMode));
       }
     });
     checkBoxMaxRankingsAllowedMax.setOnAction(event -> {
@@ -1167,10 +1054,9 @@ public class GuiConfigController implements Initializable {
               .withDefaultPrettyPrinter()
               .writeValueAsString(createRawContestConfig());
     } catch (JsonProcessingException exception) {
-      Logger.log(
-          Level.WARNING,
+      Logger.warning(
           "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
-          exception.toString());
+          exception);
     }
   }
 
@@ -1195,7 +1081,7 @@ public class GuiConfigController implements Initializable {
         datePickerContestDate.setValue(
             LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
       } catch (DateTimeParseException exception) {
-        Logger.log(Level.SEVERE, "Invalid contestDate: %s!", outputSettings.contestDate);
+        Logger.severe("Invalid contestDate: %s!", outputSettings.contestDate);
         datePickerContestDate.setValue(null);
       }
     }
@@ -1217,7 +1103,7 @@ public class GuiConfigController implements Initializable {
             ? null
             : config.getWinnerElectionMode());
     choiceTiebreakMode.setValue(
-        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
+        config.getTiebreakMode() == TiebreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
     setOvervoteRuleRadioButton(config.getOvervoteRule());
 
     ContestRules rules = rawConfig.rules;
@@ -1274,6 +1160,7 @@ public class GuiConfigController implements Initializable {
       case RULE_UNKNOWN -> {
         // Do nothing for unknown overvote rules
       }
+      default -> throw new IllegalStateException("Unexpected value: " + overvoteRule);
     }
   }
 
@@ -1369,10 +1256,9 @@ public class GuiConfigController implements Initializable {
           };
       task.setOnFailed(
           arg0 ->
-              Logger.log(
-                  Level.SEVERE,
+              Logger.severe(
                   "Error during validation:\n%s\nValidation failed!",
-                  task.getException().toString()));
+                  task.getException()));
       return task;
     }
   }
@@ -1399,10 +1285,9 @@ public class GuiConfigController implements Initializable {
           };
       task.setOnFailed(
           arg0 ->
-              Logger.log(
-                  Level.SEVERE,
+              Logger.severe(
                   "Error during tabulation:\n%s\nTabulation failed!",
-                  task.getException().toString()));
+                  task.getException()));
       return task;
     }
   }
@@ -1429,10 +1314,9 @@ public class GuiConfigController implements Initializable {
           };
       task.setOnFailed(
           arg0 ->
-              Logger.log(
-                  Level.SEVERE,
+              Logger.severe(
                   "Error when attempting to convert to CDF:\n%s\nConversion failed!",
-                  task.getException().toString()));
+                  task.getException()));
       return task;
     }
   }

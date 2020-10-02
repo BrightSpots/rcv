@@ -24,11 +24,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
-
 
 class ClearBallotCvrReader {
 
@@ -55,25 +53,24 @@ class ClearBallotCvrReader {
       // we parse these rankings from the header row into a map for lookup during CVR parsing
       String firstRow = csvReader.readLine();
       if (firstRow == null) {
-        Logger.log(Level.SEVERE, "No header row found in cast vote record file: %s", this.cvrPath);
+        Logger.severe("No header row found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
       }
       String[] headerData = firstRow.split(",");
       if (headerData.length < CvrColumnField.ChoicesBegin.ordinal()) {
-        Logger.log(Level.SEVERE, "No choice columns found in cast vote record file: %s",
-            this.cvrPath);
+        Logger.severe("No choice columns found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
       }
       Map<Integer, Pair<Integer, String>> columnIndexToRanking = new HashMap<>();
-      for (int columnIndex = CvrColumnField.ChoicesBegin.ordinal(); columnIndex < headerData.length;
+      for (int columnIndex = CvrColumnField.ChoicesBegin.ordinal();
+          columnIndex < headerData.length;
           columnIndex++) {
         String choiceColumnHeader = headerData[columnIndex];
         String[] choiceFields = choiceColumnHeader.split(":");
         // validate field count
         if (choiceFields.length != RcvChoiceHeaderField.FIELD_COUNT.ordinal()) {
-          Logger.log(Level.SEVERE,
-              "Wrong number of choice header fields in cast vote record file: %s",
-              this.cvrPath);
+          Logger.severe(
+              "Wrong number of choice header fields in cast vote record file: %s", this.cvrPath);
           throw new CvrParseException();
         }
         // filter by contest
@@ -90,8 +87,9 @@ class ClearBallotCvrReader {
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
         if (rank > this.contestConfig.getMaxRankingsAllowed()) {
-          Logger.log(Level.SEVERE, "Rank: %d exceeds max rankings allowed in config: %d", rank,
-              this.contestConfig.getMaxRankingsAllowed());
+          Logger.severe(
+              "Rank: %d exceeds max rankings allowed in config: %d",
+              rank, this.contestConfig.getMaxRankingsAllowed());
           throw new CvrParseException();
         }
         columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
@@ -113,27 +111,28 @@ class ClearBallotCvrReader {
           }
         }
         // create the cast vote record
-        CastVoteRecord castVoteRecord = new CastVoteRecord(contestId,
-            cvrData[CvrColumnField.ScanComputerName.ordinal()],
-            null,
-            cvrData[CvrColumnField.BallotID.ordinal()],
-            cvrData[CvrColumnField.PrecinctID.ordinal()],
-            null,
-            cvrData[CvrColumnField.BallotStyleID.ordinal()],
-            rankings
-        );
+        CastVoteRecord castVoteRecord =
+            new CastVoteRecord(
+                contestId,
+                cvrData[CvrColumnField.ScanComputerName.ordinal()],
+                null,
+                cvrData[CvrColumnField.BallotID.ordinal()],
+                cvrData[CvrColumnField.PrecinctID.ordinal()],
+                null,
+                cvrData[CvrColumnField.BallotStyleID.ordinal()],
+                rankings);
 
         castVoteRecords.add(castVoteRecord);
         // provide some user feedback on the Cvr count
         if (castVoteRecords.size() % 50000 == 0) {
-          Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
+          Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
       }
       csvReader.close();
-    } catch (FileNotFoundException e) {
-      Logger.log(Level.SEVERE, "Cast vote record file not found!\n%s", e.toString());
-    } catch (IOException e) {
-      Logger.log(Level.SEVERE, "Error reading file!\n%s", e.toString());
+    } catch (FileNotFoundException exception) {
+      Logger.severe("Cast vote record file not found!\n%s", exception);
+    } catch (IOException exception) {
+      Logger.severe("Error reading file!\n%s", exception);
     }
 
     if (unrecognizedCandidateCounts.size() > 0) {
@@ -142,6 +141,7 @@ class ClearBallotCvrReader {
   }
 
   // These values correspond to the data in Clear Vote Cvr Csv columns
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   public enum CvrColumnField {
     RowNumber,
     BoxID,
@@ -157,6 +157,7 @@ class ClearBallotCvrReader {
   }
 
   // These values correspond to the data in Clear Vote Rcv choice column header fields
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   public enum RcvChoiceHeaderField {
     HEADER,
     CONTEST_NAME,

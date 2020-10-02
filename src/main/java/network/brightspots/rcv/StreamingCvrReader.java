@@ -31,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -126,7 +125,7 @@ class StreamingCvrReader {
     // a sequence of one or more non-digits followed by a sequence of one or more digits
     String[] addressParts = address.split("(?<=\\D)(?=\\d)");
     if (addressParts.length != 2) {
-      Logger.log(Level.SEVERE, "Invalid cell address: %s", address);
+      Logger.severe("Invalid cell address: %s", address);
       throw new InvalidParameterException();
     }
     // row is the 0-based row of the cell
@@ -144,7 +143,7 @@ class StreamingCvrReader {
       result *= 26;
       int charValue = columnAddress.charAt(i) - '@';
       if (charValue < 1 || charValue > 26) {
-        Logger.log(Level.SEVERE, "Invalid cell address: %s", columnAddress);
+        Logger.severe("Invalid cell address: %s", columnAddress);
         throw new InvalidParameterException();
       }
       result += charValue;
@@ -152,7 +151,7 @@ class StreamingCvrReader {
     return result - 1;
   }
 
-  // purpose: Handle empty cells encountered while parsing a CVR.  Unlike empty rows, empty cells
+  // purpose: Handle empty cells encountered while parsing a CVR. Unlike empty rows, empty cells
   // do not trigger parsing callbacks so their existence must be inferred and handled when they
   // occur in a rankings cell.
   // param: currentRank the rank at which we stop inferring empty cells for this invocation
@@ -187,20 +186,17 @@ class StreamingCvrReader {
     if (precinctColumnIndex != null) {
       if (currentPrecinct == null) {
         // group precincts with missing Ids here
-        Logger.log(
-            Level.WARNING,
-            "Precinct identifier not found for cast vote record: %s",
-            computedCastVoteRecordId);
+        Logger.warning(
+            "Precinct identifier not found for cast vote record: %s", computedCastVoteRecordId);
         currentPrecinct = MISSING_PRECINCT_ID;
       }
       precinctIds.add(currentPrecinct);
     }
 
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
-      Logger.log(
-          Level.SEVERE,
-          "Cast vote record identifier missing on row %d in file %s.  This may be due to an "
-              + "incorrectly formatted xlsx file.  Try copying your cvr data into a new xlsx file "
+      Logger.severe(
+          "Cast vote record identifier missing on row %d in file %s. This may be due to an "
+              + "incorrectly formatted xlsx file. Try copying your cvr data into a new xlsx file "
               + "to fix this.",
           cvrIndex + firstVoteRowIndex, excelFileName);
       encounteredDataErrors = true;
@@ -218,7 +214,7 @@ class StreamingCvrReader {
 
     // provide some user feedback on the CVR count
     if (cvrList.size() % 50000 == 0) {
-      Logger.log(Level.INFO, "Parsed %d cast vote records.", cvrList.size());
+      Logger.info("Parsed %d cast vote records.", cvrList.size());
     }
   }
 
@@ -249,10 +245,8 @@ class StreamingCvrReader {
 
       for (String candidate : candidates) {
         candidate = candidate.trim();
-        if (candidates.length > 1 &&
-            (candidate.equals("") || candidate.equals(undervoteLabel))) {
-          Logger.log(
-              Level.SEVERE,
+        if (candidates.length > 1 && (candidate.equals("") || candidate.equals(undervoteLabel))) {
+          Logger.severe(
               "If a cell contains multiple candidates split by the overvote delimiter, it's not "
                   + "valid for any of them to be blank or an explicit undervote.");
           encounteredDataErrors = true;
@@ -326,7 +320,7 @@ class StreamingCvrReader {
 
           @Override
           public void headerFooter(String s, boolean b, String s1) {
-            Logger.log(Level.WARNING, "Unexpected XML data: %s %b %s", s, b, s1);
+            Logger.warning("Unexpected XML data: %s %b %s", s, b, s1);
           }
         };
 

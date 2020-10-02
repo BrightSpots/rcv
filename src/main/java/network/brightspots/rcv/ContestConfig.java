@@ -36,11 +36,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
-import network.brightspots.rcv.Tabulator.TieBreakMode;
+import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 class ContestConfig {
@@ -111,8 +110,8 @@ class ContestConfig {
     ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
     try {
       config.processCandidateData();
-    } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error processing candidate data:\n%s", e.toString());
+    } catch (Exception exception) {
+      Logger.severe("Error processing candidate data:\n%s", exception);
       config = null;
     }
     return config;
@@ -122,16 +121,16 @@ class ContestConfig {
   // returns: new ContestConfig object if checks pass otherwise null
   static ContestConfig loadContestConfig(String configPath, boolean silentMode) {
     if (configPath == null) {
-      Logger.log(Level.SEVERE, "No contest config path specified!");
+      Logger.severe("No contest config path specified!");
       return null;
     }
     ContestConfig config = null;
     RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
     if (rawConfig == null) {
-      Logger.log(Level.SEVERE, "Failed to load contest config: %s", configPath);
+      Logger.severe("Failed to load contest config: %s", configPath);
     } else {
       if (!silentMode) {
-        Logger.log(Level.INFO, "Successfully loaded contest config: %s", configPath);
+        Logger.info("Successfully loaded contest config: %s", configPath);
       }
       // parent folder is used as the default source folder
       // if there is no parent folder use current working directory
@@ -153,28 +152,28 @@ class ContestConfig {
     // perform checks on source input path
     if (isNullOrBlank(source.getFilePath())) {
       sourceValid = false;
-      Logger.log(Level.SEVERE, "filePath is required for each cast vote record file!");
+      Logger.severe("filePath is required for each cast vote record file!");
     } else {
       if (!isNullOrBlank(source.getOvervoteLabel())
-          && stringAlreadyInUseElsewhereInSource(source.getOvervoteLabel(), source,
-          "overvoteLabel")) {
+          && stringAlreadyInUseElsewhereInSource(
+          source.getOvervoteLabel(), source, "overvoteLabel")) {
         sourceValid = false;
       }
       if (!isNullOrBlank(source.getUndervoteLabel())
-          && stringAlreadyInUseElsewhereInSource(source.getUndervoteLabel(), source,
-          "undervoteLabel")) {
+          && stringAlreadyInUseElsewhereInSource(
+          source.getUndervoteLabel(), source, "undervoteLabel")) {
         sourceValid = false;
       }
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-          && stringAlreadyInUseElsewhereInSource(source.getUndeclaredWriteInLabel(), source,
-          "undeclaredWriteInLabel")) {
+          && stringAlreadyInUseElsewhereInSource(
+          source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
         sourceValid = false;
       }
 
       Provider provider = getProvider(source);
       if (provider == Provider.PROVIDER_UNKNOWN) {
         sourceValid = false;
-        Logger.log(Level.SEVERE, "Invalid provider for source: %s", source.getFilePath());
+        Logger.severe("Invalid provider for source: %s", source.getFilePath());
       } else if (provider == Provider.ESS) {
         // ensure valid first vote column value
         if (fieldOutOfRangeOrNotInteger(
@@ -221,26 +220,23 @@ class ContestConfig {
         }
 
         // See the config file documentation for an explanation of this regex.
-        if (!isNullOrBlank(source.getOvervoteDelimiter()) &&
-            source.getOvervoteDelimiter().matches(".*\\\\.*|[a-zA-Z0-9.',\\-\"\\s]+")) {
+        if (!isNullOrBlank(source.getOvervoteDelimiter())
+            && source.getOvervoteDelimiter().matches(".*\\\\.*|[a-zA-Z0-9.',\\-\"\\s]+")) {
           sourceValid = false;
-          Logger.log(Level.SEVERE, "overvoteDelimiter is invalid.");
+          Logger.severe("overvoteDelimiter is invalid.");
         }
       } else {
         if (provider == Provider.CDF) {
-          if (!source.getFilePath().toLowerCase().endsWith(".xml") && !source.getFilePath()
-              .toLowerCase().endsWith(".json")) {
-            Logger
-                .severe("CDF source files must be .json or .xml! Unexpected file extension for: %s",
-                    source.getFilePath());
+          if (!source.getFilePath().toLowerCase().endsWith(".xml")
+              && !source.getFilePath().toLowerCase().endsWith(".json")) {
+            Logger.severe(
+                "CDF source files must be .json or .xml! Unexpected file extension for: %s",
+                source.getFilePath());
             sourceValid = false;
           }
         } else {
           if (fieldIsDefinedButShouldNotBeForProvider(
-              source.getOvervoteLabel(),
-              "overvoteLabel",
-              provider,
-              source.getFilePath())) {
+              source.getOvervoteLabel(), "overvoteLabel", provider, source.getFilePath())) {
             sourceValid = false;
           }
         }
@@ -253,18 +249,12 @@ class ContestConfig {
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getFirstVoteRowIndex(),
-            "firstVoteRowIndex",
-            provider,
-            source.getFilePath())) {
+            source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
           sourceValid = false;
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getIdColumnIndex(),
-            "idColumnIndex",
-            provider,
-            source.getFilePath())) {
+            source.getIdColumnIndex(), "idColumnIndex", provider, source.getFilePath())) {
           sourceValid = false;
         }
 
@@ -277,48 +267,40 @@ class ContestConfig {
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getOvervoteDelimiter(),
-            "overvoteDelimiter",
-            provider,
-            source.getFilePath())) {
+            source.getOvervoteDelimiter(), "overvoteDelimiter", provider, source.getFilePath())) {
           sourceValid = false;
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getUndervoteLabel(),
-            "undervoteLabel",
-            provider,
-            source.getFilePath())) {
+            source.getUndervoteLabel(), "undervoteLabel", provider, source.getFilePath())) {
           sourceValid = false;
         }
 
         if (source.isTreatBlankAsUndeclaredWriteIn()) {
-          logErrorWithLocation(String
-              .format("treatBlankAsUndeclaredWriteIn should not be true for CVR source with " +
-                      "provider \"%s\"",
-                  provider.toString()), source.getFilePath());
+          logErrorWithLocation(
+              String.format(
+                  "treatBlankAsUndeclaredWriteIn should not be true for CVR source with "
+                      + "provider \"%s\"",
+                  provider),
+              source.getFilePath());
         }
       }
 
-      boolean providerRequiresContestId = provider == Provider.DOMINION ||
-          provider == Provider.HART ||
-          provider == Provider.CLEAR_BALLOT ||
-          provider == Provider.CDF;
+      boolean providerRequiresContestId =
+          provider == Provider.DOMINION
+              || provider == Provider.HART
+              || provider == Provider.CLEAR_BALLOT
+              || provider == Provider.CDF;
 
       if (isNullOrBlank(source.getContestId()) && providerRequiresContestId) {
         sourceValid = false;
-        Logger.log(
-            Level.SEVERE,
-            String.format("contestId must be defined for CVR source with provider \"%s\"!",
-                getProvider(source).toString()));
-      } else if (
-          !(providerRequiresContestId) &&
-              fieldIsDefinedButShouldNotBeForProvider(
-                  source.getContestId(),
-                  "contestId",
-                  provider,
-                  source.getFilePath())
-      ) {
+        Logger.severe(
+            String.format(
+                "contestId must be defined for CVR source with provider \"%s\"!",
+                getProvider(source)));
+      } else if (!(providerRequiresContestId)
+          && fieldIsDefinedButShouldNotBeForProvider(
+          source.getContestId(), "contestId", provider, source.getFilePath())) {
         // helper will log error
         sourceValid = false;
       }
@@ -338,12 +320,8 @@ class ContestConfig {
     if (!field.equals(otherField)) {
       if (!isNullOrBlank(otherFieldValue) && otherFieldValue.equalsIgnoreCase(string)) {
         match = true;
-        Logger.log(
-            Level.SEVERE,
-            "\"%s\" can't be used as %s if it's also being used as %s!",
-            string,
-            field,
-            otherField);
+        Logger.severe(
+            "\"%s\" can't be used as %s if it's also being used as %s!", string, field, otherField);
       }
     }
     return match;
@@ -351,7 +329,7 @@ class ContestConfig {
 
   private static void logErrorWithLocation(String message, String inputLocation) {
     message += inputLocation == null ? "!" : " for file source: " + inputLocation;
-    Logger.log(Level.SEVERE, message);
+    Logger.severe(message);
   }
 
   // Returns true if field value can't be converted to a long or isn't within supplied boundaries
@@ -392,7 +370,7 @@ class ContestConfig {
           stringValid = false;
           logErrorWithLocation(message, inputLocation);
         }
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException exception) {
         if (!isRequired) {
           message += " if supplied";
         }
@@ -403,18 +381,18 @@ class ContestConfig {
     return !stringValid;
   }
 
-  private static boolean fieldIsDefinedButShouldNotBeForProvider(String value, String fieldName,
-      Provider provider, String inputLocation) {
+  private static boolean fieldIsDefinedButShouldNotBeForProvider(
+      String value, String fieldName, Provider provider, String inputLocation) {
     boolean stringValid = true;
     if (!isNullOrBlank(value)) {
       stringValid = false;
-      logErrorWithLocation(String
-          .format("%s should not be defined for CVR source with provider \"%s\"", fieldName,
-              provider.toString()), inputLocation);
+      logErrorWithLocation(
+          String.format(
+              "%s should not be defined for CVR source with provider \"%s\"", fieldName, provider),
+          inputLocation);
     }
     return !stringValid;
   }
-
 
   static Provider getProvider(CvrSource cvrSource) {
     Provider provider = Provider.getByInternalLabel(cvrSource.getProvider());
@@ -425,7 +403,7 @@ class ContestConfig {
     boolean candidateValid = true;
     if (isNullOrBlank(candidate.getName())) {
       candidateValid = false;
-      Logger.log(Level.SEVERE, "A name is required for each candidate!");
+      Logger.severe("A name is required for each candidate!");
     }
     return candidateValid;
   }
@@ -435,8 +413,7 @@ class ContestConfig {
     for (String reservedString : TallyTransfers.RESERVED_STRINGS) {
       if (string.equalsIgnoreCase(reservedString)) {
         reserved = true;
-        Logger.log(
-            Level.SEVERE, "\"%s\" is a reserved term and can't be used for %s!", string, field);
+        Logger.severe("\"%s\" is a reserved term and can't be used for %s!", string, field);
         break;
       }
     }
@@ -447,8 +424,8 @@ class ContestConfig {
   // purpose: Checks to make sure string isn't reserved or used by other fields
   // param: string string to check
   // param: field field name of provided string
-  private static boolean stringAlreadyInUseElsewhereInSource(String string, CvrSource source,
-      String field) {
+  private static boolean stringAlreadyInUseElsewhereInSource(
+      String string, CvrSource source, String field) {
     boolean inUse = stringConflictsWithReservedString(string, field);
     if (!inUse) {
       inUse =
@@ -478,7 +455,7 @@ class ContestConfig {
   }
 
   boolean validate() {
-    Logger.log(Level.INFO, "Validating contest config...");
+    Logger.info("Validating contest config...");
     isValid = true;
     validateTabulatorVersion();
     validateOutputSettings();
@@ -486,10 +463,9 @@ class ContestConfig {
     validateCandidates();
     validateRules();
     if (isValid) {
-      Logger.log(Level.INFO, "Contest config validation successful.");
+      Logger.info("Contest config validation successful.");
     } else {
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "Contest config validation failed! Please modify the contest config file and try again.\n"
               + "See config_file_documentation.txt for more details.");
     }
@@ -503,24 +479,24 @@ class ContestConfig {
   private void validateTabulatorVersion() {
     if (isNullOrBlank(getTabulatorVersion())) {
       isValid = false;
-      Logger.log(Level.SEVERE, "tabulatorVersion is required!");
+      Logger.severe("tabulatorVersion is required!");
     } else {
       // ignore this check for test data, but otherwise require version to match current app version
-      if (!getTabulatorVersion().equals(AUTOMATED_TEST_VERSION) && !getTabulatorVersion()
-          .equals(Main.APP_VERSION)) {
+      if (!getTabulatorVersion().equals(AUTOMATED_TEST_VERSION)
+          && !getTabulatorVersion().equals(Main.APP_VERSION)) {
         isValid = false;
-        Logger.log(Level.SEVERE, "tabulatorVersion %s not supported!", getTabulatorVersion());
+        Logger.severe("tabulatorVersion %s not supported!", getTabulatorVersion());
       }
     }
     if (!isValid) {
-      Logger.log(Level.SEVERE, "tabulatorVersion must be set to %s!", Main.APP_VERSION);
+      Logger.severe("tabulatorVersion must be set to %s!", Main.APP_VERSION);
     }
   }
 
   private void validateOutputSettings() {
     if (isNullOrBlank(getContestName())) {
       isValid = false;
-      Logger.log(Level.SEVERE, "contestName is required!");
+      Logger.severe("contestName is required!");
     }
   }
 
@@ -533,12 +509,11 @@ class ContestConfig {
     boolean inUse = false;
     if (candidateStringsSeen.contains(candidateString)) {
       inUse = true;
-      Logger.log(
-          Level.SEVERE, "Duplicate candidate %ss are not allowed: %s", field, candidateString);
+      Logger.severe("Duplicate candidate %ss are not allowed: %s", field, candidateString);
     } else {
       for (CvrSource source : getRawConfig().cvrFileSources) {
-        inUse = stringAlreadyInUseElsewhereInSource(candidateString, source,
-            "a candidate " + field);
+        inUse =
+            stringAlreadyInUseElsewhereInSource(candidateString, source, "a candidate " + field);
         if (inUse) {
           break;
         }
@@ -550,7 +525,7 @@ class ContestConfig {
   private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest config must contain at least 1 cast vote record file!");
+      Logger.severe("Contest config must contain at least 1 cast vote record file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CvrSource source : rawConfig.cvrFileSources) {
@@ -564,8 +539,7 @@ class ContestConfig {
         // look for duplicate paths
         if (cvrFilePathSet.contains(cvrPath)) {
           isValid = false;
-          Logger.log(
-              Level.SEVERE, "Duplicate cast vote record filePaths are not allowed: %s", cvrPath);
+          Logger.severe("Duplicate cast vote record filePaths are not allowed: %s", cvrPath);
         } else {
           cvrFilePathSet.add(cvrPath);
         }
@@ -573,14 +547,14 @@ class ContestConfig {
         // ensure file exists
         if (cvrPath != null && !new File(cvrPath).exists()) {
           isValid = false;
-          Logger.log(Level.SEVERE, "Cast vote record file not found: %s", cvrPath);
+          Logger.severe("Cast vote record file not found: %s", cvrPath);
         }
 
         if (!isNullOrBlank(source.getOvervoteLabel())
             && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
             && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
           isValid = false;
-          Logger.log(Level.SEVERE,
+          Logger.severe(
               "When overvoteLabel is supplied, overvoteRule must be either \"%s\" or \"%s\"!",
               Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT,
               Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
@@ -590,32 +564,29 @@ class ContestConfig {
           // perform CDF checks
           if (rawConfig.cvrFileSources.size() != 1) {
             isValid = false;
-            Logger.log(Level.SEVERE, "CDF files must be tabulated individually.");
+            Logger.severe("CDF files must be tabulated individually.");
           }
           if (isTabulateByPrecinctEnabled()) {
             isValid = false;
-            Logger.log(Level.SEVERE, "tabulateByPrecinct may not be used with CDF files.");
+            Logger.severe("tabulateByPrecinct may not be used with CDF files.");
           }
         } else if (getProvider(source) == Provider.ESS) {
           // perform ES&S checks
           if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
             isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
-                cvrPath);
+            Logger.severe(
+                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s", cvrPath);
           }
           if (!isNullOrBlank(source.getOvervoteDelimiter())) {
             if (!isNullOrBlank(source.getOvervoteLabel())) {
               isValid = false;
-              Logger.log(
-                  Level.SEVERE,
-                  "overvoteDelimiter and overvoteLabel can't both be supplied.");
+              Logger.severe("overvoteDelimiter and overvoteLabel can't both be supplied.");
             }
           } else if (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
             isValid = false;
-            Logger.log(Level.SEVERE,
-                "overvoteDelimiter is required for an ES&S CVR source when overvoteRule is set to \"%s\".",
+            Logger.severe(
+                "overvoteDelimiter is required for an ES&S CVR source when overvoteRule "
+                    + "is set to \"%s\".",
                 Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
           }
         }
@@ -651,32 +622,28 @@ class ContestConfig {
 
     if (candidateCodeSet.size() > 0 && candidateCodeSet.size() != candidateNameSet.size()) {
       isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "If candidate codes are used, a unique code is required for each candidate!");
+      Logger.severe("If candidate codes are used, a unique code is required for each candidate!");
     }
 
     if (getNumDeclaredCandidates() < 1) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest config must contain at least 1 declared candidate!");
+      Logger.severe("Contest config must contain at least 1 declared candidate!");
     } else if (getNumDeclaredCandidates() == excludedCandidates.size()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Contest config must contain at least 1 non-excluded candidate!");
+      Logger.severe("Contest config must contain at least 1 non-excluded candidate!");
     }
   }
 
   private void validateRules() {
 
-    if (getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
+    if (getTiebreakMode() == TiebreakMode.MODE_UNKNOWN) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Invalid tiebreakMode!");
+      Logger.severe("Invalid tiebreakMode!");
     }
 
     if (needsRandomSeed() && isNullOrBlank(getRandomSeedRaw())) {
       isValid = false;
-      Logger.log(
-          Level.SEVERE,
-          "When tiebreakMode involves a random element, randomSeed must be supplied!");
+      Logger.severe("When tiebreakMode involves a random element, randomSeed must be supplied!");
     }
     if (fieldOutOfRangeOrNotInteger(
         getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, MAX_RANDOM_SEED, false)) {
@@ -685,31 +652,27 @@ class ContestConfig {
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Invalid overvoteRule!");
+      Logger.severe("Invalid overvoteRule!");
     }
 
     if (getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
       isValid = false;
-      Logger.log(Level.SEVERE, "Invalid winnerElectionMode!");
+      Logger.severe("Invalid winnerElectionMode!");
     }
 
     if (getMaxRankingsAllowed() == null
         || (getNumDeclaredCandidates() >= 1
         && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
       isValid = false;
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
-          MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION,
-          MIN_MAX_RANKINGS_ALLOWED,
-          Integer.MAX_VALUE);
+          MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION, MIN_MAX_RANKINGS_ALLOWED, Integer.MAX_VALUE);
     }
 
     if (getMaxSkippedRanksAllowed() == null
         || getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
       isValid = false;
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "maxSkippedRanksAllowed must either be \"%s\" or an integer from %d to %d!",
           MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION,
           MIN_MAX_SKIPPED_RANKS_ALLOWED,
@@ -757,51 +720,49 @@ class ContestConfig {
       if (getNumberOfWinners() > 0) {
         if (isMultiSeatBottomsUpWithThresholdEnabled()) {
           isValid = false;
-          Logger.log(Level.SEVERE, "numberOfWinners must be zero if winnerElectionMode is \"%s\"!",
-              winnerMode.toString());
+          Logger.severe(
+              "numberOfWinners must be zero if winnerElectionMode is \"%s\"!", winnerMode);
         }
 
         if (getNumberOfWinners() > 1) {
           if (isContinueUntilTwoCandidatesRemainEnabled()) {
             isValid = false;
-            Logger.log(
-                Level.SEVERE,
+            Logger.severe(
                 "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest!");
           }
 
           if (isBatchEliminationEnabled()) {
             isValid = false;
-            Logger.log(Level.SEVERE, "batchElimination can't be true in a multi-seat contest!");
+            Logger.severe("batchElimination can't be true in a multi-seat contest!");
           }
         } else { // numberOfWinners == 1
           if (!isSingleWinnerEnabled()) {
             isValid = false;
-            Logger.log(
-                Level.SEVERE,
-                "winnerElectionMode can't be \"%s\" in a single-seat contest!",
-                winnerMode.toString()
-            );
+            Logger.severe(
+                "winnerElectionMode can't be \"%s\" in a single-seat contest!", winnerMode);
           }
         }
       } else { // numberOfWinners == 0
         if (!isMultiSeatBottomsUpWithThresholdEnabled()) {
           isValid = false;
-          Logger.log(Level.SEVERE,
-              "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and multiSeatBottomsUpPercentageThreshold must be specified!",
+          Logger.severe(
+              "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and "
+                  + "multiSeatBottomsUpPercentageThreshold must be specified!",
               WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
         } else if (getMultiSeatBottomsUpPercentageThreshold() == null) {
           isValid = false;
-          Logger.log(Level.SEVERE,
-              "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold must be specified!",
-              winnerMode.toString());
+          Logger.severe(
+              "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold "
+                  + "must be specified!",
+              winnerMode);
         }
       }
     }
 
     if (isMultiSeatBottomsUpWithThresholdEnabled() && isBatchEliminationEnabled()) {
       isValid = false;
-      Logger.log(Level.SEVERE, "batchElimination can't be true when winnerElectionMode is \"%s\"!",
-          winnerMode.toString());
+      Logger.severe(
+          "batchElimination can't be true when winnerElectionMode is \"%s\"!", winnerMode);
     }
 
     // nonIntegerWinningThreshold and hareQuota are only allowed for multi-seat elections
@@ -809,20 +770,19 @@ class ContestConfig {
         && !isMultiSeatAllowMultipleWinnersPerRoundEnabled()) {
       if (isNonIntegerWinningThresholdEnabled()) {
         isValid = false;
-        Logger.log(Level.SEVERE,
+        Logger.severe(
             "nonIntegerWinningThreshold can't be true when winnerElectionMode is \"%s\"!",
-            winnerMode.toString());
+            winnerMode);
       }
       if (isHareQuotaEnabled()) {
         isValid = false;
-        Logger.log(Level.SEVERE, "hareQuota can't be true when winnerElectionMode is \"%s\"!",
-            winnerMode.toString());
+        Logger.severe("hareQuota can't be true when winnerElectionMode is \"%s\"!", winnerMode);
       }
     }
 
     if (isNonIntegerWinningThresholdEnabled() && isHareQuotaEnabled()) {
       isValid = false;
-      Logger.log(Level.SEVERE,
+      Logger.severe(
           "nonIntegerWinningThreshold and hareQuota can't both be true at the same time!");
     }
   }
@@ -867,8 +827,8 @@ class ContestConfig {
   }
 
   WinnerElectionMode getWinnerElectionMode() {
-    WinnerElectionMode mode = WinnerElectionMode
-        .getByInternalLabel(rawConfig.rules.winnerElectionMode);
+    WinnerElectionMode mode =
+        WinnerElectionMode.getByInternalLabel(rawConfig.rules.winnerElectionMode);
     return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
   }
 
@@ -965,7 +925,7 @@ class ContestConfig {
     } else {
       try {
         intValue = Integer.parseInt(rawInput);
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException exception) {
         intValue = null;
       }
     }
@@ -1018,7 +978,8 @@ class ContestConfig {
   }
 
   BigDecimal getMinimumVoteThreshold() {
-    return isNullOrBlank(getMinimumVoteThresholdRaw()) ? BigDecimal.ZERO
+    return isNullOrBlank(getMinimumVoteThresholdRaw())
+        ? BigDecimal.ZERO
         : new BigDecimal(getMinimumVoteThresholdRaw());
   }
 
@@ -1033,9 +994,9 @@ class ContestConfig {
         Integer.MAX_VALUE);
   }
 
-  TieBreakMode getTiebreakMode() {
-    TieBreakMode mode = TieBreakMode.getByInternalLabel(rawConfig.rules.tiebreakMode);
-    return mode == null ? TieBreakMode.MODE_UNKNOWN : mode;
+  TiebreakMode getTiebreakMode() {
+    TiebreakMode mode = TiebreakMode.getByInternalLabel(rawConfig.rules.tiebreakMode);
+    return mode == null ? TiebreakMode.MODE_UNKNOWN : mode;
   }
 
   private String getRandomSeedRaw() {
@@ -1047,9 +1008,9 @@ class ContestConfig {
   }
 
   boolean needsRandomSeed() {
-    return getTiebreakMode() == TieBreakMode.RANDOM
-        || getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
-        || getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION;
+    return getTiebreakMode() == TiebreakMode.RANDOM
+        || getTiebreakMode() == TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
+        || getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION;
   }
 
   boolean isExhaustOnDuplicateCandidateEnabled() {
@@ -1102,16 +1063,16 @@ class ContestConfig {
     // If any of the sources support undeclared write-ins, we need to recognize them as a valid
     // "candidate" option.
     if (undeclaredWriteInsEnabled()) {
-      candidateCodeToNameMap.put(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL,
-          Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
+      candidateCodeToNameMap.put(
+          Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
     }
   }
 
   private boolean undeclaredWriteInsEnabled() {
     boolean includeUwi = false;
     for (CvrSource source : rawConfig.cvrFileSources) {
-      if (!isNullOrBlank(source.getUndeclaredWriteInLabel()) || source
-          .isTreatBlankAsUndeclaredWriteIn()) {
+      if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
+          || source.isTreatBlankAsUndeclaredWriteIn()) {
         includeUwi = true;
         break;
       }

@@ -20,13 +20,16 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
-class Utils {
+final class Utils {
 
   static final boolean IS_OS_WINDOWS = osMatchesName("Windows");
   static final boolean IS_OS_MAC = osMatchesName("Mac");
   static final boolean IS_OS_LINUX = osMatchesName("Linux");
 
   private static final Map<String, String> envMap = System.getenv();
+
+  private Utils() {
+  }
 
   static boolean isNullOrBlank(String s) {
     return s == null || s.isBlank();
@@ -36,7 +39,7 @@ class Utils {
     boolean isInt = true;
     try {
       Integer.parseInt(s);
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException exception) {
       isInt = false;
     }
     return isInt;
@@ -67,7 +70,7 @@ class Utils {
     try {
       java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
       computerName = localMachine.getHostName();
-    } catch (UnknownHostException e) {
+    } catch (UnknownHostException exception) {
       if (envMap.containsKey("COMPUTERNAME")) {
         computerName = envMap.get("COMPUTERNAME");
       } else if (envMap.containsKey("HOSTNAME")) {
