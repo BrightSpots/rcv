@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -277,8 +276,7 @@ public class GuiConfigController implements Initializable {
               .lines()
               .collect(Collectors.joining("\n"));
     } catch (Exception e) {
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "Error loading text file: %s\n%s",
           configFileDocumentationFilename,
           e);
@@ -338,7 +336,7 @@ public class GuiConfigController implements Initializable {
    */
   public void menuItemNewConfigClicked() {
     if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Creating new contest config...");
+      Logger.info("Creating new contest config...");
       GuiContext.getInstance().setConfig(null);
       selectedFile = null;
       clearConfig();
@@ -448,8 +446,7 @@ public class GuiConfigController implements Initializable {
         TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
         setUpAndStartService(service);
       } else {
-        Logger.log(
-            Level.WARNING, "Please load a contest config file before attempting to tabulate!");
+        Logger.warning("Please load a contest config file before attempting to tabulate!");
       }
     }
   }
@@ -465,8 +462,7 @@ public class GuiConfigController implements Initializable {
         ConvertToCdfService service = new ConvertToCdfService(selectedFile.getAbsolutePath());
         setUpAndStartService(service);
       } else {
-        Logger.log(
-            Level.WARNING,
+        Logger.warning(
             "Please load a contest config file before attempting to convert to CDF!");
       }
     }
@@ -491,14 +487,14 @@ public class GuiConfigController implements Initializable {
       if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
         // In case the alert is still displayed when the GUI is no longer busy
         if (guiIsBusy) {
-          Logger.log(Level.SEVERE, "User exited tabulator before it was finished!");
+          Logger.severe("User exited tabulator before it was finished!");
         } else {
-          Logger.log(Level.INFO, "Exiting tabulator GUI...");
+          Logger.info("Exiting tabulator GUI...");
         }
         Platform.exit();
       }
     } else if (checkForSaveAndContinue()) {
-      Logger.log(Level.INFO, "Exiting tabulator GUI...");
+      Logger.info("Exiting tabulator GUI...");
       Platform.exit();
     }
   }
@@ -927,8 +923,7 @@ public class GuiConfigController implements Initializable {
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
     } catch (JsonProcessingException e) {
-      Logger.log(
-          Level.WARNING,
+      Logger.warning(
           "Unable tell if saving is necessary, but everything should work fine anyway! Prompting "
               + "for save just in case...\n%s",
           e);
@@ -993,8 +988,8 @@ public class GuiConfigController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
-    Logger.log(Level.INFO, "Opening tabulator GUI...");
-    Logger.log(Level.INFO, "Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
+    Logger.info("Opening tabulator GUI...");
+    Logger.info("Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
 
     GuiContext.getInstance()
         .getMainWindow()
@@ -1165,8 +1160,7 @@ public class GuiConfigController implements Initializable {
               .withDefaultPrettyPrinter()
               .writeValueAsString(createRawContestConfig());
     } catch (JsonProcessingException e) {
-      Logger.log(
-          Level.WARNING,
+      Logger.warning(
           "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
           e);
     }
@@ -1193,7 +1187,7 @@ public class GuiConfigController implements Initializable {
         datePickerContestDate.setValue(
             LocalDate.parse(outputSettings.contestDate, DATE_TIME_FORMATTER));
       } catch (DateTimeParseException e) {
-        Logger.log(Level.SEVERE, "Invalid contestDate: %s!", outputSettings.contestDate);
+        Logger.severe("Invalid contestDate: %s!", outputSettings.contestDate);
         datePickerContestDate.setValue(null);
       }
     }
@@ -1367,8 +1361,7 @@ public class GuiConfigController implements Initializable {
           };
       task.setOnFailed(
           arg0 ->
-              Logger.log(
-                  Level.SEVERE,
+              Logger.severe(
                   "Error during validation:\n%s\nValidation failed!",
                   task.getException()));
       return task;
@@ -1397,8 +1390,7 @@ public class GuiConfigController implements Initializable {
           };
       task.setOnFailed(
           arg0 ->
-              Logger.log(
-                  Level.SEVERE,
+              Logger.severe(
                   "Error during tabulation:\n%s\nTabulation failed!",
                   task.getException()));
       return task;
@@ -1427,8 +1419,7 @@ public class GuiConfigController implements Initializable {
           };
       task.setOnFailed(
           arg0 ->
-              Logger.log(
-                  Level.SEVERE,
+              Logger.severe(
                   "Error when attempting to convert to CDF:\n%s\nConversion failed!",
                   task.getException()));
       return task;

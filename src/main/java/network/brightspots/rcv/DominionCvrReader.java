@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
@@ -73,7 +72,7 @@ class DominionCvrReader {
         contests.put(id, newContest);
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing contest manifest:\n%s", e);
+      Logger.severe("Error parsing contest manifest:\n%s", e);
       contests = null;
     }
     return contests;
@@ -93,7 +92,7 @@ class DominionCvrReader {
         precinctsById.put(id, name);
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing precinct manifest:\n%s", e);
+      Logger.severe("Error parsing precinct manifest:\n%s", e);
       precinctsById = null;
     }
     return precinctsById;
@@ -115,7 +114,7 @@ class DominionCvrReader {
         candidates.add(newCandidate);
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing candidate manifest:\n%s", e);
+      Logger.severe("Error parsing candidate manifest:\n%s", e);
       candidates = null;
     }
     return candidates;
@@ -133,32 +132,32 @@ class DominionCvrReader {
     Path precinctPath = Paths.get(manifestFolder, PRECINCT_MANIFEST);
     this.precincts = getPrecinctData(precinctPath.toString());
     if (this.precincts == null) {
-      Logger.log(Level.SEVERE, "No precinct data found!");
+      Logger.severe("No precinct data found!");
       throw new CvrParseException();
     }
     Path precinctPortionPath = Paths.get(manifestFolder, PRECINCT_PORTION_MANIFEST);
     this.precinctPortions = getPrecinctData(precinctPortionPath.toString());
     if (this.precinctPortions == null) {
-      Logger.log(Level.SEVERE, "No precinct portion data found!");
+      Logger.severe("No precinct portion data found!");
       throw new CvrParseException();
     }
     Path contestPath = Paths.get(manifestFolder, CONTEST_MANIFEST);
     this.contests = parseContestData(contestPath.toString());
     if (this.contests == null) {
-      Logger.log(Level.SEVERE, "No contest data found!");
+      Logger.severe("No contest data found!");
       throw new CvrParseException();
     }
     Path candidatePath = Paths.get(manifestFolder, CANDIDATE_MANIFEST);
     this.candidates = getCandidates(candidatePath.toString());
     if (this.candidates == null) {
-      Logger.log(Level.SEVERE, "No candidate data found!");
+      Logger.severe("No candidate data found!");
       throw new CvrParseException();
     }
     // parse the cvr
     Path cvrPath = Paths.get(manifestFolder, CVR_EXPORT);
     parseCvrFile(cvrPath.toString(), castVoteRecords, contestId);
     if (castVoteRecords.isEmpty()) {
-      Logger.log(Level.SEVERE, "No cast vote record data found!");
+      Logger.severe("No cast vote record data found!");
       throw new CvrParseException();
     }
     if (unrecognizedCandidateCounts.size() > 0) {
@@ -201,7 +200,7 @@ class DominionCvrReader {
           if (session.containsKey("Modified")) {
             adjudicatedData = (HashMap) session.get("Modified");
           } else {
-            Logger.log(Level.WARNING,
+            Logger.warning(
                 "CVR has no adjudicated rankings, skipping: "
                     + "Tabulator ID: %s Batch ID: %s Record ID: %d",
                 tabulatorId, batchId, recordId);
@@ -211,8 +210,7 @@ class DominionCvrReader {
         // validate precinct
         Integer precinctId = (Integer) adjudicatedData.get("PrecinctId");
         if (precinctId != null && !this.precincts.containsKey(precinctId)) {
-          Logger.log(
-              Level.SEVERE,
+          Logger.severe(
               "Precinct ID \"%d\" from CVR not found in manifest data!",
               precinctId);
           throw new CvrParseException();
@@ -221,8 +219,7 @@ class DominionCvrReader {
         // validate precinct portion
         Integer precinctPortionId = (Integer) adjudicatedData.get("PrecinctPortionId");
         if (precinctPortionId != null && !this.precinctPortions.containsKey(precinctPortionId)) {
-          Logger.log(
-              Level.SEVERE,
+          Logger.severe(
               "Precinct portion ID \"%d\" from CVR not found in manifest data!",
               precinctPortionId);
           throw new CvrParseException();
@@ -251,7 +248,7 @@ class DominionCvrReader {
           // validate contest id
           if (!this.contests.containsKey(contestId)
               || !contestIdToCandidateCodes.containsKey(contestId)) {
-            Logger.log(Level.SEVERE, "Unknown contest ID '%d' found while parsing CVR!", contestId);
+            Logger.severe("Unknown contest ID '%d' found while parsing CVR!", contestId);
             throw new CvrParseException();
           }
           ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
@@ -268,8 +265,7 @@ class DominionCvrReader {
             String candidateCode = candidateId.toString();
             Set<String> candidates = contestIdToCandidateCodes.get(contestId);
             if (!candidates.contains(candidateCode)) {
-              Logger.log(
-                  Level.SEVERE,
+              Logger.severe(
                   "Candidate code '%s' is not valid for contest '%d'!",
                   candidateCode,
                   contestId);
@@ -296,11 +292,11 @@ class DominionCvrReader {
         }
         // provide some user feedback on the Cvr count
         if (castVoteRecords.size() % 50000 == 0) {
-          Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
+          Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing cast vote record:\n%s", e);
+      Logger.severe("Error parsing cast vote record:\n%s", e);
       castVoteRecords.clear();
     }
   }

@@ -33,7 +33,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import javafx.util.Pair;
 
 class CastVoteRecord {
@@ -170,7 +169,7 @@ class CastVoteRecord {
       logStringBuilder.append(fullCvrData);
     }
 
-    Logger.log(Level.FINE, logStringBuilder.toString());
+    Logger.fine(logStringBuilder.toString());
   }
 
   Map<Integer, List<Pair<String, BigDecimal>>> getCdfSnapshotData() {

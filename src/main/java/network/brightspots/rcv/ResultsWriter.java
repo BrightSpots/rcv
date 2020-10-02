@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.DominionCvrReader.Contest;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -122,14 +121,13 @@ class ResultsWriter {
     try {
       jsonWriter.writeValue(outFile, json);
     } catch (IOException e) {
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
           path,
           e);
       throw e;
     }
-    Logger.log(Level.INFO, "JSON file generated successfully.");
+    Logger.info("JSON file generated successfully.");
   }
 
   private static String generateCvrSnapshotId(String cvrId, Integer round) {
@@ -312,7 +310,7 @@ class ResultsWriter {
       String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
-    Logger.log(Level.INFO, "Generating summary spreadsheet: %s...", csvPath);
+    Logger.info("Generating summary spreadsheet: %s...", csvPath);
 
     // totalActiveVotesPerRound is a map of round to active votes in each round
     Map<Integer, BigDecimal> totalActiveVotesPerRound = new HashMap<>();
@@ -333,8 +331,7 @@ class ResultsWriter {
       BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException e) {
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
           csvPath,
           e);
@@ -406,10 +403,10 @@ class ResultsWriter {
       csvPrinter.flush();
       csvPrinter.close();
     } catch (IOException e) {
-      Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, e);
+      Logger.severe("Error saving file: %s\n%s", outputPath, e);
       throw e;
     }
-    Logger.log(Level.INFO, "Summary spreadsheet generated successfully.");
+    Logger.info("Summary spreadsheet generated successfully.");
   }
 
   // "action" rows describe which candidates were eliminated or elected
@@ -525,7 +522,7 @@ class ResultsWriter {
         Path outputPath = Paths.get(
             getOutputFilePath(csvOutputFolder, "dominion_conversion_contest", timestampString,
                 contest.getId()) + ".csv");
-        Logger.log(Level.INFO,
+        Logger.info(
             "Writing cast vote records in generic format to file: %s...",
             outputPath);
         CSVPrinter csvPrinter;
@@ -588,10 +585,10 @@ class ResultsWriter {
         csvPrinter.flush();
         csvPrinter.close();
         filesWritten.add(outputPath.toString());
-        Logger.log(Level.INFO, "Successfully wrote: %s", outputPath.toString());
+        Logger.info("Successfully wrote: %s", outputPath.toString());
       }
     } catch (IOException e) {
-      Logger.log(Level.SEVERE,
+      Logger.severe(
           "Error writing cast vote records in generic format from input file: %s\n%s",
           csvOutputFolder,
           e);
@@ -608,7 +605,7 @@ class ResultsWriter {
     gpUnitIds = generateGpUnitIds();
 
     String outputPath = getOutputFilePathFromInstance("cvr_cdf") + ".json";
-    Logger.log(Level.INFO, "Generating cast vote record CDF JSON file: %s...", outputPath);
+    Logger.info("Generating cast vote record CDF JSON file: %s...", outputPath);
 
     HashMap<String, Object> outputJson = new HashMap<>();
     outputJson.put("CVR", generateCdfMapForCvrs(castVoteRecords));
@@ -846,7 +843,7 @@ class ResultsWriter {
       String outputPath)
       throws IOException {
     String jsonPath = outputPath + ".json";
-    Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
+    Logger.info("Generating summary JSON file: %s...", jsonPath);
 
     // config will contain contest configuration info
     HashMap<String, Object> configData = new HashMap<>();

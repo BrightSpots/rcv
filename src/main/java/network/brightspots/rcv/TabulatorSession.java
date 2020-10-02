@@ -112,7 +112,7 @@ class TabulatorSession {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
         if (castVoteRecords == null) {
-          Logger.log(Level.SEVERE, "Aborting conversion due to cast vote record errors!");
+          Logger.severe("Aborting conversion due to cast vote record errors!");
         } else {
           ResultsWriter writer =
               new ResultsWriter()
@@ -128,69 +128,67 @@ class TabulatorSession {
           }
         }
       } catch (IOException | UnableToCreateDirectoryException e) {
-        Logger.log(Level.SEVERE, "CDF JSON generation failed.");
+        Logger.severe("CDF JSON generation failed.");
       }
     } else {
-      Logger.log(Level.SEVERE, "Failed to load config.");
+      Logger.severe("Failed to load config.");
     }
   }
 
   void tabulate() {
-    Logger.log(Level.INFO, "Starting tabulation session...");
+    Logger.info("Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
     if (config != null && config.validate() && setUpLogging(config)) {
-      Logger.log(Level.INFO, "Computer name: %s", Utils.getComputerName());
-      Logger.log(Level.INFO, "User name: %s", Utils.getUserName());
-      Logger.log(Level.INFO, "Config file: %s", configPath);
+      Logger.info("Computer name: %s", Utils.getComputerName());
+      Logger.info("User name: %s", Utils.getUserName());
+      Logger.info("Config file: %s", configPath);
       try {
-        Logger.log(Level.FINE, "Begin config file contents:");
+        Logger.fine("Begin config file contents:");
         BufferedReader reader = new BufferedReader(new FileReader(configPath));
         String line = reader.readLine();
         while (line != null) {
-          Logger.log(Level.FINE, line);
+          Logger.fine(line);
           line = reader.readLine();
         }
-        Logger.log(Level.FINE, "End config file contents.");
+        Logger.fine("End config file contents.");
         reader.close();
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error logging config file: %s\n%s", configPath, e);
+        Logger.severe("Error logging config file: %s\n%s", configPath, e);
       }
-      Logger.log(Level.INFO, "Tabulating '%s'...", config.getContestName());
+      Logger.info("Tabulating '%s'...", config.getContestName());
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
-        Logger.log(Level.INFO, "This is a multi-pass IRV contest.");
+        Logger.info("This is a multi-pass IRV contest.");
         int numWinners = config.getNumberOfWinners();
         // temporarily set config to single-seat so we can run sequential elections
         config.setNumberOfWinners(1);
         while (config.getSequentialWinners().size() < numWinners) {
-          Logger.log(
-              Level.INFO,
+          Logger.info(
               "Beginning tabulation for seat #%d...",
               config.getSequentialWinners().size() + 1);
           // Read cast vote records and precinct IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
           if (castVoteRecords == null) {
-            Logger.log(Level.SEVERE, "Aborting tabulation due to cast vote record errors!");
+            Logger.severe("Aborting tabulation due to cast vote record errors!");
             break;
           }
           Set<String> newWinnerSet;
           try {
             newWinnerSet = runTabulationForConfig(config, castVoteRecords);
           } catch (TabulationCancelledException e) {
-            Logger.log(Level.SEVERE, "Tabulation was cancelled by the user!");
+            Logger.severe("Tabulation was cancelled by the user!");
             break;
           }
           assert newWinnerSet.size() == 1;
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
-          Logger.log(
-              Level.INFO,
+          Logger.info(
               "Tabulation for seat #%d completed.",
               config.getSequentialWinners().size());
           if (config.getSequentialWinners().size() < numWinners) {
-            Logger.log(Level.INFO, "Excluding %s from the remaining tabulations.", newWinner);
+            Logger.info("Excluding %s from the remaining tabulations.", newWinner);
           }
         }
         // revert config to original state
@@ -204,19 +202,19 @@ class TabulatorSession {
         // Read cast vote records and precinct IDs from CVR files
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
         if (castVoteRecords == null) {
-          Logger.log(Level.SEVERE, "Aborting tabulation due to cast vote record errors!");
+          Logger.severe("Aborting tabulation due to cast vote record errors!");
         } else {
           try {
             runTabulationForConfig(config, castVoteRecords);
             tabulationSuccess = true;
           } catch (TabulationCancelledException e) {
-            Logger.log(Level.SEVERE, "Tabulation was cancelled by the user!");
+            Logger.severe("Tabulation was cancelled by the user!");
           }
         }
       }
-      Logger.log(Level.INFO, "Tabulation session completed.");
+      Logger.info("Tabulation session completed.");
       if (tabulationSuccess) {
-        Logger.log(Level.INFO, "Results written to: %s", outputPath);
+        Logger.info("Results written to: %s", outputPath);
       }
       Logger.removeTabulationFileLogging();
     }
@@ -238,10 +236,10 @@ class TabulatorSession {
       Logger.addTabulationFileLogging(tabulationLogPath);
       success = true;
     } catch (UnableToCreateDirectoryException | IOException e) {
-      Logger.log(Level.SEVERE, "Failed to configure tabulation logger!\n%s", e);
+      Logger.severe("Failed to configure tabulation logger!\n%s", e);
     }
     if (!success) {
-      Logger.log(Level.SEVERE, "Failed to configure logger!");
+      Logger.severe("Failed to configure logger!");
     }
     return success;
   }
@@ -257,7 +255,7 @@ class TabulatorSession {
     try {
       tabulator.generateSummaryFiles(timestampString);
     } catch (IOException e) {
-      Logger.log(Level.SEVERE, "Error writing summary files:\n%s", e);
+      Logger.severe("Error writing summary files:\n%s", e);
     }
     return winners;
   }
@@ -267,7 +265,7 @@ class TabulatorSession {
   // param: precinctIds a set of precinct IDs which will be populated during cvr parsing
   // returns: list of parsed CVRs or null if an error was encountered
   private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config, Set<String> precinctIds) {
-    Logger.log(Level.INFO, "Parsing cast vote records...");
+    Logger.info("Parsing cast vote records...");
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     boolean encounteredSourceProblem = false;
 
@@ -277,7 +275,7 @@ class TabulatorSession {
       Provider provider = ContestConfig.getProvider(source);
       try {
         if (ContestConfig.isCdf(source)) {
-          Logger.log(Level.INFO, "Reading CDF cast vote record file: %s...", cvrPath);
+          Logger.info("Reading CDF cast vote record file: %s...", cvrPath);
           new CommonDataFormatReader(cvrPath, config, source.getContestId(),
               source.getOvervoteLabel())
               .parseCvrFile(castVoteRecords);
@@ -289,7 +287,7 @@ class TabulatorSession {
               .readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
         } else if (provider == Provider.DOMINION) {
-          Logger.log(Level.INFO, "Reading Dominion cast vote records from folder: %s...", cvrPath);
+          Logger.info("Reading Dominion cast vote records from folder: %s...", cvrPath);
           DominionCvrReader reader = new DominionCvrReader(config, cvrPath, source.getUndeclaredWriteInLabel());
           reader.readCastVoteRecords(castVoteRecords, source.getContestId());
           // Before we tabulate, we output a converted generic CSV for the CVRs.
@@ -306,11 +304,11 @@ class TabulatorSession {
           }
           continue;
         } else if (provider == Provider.ESS) {
-          Logger.log(Level.INFO, "Reading ES&S cast vote record file: %s...", cvrPath);
+          Logger.info("Reading ES&S cast vote record file: %s...", cvrPath);
           new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
           continue;
         } else if (provider == Provider.HART) {
-          Logger.log(Level.INFO, "Reading Hart cast vote records from folder: %s...", cvrPath);
+          Logger.info("Reading Hart cast vote records from folder: %s...", cvrPath);
           new HartCvrReader(cvrPath, source.getContestId(), config,
               source.getUndeclaredWriteInLabel())
               .readCastVoteRecordsFromFolder(castVoteRecords);
@@ -318,43 +316,40 @@ class TabulatorSession {
         }
         throw new UnrecognizedProviderException();
       } catch (UnrecognizedCandidatesException e) {
-        Logger.log(Level.SEVERE, "Source file contains unrecognized candidate(s): %s", cvrPath);
+        Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
         for (String candidate : e.candidateCounts.keySet()) {
-          Logger.log(
-              Level.SEVERE,
+          Logger.severe(
               "Unrecognized candidate \"%s\" appears %d time(s)!",
               candidate,
               e.candidateCounts.get(candidate));
         }
         // various incorrect settings can lead to UnrecognizedCandidatesException so it's hard
         // to know exactly what the problem is
-        Logger.log(
-            Level.INFO,
+        Logger.info(
             "Check config settings for candidate names, firstVoteRowIndex, "
                 + "firstVoteColumnIndex, and precinctColumnIndex to make sure they are correct!");
-        Logger.log(Level.INFO, "See config_file_documentation.txt for more details.");
+        Logger.info("See config_file_documentation.txt for more details.");
         encounteredSourceProblem = true;
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error opening cast vote record file: %s", cvrPath);
-        Logger.log(Level.INFO, "Check file path and permissions and make sure they are correct!");
+        Logger.severe("Error opening cast vote record file: %s", cvrPath);
+        Logger.info("Check file path and permissions and make sure they are correct!");
         encounteredSourceProblem = true;
       } catch (ParserConfigurationException
           | SAXException
           | OpenXML4JException
           | POIXMLException e) {
-        Logger.log(Level.SEVERE, "Error parsing source file %s", cvrPath);
-        Logger.log(
-            Level.INFO,
+        Logger.severe("Error parsing source file %s", cvrPath);
+        Logger.info(
             "ES&S cast vote record files must be Microsoft Excel Workbook "
                 + "format.\nStrict Open XML and Open Office are not supported.");
         encounteredSourceProblem = true;
       } catch (CvrDataFormatException e) {
-        Logger.log(Level.SEVERE, "Data format error while parsing source file: %s", cvrPath);
-        Logger.log(Level.INFO, "See the log for details.");
+        Logger.severe("Data format error while parsing source file: %s", cvrPath);
+        Logger.info("See the log for details.");
         encounteredSourceProblem = true;
       } catch (UnrecognizedProviderException e) {
-        Logger.log(Level.SEVERE, "Unrecognized provider \"%s\" in source file: %s",
+        Logger.severe("Unrecognized provider \"%s\" in source file: %s",
             source.getProvider(), cvrPath);
         encounteredSourceProblem = true;
       } catch (CvrParseException e) {
@@ -367,13 +362,13 @@ class TabulatorSession {
     }
 
     if (encounteredSourceProblem) {
-      Logger.log(Level.SEVERE, "Parsing cast vote records failed!");
+      Logger.severe("Parsing cast vote records failed!");
       castVoteRecords = null;
     } else if (castVoteRecords.isEmpty()) {
-      Logger.log(Level.SEVERE, "No cast vote records found!");
+      Logger.severe("No cast vote records found!");
       castVoteRecords = null;
     } else {
-      Logger.log(Level.INFO, "Parsed %d cast vote records successfully.", castVoteRecords.size());
+      Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
     }
     return castVoteRecords;
   }

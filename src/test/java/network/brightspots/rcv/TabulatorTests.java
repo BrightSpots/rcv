@@ -35,7 +35,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.logging.Level;
 import network.brightspots.rcv.ContestConfig.Provider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -69,7 +68,7 @@ class TabulatorTests {
         if (line1 == null && line2 == null) {
           break;
         } else if (line1 == null || line2 == null) {
-          Logger.log(Level.SEVERE, "Files are unequal lengths!");
+          Logger.severe("Files are unequal lengths!");
           result = false;
           break;
         }
@@ -79,8 +78,7 @@ class TabulatorTests {
             && !line1.equals(line2)) {
           errorCount++;
           result = false;
-          Logger.log(
-              Level.SEVERE, "Files are not equal (line %d):\n%s\n%s", currentLine, line1, line2);
+          Logger.severe("Files are not equal (line %d):\n%s\n%s", currentLine, line1, line2);
           if (errorCount >= MAX_LOG_ERRORS) {
             break;
           }
@@ -88,10 +86,10 @@ class TabulatorTests {
         currentLine++;
       }
     } catch (FileNotFoundException e) {
-      Logger.log(Level.SEVERE, "File not found!\n%s", e);
+      Logger.severe("File not found!\n%s", e);
       result = false;
     } catch (IOException e) {
-      Logger.log(Level.SEVERE, "Error reading file!\n%s", e);
+      Logger.severe("Error reading file!\n%s", e);
       result = false;
     } finally {
       try {
@@ -102,7 +100,7 @@ class TabulatorTests {
           fr2.close();
         }
       } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error closing file!\n%s", e);
+        Logger.severe("Error closing file!\n%s", e);
       }
     }
     return result;
@@ -151,7 +149,7 @@ class TabulatorTests {
           try {
             Files.delete(file.toPath());
           } catch (IOException e) {
-            Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", file.getAbsolutePath(),
+            Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(),
                 e);
           }
         }

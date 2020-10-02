@@ -24,7 +24,6 @@ package network.brightspots.rcv;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.io.File;
-import java.util.logging.Level;
 
 final class FileUtils {
 
@@ -45,8 +44,7 @@ final class FileUtils {
     if (!isNullOrBlank(dir)) {
       File dirFile = new File(dir);
       if (!dirFile.exists() && !dirFile.mkdirs()) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "Failed to create output directory: %s\n" + "Check the directory name and permissions.",
             dir);
         throw new UnableToCreateDirectoryException("Unable to create output directory: " + dir);

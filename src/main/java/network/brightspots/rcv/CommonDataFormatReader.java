@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
@@ -288,7 +287,7 @@ class CommonDataFormatReader {
 
       // provide some user feedback on the CVR count
       if (castVoteRecords.size() % 50000 == 0) {
-        Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
+        Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
       }
     }
     if (unrecognizedCandidateCounts.size() > 0) {
@@ -452,7 +451,7 @@ class CommonDataFormatReader {
       castVoteRecords.add(newRecord);
       // provide some user feedback on the CVR count
       if (castVoteRecords.size() % 50000 == 0) {
-        Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
+        Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
       }
     } // for (Object cvr : cvrs) {
 

@@ -24,7 +24,6 @@ package network.brightspots.rcv;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
@@ -57,18 +56,16 @@ public class Main extends GuiApplication {
       // Launch the GUI
       launch(args);
     } else {
-      Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
+      Logger.info("Tabulator is being used via the CLI.");
       // Check for unexpected input
       if (argsCli.size() == 0) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "No config file path provided on command line!\n"
                 + "Please provide a path to the config file!\n"
                 + "See README.md for more details.");
         System.exit(1);
       } else if (argsCli.size() > 2) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "Too many arguments! Max is 2 but got: %d\n" + "See README.md for more details.",
             argsCli.size());
         System.exit(2);
@@ -88,9 +85,8 @@ public class Main extends GuiApplication {
   }
 
   private static void logSystemInfo() {
-    Logger.log(Level.INFO, "Launching %s version %s...", APP_NAME, APP_VERSION);
-    Logger.log(
-        Level.INFO,
+    Logger.info("Launching %s version %s...", APP_NAME, APP_VERSION);
+    Logger.info(
         "Host system: %s version %s",
         System.getProperty("os.name"),
         System.getProperty("os.version"));

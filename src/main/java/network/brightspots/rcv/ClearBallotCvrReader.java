@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
@@ -55,12 +54,12 @@ class ClearBallotCvrReader {
       // we parse these rankings from the header row into a map for lookup during CVR parsing
       String firstRow = csvReader.readLine();
       if (firstRow == null) {
-        Logger.log(Level.SEVERE, "No header row found in cast vote record file: %s", this.cvrPath);
+        Logger.severe("No header row found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
       }
       String[] headerData = firstRow.split(",");
       if (headerData.length < CvrColumnField.ChoicesBegin.ordinal()) {
-        Logger.log(Level.SEVERE, "No choice columns found in cast vote record file: %s",
+        Logger.severe("No choice columns found in cast vote record file: %s",
             this.cvrPath);
         throw new CvrParseException();
       }
@@ -71,7 +70,7 @@ class ClearBallotCvrReader {
         String[] choiceFields = choiceColumnHeader.split(":");
         // validate field count
         if (choiceFields.length != RcvChoiceHeaderField.FIELD_COUNT.ordinal()) {
-          Logger.log(Level.SEVERE,
+          Logger.severe(
               "Wrong number of choice header fields in cast vote record file: %s",
               this.cvrPath);
           throw new CvrParseException();
@@ -90,7 +89,7 @@ class ClearBallotCvrReader {
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
         if (rank > this.contestConfig.getMaxRankingsAllowed()) {
-          Logger.log(Level.SEVERE, "Rank: %d exceeds max rankings allowed in config: %d", rank,
+          Logger.severe("Rank: %d exceeds max rankings allowed in config: %d", rank,
               this.contestConfig.getMaxRankingsAllowed());
           throw new CvrParseException();
         }
@@ -126,14 +125,14 @@ class ClearBallotCvrReader {
         castVoteRecords.add(castVoteRecord);
         // provide some user feedback on the Cvr count
         if (castVoteRecords.size() % 50000 == 0) {
-          Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
+          Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
       }
       csvReader.close();
     } catch (FileNotFoundException e) {
-      Logger.log(Level.SEVERE, "Cast vote record file not found!\n%s", e);
+      Logger.severe("Cast vote record file not found!\n%s", e);
     } catch (IOException e) {
-      Logger.log(Level.SEVERE, "Error reading file!\n%s", e);
+      Logger.severe("Error reading file!\n%s", e);
     }
 
     if (unrecognizedCandidateCounts.size() > 0) {

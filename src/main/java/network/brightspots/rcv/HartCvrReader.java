@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
@@ -59,7 +58,7 @@ class HartCvrReader {
         }
       }
     } else {
-      Logger.log(Level.SEVERE, "Unable to find any files in directory: %s",
+      Logger.severe("Unable to find any files in directory: %s",
           cvrRoot.getAbsolutePath());
       throw new IOException();
     }
@@ -73,7 +72,7 @@ class HartCvrReader {
   void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
       throws IOException, CvrParseException {
     try {
-      Logger.log(Level.INFO, "Reading Hart cast vote record file: %s...", path.getFileName());
+      Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
       XmlMapper xmlMapper = new XmlMapper();
       xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -121,11 +120,11 @@ class HartCvrReader {
 
         // provide some user feedback on the Cvr count
         if (castVoteRecords.size() % 50000 == 0) {
-          Logger.log(Level.INFO, "Parsed %d cast vote records.", castVoteRecords.size());
+          Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
       }
     } catch (Exception e) {
-      Logger.log(Level.SEVERE, "Error parsing cast vote record:\n%s", e);
+      Logger.severe("Error parsing cast vote record:\n%s", e);
       throw e;
     }
   }

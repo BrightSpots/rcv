@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Level;
 
 @SuppressWarnings("SameParameterValue")
 class JsonParser {
@@ -45,8 +44,7 @@ class JsonParser {
       createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException e) {
       if (logsEnabled) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "Error parsing JSON file: %s\n%s\n"
                 + "Check file formatting and values and make sure they are correct!\n"
                 + "It might help to try surrounding values causing problems with quotes (e.g. "
@@ -57,8 +55,7 @@ class JsonParser {
       createdObject = null;
     } catch (IOException e) {
       if (logsEnabled) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "Error opening file: %s\n%s\n"
                 + "Check file path and permissions and make sure they are correct!",
             jsonFilePath,
@@ -83,10 +80,9 @@ class JsonParser {
           .writer()
           .withDefaultPrettyPrinter()
           .writeValue(jsonFile, objectToSerialize);
-      Logger.log(Level.INFO, "Successfully saved file: %s", jsonFile.getAbsolutePath());
+      Logger.info("Successfully saved file: %s", jsonFile.getAbsolutePath());
     } catch (IOException e) {
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "Error saving file: %s\n%s",
           jsonFile.getAbsolutePath(),
           e);

@@ -38,7 +38,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 
@@ -105,7 +104,7 @@ class Tabulator {
     for (String candidate : candidatesToInclude) {
       BigDecimal votes = roundTally.get(candidate);
       if (shouldLog) {
-        Logger.log(Level.INFO, "Candidate \"%s\" got %s vote(s).", candidate, votes);
+        Logger.info("Candidate \"%s\" got %s vote(s).", candidate, votes);
       }
       LinkedList<String> candidates =
           tallyToCandidates.computeIfAbsent(votes, k -> new LinkedList<>());
@@ -143,7 +142,7 @@ class Tabulator {
     // remaining candidates.
     while (shouldContinueTabulating()) {
       currentRound++;
-      Logger.log(Level.INFO, "Round: %d", currentRound);
+      Logger.info("Round: %d", currentRound);
 
       // currentRoundCandidateToTally is a map of candidate ID to vote tally for the current round.
       // At each iteration of this loop that involves eliminating candidates, the eliminatedRound
@@ -188,8 +187,7 @@ class Tabulator {
                 extraVotes.signum() == 1
                     ? config.divide(extraVotes, candidateVotes)
                     : BigDecimal.ZERO;
-            Logger.log(
-                Level.INFO,
+            Logger.info(
                 "Candidate \"%s\" was elected with a surplus fraction of %s.",
                 winner,
                 surplusFraction);
@@ -242,24 +240,20 @@ class Tabulator {
 
   // log some basic info about the contest before starting tabulation
   private void logSummaryInfo() {
-    Logger.log(
-        Level.INFO,
-        "There are %d declared candidates for this contest:",
+    Logger.info("There are %d declared candidates for this contest:",
         config.getNumDeclaredCandidates());
     for (String candidate : candidateIds) {
       if (!candidate.equals(UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-        Logger.log(
-            Level.INFO,
-            "%s%s",
+        Logger.info("%s%s",
             candidate,
             config.candidateIsExcluded(candidate) ? " (excluded from tabulation)" : "");
       }
     }
 
     if (config.getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION) {
-      Logger.log(Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
+      Logger.info("Randomly generated candidate permutation for tie-breaking:");
       for (String candidateId : config.getCandidatePermutation()) {
-        Logger.log(Level.INFO, "%s", candidateId);
+        Logger.info("%s", candidateId);
       }
     }
   }
@@ -343,8 +337,7 @@ class Tabulator {
         BigDecimal winnerTally = roundTally.get(winner);
         BigDecimal winnerResidual = winnerTally.subtract(winningThreshold);
         if (winnerResidual.signum() == 1) {
-          Logger.log(
-              Level.INFO, "%s had residual surplus of %s.", winner, winnerResidual);
+          Logger.info("%s had residual surplus of %s.", winner, winnerResidual);
           roundToResidualSurplus.put(
               currentRound, roundToResidualSurplus.get(currentRound).add(winnerResidual));
           roundTally.put(winner, winningThreshold);
@@ -385,7 +378,7 @@ class Tabulator {
             .add(BigDecimal.ONE);
       }
     }
-    Logger.log(Level.INFO, "Winning threshold set to %s.", winningThreshold);
+    Logger.info("Winning threshold set to %s.", winningThreshold);
   }
 
   // determine if we should continue tabulating based on how many winners have been
@@ -509,8 +502,7 @@ class Tabulator {
           // replace the list of tied candidates with our single tie-break winner
           selectedWinners = new LinkedList<>();
           selectedWinners.add(winner);
-          Logger.log(
-              Level.INFO,
+          Logger.info(
               "Candidate \"%s\" won a tie-breaker in round %d against %s. Each candidate had %s "
                   + "vote(s). %s",
               winner,
@@ -523,8 +515,7 @@ class Tabulator {
     }
 
     for (String winner : selectedWinners) {
-      Logger.log(
-          Level.INFO,
+      Logger.info(
           "Candidate \"%s\" was elected in round %d with %s votes.",
           winner,
           currentRound,
@@ -545,8 +536,7 @@ class Tabulator {
     if (currentRoundCandidateToTally.get(label) != null
         && currentRoundCandidateToTally.get(label).signum() == 1) {
       eliminated.add(label);
-      Logger.log(
-          Level.INFO,
+      Logger.info(
           "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It "
               + "had %s votes.",
           label,
@@ -570,8 +560,7 @@ class Tabulator {
         if (tally.compareTo(threshold) < 0) {
           for (String candidate : currentRoundTallyToCandidates.get(tally)) {
             eliminated.add(candidate);
-            Logger.log(
-                Level.INFO,
+            Logger.info(
                 "Eliminated candidate \"%s\" in round %d because they only had %s vote(s), below "
                     + "the minimum threshold of %s.",
                 candidate,
@@ -598,8 +587,7 @@ class Tabulator {
       if (batchEliminations.size() > 1) {
         for (BatchElimination elimination : batchEliminations) {
           eliminated.add(elimination.candidateId);
-          Logger.log(
-              Level.INFO,
+          Logger.info(
               "Batch-eliminated candidate \"%s\" in round %d. The running total was %s vote(s) and "
                   + "the next-lowest count was %s vote(s).",
               elimination.candidateId,
@@ -638,8 +626,7 @@ class Tabulator {
               config.getCandidatePermutation());
 
       eliminatedCandidate = tiebreak.selectCandidate();
-      Logger.log(
-          Level.INFO,
+      Logger.info(
           "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s "
               + "vote(s). %s",
           eliminatedCandidate,
@@ -649,8 +636,7 @@ class Tabulator {
           tiebreak.getExplanation());
     } else {
       eliminatedCandidate = lastPlaceCandidates.getFirst();
-      Logger.log(
-          Level.INFO,
+      Logger.info(
           "Candidate \"%s\" was eliminated in round %d with %s vote(s).",
           eliminatedCandidate,
           currentRound,
@@ -694,8 +680,7 @@ class Tabulator {
       try {
         writer.generateCdfJson(castVoteRecords);
       } catch (RoundSnapshotDataMissingException e) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "CDF JSON generation failed due to missing snapshot for %s",
             e.getCvrId());
       }

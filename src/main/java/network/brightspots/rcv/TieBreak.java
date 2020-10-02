@@ -38,7 +38,6 @@ import java.util.SortedMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-import java.util.logging.Level;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -201,17 +200,14 @@ class Tiebreak {
 
   // interactively select the loser of this tiebreak via the graphical user interface
   private String doInteractiveGui(List<String> tiedCandidates) throws TabulationCancelledException {
-    Logger.log(
-        Level.INFO,
+    Logger.info(
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
         round,
         numVotes.intValue(),
         String.join(", ", tiedCandidates));
-    Logger.log(
-        Level.INFO,
-        "Please use the pop-up window to select the candidate who should "
-            + (selectingAWinner ? "win" : "lose")
-            + " this tiebreaker.");
+    Logger.info("Please use the pop-up window to select the candidate who should "
+        + (selectingAWinner ? "win" : "lose")
+        + " this tiebreaker.");
 
     String selection = null;
 
@@ -228,10 +224,10 @@ class Tiebreak {
           selection = guiTiebreakerPromptResponse.selectedCandidate;
         }
       } catch (InterruptedException | ExecutionException e) {
-        Logger.log(Level.SEVERE, "Failed to get tiebreaker!\n%s", e);
+        Logger.severe("Failed to get tiebreaker!\n%s", e);
       }
       if (selection == null) {
-        Logger.log(Level.WARNING, "Invalid selection! Please try again.");
+        Logger.warning("Invalid selection! Please try again.");
       }
     }
 
@@ -345,7 +341,7 @@ class Tiebreak {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw);
+        Logger.severe("Failed to open: %s:\n%s. ", resourcePath, sw);
       }
       return guiTiebreakerPromptResponse;
     }
