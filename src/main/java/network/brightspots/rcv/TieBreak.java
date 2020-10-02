@@ -46,14 +46,14 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import network.brightspots.rcv.Tabulator.TabulationCancelledException;
-import network.brightspots.rcv.Tabulator.TieBreakMode;
+import network.brightspots.rcv.Tabulator.TiebreakMode;
 
-class TieBreak {
+class Tiebreak {
 
   private static final String CLI_CANCEL_COMMAND = "x";
   private static Random random;
   private final List<String> allTiedCandidates;
-  private final Tabulator.TieBreakMode tieBreakMode;
+  private final TiebreakMode tiebreakMode;
   // ordering to use if we're doing permutation-based tie-breaking
   private final ArrayList<String> candidatePermutation;
   private final int round;
@@ -66,24 +66,24 @@ class TieBreak {
   private String selectedCandidate;
   private String explanation;
 
-  // TieBreak constructor
+  // Tiebreak constructor
   // param: selectingAWinner are we determining a winner or loser
   // param: allTiedCandidates list of all candidate IDs tied at this vote total
-  // param: tieBreakMode rule to use for selecting the loser/winner
+  // param: tiebreakMode rule to use for selecting the loser/winner
   // param: round in which this tie occurs
   // param: numVotes tally of votes for tying candidates
   // param: roundTallies map from round number to map of candidate ID to vote total (for that round)
-  TieBreak(
+  Tiebreak(
       boolean selectingAWinner,
       List<String> allTiedCandidates,
-      Tabulator.TieBreakMode tieBreakMode,
+      TiebreakMode tiebreakMode,
       int round,
       BigDecimal numVotes,
       Map<Integer, Map<String, BigDecimal>> roundTallies,
       ArrayList<String> candidatePermutation) {
     this.selectingAWinner = selectingAWinner;
     this.allTiedCandidates = allTiedCandidates;
-    this.tieBreakMode = tieBreakMode;
+    this.tiebreakMode = tiebreakMode;
     this.round = round;
     this.numVotes = numVotes;
     this.roundTallies = roundTallies;
@@ -114,7 +114,7 @@ class TieBreak {
 
   // execute the tiebreak logic given the tiebreak rule in use
   String selectCandidate() throws TabulationCancelledException {
-    switch (tieBreakMode) {
+    switch (tiebreakMode) {
       case INTERACTIVE:
         selectedCandidate = doInteractive(allTiedCandidates);
         break;
@@ -294,10 +294,10 @@ class TieBreak {
                   + "%s.",
               candidatesInContention.size() > 2 ? "among" : "between",
               Utils.listToSentenceWithQuotes(candidatesInContention),
-              tieBreakMode == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
-                  ? TieBreakMode.RANDOM.getInternalLabel()
-                  : TieBreakMode.INTERACTIVE.getInternalLabel());
-      if (tieBreakMode == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
+              tiebreakMode == TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
+                  ? TiebreakMode.RANDOM.getInternalLabel()
+                  : TiebreakMode.INTERACTIVE.getInternalLabel());
+      if (tiebreakMode == TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
         selection = doInteractive(candidatesInContention);
       } else { // PREVIOUS_ROUND_COUNTS_THEN_RANDOM
         selection = doRandom(candidatesInContention);

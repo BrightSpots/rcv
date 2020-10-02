@@ -36,7 +36,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -62,7 +61,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -74,7 +72,7 @@ import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.RawContestConfig.OutputSettings;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
-import network.brightspots.rcv.Tabulator.TieBreakMode;
+import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 @SuppressWarnings({"WeakerAccess", "rawtypes"})
@@ -187,7 +185,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxCandidateExcluded;
   @FXML
-  private ChoiceBox<TieBreakMode> choiceTiebreakMode;
+  private ChoiceBox<TiebreakMode> choiceTiebreakMode;
   @FXML
   private RadioButton radioOvervoteAlwaysSkip;
   @FXML
@@ -258,10 +256,10 @@ public class GuiConfigController implements Initializable {
         : WinnerElectionMode.MODE_UNKNOWN;
   }
 
-  private static TieBreakMode getTiebreakModeChoice(ChoiceBox<TieBreakMode> choiceBox) {
-    return choiceBox.getValue() != null ? TieBreakMode
+  private static TiebreakMode getTiebreakModeChoice(ChoiceBox<TiebreakMode> choiceBox) {
+    return choiceBox.getValue() != null ? TiebreakMode
         .getByInternalLabel(choiceBox.getValue().getInternalLabel())
-        : TieBreakMode.MODE_UNKNOWN;
+        : TiebreakMode.MODE_UNKNOWN;
   }
 
   private static String getTextOrEmptyString(TextField textField) {
@@ -1105,8 +1103,8 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.setEditable(false);
 
     clearAndDisableWinningRuleFields();
-    choiceTiebreakMode.getItems().addAll(TieBreakMode.values());
-    choiceTiebreakMode.getItems().remove(TieBreakMode.MODE_UNKNOWN);
+    choiceTiebreakMode.getItems().addAll(TiebreakMode.values());
+    choiceTiebreakMode.getItems().remove(TiebreakMode.MODE_UNKNOWN);
     choiceTiebreakMode.setOnAction(event -> {
       clearAndDisableTiebreakFields();
       switch (getTiebreakModeChoice(choiceTiebreakMode)) {
@@ -1217,7 +1215,7 @@ public class GuiConfigController implements Initializable {
             ? null
             : config.getWinnerElectionMode());
     choiceTiebreakMode.setValue(
-        config.getTiebreakMode() == TieBreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
+        config.getTiebreakMode() == TiebreakMode.MODE_UNKNOWN ? null : config.getTiebreakMode());
     setOvervoteRuleRadioButton(config.getOvervoteRule());
 
     ContestRules rules = rawConfig.rules;

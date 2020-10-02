@@ -40,7 +40,7 @@ import java.util.logging.Level;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
-import network.brightspots.rcv.Tabulator.TieBreakMode;
+import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 class ContestConfig {
@@ -667,7 +667,7 @@ class ContestConfig {
 
   private void validateRules() {
 
-    if (getTiebreakMode() == TieBreakMode.MODE_UNKNOWN) {
+    if (getTiebreakMode() == TiebreakMode.MODE_UNKNOWN) {
       isValid = false;
       Logger.log(Level.SEVERE, "Invalid tiebreakMode!");
     }
@@ -1033,9 +1033,9 @@ class ContestConfig {
         Integer.MAX_VALUE);
   }
 
-  TieBreakMode getTiebreakMode() {
-    TieBreakMode mode = TieBreakMode.getByInternalLabel(rawConfig.rules.tiebreakMode);
-    return mode == null ? TieBreakMode.MODE_UNKNOWN : mode;
+  TiebreakMode getTiebreakMode() {
+    TiebreakMode mode = TiebreakMode.getByInternalLabel(rawConfig.rules.tiebreakMode);
+    return mode == null ? TiebreakMode.MODE_UNKNOWN : mode;
   }
 
   private String getRandomSeedRaw() {
@@ -1047,9 +1047,9 @@ class ContestConfig {
   }
 
   boolean needsRandomSeed() {
-    return getTiebreakMode() == TieBreakMode.RANDOM
-        || getTiebreakMode() == TieBreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
-        || getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION;
+    return getTiebreakMode() == TiebreakMode.RANDOM
+        || getTiebreakMode() == TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM
+        || getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION;
   }
 
   boolean isExhaustOnDuplicateCandidateEnabled() {

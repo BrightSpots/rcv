@@ -119,13 +119,13 @@ class Tabulator {
   Set<String> tabulate() throws TabulationCancelledException {
     if (config.needsRandomSeed()) {
       Random random = new Random(config.getRandomSeed());
-      if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
+      if (config.getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION) {
         // sort candidate permutation first for reproducibility
         Collections.sort(config.getCandidatePermutation());
         // every day I'm shuffling
         Collections.shuffle(config.getCandidatePermutation(), random);
       } else {
-        TieBreak.setRandom(random);
+        Tiebreak.setRandom(random);
       }
     }
 
@@ -256,7 +256,7 @@ class Tabulator {
       }
     }
 
-    if (config.getTiebreakMode() == TieBreakMode.GENERATE_PERMUTATION) {
+    if (config.getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION) {
       Logger.log(Level.INFO, "Randomly generated candidate permutation for tie-breaking:");
       for (String candidateId : config.getCandidatePermutation()) {
         Logger.log(Level.INFO, "%s", candidateId);
@@ -496,8 +496,8 @@ class Tabulator {
         selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
         // But if there are multiple candidates tied for the max tally, we need to break the tie.
         if (selectedWinners.size() > 1) {
-          TieBreak tieBreak =
-              new TieBreak(
+          Tiebreak tiebreak =
+              new Tiebreak(
                   true,
                   selectedWinners,
                   config.getTiebreakMode(),
@@ -505,7 +505,7 @@ class Tabulator {
                   maxVotes,
                   roundTallies,
                   config.getCandidatePermutation());
-          String winner = tieBreak.selectCandidate();
+          String winner = tiebreak.selectCandidate();
           // replace the list of tied candidates with our single tie-break winner
           selectedWinners = new LinkedList<>();
           selectedWinners.add(winner);
@@ -515,9 +515,9 @@ class Tabulator {
                   + "vote(s). %s",
               winner,
               currentRound,
-              tieBreak.nonSelectedCandidateDescription(),
+              tiebreak.nonSelectedCandidateDescription(),
               maxVotes.toString(),
-              tieBreak.getExplanation());
+              tiebreak.getExplanation());
         }
       }
     }
@@ -626,9 +626,9 @@ class Tabulator {
     LinkedList<String> lastPlaceCandidates = currentRoundTallyToCandidates.get(minVotes);
     if (lastPlaceCandidates.size() > 1) {
       // there was a tie for last place
-      // create new TieBreak object to pick a loser
-      TieBreak tieBreak =
-          new TieBreak(
+      // create new Tiebreak object to pick a loser
+      Tiebreak tiebreak =
+          new Tiebreak(
               false,
               lastPlaceCandidates,
               config.getTiebreakMode(),
@@ -637,16 +637,16 @@ class Tabulator {
               roundTallies,
               config.getCandidatePermutation());
 
-      eliminatedCandidate = tieBreak.selectCandidate();
+      eliminatedCandidate = tiebreak.selectCandidate();
       Logger.log(
           Level.INFO,
           "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s "
               + "vote(s). %s",
           eliminatedCandidate,
           currentRound,
-          tieBreak.nonSelectedCandidateDescription(),
+          tiebreak.nonSelectedCandidateDescription(),
           minVotes.toString(),
-          tieBreak.getExplanation());
+          tiebreak.getExplanation());
     } else {
       eliminatedCandidate = lastPlaceCandidates.getFirst();
       Logger.log(
@@ -1106,8 +1106,8 @@ class Tabulator {
     SKIP_TO_NEXT_RANK,
   }
 
-  // TieBreakMode determines how ties will be handled
-  enum TieBreakMode {
+  // TiebreakMode determines how ties will be handled
+  enum TiebreakMode {
     RANDOM("random", "Random"),
     INTERACTIVE("stopCountingAndAsk", "Stop counting and ask"),
     PREVIOUS_ROUND_COUNTS_THEN_RANDOM("previousRoundCountsThenRandom",
@@ -1121,13 +1121,13 @@ class Tabulator {
     private final String internalLabel;
     private final String guiLabel;
 
-    TieBreakMode(String internalLabel, String guiLabel) {
+    TiebreakMode(String internalLabel, String guiLabel) {
       this.internalLabel = internalLabel;
       this.guiLabel = guiLabel;
     }
 
-    static TieBreakMode getByInternalLabel(String labelLookup) {
-      return Arrays.stream(TieBreakMode.values())
+    static TiebreakMode getByInternalLabel(String labelLookup) {
+      return Arrays.stream(TiebreakMode.values())
           .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
           .orElse(null);
