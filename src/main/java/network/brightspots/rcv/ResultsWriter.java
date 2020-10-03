@@ -644,7 +644,7 @@ class ResultsWriter {
             entry("Type", "other"),
             entry("OtherType", "Election Scope Jurisdiction"),
             entry("Name", config.getContestJurisdiction()),
-            entry("@type", "CVR.GpUnit")));
+            entry("@type", "GpUnit")));
 
     // generate GpUnit entries
     for (Entry<String, String> entry : gpUnitIds.entrySet()) {
@@ -653,7 +653,7 @@ class ResultsWriter {
               entry("@id", entry.getValue()),
               entry("Type", "precinct"),
               entry("Name", entry.getKey()),
-              entry("@type", "CVR.GpUnit")));
+              entry("@type", "GpUnit")));
     }
     return gpUnitMaps;
   }
@@ -690,7 +690,7 @@ class ResultsWriter {
       cvrMap.put("CurrentSnapshotId", generateCvrSnapshotId(sanitizedId, numRounds));
       cvrMap.put("CVRSnapshot", cvrSnapshots);
       cvrMap.put("ElectionId", CDF_ELECTION_ID);
-      cvrMap.put("@type", "CVR.CVR");
+      cvrMap.put("@type", "CVR");
       // if using precincts add GpUnitId for cvr precinct
       if (config.isTabulateByPrecinctEnabled()) {
         String gpUnitId = gpUnitIds.get(cvr.getPrecinct());
@@ -807,7 +807,7 @@ class ResultsWriter {
       contestSelections.add(
           Map.ofEntries(
               entry("@id", getCdfContestSelectionIdForCandidateCode(candidateCode)),
-              entry("@type", "CVR.ContestSelection"),
+              entry("@type", "ContestSelection"),
               entry(
                   "CandidateIds",
                   new String[]{getCdfCandidateIdForCandidateCode(candidateCode)})));
@@ -816,7 +816,7 @@ class ResultsWriter {
     Map<String, Object> contestJson =
         Map.ofEntries(
             entry("@id", CDF_CONTEST_ID),
-            entry("@type", "CVR.CandidateContest"),
+            entry("@type", "CandidateContest"),
             entry("ContestSelection", contestSelections),
             entry("Name", config.getContestName()));
 
@@ -825,7 +825,7 @@ class ResultsWriter {
     electionMap.put("Candidate", candidates);
     electionMap.put("Contest", new Map[]{contestJson});
     electionMap.put("ElectionScopeId", CDF_GPU_ID);
-    electionMap.put("@type", "CVR.Election");
+    electionMap.put("@type", "Election");
 
     return electionMap;
   }
