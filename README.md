@@ -95,7 +95,7 @@ Or, again, if you're compiling and running using Gradle:
 
 `$ gradlew run --args="-cli path/to/config  convert-to-cdf"`
 
-Note: if you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, the label will be represented differently in the generated CDF source file than it was in the original CVR source. When you create a new config using this generated CDF source file and you need to set overvoteLabel, you should use "overvote". If you need to set undeclaredWriteInLabel, you should use "undeclared_write-ins".
+Note: if you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, the label will be represented differently in the generated CDF source file than it was in the original CVR source. When you create a new config using this generated CDF source file and you need to set overvoteLabel, you should use "overvote". If you need to set undeclaredWriteInLabel, you should use "Undeclared Write-ins".
 
 ## Viewing Tabulator Output
 
