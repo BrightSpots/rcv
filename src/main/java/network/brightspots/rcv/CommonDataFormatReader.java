@@ -363,6 +363,10 @@ class CommonDataFormatReader {
       for (Object cvrContestSelectionObject : cvrContestSelections) {
         HashMap cvrContestSelection = (HashMap) cvrContestSelectionObject;
         String contestSelectionId = (String) cvrContestSelection.get("ContestSelectionId");
+        if (!contestSelections.containsKey(contestSelectionId)) {
+          Logger.severe("ContestSelection \"%s\" from CVR not found!", contestSelectionId);
+          throw new CvrParseException();
+        }
         HashMap contestSelection = (HashMap) contestSelections.get(contestSelectionId);
         String candidateId;
         if (contestSelection.containsKey("IsWriteIn")
