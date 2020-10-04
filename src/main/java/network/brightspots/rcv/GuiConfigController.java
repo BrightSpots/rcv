@@ -307,20 +307,21 @@ public class GuiConfigController implements Initializable {
    * Action when help menu item is clicked. Try to open the local help manual.
    */
   public void menuItemOpenHelpClicked() {
-    URL helpFileUrl = ClassLoader.getSystemResource(CONFIG_FILE_DOCUMENTATION_FILENAME);
+    String helpFile = ClassLoader.getSystemResource(CONFIG_FILE_DOCUMENTATION_FILENAME).getFile();
     String command = null;
     if (Utils.IS_OS_WINDOWS) {
-      command = String.format("cmd /c start \"Help\" \"%s\"", helpFileUrl);
+      command = String.format("cmd /c start \"Help\" \"%s\"", helpFile);
     } else if (Utils.IS_OS_MAC) {
-      command = String.format("open %s", helpFileUrl);
+      command = String.format("/usr/bin/open %s", helpFile);
     } else if (Utils.IS_OS_LINUX) {
-      command = String.format("xdg-open \"%s\"", helpFileUrl);
+      command = String.format("xdg-open \"%s\"", helpFile);
     } else {
       Logger.info("Unable to determine operating system. Try opening the documentation "
-          + "manually at: %s", helpFileUrl);
+          + "manually at: %s", helpFile);
     }
     if (command != null) {
       try {
+        Logger.info("Running: %s", command);
         Process process = Runtime.getRuntime().exec(command);
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
@@ -330,7 +331,7 @@ public class GuiConfigController implements Initializable {
         reader.close();
       } catch (IOException exception) {
         Logger.severe("Error opening help file: %s", exception);
-        Logger.info("Try opening the documentation manually at: %s", helpFileUrl);
+        Logger.info("Try opening the documentation manually at: %s", helpFile);
       }
     }
   }
