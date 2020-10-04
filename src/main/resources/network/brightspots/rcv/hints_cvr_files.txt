@@ -14,7 +14,7 @@ Contest ID (required for non-ES&S): Some CVRs assign an ID label to each contest
 
 First Vote Column (required for ES&S): the column where the first vote record is.
 
-First Vote Row (required for ES&S): the row where the first vote record.
+First Vote Row (required for ES&S): the row where the first vote record is.
 
 ID Column (optional): The column the IDs are in. Not all CVR files contain an ID column.
 
