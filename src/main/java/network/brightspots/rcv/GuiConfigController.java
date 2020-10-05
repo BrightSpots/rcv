@@ -23,7 +23,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.time.LocalDate;
@@ -307,15 +306,15 @@ public class GuiConfigController implements Initializable {
    * Action when help menu item is clicked. Try to open the local help manual.
    */
   public void menuItemOpenHelpClicked() {
-      ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
-      Alert alert =
-          new Alert(
-              AlertType.INFORMATION,
-              "You can find more information in the config_file_documentation.txt file\n"
-                  + "included in the docs directory of the application folder.",
-              saveButton);
-      alert.setHeaderText(null);
-      Optional<ButtonType> result = alert.showAndWait();
+    ButtonType saveButton = new ButtonType("Ok", ButtonBar.ButtonData.YES);
+    Alert alert =
+        new Alert(
+            AlertType.INFORMATION,
+            "You can find more information in the config_file_documentation.txt file\n"
+                + "included in the docs directory of the application folder.",
+            saveButton);
+    alert.setHeaderText("");
+    alert.showAndWait();
   }
 
   /**
