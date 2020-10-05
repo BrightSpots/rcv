@@ -539,7 +539,7 @@
             <VBox>
               <VBox maxWidth="460.0" styleClass="bordered-box">
                 <HBox spacing="4.0">
-                  <Label prefWidth="212.0" text="Overvote Rule *"/>
+                  <Label prefWidth="120.0" text="Overvote Rule *"/>
                   <VBox spacing="4.0">
                     <fx:define>
                       <ToggleGroup fx:id="overvoteRuleToggleGroup"/>
