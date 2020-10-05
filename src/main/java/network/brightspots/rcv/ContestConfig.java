@@ -395,8 +395,7 @@ class ContestConfig {
   }
 
   static Provider getProvider(CvrSource cvrSource) {
-    Provider provider = Provider.getByInternalLabel(cvrSource.getProvider());
-    return provider == null ? Provider.PROVIDER_UNKNOWN : provider;
+    return Provider.getByInternalLabel(cvrSource.getProvider());
   }
 
   static boolean passesBasicCandidateValidation(Candidate candidate) {
@@ -827,9 +826,7 @@ class ContestConfig {
   }
 
   WinnerElectionMode getWinnerElectionMode() {
-    WinnerElectionMode mode =
-        WinnerElectionMode.getByInternalLabel(rawConfig.rules.winnerElectionMode);
-    return mode == null ? WinnerElectionMode.MODE_UNKNOWN : mode;
+    return WinnerElectionMode.getByInternalLabel(rawConfig.rules.winnerElectionMode);
   }
 
   boolean isSingleWinnerEnabled() {
@@ -969,8 +966,7 @@ class ContestConfig {
   }
 
   OvervoteRule getOvervoteRule() {
-    OvervoteRule rule = OvervoteRule.getByInternalLabel(rawConfig.rules.overvoteRule);
-    return rule == null ? OvervoteRule.RULE_UNKNOWN : rule;
+    return OvervoteRule.getByInternalLabel(rawConfig.rules.overvoteRule);
   }
 
   private String getMinimumVoteThresholdRaw() {
@@ -995,8 +991,7 @@ class ContestConfig {
   }
 
   TiebreakMode getTiebreakMode() {
-    TiebreakMode mode = TiebreakMode.getByInternalLabel(rawConfig.rules.tiebreakMode);
-    return mode == null ? TiebreakMode.MODE_UNKNOWN : mode;
+    return TiebreakMode.getByInternalLabel(rawConfig.rules.tiebreakMode);
   }
 
   private String getRandomSeedRaw() {
@@ -1100,7 +1095,7 @@ class ContestConfig {
       return Arrays.stream(Provider.values())
           .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
-          .orElse(null);
+          .orElse(PROVIDER_UNKNOWN);
     }
 
     @Override

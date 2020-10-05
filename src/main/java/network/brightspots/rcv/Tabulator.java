@@ -1059,7 +1059,7 @@ class Tabulator {
       return Arrays.stream(OvervoteRule.values())
           .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
-          .orElse(null);
+          .orElse(RULE_UNKNOWN);
     }
 
     @Override
@@ -1103,7 +1103,7 @@ class Tabulator {
       return Arrays.stream(TiebreakMode.values())
           .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
-          .orElse(null);
+          .orElse(MODE_UNKNOWN);
     }
 
     @Override
@@ -1140,7 +1140,7 @@ class Tabulator {
       return Arrays.stream(WinnerElectionMode.values())
           .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
-          .orElse(null);
+          .orElse(MODE_UNKNOWN);
     }
 
     @Override
