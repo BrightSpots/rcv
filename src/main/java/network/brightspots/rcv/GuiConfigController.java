@@ -307,33 +307,15 @@ public class GuiConfigController implements Initializable {
    * Action when help menu item is clicked. Try to open the local help manual.
    */
   public void menuItemOpenHelpClicked() {
-    String helpFile = ClassLoader.getSystemResource(CONFIG_FILE_DOCUMENTATION_FILENAME).getFile();
-    String command = null;
-    if (Utils.IS_OS_WINDOWS) {
-      command = String.format("cmd /c start \"Help\" \"%s\"", helpFile);
-    } else if (Utils.IS_OS_MAC) {
-      command = String.format("/usr/bin/open %s", helpFile);
-    } else if (Utils.IS_OS_LINUX) {
-      command = String.format("xdg-open \"%s\"", helpFile);
-    } else {
-      Logger.info("Unable to determine operating system. Try opening the documentation "
-          + "manually at: %s", helpFile);
-    }
-    if (command != null) {
-      try {
-        Logger.info("Running: %s", command);
-        Process process = Runtime.getRuntime().exec(command);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-          Logger.info(line);
-        }
-        reader.close();
-      } catch (IOException exception) {
-        Logger.severe("Error opening help file: %s", exception);
-        Logger.info("Try opening the documentation manually at: %s", helpFile);
-      }
-    }
+      ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
+      Alert alert =
+          new Alert(
+              AlertType.INFORMATION,
+              "You can find more information in the config_file_documentation.txt file\n"
+                  + "included in the docs directory of application folder.",
+              saveButton);
+      alert.setHeaderText(null);
+      Optional<ButtonType> result = alert.showAndWait();
   }
 
   /**
