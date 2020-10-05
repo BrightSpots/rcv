@@ -312,7 +312,7 @@ public class GuiConfigController implements Initializable {
           new Alert(
               AlertType.INFORMATION,
               "You can find more information in the config_file_documentation.txt file\n"
-                  + "included in the docs directory of application folder.",
+                  + "included in the docs directory of the application folder.",
               saveButton);
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
