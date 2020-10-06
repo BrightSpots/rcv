@@ -16,6 +16,7 @@
 
 package network.brightspots.rcv;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -130,11 +131,17 @@ class DominionCvrReader {
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
       throws CvrParseException, UnrecognizedCandidatesException {
     // read metadata files for precincts, precinct portions, contest, and candidates
+
+    // Precinct data does not exist for earlier versions of Dominion (only precinct portion)
+    // See rcv/reference/dominion/CVR export file format.pdf
     Path precinctPath = Paths.get(manifestFolder, PRECINCT_MANIFEST);
-    this.precincts = getPrecinctData(precinctPath.toString());
-    if (this.precincts == null) {
-      Logger.severe("No precinct data found!");
-      throw new CvrParseException();
+    File precinctFile = precinctPath.toFile();
+    if (precinctFile.exists()) {
+      this.precincts = getPrecinctData(precinctPath.toString());
+      if (this.precincts == null) {
+        Logger.severe("No precinct data found!");
+        throw new CvrParseException();
+      }
     }
     Path precinctPortionPath = Paths.get(manifestFolder, PRECINCT_PORTION_MANIFEST);
     this.precinctPortions = getPrecinctData(precinctPortionPath.toString());
@@ -208,13 +215,14 @@ class DominionCvrReader {
             continue;
           }
         }
-        // validate precinct
+        // validate precinct (may not exist for older data sets)
         Integer precinctId = (Integer) adjudicatedData.get("PrecinctId");
-        if (precinctId != null && !this.precincts.containsKey(precinctId)) {
+        if (precinctId != null && (this.precincts == null || !this.precincts
+            .containsKey(precinctId))) {
           Logger.severe("Precinct ID \"%d\" from CVR not found in manifest data!", precinctId);
           throw new CvrParseException();
         }
-        String precinct = this.precincts.get(precinctId);
+        String precinct = this.precincts != null ? this.precincts.get(precinctId) : null;
         // validate precinct portion
         Integer precinctPortionId = (Integer) adjudicatedData.get("PrecinctPortionId");
         if (precinctPortionId != null && !this.precinctPortions.containsKey(precinctPortionId)) {
