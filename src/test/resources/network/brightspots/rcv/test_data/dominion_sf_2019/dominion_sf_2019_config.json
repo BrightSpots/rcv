@@ -1,0 +1,66 @@
+{
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "San Francisco Consolidated 2019",
+    "outputDirectory": "output",
+    "contestDate": "2019-11-05",
+    "contestJurisdiction": "San Francisco",
+    "contestOffice": "DISTRICT ATTORNEY",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": false
+  },
+  "cvrFileSources": [
+    {
+      "filePath": "dominion_sf_2019_input_data",
+      "provider": "dominion",
+      "contestId": "339",
+      "treatBlankAsUndeclaredWriteIn": false,
+      "overvoteLabel": "",
+      "undervoteLabel": "",
+      "undeclaredWriteInLabel": "45"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "SUZY LOFTUS",
+      "code": "15",
+      "excluded": false
+    },
+    {
+      "name": "LEIF DAUTCH",
+      "code": "16",
+      "excluded": false
+    },
+    {
+      "name": "NANCY TUNG",
+      "code": "17",
+      "excluded": false
+    },
+    {
+      "name": "CHESA BOUDIN",
+      "code": "18",
+      "excluded": false
+    },
+    {
+      "name": "Write-in",
+      "code": "339",
+      "excluded": false
+  } ],
+  "rules" : {
+    "tiebreakMode": "useCandidateOrder",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "singleWinnerMajority",
+    "randomSeed": "",
+    "numberOfWinners": "1",
+    "bottomsUpPercentageThreshold": "",
+    "decimalPlacesForVoteArithmetic": "4",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "1",
+    "maxRankingsAllowed": "8",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Kansas Rules"
+  }
+}
