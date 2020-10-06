@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "dominion_no_precinct_data",
+      "filePath": "dominion_no_precinct_data_input_data",
       "provider": "dominion",
       "contestId": "1",
       "treatBlankAsUndeclaredWriteIn": false,
