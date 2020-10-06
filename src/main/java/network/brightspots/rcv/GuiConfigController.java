@@ -23,7 +23,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.time.LocalDate;
@@ -307,32 +306,15 @@ public class GuiConfigController implements Initializable {
    * Action when help menu item is clicked. Try to open the local help manual.
    */
   public void menuItemOpenHelpClicked() {
-    URL helpFileUrl = ClassLoader.getSystemResource(CONFIG_FILE_DOCUMENTATION_FILENAME);
-    String command = null;
-    if (Utils.IS_OS_WINDOWS) {
-      command = String.format("cmd /c start \"Help\" \"%s\"", helpFileUrl);
-    } else if (Utils.IS_OS_MAC) {
-      command = String.format("open %s", helpFileUrl);
-    } else if (Utils.IS_OS_LINUX) {
-      command = String.format("xdg-open \"%s\"", helpFileUrl);
-    } else {
-      Logger.info("Unable to determine operating system. Try opening the documentation "
-          + "manually at: %s", helpFileUrl);
-    }
-    if (command != null) {
-      try {
-        Process process = Runtime.getRuntime().exec(command);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-          Logger.info(line);
-        }
-        reader.close();
-      } catch (IOException exception) {
-        Logger.severe("Error opening help file: %s", exception);
-        Logger.info("Try opening the documentation manually at: %s", helpFileUrl);
-      }
-    }
+    ButtonType saveButton = new ButtonType("Ok", ButtonBar.ButtonData.YES);
+    Alert alert =
+        new Alert(
+            AlertType.INFORMATION,
+            "You can find more information in the config_file_documentation.txt file\n"
+                + "included in the docs directory of the application folder.",
+            saveButton);
+    alert.setHeaderText("");
+    alert.showAndWait();
   }
 
   /**
