@@ -286,6 +286,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Dominion - No Precinct Data")
+  void testDominionNoPrecinctData() {
+    runTabulationTest("dominion_no_precinct_data");
+  }
+
+  @Test
   @DisplayName("test invalid params in config file")
   void invalidParamsTest() {
     String configPath = getTestFilePath("invalid_params_test", "_config.json");
