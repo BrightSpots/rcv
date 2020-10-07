@@ -77,8 +77,6 @@ public class GuiConfigController implements Initializable {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final String CONFIG_FILE_DOCUMENTATION_FILENAME =
-      "network/brightspots/rcv/config_file_documentation.txt";
   private static final String HINTS_CONTEST_INFO_FILENAME =
       "network/brightspots/rcv/hints_contest_info.txt";
   private static final String HINTS_CVR_FILES_FILENAME =

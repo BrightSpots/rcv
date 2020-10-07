@@ -29,7 +29,7 @@ import java.util.List;
 public class Main extends GuiApplication {
 
   public static final String APP_NAME = "Universal RCV Tabulator";
-  public static final String APP_VERSION = "1.2.0_alpha";
+  public static final String APP_VERSION = "1.2.0";
 
   /**
    * Main entry point to the RCV tabulator program.
