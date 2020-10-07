@@ -217,8 +217,8 @@ class DominionCvrReader {
         }
         // validate precinct (may not exist for older data sets)
         Integer precinctId = (Integer) adjudicatedData.get("PrecinctId");
-        if (precinctId != null && (this.precincts == null || !this.precincts
-            .containsKey(precinctId))) {
+        if (precinctId != null
+            && (this.precincts == null || !this.precincts.containsKey(precinctId))) {
           Logger.severe("Precinct ID \"%d\" from CVR not found in manifest data!", precinctId);
           throw new CvrParseException();
         }
