@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -238,7 +239,7 @@ class StreamingCvrReader {
       // There may be multiple candidates in this cell (i.e. an overvote).
       String[] candidates;
       if (!isNullOrBlank(overvoteDelimiter)) {
-        candidates = cellString.split(overvoteDelimiter);
+        candidates = cellString.split(Pattern.quote(overvoteDelimiter));
       } else {
         candidates = new String[]{cellString};
       }
