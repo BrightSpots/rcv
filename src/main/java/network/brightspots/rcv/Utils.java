@@ -83,8 +83,4 @@ final class Utils {
     }
     return user;
   }
-
-  private static boolean osMatchesName(final String osNamePrefix) {
-    return System.getProperty("os.name").toUpperCase().startsWith(osNamePrefix.toUpperCase());
-  }
 }
