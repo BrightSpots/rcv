@@ -491,6 +491,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("multi-cdf tabulation")
+  void nistTest8() {
+    runTabulationTest("test_set_8_multi_cdf");
+  }
+
+  @Test
   @DisplayName("multi-seat whole number threshold")
   void multiWinnerWholeThresholdTest() {
     runTabulationTest("test_set_multi_winner_whole_threshold");

@@ -561,10 +561,6 @@ class ContestConfig {
 
         if (isCdf(source)) {
           // perform CDF checks
-          if (rawConfig.cvrFileSources.size() != 1) {
-            isValid = false;
-            Logger.severe("CDF files must be tabulated individually.");
-          }
           if (isTabulateByPrecinctEnabled()) {
             isValid = false;
             Logger.severe("tabulateByPrecinct may not be used with CDF files.");
