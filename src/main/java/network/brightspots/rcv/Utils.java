@@ -22,10 +22,6 @@ import java.util.Map;
 
 final class Utils {
 
-  static final boolean IS_OS_WINDOWS = osMatchesName("Windows");
-  static final boolean IS_OS_MAC = osMatchesName("Mac");
-  static final boolean IS_OS_LINUX = osMatchesName("Linux");
-
   private static final Map<String, String> envMap = System.getenv();
 
   private Utils() {
@@ -86,9 +82,5 @@ final class Utils {
       user = envMap.getOrDefault("USERNAME", "[unknown]");
     }
     return user;
-  }
-
-  private static boolean osMatchesName(final String osNamePrefix) {
-    return System.getProperty("os.name").toUpperCase().startsWith(osNamePrefix.toUpperCase());
   }
 }

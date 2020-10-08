@@ -61,7 +61,7 @@ Mac OS has built-in encryption capability that allows users to create encrypted 
 
 The GUI can be used to easily create, save, and load contest configuration files (which are in .json format). These files can also be created manually using any basic text editor, but this method isn't recommended.
 
-In either case, please reference the [config file documentation](src/main/resources/network/brightspots/rcv/config_file_documentation.txt) when configuring a contest.
+In either case, please reference the [config file documentation](config_file_documentation.txt) when configuring a contest.
 
 **Warning**: Using shortcuts, aliases, or symbolic links to launch the Tabulator is not supported; doing so may result in unexpected behavior. Also, please avoid clicking in the command prompt / terminal window when starting the Tabulator GUI, as it may halt the startup process.
 
