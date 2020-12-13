@@ -11,10 +11,10 @@
     "tally" : {
       "A" : "3",
       "B" : "1",
-      "UWI" : "5"
+      "Undeclared Write-ins" : "5"
     },
     "tallyResults" : [ {
-      "eliminated" : "UWI",
+      "eliminated" : "Undeclared Write-ins",
       "transfers" : {
         "exhausted" : "5"
       }

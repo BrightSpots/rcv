@@ -1,0 +1,31 @@
+Hints for this tab
+
+The tabulator needs to know where each of your CVR files is and how to interpret each of them. As you add files, it will build up a list of files to use when it tabulates the results of this contest.
+
+For each of your CVR files, provide the necessary information and then use the Add button to add it to the list.
+
+Provider (required): The vendor/machine that generated (produced) the file. After you select the field, the tabulator will fill in as many of the other fields as it can based on what it knows about that provider. You can adjust those values as necessary.
+
+Path (required): Location of the CVR file.
+  * Example: /Users/test data/2015-portland-mayor-cvr.xlsx
+  * Example: C:\Users\test data\precinct14.json
+
+Contest ID (required for non-ES&S): Some CVRs assign an ID label to each contest in the CVR. The tabulator needs to know which contest is being tabulated when multiple contests are included in one CVR. Enter the ID of the contest being tabulated in this field.
+
+First Vote Column (required for ES&S): the column where the first vote record is.
+
+First Vote Row (required for ES&S): the row where the first vote record is.
+
+ID Column (optional): The column the IDs are in. Not all CVR files contain an ID column.
+
+Precinct Column (required for ES&S if you want to tabulate by precinct): The column that contains the precinct.
+
+Overvote Delimiter (optional, but must be blank if "Overvote Label" is provided): If using a CVR in ES&S style, overvotes can be reflected in a CVR by displaying all candidates marked at a ranking. Those candidate names will be differentiated from each other by a delimiter, something like a vertical bar | or a slash /. If your overvotes are delimited like this, enter the delimiter used in this field. Note that ES&S files may include only the label "overvote" and no additional information, in which case the "Overvote Label" field should be used instead.
+
+Overvote Label (optional): Some CDF and ES&S CVRs use a particular word/phrase to indicate an overvote.
+
+Undervote Label (optional): Some ES&S CVRs use a particular word/phrase to indicate an undervote.
+
+Undeclared Write-in Label (optional): Some CVRs use a particular word/phrase to indicate a write-in.
+
+Treat Blank as Undeclared Write-in (optional): When checked, the tabulator will interpret blank cells in this ES&S CVR as votes for undeclared write-ins.

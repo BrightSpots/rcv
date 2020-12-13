@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
-    "provider" : "ESS"
+    "provider": "ess",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "A",
@@ -36,23 +40,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode" : "usePermutationInConfig",
-    "overvoteRule" : "alwaysSkipToNextRank",
-    "winnerElectionMode" : "multiSeatAllowOnlyOneWinnerPerRound",
-    "randomSeed" : "",
-    "numberOfWinners" : "3",
-    "decimalPlacesForVoteArithmetic" : "4",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "1",
-    "maxRankingsAllowed" : "3",
-    "nonIntegerWinningThreshold" : true,
-    "hareQuota" : false,
-    "batchElimination" : false,
-    "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "",
-    "undervoteLabel" : "undervote",
-    "undeclaredWriteInLabel" : "",
-    "rulesDescription" : "Allow Only One Winner per Round Test"
+    "tiebreakMode": "useCandidateOrder",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "multiWinnerAllowOnlyOneWinnerPerRound",
+    "randomSeed": "",
+    "numberOfWinners": "3",
+    "decimalPlacesForVoteArithmetic": "4",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "1",
+    "maxRankingsAllowed": "3",
+    "nonIntegerWinningThreshold": true,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": false,
+    "rulesDescription": "Allow Only One Winner per Round Test"
   }
 }

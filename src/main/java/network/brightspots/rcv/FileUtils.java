@@ -24,12 +24,14 @@ package network.brightspots.rcv;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.io.File;
-import java.util.logging.Level;
 
-class FileUtils {
+final class FileUtils {
 
   // cache location for finding and creating user files and folders
   private static String userDirectory = null;
+
+  private FileUtils() {
+  }
 
   // return userDirectory if it exists
   // fallback to current working directory
@@ -45,8 +47,7 @@ class FileUtils {
     if (!isNullOrBlank(dir)) {
       File dirFile = new File(dir);
       if (!dirFile.exists() && !dirFile.mkdirs()) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "Failed to create output directory: %s\n" + "Check the directory name and permissions.",
             dir);
         throw new UnableToCreateDirectoryException("Unable to create output directory: " + dir);

@@ -30,7 +30,7 @@ The Tabulator produces the following as output:
 
 #### Method 2 (Less Easy): Compile and Run Using Gradle
 
-1. Install [JDK 11 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by verifying that the following command returns the expected version:
+1. Install [JDK 14 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by verifying that the following command returns the expected version:
     
     `$ java -version`
     
@@ -61,7 +61,7 @@ Mac OS has built-in encryption capability that allows users to create encrypted 
 
 The GUI can be used to easily create, save, and load contest configuration files (which are in .json format). These files can also be created manually using any basic text editor, but this method isn't recommended.
 
-In either case, please reference the [config file documentation](src/main/resources/network/brightspots/rcv/config_file_documentation.txt) when configuring a contest.
+In either case, please reference the [config file documentation](config_file_documentation.txt) when configuring a contest.
 
 **Warning**: Using shortcuts, aliases, or symbolic links to launch the Tabulator is not supported; doing so may result in unexpected behavior. Also, please avoid clicking in the command prompt / terminal window when starting the Tabulator GUI, as it may halt the startup process.
 
@@ -95,11 +95,7 @@ Or, again, if you're compiling and running using Gradle:
 
 `$ gradlew run --args="-cli path/to/config  convert-to-cdf"`
 
-Finally, there's a `convert-dominion-to-generic-csv` option as well for converting Dominion JSON CVRs into a standardized, generic .csv format:
-
-`$ rcv -cli path/to/folder/containing/jsons convert-dominion-to-generic-csv`
-
-This option is available in the GUI by selecting the "Conversion > Convert Dominion to Generic Format..." menu option.
+Note: if you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, the label will be represented differently in the generated CDF source file than it was in the original CVR source. When you create a new config using this generated CDF source file and you need to set overvoteLabel, you should use "overvote". If you need to set undeclaredWriteInLabel, you should use "Undeclared Write-ins".
 
 ## Viewing Tabulator Output
 

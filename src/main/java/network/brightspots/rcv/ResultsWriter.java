@@ -51,9 +51,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 import javafx.util.Pair;
 import network.brightspots.rcv.DominionCvrReader.Contest;
+import network.brightspots.rcv.RawContestConfig.CvrSource;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -65,7 +65,8 @@ class ResultsWriter {
   private static final String CDF_GPU_ID_FORMAT = "gpu-%d";
   private static final String CDF_REPORTING_DEVICE_ID = "rd-001";
 
-  private static final Map<String, String> candidateCodeToCdfId = new HashMap<>();
+  private static final Map<String, String> cdfCandidateCodeToContestSelectionId = new HashMap<>();
+  private static final Map<String, String> cdfCandidateCodeToCandidateId = new HashMap<>();
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
@@ -85,8 +86,8 @@ class ResultsWriter {
 
   // visible for testing
   @SuppressWarnings("WeakerAccess")
-  static String sequentialSuffixForOutputPath(Integer sequentialTabulationNumber) {
-    return sequentialTabulationNumber != null ? "_" + sequentialTabulationNumber : "";
+  static String sequentialSuffixForOutputPath(String sequentialTabulationId) {
+    return sequentialTabulationId != null ? "_" + sequentialTabulationId : "";
   }
 
   // visible for testing
@@ -95,11 +96,11 @@ class ResultsWriter {
       String outputDirectory,
       String outputType,
       String timestampString,
-      Integer sequentialTabulationNumber) {
+      String sequentialTabulationId) {
     String fileName =
         String.format(
             "%s_%s%s",
-            timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationNumber));
+            timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationId));
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
   }
 
@@ -120,14 +121,12 @@ class ResultsWriter {
     try {
       jsonWriter.writeValue(outFile, json);
     } catch (IOException exception) {
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
-          path,
-          exception.toString());
+          path, exception);
       throw exception;
     }
-    Logger.log(Level.INFO, "JSON file generated successfully.");
+    Logger.info("JSON file generated successfully.");
   }
 
   private static String generateCvrSnapshotId(String cvrId, Integer round) {
@@ -136,14 +135,22 @@ class ResultsWriter {
         : String.format("ballot-%s", cvrId);
   }
 
-  private static String getCdfIdForCandidateCode(String code) {
-    String id = candidateCodeToCdfId.get(code);
+  // generates an internal ContestSelectionId based on a candidate code
+  private static String getCdfContestSelectionIdForCandidateCode(String code) {
+    String id = cdfCandidateCodeToContestSelectionId.get(code);
     if (id == null) {
-      id =
-          code.startsWith("cs-")
-              ? code
-              : String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
-      candidateCodeToCdfId.put(code, id);
+      id = String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
+      cdfCandidateCodeToContestSelectionId.put(code, id);
+    }
+    return id;
+  }
+
+  // generates an internal CandidateId based on a candidate code
+  private static String getCdfCandidateIdForCandidateCode(String code) {
+    String id = cdfCandidateCodeToCandidateId.get(code);
+    if (id == null) {
+      id = String.format("c-%s", sanitizeStringForOutput(code).toLowerCase());
+      cdfCandidateCodeToCandidateId.put(code, id);
     }
     return id;
   }
@@ -201,13 +208,13 @@ class ResultsWriter {
   }
 
   private String getOutputFilePathFromInstance(String outputType) {
+    String tabulationSequenceId = null;
+    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
+      int sequence = config.getSequentialWinners().size() + 1;
+      tabulationSequenceId = Integer.toString(sequence);
+    }
     return getOutputFilePath(
-        config.getOutputDirectory(),
-        outputType,
-        timestampString,
-        config.isMultiSeatSequentialWinnerTakesAllEnabled()
-            ? config.getSequentialWinners().size() + 1
-            : null);
+        config.getOutputDirectory(), outputType, timestampString, tabulationSequenceId);
   }
 
   ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
@@ -298,7 +305,7 @@ class ResultsWriter {
       String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
-    Logger.log(Level.INFO, "Generating summary spreadsheet: %s...", csvPath);
+    Logger.info("Generating summary spreadsheet: %s...", csvPath);
 
     // totalActiveVotesPerRound is a map of round to active votes in each round
     Map<Integer, BigDecimal> totalActiveVotesPerRound = new HashMap<>();
@@ -319,11 +326,9 @@ class ResultsWriter {
       BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException exception) {
-      Logger.log(
-          Level.SEVERE,
+      Logger.severe(
           "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
-          csvPath,
-          exception.toString());
+          csvPath, exception);
       throw exception;
     }
 
@@ -354,7 +359,7 @@ class ResultsWriter {
         if (thisRoundTally == null) {
           thisRoundTally = BigDecimal.ZERO;
         }
-        csvPrinter.print(thisRoundTally.toString());
+        csvPrinter.print(thisRoundTally);
       }
       csvPrinter.println();
     }
@@ -371,7 +376,7 @@ class ResultsWriter {
         // so we'll just incorporate that part (if any) into the inactive count.
         thisRoundInactive = thisRoundInactive.subtract(roundToResidualSurplus.get(round));
       }
-      csvPrinter.print(thisRoundInactive.toString());
+      csvPrinter.print(thisRoundInactive);
     }
     csvPrinter.println();
 
@@ -383,7 +388,7 @@ class ResultsWriter {
     if (precinct == null && roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
-        csvPrinter.print(roundToResidualSurplus.get(round).toString());
+        csvPrinter.print(roundToResidualSurplus.get(round));
       }
       csvPrinter.println();
     }
@@ -392,10 +397,10 @@ class ResultsWriter {
       csvPrinter.flush();
       csvPrinter.close();
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE, "Error saving file: %s\n%s", outputPath, exception.toString());
+      Logger.severe("Error saving file: %s\n%s", outputPath, exception);
       throw exception;
     }
-    Logger.log(Level.INFO, "Summary spreadsheet generated successfully.");
+    Logger.info("Summary spreadsheet generated successfully.");
   }
 
   // "action" rows describe which candidates were eliminated or elected
@@ -451,7 +456,7 @@ class ResultsWriter {
       }
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
-    csvPrinter.printRecord("Threshold", winningThreshold.toString());
+    csvPrinter.printRecord("Threshold", winningThreshold);
     if (!isNullOrBlank(precinct)) {
       csvPrinter.printRecord("Precinct", precinct);
     }
@@ -464,9 +469,9 @@ class ResultsWriter {
     entries.sort(
         (firstObject, secondObject) -> {
           int ret;
-          if (firstObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+          if (firstObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             ret = 1;
-          } else if (secondObject.getKey().equals(config.getUndeclaredWriteInLabel())) {
+          } else if (secondObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             ret = -1;
           } else {
             ret = (secondObject.getValue()).compareTo(firstObject.getValue());
@@ -491,21 +496,32 @@ class ResultsWriter {
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
-  // write CastVoteRecords for all contests to the provided folder
+  // write CastVoteRecords for the specified contest to the provided folder
   // returns a list of files written
-  List<String> writeGenericCvrCsv(List<CastVoteRecord> castVoteRecords,
+  List<String> writeGenericCvrCsv(
+      List<CastVoteRecord> castVoteRecords,
       Collection<Contest> contests,
-      String csvOutputFolder)
+      String csvOutputFolder,
+      String contestId,
+      String undeclaredWriteInLabel)
       throws IOException {
     List<String> filesWritten = new ArrayList<>();
     try {
       for (Contest contest : contests) {
-        Path outputPath = Paths.get(
-            getOutputFilePath(csvOutputFolder, "dominion_conversion_contest", timestampString,
-                contest.getId()) + ".csv");
-        Logger.log(Level.INFO,
-            "Writing cast vote records in generic format to file: %s...",
-            outputPath.toString());
+        if (!contest.getId().equals(contestId)) {
+          // We already skipped loading CVRs for the other contests. This just ensures that we
+          // don't generate empty CSVs for them.
+          continue;
+        }
+        Path outputPath =
+            Paths.get(
+                getOutputFilePath(
+                    csvOutputFolder,
+                    "dominion_conversion_contest",
+                    timestampString,
+                    contest.getId())
+                    + ".csv");
+        Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
         CSVPrinter csvPrinter;
         BufferedWriter writer = Files.newBufferedWriter(outputPath);
         csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
@@ -540,13 +556,18 @@ class ResultsWriter {
           } else {
             csvPrinter.print(castVoteRecord.getPrecinctPortion());
           }
-          // for each rank determine what candidate id, overvote, or undervote ocurred
+          // for each rank determine what candidate id, overvote, or undervote occurred
           for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
             if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
               Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);
               assert !candidateSet.isEmpty();
               if (candidateSet.size() == 1) {
                 String selection = candidateSet.iterator().next();
+                // We map all undeclared write-ins to our constant string when we read them in,
+                // so we need to translate it back to the original candidate ID here.
+                if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
+                  selection = undeclaredWriteInLabel;
+                }
                 csvPrinter.print(selection);
               } else {
                 csvPrinter.print("overvote");
@@ -561,18 +582,16 @@ class ResultsWriter {
         csvPrinter.flush();
         csvPrinter.close();
         filesWritten.add(outputPath.toString());
-        Logger.log(Level.INFO, "Successfully wrote: %s", outputPath.toString());
+        Logger.info("Successfully wrote: %s", outputPath.toString());
       }
     } catch (IOException exception) {
-      Logger.log(Level.SEVERE,
+      Logger.severe(
           "Error writing cast vote records in generic format from input file: %s\n%s",
-          csvOutputFolder,
-          exception.toString());
+          csvOutputFolder, exception);
       throw exception;
     }
     return filesWritten;
   }
-
 
   // create NIST Common Data Format CVR json
   void generateCdfJson(List<CastVoteRecord> castVoteRecords)
@@ -581,7 +600,7 @@ class ResultsWriter {
     gpUnitIds = generateGpUnitIds();
 
     String outputPath = getOutputFilePathFromInstance("cvr_cdf") + ".json";
-    Logger.log(Level.INFO, "Generating cast vote record CDF JSON file: %s...", outputPath);
+    Logger.info("Generating cast vote record CDF JSON file: %s...", outputPath);
 
     HashMap<String, Object> outputJson = new HashMap<>();
     outputJson.put("CVR", generateCdfMapForCvrs(castVoteRecords));
@@ -625,7 +644,7 @@ class ResultsWriter {
             entry("Type", "other"),
             entry("OtherType", "Election Scope Jurisdiction"),
             entry("Name", config.getContestJurisdiction()),
-            entry("@type", "CVR.GpUnit")));
+            entry("@type", "GpUnit")));
 
     // generate GpUnit entries
     for (Entry<String, String> entry : gpUnitIds.entrySet()) {
@@ -634,7 +653,7 @@ class ResultsWriter {
               entry("@id", entry.getValue()),
               entry("Type", "precinct"),
               entry("Name", entry.getKey()),
-              entry("@type", "CVR.GpUnit")));
+              entry("@type", "GpUnit")));
     }
     return gpUnitMaps;
   }
@@ -671,7 +690,7 @@ class ResultsWriter {
       cvrMap.put("CurrentSnapshotId", generateCvrSnapshotId(sanitizedId, numRounds));
       cvrMap.put("CVRSnapshot", cvrSnapshots);
       cvrMap.put("ElectionId", CDF_ELECTION_ID);
-      cvrMap.put("@type", "CVR.CVR");
+      cvrMap.put("@type", "CVR");
       // if using precincts add GpUnitId for cvr precinct
       if (config.isTabulateByPrecinctEnabled()) {
         String gpUnitId = gpUnitIds.get(cvr.getPrecinct());
@@ -741,7 +760,7 @@ class ResultsWriter {
 
       selectionMapList.add(
           Map.ofEntries(
-              entry("ContestSelectionId", getCdfIdForCandidateCode(candidateCode)),
+              entry("ContestSelectionId", getCdfContestSelectionIdForCandidateCode(candidateCode)),
               entry("SelectionPosition", selectionPositionMapList),
               entry("@type", "CVR.CVRContestSelection")));
     }
@@ -760,36 +779,53 @@ class ResultsWriter {
   }
 
   private Map<String, Object> generateCdfMapForElection() {
-    HashMap<String, Object> electionMap = new HashMap<>();
-
+    // containers for election-level data
     List<Map<String, Object>> contestSelections = new LinkedList<>();
+    List<Map<String, Object>> candidates = new LinkedList<>();
+
+    // iterate all candidates and create Candidate and ContestSelection objects for them
     List<String> candidateCodes = new LinkedList<>(config.getCandidateCodeList());
+    // if any of the sources have overvote labels, we also need to register the explicit overvote
+    // as a valid candidate/contest selection
+    boolean includeExplicitOvervote = false;
+    for (CvrSource source : config.getRawConfig().cvrFileSources) {
+      if (!isNullOrBlank(source.getOvervoteLabel())) {
+        includeExplicitOvervote = true;
+        break;
+      }
+    }
+    if (includeExplicitOvervote) {
+      candidateCodes.add(Tabulator.EXPLICIT_OVERVOTE_LABEL);
+    }
     Collections.sort(candidateCodes);
     for (String candidateCode : candidateCodes) {
-      Map<String, String> codeMap =
+      candidates.add(
           Map.ofEntries(
-              entry("@type", "CVR.Code"),
-              entry("Type", "other"),
-              entry("OtherType", "vendor-label"),
-              entry("Value", config.getNameForCandidateCode(candidateCode)));
+              entry("@id", getCdfCandidateIdForCandidateCode(candidateCode)),
+              entry("Name", candidateCode)));
 
       contestSelections.add(
           Map.ofEntries(
-              entry("@id", getCdfIdForCandidateCode(candidateCode)),
-              entry("@type", "CVR.ContestSelection"),
-              entry("Code", new Map[]{codeMap})));
+              entry("@id", getCdfContestSelectionIdForCandidateCode(candidateCode)),
+              entry("@type", "ContestSelection"),
+              entry(
+                  "CandidateIds",
+                  new String[]{getCdfCandidateIdForCandidateCode(candidateCode)})));
     }
 
     Map<String, Object> contestJson =
         Map.ofEntries(
             entry("@id", CDF_CONTEST_ID),
+            entry("@type", "CandidateContest"),
             entry("ContestSelection", contestSelections),
-            entry("@type", "CVR.CandidateContest"));
+            entry("Name", config.getContestName()));
 
+    HashMap<String, Object> electionMap = new HashMap<>();
     electionMap.put("@id", CDF_ELECTION_ID);
+    electionMap.put("Candidate", candidates);
     electionMap.put("Contest", new Map[]{contestJson});
     electionMap.put("ElectionScopeId", CDF_GPU_ID);
-    electionMap.put("@type", "CVR.Election");
+    electionMap.put("@type", "Election");
 
     return electionMap;
   }
@@ -802,7 +838,7 @@ class ResultsWriter {
       String outputPath)
       throws IOException {
     String jsonPath = outputPath + ".json";
-    Logger.log(Level.INFO, "Generating summary JSON file: %s...", jsonPath);
+    Logger.info("Generating summary JSON file: %s...", jsonPath);
 
     // config will contain contest configuration info
     HashMap<String, Object> configData = new HashMap<>();

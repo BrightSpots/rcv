@@ -14,27 +14,44 @@
     "filePath" : "test_set_0_skipped_first_choice_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "cdf",
+    "contestId": "Nist Test Set 0 Skipped First Choice",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": ""
   } ],
-  "candidates" : [ ],
+  "candidates" : [ {
+    "name" : "Candidate A Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate B Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate C Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate D Name",
+    "code" : "",
+    "excluded" : false
+  }],
   "rules" : {
-    "tiebreakMode" : "random",
-    "overvoteRule" : "exhaustImmediately",
-    "winnerElectionMode" : "standard",
-    "randomSeed" : "0",
-    "numberOfWinners" : "1",
-    "decimalPlacesForVoteArithmetic" : "1",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "4",
-    "maxRankingsAllowed" : "4",
-    "nonIntegerWinningThreshold" : false,
-    "hareQuota" : false,
-    "batchElimination" : false,
-    "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "",
-    "undervoteLabel" : "",
-    "undeclaredWriteInLabel" : "",
-    "rulesDescription" : "Skiptonext_exhaustatovervote"
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "singleWinnerMajority",
+    "randomSeed": "0",
+    "numberOfWinners": "1",
+    "decimalPlacesForVoteArithmetic": "1",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "4",
+    "maxRankingsAllowed": "4",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": false,
+    "rulesDescription": "Skiptonext_exhaustatovervote"
   }
 }

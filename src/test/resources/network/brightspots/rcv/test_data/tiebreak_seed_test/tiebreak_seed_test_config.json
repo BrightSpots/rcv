@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
-    "provider" : "ES&S"
+    "provider" : "ess",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "Mookie Blaylock",
@@ -32,23 +36,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode" : "random",
-    "overvoteRule" : "alwaysSkipToNextRank",
-    "winnerElectionMode" : "standard",
-    "randomSeed" : "1",
-    "numberOfWinners" : "1",
-    "decimalPlacesForVoteArithmetic" : "4",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "0",
-    "maxRankingsAllowed" : "3",
-    "nonIntegerWinningThreshold" : false,
-    "hareQuota" : false,
-    "batchElimination" : true,
-    "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
-    "undeclaredWriteInLabel" : "",
-    "rulesDescription" : "Doyle Rules"
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "singleWinnerMajority",
+    "randomSeed": "1",
+    "numberOfWinners": "1",
+    "decimalPlacesForVoteArithmetic": "4",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "0",
+    "maxRankingsAllowed": "3",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": true,
+    "exhaustOnDuplicateCandidate": false,
+    "rulesDescription": "Doyle Rules"
   }
 }

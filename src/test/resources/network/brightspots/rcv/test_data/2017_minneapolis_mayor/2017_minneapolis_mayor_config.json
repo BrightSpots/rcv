@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "1",
-    "provider" : "ES&S"
+    "provider" : "ess",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": "UWI"
   } ],
   "candidates" : [ {
     "name" : "Jacob Frey",
@@ -92,23 +96,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode" : "random",
-    "overvoteRule" : "alwaysSkipToNextRank",
-    "winnerElectionMode" : "standard",
-    "randomSeed" : "0",
-    "numberOfWinners" : "1",
-    "decimalPlacesForVoteArithmetic" : "4",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "1",
-    "maxRankingsAllowed" : "3",
-    "nonIntegerWinningThreshold" : false,
-    "hareQuota" : false,
-    "batchElimination" : true,
-    "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
-    "undeclaredWriteInLabel" : "UWI",
-    "rulesDescription" : "Minneapolis Rules"
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "singleWinnerMajority",
+    "randomSeed": "0",
+    "numberOfWinners": "1",
+    "decimalPlacesForVoteArithmetic": "4",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "1",
+    "maxRankingsAllowed": "3",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": true,
+    "exhaustOnDuplicateCandidate": false,
+    "rulesDescription": "Minneapolis Rules"
   }
 }

@@ -31,12 +31,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
+import java.util.regex.Pattern;
 import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
+import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
@@ -68,6 +69,12 @@ class StreamingCvrReader {
   private final Integer idColumnIndex;
   // 1-based column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
+  // optional delimiter for cells that contain multiple candidates
+  private final String overvoteDelimiter;
+  private final String overvoteLabel;
+  private final String undervoteLabel;
+  private final String undeclaredWriteInLabel;
+  private final boolean treatBlankAsUndeclaredWriteIn;
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // used for generating CVR IDs
@@ -105,6 +112,11 @@ class StreamingCvrReader {
         !isNullOrBlank(source.getPrecinctColumnIndex())
             ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
             : null;
+    this.overvoteDelimiter = source.getOvervoteDelimiter();
+    this.overvoteLabel = source.getOvervoteLabel();
+    this.undervoteLabel = source.getUndervoteLabel();
+    this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
+    this.treatBlankAsUndeclaredWriteIn = source.isTreatBlankAsUndeclaredWriteIn();
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -114,7 +126,7 @@ class StreamingCvrReader {
     // a sequence of one or more non-digits followed by a sequence of one or more digits
     String[] addressParts = address.split("(?<=\\D)(?=\\d)");
     if (addressParts.length != 2) {
-      Logger.log(Level.SEVERE, "Invalid cell address: %s", address);
+      Logger.severe("Invalid cell address: %s", address);
       throw new InvalidParameterException();
     }
     // row is the 0-based row of the cell
@@ -132,7 +144,7 @@ class StreamingCvrReader {
       result *= 26;
       int charValue = columnAddress.charAt(i) - '@';
       if (charValue < 1 || charValue > 26) {
-        Logger.log(Level.SEVERE, "Invalid cell address: %s", columnAddress);
+        Logger.severe("Invalid cell address: %s", columnAddress);
         throw new InvalidParameterException();
       }
       result += charValue;
@@ -140,7 +152,7 @@ class StreamingCvrReader {
     return result - 1;
   }
 
-  // purpose: Handle empty cells encountered while parsing a CVR.  Unlike empty rows, empty cells
+  // purpose: Handle empty cells encountered while parsing a CVR. Unlike empty rows, empty cells
   // do not trigger parsing callbacks so their existence must be inferred and handled when they
   // occur in a rankings cell.
   // param: currentRank the rank at which we stop inferring empty cells for this invocation
@@ -148,8 +160,8 @@ class StreamingCvrReader {
     for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {
       currentCvrData.add("empty cell");
       // add UWI ranking if required by settings
-      if (config.isTreatBlankAsUndeclaredWriteInEnabled()) {
-        currentRankings.add(new Pair<>(rank, config.getUndeclaredWriteInLabel()));
+      if (treatBlankAsUndeclaredWriteIn) {
+        currentRankings.add(new Pair<>(rank, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL));
       }
     }
   }
@@ -175,18 +187,19 @@ class StreamingCvrReader {
     if (precinctColumnIndex != null) {
       if (currentPrecinct == null) {
         // group precincts with missing Ids here
-        Logger.log(
-            Level.WARNING,
-            "Precinct identifier not found for cast vote record: %s",
-            computedCastVoteRecordId);
+        Logger.warning(
+            "Precinct identifier not found for cast vote record: %s", computedCastVoteRecordId);
         currentPrecinct = MISSING_PRECINCT_ID;
       }
       precinctIds.add(currentPrecinct);
     }
 
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
-      Logger.log(
-          Level.SEVERE, "Cast vote record identifier not found for: %s", computedCastVoteRecordId);
+      Logger.severe(
+          "Cast vote record identifier missing on row %d in file %s. This may be due to an "
+              + "incorrectly formatted xlsx file. Try copying your cvr data into a new xlsx file "
+              + "to fix this.",
+          cvrIndex + firstVoteRowIndex, excelFileName);
       encounteredDataErrors = true;
     }
 
@@ -202,7 +215,7 @@ class StreamingCvrReader {
 
     // provide some user feedback on the CVR count
     if (cvrList.size() % 50000 == 0) {
-      Logger.log(Level.INFO, "Parsed %d cast vote records.", cvrList.size());
+      Logger.info("Parsed %d cast vote records.", cvrList.size());
     }
   }
 
@@ -218,24 +231,40 @@ class StreamingCvrReader {
     // see if this column is in the ranking range
     if (col >= firstVoteColumnIndex
         && col < firstVoteColumnIndex + config.getMaxRankingsAllowed()) {
-
       int currentRank = col - firstVoteColumnIndex + 1;
       // handle any empty cells which may exist between this cell and any previous one
       handleEmptyCells(currentRank);
-      String candidate = cellData.trim();
-      // skip undervotes
-      if (!candidate.equals(config.getUndervoteLabel())) {
-        // map overvotes to our internal overvote string
-        if (candidate.equals(config.getOvervoteLabel())) {
-          candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-        } else if (!config.getCandidateCodeList().contains(candidate)
-            && !candidate.equals(config.getUndeclaredWriteInLabel())) {
-          // this is an unrecognized candidate so add it to the unrecognized candidate map
-          // this helps identify problems with CVRs
-          unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
+      String cellString = cellData.trim();
+
+      // There may be multiple candidates in this cell (i.e. an overvote).
+      String[] candidates;
+      if (!isNullOrBlank(overvoteDelimiter)) {
+        candidates = cellString.split(Pattern.quote(overvoteDelimiter));
+      } else {
+        candidates = new String[]{cellString};
+      }
+
+      for (String candidate : candidates) {
+        candidate = candidate.trim();
+        if (candidates.length > 1 && (candidate.equals("") || candidate.equals(undervoteLabel))) {
+          Logger.severe(
+              "If a cell contains multiple candidates split by the overvote delimiter, it's not "
+                  + "valid for any of them to be blank or an explicit undervote.");
+          encounteredDataErrors = true;
+        } else if (!candidate.equals(undervoteLabel)) {
+          // map overvotes to our internal overvote string
+          if (candidate.equals(overvoteLabel)) {
+            candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+          } else if (candidate.equals(undeclaredWriteInLabel)) {
+            candidate = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+          } else if (!config.getCandidateCodeList().contains(candidate)) {
+            // This is an unrecognized candidate, so add it to the unrecognized candidate map.
+            // This helps identify problems with CVRs.
+            unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
+          }
+          Pair<Integer, String> ranking = new Pair<>(currentRank, candidate);
+          currentRankings.add(ranking);
         }
-        Pair<Integer, String> ranking = new Pair<>(currentRank, candidate);
-        currentRankings.add(ranking);
       }
       // update lastRankSeen - used to handle empty ranking cells
       lastRankSeen = currentRank;
@@ -292,7 +321,7 @@ class StreamingCvrReader {
 
           @Override
           public void headerFooter(String s, boolean b, String s1) {
-            Logger.log(Level.WARNING, "Unexpected XML data: %s %b %s", s, b, s1);
+            Logger.warning("Unexpected XML data: %s %b %s", s, b, s1);
           }
         };
 
@@ -321,15 +350,5 @@ class StreamingCvrReader {
 
   static class CvrDataFormatException extends Exception {
 
-  }
-
-  static class UnrecognizedCandidatesException extends Exception {
-
-    // count of how many times each unrecognized candidate was encountered during CVR parsing
-    final Map<String, Integer> candidateCounts;
-
-    UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
-      this.candidateCounts = candidateCounts;
-    }
   }
 }

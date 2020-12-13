@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "Test Set 3",
+    "contestName": "overvote skips to next rank",
     "outputDirectory": "output",
     "contestDate": "2019-03-06",
     "contestJurisdiction": "TestSets_Single_winner",
@@ -14,27 +14,44 @@
     "filePath" : "test_set_2_overvote_skip_to_next_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "cdf",
+    "contestId": "overvote skips to next rank",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": ""
   } ],
-  "candidates" : [ ],
+  "candidates" : [ {
+    "name" : "Candidate A Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate B Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate C Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate D Name",
+    "code" : "",
+    "excluded" : false
+  }],
   "rules" : {
-    "tiebreakMode" : "random",
-    "overvoteRule" : "alwaysSkipToNextRank",
-    "winnerElectionMode" : "standard",
-    "randomSeed" : "0",
-    "numberOfWinners" : "1",
-    "decimalPlacesForVoteArithmetic" : "1",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "0",
-    "maxRankingsAllowed" : "4",
-    "nonIntegerWinningThreshold" : false,
-    "hareQuota" : false,
-    "batchElimination" : false,
-    "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "",
-    "undervoteLabel" : "",
-    "undeclaredWriteInLabel" : "",
-    "rulesDescription" : "OV_skiptonext"
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "singleWinnerMajority",
+    "randomSeed": "0",
+    "numberOfWinners": "1",
+    "decimalPlacesForVoteArithmetic": "1",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "0",
+    "maxRankingsAllowed": "4",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": false,
+    "rulesDescription": "OV_skiptonext"
   }
 }

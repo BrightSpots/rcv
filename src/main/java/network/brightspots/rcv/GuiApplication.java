@@ -19,7 +19,6 @@ package network.brightspots.rcv;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.logging.Level;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -30,8 +29,8 @@ import javafx.stage.Stage;
 @SuppressWarnings("WeakerAccess")
 public class GuiApplication extends Application {
 
-  private static final int STAGE_HEIGHT = 855;
-  private static final int STAGE_WIDTH = 935;
+  private static final int STAGE_HEIGHT = 1000;
+  private static final int STAGE_WIDTH = 1200;
 
   @Override
   public void start(Stage window) {
@@ -47,7 +46,7 @@ public class GuiApplication extends Application {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       exception.printStackTrace(pw);
-      Logger.log(Level.SEVERE, "Failed to open: %s:\n%s. ", resourcePath, sw.toString());
+      Logger.severe("Failed to open: %s:\n%s. ", resourcePath, sw);
     }
 
     // Avoid cutting off the top bar for low resolution displays

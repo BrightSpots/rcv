@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "ES&S"
+    "provider" : "ess",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "Carmona, Ralph C.",
@@ -32,23 +36,21 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode" : "random",
-    "overvoteRule" : "exhaustImmediately",
-    "winnerElectionMode" : "singleSeatContinueUntilTwoCandidatesRemain",
-    "randomSeed" : "0",
-    "numberOfWinners" : "1",
-    "decimalPlacesForVoteArithmetic" : "5",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "1",
-    "maxRankingsAllowed" : "15",
-    "nonIntegerWinningThreshold" : false,
-    "hareQuota" : false,
-    "batchElimination" : false,
-    "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
-    "undeclaredWriteInLabel" : "",
-    "rulesDescription" : "Continue until Two Candidates Remain Test"
+    "tiebreakMode": "random",
+    "overvoteRule": "exhaustImmediately",
+    "winnerElectionMode": "singleWinnerMajority",
+    "randomSeed": "0",
+    "numberOfWinners": "1",
+    "bottomsUpPercentageThreshold": "",
+    "decimalPlacesForVoteArithmetic": "5",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "1",
+    "maxRankingsAllowed": "15",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
+    "continueUntilTwoCandidatesRemain": true,
+    "exhaustOnDuplicateCandidate": false,
+    "rulesDescription": "Continue until Two Candidates Remain Test"
   }
 }

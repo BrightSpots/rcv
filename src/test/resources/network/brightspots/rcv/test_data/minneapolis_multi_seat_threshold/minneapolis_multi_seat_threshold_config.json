@@ -16,7 +16,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : ""
+    "provider": "ess",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "overvote",
+    "undervoteLabel": "undervote",
+    "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
     "name" : "A",
@@ -44,23 +48,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode" : "interactive",
-    "overvoteRule" : "alwaysSkipToNextRank",
-    "winnerElectionMode" : "standard",
-    "randomSeed" : "",
-    "numberOfWinners" : "3",
-    "decimalPlacesForVoteArithmetic" : "4",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "1",
-    "maxRankingsAllowed" : "6",
-    "nonIntegerWinningThreshold" : false,
-    "hareQuota" : false,
-    "batchElimination" : false,
-    "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
-    "undeclaredWriteInLabel" : "",
-    "rulesDescription" : "Multi-winner Test2"
+    "tiebreakMode": "stopCountingAndAsk",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
+    "randomSeed": "",
+    "numberOfWinners": "3",
+    "decimalPlacesForVoteArithmetic": "4",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "1",
+    "maxRankingsAllowed": "6",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": false,
+    "rulesDescription": "Multi-winner Test2"
   }
 }

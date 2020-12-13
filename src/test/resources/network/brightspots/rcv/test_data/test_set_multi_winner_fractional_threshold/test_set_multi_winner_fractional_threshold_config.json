@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "Multi_winner2",
+    "contestName": "test set multi winner fractional",
     "outputDirectory": "output",
     "contestDate": "2019-01-18",
     "contestJurisdiction": "Multi-winner",
@@ -14,27 +14,52 @@
     "filePath" : "test_set_multi_winner_fractional_threshold_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "cdf",
+    "contestId": "test set multi winner fractional",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": ""
   } ],
-  "candidates" : [ ],
+  "candidates" : [ {
+    "name" : "Candidate A Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate B Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate C Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate D Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate E Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name": "Candidate F Name",
+    "code": "",
+    "excluded": false
+  }],
   "rules" : {
-    "tiebreakMode" : "interactive",
-    "overvoteRule" : "alwaysSkipToNextRank",
-    "winnerElectionMode" : "standard",
-    "randomSeed" : "1",
-    "numberOfWinners" : "3",
-    "decimalPlacesForVoteArithmetic" : "4",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "1",
-    "maxRankingsAllowed" : "6",
-    "nonIntegerWinningThreshold" : true,
-    "hareQuota" : false,
-    "batchElimination" : false,
-    "exhaustOnDuplicateCandidate" : false,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "",
-    "undervoteLabel" : "",
-    "undeclaredWriteInLabel" : "",
-    "rulesDescription" : "Multi-winner Test 3"
+    "tiebreakMode": "stopCountingAndAsk",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
+    "randomSeed": "1",
+    "numberOfWinners": "3",
+    "decimalPlacesForVoteArithmetic": "4",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "1",
+    "maxRankingsAllowed": "6",
+    "nonIntegerWinningThreshold": true,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": false,
+    "rulesDescription": "Multi-winner Test 3"
   }
 }

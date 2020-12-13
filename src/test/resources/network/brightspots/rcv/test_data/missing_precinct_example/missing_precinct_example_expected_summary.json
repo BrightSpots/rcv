@@ -27,7 +27,7 @@
       "Theron Preston Washington" : "0",
       "Tom Hoch" : "1",
       "Troy Benjegerdes" : "0",
-      "UWI" : "0"
+      "Undeclared Write-ins" : "0"
     },
     "tallyResults" : [ {
       "eliminated" : "Aswar Rahman",
@@ -42,7 +42,7 @@
       "eliminated" : "L.A. Nik",
       "transfers" : { }
     }, {
-      "eliminated" : "UWI",
+      "eliminated" : "Undeclared Write-ins",
       "transfers" : { }
     }, {
       "eliminated" : "Christopher Zimmerman",

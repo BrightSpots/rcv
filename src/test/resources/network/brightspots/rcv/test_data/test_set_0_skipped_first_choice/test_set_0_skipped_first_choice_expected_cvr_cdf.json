@@ -1,7 +1,7 @@
 {
   "@type" : "CVR.CastVoteRecordReport",
   "CVR" : [ {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "1",
     "CVRSnapshot" : [ {
       "@id" : "ballot-1",
@@ -10,7 +10,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -20,7 +20,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -30,7 +30,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -40,7 +40,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -59,7 +59,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -69,7 +69,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -79,7 +79,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -89,7 +89,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -108,7 +108,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -118,7 +118,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -128,7 +128,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -138,7 +138,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -157,7 +157,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -167,7 +167,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -177,7 +177,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -187,7 +187,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -203,7 +203,7 @@
     "CurrentSnapshotId" : "ballot-1-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "2",
     "CVRSnapshot" : [ {
       "@id" : "ballot-2",
@@ -212,7 +212,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -222,7 +222,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -232,7 +232,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -242,7 +242,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -261,7 +261,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -271,7 +271,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -281,7 +281,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -291,7 +291,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -310,7 +310,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -320,7 +320,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -330,7 +330,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -340,7 +340,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -359,7 +359,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -369,7 +369,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -379,7 +379,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -389,7 +389,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -405,7 +405,7 @@
     "CurrentSnapshotId" : "ballot-2-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "3",
     "CVRSnapshot" : [ {
       "@id" : "ballot-3",
@@ -414,7 +414,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -424,7 +424,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -434,7 +434,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -444,7 +444,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -463,7 +463,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -473,7 +473,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -483,7 +483,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -493,7 +493,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -512,7 +512,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -522,7 +522,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -532,7 +532,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -542,7 +542,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -561,7 +561,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -571,7 +571,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -581,7 +581,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -591,7 +591,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -607,7 +607,7 @@
     "CurrentSnapshotId" : "ballot-3-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "4",
     "CVRSnapshot" : [ {
       "@id" : "ballot-4",
@@ -616,7 +616,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -626,7 +626,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -636,7 +636,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -646,7 +646,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -665,7 +665,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -675,7 +675,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -685,7 +685,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -695,7 +695,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -714,7 +714,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -724,7 +724,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -734,7 +734,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -744,7 +744,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -763,7 +763,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -773,7 +773,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -783,7 +783,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -793,7 +793,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -809,7 +809,7 @@
     "CurrentSnapshotId" : "ballot-4-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "5",
     "CVRSnapshot" : [ {
       "@id" : "ballot-5",
@@ -818,7 +818,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -828,7 +828,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -838,7 +838,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -848,7 +848,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -867,7 +867,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -877,7 +877,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -887,7 +887,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -897,7 +897,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -916,7 +916,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -926,7 +926,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -936,7 +936,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -946,7 +946,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -965,7 +965,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -975,7 +975,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -985,7 +985,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -995,7 +995,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1011,7 +1011,7 @@
     "CurrentSnapshotId" : "ballot-5-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "6",
     "CVRSnapshot" : [ {
       "@id" : "ballot-6",
@@ -1020,7 +1020,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1030,7 +1030,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1040,7 +1040,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1059,7 +1059,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1069,7 +1069,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1079,7 +1079,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1098,7 +1098,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1108,7 +1108,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1118,7 +1118,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1137,7 +1137,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1147,7 +1147,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1157,7 +1157,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1173,7 +1173,7 @@
     "CurrentSnapshotId" : "ballot-6-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "7",
     "CVRSnapshot" : [ {
       "@id" : "ballot-7",
@@ -1182,7 +1182,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1192,7 +1192,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1202,7 +1202,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1212,7 +1212,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1231,7 +1231,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1241,7 +1241,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1251,7 +1251,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1261,7 +1261,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1280,7 +1280,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1290,7 +1290,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1300,7 +1300,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1310,7 +1310,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1329,7 +1329,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1339,7 +1339,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1349,7 +1349,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1359,7 +1359,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1375,7 +1375,7 @@
     "CurrentSnapshotId" : "ballot-7-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "8",
     "CVRSnapshot" : [ {
       "@id" : "ballot-8",
@@ -1384,7 +1384,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1394,7 +1394,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1404,7 +1404,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1414,7 +1414,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1433,7 +1433,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1443,7 +1443,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1453,7 +1453,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1463,7 +1463,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1482,7 +1482,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1492,7 +1492,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1502,7 +1502,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1512,7 +1512,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1531,7 +1531,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1541,7 +1541,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1551,7 +1551,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1561,7 +1561,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1577,7 +1577,7 @@
     "CurrentSnapshotId" : "ballot-8-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "9",
     "CVRSnapshot" : [ {
       "@id" : "ballot-9",
@@ -1586,7 +1586,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1596,7 +1596,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1606,7 +1606,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1616,7 +1616,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1635,7 +1635,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1645,7 +1645,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1655,7 +1655,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1665,7 +1665,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1684,7 +1684,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1694,7 +1694,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1704,7 +1704,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1714,7 +1714,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1733,7 +1733,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1743,7 +1743,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1753,7 +1753,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1763,7 +1763,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1779,7 +1779,7 @@
     "CurrentSnapshotId" : "ballot-9-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "10",
     "CVRSnapshot" : [ {
       "@id" : "ballot-10",
@@ -1788,7 +1788,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1798,7 +1798,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1808,7 +1808,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1818,7 +1818,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1837,7 +1837,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1847,7 +1847,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1857,7 +1857,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1867,7 +1867,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1886,7 +1886,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1896,7 +1896,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1906,7 +1906,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1916,7 +1916,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1935,7 +1935,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1945,7 +1945,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1955,7 +1955,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1965,7 +1965,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -1981,7 +1981,7 @@
     "CurrentSnapshotId" : "ballot-10-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "11",
     "CVRSnapshot" : [ {
       "@id" : "ballot-11",
@@ -1990,7 +1990,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2000,7 +2000,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2010,7 +2010,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2020,7 +2020,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2039,7 +2039,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2049,7 +2049,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2059,7 +2059,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2069,7 +2069,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2088,7 +2088,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2098,7 +2098,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2108,7 +2108,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2118,7 +2118,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2137,7 +2137,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2147,7 +2147,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2157,7 +2157,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2167,7 +2167,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-d",
+          "ContestSelectionId" : "cs-candidate_d_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2183,7 +2183,7 @@
     "CurrentSnapshotId" : "ballot-11-round-3",
     "ElectionId" : "election-001"
   }, {
-    "@type" : "CVR.CVR",
+    "@type" : "CVR",
     "BallotPrePrintedId" : "12",
     "CVRSnapshot" : [ {
       "@id" : "ballot-12",
@@ -2192,7 +2192,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2202,7 +2202,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2212,7 +2212,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2237,7 +2237,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2247,7 +2247,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2257,7 +2257,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2282,7 +2282,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2292,7 +2292,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2302,7 +2302,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2327,7 +2327,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-a",
+          "ContestSelectionId" : "cs-candidate_a_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2337,7 +2337,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-b",
+          "ContestSelectionId" : "cs-candidate_b_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2347,7 +2347,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-c",
+          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2371,54 +2371,48 @@
   } ],
   "Election" : [ {
     "@id" : "election-001",
-    "@type" : "CVR.Election",
+    "@type" : "Election",
+    "Candidate" : [ {
+      "@id" : "c-candidate_a_name",
+      "Name" : "Candidate A Name"
+    }, {
+      "@id" : "c-candidate_b_name",
+      "Name" : "Candidate B Name"
+    }, {
+      "@id" : "c-candidate_c_name",
+      "Name" : "Candidate C Name"
+    }, {
+      "@id" : "c-candidate_d_name",
+      "Name" : "Candidate D Name"
+    } ],
     "Contest" : [ {
       "@id" : "contest-001",
-      "@type" : "CVR.CandidateContest",
+      "@type" : "CandidateContest",
       "ContestSelection" : [ {
-        "@id" : "cs-a",
-        "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "A"
-        } ]
+        "@id" : "cs-candidate_a_name",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-candidate_a_name" ]
       }, {
-        "@id" : "cs-b",
-        "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "B"
-        } ]
+        "@id" : "cs-candidate_b_name",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-candidate_b_name" ]
       }, {
-        "@id" : "cs-c",
-        "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "C"
-        } ]
+        "@id" : "cs-candidate_c_name",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-candidate_c_name" ]
       }, {
-        "@id" : "cs-d",
-        "@type" : "CVR.ContestSelection",
-        "Code" : [ {
-          "@type" : "CVR.Code",
-          "OtherType" : "vendor-label",
-          "Type" : "other",
-          "Value" : "D"
-        } ]
-      } ]
+        "@id" : "cs-candidate_d_name",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-candidate_d_name" ]
+      } ],
+      "Name" : "Test Set 0"
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2019-05-01T17:40:53-07:00",
+  "GeneratedDate" : "2020-10-03T14:33:56-07:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
-    "@type" : "CVR.GpUnit",
+    "@type" : "GpUnit",
     "Name" : "TestSets_Single_winner",
     "OtherType" : "Election Scope Jurisdiction",
     "Type" : "other"

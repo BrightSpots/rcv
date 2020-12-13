@@ -24,13 +24,12 @@ package network.brightspots.rcv;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
   public static final String APP_NAME = "Universal RCV Tabulator";
-  public static final String APP_VERSION = "1.1.0";
+  public static final String APP_VERSION = "1.2.0";
 
   /**
    * Main entry point to the RCV tabulator program.
@@ -38,7 +37,7 @@ public class Main extends GuiApplication {
    * @param args command-line args
    */
   public static void main(String[] args) {
-    System.out.println(String.format("%s version %s", APP_NAME, APP_VERSION));
+    System.out.printf("%s version %s%n", APP_NAME, APP_VERSION);
     Logger.setup();
     logSystemInfo();
 
@@ -57,18 +56,16 @@ public class Main extends GuiApplication {
       // Launch the GUI
       launch(args);
     } else {
-      Logger.log(Level.INFO, "Tabulator is being used via the CLI.");
+      Logger.info("Tabulator is being used via the CLI.");
       // Check for unexpected input
       if (argsCli.size() == 0) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "No config file path provided on command line!\n"
                 + "Please provide a path to the config file!\n"
                 + "See README.md for more details.");
         System.exit(1);
       } else if (argsCli.size() > 2) {
-        Logger.log(
-            Level.SEVERE,
+        Logger.severe(
             "Too many arguments! Max is 2 but got: %d\n" + "See README.md for more details.",
             argsCli.size());
         System.exit(2);
@@ -77,9 +74,7 @@ public class Main extends GuiApplication {
       String providedPath = argsCli.get(0);
       // Session object will manage the tabulation process
       TabulatorSession session = new TabulatorSession(providedPath);
-      if (argsCli.size() == 2 && argsCli.get(1).equals("convert-dominion-to-generic-csv")) {
-        session.convertDominionCvrJsonToGenericCsv(providedPath);
-      } else if (argsCli.size() == 2 && argsCli.get(1).equals("convert-to-cdf")) {
+      if (argsCli.size() == 2 && argsCli.get(1).equals("convert-to-cdf")) {
         session.convertToCdf();
       } else {
         session.tabulate();
@@ -90,11 +85,9 @@ public class Main extends GuiApplication {
   }
 
   private static void logSystemInfo() {
-    Logger.log(Level.INFO, "Launching %s version %s...", APP_NAME, APP_VERSION);
-    Logger.log(
-        Level.INFO,
+    Logger.info("Launching %s version %s...", APP_NAME, APP_VERSION);
+    Logger.info(
         "Host system: %s version %s",
-        System.getProperty("os.name"),
-        System.getProperty("os.version"));
+        System.getProperty("os.name"), System.getProperty("os.version"));
   }
 }

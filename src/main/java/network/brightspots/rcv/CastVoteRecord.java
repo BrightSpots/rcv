@@ -24,7 +24,6 @@ package network.brightspots.rcv;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,7 +33,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import javafx.util.Pair;
 
 class CastVoteRecord {
@@ -61,26 +59,26 @@ class CastVoteRecord {
   // a set is used to handle overvotes
   SortedMap<Integer, Set<String>> rankToCandidateIds;
   // contest associated with this CVR
-  private Integer contestId;
+  private String contestId;
   // tabulatorId parsed from Dominion CVR data
-  private Integer tabulatorId;
+  private String tabulatorId;
   // batchId parsed from Dominion CVR data
-  private Integer batchId;
+  private String batchId;
   // ballotTypeId parsed from Dominion CVR data
-  private Integer ballotTypeId;
+  private String ballotTypeId;
   // whether this CVR is exhausted or not
   private boolean isExhausted;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
   CastVoteRecord(
-      Integer contestId,
-      Integer tabulatorId,
-      Integer batchId,
+      String contestId,
+      String tabulatorId,
+      String batchId,
       String suppliedId,
       String precinct,
       String precinctPortion,
-      Integer ballotTypeId,
+      String ballotTypeId,
       List<Pair<Integer, String>> rankings) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
@@ -90,7 +88,7 @@ class CastVoteRecord {
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
     this.ballotTypeId = ballotTypeId;
-    this.fullCvrData = new ArrayList<>();
+    this.fullCvrData = null;
     sortRankings(rankings);
   }
 
@@ -108,19 +106,19 @@ class CastVoteRecord {
     sortRankings(rankings);
   }
 
-  Integer getContestId() {
+  String getContestId() {
     return contestId;
   }
 
-  Integer getTabulatorId() {
+  String getTabulatorId() {
     return tabulatorId;
   }
 
-  Integer getBatchId() {
+  String getBatchId() {
     return batchId;
   }
 
-  Integer getBallotTypeId() {
+  String getBallotTypeId() {
     return ballotTypeId;
   }
 
@@ -162,7 +160,7 @@ class CastVoteRecord {
 
     // add vote value if not 1
     if (fractionalTransferValue != null && !fractionalTransferValue.equals(BigDecimal.ONE)) {
-      logStringBuilder.append(" [value] ").append(fractionalTransferValue.toString());
+      logStringBuilder.append(" [value] ").append(fractionalTransferValue);
     }
 
     // add complete data for round 1 only
@@ -171,7 +169,7 @@ class CastVoteRecord {
       logStringBuilder.append(fullCvrData);
     }
 
-    Logger.log(Level.FINE, logStringBuilder.toString());
+    Logger.fine(logStringBuilder.toString());
   }
 
   Map<Integer, List<Pair<String, BigDecimal>>> getCdfSnapshotData() {

@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "Test Set 6",
+    "contestName": "test set 6",
     "outputDirectory": "output",
     "contestDate": "2019-03-06",
     "contestJurisdiction": "TestSets_Single_winner",
@@ -14,27 +14,44 @@
     "filePath" : "test_set_6_duplicate_exhaust_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider" : "CDF"
+    "provider" : "cdf",
+    "contestId": "test set 6",
+    "treatBlankAsUndeclaredWriteIn": false,
+    "overvoteLabel": "",
+    "undervoteLabel": "",
+    "undeclaredWriteInLabel": ""
   } ],
-  "candidates" : [ ],
+  "candidates" : [ {
+    "name" : "Candidate A Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate B Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate C Name",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "Candidate D Name",
+    "code" : "",
+    "excluded" : false
+  }],
   "rules" : {
-    "tiebreakMode" : "random",
-    "overvoteRule" : "alwaysSkipToNextRank",
-    "winnerElectionMode" : "standard",
-    "randomSeed" : "0",
-    "numberOfWinners" : "1",
-    "decimalPlacesForVoteArithmetic" : "1",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "4",
-    "maxRankingsAllowed" : "4",
-    "nonIntegerWinningThreshold" : false,
-    "hareQuota" : false,
-    "batchElimination" : false,
-    "exhaustOnDuplicateCandidate" : true,
-    "treatBlankAsUndeclaredWriteIn" : false,
-    "overvoteLabel" : "",
-    "undervoteLabel" : "",
-    "undeclaredWriteInLabel" : "",
-    "rulesDescription" : "Duplicate choice exhaust"
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "singleWinnerMajority",
+    "randomSeed": "0",
+    "numberOfWinners": "1",
+    "decimalPlacesForVoteArithmetic": "1",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "4",
+    "maxRankingsAllowed": "4",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": true,
+    "rulesDescription": "Duplicate choice exhaust"
   }
 }

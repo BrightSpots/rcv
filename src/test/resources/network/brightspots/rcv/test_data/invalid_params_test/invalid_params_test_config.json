@@ -20,10 +20,6 @@
     "batchElimination": "True",
     "continueUntilTwoCandidatesRemain": "false",
     "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI",
     "rulesDescription": "Testing our validation logic for params"
   }
 }

@@ -56,17 +56,22 @@ public class RawContestConfig {
 
   // CvrSource: encapsulates a source cast vote record file
   // all indexes are 1-based
-  @SuppressWarnings("unused")
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
 
     private String filePath;
+    private String contestId;
     private String firstVoteColumnIndex;
     private String firstVoteRowIndex;
     private String idColumnIndex;
     private String precinctColumnIndex;
+    private String overvoteDelimiter;
     private String provider;
+    private String overvoteLabel;
+    private String undervoteLabel;
+    private String undeclaredWriteInLabel;
+    private boolean treatBlankAsUndeclaredWriteIn;
 
     CvrSource() {
     }
@@ -77,13 +82,25 @@ public class RawContestConfig {
         String firstVoteRowIndex,
         String idColumnIndex,
         String precinctColumnIndex,
-        String provider) {
+        String overvoteDelimiter,
+        String provider,
+        String contestId,
+        String overvoteLabel,
+        String undervoteLabel,
+        String undeclaredWriteInLabel,
+        boolean treatBlankAsUndeclaredWriteIn) {
       this.filePath = filePath;
       this.firstVoteColumnIndex = firstVoteColumnIndex;
       this.firstVoteRowIndex = firstVoteRowIndex;
       this.idColumnIndex = idColumnIndex;
       this.precinctColumnIndex = precinctColumnIndex;
+      this.overvoteDelimiter = overvoteDelimiter;
       this.provider = provider;
+      this.contestId = contestId;
+      this.overvoteLabel = overvoteLabel;
+      this.undervoteLabel = undervoteLabel;
+      this.undeclaredWriteInLabel = undeclaredWriteInLabel;
+      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
 
     public String getFilePath() {
@@ -92,6 +109,14 @@ public class RawContestConfig {
 
     public void setFilePath(String filePath) {
       this.filePath = filePath;
+    }
+
+    public String getContestId() {
+      return contestId;
+    }
+
+    public void setContestId(String contestId) {
+      this.contestId = contestId;
     }
 
     public String getFirstVoteColumnIndex() {
@@ -126,12 +151,52 @@ public class RawContestConfig {
       this.precinctColumnIndex = precinctColumnIndex;
     }
 
+    public String getOvervoteDelimiter() {
+      return overvoteDelimiter;
+    }
+
+    public void setOvervoteDelimiter(String overvoteDelimiter) {
+      this.overvoteDelimiter = overvoteDelimiter;
+    }
+
     public String getProvider() {
       return provider;
     }
 
     public void setProvider(String provider) {
       this.provider = provider;
+    }
+
+    public String getOvervoteLabel() {
+      return overvoteLabel;
+    }
+
+    public void setOvervoteLabel(String overvoteLabel) {
+      this.overvoteLabel = overvoteLabel;
+    }
+
+    public String getUndervoteLabel() {
+      return undervoteLabel;
+    }
+
+    public void setUndervoteLabel(String undervoteLabel) {
+      this.undervoteLabel = undervoteLabel;
+    }
+
+    public String getUndeclaredWriteInLabel() {
+      return undeclaredWriteInLabel;
+    }
+
+    public void setUndeclaredWriteInLabel(String undeclaredWriteInLabel) {
+      this.undeclaredWriteInLabel = undeclaredWriteInLabel;
+    }
+
+    public boolean isTreatBlankAsUndeclaredWriteIn() {
+      return treatBlankAsUndeclaredWriteIn;
+    }
+
+    public void setTreatBlankAsUndeclaredWriteIn(boolean treatBlankAsUndeclaredWriteIn) {
+      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
   }
 
@@ -143,7 +208,6 @@ public class RawContestConfig {
     private String name;
     private String code;
     private boolean excluded;
-    private Integer contestId;
 
     Candidate() {
     }
@@ -152,13 +216,6 @@ public class RawContestConfig {
       this.name = name;
       this.code = code;
       this.excluded = excluded;
-    }
-
-    Candidate(String name, String code, boolean excluded, Integer contestId) {
-      this.name = name;
-      this.code = code;
-      this.excluded = excluded;
-      this.contestId = contestId;
     }
 
     public String getName() {
@@ -184,13 +241,10 @@ public class RawContestConfig {
     public void setExcluded(boolean excluded) {
       this.excluded = excluded;
     }
-
-    public Integer getContestId() {
-      return contestId;
-    }
   }
 
   // ContestRules: encapsulates the set of rules required to perform contest tabulation
+  @SuppressWarnings({"unused", "RedundantSuppression"})
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class ContestRules {
@@ -208,11 +262,15 @@ public class RawContestConfig {
     public boolean nonIntegerWinningThreshold;
     public boolean hareQuota;
     public boolean batchElimination;
+    public boolean continueUntilTwoCandidatesRemain;
     public boolean exhaustOnDuplicateCandidate;
+    public String rulesDescription;
+
+    // These are deprecated (moved to individual CVRs), but we need to leave them in place here for
+    // the purpose of supporting automatic migration from older config versions.
     public boolean treatBlankAsUndeclaredWriteIn;
     public String overvoteLabel;
     public String undervoteLabel;
     public String undeclaredWriteInLabel;
-    public String rulesDescription;
   }
 }

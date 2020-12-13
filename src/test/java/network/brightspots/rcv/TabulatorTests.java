@@ -17,7 +17,7 @@
 /*
  * Purpose:
  * These regression tests run various tabulations and compare the generated results to
- * expected results.  Passing these tests ensures that changes to tabulation code have not
+ * expected results. Passing these tests ensures that changes to tabulation code have not
  * altered the results of the tabulation.
  */
 
@@ -26,6 +26,7 @@ package network.brightspots.rcv;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,8 +35,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.logging.Level;
+import network.brightspots.rcv.ContestConfig.Provider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,7 +68,7 @@ class TabulatorTests {
         if (line1 == null && line2 == null) {
           break;
         } else if (line1 == null || line2 == null) {
-          Logger.log(Level.SEVERE, "Files are unequal lengths!");
+          Logger.severe("Files are unequal lengths!");
           result = false;
           break;
         }
@@ -78,19 +78,18 @@ class TabulatorTests {
             && !line1.equals(line2)) {
           errorCount++;
           result = false;
-          Logger.log(
-              Level.SEVERE, "Files are not equal (line %d):\n%s\n%s", currentLine, line1, line2);
+          Logger.severe("Files are not equal (line %d):\n%s\n%s", currentLine, line1, line2);
           if (errorCount >= MAX_LOG_ERRORS) {
             break;
           }
         }
         currentLine++;
       }
-    } catch (FileNotFoundException e) {
-      Logger.log(Level.SEVERE, "File not found!\n%s", e.toString());
+    } catch (FileNotFoundException exception) {
+      Logger.severe("File not found!\n%s", exception);
       result = false;
-    } catch (IOException e) {
-      Logger.log(Level.SEVERE, "Error reading file!\n%s", e.toString());
+    } catch (IOException exception) {
+      Logger.severe("Error reading file!\n%s", exception);
       result = false;
     } finally {
       try {
@@ -100,8 +99,8 @@ class TabulatorTests {
         if (fr2 != null) {
           fr2.close();
         }
-      } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error closing file!\n%s", e.toString());
+      } catch (IOException exception) {
+        Logger.severe("Error closing file!\n%s", exception);
       }
     }
     return result;
@@ -114,47 +113,38 @@ class TabulatorTests {
         .toString();
   }
 
-  // helper function test Dominion CVR conversion routine
-  private static void runDominionCvrConversionTest(String stem) {
-    String dominionDataFolder = Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem)
-        .toAbsolutePath().toString();
-    TabulatorSession session = new TabulatorSession(null);
-    List<String> filesWritten = session.convertDominionCvrJsonToGenericCsv(dominionDataFolder);
-
-    for (String convertedFile : filesWritten) {
-      String contestNumber = convertedFile
-          .substring(convertedFile.lastIndexOf('_') + 1, convertedFile.lastIndexOf('.'));
-      String expectedPath = Paths
-          .get(dominionDataFolder, stem + "_contest_" + contestNumber + "_expected.csv")
-          .toAbsolutePath().toString();
-      assertTrue(fileCompare(convertedFile, expectedPath));
-      // Clean up test file(s)
-      try {
-        Files.delete(Paths.get(convertedFile));
-      } catch (IOException e) {
-        Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", convertedFile, e.toString());
-      }
-    }
-  }
-
   // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
+    Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
     session.tabulate();
-
+    Logger.info("Examining tabulation test results...");
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
 
     if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-        compareJsons(config, stem, timestampString, i);
+        compareJsons(config, stem, timestampString, Integer.toString(i));
       }
     } else {
       compareJsons(config, stem, timestampString, null);
     }
 
+    // If this is a Dominion tabulation test, also check the converted output file.
+    boolean isDominion =
+        config.rawConfig.cvrFileSources.stream()
+            .anyMatch(source -> ContestConfig.getProvider(source) == Provider.DOMINION);
+    if (isDominion) {
+      String expectedPath =
+          getTestFilePath(
+              stem,
+              "_contest_"
+                  + config.rawConfig.cvrFileSources.get(0).getContestId()
+                  + "_expected.csv");
+      assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
+    }
     // test passed so cleanup test output folder
     File outputFolder = new File(session.getOutputPath());
     if (outputFolder.listFiles() != null) {
@@ -163,20 +153,20 @@ class TabulatorTests {
         if (!file.isDirectory()) {
           try {
             Files.delete(file.toPath());
-          } catch (IOException e) {
-            Logger.log(Level.SEVERE, "Error deleting file: %s\n%s", file.getAbsolutePath(),
-                e.toString());
+          } catch (IOException exception) {
+            Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
           }
         }
       }
     }
+    Logger.info("Test complete.");
   }
 
   private static void compareJsons(
-      ContestConfig config, String stem, String timestampString, Integer sequentialNumber) {
-    compareJson(config, stem, "summary", timestampString, sequentialNumber);
+      ContestConfig config, String stem, String timestampString, String sequentialId) {
+    compareJson(config, stem, "summary", timestampString, sequentialId);
     if (config.isGenerateCdfJsonEnabled()) {
-      compareJson(config, stem, "cvr_cdf", timestampString, sequentialNumber);
+      compareJson(config, stem, "cvr_cdf", timestampString, sequentialId);
     }
   }
 
@@ -185,19 +175,25 @@ class TabulatorTests {
       String stem,
       String jsonType,
       String timestampString,
-      Integer sequentialNumber) {
+      String sequentialId) {
     String actualOutputPath =
         ResultsWriter.getOutputFilePath(
-            config.getOutputDirectory(), jsonType, timestampString, sequentialNumber)
+            config.getOutputDirectory(), jsonType, timestampString, sequentialId)
             + ".json";
     String expectedPath =
         getTestFilePath(
             stem,
-            ResultsWriter.sequentialSuffixForOutputPath(sequentialNumber)
+            ResultsWriter.sequentialSuffixForOutputPath(sequentialId)
                 + "_expected_"
                 + jsonType
                 + ".json");
-    assertTrue(fileCompare(expectedPath, actualOutputPath));
+    Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
+    if (fileCompare(expectedPath, actualOutputPath)) {
+      Logger.info("Files are equal.");
+    } else {
+      Logger.info("Files are different.");
+      fail();
+    }
   }
 
   @BeforeAll
@@ -206,21 +202,93 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("Dominion Cvr conversion test - Alaska test data")
-  void testDominionCvrConversionAlaska() {
-    runDominionCvrConversionTest("dominion_cvr_conversion_alaska");
+  @DisplayName("NIST XML CDF 2")
+  void nistXmlCdf2() {
+    runTabulationTest("nist_xml_cdf_2");
   }
 
   @Test
-  @DisplayName("Dominion Cvr conversion test - Kansas test data")
-  void testDominionCvrConversionKansas() {
-    runDominionCvrConversionTest("dominion_cvr_conversion_kansas");
+  @DisplayName("unisyn_xml_cdf_city_tax_collector")
+  void unisynXmlCdfCityTaxCollector() {
+    runTabulationTest("unisyn_xml_cdf_city_tax_collector");
   }
 
   @Test
-  @DisplayName("Dominion Cvr conversion test - Wyoming fake test data")
-  void testDominionCvrConversionWyoming() {
-    runDominionCvrConversionTest("dominion_cvr_conversion_wyoming");
+  @DisplayName("unisyn_xml_cdf_city_mayor")
+  void unisynXmlCdfCityMayor() {
+    runTabulationTest("unisyn_xml_cdf_city_mayor");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_city_council_member")
+  void unisynXmlCdfCityCouncilMember() {
+    runTabulationTest("unisyn_xml_cdf_city_council_member");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_city_chief_of_police")
+  void unisynXmlCdfCityChiefOfPolice() {
+    runTabulationTest("unisyn_xml_cdf_city_chief_of_police");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_city_coroner")
+  void unisynXmlCdfCityCoroner() {
+    runTabulationTest("unisyn_xml_cdf_city_coroner");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_county_sheriff")
+  void unisynXmlCdfCountySheriff() {
+    runTabulationTest("unisyn_xml_cdf_county_sheriff");
+  }
+
+  @Test
+  @DisplayName("unisyn_xml_cdf_county_coroner")
+  void unisynXmlCdfCountyCoroner() {
+    runTabulationTest("unisyn_xml_cdf_county_coroner");
+  }
+
+  @Test
+  @DisplayName("Clear Ballot - Kansas Primary")
+  void testClearBallotKansasPrimary() {
+    runTabulationTest("clear_ballot_kansas_primary");
+  }
+
+  @Test
+  @DisplayName("Hart - Travis County Officers")
+  void testHartTravisCountyOfficers() {
+    runTabulationTest("hart_travis_county_officers");
+  }
+
+  @Test
+  @DisplayName("Hart - Cedar Park School Board")
+  void testHartCedarParkSchoolBoard() {
+    runTabulationTest("hart_cedar_park_school_board");
+  }
+
+  @Test
+  @DisplayName("Dominion test - Alaska test data")
+  void testDominionAlaska() {
+    runTabulationTest("dominion_alaska");
+  }
+
+  @Test
+  @DisplayName("Dominion test - Kansas test data")
+  void testDominionKansas() {
+    runTabulationTest("dominion_kansas");
+  }
+
+  @Test
+  @DisplayName("Dominion test - Wyoming test data")
+  void testDominionWyoming() {
+    runTabulationTest("dominion_wyoming");
+  }
+
+  @Test
+  @DisplayName("Dominion - No Precinct Data")
+  void testDominionNoPrecinctData() {
+    runTabulationTest("dominion_no_precinct_data");
   }
 
   @Test
@@ -423,6 +491,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("multi-cdf tabulation")
+  void nistTest8() {
+    runTabulationTest("test_set_8_multi_cdf");
+  }
+
+  @Test
   @DisplayName("multi-seat whole number threshold")
   void multiWinnerWholeThresholdTest() {
     runTabulationTest("test_set_multi_winner_whole_threshold");
@@ -468,5 +542,11 @@ class TabulatorTests {
   @DisplayName("multi-seat UWI test")
   void multiSeatUwiTest() {
     runTabulationTest("multi_seat_uwi_test");
+  }
+
+  @Test
+  @DisplayName("overvote delimiter test")
+  void overvoteDelimiterTest() {
+    runTabulationTest("test_set_overvote_delimiter");
   }
 }

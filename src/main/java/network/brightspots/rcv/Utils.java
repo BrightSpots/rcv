@@ -16,12 +16,16 @@
 
 package network.brightspots.rcv;
 
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
-class Utils {
+final class Utils {
 
   private static final Map<String, String> envMap = System.getenv();
+
+  private Utils() {
+  }
 
   static boolean isNullOrBlank(String s) {
     return s == null || s.isBlank();
@@ -31,7 +35,7 @@ class Utils {
     boolean isInt = true;
     try {
       Integer.parseInt(s);
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException exception) {
       isInt = false;
     }
     return isInt;
@@ -59,15 +63,24 @@ class Utils {
 
   static String getComputerName() {
     String computerName = "[unknown]";
-    if (envMap.containsKey("COMPUTERNAME")) {
-      computerName = envMap.get("COMPUTERNAME");
-    } else if (envMap.containsKey("HOSTNAME")) {
-      computerName = envMap.get("HOSTNAME");
+    try {
+      java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
+      computerName = localMachine.getHostName();
+    } catch (UnknownHostException exception) {
+      if (envMap.containsKey("COMPUTERNAME")) {
+        computerName = envMap.get("COMPUTERNAME");
+      } else if (envMap.containsKey("HOSTNAME")) {
+        computerName = envMap.get("HOSTNAME");
+      }
     }
     return computerName;
   }
 
   static String getUserName() {
-    return envMap.getOrDefault("USERNAME", "[unknown]");
+    String user = System.getProperty("user.name");
+    if (user == null) {
+      user = envMap.getOrDefault("USERNAME", "[unknown]");
+    }
+    return user;
   }
 }

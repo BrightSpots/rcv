@@ -9,40 +9,40 @@
   "results" : [ {
     "round" : 1,
     "tally" : {
-      "A" : "5",
-      "B" : "5",
-      "C" : "3",
-      "D" : "2"
+      "Candidate A Name" : "5",
+      "Candidate B Name" : "5",
+      "Candidate C Name" : "3",
+      "Candidate D Name" : "2"
     },
     "tallyResults" : [ {
-      "eliminated" : "D",
+      "eliminated" : "Candidate D Name",
       "transfers" : {
-        "A" : "1",
-        "C" : "1"
+        "Candidate A Name" : "1",
+        "Candidate C Name" : "1"
       }
     } ]
   }, {
     "round" : 2,
     "tally" : {
-      "A" : "6",
-      "B" : "5",
-      "C" : "4"
+      "Candidate A Name" : "6",
+      "Candidate B Name" : "5",
+      "Candidate C Name" : "4"
     },
     "tallyResults" : [ {
-      "eliminated" : "C",
+      "eliminated" : "Candidate C Name",
       "transfers" : {
-        "A" : "2",
-        "B" : "2"
+        "Candidate A Name" : "2",
+        "Candidate B Name" : "2"
       }
     } ]
   }, {
     "round" : 3,
     "tally" : {
-      "A" : "8",
-      "B" : "7"
+      "Candidate A Name" : "8",
+      "Candidate B Name" : "7"
     },
     "tallyResults" : [ {
-      "elected" : "A",
+      "elected" : "Candidate A Name",
       "transfers" : { }
     } ]
   } ]
