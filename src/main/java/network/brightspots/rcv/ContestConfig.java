@@ -954,7 +954,7 @@ class ContestConfig {
   }
 
   int getNumCandidates() {
-    return getCandidateCodeList().size();
+    return getCandidateCodeList().size() - excludedCandidates.size();
   }
 
   boolean candidateIsExcluded(String candidate) {
