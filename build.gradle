@@ -38,15 +38,11 @@ checkstyle {
     toolVersion = "8.36.2"
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
-    //
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-8.36.2/src/main/resources/google_checks.xml
-    //
-    // VERY IMPORTANT: after copying a new version of the above, make sure the "SuppressionFilter"
-    // module has this line in order to actually pick up our project's Checkstyle suppression rules:
-    // value="${config_loc}/checkstyle-suppressions.xml"
-    // More info on this at: https://github.com/BrightSpots/rcv/issues/489
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
 }
+System.setProperty( "org.checkstyle.google.suppressionfilter.config",
+        "$projectDir/config/checkstyle/checkstyle-suppressions.xml")
 
 // ### Idea plugin settings
 idea {
