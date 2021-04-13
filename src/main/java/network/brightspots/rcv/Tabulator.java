@@ -365,22 +365,22 @@ class Tabulator {
               config.isHareQuotaEnabled()
                   ? config.getNumberOfWinners()
                   : config.getNumberOfWinners() + 1);
-      if (config.isNonIntegerWinningThresholdEnabled()) {
+      if (config.isHareQuotaEnabled()) {
+        winningThreshold = config.divide(currentRoundTotalVotes, divisor)
+      } else if (config.isNonIntegerWinningThresholdEnabled()) {
         // threshold = (votes / (num_winners + 1)) + 10^(-1 * decimalPlacesForVoteArithmetic)
         BigDecimal augend =
             config.divide(
                 BigDecimal.ONE, BigDecimal.TEN.pow(config.getDecimalPlacesForVoteArithmetic()));
         winningThreshold = config.divide(currentRoundTotalVotes, divisor).add(augend);
+      } else if (config.isFloorWinningThresholdEnabled()) {
+        // threshold = floor(votes / (num_winners + 1)) + 1
+        winningThreshold =
+            currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
       } else {
-        if (config.isFloorWinningThresholdEnabled()) {
-          // threshold = floor(votes / (num_winners + 1)) + 1
-          winningThreshold =
-              currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
-        } else {
-          // threshold = (votes / (num_winners + 1)) + 1
-          winningThreshold =
-              config.divide(currentRoundTotalVotes, divisor).add(BigDecimal.ONE);
-        }
+        // threshold = (votes / (num_winners + 1)) + 1
+        winningThreshold =
+            config.divide(currentRoundTotalVotes, divisor).add(BigDecimal.ONE);
       }
     }
     Logger.info("Winning threshold set to %s.", winningThreshold);
