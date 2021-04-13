@@ -372,9 +372,15 @@ class Tabulator {
                 BigDecimal.ONE, BigDecimal.TEN.pow(config.getDecimalPlacesForVoteArithmetic()));
         winningThreshold = config.divide(currentRoundTotalVotes, divisor).add(augend);
       } else {
-        // threshold = floor(votes / (num_winners + 1)) + 1
-        winningThreshold =
-            currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
+        if (config.isFloorWinningThresholdEnabled()) {
+          // threshold = floor(votes / (num_winners + 1)) + 1
+          winningThreshold =
+              currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
+        } else {
+          // threshold = (votes / (num_winners + 1)) + 1
+          winningThreshold =
+              config.divide(currentRoundTotalVotes, divisor).add(BigDecimal.ONE);
+        }
       }
     }
     Logger.info("Winning threshold set to %s.", winningThreshold);
