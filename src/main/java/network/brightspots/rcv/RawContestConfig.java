@@ -259,6 +259,7 @@ public class RawContestConfig {
     public String minimumVoteThreshold;
     public String maxSkippedRanksAllowed;
     public String maxRankingsAllowed;
+    public boolean floorWinningThreshold;
     public boolean nonIntegerWinningThreshold;
     public boolean hareQuota;
     public boolean batchElimination;
