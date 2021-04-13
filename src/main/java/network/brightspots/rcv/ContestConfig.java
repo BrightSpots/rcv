@@ -850,7 +850,11 @@ class ContestConfig {
   boolean isMultiSeatSequentialWinnerTakesAllEnabled() {
     return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL;
   }
-
+  
+  boolean isFloorWinningThresholdEnabled() {
+    return rawConfig.rules.floorWinningThreshold
+  }
+  
   boolean isNonIntegerWinningThresholdEnabled() {
     return rawConfig.rules.nonIntegerWinningThreshold;
   }
