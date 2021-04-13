@@ -241,6 +241,13 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         text description of this rules configuration for organizing your config files -- not used by the tabulator
         Example "Maine Rules"
         value: string of length [1..1000]
+        
+      "floorWinningThreshold" optional
+        if true, threshold = floor(V/(S+1)) + 1
+        if false, threshold = (V/(S+1)) + 1
+        makes no difference if nonIntegerWinningThreshold is true
+        value: true | false
+        if not supplied: true
 
       "nonIntegerWinningThreshold" optional
         the vote threshold used to determine winners can be a non-integer
