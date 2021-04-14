@@ -365,16 +365,26 @@ class Tabulator {
               config.isHareQuotaEnabled()
                   ? config.getNumberOfWinners()
                   : config.getNumberOfWinners() + 1);
-      if (config.isNonIntegerWinningThresholdEnabled()) {
-        // threshold = (votes / (num_winners + 1)) + 10^(-1 * decimalPlacesForVoteArithmetic)
-        BigDecimal augend =
-            config.divide(
-                BigDecimal.ONE, BigDecimal.TEN.pow(config.getDecimalPlacesForVoteArithmetic()));
-        winningThreshold = config.divide(currentRoundTotalVotes, divisor).add(augend);
+      // If we use integers, we shouldn't use any decimal places.
+      // Otherwise we use the amount of decimal places specified by the user
+      int decimals =
+          config.isNonIntegerWinningThresholdEnabled()
+              ? config.getDecimalPlacesForVoteArithmetic
+              : 0;
+      // Augend is the smallest unit comaptable our rounding.
+      // If we are only using integers, augend is 1
+      // augend = 10^(-1 * decimals)
+      augend =
+          config.divide(
+              BigDecimal.ONE, BigDecimal.TEN.pow(decimals));
+      if (config.isHareQuotaEnabled()) {
+        // Rounding up simulates "greater than or equal to".
+        // threshold = ceiling(votes / num_winners)
+        winningThreshold = currentRoundTotalVotes.divide(divisor, decimals, RoundingMode.UP);
       } else {
-        // threshold = floor(votes / (num_winners + 1)) + 1
-        winningThreshold =
-            currentRoundTotalVotes.divideToIntegralValue(divisor).add(BigDecimal.ONE);
+        // Rounding down then adding augend simulates "greater than".
+        // threshold = floor(votes / (numwinners + 1)) + augend
+        winningThreshold = currentRoundTotalVotes.divide(divisor, decimals, RoundingMode.DOWN).add(augend);
       }
     }
     Logger.info("Winning threshold set to %s.", winningThreshold);
