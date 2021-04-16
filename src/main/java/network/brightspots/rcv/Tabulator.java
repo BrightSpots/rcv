@@ -369,22 +369,22 @@ class Tabulator {
       // Otherwise we use the amount of decimal places specified by the user
       int decimals =
           config.isNonIntegerWinningThresholdEnabled()
-              ? config.getDecimalPlacesForVoteArithmetic
+              ? config.getDecimalPlacesForVoteArithmetic()
               : 0;
       // Augend is the smallest unit comaptable our rounding.
       // If we are only using integers, augend is 1
       // augend = 10^(-1 * decimals)
-      augend =
+      BigDecimal augend =
           config.divide(
               BigDecimal.ONE, BigDecimal.TEN.pow(decimals));
       if (config.isHareQuotaEnabled()) {
         // Rounding up simulates "greater than or equal to".
         // threshold = ceiling(votes / num_winners)
-        winningThreshold = currentRoundTotalVotes.divide(divisor, decimals, RoundingMode.UP);
+        winningThreshold = currentRoundTotalVotes.divide(divisor, decimals, java.math.RoundingMode.UP);
       } else {
         // Rounding down then adding augend simulates "greater than".
         // threshold = floor(votes / (numwinners + 1)) + augend
-        winningThreshold = currentRoundTotalVotes.divide(divisor, decimals, RoundingMode.DOWN).add(augend);
+        winningThreshold = currentRoundTotalVotes.divide(divisor, decimals, java.math.RoundingMode.DOWN).add(augend);
       }
     }
     Logger.info("Winning threshold set to %s.", winningThreshold);
