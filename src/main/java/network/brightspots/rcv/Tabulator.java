@@ -371,7 +371,7 @@ class Tabulator {
           config.isNonIntegerWinningThresholdEnabled()
               ? config.getDecimalPlacesForVoteArithmetic()
               : 0;
-      // Augend is the smallest unit comaptable our rounding.
+      // Augend is the smallest unit compatible with our rounding.
       // If we are only using integers, augend is 1
       // augend = 10^(-1 * decimals)
       BigDecimal augend =
