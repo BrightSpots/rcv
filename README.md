@@ -30,7 +30,7 @@ The Tabulator produces the following as output:
 
 #### Method 2 (Less Easy): Compile and Run Using Gradle
 
-1. Install [JDK 14 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by verifying that the following command returns the expected version:
+1. Install [JDK 14 or 15](https://jdk.java.net/), and make sure your Java path is picking it up properly by verifying that the following command returns the expected version:
     
     `$ java -version`
     
