@@ -379,11 +379,14 @@ class Tabulator {
       if (config.isHareQuotaEnabled()) {
         // Rounding up simulates "greater than or equal to".
         // threshold = ceiling(votes / num_winners)
-        winningThreshold = currentRoundTotalVotes.divide(divisor, decimals, java.math.RoundingMode.UP);
+        winningThreshold =
+            currentRoundTotalVotes.divide(divisor, decimals, java.math.RoundingMode.UP);
       } else {
         // Rounding down then adding augend simulates "greater than".
         // threshold = floor(votes / (numwinners + 1)) + augend
-        winningThreshold = currentRoundTotalVotes.divide(divisor, decimals, java.math.RoundingMode.DOWN).add(augend);
+        winningThreshold =
+            currentRoundTotalVotes.divide(divisor, decimals, java.math.RoundingMode.DOWN)
+                .add(augend);
       }
     }
     Logger.info("Winning threshold set to %s.", winningThreshold);
