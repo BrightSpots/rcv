@@ -375,8 +375,7 @@ class Tabulator {
       // If we are only using integers, augend is 1
       // augend = 10^(-1 * decimals)
       BigDecimal augend =
-          config.divide(
-              BigDecimal.ONE, BigDecimal.TEN.pow(decimals));
+          BigDecimal.ONE.divide(BigDecimal.TEN.pow(decimals));
       if (config.isHareQuotaEnabled()) {
         // Rounding up simulates "greater than or equal to".
         // threshold = ceiling(votes / num_winners)
