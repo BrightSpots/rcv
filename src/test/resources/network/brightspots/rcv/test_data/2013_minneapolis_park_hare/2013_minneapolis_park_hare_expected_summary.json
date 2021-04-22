@@ -4,7 +4,7 @@
     "date" : "",
     "jurisdiction" : "Minneapolis",
     "office" : "Park and Recreation Commissioner",
-    "threshold" : "19822"
+    "threshold" : "19821"
   },
   "results" : [ {
     "round" : 1,
@@ -212,7 +212,7 @@
       "elected" : "JOHN ERWIN",
       "transfers" : {
         "exhausted" : "1827.2600",
-        "residual surplus" : "0.7400"
+        "residual surplus" : "1.7400"
       }
     }, {
       "elected" : "MEG FORNEY",
@@ -222,7 +222,7 @@
     "round" : 10,
     "tally" : {
       "ANNIE YOUNG" : "13914.0000",
-      "JOHN ERWIN" : "19822",
+      "JOHN ERWIN" : "19821",
       "MEG FORNEY" : "11704.0000"
     },
     "tallyResults" : [ ]
