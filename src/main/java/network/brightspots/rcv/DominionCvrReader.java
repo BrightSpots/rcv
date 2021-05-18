@@ -196,12 +196,16 @@ class DominionCvrReader {
         HashMap json = JsonParser.readFromFile(singleCvrPath.toString(), HashMap.class);
         gatherCvrsForContest(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
       } else if (firstCvrPath.toFile().exists()) {
+        int recordsParsed = 0, recordsParsedAtLastlog = 0;
         int cvrSequence = 1;
         Path cvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         while (cvrPath.toFile().exists()) {
           HashMap json = JsonParser.readFromFile(cvrPath.toString(), HashMap.class);
-          int recordsParsed = gatherCvrsForContest(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
-          Logger.info("Parsed %d records from %s", recordsParsed, cvrPath.toString());
+          recordsParsed += gatherCvrsForContest(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
+          if (recordsParsed - recordsParsedAtLastlog > 50000) {
+            Logger.info("Parsed %d records from %d files", recordsParsed, cvrSequence);
+            recordsParsedAtLastlog = recordsParsed;
+          }
           cvrSequence++;
           cvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         }
