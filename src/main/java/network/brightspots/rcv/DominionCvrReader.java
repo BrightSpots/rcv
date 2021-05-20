@@ -266,72 +266,77 @@ class DominionCvrReader {
       String precinctPortion = this.precinctPortions.get(precinctPortionId);
       String ballotTypeId = adjudicatedData.get("BallotTypeId").toString();
 
-      ArrayList contests;
+      ArrayList cardsList;
       // sometimes there is a "Cards" object at this level
       if (adjudicatedData.containsKey("Cards")) {
-        ArrayList cardsList = (ArrayList) adjudicatedData.get("Cards");
-        HashMap cardsObject = (HashMap) cardsList.get(0);
-        contests = (ArrayList) cardsObject.get("Contests");
+        cardsList = (ArrayList<Object>) adjudicatedData.get("Cards");
       } else {
-        contests = (ArrayList) adjudicatedData.get("Contests");
+        ArrayList<HashMap> oneCardList = new ArrayList<HashMap>(1);
+        oneCardList.add(adjudicatedData);
+        cardsList = (ArrayList) oneCardList;
       }
 
-      // each contest object is a cvr
-      for (Object contestObject : contests) {
-        HashMap contest = (HashMap) contestObject;
-        String contestId = contest.get("Id").toString();
-        // skip this CVR if it's not for the contest we're interested in
-        if (!contestId.equals(contestIdToLoad)) {
-          continue;
-        }
-        // validate contest id
-        if (!this.contests.containsKey(contestId)
-            || !contestIdToCandidateCodes.containsKey(contestId)) {
-          Logger.severe("Unknown contest ID '%d' found while parsing CVR!", contestId);
-          throw new CvrParseException();
-        }
-        ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
-        // marks is an array of rankings
-        ArrayList marks = (ArrayList) contest.get("Marks");
-        for (Object rankingObject : marks) {
-          HashMap rankingMap = (HashMap) rankingObject;
-          // skip ambiguous rankings
-          boolean isAmbiguous = (boolean) rankingMap.get("IsAmbiguous");
-          if (isAmbiguous) {
+      for (Object cardObject : cardsList) {
+        HashMap card = (HashMap) cardObject;
+        ArrayList contests = (ArrayList) card.get("Contests");
+
+        // each contest object is a cvr
+        for (Object contestObject : contests) {
+          HashMap contest = (HashMap) contestObject;
+          String contestId = contest.get("Id").toString();
+          // skip this CVR if it's not for the contest we're interested in
+          if (!contestId.equals(contestIdToLoad)) {
             continue;
           }
-          Integer candidateId = (Integer) rankingMap.get("CandidateId");
-          String candidateCode = candidateId.toString();
-          Set<String> candidates = contestIdToCandidateCodes.get(contestId);
-          if (!candidates.contains(candidateCode)) {
-            Logger.severe(
-                "Candidate code '%s' is not valid for contest '%d'!", candidateCode, contestId);
+          // validate contest id
+          if (!this.contests.containsKey(contestId)
+              || !contestIdToCandidateCodes.containsKey(contestId)) {
+            Logger.severe("Unknown contest ID '%d' found while parsing CVR!", contestId);
             throw new CvrParseException();
           }
-          // We also need to throw an error if this candidate doesn't appear in the tabulator's
-          // config file for this contest.
-          if (candidateCode.equals(undeclaredWriteInLabel)) {
-            candidateCode = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-          } else if (!config.getCandidateCodeList().contains(candidateCode)) {
-            unrecognizedCandidateCounts.merge(candidateCode, 1, Integer::sum);
-          }
+          ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
+          // marks is an array of rankings
+          ArrayList marks = (ArrayList) contest.get("Marks");
+          for (Object rankingObject : marks) {
+            HashMap rankingMap = (HashMap) rankingObject;
+            // skip ambiguous rankings
+            boolean isAmbiguous = (boolean) rankingMap.get("IsAmbiguous");
+            if (isAmbiguous) {
+              continue;
+            }
+            Integer candidateId = (Integer) rankingMap.get("CandidateId");
+            String candidateCode = candidateId.toString();
+            Set<String> candidates = contestIdToCandidateCodes.get(contestId);
+            if (!candidates.contains(candidateCode)) {
+              Logger.severe(
+                  "Candidate code '%s' is not valid for contest '%d'!", candidateCode, contestId);
+              throw new CvrParseException();
+            }
+            // We also need to throw an error if this candidate doesn't appear in the tabulator's
+            // config file for this contest.
+            if (candidateCode.equals(undeclaredWriteInLabel)) {
+              candidateCode = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+            } else if (!config.getCandidateCodeList().contains(candidateCode)) {
+              unrecognizedCandidateCounts.merge(candidateCode, 1, Integer::sum);
+            }
 
-          Integer rank = (Integer) rankingMap.get("Rank");
-          Pair<Integer, String> ranking = new Pair<>(rank, candidateCode);
-          rankings.add(ranking);
+            Integer rank = (Integer) rankingMap.get("Rank");
+            Pair<Integer, String> ranking = new Pair<>(rank, candidateCode);
+            rankings.add(ranking);
+          }
+          // create the new Cvr
+          CastVoteRecord newCvr =
+              new CastVoteRecord(
+                  contestId,
+                  tabulatorId,
+                  batchId,
+                  suppliedId,
+                  precinct,
+                  precinctPortion,
+                  ballotTypeId,
+                  rankings);
+          castVoteRecords.add(newCvr);
         }
-        // create the new Cvr
-        CastVoteRecord newCvr =
-            new CastVoteRecord(
-                contestId,
-                tabulatorId,
-                batchId,
-                suppliedId,
-                precinct,
-                precinctPortion,
-                ballotTypeId,
-                rankings);
-        castVoteRecords.add(newCvr);
       }
       // provide some user feedback on the Cvr count
       recordsParsed++;
