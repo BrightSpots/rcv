@@ -1,0 +1,3 @@
+[submodule "src/test/resources/network/brightspots/rcv/test_data"]
+	path = src/test/resources/network/brightspots/rcv/test_data
+	url = git@github.com:brightspots/rcvtests.git
