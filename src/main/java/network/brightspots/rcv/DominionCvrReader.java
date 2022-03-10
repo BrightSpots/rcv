@@ -196,7 +196,8 @@ class DominionCvrReader {
         HashMap json = JsonParser.readFromFile(singleCvrPath.toString(), HashMap.class);
         parseCvrFile(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
       } else if (firstCvrPath.toFile().exists()) {
-        int recordsParsed = 0, recordsParsedAtLastlog = 0;
+        int recordsParsed = 0;
+        int recordsParsedAtLastlog = 0;
         int cvrSequence = 1;
         Path cvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         while (cvrPath.toFile().exists()) {
