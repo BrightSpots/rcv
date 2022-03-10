@@ -164,7 +164,7 @@ class DominionCvrReader {
       throw new CvrParseException();
     }
     // parse the cvr file(s)
-    parseCvrFile(castVoteRecords, contestId);
+    gatherCvrsForContest(castVoteRecords, contestId);
     if (castVoteRecords.isEmpty()) {
       Logger.severe("No cast vote record data found!");
       throw new CvrParseException();
@@ -175,7 +175,7 @@ class DominionCvrReader {
   }
 
   // parse the CVR file or files into a List of CastVoteRecords for tabulation
-  private void parseCvrFile(List<CastVoteRecord> castVoteRecords, String contestIdToLoad) {
+  private void gatherCvrsForContest(List<CastVoteRecord> castVoteRecords, String contestIdToLoad) {
     // build a lookup map for candidates codes to optimize Cvr parsing
     Map<String, Set<String>> contestIdToCandidateCodes = new HashMap<>();
     for (Candidate candidate : this.candidates) {
@@ -194,14 +194,14 @@ class DominionCvrReader {
       Path firstCvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, 1));
       if (singleCvrPath.toFile().exists()) {
         HashMap json = JsonParser.readFromFile(singleCvrPath.toString(), HashMap.class);
-        gatherCvrsForContest(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
+        parseCvrFile(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
       } else if (firstCvrPath.toFile().exists()) {
         int recordsParsed = 0, recordsParsedAtLastlog = 0;
         int cvrSequence = 1;
         Path cvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         while (cvrPath.toFile().exists()) {
           HashMap json = JsonParser.readFromFile(cvrPath.toString(), HashMap.class);
-          recordsParsed += gatherCvrsForContest(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
+          recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
           if (recordsParsed - recordsParsedAtLastlog > 50000) {
             Logger.info("Parsed %d records from %d files", recordsParsed, cvrSequence);
             recordsParsedAtLastlog = recordsParsed;
@@ -219,7 +219,7 @@ class DominionCvrReader {
     }
   }
 
-  private int gatherCvrsForContest(
+  private int parseCvrFile(
       HashMap json, List<CastVoteRecord> castVoteRecords, String contestIdToLoad,
       Map<String, Set<String>> contestIdToCandidateCodes)
       throws CvrParseException {
