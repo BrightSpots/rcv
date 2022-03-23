@@ -2,8 +2,8 @@ plugins {
     id "application"
     id "checkstyle"
     id "idea"
-    id "java"
-    id "org.openjfx.javafxplugin" version "0.0.9"
+    id "java-library"
+    id "org.openjfx.javafxplugin" version "0.0.10"
     id "org.beryx.jlink" version "2.20.0"
 }
 
@@ -24,7 +24,7 @@ dependencies {
 
 // ### Application plugin settings
 application {
-    mainClassName = "${moduleName}.Main"
+    mainClass = "${moduleName}.Main"
 }
 
 // Uncomment below to simulate running from the CLI
@@ -52,7 +52,7 @@ idea {
 }
 
 // ### Java plugin settings
-sourceCompatibility = JavaVersion.VERSION_14
+sourceCompatibility = JavaVersion.VERSION_17
 
 compileJava.dependsOn(clean)
 compileJava {
@@ -73,7 +73,7 @@ test {
 
 // ### JavaFX plugin settings
 javafx {
-    version = "14.0.1"
+    version = "17"
     modules = ["javafx.base", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
