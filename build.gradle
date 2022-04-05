@@ -3,7 +3,7 @@ plugins {
     id "checkstyle"
     id "idea"
     id "java-library"
-    id "org.openjfx.javafxplugin" version "0.0.10"
+    id "org.openjfx.javafxplugin" version "0.0.11"
     id "org.beryx.jlink" version "2.20.0"
 }
 
