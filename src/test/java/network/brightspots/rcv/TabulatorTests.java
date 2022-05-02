@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import network.brightspots.rcv.ContestConfig.Provider;
@@ -51,13 +52,10 @@ class TabulatorTests {
   // compare file contents line by line to identify differences
   private static boolean fileCompare(String path1, String path2) {
     boolean result = true;
-    FileReader fr1 = null;
-    FileReader fr2 = null;
-    try {
-      fr1 = new FileReader(path1);
-      BufferedReader br1 = new BufferedReader(fr1);
-      fr2 = new FileReader(path2);
-      BufferedReader br2 = new BufferedReader(fr2);
+    try (
+        BufferedReader br1 = new BufferedReader(new FileReader(path1, StandardCharsets.UTF_8));
+        BufferedReader br2 = new BufferedReader(new FileReader(path2, StandardCharsets.UTF_8))
+    ) {
       int currentLine = 1;
       int errorCount = 0;
 
@@ -91,17 +89,6 @@ class TabulatorTests {
     } catch (IOException exception) {
       Logger.severe("Error reading file!\n%s", exception);
       result = false;
-    } finally {
-      try {
-        if (fr1 != null) {
-          fr1.close();
-        }
-        if (fr2 != null) {
-          fr2.close();
-        }
-      } catch (IOException exception) {
-        Logger.severe("Error closing file!\n%s", exception);
-      }
     }
     return result;
   }
@@ -147,9 +134,9 @@ class TabulatorTests {
     }
     // test passed so cleanup test output folder
     File outputFolder = new File(session.getOutputPath());
-    if (outputFolder.listFiles() != null) {
-      //noinspection ConstantConditions
-      for (File file : outputFolder.listFiles()) {
+    File[] files = outputFolder.listFiles();
+    if (files != null) {
+      for (File file : files) {
         if (!file.isDirectory()) {
           try {
             Files.delete(file.toPath());
