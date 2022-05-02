@@ -72,6 +72,9 @@ import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
+/**
+ * View controller for config layout.
+ */
 @SuppressWarnings({"WeakerAccess"})
 public class GuiConfigController implements Initializable {
 

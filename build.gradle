@@ -35,11 +35,13 @@ application {
 
 // ### Checkstyle plugin settings
 checkstyle {
-    toolVersion = "8.36.2"
+    toolVersion = '10.2'
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
-    // https://github.com/checkstyle/checkstyle/blob/checkstyle-8.36.2/src/main/resources/google_checks.xml
+    // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.2/src/main/resources/google_checks.xml
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
+    maxWarnings = 0
+    ignoreFailures = false
 }
 System.setProperty( "org.checkstyle.google.suppressionfilter.config",
         "$projectDir/config/checkstyle/checkstyle-suppressions.xml")

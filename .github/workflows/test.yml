@@ -16,4 +16,4 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Test with Gradle
-        run: ./gradlew build
+        run: ./gradlew check
