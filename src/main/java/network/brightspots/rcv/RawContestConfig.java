@@ -27,9 +27,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
-/**
- * Contest configuration that can be serialized and deserialized.
- */
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
@@ -43,9 +40,7 @@ public class RawContestConfig {
   RawContestConfig() {
   }
 
-  /**
-   * Output settings that can be serialized and deserialized.
-   */
+  // OutputSettings: encapsulates the output settings
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class OutputSettings {
@@ -59,11 +54,8 @@ public class RawContestConfig {
     public boolean generateCdfJson;
   }
 
-  /**
-   * Source cast vote record file that can be serialized and deserialized.
-   *
-   * <p>All indexes are 1-based. </p>
-   */
+  // CvrSource: encapsulates a source cast vote record file
+  // all indexes are 1-based
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
@@ -208,9 +200,7 @@ public class RawContestConfig {
     }
   }
 
-  /**
-   * Contest candidate data that can be serialized and deserialized.
-   */
+  // Candidate encapsulates data for each candidate in a contest
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
@@ -253,9 +243,7 @@ public class RawContestConfig {
     }
   }
 
-  /**
-   * Contest rules necessary for tabulation that can be serialized and deserialized.
-   */
+  // ContestRules: encapsulates the set of rules required to perform contest tabulation
   @SuppressWarnings({"unused", "RedundantSuppression"})
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -167,7 +166,7 @@ class Tiebreak {
     String selection = null;
 
     while (selection == null) {
-      Scanner sc = new Scanner(System.in, StandardCharsets.UTF_8);
+      Scanner sc = new Scanner(System.in);
       String userInput = sc.nextLine();
       if (userInput.equals(CLI_CANCEL_COMMAND)) {
         System.out.println("Cancelling tabulation...");

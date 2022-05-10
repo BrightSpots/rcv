@@ -25,9 +25,6 @@ package network.brightspots.rcv;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Main entry point to the RCV tabulator program.
- */
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 

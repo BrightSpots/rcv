@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +48,7 @@ class ClearBallotCvrReader {
     // map for tracking unrecognized candidates during parsing
     Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
     try {
-      csvReader = new BufferedReader(new FileReader(this.cvrPath, StandardCharsets.UTF_8));
+      csvReader = new BufferedReader(new FileReader(this.cvrPath));
       // each "choice column" in the input Csv corresponds to a unique ranking: candidate+rank pair
       // we parse these rankings from the header row into a map for lookup during CVR parsing
       String firstRow = csvReader.readLine();
@@ -104,10 +103,11 @@ class ClearBallotCvrReader {
         // parse rankings
         String[] cvrData = row.split(",");
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
-        for (var entry : columnIndexToRanking.entrySet()) {
-          if (Integer.parseInt(cvrData[entry.getKey()]) == 1) {
+        for (int columnIndex : columnIndexToRanking.keySet()) {
+          if (Integer.parseInt(cvrData[columnIndex]) == 1) {
             // user marked this column
-            rankings.add(entry.getValue());
+            Pair<Integer, String> ranking = columnIndexToRanking.get(columnIndex);
+            rankings.add(ranking);
           }
         }
         // create the cast vote record
