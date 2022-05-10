@@ -26,6 +26,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
+/**
+ * View controller for tiebreaker layout.
+ */
 @SuppressWarnings("WeakerAccess")
 public class GuiTiebreakerController {
 

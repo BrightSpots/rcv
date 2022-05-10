@@ -32,6 +32,7 @@ package network.brightspots.rcv;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -142,14 +143,14 @@ class TabulatorSession {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
-    //noinspection ConstantConditions
-    if (config != null && config.validate() && setUpLogging(config)) {
+    if (config.validate() && setUpLogging(config)) {
       Logger.info("Computer name: %s", Utils.getComputerName());
       Logger.info("User name: %s", Utils.getUserName());
       Logger.info("Config file: %s", configPath);
       try {
         Logger.fine("Begin config file contents:");
-        BufferedReader reader = new BufferedReader(new FileReader(configPath));
+        BufferedReader reader = new BufferedReader(
+            new FileReader(configPath, StandardCharsets.UTF_8));
         String line = reader.readLine();
         while (line != null) {
           Logger.fine(line);
@@ -164,7 +165,7 @@ class TabulatorSession {
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         Logger.info("This is a multi-pass IRV contest.");
         int numWinners = config.getNumberOfWinners();
-        // temporarily set config to single-seat so we can run sequential elections
+        // temporarily set config to single-seat so that we can run sequential elections
         config.setNumberOfWinners(1);
         while (config.getSequentialWinners().size() < numWinners) {
           Logger.info(
@@ -324,7 +325,7 @@ class TabulatorSession {
               "Unrecognized candidate \"%s\" appears %d time(s)!",
               candidate, exception.candidateCounts.get(candidate));
         }
-        // various incorrect settings can lead to UnrecognizedCandidatesException so it's hard
+        // various incorrect settings can lead to UnrecognizedCandidatesException, so it's hard
         // to know exactly what the problem is
         Logger.info(
             "Check config settings for candidate names, firstVoteRowIndex, "

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter
+    xmlns="https://github.com/spotbugs/filter/4.6.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  xsi:schemaLocation="https://raw.githubusercontent.com/spotbugs/spotbugs/4.6.0/spotbugs/etc/findbugsfilter.xsd">
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.(HartCvrReader\$(Contest|Option|PrecinctSplit)|RawContestConfig\$ContestRules)"/>
+    <Bug code="UwF"/>
+  </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.HartCvrReader\$(Party|Contest|WriteInData|Option)"/>
+    <Bug code="UuF"/>
+  </Match>
+  <Match>
+    <Class name="network.brightspots.rcv.HartCvrReader"/>
+    <Method name="readCastVoteRecord"/>
+    <Bug code="NP"/>
+  </Match>
+</FindBugsFilter>

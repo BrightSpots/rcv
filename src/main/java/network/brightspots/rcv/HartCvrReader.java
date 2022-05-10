@@ -72,12 +72,11 @@ class HartCvrReader {
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path) throws IOException {
-    try {
-      Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
+    Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
-      XmlMapper xmlMapper = new XmlMapper();
-      xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      FileInputStream inputStream = new FileInputStream(path.toFile());
+    XmlMapper xmlMapper = new XmlMapper();
+    xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    try (FileInputStream inputStream = new FileInputStream(path.toFile())) {
       HartCvrXml xmlCvr = xmlMapper.readValue(inputStream, HartCvrXml.class);
 
       for (Contest contest : xmlCvr.Contests) {
@@ -125,7 +124,7 @@ class HartCvrReader {
           Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
       }
-    } catch (Exception exception) {
+    } catch (IOException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
       throw exception;
     }
