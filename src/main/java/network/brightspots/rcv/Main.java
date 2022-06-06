@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -31,7 +31,7 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
-  public static final String APP_NAME = "Universal RCV Tabulator";
+  public static final String APP_NAME = "RCTab";
   public static final String APP_VERSION = "1.2.0";
 
   /**
