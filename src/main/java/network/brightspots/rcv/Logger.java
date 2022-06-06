@@ -137,16 +137,15 @@ class Logger {
         new Handler() {
           @Override
           public void publish(LogRecord record) {
-            if (!isLoggable(record)) {
-              return;
-            }
-            String msg = getFormatter().format(record);
-            // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
-            // otherwise schedule the text update to run on the GUI thread
-            if (Platform.isFxApplicationThread()) {
-              textArea.appendText(msg);
-            } else {
-              Platform.runLater(() -> textArea.appendText(msg));
+            if (isLoggable(record)) {
+              String msg = getFormatter().format(record);
+              // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
+              // otherwise schedule the text update to run on the GUI thread
+              if (Platform.isFxApplicationThread()) {
+                textArea.appendText(msg);
+              } else {
+                Platform.runLater(() -> textArea.appendText(msg));
+              }
             }
           }
 

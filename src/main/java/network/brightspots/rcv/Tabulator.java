@@ -394,27 +394,29 @@ class Tabulator {
   // determine if we should continue tabulating based on how many winners have been
   // selected and if continueUntilTwoCandidatesRemain is true.
   private boolean shouldContinueTabulating() {
+    boolean continueTabulating;
     int numEliminatedCandidates = candidateToRoundEliminated.keySet().size();
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
     if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
-      return numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
+      continueTabulating = numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
           || candidateToRoundEliminated.containsValue(currentRound);
     } else if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       // in this mode, we're done as soon as we've declared any winners
-      return numWinnersDeclared == 0;
+      continueTabulating = numWinnersDeclared == 0;
     } else {
       // If there are more seats to fill, we should keep going, of course.
       // But also: if we've selected all the winners in a multi-seat contest, we should tabulate one
       // extra round in order to show the effect of redistributing the final surpluses... unless
       // bottoms-up is enabled, in which case we can stop as soon as we've declared the winners.
-      return numWinnersDeclared < config.getNumberOfWinners()
+      continueTabulating = numWinnersDeclared < config.getNumberOfWinners()
           || (config.getNumberOfWinners() > 1
           && winnerToRound.containsValue(currentRound)
           && !config.isMultiSeatBottomsUpUntilNWinnersEnabled());
     }
+    return continueTabulating;
   }
 
   // Handles continued tabulation after a winner has been chosen when
