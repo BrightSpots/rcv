@@ -223,18 +223,11 @@ class TabulatorSession {
 
   private boolean setUpLogging(ContestConfig config) {
     boolean success = false;
-
-    // %g format is for log file naming
-    String tabulationLogPath =
-        Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
-            .toAbsolutePath()
-            .toString();
-
     // cache outputPath for testing
     outputPath = config.getOutputDirectory();
     try {
       FileUtils.createOutputDirectory(config.getOutputDirectory());
-      Logger.addTabulationFileLogging(tabulationLogPath);
+      Logger.addTabulationFileLogging(config.getOutputDirectory(), timestampString);
       success = true;
     } catch (UnableToCreateDirectoryException | IOException exception) {
       Logger.severe("Failed to configure tabulation logger!\n%s", exception);
