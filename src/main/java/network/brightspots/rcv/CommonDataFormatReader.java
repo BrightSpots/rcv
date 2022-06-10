@@ -234,34 +234,7 @@ class CommonDataFormatReader {
                 unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
               }
             }
-
-            if (cvrContestSelection.Rank == null) {
-              for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
-                if (selectionPosition.CVRWriteIn != null) {
-                  candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-                }
-                // ignore if no indication is present (NIST 1500-103 section 3.4.2)
-                if (selectionPosition.HasIndication != null
-                    && selectionPosition.HasIndication.equals(STATUS_NO)) {
-                  continue;
-                }
-                // skip if not allocable
-                if (selectionPosition.IsAllocable.equals(STATUS_NO)) {
-                  continue;
-                }
-                if (selectionPosition.Rank == null) {
-                  Logger.severe(
-                      "No Rank found on CVR \"%s\" Contest \"%s\"!", cvr.UniqueId,
-                      contest.ContestId);
-                  throw new CvrParseException();
-                }
-                Integer rank = Integer.parseInt(selectionPosition.Rank);
-                rankings.add(new Pair<>(rank, candidateId));
-              }
-            } else {
-              Integer rank = Integer.parseInt(cvrContestSelection.Rank);
-              rankings.add(new Pair<>(rank, candidateId));
-            }
+            parseRankings(cvr, contest, rankings, cvrContestSelection, candidateId);
           }
         }
 
@@ -291,6 +264,38 @@ class CommonDataFormatReader {
       if (unrecognizedCandidateCounts.size() > 0) {
         throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
       }
+    }
+  }
+
+  private void parseRankings(CVR cvr, CVRContest contest, List<Pair<Integer, String>> rankings,
+      CVRContestSelection cvrContestSelection, String candidateId) throws CvrParseException {
+    // parse the selected rankings for the specified contest into the provided rankings list
+    if (cvrContestSelection.Rank == null) {
+      for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
+        if (selectionPosition.CVRWriteIn != null) {
+          candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+        }
+        // ignore if no indication is present (NIST 1500-103 section 3.4.2)
+        if (selectionPosition.HasIndication != null
+            && selectionPosition.HasIndication.equals(STATUS_NO)) {
+          continue;
+        }
+        // skip if not allocable
+        if (selectionPosition.IsAllocable.equals(STATUS_NO)) {
+          continue;
+        }
+        if (selectionPosition.Rank == null) {
+          Logger.severe(
+              "No Rank found on CVR \"%s\" Contest \"%s\"!", cvr.UniqueId,
+              contest.ContestId);
+          throw new CvrParseException();
+        }
+        Integer rank = Integer.parseInt(selectionPosition.Rank);
+        rankings.add(new Pair<>(rank, candidateId));
+      }
+    } else {
+      Integer rank = Integer.parseInt(cvrContestSelection.Rank);
+      rankings.add(new Pair<>(rank, candidateId));
     }
   }
 

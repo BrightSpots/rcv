@@ -472,21 +472,7 @@ class Tabulator {
             == config.getNumberOfWinners() - winnerToRound.size()) {
           selectedWinners.addAll(currentRoundCandidateToTally.keySet());
         } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
-          // We see if anyone has met/exceeded the threshold (unless bottoms-up is enabled, in which
-          // case we just wait until there are numWinners candidates remaining and then declare all
-          // of them as winners simultaneously).
-          // tally indexes over all tallies to find any winners
-          for (var entry : currentRoundTallyToCandidates.entrySet()) {
-            if (entry.getKey().compareTo(winningThreshold) >= 0) {
-              // we have winner(s)
-              for (String candidate : entry.getValue()) {
-                // The undeclared write-in placeholder can't win!
-                if (!candidate.equals(UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-                  selectedWinners.add(candidate);
-                }
-              }
-            }
-          }
+          selectWinners(currentRoundTallyToCandidates, selectedWinners);
         }
       }
 
@@ -531,6 +517,23 @@ class Tabulator {
     }
 
     return selectedWinners;
+  }
+
+  private void selectWinners(SortedMap<BigDecimal,
+      LinkedList<String>> currentRoundTallyToCandidates, List<String> selectedWinners) {
+    // select all candidates which have equaled or exceeded the winning threshold and add them to
+    // the selectedWinners List
+    for (var entry : currentRoundTallyToCandidates.entrySet()) {
+      if (entry.getKey().compareTo(winningThreshold) >= 0) {
+        // we have winner(s)
+        for (String candidate : entry.getValue()) {
+          // The undeclared write-in placeholder can't win
+          if (!candidate.equals(UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
+            selectedWinners.add(candidate);
+          }
+        }
+      }
+    }
   }
 
   // function: dropUndeclaredWriteIns
