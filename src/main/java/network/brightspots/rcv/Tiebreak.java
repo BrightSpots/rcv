@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the

@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -845,7 +845,7 @@ public class GuiConfigController implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
     Logger.info("Opening tabulator GUI...");
-    Logger.info("Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
+    Logger.info("Welcome to %s version %s!", Main.APP_NAME, Main.APP_VERSION);
 
     GuiContext.getInstance()
         .getMainWindow()

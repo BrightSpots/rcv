@@ -1,8 +1,8 @@
-# Universal RCV Tabulator
+# RCTab
 
 ## Overview
 
-The Universal RCV Tabulator is a free, open-source application designed to quickly and accurately tabulate a wide variety of ranked choice voting (RCV) elections, including both single-winner contests and various multi-winner formats (e.g. single transferable vote, a.k.a. STV). It allows users to:
+RCTab is a free, open-source application designed to quickly and accurately tabulate a wide variety of ranked choice voting (RCV) elections, including both single-winner contests and various multi-winner formats (e.g. single transferable vote, a.k.a. STV). It allows users to:
 - Create contest configuration files using a graphical user interface (GUI)
 - Validate contest configuration files to ensure they are well-formed, and all values are within expected ranges
 - Tabulate a contest
