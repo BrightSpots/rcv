@@ -543,26 +543,7 @@ class ResultsWriter {
           } else {
             csvPrinter.print(castVoteRecord.getPrecinctPortion());
           }
-          // for each rank determine what candidate id, overvote, or undervote occurred
-          for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
-            if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
-              Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);
-              assert !candidateSet.isEmpty();
-              if (candidateSet.size() == 1) {
-                String selection = candidateSet.iterator().next();
-                // We map all undeclared write-ins to our constant string when we read them in,
-                // so we need to translate it back to the original candidate ID here.
-                if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-                  selection = undeclaredWriteInLabel;
-                }
-                csvPrinter.print(selection);
-              } else {
-                csvPrinter.print("overvote");
-              }
-            } else {
-              csvPrinter.print("undervote");
-            }
-          }
+          printRankings(undeclaredWriteInLabel, contest, csvPrinter, castVoteRecord);
           csvPrinter.println();
         }
         // finalize the file
@@ -578,6 +559,30 @@ class ResultsWriter {
       throw exception;
     }
     return filesWritten;
+  }
+
+  private void printRankings(String undeclaredWriteInLabel, Contest contest, CSVPrinter csvPrinter,
+      CastVoteRecord castVoteRecord) throws IOException {
+    // for each rank determine what candidate id, overvote, or undervote occurred and print it
+    for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
+      if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
+        Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);
+        assert !candidateSet.isEmpty();
+        if (candidateSet.size() == 1) {
+          String selection = candidateSet.iterator().next();
+          // We map all undeclared write-ins to our constant string when we read them in,
+          // so we need to translate it back to the original candidate ID here.
+          if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
+            selection = undeclaredWriteInLabel;
+          }
+          csvPrinter.print(selection);
+        } else {
+          csvPrinter.print("overvote");
+        }
+      } else {
+        csvPrinter.print("undervote");
+      }
+    }
   }
 
   // create NIST Common Data Format CVR json

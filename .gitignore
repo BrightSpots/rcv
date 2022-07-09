@@ -34,7 +34,6 @@ tmp
 
 # Generated files
 .idea/**/contentModel.xml
-.idea/**/Project_Default.xml
 
 # Sensitive or high-churn files
 .idea/**/dataSources/
