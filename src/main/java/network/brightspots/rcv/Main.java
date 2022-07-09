@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Main entry point to the RCV tabulator program.
+ * Main entry point to RCTab
  */
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
@@ -35,7 +35,7 @@ public class Main extends GuiApplication {
   public static final String APP_VERSION = "1.2.0";
 
   /**
-   * Main entry point to the RCV tabulator program.
+   * Main entry point to RCTab
    *
    * @param args command-line args
    */
