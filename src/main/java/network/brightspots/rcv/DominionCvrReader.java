@@ -216,7 +216,7 @@ class DominionCvrReader {
             "Error parsing cast vote record: neither %s nor %s exists",
           singleCvrPath.toString(), firstCvrPath.toString()));
       }
-    } catch (Exception exception) {
+    } catch (FileNotFoundException | CvrParseException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
       castVoteRecords.clear();
     }
