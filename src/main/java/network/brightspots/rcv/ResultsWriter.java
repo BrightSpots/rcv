@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -18,7 +18,7 @@
  * Purpose:
  * Helper class takes tabulation results data as input and generates summary files which
  * contains results summary information.
- * Currently we support a CSV summary file and a JSON summary file.
+ * Currently, we support a CSV summary file and a JSON summary file.
  */
 
 package network.brightspots.rcv;
@@ -137,37 +137,29 @@ class ResultsWriter {
 
   // generates an internal ContestSelectionId based on a candidate code
   private static String getCdfContestSelectionIdForCandidateCode(String code) {
-    String id = cdfCandidateCodeToContestSelectionId.get(code);
-    if (id == null) {
-      id = String.format("cs-%s", sanitizeStringForOutput(code).toLowerCase());
-      cdfCandidateCodeToContestSelectionId.put(code, id);
-    }
-    return id;
+    return cdfCandidateCodeToContestSelectionId.computeIfAbsent(code,
+        c -> String.format("cs-%s", sanitizeStringForOutput(c).toLowerCase()));
   }
 
   // generates an internal CandidateId based on a candidate code
   private static String getCdfCandidateIdForCandidateCode(String code) {
-    String id = cdfCandidateCodeToCandidateId.get(code);
-    if (id == null) {
-      id = String.format("c-%s", sanitizeStringForOutput(code).toLowerCase());
-      cdfCandidateCodeToCandidateId.put(code, id);
-    }
-    return id;
+    return cdfCandidateCodeToCandidateId.computeIfAbsent(code,
+        c -> String.format("c-%s", sanitizeStringForOutput(c).toLowerCase()));
   }
 
   // Instead of a map from rank to list of candidates, we need a sorted list of candidates
   // with the ranks they were given. (Ordinarily a candidate will have only a single rank, but they
   // could have multiple ranks if the ballot duplicates the candidate, i.e. assigns them multiple
-  // ranks.
+  // ranks.)
   // We sort by the lowest (best) rank, then alphabetically by name.
   private static List<Map.Entry<String, List<Integer>>> getCandidatesWithRanksList(
       Map<Integer, Set<String>> rankToCandidateIds) {
     Map<String, List<Integer>> candidateIdToRanks = new HashMap<>();
     // first group the ranks by candidate
-    for (int rank : rankToCandidateIds.keySet()) {
-      for (String candidateId : rankToCandidateIds.get(rank)) {
+    for (var entry : rankToCandidateIds.entrySet()) {
+      for (String candidateId : entry.getValue()) {
         candidateIdToRanks.computeIfAbsent(candidateId, k -> new LinkedList<>());
-        candidateIdToRanks.get(candidateId).add(rank);
+        candidateIdToRanks.get(candidateId).add(entry.getKey());
       }
     }
     // we want the ranks for a given candidate in ascending order
@@ -238,13 +230,12 @@ class ResultsWriter {
   }
 
   ResultsWriter setCandidatesToRoundEliminated(Map<String, Integer> candidatesToRoundEliminated) {
-    // roundToEliminatedCandidates is the inverse of candidatesToRoundEliminated map
+    // roundToEliminatedCandidates is the inverse of candidatesToRoundEliminated map,
     // so we can look up who got eliminated for each round
     roundToEliminatedCandidates = new HashMap<>();
-    for (String candidate : candidatesToRoundEliminated.keySet()) {
-      int round = candidatesToRoundEliminated.get(candidate);
-      roundToEliminatedCandidates.computeIfAbsent(round, k -> new LinkedList<>());
-      roundToEliminatedCandidates.get(round).add(candidate);
+    for (var entry : candidatesToRoundEliminated.entrySet()) {
+      roundToEliminatedCandidates.computeIfAbsent(entry.getValue(), k -> new LinkedList<>());
+      roundToEliminatedCandidates.get(entry.getValue()).add(entry.getKey());
     }
     return this;
   }
@@ -252,10 +243,9 @@ class ResultsWriter {
   ResultsWriter setWinnerToRound(Map<String, Integer> winnerToRound) {
     // very similar to the logic in setCandidatesToRoundEliminated above
     roundToWinningCandidates = new HashMap<>();
-    for (String candidate : winnerToRound.keySet()) {
-      int round = winnerToRound.get(candidate);
-      roundToWinningCandidates.computeIfAbsent(round, k -> new LinkedList<>());
-      roundToWinningCandidates.get(round).add(candidate);
+    for (var entry : winnerToRound.entrySet()) {
+      roundToWinningCandidates.computeIfAbsent(entry.getValue(), k -> new LinkedList<>());
+      roundToWinningCandidates.get(entry.getValue()).add(entry.getKey());
     }
     return this;
   }
@@ -280,18 +270,15 @@ class ResultsWriter {
       Map<String, Integer> numBallotsByPrecinct)
       throws IOException {
     Set<String> filenames = new HashSet<>();
-    for (String precinct : precinctRoundTallies.keySet()) {
+    for (var entry : precinctRoundTallies.entrySet()) {
+      String precinct = entry.getKey();
+      Map<Integer, Map<String, BigDecimal>> roundTallies = entry.getValue();
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
           getOutputFilePathFromInstance(String.format("%s_precinct_summary", precinctFileString));
       int numBallots = numBallotsByPrecinct.get(precinct);
-      generateSummarySpreadsheet(
-          precinctRoundTallies.get(precinct), numBallots, precinct, outputPath);
-      generateSummaryJson(
-          precinctRoundTallies.get(precinct),
-          precinctTallyTransfers.get(precinct),
-          precinct,
-          outputPath);
+      generateSummarySpreadsheet(roundTallies, numBallots, precinct, outputPath);
+      generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct), precinct, outputPath);
     }
   }
 
@@ -463,7 +450,7 @@ class ResultsWriter {
     csvPrinter.println();
   }
 
-  // return a list of all input candidates sorted from highest tally to lowest
+  // return a list of all input candidates sorted from the highest tally to lowest
   private List<String> sortCandidatesByTally(Map<String, BigDecimal> tally) {
     List<Map.Entry<String, BigDecimal>> entries = new ArrayList<>(tally.entrySet());
     entries.sort(
@@ -479,7 +466,7 @@ class ResultsWriter {
           return ret;
         });
     List<String> sortedCandidates = new LinkedList<>();
-    for (Map.Entry<String, BigDecimal> entry : entries) {
+    for (var entry : entries) {
       sortedCandidates.add(entry.getKey());
     }
     return sortedCandidates;
@@ -556,26 +543,7 @@ class ResultsWriter {
           } else {
             csvPrinter.print(castVoteRecord.getPrecinctPortion());
           }
-          // for each rank determine what candidate id, overvote, or undervote occurred
-          for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
-            if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
-              Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);
-              assert !candidateSet.isEmpty();
-              if (candidateSet.size() == 1) {
-                String selection = candidateSet.iterator().next();
-                // We map all undeclared write-ins to our constant string when we read them in,
-                // so we need to translate it back to the original candidate ID here.
-                if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-                  selection = undeclaredWriteInLabel;
-                }
-                csvPrinter.print(selection);
-              } else {
-                csvPrinter.print("overvote");
-              }
-            } else {
-              csvPrinter.print("undervote");
-            }
-          }
+          printRankings(undeclaredWriteInLabel, contest, csvPrinter, castVoteRecord);
           csvPrinter.println();
         }
         // finalize the file
@@ -593,10 +561,34 @@ class ResultsWriter {
     return filesWritten;
   }
 
+  private void printRankings(String undeclaredWriteInLabel, Contest contest, CSVPrinter csvPrinter,
+      CastVoteRecord castVoteRecord) throws IOException {
+    // for each rank determine what candidate id, overvote, or undervote occurred and print it
+    for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
+      if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
+        Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);
+        assert !candidateSet.isEmpty();
+        if (candidateSet.size() == 1) {
+          String selection = candidateSet.iterator().next();
+          // We map all undeclared write-ins to our constant string when we read them in,
+          // so we need to translate it back to the original candidate ID here.
+          if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
+            selection = undeclaredWriteInLabel;
+          }
+          csvPrinter.print(selection);
+        } else {
+          csvPrinter.print("overvote");
+        }
+      } else {
+        csvPrinter.print("undervote");
+      }
+    }
+  }
+
   // create NIST Common Data Format CVR json
   void generateCdfJson(List<CastVoteRecord> castVoteRecords)
       throws IOException, RoundSnapshotDataMissingException {
-    // generate GpUnitIds for precincts "geo-political units" (can be a precinct or jurisdiction)
+    // generate GpUnitIds for precincts "geopolitical units" (can be a precinct or jurisdiction)
     gpUnitIds = generateGpUnitIds();
 
     String outputPath = getOutputFilePathFromInstance("cvr_cdf") + ".json";
@@ -876,8 +868,8 @@ class ResultsWriter {
 
   private Map<String, BigDecimal> updateCandidateNamesInTally(Map<String, BigDecimal> tally) {
     Map<String, BigDecimal> newTally = new HashMap<>();
-    for (String key : tally.keySet()) {
-      newTally.put(config.getNameForCandidateCode(key), tally.get(key));
+    for (var entry : tally.entrySet()) {
+      newTally.put(config.getNameForCandidateCode(entry.getKey()), entry.getValue());
     }
     return newTally;
   }
@@ -913,12 +905,12 @@ class ResultsWriter {
           if (transfersFromCandidate != null) {
             // We want to replace candidate IDs with names here, too.
             Map<String, BigDecimal> translatedTransfers = new HashMap<>();
-            for (String candidateId : transfersFromCandidate.keySet()) {
+            for (var entry : transfersFromCandidate.entrySet()) {
               // candidateName will be null for special values like "exhausted"
-              String candidateName = config.getNameForCandidateCode(candidateId);
+              String candidateName = config.getNameForCandidateCode(entry.getKey());
               translatedTransfers.put(
-                  candidateName != null ? candidateName : candidateId,
-                  transfersFromCandidate.get(candidateId));
+                  candidateName != null ? candidateName : entry.getKey(),
+                  entry.getValue());
             }
             action.put("transfers", translatedTransfers);
           }

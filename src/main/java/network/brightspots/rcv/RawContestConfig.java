@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -27,6 +27,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
+/**
+ * Contest configuration that can be serialized and deserialized.
+ */
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
@@ -40,7 +43,9 @@ public class RawContestConfig {
   RawContestConfig() {
   }
 
-  // OutputSettings: encapsulates the output settings
+  /**
+   * Output settings that can be serialized and deserialized.
+   */
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class OutputSettings {
@@ -54,8 +59,11 @@ public class RawContestConfig {
     public boolean generateCdfJson;
   }
 
-  // CvrSource: encapsulates a source cast vote record file
-  // all indexes are 1-based
+  /**
+   * Source cast vote record file that can be serialized and deserialized.
+   *
+   * <p>All indexes are 1-based. </p>
+   */
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
@@ -200,7 +208,9 @@ public class RawContestConfig {
     }
   }
 
-  // Candidate encapsulates data for each candidate in a contest
+  /**
+   * Contest candidate data that can be serialized and deserialized.
+   */
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
@@ -243,7 +253,9 @@ public class RawContestConfig {
     }
   }
 
-  // ContestRules: encapsulates the set of rules required to perform contest tabulation
+  /**
+   * Contest rules necessary for tabulation that can be serialized and deserialized.
+   */
   @SuppressWarnings({"unused", "RedundantSuppression"})
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)

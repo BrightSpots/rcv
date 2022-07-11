@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("SameParameterValue")
 class JsonParser {
@@ -38,25 +39,28 @@ class JsonParser {
   // returns: instance of the object parsed from json or null if there was a problem
   private static <T> T readFromFile(String jsonFilePath, Class<T> valueType, boolean logsEnabled) {
     T createdObject;
-    try {
-      FileReader fileReader = new FileReader(jsonFilePath);
+    try (FileReader fileReader = new FileReader(jsonFilePath, StandardCharsets.UTF_8)) {
       ObjectMapper objectMapper = new ObjectMapper();
       createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException exception) {
       if (logsEnabled) {
         Logger.severe(
-            "Error parsing JSON file: %s\n%s\n"
-                + "Check file formatting and values and make sure they are correct!\n"
-                + "It might help to try surrounding values causing problems with quotes (e.g. "
-                + " \"value\").\nSee config_file_documentation.txt for more details.",
+            """
+                Error parsing JSON file: %s
+                %s
+                Check file formatting and values and make sure they are correct!
+                It might help to try surrounding values causing problems with quotes (e.g. "value").
+                See config_file_documentation.txt for more details.""",
             jsonFilePath, exception);
       }
       createdObject = null;
     } catch (IOException exception) {
       if (logsEnabled) {
         Logger.severe(
-            "Error opening file: %s\n%s\n"
-                + "Check file path and permissions and make sure they are correct!",
+            """
+                Error opening file: %s
+                %s
+                Check file path and permissions and make sure they are correct!""",
             jsonFilePath, exception);
       }
       createdObject = null;

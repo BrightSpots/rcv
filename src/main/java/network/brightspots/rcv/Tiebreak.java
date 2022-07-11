@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -166,7 +167,7 @@ class Tiebreak {
     String selection = null;
 
     while (selection == null) {
-      Scanner sc = new Scanner(System.in);
+      Scanner sc = new Scanner(System.in, StandardCharsets.UTF_8);
       String userInput = sc.nextLine();
       if (userInput.equals(CLI_CANCEL_COMMAND)) {
         System.out.println("Cancelling tabulation...");

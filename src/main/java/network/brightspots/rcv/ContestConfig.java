@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -120,25 +120,25 @@ class ContestConfig {
   // create rawContestConfig from file - can fail for IO issues or invalid json
   // returns: new ContestConfig object if checks pass otherwise null
   static ContestConfig loadContestConfig(String configPath, boolean silentMode) {
+    ContestConfig config = null;
     if (configPath == null) {
       Logger.severe("No contest config path specified!");
-      return null;
-    }
-    ContestConfig config = null;
-    RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
-    if (rawConfig == null) {
-      Logger.severe("Failed to load contest config: %s", configPath);
     } else {
-      if (!silentMode) {
-        Logger.info("Successfully loaded contest config: %s", configPath);
+      RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
+      if (rawConfig == null) {
+        Logger.severe("Failed to load contest config: %s", configPath);
+      } else {
+        if (!silentMode) {
+          Logger.info("Successfully loaded contest config: %s", configPath);
+        }
+        // parent folder is used as the default source folder
+        // if there is no parent folder use current working directory
+        String parentFolder = new File(configPath).getParent();
+        if (parentFolder == null) {
+          parentFolder = System.getProperty("user.dir");
+        }
+        config = loadContestConfig(rawConfig, parentFolder);
       }
-      // parent folder is used as the default source folder
-      // if there is no parent folder use current working directory
-      String parentFolder = new File(configPath).getParent();
-      if (parentFolder == null) {
-        parentFolder = System.getProperty("user.dir");
-      }
-      config = loadContestConfig(rawConfig, parentFolder);
     }
     return config;
   }
@@ -954,7 +954,7 @@ class ContestConfig {
   }
 
   int getNumCandidates() {
-    return getCandidateCodeList().size();
+    return getCandidateCodeList().size() - excludedCandidates.size();
   }
 
   boolean candidateIsExcluded(String candidate) {

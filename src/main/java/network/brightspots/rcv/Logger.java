@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -98,14 +98,24 @@ class Logger {
   }
 
   // adds file logging for a tabulation run
-  static void addTabulationFileLogging(String outputPath) throws IOException {
-    // use Level.FINE to capture audit info
-    tabulationHandler =
-        new FileHandler(outputPath, LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
+  static void addTabulationFileLogging(String outputFolder, String timestampString)
+      throws IOException {
+    // log file name is: outputFolder + timestamp + log index
+    // FileHandler requires % to be encoded as %%.  %g is the log index
+    String tabulationLogPattern =
+            Paths.get(outputFolder.replace("%", "%%"),
+                    String.format("%s_audit_%%g.log", timestampString))
+                    .toAbsolutePath()
+                    .toString();
+
+    tabulationHandler = new FileHandler(tabulationLogPattern,
+            LOG_FILE_MAX_SIZE_BYTES,
+            TABULATION_LOG_FILE_COUNT,
+            true);
     tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
     logger.addHandler(tabulationHandler);
-    info("Tabulation logging to: %s", outputPath.replace("%g", "*"));
+    info("Tabulation logging to: %s", tabulationLogPattern.replace("%g", "0"));
   }
 
   // remove file logging once a tabulation run is completed
@@ -116,19 +126,24 @@ class Logger {
   }
 
   static void fine(String message, Object... obj) {
-    logger.log(Level.FINE, String.format(message, obj));
+    log(Level.FINE, message, obj);
   }
 
   static void info(String message, Object... obj) {
-    logger.log(Level.INFO, String.format(message, obj));
+    log(Level.INFO, message, obj);
   }
 
   static void warning(String message, Object... obj) {
-    logger.log(Level.WARNING, String.format(message, obj));
+    log(Level.WARNING, message, obj);
   }
 
   static void severe(String message, Object... obj) {
-    logger.log(Level.SEVERE, String.format(message, obj));
+    log(Level.SEVERE, message, obj);
+  }
+
+  private static void log(Level level, String message, Object... obj) {
+    // only call format if there are format args provided
+    logger.log(level, obj.length > 0 ? String.format(message, obj) : message);
   }
 
   // add logging to the provided text area for display to user in the GUI
@@ -137,16 +152,15 @@ class Logger {
         new Handler() {
           @Override
           public void publish(LogRecord record) {
-            if (!isLoggable(record)) {
-              return;
-            }
-            String msg = getFormatter().format(record);
-            // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
-            // otherwise schedule the text update to run on the GUI thread
-            if (Platform.isFxApplicationThread()) {
-              textArea.appendText(msg);
-            } else {
-              Platform.runLater(() -> textArea.appendText(msg));
+            if (isLoggable(record)) {
+              String msg = getFormatter().format(record);
+              // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
+              // otherwise schedule the text update to run on the GUI thread
+              if (Platform.isFxApplicationThread()) {
+                textArea.appendText(msg);
+              } else {
+                Platform.runLater(() -> textArea.appendText(msg));
+              }
             }
           }
 

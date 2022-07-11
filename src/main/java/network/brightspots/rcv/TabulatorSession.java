@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -32,6 +32,7 @@ package network.brightspots.rcv;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -142,14 +143,14 @@ class TabulatorSession {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
-    //noinspection ConstantConditions
-    if (config != null && config.validate() && setUpLogging(config)) {
+    if (config.validate() && setUpLogging(config)) {
       Logger.info("Computer name: %s", Utils.getComputerName());
       Logger.info("User name: %s", Utils.getUserName());
       Logger.info("Config file: %s", configPath);
       try {
         Logger.fine("Begin config file contents:");
-        BufferedReader reader = new BufferedReader(new FileReader(configPath));
+        BufferedReader reader = new BufferedReader(
+            new FileReader(configPath, StandardCharsets.UTF_8));
         String line = reader.readLine();
         while (line != null) {
           Logger.fine(line);
@@ -164,7 +165,7 @@ class TabulatorSession {
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         Logger.info("This is a multi-pass IRV contest.");
         int numWinners = config.getNumberOfWinners();
-        // temporarily set config to single-seat so we can run sequential elections
+        // temporarily set config to single-seat so that we can run sequential elections
         config.setNumberOfWinners(1);
         while (config.getSequentialWinners().size() < numWinners) {
           Logger.info(
@@ -222,18 +223,11 @@ class TabulatorSession {
 
   private boolean setUpLogging(ContestConfig config) {
     boolean success = false;
-
-    // %g format is for log file naming
-    String tabulationLogPath =
-        Paths.get(config.getOutputDirectory(), String.format("%s_audit_%%g.log", timestampString))
-            .toAbsolutePath()
-            .toString();
-
     // cache outputPath for testing
     outputPath = config.getOutputDirectory();
     try {
       FileUtils.createOutputDirectory(config.getOutputDirectory());
-      Logger.addTabulationFileLogging(tabulationLogPath);
+      Logger.addTabulationFileLogging(config.getOutputDirectory(), timestampString);
       success = true;
     } catch (UnableToCreateDirectoryException | IOException exception) {
       Logger.severe("Failed to configure tabulation logger!\n%s", exception);
@@ -324,7 +318,7 @@ class TabulatorSession {
               "Unrecognized candidate \"%s\" appears %d time(s)!",
               candidate, exception.candidateCounts.get(candidate));
         }
-        // various incorrect settings can lead to UnrecognizedCandidatesException so it's hard
+        // various incorrect settings can lead to UnrecognizedCandidatesException, so it's hard
         // to know exactly what the problem is
         Logger.info(
             "Check config settings for candidate names, firstVoteRowIndex, "

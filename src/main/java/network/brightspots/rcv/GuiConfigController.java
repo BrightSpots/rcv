@@ -1,5 +1,5 @@
 /*
- * Universal RCV Tabulator
+ * RCTab
  * Copyright (c) 2017-2020 Bright Spots Developers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -72,6 +73,9 @@ import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
+/**
+ * View controller for config layout.
+ */
 @SuppressWarnings({"WeakerAccess"})
 public class GuiConfigController implements Initializable {
 
@@ -268,14 +272,10 @@ public class GuiConfigController implements Initializable {
 
   private static String loadTxtFileIntoString(String configFileDocumentationFilename) {
     String text;
-    try {
-      text =
-          new BufferedReader(
-              new InputStreamReader(
-                  Objects.requireNonNull(
-                      ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename))))
-              .lines()
-              .collect(Collectors.joining("\n"));
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(
+        ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename)),
+        StandardCharsets.UTF_8))) {
+      text = reader.lines().collect(Collectors.joining("\n"));
     } catch (Exception exception) {
       Logger.severe(
           "Error loading text file: %s\n%s",
@@ -845,7 +845,7 @@ public class GuiConfigController implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
     Logger.info("Opening tabulator GUI...");
-    Logger.info("Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
+    Logger.info("Welcome to %s version %s!", Main.APP_NAME, Main.APP_VERSION);
 
     GuiContext.getInstance()
         .getMainWindow()
@@ -996,9 +996,8 @@ public class GuiConfigController implements Initializable {
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
-        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS,
-            MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> textFieldNumberOfWinners
-            .setDisable(false);
+        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS, MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL ->
+            textFieldNumberOfWinners.setDisable(false);
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldNumberOfWinners.setText("0");
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
