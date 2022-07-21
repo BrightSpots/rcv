@@ -279,6 +279,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("multi-cvr file dominion test")
+  void multiFileDominionTest() {
+    runTabulationTest("dominion_multi_file");
+  }
+
+  @Test
   @DisplayName("test invalid params in config file")
   void invalidParamsTest() {
     String configPath = getTestFilePath("invalid_params_test", "_config.json");
