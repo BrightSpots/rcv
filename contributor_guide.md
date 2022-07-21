@@ -21,9 +21,9 @@ The Ranked Choice Voting Resource Center, a nonpartisan 501(c)(3), and the Brigh
 - We use [Google Java Style](https://google.github.io/styleguide/javaguide.html).  Intellij has a [plugin](https://checkstyle.sourceforge.io/google_style.html) for it which we recommend.
 - [Fork our repo](https://docs.github.com/en/get-started/quickstart/contributing-to-projects) and use GitHub flow.  Remember to initialize submodules.
 - All commit messages should hash-reference the issue number in the text e.g. "Don't log config file contents #520"
-5. Run the regression tests locally using Gradle to ensure your changes do not break existing code. 
+5. Run the Gradle "check" target, which runs code / style checks, and the regression tests.  This ensures your changes do not break existing code. 
 6. Create a pull request and make changes suggested by the reviewers.  If the suggested changes significantly expand the scope of an issue, consider breaking them out into a new issue.
-7. Merge your pull request and celebrate!  It's a lot of work and we really appreciate it.
+7. Merge your pull request and celebrate!  It's a lot of work and we really appreciate your contribution.
 
 If you have any questions or feedback please reach out to Rene Rojas by email at rene.rojas@rcvresources.org.  
  
