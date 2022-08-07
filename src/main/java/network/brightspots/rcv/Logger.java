@@ -8,10 +8,9 @@
  */
 
 /*
- * Purpose:
- * Wrapper for console and file logging functions. All logging messages including execution,
+ * Purpose: Wrapper for logging functions. All logging messages including execution,
  * tabulation, and audit information go through this.
- *
+ * Design:
  * log message
  *  |
  *  v
@@ -26,8 +25,10 @@
  *  displays INFO level logging in GUI for user feedback in GUI mode
  *
  * default handler -> console
- *  displays INFO level logging in console for debugging
- *
+ *  displays INFO level logging in console for debugging.
+ * Conditions: always
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
  */
 
 package network.brightspots.rcv;

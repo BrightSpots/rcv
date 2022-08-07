@@ -8,11 +8,12 @@
  */
 
 /*
- * Purpose:
- * TallyTransfers is a container class which stores a map for each round showing how many votes were
+ * Purpose: export round-by-round transfer data for analysis and visualization by other applications
+ * Design: container class which stores a map for each round showing how many votes were
  * transferred from each candidate to each candidate.
- * The primary purpose for this is generating Sankey plots that visually show the flow of votes
- * over the course of a tabulation.
+ * Conditions: during tabulation
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
  */
 
 package network.brightspots.rcv;

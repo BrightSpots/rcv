@@ -7,6 +7,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+/*
+ * Purpose: GUI Controller for tiebreak selection during a GUI tabulation.
+ * Design: GuiTiebreakerLayout.fxml
+ * Conditions: in GUI tabulation when a tiebreak occurs
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ */
+
 package network.brightspots.rcv;
 
 import java.util.List;

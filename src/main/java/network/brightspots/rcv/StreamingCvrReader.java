@@ -8,8 +8,12 @@
  */
 
 /*
- * Purpose:
- * Helper class to read and parse an XLS cast vote record file into cast vote record objects.
+ * Purpose: Read and parse ES&S election data into CastVoteRecord objects.
+ * Design: ES&S uses an xlsx (Excel) file to store cvr data.  This class uses Apache Poi to stream
+ * the xlsx file, which triggers callbacks at the beginning and end of every row, and every cell.
+ * Conditions: used when reading ES&S election data
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
  */
 
 package network.brightspots.rcv;

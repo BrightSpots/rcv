@@ -8,8 +8,12 @@
  */
 
 /*
- * Internal representation of a single cast vote record, including to whom it counts over the course
- *  of a tabulation (can be multiple candidates for a multi-winner election).
+ * Purpose: Internal representation of a single cast vote record, including to whom it counts, over
+ * the course of a tabulation (can be multiple candidates for a multi-winner election).
+ * Design: simple container class for individual cvr data and associated utils
+ * Conditions: always
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
  */
 
 package network.brightspots.rcv;

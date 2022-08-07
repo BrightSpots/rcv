@@ -8,16 +8,17 @@
  */
 
 /*
- * Purpose:
- * TabulatorSession contains the high-level flow for tabulation execution:
+ * Purpose: high-level flow for tabulation execution
  * parse config file
  * parse cast vote records
  * tabulate contest
  * output results
- *
- * TabulatorSession also stores state metadata which exists outside tabulation results including:
+ * Design:TabulatorSession also stores state metadata which exists outside tabulation results:
  * config object, resolved output, and logging paths, tabulation object, and CVR data including
  * precinct codes discovered while parsing CVR files.
+ * Conditions: during tabulation, validation, and conversion
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
  */
 
 package network.brightspots.rcv;

@@ -8,10 +8,13 @@
  */
 
 /*
- * Purpose:
- * These regression tests run various tabulations and compare the generated results to
- * expected results. Passing these tests ensures that changes to tabulation code have not
- * altered the results of the tabulation.
+ * Purpose: These regression tests run various tabulations and compare the generated results to
+ * expected results.
+ * Design:  Passing these tests ensures that changes to code have not altered the results of the
+ * tabulation.
+ * Conditions: during testing
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
  */
 
 package network.brightspots.rcv;
@@ -131,11 +134,11 @@ class TabulatorTests {
     if (files != null) {
       for (File file : files) {
         if (!file.isDirectory()) {
-          try {
-            Files.delete(file.toPath());
-          } catch (IOException exception) {
-            Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
-          }
+//          try {
+//            Files.delete(file.toPath());
+//          } catch (IOException exception) {
+//            Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
+//          }
         }
       }
     }

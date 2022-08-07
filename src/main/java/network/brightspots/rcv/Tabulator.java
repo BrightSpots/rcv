@@ -8,10 +8,16 @@
  */
 
 /*
- * Purpose:
- * Perform ranked choice tabulation calculations. Round-by-round tabulation of votes to
- * each candidate. Handles overvote / undervote decisions batch elimination and tiebreaks. Results
- * are logged to console and audit file.
+ * Purpose: core contest tabulation logic including:
+ * Rank choice flows and vote reallocation
+ * winner selection, loser selection, and tiebreak rules
+ * overvote / undervote rules
+ * Design: On each loop a round is tallied and tabulated according to selected rules
+ * Inputs: CastVoteRecords for the desired contest and ContestConfig with rules configuration
+ * Results are logged to console and audit file.
+ * Conditions: during tabulation
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
  */
 
 package network.brightspots.rcv;

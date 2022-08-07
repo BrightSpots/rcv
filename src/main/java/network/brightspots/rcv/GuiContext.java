@@ -7,6 +7,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+/*
+ * Purpose: Container for GUIApplication shared data.
+ * Design: GuiConfigController uses this to store and share application data with event handlers.
+ * Conditions: Runs in GUI mode.
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ */
+
 package network.brightspots.rcv;
 
 import javafx.stage.Stage;

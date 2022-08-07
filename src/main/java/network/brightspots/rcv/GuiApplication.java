@@ -7,6 +7,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+/*
+ * Purpose: Main entry point for JavaFX GUI application startup.  Loads layout resources.
+ * Design: This class uses JavaFX and implements the Application start method.
+ * Conditions: used whenever using the GUI application mode
+ * Version history: version 1.0
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ */
+
 package network.brightspots.rcv;
 
 import java.io.IOException;
