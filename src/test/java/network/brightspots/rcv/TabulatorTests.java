@@ -134,11 +134,11 @@ class TabulatorTests {
     if (files != null) {
       for (File file : files) {
         if (!file.isDirectory()) {
-//          try {
-//            Files.delete(file.toPath());
-//          } catch (IOException exception) {
-//            Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
-//          }
+          try {
+            Files.delete(file.toPath());
+          } catch (IOException exception) {
+            Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
+          }
         }
       }
     }
