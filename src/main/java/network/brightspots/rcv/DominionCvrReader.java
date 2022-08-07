@@ -38,11 +38,11 @@ class DominionCvrReader {
   private final String undeclaredWriteInLabel;
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
-  // map of precinct Id to precinct description
+  // map of precinct ID to precinct description
   private Map<Integer, String> precincts;
-  // map of precinct portion Id to precinct portion description
+  // map of precinct portion ID to precinct portion description
   private Map<Integer, String> precinctPortions;
-  // map of contest Id to Contest data
+  // map of contest ID to Contest data
   private Map<String, Contest> contests;
   private List<Candidate> candidates;
 
@@ -75,7 +75,7 @@ class DominionCvrReader {
     return contests;
   }
 
-  // returns map from Id to Description parsed from input file
+  // returns map from ID to Description parsed from input file
   // PrecinctManifest.json and PrecinctPortionManifest.json use this structure
   private static Map<Integer, String> getPrecinctData(String precinctPath) {
     Map<Integer, String> precinctsById = new HashMap<>();
@@ -190,16 +190,16 @@ class DominionCvrReader {
         parseCvrFile(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
       } else if (firstCvrPath.toFile().exists()) {
         int recordsParsed = 0;
-        int recordsParsedAtLastlog = 0;
+        int recordsParsedAtLastLog = 0;
         int cvrSequence = 1;
         Path cvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         while (cvrPath.toFile().exists()) {
           HashMap json = JsonParser.readFromFile(cvrPath.toString(), HashMap.class);
           recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad,
               contestIdToCandidateCodes);
-          if (recordsParsed - recordsParsedAtLastlog > 50000) {
+          if (recordsParsed - recordsParsedAtLastLog > 50000) {
             Logger.info("Parsed %d records from %d files", recordsParsed, cvrSequence);
-            recordsParsedAtLastlog = recordsParsed;
+            recordsParsedAtLastLog = recordsParsed;
           }
           cvrSequence++;
           cvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, cvrSequence));
@@ -207,7 +207,7 @@ class DominionCvrReader {
       } else {
         throw new FileNotFoundException(String.format(
             "Error parsing cast vote record: neither %s nor %s exists",
-          singleCvrPath.toString(), firstCvrPath.toString()));
+            singleCvrPath, firstCvrPath));
       }
     } catch (FileNotFoundException | CvrParseException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
@@ -267,11 +267,11 @@ class DominionCvrReader {
       ArrayList cardsList;
       // sometimes there is a "Cards" object at this level
       if (adjudicatedData.containsKey("Cards")) {
-        cardsList = (ArrayList<Object>) adjudicatedData.get("Cards");
+        cardsList = (ArrayList) adjudicatedData.get("Cards");
       } else {
-        ArrayList<HashMap> oneCardList = new ArrayList<HashMap>(1);
+        ArrayList<HashMap> oneCardList = new ArrayList<>(1);
         oneCardList.add(adjudicatedData);
-        cardsList = (ArrayList) oneCardList;
+        cardsList = oneCardList;
       }
 
       for (Object cardObject : cardsList) {
