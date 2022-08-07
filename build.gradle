@@ -42,6 +42,8 @@ checkstyle {
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.3.2/src/main/resources/google_checks.xml
+    // NOTE: It may also be necessary to change "${org.checkstyle.google.suppressionfilter.config}"
+    // to "${config_loc}/checkstyle-suppressions.xml" or else the suppressions might be ignored
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
     maxWarnings = 0
     ignoreFailures = false
