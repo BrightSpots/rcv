@@ -211,6 +211,13 @@ class Tabulator {
         // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
         if (eliminated.isEmpty()) {
           eliminated = dropCandidatesBelowThreshold(currentRoundTallyToCandidates);
+          // One edge case: if everyone is below the threshold, we can't proceed. This would only
+          // happen in the first or (if we drop undeclared write-ins first) second round.
+          if (eliminated.size() == config.getNumDeclaredCandidates()) {
+            Logger.severe("Tabulation can't proceed because all declared candidates are below "
+                + "the minimum vote threshold.");
+            throw new TabulationCancelledException(false);
+          }
         }
         // 3. Otherwise, try batch elimination.
         if (eliminated.isEmpty()) {
@@ -393,7 +400,7 @@ class Tabulator {
   // selected and if continueUntilTwoCandidatesRemain is true.
   private boolean shouldContinueTabulating() {
     boolean keepTabulating;
-    int numEliminatedCandidates = candidateToRoundEliminated.keySet().size();
+    int numEliminatedCandidates = candidateToRoundEliminated.size();
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
     if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
@@ -1194,5 +1201,21 @@ class Tabulator {
 
   static class TabulationCancelledException extends Exception {
 
+    final boolean cancelledByUser;
+
+    TabulationCancelledException() {
+      this.cancelledByUser = true;
+    }
+
+    TabulationCancelledException(boolean cancelledByUser) {
+      this.cancelledByUser = cancelledByUser;
+    }
+
+    @Override
+    public String getMessage() {
+      return cancelledByUser
+          ? "Tabulation was cancelled by the user!"
+          : "Tabulation was cancelled due to a problem with the input data or config.";
+    }
   }
 }
