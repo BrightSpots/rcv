@@ -1203,10 +1203,6 @@ class Tabulator {
 
     final boolean cancelledByUser;
 
-    TabulationCancelledException() {
-      this.cancelledByUser = true;
-    }
-
     TabulationCancelledException(boolean cancelledByUser) {
       this.cancelledByUser = cancelledByUser;
     }

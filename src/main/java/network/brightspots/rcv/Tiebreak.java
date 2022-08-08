@@ -166,7 +166,7 @@ class Tiebreak {
       String userInput = sc.nextLine();
       if (userInput.equals(CLI_CANCEL_COMMAND)) {
         System.out.println("Cancelling tabulation...");
-        throw new TabulationCancelledException();
+        throw new TabulationCancelledException(true);
       }
       try {
         int choice = Integer.parseInt(userInput);
@@ -207,7 +207,7 @@ class Tiebreak {
         Platform.runLater(futureTask);
         GuiTiebreakerPromptResponse guiTiebreakerPromptResponse = futureTask.get();
         if (guiTiebreakerPromptResponse.tabulationCancelled) {
-          throw new TabulationCancelledException();
+          throw new TabulationCancelledException(true);
         } else {
           selection = guiTiebreakerPromptResponse.selectedCandidate;
         }
