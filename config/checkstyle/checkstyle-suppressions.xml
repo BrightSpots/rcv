@@ -5,7 +5,7 @@
   "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-  <!--  If we don't name our fields in ways the violate the below checks, the code doesn't function -->
+  <!--  If we don't name our fields in ways that violate the below checks, the code doesn't function -->
   <suppress checks="MemberName" files="CommonDataFormatReader.java|HartCvrReader.java"/>
   <suppress checks="AbbreviationAsWordInNameCheck" files="CommonDataFormatReader.java"
     message="CVR"/>

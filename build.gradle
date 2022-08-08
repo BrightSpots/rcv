@@ -1,10 +1,11 @@
 plugins {
     id "application"
     id "checkstyle"
-    id "com.github.spotbugs" version "5.0.6"
+    // Latest version at: https://github.com/spotbugs/spotbugs-gradle-plugin/tags
+    id "com.github.spotbugs" version "5.0.9"
     id "idea"
     id "java-library"
-    id "org.beryx.jlink" version "2.20.0"
+    id "org.beryx.jlink" version "2.25.0"
     id "org.openjfx.javafxplugin" version "0.0.11"
 }
 
@@ -15,12 +16,12 @@ repositories {
 dependencies {
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'org.apache.poi:poi-ooxml:5.2.2'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.2'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 }
 
 // ### Application plugin settings
@@ -36,10 +37,13 @@ application {
 
 // ### Checkstyle plugin settings
 checkstyle {
-    toolVersion = '10.2'
+    // Latest version at https://github.com/checkstyle/checkstyle/tags
+    toolVersion = '10.3.2'
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
-    // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.2/src/main/resources/google_checks.xml
+    // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.3.2/src/main/resources/google_checks.xml
+    // NOTE: It may also be necessary to change "${org.checkstyle.google.suppressionfilter.config}"
+    // to "${config_loc}/checkstyle-suppressions.xml" or else the suppressions might be ignored
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
     maxWarnings = 0
     ignoreFailures = false
@@ -48,7 +52,8 @@ System.setProperty("org.checkstyle.google.suppressionfilter.config",
         "$projectDir/config/checkstyle/checkstyle-suppressions.xml")
 
 spotbugs {
-    toolVersion = '4.6.0'
+    // Latest version at: https://github.com/spotbugs/spotbugs/tags
+    toolVersion = '4.7.1'
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
 
@@ -80,7 +85,7 @@ test {
 
 // ### JavaFX plugin settings
 javafx {
-    version = "17"
+    version = "18"
     modules = ["javafx.base", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
