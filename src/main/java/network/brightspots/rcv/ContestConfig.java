@@ -549,7 +549,7 @@ class ContestConfig {
           Logger.severe(
               "When overvoteLabel is supplied, overvoteRule must be either \"%s\" or \"%s\"!",
               Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT,
-              Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
+              Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
         }
 
         if (isCdf(source)) {
