@@ -113,7 +113,7 @@ class Tabulator {
 
   // run the main tabulation routine to determine contest results
   // returns: set containing winner(s)
-  Set<String> tabulate() throws TabulationCancelledException {
+  Set<String> tabulate() throws TabulationAbortedException {
     if (config.needsRandomSeed()) {
       Random random = new Random(config.getRandomSeed());
       if (config.getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION) {
@@ -216,7 +216,7 @@ class Tabulator {
           if (eliminated.size() == config.getNumDeclaredCandidates()) {
             Logger.severe("Tabulation can't proceed because all declared candidates are below "
                 + "the minimum vote threshold.");
-            throw new TabulationCancelledException(false);
+            throw new TabulationAbortedException(false);
           }
         }
         // 3. Otherwise, try batch elimination.
@@ -454,7 +454,7 @@ class Tabulator {
   private List<String> identifyWinners(
       Map<String, BigDecimal> currentRoundCandidateToTally,
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
-      throws TabulationCancelledException {
+      throws TabulationAbortedException {
     List<String> selectedWinners = new LinkedList<>();
 
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
@@ -616,7 +616,7 @@ class Tabulator {
   // returns: eliminated candidates
   private List<String> doRegularElimination(
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
-      throws TabulationCancelledException {
+      throws TabulationAbortedException {
     List<String> eliminated = new LinkedList<>();
     String eliminatedCandidate;
     // lowest tally in this round
@@ -1199,11 +1199,11 @@ class Tabulator {
     }
   }
 
-  static class TabulationCancelledException extends Exception {
+  static class TabulationAbortedException extends Exception {
 
     final boolean cancelledByUser;
 
-    TabulationCancelledException(boolean cancelledByUser) {
+    TabulationAbortedException(boolean cancelledByUser) {
       this.cancelledByUser = cancelledByUser;
     }
 

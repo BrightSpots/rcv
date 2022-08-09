@@ -40,7 +40,7 @@ import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
-import network.brightspots.rcv.Tabulator.TabulationCancelledException;
+import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 import org.apache.poi.ooxml.POIXMLException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
@@ -244,7 +244,7 @@ class TabulatorSession {
   // returns: set of winners from tabulation
   private Set<String> runTabulationForConfig(
       ContestConfig config, List<CastVoteRecord> castVoteRecords)
-      throws TabulationCancelledException {
+      throws TabulationAbortedException {
     Set<String> winners;
     Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIds);
     winners = tabulator.tabulate();

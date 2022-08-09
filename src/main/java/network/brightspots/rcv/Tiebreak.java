@@ -40,7 +40,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import network.brightspots.rcv.Tabulator.TabulationCancelledException;
+import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 
 class Tiebreak {
@@ -108,7 +108,7 @@ class Tiebreak {
   }
 
   // execute the tiebreak logic given the tiebreak rule in use
-  String selectCandidate() throws TabulationCancelledException {
+  String selectCandidate() throws TabulationAbortedException {
     switch (tiebreakMode) {
       case INTERACTIVE -> selectedCandidate = doInteractive(allTiedCandidates);
       case RANDOM -> selectedCandidate = doRandom(allTiedCandidates);
@@ -144,7 +144,7 @@ class Tiebreak {
   }
 
   // interactively select the winner/loser of this tiebreak via the command-line interface
-  private String doInteractiveCli(List<String> tiedCandidates) throws TabulationCancelledException {
+  private String doInteractiveCli(List<String> tiedCandidates) throws TabulationAbortedException {
     System.out.printf(
         "Tie in round %d for the following candidates, each of whom has %d vote(s): %n",
         round, numVotes.intValue());
@@ -166,7 +166,7 @@ class Tiebreak {
       String userInput = sc.nextLine();
       if (userInput.equals(CLI_CANCEL_COMMAND)) {
         System.out.println("Cancelling tabulation...");
-        throw new TabulationCancelledException(true);
+        throw new TabulationAbortedException(true);
       }
       try {
         int choice = Integer.parseInt(userInput);
@@ -187,7 +187,7 @@ class Tiebreak {
   }
 
   // interactively select the loser of this tiebreak via the graphical user interface
-  private String doInteractiveGui(List<String> tiedCandidates) throws TabulationCancelledException {
+  private String doInteractiveGui(List<String> tiedCandidates) throws TabulationAbortedException {
     Logger.info(
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
         round,
@@ -207,7 +207,7 @@ class Tiebreak {
         Platform.runLater(futureTask);
         GuiTiebreakerPromptResponse guiTiebreakerPromptResponse = futureTask.get();
         if (guiTiebreakerPromptResponse.tabulationCancelled) {
-          throw new TabulationCancelledException(true);
+          throw new TabulationAbortedException(true);
         } else {
           selection = guiTiebreakerPromptResponse.selectedCandidate;
         }
@@ -223,7 +223,7 @@ class Tiebreak {
   }
 
   // interactively select the winner/loser of this tiebreak
-  private String doInteractive(List<String> tiedCandidates) throws TabulationCancelledException {
+  private String doInteractive(List<String> tiedCandidates) throws TabulationAbortedException {
     String selection;
     if (GuiContext.getInstance().getConfig() != null) {
       selection = doInteractiveGui(tiedCandidates);
@@ -244,7 +244,7 @@ class Tiebreak {
 
   // select candidate based on previous round tallies (fall back to "Stop counting and ask" or
   // "Random" tiebreakMode)
-  private String doPreviousRounds(List<String> tiedCandidates) throws TabulationCancelledException {
+  private String doPreviousRounds(List<String> tiedCandidates) throws TabulationAbortedException {
     String selection = null;
     List<String> candidatesInContention = tiedCandidates;
 
