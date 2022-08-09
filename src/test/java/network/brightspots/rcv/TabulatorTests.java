@@ -13,8 +13,7 @@
  * Design: Passing these tests ensures that changes to code have not altered the results of the
  * tabulation.
  * Conditions: During automated testing.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

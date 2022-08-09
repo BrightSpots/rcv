@@ -17,8 +17,7 @@
  * config object, resolved output, and logging paths, tabulation object, and CVR data including
  * precinct codes discovered while parsing CVR files.
  * Conditions: During tabulation, validation, and conversion.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

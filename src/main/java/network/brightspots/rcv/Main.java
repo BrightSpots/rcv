@@ -12,8 +12,7 @@
  * Parse command line, configure logging and launch GUI or create and run a tabulation session.
  * Design: NA.
  * Conditions: Always.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

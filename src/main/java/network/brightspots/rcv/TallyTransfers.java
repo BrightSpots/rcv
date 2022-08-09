@@ -13,8 +13,7 @@
  * Design: Container class which stores a map for each round showing how many votes were
  * transferred from each candidate to each candidate.
  * Conditions: During tabulation.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

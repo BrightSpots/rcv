@@ -16,8 +16,7 @@
  * Inputs: CastVoteRecords for the desired contest and ContestConfig with rules configuration.
  * Results are logged to console and audit file.
  * Conditions: During tabulation.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

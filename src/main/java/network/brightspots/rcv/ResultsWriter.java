@@ -14,8 +14,7 @@
  * JSON summary file(s) with additional data on transfer counts.
  * Also converts CVR sources into CDF format and writes them to disk.
  * Conditions: During tabulation and conversion.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

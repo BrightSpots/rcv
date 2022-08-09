@@ -16,8 +16,7 @@
  * simplifies parsing code a bit, but also means that (for now) larger CDF files will result in
  * larger memory consumption during parsing.
  * Conditions: Used when reading and tabulating CDF election data.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

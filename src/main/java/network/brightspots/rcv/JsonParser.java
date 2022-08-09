@@ -11,8 +11,7 @@
  * Purpose: Wrapper around Jackson JSON package for reading and writing JSON objects to disk.
  * Design: Uses Jackson ObjectMapper class to serialize and deserialize JSON with nifty annotations.
  * Conditions: During config load, save, or validation from the GUI, tabulation, and conversion.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

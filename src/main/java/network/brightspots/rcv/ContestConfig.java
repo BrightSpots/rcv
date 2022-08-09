@@ -13,8 +13,7 @@
  * significant logic for validating Contest Config data in different tabulation scenarios.
  * Design: Wraps a RawContestConfig object (underlying data) and adds utility methods.
  * Conditions: Used during GUI sessions and during any tabulation.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

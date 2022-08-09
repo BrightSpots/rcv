@@ -15,8 +15,7 @@
  * Design: Layout resources are in GuiConfigLayout.xml.  The event handlers here are called in
  * response to GUI events on the GUI render thread.  Longer actions are done on background threads.
  * Conditions: Runs in GUI mode.
- * Version history: Version 1.0.
- * Complete revision history is available at: https://github.com/BrightSpots/rcv.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
