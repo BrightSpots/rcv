@@ -9,11 +9,11 @@
 
 /*
  * Purpose: Read and parse Hart election data for a contest into CastVoteRecord objects.
- * Design: Hart uses an xml file per cvr to store cvr data.  This class uses Jackson
+ * Design: Hart uses an xml file per CVR to store CVR data.  This class uses Jackson
  * XmlMapper to read these files into memory and parse the selections.
- * Conditions: used when reading Hart election data
- * Version history: version 1.0
- * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ * Conditions: Used when reading Hart election data.
+ * Version history: Version 1.0.
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

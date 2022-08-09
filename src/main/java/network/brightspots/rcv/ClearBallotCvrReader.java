@@ -8,12 +8,12 @@
  */
 
 /*
- * Purpose: parses Clear Ballot cvr files into CastVoteRecords
+ * Purpose: Parses Clear Ballot CVR files into CastVoteRecords.
  * Design: Clear Ballot data is stored in .csv files one row per csv.  This class uses a buffered
  * (streaming) file reader which should be able to parse files of any size.
- * Conditions: when using Clear Ballot cvr data
- * Version history: version 1.0
- * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ * Conditions: When reading Clear Ballot CVR data.
+ * Version history: Version 1.0.
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

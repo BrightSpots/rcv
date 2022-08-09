@@ -8,11 +8,11 @@
  */
 
 /*
- * Purpose: Handle tiebreak logic based on given rules configuration
- * Design:  GUI mode uses JavaFX to get the user input if needed.  Cli reads from stdin.
- * Conditions: during tabulation
- * Version history: version 1.0
- * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ * Purpose: Handle tiebreak logic based on given rules configuration.
+ * Design: GUI mode uses JavaFX to get the user input if needed.  CLI reads from stdin.
+ * Conditions: During tabulation.
+ * Version history: Version 1.0.
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

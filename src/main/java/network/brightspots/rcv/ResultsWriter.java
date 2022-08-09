@@ -8,14 +8,14 @@
  */
 
 /*
- * Purpose: Ingests tabulation results and generates various summary report files
- * Design: generates per-precinct files if specified
- * CSV summary file(s) with round by round counts
- * JSON summary file(s) with additional data on transfer counts
- * Also converts CVR sources into CDF format and writes them to disk
- * Conditions: during tabulation and conversion
- * Version history: version 1.0
- * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ * Purpose: Ingests tabulation results and generates various summary report files.
+ * Design: Generates per-precinct files if specified.
+ * CSV summary file(s) with round by round counts.
+ * JSON summary file(s) with additional data on transfer counts.
+ * Also converts CVR sources into CDF format and writes them to disk.
+ * Conditions: During tabulation and conversion.
+ * Version history: Version 1.0.
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

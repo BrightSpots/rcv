@@ -8,12 +8,12 @@
  */
 
 /*
- * Purpose: when loading contest config files into the GUI, this class will migrate older config
+ * Purpose: When loading contest config files into the GUI, this class will migrate older config
  * data to the latest version.
- * Design: static methods which operate on contest config data
- * Conditions: active when using the GUI
- * Version history: version 1.0
- * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ * Design: Static methods which operate on contest config data.
+ * Conditions: When using the GUI.
+ * Version history: Version 1.0.
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

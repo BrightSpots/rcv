@@ -9,14 +9,14 @@
 
 /*
  * Purpose: GUI controller class for the JavaFX GUIApplication:
- * Event handlers for the GUI
- * Logic for loading configs into the GUI, saving, and editing
- * Launches validate, tabulate, and convert tasks
+ * Event handlers for the GUI.
+ * Logic for loading configs into the GUI, saving, and editing.
+ * Launches validate, tabulate, and convert tasks.
  * Design: Layout resources are in GuiConfigLayout.xml.  The event handlers here are called in
  * response to GUI events on the GUI render thread.  Longer actions are done on background threads.
  * Conditions: Runs in GUI mode.
- * Version history: version 1.0
- * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ * Version history: Version 1.0.
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

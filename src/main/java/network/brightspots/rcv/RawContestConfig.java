@@ -8,12 +8,12 @@
  */
 
 /*
- * Purpose: RawContestConfig defines the data model used for a contest configuration. It is used
+ * Purpose: RawContestConfig defines the data model used for a contest configuration.  It is used
  * by JsonParser with Jackson to map JSON configuration files to Java objects and back to disk.
- * Design: simple container classes with Jackson annotations
- * Conditions: During config loading, saving, or validating from the GUI, tabulation, and conversion
- * Version history: version 1.0
- * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ * Design: Simple container classes with Jackson annotations.
+ * Conditions: During config load, save, or validation from the GUI, tabulation, and conversion.
+ * Version history: Version 1.0.
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

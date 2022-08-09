@@ -10,10 +10,10 @@
 /*
  * Purpose: Utilities for file and folder creation.  Implements the notion of a user directory to
  * enable relative paths in config files.
- * Design: mostly just a namespace to organize file-related utilities.
- * Conditions: always
- * Version history: version 1.0
- * Complete revision history is available at: https://github.com/BrightSpots/rcv
+ * Design: Mostly just a namespace to organize file-related utilities.
+ * Conditions: Always.
+ * Version history: Version 1.0.
+ * Complete revision history is available at: https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
