@@ -8,8 +8,11 @@
  */
 
 /*
- * Purpose:
- * Static utils for simple file manipulation.
+ * Purpose: Utilities for file and folder creation.  Implements the notion of a user directory to
+ * enable relative paths in config files.
+ * Design: Mostly just a namespace to organize file-related utilities.
+ * Conditions: Always.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

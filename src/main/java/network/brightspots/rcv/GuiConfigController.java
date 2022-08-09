@@ -7,6 +7,17 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+/*
+ * Purpose: GUI controller class for the JavaFX GUIApplication:
+ * Event handlers for the GUI.
+ * Logic for loading configs into the GUI, saving, and editing.
+ * Launches validate, tabulate, and convert tasks.
+ * Design: Layout resources are in GuiConfigLayout.xml.  The event handlers here are called in
+ * response to GUI events on the GUI render thread.  Longer actions are done on background threads.
+ * Conditions: Runs in GUI mode.
+ * Version history: see https://github.com/BrightSpots/rcv.
+ */
+
 package network.brightspots.rcv;
 
 import static javafx.collections.FXCollections.observableArrayList;

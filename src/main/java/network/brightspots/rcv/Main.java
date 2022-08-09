@@ -8,9 +8,11 @@
  */
 
 /*
- * Purpose:
- * Main entry point for the RCV module.
- * Parse command line and launch GUI or create and run a tabulation session.
+ * Purpose: Main entry point for the RCV module.
+ * Parse command line, configure logging and launch GUI or create and run a tabulation session.
+ * Design: NA.
+ * Conditions: Always.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

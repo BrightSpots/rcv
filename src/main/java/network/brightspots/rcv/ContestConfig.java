@@ -8,9 +8,12 @@
  */
 
 /*
- * Purpose:
- * Wrapper for RawContestConfig object. This class adds logic for looking up rule enum
- * names, candidate names, various configuration utilities, and cast vote record objects.
+ * Purpose: Wrapper for RawContestConfig object.  This class adds logic for looking up rule enum
+ * names, candidate names, tracking sequential winners, various GUI-related utilities, and
+ * significant logic for validating Contest Config data in different tabulation scenarios.
+ * Design: Wraps a RawContestConfig object (underlying data) and adds utility methods.
+ * Conditions: Used during GUI sessions and during any tabulation.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

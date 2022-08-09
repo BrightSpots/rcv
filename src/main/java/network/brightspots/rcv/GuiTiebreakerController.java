@@ -7,6 +7,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+/*
+ * Purpose: GUI Controller for tiebreak selection during a GUI tabulation.
+ * Design: NA.
+ * Conditions: During GUI tabulation when a tiebreak occurs.
+ * Version history: see https://github.com/BrightSpots/rcv.
+ */
+
 package network.brightspots.rcv;
 
 import java.util.List;

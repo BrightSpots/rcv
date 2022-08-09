@@ -8,10 +8,12 @@
  */
 
 /*
- * Purpose:
- * These regression tests run various tabulations and compare the generated results to
- * expected results. Passing these tests ensures that changes to tabulation code have not
- * altered the results of the tabulation.
+ * Purpose: These regression tests run various tabulations and compare the generated results to
+ * expected results.
+ * Design: Passing these tests ensures that changes to code have not altered the results of the
+ * tabulation.
+ * Conditions: During automated testing.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

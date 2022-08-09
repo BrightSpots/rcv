@@ -8,26 +8,26 @@
  */
 
 /*
- * Purpose:
- * Wrapper for console and file logging functions. All logging messages including execution,
+ * Purpose: Wrapper for logging functions.  All logging messages including execution,
  * tabulation, and audit information go through this.
- *
+ * Design:
  * log message
  *  |
  *  v
- * tabulation handler (FINE) -> tabulation "audit" file
- *  when a tabulation is in progress this captures all FINE level logging including audit info
+ * Tabulation handler (FINE) -> tabulation "audit" file
+ *  When a tabulation is in progress this captures all FINE level logging including audit info.
  *
- * execution handler (INFO) -> execution file
- *  captures all INFO level logging for the execution of a session
- *  "session" could span multiple tabulations in GUI mode
+ * Execution handler (INFO) -> execution file
+ *  Captures all INFO level logging for the execution of a session.
+ *  "session" could span multiple tabulations in GUI mode.
  *
  * GUI handler (INFO) -> textArea
- *  displays INFO level logging in GUI for user feedback in GUI mode
+ *  Displays INFO level logging in GUI for user feedback in GUI mode.
  *
- * default handler -> console
- *  displays INFO level logging in console for debugging
- *
+ * Default handler -> console
+ *  Displays INFO level logging in console for debugging.
+ * Conditions: Always.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;

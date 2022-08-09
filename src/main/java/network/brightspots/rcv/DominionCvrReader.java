@@ -7,6 +7,17 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+/*
+ * Purpose: Read and parse Dominion election data for a contest into CastVoteRecord objects and
+ * other election metadata (candidate names, precinct name, etc.).
+ * Design: Dominion uses a set of JSON files to store election data.  This class uses Jackson
+ * ObjectMapper to read these JSON files into memory at once.  This simplifies parsing code, but
+ * does have the limitation that the memory footprint during parsing is proportional to the size of
+ * the CVR JSON file.
+ * Conditions: When reading Dominion election data.
+ * Version history: see https://github.com/BrightSpots/rcv.
+ */
+
 package network.brightspots.rcv;
 
 import java.io.File;

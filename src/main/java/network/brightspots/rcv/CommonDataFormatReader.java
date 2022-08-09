@@ -8,9 +8,15 @@
  */
 
 /*
- * Purpose:
- * Helper class to read and parse a Common Data Format file into cast vote record objects
- * and candidate names.
+ * Purpose: Read and parse a Common Data Format (xml) file into cast vote record objects, and other
+ * contest metadata (notably candidate names).  CDF uses internal ids to map candidate names (i.e.
+ * contest "options") and geographical units to CVR options and precinct names respectively.
+ * Building this mapping happens before records can be parsed.
+ * Design: This class uses Jackson xmlmapper to read each CDF file into memory at once.  This
+ * simplifies parsing code a bit, but also means that (for now) larger CDF files will result in
+ * larger memory consumption during parsing.
+ * Conditions: Used when reading and tabulating CDF election data.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
