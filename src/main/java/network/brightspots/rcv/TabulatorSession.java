@@ -26,7 +26,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -136,7 +135,8 @@ class TabulatorSession {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
-    if (config.validate() && setUpLogging(config)) {
+    boolean isLoggingSetUp = setUpLogging(config);
+    if (config.validate() && isLoggingSetUp) {
       Logger.info("Computer name: %s", Utils.getComputerName());
       Logger.info("User name: %s", Utils.getUserName());
       Logger.info("Config file: %s", configPath);
@@ -210,8 +210,8 @@ class TabulatorSession {
       if (tabulationSuccess) {
         Logger.info("Results written to: %s", outputPath);
       }
-      Logger.removeTabulationFileLogging();
     }
+    Logger.removeTabulationFileLogging();
   }
 
   private boolean setUpLogging(ContestConfig config) {
