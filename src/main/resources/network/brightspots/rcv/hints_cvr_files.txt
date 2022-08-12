@@ -26,6 +26,6 @@ Overvote Label (optional): Some CDF and ES&S CVRs use a particular word/phrase t
 
 Undervote Label (optional): Some ES&S CVRs use a particular word/phrase to indicate an undervote.
 
-Undeclared Write-in Label (optional): Some CVRs use a particular word/phrase to indicate a write-in.
+Undeclared Write-in Label (optional): Some CVRs use a particular word/phrase to indicate an undeclared write-in.
 
 Treat Blank as Undeclared Write-in (optional): When checked, the tabulator will interpret blank cells in this ES&S CVR as votes for undeclared write-ins.
