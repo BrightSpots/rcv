@@ -522,6 +522,7 @@ public class GuiConfigController implements Initializable {
    */
   public void buttonCvrFilePathClicked() {
     List<File> selectedFiles = null;
+    File selectedDirectory = null;
 
     Provider provider = getProviderChoice(choiceCvrProvider);
     switch (provider) {
@@ -543,8 +544,7 @@ public class GuiConfigController implements Initializable {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         dc.setTitle("Select " + provider + " Cast Vote Record Folder");
-        // TODO: Uncomment / figure out what to do about directories
-        // selectedFiles = dc.showDialog(GuiContext.getInstance().getMainWindow());
+        selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
       case ESS -> {
         FileChooser fc = new FileChooser();
@@ -562,6 +562,8 @@ public class GuiConfigController implements Initializable {
     if (selectedFiles != null) {
       textFieldCvrFilePath.setText(selectedFiles.stream().map(File::getAbsolutePath).collect(
           Collectors.joining(CVR_FILE_PATH_DELIMITER)));
+    } else if (selectedDirectory != null) {
+      textFieldCvrFilePath.setText(selectedDirectory.getAbsolutePath());
     }
   }
 
