@@ -105,7 +105,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         value: string of length [1..1000]
 
       "undeclaredWriteInLabel" optional
-        the special label used in the cast vote records to denote a vote for an undeclared write-in
+        the special label used in the cast vote records to denote a vote for an undeclared write-in (i.e. a candidate who has not notified election officials that they're running for election); note that tabulator always eliminates undeclared write-ins first if present
         example: "UWI"
         value: string of length [1..1000]
 
@@ -115,7 +115,7 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
         if not supplied: false
 
   "candidates" required
-    list of registered candidate names and associated candidate code (note: leave empty when CVR is in Common Data Format)
+    list of registered candidate names (including declared write-in candidates) and associated optional fields (note: leave this section empty when CVR is in Common Data Format)
     each "candidates" list item has the following parameters:
 
     "name" required
