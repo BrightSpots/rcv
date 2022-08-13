@@ -42,8 +42,13 @@ checkstyle {
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.3.2/src/main/resources/google_checks.xml
-    // NOTE: It may also be necessary to change "${org.checkstyle.google.suppressionfilter.config}"
-    // to "${config_loc}/checkstyle-suppressions.xml" or else the suppressions might be ignored
+    // NOTE: After updating the local version of config/checkstyle/google_checks.xml again in the
+    // future, it may be necessary to subsequently replace the following line in the local copy to
+    // prevent suppressions from being ignored:
+    // "${org.checkstyle.google.suppressionfilter.config}"
+    // with:
+    // "${config_loc}/checkstyle-suppressions.xml"
+    // Additional context: https://github.com/gradle/gradle/issues/21409
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
     maxWarnings = 0
     ignoreFailures = false

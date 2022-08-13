@@ -26,7 +26,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -136,91 +135,101 @@ class TabulatorSession {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
-    if (config.validate() && setUpLogging(config)) {
-      Logger.info("Computer name: %s", Utils.getComputerName());
-      Logger.info("User name: %s", Utils.getUserName());
-      Logger.info("Config file: %s", configPath);
-      try {
-        Logger.fine("Begin config file contents:");
-        BufferedReader reader = new BufferedReader(
-            new FileReader(configPath, StandardCharsets.UTF_8));
-        String line = reader.readLine();
-        while (line != null) {
-          Logger.fine(line);
-          line = reader.readLine();
-        }
-        Logger.fine("End config file contents.");
-        reader.close();
-      } catch (IOException exception) {
-        Logger.severe("Error logging config file: %s\n%s", configPath, exception);
+
+    boolean isLoggingSetUp = setUpLogging(config.getOutputDirectory());
+    if (!isLoggingSetUp) {
+      Logger.removeTabulationFileLogging();
+      return;
+    }
+
+    boolean isConfigValid = config.validate();
+    if (!isConfigValid) {
+      Logger.removeTabulationFileLogging();
+      return;
+    }
+
+    Logger.info("Computer name: %s", Utils.getComputerName());
+    Logger.info("User name: %s", Utils.getUserName());
+    Logger.info("Config file: %s", configPath);
+    try {
+      Logger.fine("Begin config file contents:");
+      BufferedReader reader = new BufferedReader(
+          new FileReader(configPath, StandardCharsets.UTF_8));
+      String line = reader.readLine();
+      while (line != null) {
+        Logger.fine(line);
+        line = reader.readLine();
       }
-      Logger.info("Tabulating '%s'...", config.getContestName());
-      if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
-        Logger.info("This is a multi-pass IRV contest.");
-        int numWinners = config.getNumberOfWinners();
-        // temporarily set config to single-seat so that we can run sequential elections
-        config.setNumberOfWinners(1);
-        while (config.getSequentialWinners().size() < numWinners) {
-          Logger.info(
-              "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
-          // Read cast vote records and precinct IDs from CVR files
-          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
-          if (castVoteRecords == null) {
-            Logger.severe("Aborting tabulation due to cast vote record errors!");
-            break;
-          }
-          Set<String> newWinnerSet;
-          try {
-            newWinnerSet = runTabulationForConfig(config, castVoteRecords);
-          } catch (TabulationCancelledException exception) {
-            Logger.severe("Tabulation was cancelled by the user!");
-            break;
-          }
-          assert newWinnerSet.size() == 1;
-          String newWinner = (String) newWinnerSet.toArray()[0];
-          config.setCandidateExclusionStatus(newWinner, true);
-          config.addSequentialWinner(newWinner);
-          Logger.info("Tabulation for seat #%d completed.", config.getSequentialWinners().size());
-          if (config.getSequentialWinners().size() < numWinners) {
-            Logger.info("Excluding %s from the remaining tabulations.", newWinner);
-          }
-        }
-        // revert config to original state
-        config.setNumberOfWinners(numWinners);
-        for (String winner : config.getSequentialWinners()) {
-          config.setCandidateExclusionStatus(winner, false);
-        }
-        tabulationSuccess = true;
-      } else {
-        // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
+      Logger.fine("End config file contents.");
+      reader.close();
+    } catch (IOException exception) {
+      Logger.severe("Error logging config file: %s\n%s", configPath, exception);
+    }
+    Logger.info("Tabulating '%s'...", config.getContestName());
+    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
+      Logger.info("This is a multi-pass IRV contest.");
+      int numWinners = config.getNumberOfWinners();
+      // temporarily set config to single-seat so that we can run sequential elections
+      config.setNumberOfWinners(1);
+      while (config.getSequentialWinners().size() < numWinners) {
+        Logger.info(
+            "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
         // Read cast vote records and precinct IDs from CVR files
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
         if (castVoteRecords == null) {
           Logger.severe("Aborting tabulation due to cast vote record errors!");
-        } else {
-          try {
-            runTabulationForConfig(config, castVoteRecords);
-            tabulationSuccess = true;
-          } catch (TabulationCancelledException exception) {
-            Logger.severe("Tabulation was cancelled by the user!");
-          }
+          break;
+        }
+        Set<String> newWinnerSet;
+        try {
+          newWinnerSet = runTabulationForConfig(config, castVoteRecords);
+        } catch (TabulationCancelledException exception) {
+          Logger.severe("Tabulation was cancelled by the user!");
+          break;
+        }
+        assert newWinnerSet.size() == 1;
+        String newWinner = (String) newWinnerSet.toArray()[0];
+        config.setCandidateExclusionStatus(newWinner, true);
+        config.addSequentialWinner(newWinner);
+        Logger.info("Tabulation for seat #%d completed.", config.getSequentialWinners().size());
+        if (config.getSequentialWinners().size() < numWinners) {
+          Logger.info("Excluding %s from the remaining tabulations.", newWinner);
         }
       }
-      Logger.info("Tabulation session completed.");
-      if (tabulationSuccess) {
-        Logger.info("Results written to: %s", outputPath);
+      // revert config to original state
+      config.setNumberOfWinners(numWinners);
+      config.getSequentialWinners()
+          .forEach(winner -> config.setCandidateExclusionStatus(winner, false));
+      tabulationSuccess = true;
+    } else {
+      // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
+      // Read cast vote records and precinct IDs from CVR files
+      List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
+      if (castVoteRecords == null) {
+        Logger.severe("Aborting tabulation due to cast vote record errors!");
+      } else {
+        try {
+          runTabulationForConfig(config, castVoteRecords);
+          tabulationSuccess = true;
+        } catch (TabulationCancelledException exception) {
+          Logger.severe("Tabulation was cancelled by the user!");
+        }
       }
-      Logger.removeTabulationFileLogging();
     }
+    Logger.info("Tabulation session completed.");
+    if (tabulationSuccess) {
+      Logger.info("Results written to: %s", outputPath);
+    }
+    Logger.removeTabulationFileLogging();
   }
 
-  private boolean setUpLogging(ContestConfig config) {
+  private boolean setUpLogging(String outputDirectory) {
     boolean success = false;
     // cache outputPath for testing
-    outputPath = config.getOutputDirectory();
+    outputPath = outputDirectory;
     try {
-      FileUtils.createOutputDirectory(config.getOutputDirectory());
-      Logger.addTabulationFileLogging(config.getOutputDirectory(), timestampString);
+      FileUtils.createOutputDirectory(outputDirectory);
+      Logger.addTabulationFileLogging(outputDirectory, timestampString);
       success = true;
     } catch (UnableToCreateDirectoryException | IOException exception) {
       Logger.severe("Failed to configure tabulation logger!\n%s", exception);
@@ -306,11 +315,9 @@ class TabulatorSession {
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
-        for (String candidate : exception.candidateCounts.keySet()) {
-          Logger.severe(
-              "Unrecognized candidate \"%s\" appears %d time(s)!",
-              candidate, exception.candidateCounts.get(candidate));
-        }
+        exception.candidateCounts.keySet().forEach(candidate -> Logger.severe(
+            "Unrecognized candidate \"%s\" appears %d time(s)!",
+            candidate, exception.candidateCounts.get(candidate)));
         // various incorrect settings can lead to UnrecognizedCandidatesException, so it's hard
         // to know exactly what the problem is
         Logger.info(
