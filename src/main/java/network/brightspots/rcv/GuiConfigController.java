@@ -98,7 +98,8 @@ public class GuiConfigController implements Initializable {
   private static final String HINTS_VOTER_ERROR_RULES_FILENAME =
       "network/brightspots/rcv/hints_voter_error_rules.txt";
   private static final String HINTS_OUTPUT_FILENAME = "network/brightspots/rcv/hints_output.txt";
-  private static final String CVR_FILE_PATH_DELIMITER = ";";
+  // It's possible for file paths to legitimately have consecutive semicolons, but unlikely
+  private static final String CVR_FILE_PATH_DELIMITER = ";;";
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;

@@ -9,10 +9,10 @@ Provider (required): The vendor/machine that generated (produced) the file. Afte
 Path (required): Location of the CVR file.
   * Example: /test data/2015-portland-mayor-cvr.xlsx
   * Example: C:\test data\2015-portland-mayor-cvr.xlsx
-NOTE: You can select multiple files by holding down Shift in the dialog. You can also manually add multiple if you enter the values in the Path input box, separated with semicolons:
-  * Example: C:\test data\precinct14.json;C:\test data\precinct15.json;C:\test data\precinct16.json
-NOTE: For providers that require directories to be selected, it's not possible to select multiple using the directory chooser dialog. However, if you manually enter the values in the Path input box, separated with semicolons, this will work:
-  * Example: C:\test data\Dominion Input 1;C:\test data\Dominion Input 2;C:\test data\Dominion Input 3
+NOTE: You can select multiple consecutive files by holding down Shift when you click filenames in the dialog (or multiple non-adjacent files by holding down Ctrl or Cmd). You can also manually add multiple if you enter the values in the Path input box, each separated by two semicolons:
+  * Example: C:\test data\precinct14.json;;C:\test data\precinct15.json;;C:\test data\precinct16.json
+NOTE: For providers that require directories to be selected, it's not possible to select multiple using the directory chooser dialog. However, if you manually enter the values in the Path input box, separated with double semicolons, this will work:
+  * Example: C:\test data\Dominion Input 1;;C:\test data\Dominion Input 2;;C:\test data\Dominion Input 3
 
 Contest ID (required for non-ES&S): Some CVRs assign an ID label to each contest in the CVR. The tabulator needs to know which contest is being tabulated when multiple contests are included in one CVR. Enter the ID of the contest being tabulated in this field.
 
