@@ -6,7 +6,7 @@ For each of your CVR files, provide the necessary information and then use the A
 
 Provider (required): The vendor/machine that generated (produced) the file. After you select the field, the tabulator will fill in as many of the other fields as it can based on what it knows about that provider. You can adjust those values as necessary.
 
-Path (required): Location of the CVR file.
+Path (required): Location of the CVR file. Please ensure none of your file paths contain double semicolons within them, or they'll get split and treated as separate file paths (see below).
   * Example: /test data/2015-portland-mayor-cvr.xlsx
   * Example: C:\test data\2015-portland-mayor-cvr.xlsx
 NOTE: You can select multiple consecutive files by holding down Shift when you click filenames in the dialog (or multiple non-adjacent files by holding down Ctrl or Cmd). You can also manually add multiple if you enter the values in the Path input box, each separated by two semicolons:
