@@ -34,6 +34,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -96,6 +98,8 @@ public class GuiConfigController implements Initializable {
   private static final String HINTS_VOTER_ERROR_RULES_FILENAME =
       "network/brightspots/rcv/hints_voter_error_rules.txt";
   private static final String HINTS_OUTPUT_FILENAME = "network/brightspots/rcv/hints_output.txt";
+  // It's possible for file paths to legitimately have consecutive semicolons, but unlikely
+  private static final String CVR_FILE_PATH_DELIMITER = ";;";
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
@@ -518,7 +522,8 @@ public class GuiConfigController implements Initializable {
    * Action when CVR file path button is clicked.
    */
   public void buttonCvrFilePathClicked() {
-    File openFile = null;
+    List<File> selectedFiles = null;
+    File selectedDirectory = null;
 
     Provider provider = getProviderChoice(choiceCvrProvider);
     switch (provider) {
@@ -526,37 +531,40 @@ public class GuiConfigController implements Initializable {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters().add(new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
-        fc.setTitle("Select " + provider + " Cast Vote Record File");
-        openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+        fc.setTitle("Select " + provider + " Cast Vote Record Files");
+        selectedFiles = fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
       }
       case CLEAR_BALLOT -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters().add(new ExtensionFilter("CSV files", "*.csv"));
-        fc.setTitle("Select " + provider + " Cast Vote Record File");
-        openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+        fc.setTitle("Select " + provider + " Cast Vote Record Files");
+        selectedFiles = fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
       }
       case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         dc.setTitle("Select " + provider + " Cast Vote Record Folder");
-        openFile = dc.showDialog(GuiContext.getInstance().getMainWindow());
+        selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
       case ESS -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters()
             .add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
-        fc.setTitle("Select " + provider + " Cast Vote Record File");
-        openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+        fc.setTitle("Select " + provider + " Cast Vote Record Files");
+        selectedFiles = fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
       }
       default -> {
         // Do nothing for unhandled providers
       }
     }
 
-    if (openFile != null) {
-      textFieldCvrFilePath.setText(openFile.getAbsolutePath());
+    if (selectedFiles != null) {
+      textFieldCvrFilePath.setText(selectedFiles.stream().map(File::getAbsolutePath).collect(
+          Collectors.joining(CVR_FILE_PATH_DELIMITER)));
+    } else if (selectedDirectory != null) {
+      textFieldCvrFilePath.setText(selectedDirectory.getAbsolutePath());
     }
   }
 
@@ -564,25 +572,45 @@ public class GuiConfigController implements Initializable {
    * Action when add CVR file button is clicked.
    */
   public void buttonAddCvrFileClicked() {
-    CvrSource cvrSource =
-        new CvrSource(
-            getTextOrEmptyString(textFieldCvrFilePath),
-            getTextOrEmptyString(textFieldCvrFirstVoteCol),
-            getTextOrEmptyString(textFieldCvrFirstVoteRow),
-            getTextOrEmptyString(textFieldCvrIdCol),
-            getTextOrEmptyString(textFieldCvrPrecinctCol),
-            getTextOrEmptyString(textFieldCvrOvervoteDelimiter),
-            getProviderChoice(choiceCvrProvider).getInternalLabel(),
-            getTextOrEmptyString(textFieldCvrContestId),
-            getTextOrEmptyString(textFieldCvrOvervoteLabel),
-            getTextOrEmptyString(textFieldCvrUndervoteLabel),
-            getTextOrEmptyString(textFieldCvrUndeclaredWriteInLabel),
-            checkBoxCvrTreatBlankAsUndeclaredWriteIn.isSelected()
-        );
-    if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
-      tableViewCvrFiles.getItems().add(cvrSource);
-      textFieldCvrFilePath.clear();
-    }
+    List<String> cvrPaths = Arrays.stream(getTextOrEmptyString(textFieldCvrFilePath).split(
+        CVR_FILE_PATH_DELIMITER)).toList();
+    List<String> failedFilePaths = new ArrayList<>();
+    String firstVoteColumnIndex = getTextOrEmptyString(textFieldCvrFirstVoteCol);
+    String firstVoteRowIndex = getTextOrEmptyString(textFieldCvrFirstVoteRow);
+    String idColumnIndex = getTextOrEmptyString(textFieldCvrIdCol);
+    String precinctColumnIndex = getTextOrEmptyString(textFieldCvrPrecinctCol);
+    String overvoteDelimiter = getTextOrEmptyString(textFieldCvrOvervoteDelimiter);
+    String provider = getProviderChoice(choiceCvrProvider).getInternalLabel();
+    String contestId = getTextOrEmptyString(textFieldCvrContestId);
+    String overvoteLabel = getTextOrEmptyString(textFieldCvrOvervoteLabel);
+    String undervoteLabel = getTextOrEmptyString(textFieldCvrUndervoteLabel);
+    String undeclaredWriteInLabel = getTextOrEmptyString(textFieldCvrUndeclaredWriteInLabel);
+    boolean treatBlankAsUndeclaredWriteIn = checkBoxCvrTreatBlankAsUndeclaredWriteIn.isSelected();
+
+    cvrPaths.forEach(filePath -> {
+      CvrSource cvrSource =
+          new CvrSource(
+              filePath,
+              firstVoteColumnIndex,
+              firstVoteRowIndex,
+              idColumnIndex,
+              precinctColumnIndex,
+              overvoteDelimiter,
+              provider,
+              contestId,
+              overvoteLabel,
+              undervoteLabel,
+              undeclaredWriteInLabel,
+              treatBlankAsUndeclaredWriteIn
+          );
+      if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
+        tableViewCvrFiles.getItems().add(cvrSource);
+      } else {
+        failedFilePaths.add(filePath);
+      }
+    });
+    // If any entries failed validation, preserve them in the text box so the user can try again
+    textFieldCvrFilePath.setText(String.join(CVR_FILE_PATH_DELIMITER, failedFilePaths));
   }
 
   /**
