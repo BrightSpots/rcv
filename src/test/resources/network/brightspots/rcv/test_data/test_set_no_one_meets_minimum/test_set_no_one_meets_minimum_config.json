@@ -1,0 +1,54 @@
+{
+  "tabulatorVersion" : "1.2.0",
+  "outputSettings" : {
+    "contestName" : "Test Set No One Meets Minimum",
+    "outputDirectory" : "output",
+    "contestDate" : "2022-08-15",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_set_no_one_meets_minimum_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "1",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "code" : "",
+    "excluded" : false
+  }, {
+    "name" : "B",
+    "code" : "",
+    "excluded" : false
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "4",
+    "maxSkippedRanksAllowed" : "4",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

@@ -131,6 +131,10 @@ class TabulatorSession {
   }
 
   void tabulate() {
+    tabulate(null);
+  }
+
+  void tabulate(List<String> exceptionsEncountered) {
     Logger.info("Starting tabulation session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
@@ -163,6 +167,9 @@ class TabulatorSession {
       Logger.fine("End config file contents.");
       reader.close();
     } catch (IOException exception) {
+      if (exceptionsEncountered != null) {
+        exceptionsEncountered.add(exception.getClass().toString());
+      }
       Logger.severe("Error logging config file: %s\n%s", configPath, exception);
     }
     Logger.info("Tabulating '%s'...", config.getContestName());
@@ -184,6 +191,9 @@ class TabulatorSession {
         try {
           newWinnerSet = runTabulationForConfig(config, castVoteRecords);
         } catch (TabulationAbortedException exception) {
+          if (exceptionsEncountered != null) {
+            exceptionsEncountered.add(exception.getClass().toString());
+          }
           Logger.severe(exception.getMessage());
           break;
         }
@@ -212,6 +222,9 @@ class TabulatorSession {
           runTabulationForConfig(config, castVoteRecords);
           tabulationSuccess = true;
         } catch (TabulationAbortedException exception) {
+          if (exceptionsEncountered != null) {
+            exceptionsEncountered.add(exception.getClass().toString());
+          }
           Logger.severe(exception.getMessage());
         }
       }

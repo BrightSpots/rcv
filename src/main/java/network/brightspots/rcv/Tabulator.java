@@ -159,7 +159,7 @@ class Tabulator {
       // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
       // on the number of active votes in the current round.
       if (currentRound == 1 || config.getNumberOfWinners() <= 1) {
-        setWinningThreshold(currentRoundCandidateToTally);
+        setWinningThreshold(currentRoundCandidateToTally, config.getMinimumVoteThreshold());
       }
 
       // "invert" map and look for winners
@@ -352,7 +352,8 @@ class Tabulator {
   }
 
   // determine and store the threshold to win
-  private void setWinningThreshold(Map<String, BigDecimal> currentRoundCandidateToTally) {
+  private void setWinningThreshold(Map<String, BigDecimal> currentRoundCandidateToTally,
+      BigDecimal minimumVoteThreshold) {
     BigDecimal currentRoundTotalVotes = BigDecimal.ZERO;
     for (BigDecimal numVotes : currentRoundCandidateToTally.values()) {
       currentRoundTotalVotes = currentRoundTotalVotes.add(numVotes);
@@ -393,6 +394,14 @@ class Tabulator {
                 .add(augend);
       }
     }
+
+    // We can never set a winning threshold that's less than the minimum vote threshold specified in
+    // the config.
+    if (minimumVoteThreshold.signum() == 1
+        && minimumVoteThreshold.compareTo(winningThreshold) == 1) {
+      winningThreshold = minimumVoteThreshold;
+    }
+
     Logger.info("Winning threshold set to %s.", winningThreshold);
   }
 
