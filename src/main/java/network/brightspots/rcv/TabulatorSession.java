@@ -183,8 +183,8 @@ class TabulatorSession {
         Set<String> newWinnerSet;
         try {
           newWinnerSet = runTabulationForConfig(config, castVoteRecords);
-        } catch (TabulationCancelledException exception) {
-          Logger.severe("Tabulation was cancelled by the user!");
+        } catch (TabulationAbortedException exception) {
+          Logger.severe(exception.getMessage());
           break;
         }
         assert newWinnerSet.size() == 1;
@@ -211,8 +211,8 @@ class TabulatorSession {
         try {
           runTabulationForConfig(config, castVoteRecords);
           tabulationSuccess = true;
-        } catch (TabulationCancelledException exception) {
-          Logger.severe("Tabulation was cancelled by the user!");
+        } catch (TabulationAbortedException exception) {
+          Logger.severe(exception.getMessage());
         }
       }
     }
