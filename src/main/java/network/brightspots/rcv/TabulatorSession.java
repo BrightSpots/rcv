@@ -101,7 +101,8 @@ class TabulatorSession {
   // special mode to just export the CVR as CDF JSON instead of tabulating
   void convertToCdf() {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    if (config != null && config.validate()) {
+    // If there are no validation errors
+    if (config != null && config.validate().isEmpty()) {
       checkConfigVersionMatchesApp(config);
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
@@ -142,8 +143,8 @@ class TabulatorSession {
       return;
     }
 
-    boolean isConfigValid = config.validate();
-    if (!isConfigValid) {
+    // If there are validation errors
+    if (!config.validate().isEmpty()) {
       Logger.removeTabulationFileLogging();
       return;
     }

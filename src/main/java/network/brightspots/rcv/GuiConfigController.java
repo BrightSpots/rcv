@@ -603,7 +603,8 @@ public class GuiConfigController implements Initializable {
               undeclaredWriteInLabel,
               treatBlankAsUndeclaredWriteIn
           );
-      if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
+      if (ContestConfig.performBasicCvrSourceValidation(cvrSource).isEmpty()) {
+        // If there are no validation errors
         tableViewCvrFiles.getItems().add(cvrSource);
       } else {
         failedFilePaths.add(filePath);
@@ -667,7 +668,8 @@ public class GuiConfigController implements Initializable {
             getTextOrEmptyString(textFieldCandidateName),
             getTextOrEmptyString(textFieldCandidateCode),
             checkBoxCandidateExcluded.isSelected());
-    if (ContestConfig.passesBasicCandidateValidation(candidate)) {
+    if (ContestConfig.performBasicCandidateValidation(candidate).isEmpty()) {
+      // If there are no validation errors
       tableViewCandidates.getItems().add(candidate);
       buttonClearCandidateClicked();
     }
