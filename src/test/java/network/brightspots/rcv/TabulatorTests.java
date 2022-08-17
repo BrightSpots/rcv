@@ -31,7 +31,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 import network.brightspots.rcv.ContestConfig.Provider;
+import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,12 +98,20 @@ class TabulatorTests {
         .toString();
   }
 
-  // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem) {
+    runTabulationTest(stem, null);
+  }
+
+  // helper function to support running various tabulation tests
+  private static void runTabulationTest(String stem, String expectedException) {
     String configPath = getTestFilePath(stem, "_config.json");
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
-    session.tabulate();
+    List<String> exceptionsEncountered = session.tabulate();
+    if (expectedException != null) {
+      assertTrue(exceptionsEncountered.contains(expectedException));
+      return;
+    }
     Logger.info("Examining tabulation test results...");
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
@@ -538,5 +549,29 @@ class TabulatorTests {
   @DisplayName("overvote delimiter test")
   void overvoteDelimiterTest() {
     runTabulationTest("test_set_overvote_delimiter");
+  }
+
+  @Test
+  @DisplayName("sequential with batch elimination test")
+  void sequentialWithBatchElimination() {
+    runTabulationTest("sequential_with_batch");
+  }
+
+  @Test
+  @DisplayName("sequential with continue until two test")
+  void sequentialWithContinueUntilTwo() {
+    runTabulationTest("sequential_with_continue_until_two");
+  }
+
+  @Test
+  @DisplayName("overvote exhaust if multiple continuing test")
+  void overvoteExhaustIfMultipleContinuingTest() {
+    runTabulationTest("exhaust_if_multiple_continuing");
+  }
+
+  @Test
+  @DisplayName("no one meets minimum test")
+  void noOneMeetsMinimumTest() {
+    runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());
   }
 }

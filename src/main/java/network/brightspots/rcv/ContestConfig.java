@@ -716,23 +716,30 @@ class ContestConfig {
         }
 
         if (getNumberOfWinners() > 1) {
-          if (isContinueUntilTwoCandidatesRemainEnabled()) {
-            validationErrors.add(
-                ValidationError.RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT);
-            Logger.severe(
-                "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest!");
-          }
+          if (winnerMode != WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL) {
+            if (isContinueUntilTwoCandidatesRemainEnabled()) {
+              validationErrors.add(
+                  ValidationError.RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT);
+              Logger.severe(
+                  "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest unless "
+                      + "the winner election mode is multi-pass IRV!"
+              );
+            }
 
-          if (isBatchEliminationEnabled()) {
-            validationErrors.add(ValidationError.RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT);
-            Logger.severe("batchElimination can't be true in a multi-seat contest!");
-          }
-        } else { // numberOfWinners == 1
-          if (!isSingleWinnerEnabled()) {
-            validationErrors.add(
-                ValidationError.RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT);
-            Logger.severe(
-                "winnerElectionMode can't be \"%s\" in a single-seat contest!", winnerMode);
+            if (isBatchEliminationEnabled()) {
+              validationErrors.add(ValidationError.RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT);
+              Logger.severe(
+                  "batchElimination can't be true in a multi-seat contest unless the "
+                      + "winner election mode is multi-pass IRV!"
+              );
+            }
+          } else { // numberOfWinners == 1
+            if (!isSingleWinnerEnabled()) {
+              validationErrors.add(
+                  ValidationError.RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT);
+              Logger.severe(
+                  "winnerElectionMode can't be \"%s\" in a single-seat contest!", winnerMode);
+            }
           }
         }
       } else { // numberOfWinners == 0

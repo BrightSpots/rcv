@@ -1,0 +1,85 @@
+{
+  "config" : {
+    "contest" : "Test Sequential with Continue until Two",
+    "date" : "",
+    "jurisdiction" : "",
+    "office" : "",
+    "threshold" : "4"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2",
+      "D" : "1",
+      "E" : "0",
+      "F" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2",
+      "D" : "1",
+      "E" : "0",
+      "F" : "0"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "F",
+      "transfers" : { }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2",
+      "D" : "1",
+      "E" : "0"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "E",
+      "transfers" : { }
+    } ]
+  }, {
+    "round" : 4,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2",
+      "D" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ]
+  }, {
+    "round" : 5,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "B",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ]
+  }, {
+    "round" : 6,
+    "tally" : {
+      "A" : "5",
+      "C" : "2"
+    },
+    "tallyResults" : [ ]
+  } ]
+}
