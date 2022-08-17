@@ -801,9 +801,9 @@ class Tabulator {
           if (continuingCandidate != null) { // at least two continuing
             decision = OvervoteDecision.EXHAUST;
             break;
+          } else {
+            continuingCandidate = candidate;
           }
-        } else {
-          continuingCandidate = candidate;
         }
       }
     }
