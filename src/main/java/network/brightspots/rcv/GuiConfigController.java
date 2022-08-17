@@ -54,6 +54,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
@@ -619,17 +620,36 @@ public class GuiConfigController implements Initializable {
     textFieldCvrFilePath.setText(String.join(CVR_FILE_PATH_DELIMITER, failedFilePaths));
   }
 
+  private static void addErrorStyling(Control control) {
+    if (control instanceof CheckBox) {
+      control.getStyleClass().add("check-box-error");
+    } else {
+      control.getStyleClass().add("error");
+    }
+  }
+
+  private static void clearErrorStyling(Control control) {
+    if (control instanceof CheckBox) {
+      control.getStyleClass().removeAll("check-box-error");
+    } else {
+      control.getStyleClass().removeAll("error");
+    }
+  }
+
   private void clearBasicCvrValidationHighlighting() {
-    textFieldCvrFilePath.getStyleClass().removeAll("error");
-    textFieldCvrContestId.getStyleClass().removeAll("error");
-    textFieldCvrFirstVoteCol.getStyleClass().removeAll("error");
-    textFieldCvrFirstVoteRow.getStyleClass().removeAll("error");
-    textFieldCvrIdCol.getStyleClass().removeAll("error");
-    textFieldCvrPrecinctCol.getStyleClass().removeAll("error");
-    textFieldCvrOvervoteDelimiter.getStyleClass().removeAll("error");
-    textFieldCvrOvervoteLabel.getStyleClass().removeAll("error");
-    textFieldCvrUndervoteLabel.getStyleClass().removeAll("error");
-    textFieldCvrUndeclaredWriteInLabel.getStyleClass().removeAll("error");
+    List<Control> controlsToClear = Arrays.asList(
+        textFieldCvrFilePath,
+        textFieldCvrContestId,
+        textFieldCvrFirstVoteCol,
+        textFieldCvrFirstVoteRow,
+        textFieldCvrIdCol,
+        textFieldCvrPrecinctCol,
+        textFieldCvrOvervoteDelimiter,
+        textFieldCvrOvervoteLabel,
+        textFieldCvrUndervoteLabel,
+        textFieldCvrUndeclaredWriteInLabel
+    );
+    controlsToClear.forEach(GuiConfigController::clearErrorStyling);
   }
 
   private void highlightInputsFailingBasicCvrValidation(Set<ValidationError> validationErrors) {
@@ -639,48 +659,48 @@ public class GuiConfigController implements Initializable {
 
     if (validationErrors.contains(ValidationError.CVR_FILE_PATH_MISSING)
         || validationErrors.contains(ValidationError.CVR_CDF_FILE_PATH_INVALID)) {
-      textFieldCvrFilePath.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrFilePath);
     }
 
     if (validationErrors.contains(ValidationError.CVR_CONTEST_ID_INVALID)) {
-      textFieldCvrContestId.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrContestId);
     }
 
     if (validationErrors.contains(ValidationError.CVR_FIRST_VOTE_COLUMN_INVALID)) {
-      textFieldCvrFirstVoteCol.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrFirstVoteCol);
     }
 
     if (validationErrors.contains(ValidationError.CVR_FIRST_VOTE_ROW_INVALID)) {
-      textFieldCvrFirstVoteRow.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrFirstVoteRow);
     }
 
     if (validationErrors.contains(ValidationError.CVR_ID_COLUMN_INVALID)) {
-      textFieldCvrIdCol.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrIdCol);
     }
 
     if (validationErrors.contains(ValidationError.CVR_PRECINCT_COLUMN_INVALID)) {
-      textFieldCvrPrecinctCol.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrPrecinctCol);
     }
 
     if (validationErrors.contains(ValidationError.CVR_OVERVOTE_DELIMITER_INVALID)) {
-      textFieldCvrOvervoteDelimiter.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrOvervoteDelimiter);
     }
 
     if (validationErrors.contains(ValidationError.CVR_OVERVOTE_LABEL_INVALID)) {
-      textFieldCvrOvervoteLabel.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrOvervoteLabel);
     }
 
     if (validationErrors.contains(ValidationError.CVR_UNDERVOTE_LABEL_INVALID)) {
-      textFieldCvrUndervoteLabel.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrUndervoteLabel);
     }
 
-    if (validationErrors.contains(ValidationError.CVR_UWI_LABEL_ALREADY_IN_USE)) {
-      textFieldCvrUndeclaredWriteInLabel.getStyleClass().add("error");
+    if (validationErrors.contains(ValidationError.CVR_UWI_LABEL_INVALID)) {
+      addErrorStyling(textFieldCvrUndeclaredWriteInLabel);
     }
 
     if (validationErrors.contains(ValidationError.CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED)) {
-      textFieldCvrOvervoteDelimiter.getStyleClass().add("error");
-      textFieldCvrOvervoteLabel.getStyleClass().add("error");
+      addErrorStyling(textFieldCvrOvervoteDelimiter);
+      addErrorStyling(textFieldCvrOvervoteLabel);
     }
   }
 
@@ -733,7 +753,7 @@ public class GuiConfigController implements Initializable {
    * Action when add candidate button is clicked.
    */
   public void buttonAddCandidateClicked() {
-    textFieldCandidateName.getStyleClass().removeAll("error");
+    clearErrorStyling(textFieldCandidateName);
     Candidate candidate =
         new Candidate(
             getTextOrEmptyString(textFieldCandidateName),
@@ -745,7 +765,7 @@ public class GuiConfigController implements Initializable {
       tableViewCandidates.getItems().add(candidate);
       buttonClearCandidateClicked();
     } else if (validationErrors.contains(ValidationError.CANDIDATE_NAME_MISSING)) {
-      textFieldCandidateName.getStyleClass().add("error");
+      addErrorStyling(textFieldCandidateName);
     }
   }
 
@@ -753,7 +773,7 @@ public class GuiConfigController implements Initializable {
    * Action when clear candidate button is clicked.
    */
   public void buttonClearCandidateClicked() {
-    textFieldCandidateName.getStyleClass().removeAll("error");
+    clearErrorStyling(textFieldCandidateName);
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);

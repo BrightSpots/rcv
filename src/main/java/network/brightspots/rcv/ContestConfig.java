@@ -146,7 +146,6 @@ class ContestConfig {
   /* Performs basic validation on CVR sources and returns a set of validation errors. **/
   static Set<ValidationError> performBasicCvrSourceValidation(CvrSource source) {
     Set<ValidationError> validationErrors = new HashSet<>();
-    // Perform checks on source input path
     if (isNullOrBlank(source.getFilePath())) {
       validationErrors.add(ValidationError.CVR_FILE_PATH_MISSING);
       Logger.severe("filePath is required for each cast vote record file!");
@@ -164,7 +163,7 @@ class ContestConfig {
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
           && stringAlreadyInUseElsewhereInSource(
           source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
-        validationErrors.add(ValidationError.CVR_UWI_LABEL_ALREADY_IN_USE);
+        validationErrors.add(ValidationError.CVR_UWI_LABEL_INVALID);
       }
 
       Provider provider = getProvider(source);
@@ -172,7 +171,6 @@ class ContestConfig {
         validationErrors.add(ValidationError.CVR_PROVIDER_INVALID);
         Logger.severe("Invalid provider for source: %s", source.getFilePath());
       } else if (provider == Provider.ESS) {
-        // Ensure valid first vote column value
         if (fieldOutOfRangeOrNotInteger(
             source.getFirstVoteColumnIndex(),
             "firstVoteColumnIndex",
@@ -183,7 +181,6 @@ class ContestConfig {
           validationErrors.add(ValidationError.CVR_FIRST_VOTE_COLUMN_INVALID);
         }
 
-        // Ensure valid first vote row value
         if (fieldOutOfRangeOrNotInteger(
             source.getFirstVoteRowIndex(),
             "firstVoteRowIndex",
@@ -194,7 +191,6 @@ class ContestConfig {
           validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_INVALID);
         }
 
-        // Ensure valid id column value
         if (fieldOutOfRangeOrNotInteger(
             source.getIdColumnIndex(),
             "idColumnIndex",
@@ -205,7 +201,6 @@ class ContestConfig {
           validationErrors.add(ValidationError.CVR_ID_COLUMN_INVALID);
         }
 
-        // Ensure valid precinct column value
         if (fieldOutOfRangeOrNotInteger(
             source.getPrecinctColumnIndex(),
             "precinctColumnIndex",
@@ -302,7 +297,7 @@ class ContestConfig {
             String.format(
                 "contestId must be defined for CVR source with provider \"%s\"!",
                 getProvider(source)));
-      } else if (!(providerRequiresContestId)
+      } else if (!providerRequiresContestId
           && fieldIsDefinedButShouldNotBeForProvider(
           source.getContestId(), "contestId", provider, source.getFilePath())) {
         // Helper will log error
@@ -634,9 +629,10 @@ class ContestConfig {
       validationErrors.add(ValidationError.RULES_RANDOM_SEED_MISSING);
       Logger.severe("When tiebreakMode involves a random element, randomSeed must be supplied!");
     }
+
     if (fieldOutOfRangeOrNotInteger(
         getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, MAX_RANDOM_SEED, false)) {
-      validationErrors.add(ValidationError.RULES_RANDOM_SEED_MISSING);
+      validationErrors.add(ValidationError.RULES_RANDOM_SEED_INVALID);
     }
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
@@ -710,7 +706,7 @@ class ContestConfig {
       if (getNumberOfWinners() > 0) {
         if (isMultiSeatBottomsUpWithThresholdEnabled()) {
           validationErrors.add(
-              ValidationError.RULES_NUMBER_OF_WINNERS_DOES_INVALID_FOR_WINNER_ELECTION_MODE);
+              ValidationError.RULES_NUMBER_OF_WINNERS_INVALID_FOR_WINNER_ELECTION_MODE);
           Logger.severe(
               "numberOfWinners must be zero if winnerElectionMode is \"%s\"!", winnerMode);
         }
@@ -733,27 +729,23 @@ class ContestConfig {
                       + "winner election mode is multi-pass IRV!"
               );
             }
-          } else { // numberOfWinners == 1
-            if (!isSingleWinnerEnabled()) {
-              validationErrors.add(
-                  ValidationError.RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT);
-              Logger.severe(
-                  "winnerElectionMode can't be \"%s\" in a single-seat contest!", winnerMode);
-            }
+          }
+        } else { // numberOfWinners == 1
+          if (!isSingleWinnerEnabled()) {
+            validationErrors.add(
+                ValidationError.RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT);
+            Logger.severe(
+                "winnerElectionMode can't be \"%s\" in a single-seat contest!", winnerMode);
           }
         }
       } else { // numberOfWinners == 0
         if (!isMultiSeatBottomsUpWithThresholdEnabled()) {
-          validationErrors.add(
-              ValidationError
-                  .RULES_NUMBER_OF_WINNERS_WINNER_ELECTION_MODE_PERCENTAGE_THRESHOLD_DISAGREEMENT);
+          validationErrors.add(ValidationError.RULES_ZERO_WINNERS_INVALID_WINNER_ELECTION_MODE);
           Logger.severe(
-              "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and "
-                  + "multiSeatBottomsUpPercentageThreshold must be specified!",
+              "If numberOfWinners is zero, winnerElectionMode must be \"%s\"!",
               WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
         } else if (getMultiSeatBottomsUpPercentageThreshold() == null) {
-          validationErrors.add(
-              ValidationError.RULES_WINNER_ELECTION_MODE_INVALID_WITH_PERCENTAGE_THRESHOLD);
+          validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
           Logger.severe(
               "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold "
                   + "must be specified!",
@@ -764,7 +756,7 @@ class ContestConfig {
 
     if (isMultiSeatBottomsUpWithThresholdEnabled() && isBatchEliminationEnabled()) {
       validationErrors.add(
-          ValidationError.RULES_BATCH_ELIMINATION_WINNER_ELECTION_MODE_DISAGREEMENT);
+          ValidationError.RULES_BOTTOMS_UP_THRESHOLD_BATCH_ELIMINATION_DISAGREEMENT);
       Logger.severe(
           "batchElimination can't be true when winnerElectionMode is \"%s\"!", winnerMode);
     }
@@ -1091,7 +1083,7 @@ class ContestConfig {
     CVR_FILE_PATH_MISSING,
     CVR_OVERVOTE_LABEL_INVALID,
     CVR_UNDERVOTE_LABEL_INVALID,
-    CVR_UWI_LABEL_ALREADY_IN_USE,
+    CVR_UWI_LABEL_INVALID,
     CVR_PROVIDER_INVALID,
     CVR_FIRST_VOTE_COLUMN_INVALID,
     CVR_FIRST_VOTE_ROW_INVALID,
@@ -1123,6 +1115,7 @@ class ContestConfig {
     CANDIDATE_NO_CANDIDATES_SPECIFIED,
     CANDIDATE_ALL_EXCLUDED,
     RULES_TIEBREAK_MODE_INVALID,
+    RULES_RANDOM_SEED_INVALID,
     RULES_RANDOM_SEED_MISSING,
     RULES_OVERVOTE_RULE_INVALID,
     RULES_WINNER_ELECTION_MODE_INVALID,
@@ -1132,13 +1125,13 @@ class ContestConfig {
     RULES_MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC_INVALID,
     RULES_MIN_VOTE_THRESHOLD_INVALID,
     RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID,
-    RULES_NUMBER_OF_WINNERS_DOES_INVALID_FOR_WINNER_ELECTION_MODE,
+    RULES_NUMBER_OF_WINNERS_INVALID_FOR_WINNER_ELECTION_MODE,
     RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT,
     RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT,
     RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT,
-    RULES_NUMBER_OF_WINNERS_WINNER_ELECTION_MODE_PERCENTAGE_THRESHOLD_DISAGREEMENT,
-    RULES_WINNER_ELECTION_MODE_INVALID_WITH_PERCENTAGE_THRESHOLD,
-    RULES_BATCH_ELIMINATION_WINNER_ELECTION_MODE_DISAGREEMENT,
+    RULES_ZERO_WINNERS_INVALID_WINNER_ELECTION_MODE,
+    RULES_PERCENTAGE_THRESHOLD_MISSING,
+    RULES_BOTTOMS_UP_THRESHOLD_BATCH_ELIMINATION_DISAGREEMENT,
     RULES_NON_INTEGER_WINNING_THRESHOLD_WINNER_ELECTION_MODE_DISAGREEMENT,
     RULES_HARE_QUOTA_WINNER_ELECTION_MODE_DISAGREEMENT,
     RULES_NON_INTEGER_WINNING_THRESHOLD_HARE_QUOTA_DISAGREEMENT
