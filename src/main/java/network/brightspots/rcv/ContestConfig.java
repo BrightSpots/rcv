@@ -286,7 +286,7 @@ class ContestConfig {
                       + "provider \"%s\"",
                   provider),
               source.getFilePath());
-          validationErrors.add(ValidationError.CVR_PROVIDER_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE);
+          validationErrors.add(ValidationError.CVR_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE);
         }
       }
 
@@ -1092,7 +1092,7 @@ class ContestConfig {
     CVR_PRECINCT_COLUMN_INVALID,
     CVR_OVERVOTE_DELIMITER_INVALID,
     CVR_CDF_FILE_PATH_INVALID,
-    CVR_PROVIDER_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE,
+    CVR_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE,
     CVR_CONTEST_ID_INVALID,
     CVR_DUPLICATE_FILE_PATHS,
     CVR_FILE_PATH_INVALID,
