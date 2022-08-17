@@ -58,9 +58,10 @@ public class Main extends GuiApplication {
       // Check for unexpected input
       if (argsCli.size() == 0) {
         Logger.severe(
-            "No config file path provided on command line!\n"
-                + "Please provide a path to the config file!\n"
-                + "See README.md for more details.");
+            """
+                No config file path provided on command line!
+                Please provide a path to the config file!
+                See README.md for more details.""");
         System.exit(1);
       } else if (argsCli.size() > 2) {
         Logger.severe(
