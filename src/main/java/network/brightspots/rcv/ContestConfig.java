@@ -222,6 +222,12 @@ class ContestConfig {
           validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_INVALID);
           Logger.severe("overvoteDelimiter is invalid.");
         }
+
+        if (!isNullOrBlank(source.getOvervoteDelimiter())
+            && !isNullOrBlank(source.getOvervoteLabel())) {
+          validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED);
+          Logger.severe("overvoteDelimiter and overvoteLabel can't both be supplied.");
+        }
       } else {
         if (provider == Provider.CDF) {
           if (!source.getFilePath().toLowerCase().endsWith(".xml")
@@ -567,12 +573,8 @@ class ContestConfig {
             Logger.severe(
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s", cvrPath);
           }
-          if (!isNullOrBlank(source.getOvervoteDelimiter())) {
-            if (!isNullOrBlank(source.getOvervoteLabel())) {
-              validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED);
-              Logger.severe("overvoteDelimiter and overvoteLabel can't both be supplied.");
-            }
-          } else if (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
+          if (isNullOrBlank(source.getOvervoteDelimiter())
+              && getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
             validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_MISSING);
             Logger.severe(
                 "overvoteDelimiter is required for an ES&S CVR source when overvoteRule "
