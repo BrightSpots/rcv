@@ -716,15 +716,22 @@ class ContestConfig {
         }
 
         if (getNumberOfWinners() > 1) {
-          if (isContinueUntilTwoCandidatesRemainEnabled()) {
-            isValid = false;
-            Logger.severe(
-                "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest!");
-          }
+          if (winnerMode != WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL) {
+            if (isContinueUntilTwoCandidatesRemainEnabled()) {
+              isValid = false;
+              Logger.severe(
+                  "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest unless "
+                      + "the winner election mode is multi-pass IRV!"
+              );
+            }
 
-          if (isBatchEliminationEnabled()) {
-            isValid = false;
-            Logger.severe("batchElimination can't be true in a multi-seat contest!");
+            if (isBatchEliminationEnabled()) {
+              isValid = false;
+              Logger.severe(
+                  "batchElimination can't be true in a multi-seat contest unless the "
+                      + "winner election mode is multi-pass IRV!"
+              );
+            }
           }
         } else { // numberOfWinners == 1
           if (!isSingleWinnerEnabled()) {

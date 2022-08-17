@@ -537,4 +537,16 @@ class TabulatorTests {
   void overvoteDelimiterTest() {
     runTabulationTest("test_set_overvote_delimiter");
   }
+
+  @Test
+  @DisplayName("sequential with batch elimination test")
+  void sequentialWithBatchElimination() {
+    runTabulationTest("sequential_with_batch");
+  }
+
+  @Test
+  @DisplayName("sequential with continue until two test")
+  void sequentialWithContinueUntilTwo() {
+    runTabulationTest("sequential_with_continue_until_two");
+  }
 }
