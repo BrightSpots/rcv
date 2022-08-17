@@ -139,92 +139,82 @@ class TabulatorSession {
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
 
-    boolean isLoggingSetUp = setUpLogging(config.getOutputDirectory());
-    if (!isLoggingSetUp) {
-      Logger.removeTabulationFileLogging();
-      return exceptionsEncountered;
-    }
-
-    boolean isConfigValid = config.validate();
-    if (!isConfigValid) {
-      Logger.removeTabulationFileLogging();
-      return exceptionsEncountered;
-    }
-
-    Logger.info("Computer name: %s", Utils.getComputerName());
-    Logger.info("User name: %s", Utils.getUserName());
-    Logger.info("Config file: %s", configPath);
-    try {
-      Logger.fine("Begin config file contents:");
-      BufferedReader reader = new BufferedReader(
-          new FileReader(configPath, StandardCharsets.UTF_8));
-      String line = reader.readLine();
-      while (line != null) {
-        Logger.fine(line);
-        line = reader.readLine();
+    if (setUpLogging(config.getOutputDirectory()) && config.validate()) {
+      Logger.info("Computer name: %s", Utils.getComputerName());
+      Logger.info("User name: %s", Utils.getUserName());
+      Logger.info("Config file: %s", configPath);
+      try {
+        Logger.fine("Begin config file contents:");
+        BufferedReader reader = new BufferedReader(
+            new FileReader(configPath, StandardCharsets.UTF_8));
+        String line = reader.readLine();
+        while (line != null) {
+          Logger.fine(line);
+          line = reader.readLine();
+        }
+        Logger.fine("End config file contents.");
+        reader.close();
+      } catch (IOException exception) {
+        exceptionsEncountered.add(exception.getClass().toString());
+        Logger.severe("Error logging config file: %s\n%s", configPath, exception);
       }
-      Logger.fine("End config file contents.");
-      reader.close();
-    } catch (IOException exception) {
-      exceptionsEncountered.add(exception.getClass().toString());
-      Logger.severe("Error logging config file: %s\n%s", configPath, exception);
-    }
-    Logger.info("Tabulating '%s'...", config.getContestName());
-    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
-      Logger.info("This is a multi-pass IRV contest.");
-      int numWinners = config.getNumberOfWinners();
-      // temporarily set config to single-seat so that we can run sequential elections
-      config.setNumberOfWinners(1);
-      while (config.getSequentialWinners().size() < numWinners) {
-        Logger.info(
-            "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
+      Logger.info("Tabulating '%s'...", config.getContestName());
+      if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
+        Logger.info("This is a multi-pass IRV contest.");
+        int numWinners = config.getNumberOfWinners();
+        // temporarily set config to single-seat so that we can run sequential elections
+        config.setNumberOfWinners(1);
+        while (config.getSequentialWinners().size() < numWinners) {
+          Logger.info(
+              "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
+          // Read cast vote records and precinct IDs from CVR files
+          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
+          if (castVoteRecords == null) {
+            Logger.severe("Aborting tabulation due to cast vote record errors!");
+            break;
+          }
+          Set<String> newWinnerSet;
+          try {
+            newWinnerSet = runTabulationForConfig(config, castVoteRecords);
+          } catch (TabulationAbortedException exception) {
+            exceptionsEncountered.add(exception.getClass().toString());
+            Logger.severe(exception.getMessage());
+            break;
+          }
+          assert newWinnerSet.size() == 1;
+          String newWinner = (String) newWinnerSet.toArray()[0];
+          config.setCandidateExclusionStatus(newWinner, true);
+          config.addSequentialWinner(newWinner);
+          Logger.info("Tabulation for seat #%d completed.", config.getSequentialWinners().size());
+          if (config.getSequentialWinners().size() < numWinners) {
+            Logger.info("Excluding %s from the remaining tabulations.", newWinner);
+          }
+        }
+        // revert config to original state
+        config.setNumberOfWinners(numWinners);
+        config.getSequentialWinners()
+            .forEach(winner -> config.setCandidateExclusionStatus(winner, false));
+        tabulationSuccess = true;
+      } else {
+        // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
         // Read cast vote records and precinct IDs from CVR files
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
         if (castVoteRecords == null) {
           Logger.severe("Aborting tabulation due to cast vote record errors!");
-          break;
-        }
-        Set<String> newWinnerSet;
-        try {
-          newWinnerSet = runTabulationForConfig(config, castVoteRecords);
-        } catch (TabulationAbortedException exception) {
-          exceptionsEncountered.add(exception.getClass().toString());
-          Logger.severe(exception.getMessage());
-          break;
-        }
-        assert newWinnerSet.size() == 1;
-        String newWinner = (String) newWinnerSet.toArray()[0];
-        config.setCandidateExclusionStatus(newWinner, true);
-        config.addSequentialWinner(newWinner);
-        Logger.info("Tabulation for seat #%d completed.", config.getSequentialWinners().size());
-        if (config.getSequentialWinners().size() < numWinners) {
-          Logger.info("Excluding %s from the remaining tabulations.", newWinner);
+        } else {
+          try {
+            runTabulationForConfig(config, castVoteRecords);
+            tabulationSuccess = true;
+          } catch (TabulationAbortedException exception) {
+            exceptionsEncountered.add(exception.getClass().toString());
+            Logger.severe(exception.getMessage());
+          }
         }
       }
-      // revert config to original state
-      config.setNumberOfWinners(numWinners);
-      config.getSequentialWinners()
-          .forEach(winner -> config.setCandidateExclusionStatus(winner, false));
-      tabulationSuccess = true;
-    } else {
-      // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
-      // Read cast vote records and precinct IDs from CVR files
-      List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
-      if (castVoteRecords == null) {
-        Logger.severe("Aborting tabulation due to cast vote record errors!");
-      } else {
-        try {
-          runTabulationForConfig(config, castVoteRecords);
-          tabulationSuccess = true;
-        } catch (TabulationAbortedException exception) {
-          exceptionsEncountered.add(exception.getClass().toString());
-          Logger.severe(exception.getMessage());
-        }
+      Logger.info("Tabulation session completed.");
+      if (tabulationSuccess) {
+        Logger.info("Results written to: %s", outputPath);
       }
-    }
-    Logger.info("Tabulation session completed.");
-    if (tabulationSuccess) {
-      Logger.info("Results written to: %s", outputPath);
     }
     Logger.removeTabulationFileLogging();
     return exceptionsEncountered;
