@@ -620,16 +620,16 @@ public class GuiConfigController implements Initializable {
   }
 
   private void clearBasicCvrValidationHighlighting() {
-      textFieldCvrFilePath.getStyleClass().removeAll("error");
-      textFieldCvrContestId.getStyleClass().removeAll("error");
-      textFieldCvrFirstVoteCol.getStyleClass().removeAll("error");
-      textFieldCvrFirstVoteRow.getStyleClass().removeAll("error");
-      textFieldCvrIdCol.getStyleClass().removeAll("error");
-      textFieldCvrPrecinctCol.getStyleClass().removeAll("error");
-      textFieldCvrOvervoteDelimiter.getStyleClass().removeAll("error");
-      textFieldCvrOvervoteLabel.getStyleClass().removeAll("error");
-      textFieldCvrUndervoteLabel.getStyleClass().removeAll("error");
-      textFieldCvrUndeclaredWriteInLabel.getStyleClass().removeAll("error");
+    textFieldCvrFilePath.getStyleClass().removeAll("error");
+    textFieldCvrContestId.getStyleClass().removeAll("error");
+    textFieldCvrFirstVoteCol.getStyleClass().removeAll("error");
+    textFieldCvrFirstVoteRow.getStyleClass().removeAll("error");
+    textFieldCvrIdCol.getStyleClass().removeAll("error");
+    textFieldCvrPrecinctCol.getStyleClass().removeAll("error");
+    textFieldCvrOvervoteDelimiter.getStyleClass().removeAll("error");
+    textFieldCvrOvervoteLabel.getStyleClass().removeAll("error");
+    textFieldCvrUndervoteLabel.getStyleClass().removeAll("error");
+    textFieldCvrUndeclaredWriteInLabel.getStyleClass().removeAll("error");
   }
 
   private void highlightInputsFailingBasicCvrValidation(Set<ValidationError> validationErrors) {
@@ -745,7 +745,7 @@ public class GuiConfigController implements Initializable {
       tableViewCandidates.getItems().add(candidate);
       buttonClearCandidateClicked();
     } else if (validationErrors.contains(ValidationError.CANDIDATE_NAME_MISSING)) {
-        textFieldCandidateName.getStyleClass().add("error");
+      textFieldCandidateName.getStyleClass().add("error");
     }
   }
 
