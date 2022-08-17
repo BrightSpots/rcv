@@ -92,6 +92,7 @@ class ContestConfig {
   private Map<String, String> candidateCodeToNameMap;
   // A list of any validation errors
   private Set<ValidationError> validationErrors = new HashSet<>();
+
   private ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     this.rawConfig = rawConfig;
     this.sourceDirectory = sourceDirectory;
@@ -233,7 +234,7 @@ class ContestConfig {
         } else {
           if (fieldIsDefinedButShouldNotBeForProvider(
               source.getOvervoteLabel(), "overvoteLabel", provider, source.getFilePath())) {
-            validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
+            validationErrors.add(ValidationError.CVR_OVERVOTE_UNEXPECTEDLY_DEFINED);
           }
         }
         if (fieldIsDefinedButShouldNotBeForProvider(
@@ -241,17 +242,17 @@ class ContestConfig {
             "firstVoteColumnIndex",
             provider,
             source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_FIRST_VOTE_COLUMN_INVALID);
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_INVALID);
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getIdColumnIndex(), "idColumnIndex", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_ID_COLUMN_INVALID);
+          validationErrors.add(ValidationError.CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
@@ -259,17 +260,17 @@ class ContestConfig {
             "precinctColumnIndex",
             provider,
             source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
+          validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getOvervoteDelimiter(), "overvoteDelimiter", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_INVALID);
+          validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getUndervoteLabel(), "undervoteLabel", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_INVALID);
+          validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED);
         }
 
         if (source.isTreatBlankAsUndeclaredWriteIn()) {
@@ -279,7 +280,7 @@ class ContestConfig {
                       + "provider \"%s\"",
                   provider),
               source.getFilePath());
-          validationErrors.add(ValidationError.CVR_PROVIDER_TREAT_BLANK_AS_UWI_DISAGREEMENT);
+          validationErrors.add(ValidationError.CVR_PROVIDER_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE);
         }
       }
 
@@ -299,7 +300,7 @@ class ContestConfig {
           && fieldIsDefinedButShouldNotBeForProvider(
           source.getContestId(), "contestId", provider, source.getFilePath())) {
         // Helper will log error
-        validationErrors.add(ValidationError.CVR_CONTEST_ID_INVALID);
+        validationErrors.add(ValidationError.CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED);
       }
     }
     return validationErrors;
@@ -1078,16 +1079,18 @@ class ContestConfig {
     TABULATOR_VERSION_NOT_SUPPORTED,
     OUTPUT_CONTEST_NAME_MISSING,
     CVR_NO_FILES_SPECIFIED,
-    CVR_FILE_PATH_MISSING,CVR_OVERVOTE_LABEL_INVALID,
+    CVR_FILE_PATH_MISSING,
+    CVR_OVERVOTE_LABEL_INVALID,
     CVR_UNDERVOTE_LABEL_INVALID,
     CVR_UWI_LABEL_ALREADY_IN_USE,
-    CVR_PROVIDER_INVALID,CVR_FIRST_VOTE_COLUMN_INVALID,
+    CVR_PROVIDER_INVALID,
+    CVR_FIRST_VOTE_COLUMN_INVALID,
     CVR_FIRST_VOTE_ROW_INVALID,
     CVR_ID_COLUMN_INVALID,
     CVR_PRECINCT_COLUMN_INVALID,
     CVR_OVERVOTE_DELIMITER_INVALID,
     CVR_CDF_FILE_PATH_INVALID,
-    CVR_PROVIDER_TREAT_BLANK_AS_UWI_DISAGREEMENT,
+    CVR_PROVIDER_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE,
     CVR_CONTEST_ID_INVALID,
     CVR_DUPLICATE_FILE_PATHS,
     CVR_FILE_PATH_INVALID,
@@ -1096,6 +1099,14 @@ class ContestConfig {
     CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN,
     CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED,
     CVR_OVERVOTE_DELIMITER_MISSING,
+    CVR_OVERVOTE_DELIMITER_UNEXPECTEDLY_DEFINED,
+    CVR_OVERVOTE_UNEXPECTEDLY_DEFINED,
+    CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED,
+    CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED,
+    CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED,
+    CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
+    CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED,
+    CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
     CANDIDATE_NAME_MISSING,
     CANDIDATE_NAME_INVALID,
     CANDIDATE_CODE_INVALID,
