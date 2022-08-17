@@ -541,12 +541,12 @@ class TabulatorTests {
   @Test
   @DisplayName("sequential with batch elimination test")
   void sequentialWithBatchElimination() {
-    runTabulationTest("test_set_sequential_with_batch");
+    runTabulationTest("sequential_with_batch");
   }
 
   @Test
   @DisplayName("sequential with continue until two test")
   void sequentialWithContinueUntilTwo() {
-    runTabulationTest("test_set_sequential_with_continue_until_two");
+    runTabulationTest("sequential_with_continue_until_two");
   }
 }

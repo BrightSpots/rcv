@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "Test Sequential with Batch Elimination",
+    "contestName": "Test Sequential with Continue until Two",
     "outputDirectory": "output",
     "contestDate": "",
     "contestJurisdiction": "",
@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "test_set_sequential_with_batch_cvr.xlsx",
+      "filePath": "sequential_with_continue_until_two_cvr.xlsx",
       "contestId": "",
       "firstVoteColumnIndex": "2",
       "firstVoteRowIndex": "2",
@@ -70,8 +70,8 @@
     "maxRankingsAllowed": "3",
     "nonIntegerWinningThreshold": false,
     "hareQuota": false,
-    "batchElimination": true,
-    "continueUntilTwoCandidatesRemain": false,
+    "batchElimination": false,
+    "continueUntilTwoCandidatesRemain": true,
     "exhaustOnDuplicateCandidate": false,
     "rulesDescription": "",
     "treatBlankAsUndeclaredWriteIn": false
