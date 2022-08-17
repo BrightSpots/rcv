@@ -550,8 +550,9 @@ class TabulatorTests {
     runTabulationTest("sequential_with_continue_until_two");
   }
 
+  @Test
   @DisplayName("overvote exhaust if multiple continuing test")
   void overvoteExhaustIfMultipleContinuingTest() {
-    runTabulationTest("test_set_exhaust_if_multiple_continuing");
+    runTabulationTest("exhaust_if_multiple_continuing");
   }
 }
