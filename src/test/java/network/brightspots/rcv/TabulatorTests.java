@@ -107,8 +107,7 @@ class TabulatorTests {
     String configPath = getTestFilePath(stem, "_config.json");
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
-    List<String> exceptionsEncountered = new LinkedList<>();
-    session.tabulate(exceptionsEncountered);
+    List<String> exceptionsEncountered = session.tabulate();
     if (expectedException != null) {
       assertTrue(exceptionsEncountered.contains(expectedException));
       return;
@@ -551,7 +550,6 @@ class TabulatorTests {
   }
 
   @Test
-<<<<<<< HEAD
   @DisplayName("sequential with batch elimination test")
   void sequentialWithBatchElimination() {
     runTabulationTest("sequential_with_batch");
@@ -572,6 +570,6 @@ class TabulatorTests {
   @Test
   @DisplayName("no one meets minimum test")
   void noOneMeetsMinimumTest() {
-    runTabulationTest("test_set_no_one_meets_minimum", TabulationAbortedException.class.toString());
+    runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());
   }
 }

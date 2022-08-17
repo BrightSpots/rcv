@@ -10,7 +10,7 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "test_set_no_one_meets_minimum_cvr.xlsx",
+    "filePath" : "no_one_meets_minimum_cvr.xlsx",
     "contestId" : "",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
