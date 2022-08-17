@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -70,6 +71,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
+import network.brightspots.rcv.ContestConfig.ValidationError;
 import network.brightspots.rcv.ContestConfigMigration.ConfigVersionIsNewerThanAppVersionException;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
@@ -572,6 +574,7 @@ public class GuiConfigController implements Initializable {
    * Action when add CVR file button is clicked.
    */
   public void buttonAddCvrFileClicked() {
+    clearBasicCvrValidationHighlighting();
     List<String> cvrPaths = Arrays.stream(getTextOrEmptyString(textFieldCvrFilePath).split(
         CVR_FILE_PATH_DELIMITER)).toList();
     List<String> failedFilePaths = new ArrayList<>();
@@ -603,15 +606,82 @@ public class GuiConfigController implements Initializable {
               undeclaredWriteInLabel,
               treatBlankAsUndeclaredWriteIn
           );
-      if (ContestConfig.performBasicCvrSourceValidation(cvrSource).isEmpty()) {
-        // If there are no validation errors
+      Set<ValidationError> validationErrors =
+          ContestConfig.performBasicCvrSourceValidation(cvrSource);
+      if (validationErrors.isEmpty()) {
         tableViewCvrFiles.getItems().add(cvrSource);
       } else {
+        highlightInputsFailingBasicCvrValidation(validationErrors);
         failedFilePaths.add(filePath);
       }
     });
     // If any entries failed validation, preserve them in the text box so the user can try again
     textFieldCvrFilePath.setText(String.join(CVR_FILE_PATH_DELIMITER, failedFilePaths));
+  }
+
+  private void clearBasicCvrValidationHighlighting() {
+      textFieldCvrFilePath.getStyleClass().removeAll("error");
+      textFieldCvrContestId.getStyleClass().removeAll("error");
+      textFieldCvrFirstVoteCol.getStyleClass().removeAll("error");
+      textFieldCvrFirstVoteRow.getStyleClass().removeAll("error");
+      textFieldCvrIdCol.getStyleClass().removeAll("error");
+      textFieldCvrPrecinctCol.getStyleClass().removeAll("error");
+      textFieldCvrOvervoteDelimiter.getStyleClass().removeAll("error");
+      textFieldCvrOvervoteLabel.getStyleClass().removeAll("error");
+      textFieldCvrUndervoteLabel.getStyleClass().removeAll("error");
+      textFieldCvrUndeclaredWriteInLabel.getStyleClass().removeAll("error");
+  }
+
+  private void highlightInputsFailingBasicCvrValidation(Set<ValidationError> validationErrors) {
+    // Only highlight fields if it's possible to trigger the validation errors via the GUI (i.e.
+    // don't highlight if the elements in question are disabled, and it's not possible to get into
+    // the invalid state).
+
+    if (validationErrors.contains(ValidationError.CVR_FILE_PATH_MISSING)
+        || validationErrors.contains(ValidationError.CVR_CDF_FILE_PATH_INVALID)) {
+      textFieldCvrFilePath.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_CONTEST_ID_INVALID)) {
+      textFieldCvrContestId.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_FIRST_VOTE_COLUMN_INVALID)) {
+      textFieldCvrFirstVoteCol.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_FIRST_VOTE_ROW_INVALID)) {
+      textFieldCvrFirstVoteRow.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_ID_COLUMN_INVALID)) {
+      textFieldCvrIdCol.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_PRECINCT_COLUMN_INVALID)) {
+      textFieldCvrPrecinctCol.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_OVERVOTE_DELIMITER_INVALID)) {
+      textFieldCvrOvervoteDelimiter.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_OVERVOTE_LABEL_INVALID)) {
+      textFieldCvrOvervoteLabel.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_UNDERVOTE_LABEL_INVALID)) {
+      textFieldCvrUndervoteLabel.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_UWI_LABEL_ALREADY_IN_USE)) {
+      textFieldCvrUndeclaredWriteInLabel.getStyleClass().add("error");
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED)) {
+      textFieldCvrOvervoteDelimiter.getStyleClass().add("error");
+      textFieldCvrOvervoteLabel.getStyleClass().add("error");
+    }
   }
 
   /**
@@ -620,10 +690,10 @@ public class GuiConfigController implements Initializable {
   public void buttonClearCvrFieldsClicked() {
     choiceCvrProvider.setValue(null);
     clearAndDisableCvrFilesTabFields();
-
   }
 
   private void clearAndDisableCvrFilesTabFields() {
+    clearBasicCvrValidationHighlighting();
     buttonAddCvrFile.setDisable(true);
     textFieldCvrFilePath.clear();
     textFieldCvrFilePath.setDisable(true);
@@ -663,15 +733,19 @@ public class GuiConfigController implements Initializable {
    * Action when add candidate button is clicked.
    */
   public void buttonAddCandidateClicked() {
+    textFieldCandidateName.getStyleClass().removeAll("error");
     Candidate candidate =
         new Candidate(
             getTextOrEmptyString(textFieldCandidateName),
             getTextOrEmptyString(textFieldCandidateCode),
             checkBoxCandidateExcluded.isSelected());
-    if (ContestConfig.performBasicCandidateValidation(candidate).isEmpty()) {
-      // If there are no validation errors
+    Set<ValidationError> validationErrors =
+        ContestConfig.performBasicCandidateValidation(candidate);
+    if (validationErrors.isEmpty()) {
       tableViewCandidates.getItems().add(candidate);
       buttonClearCandidateClicked();
+    } else if (validationErrors.contains(ValidationError.CANDIDATE_NAME_MISSING)) {
+        textFieldCandidateName.getStyleClass().add("error");
     }
   }
 
@@ -679,6 +753,7 @@ public class GuiConfigController implements Initializable {
    * Action when clear candidate button is clicked.
    */
   public void buttonClearCandidateClicked() {
+    textFieldCandidateName.getStyleClass().removeAll("error");
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
