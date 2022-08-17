@@ -113,7 +113,7 @@ class Tabulator {
 
   // run the main tabulation routine to determine contest results
   // returns: set containing winner(s)
-  Set<String> tabulate() throws TabulationCancelledException {
+  Set<String> tabulate() throws TabulationAbortedException {
     if (config.needsRandomSeed()) {
       Random random = new Random(config.getRandomSeed());
       if (config.getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION) {
@@ -159,7 +159,7 @@ class Tabulator {
       // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
       // on the number of active votes in the current round.
       if (currentRound == 1 || config.getNumberOfWinners() <= 1) {
-        setWinningThreshold(currentRoundCandidateToTally);
+        setWinningThreshold(currentRoundCandidateToTally, config.getMinimumVoteThreshold());
       }
 
       // "invert" map and look for winners
@@ -211,6 +211,13 @@ class Tabulator {
         // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
         if (eliminated.isEmpty()) {
           eliminated = dropCandidatesBelowThreshold(currentRoundTallyToCandidates);
+          // One edge case: if everyone is below the threshold, we can't proceed. This would only
+          // happen in the first or (if we drop undeclared write-ins first) second round.
+          if (eliminated.size() == config.getNumDeclaredCandidates()) {
+            Logger.severe("Tabulation can't proceed because all declared candidates are below "
+                + "the minimum vote threshold.");
+            throw new TabulationAbortedException(false);
+          }
         }
         // 3. Otherwise, try batch elimination.
         if (eliminated.isEmpty()) {
@@ -345,7 +352,8 @@ class Tabulator {
   }
 
   // determine and store the threshold to win
-  private void setWinningThreshold(Map<String, BigDecimal> currentRoundCandidateToTally) {
+  private void setWinningThreshold(Map<String, BigDecimal> currentRoundCandidateToTally,
+      BigDecimal minimumVoteThreshold) {
     BigDecimal currentRoundTotalVotes = BigDecimal.ZERO;
     for (BigDecimal numVotes : currentRoundCandidateToTally.values()) {
       currentRoundTotalVotes = currentRoundTotalVotes.add(numVotes);
@@ -386,6 +394,14 @@ class Tabulator {
                 .add(augend);
       }
     }
+
+    // We can never set a winning threshold that's less than the minimum vote threshold specified in
+    // the config.
+    if (minimumVoteThreshold.signum() == 1
+        && minimumVoteThreshold.compareTo(winningThreshold) == 1) {
+      winningThreshold = minimumVoteThreshold;
+    }
+
     Logger.info("Winning threshold set to %s.", winningThreshold);
   }
 
@@ -393,7 +409,7 @@ class Tabulator {
   // selected and if continueUntilTwoCandidatesRemain is true.
   private boolean shouldContinueTabulating() {
     boolean keepTabulating;
-    int numEliminatedCandidates = candidateToRoundEliminated.keySet().size();
+    int numEliminatedCandidates = candidateToRoundEliminated.size();
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
     if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
@@ -447,7 +463,7 @@ class Tabulator {
   private List<String> identifyWinners(
       Map<String, BigDecimal> currentRoundCandidateToTally,
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
-      throws TabulationCancelledException {
+      throws TabulationAbortedException {
     List<String> selectedWinners = new LinkedList<>();
 
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
@@ -609,7 +625,7 @@ class Tabulator {
   // returns: eliminated candidates
   private List<String> doRegularElimination(
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
-      throws TabulationCancelledException {
+      throws TabulationAbortedException {
     List<String> eliminated = new LinkedList<>();
     String eliminatedCandidate;
     // lowest tally in this round
@@ -1192,7 +1208,19 @@ class Tabulator {
     }
   }
 
-  static class TabulationCancelledException extends Exception {
+  static class TabulationAbortedException extends Exception {
 
+    final boolean cancelledByUser;
+
+    TabulationAbortedException(boolean cancelledByUser) {
+      this.cancelledByUser = cancelledByUser;
+    }
+
+    @Override
+    public String getMessage() {
+      return cancelledByUser
+          ? "Tabulation was cancelled by the user!"
+          : "Tabulation was cancelled due to a problem with the input data or config.";
+    }
   }
 }
