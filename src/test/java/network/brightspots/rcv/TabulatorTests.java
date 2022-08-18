@@ -296,7 +296,8 @@ class TabulatorTests {
     String configPath = getTestFilePath("invalid_params_test", "_config.json");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
-    assertFalse(config.validate());
+    // Expect validation errors
+    assertFalse(config.validate().isEmpty());
   }
 
   @Test
@@ -305,7 +306,8 @@ class TabulatorTests {
     String configPath = getTestFilePath("invalid_sources_test", "_config.json");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
-    assertFalse(config.validate());
+    // Expect validation errors
+    assertFalse(config.validate().isEmpty());
   }
 
   @Test
