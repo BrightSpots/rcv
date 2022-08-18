@@ -1,16 +1,15 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Test Set No One Meets Minimum",
-    "outputDirectory": "output",
-    "contestDate": "2022-08-15",
-    "contestJurisdiction": "",
-    "contestOffice": "",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Test Set No One Meets Minimum",
+    "outputDirectory" : "output",
+    "contestDate" : "2022-08-15",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
+  "cvrFileSources" : [ {
     "filePath" : "no_one_meets_minimum_cvr.xlsx",
     "contestId" : "",
     "firstVoteColumnIndex" : "2",
