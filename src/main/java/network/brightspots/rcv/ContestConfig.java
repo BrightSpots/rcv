@@ -744,12 +744,12 @@ class ContestConfig {
           Logger.severe(
               "If numberOfWinners is zero, winnerElectionMode must be \"%s\"!",
               WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
-        } else if (getMultiSeatBottomsUpPercentageThreshold() == null) {
+        }
+
+        if (getMultiSeatBottomsUpPercentageThreshold() == null) {
           validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
-          Logger.severe(
-              "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold "
-                  + "must be specified!",
-              winnerMode);
+          Logger.severe("If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
+              + "must be specified!");
         }
       }
     }
