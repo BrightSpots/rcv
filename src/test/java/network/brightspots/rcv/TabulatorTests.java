@@ -1,24 +1,19 @@
 /*
- * Universal RCV Tabulator
- * Copyright (c) 2017-2020 Bright Spots Developers.
+ * RCTab
+ * Copyright (c) 2017-2022 Bright Spots Developers.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- * the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License along with this
- * program.  If not, see <http://www.gnu.org/licenses/>.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
 /*
- * Purpose:
- * These regression tests run various tabulations and compare the generated results to
- * expected results. Passing these tests ensures that changes to tabulation code have not
- * altered the results of the tabulation.
+ * Purpose: These regression tests run various tabulations and compare the generated results to
+ * expected results.
+ * Design: Passing these tests ensures that changes to code have not altered the results of the
+ * tabulation.
+ * Conditions: During automated testing.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
@@ -33,9 +28,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 import network.brightspots.rcv.ContestConfig.Provider;
+import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,13 +50,10 @@ class TabulatorTests {
   // compare file contents line by line to identify differences
   private static boolean fileCompare(String path1, String path2) {
     boolean result = true;
-    FileReader fr1 = null;
-    FileReader fr2 = null;
-    try {
-      fr1 = new FileReader(path1);
-      BufferedReader br1 = new BufferedReader(fr1);
-      fr2 = new FileReader(path2);
-      BufferedReader br2 = new BufferedReader(fr2);
+    try (
+        BufferedReader br1 = new BufferedReader(new FileReader(path1, StandardCharsets.UTF_8));
+        BufferedReader br2 = new BufferedReader(new FileReader(path2, StandardCharsets.UTF_8))
+    ) {
       int currentLine = 1;
       int errorCount = 0;
 
@@ -91,17 +87,6 @@ class TabulatorTests {
     } catch (IOException exception) {
       Logger.severe("Error reading file!\n%s", exception);
       result = false;
-    } finally {
-      try {
-        if (fr1 != null) {
-          fr1.close();
-        }
-        if (fr2 != null) {
-          fr2.close();
-        }
-      } catch (IOException exception) {
-        Logger.severe("Error closing file!\n%s", exception);
-      }
     }
     return result;
   }
@@ -113,12 +98,20 @@ class TabulatorTests {
         .toString();
   }
 
-  // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem) {
+    runTabulationTest(stem, null);
+  }
+
+  // helper function to support running various tabulation tests
+  private static void runTabulationTest(String stem, String expectedException) {
     String configPath = getTestFilePath(stem, "_config.json");
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
-    session.tabulate();
+    List<String> exceptionsEncountered = session.tabulate();
+    if (expectedException != null) {
+      assertTrue(exceptionsEncountered.contains(expectedException));
+      return;
+    }
     Logger.info("Examining tabulation test results...");
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
@@ -147,9 +140,9 @@ class TabulatorTests {
     }
     // test passed so cleanup test output folder
     File outputFolder = new File(session.getOutputPath());
-    if (outputFolder.listFiles() != null) {
-      //noinspection ConstantConditions
-      for (File file : outputFolder.listFiles()) {
+    File[] files = outputFolder.listFiles();
+    if (files != null) {
+      for (File file : files) {
         if (!file.isDirectory()) {
           try {
             Files.delete(file.toPath());
@@ -292,12 +285,19 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("multi-cvr file dominion test")
+  void multiFileDominionTest() {
+    runTabulationTest("dominion_multi_file");
+  }
+
+  @Test
   @DisplayName("test invalid params in config file")
   void invalidParamsTest() {
     String configPath = getTestFilePath("invalid_params_test", "_config.json");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
-    assertFalse(config.validate());
+    // Expect validation errors
+    assertFalse(config.validate().isEmpty());
   }
 
   @Test
@@ -306,7 +306,8 @@ class TabulatorTests {
     String configPath = getTestFilePath("invalid_sources_test", "_config.json");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     assertNotNull(config);
-    assertFalse(config.validate());
+    // Expect validation errors
+    assertFalse(config.validate().isEmpty());
   }
 
   @Test
@@ -548,5 +549,29 @@ class TabulatorTests {
   @DisplayName("overvote delimiter test")
   void overvoteDelimiterTest() {
     runTabulationTest("test_set_overvote_delimiter");
+  }
+
+  @Test
+  @DisplayName("sequential with batch elimination test")
+  void sequentialWithBatchElimination() {
+    runTabulationTest("sequential_with_batch");
+  }
+
+  @Test
+  @DisplayName("sequential with continue until two test")
+  void sequentialWithContinueUntilTwo() {
+    runTabulationTest("sequential_with_continue_until_two");
+  }
+
+  @Test
+  @DisplayName("overvote exhaust if multiple continuing test")
+  void overvoteExhaustIfMultipleContinuingTest() {
+    runTabulationTest("exhaust_if_multiple_continuing");
+  }
+
+  @Test
+  @DisplayName("no one meets minimum test")
+  void noOneMeetsMinimumTest() {
+    runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());
   }
 }

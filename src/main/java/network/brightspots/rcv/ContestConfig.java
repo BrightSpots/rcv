@@ -1,23 +1,19 @@
 /*
- * Universal RCV Tabulator
- * Copyright (c) 2017-2020 Bright Spots Developers.
+ * RCTab
+ * Copyright (c) 2017-2022 Bright Spots Developers.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- * the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License along with this
- * program.  If not, see <http://www.gnu.org/licenses/>.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
 /*
- * Purpose:
- * Wrapper for RawContestConfig object. This class adds logic for looking up rule enum
- * names, candidate names, various configuration utilities, and cast vote record objects.
+ * Purpose: Wrapper for RawContestConfig object.  This class adds logic for looking up rule enum
+ * names, candidate names, tracking sequential winners, various GUI-related utilities, and
+ * significant logic for validating Contest Config data in different tabulation scenarios.
+ * Design: Wraps a RawContestConfig object (underlying data) and adds utility methods.
+ * Conditions: Used during GUI sessions and during any tabulation.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
@@ -83,19 +79,19 @@ class ContestConfig {
   private static final int MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 100;
   private static final long MIN_RANDOM_SEED = -140737488355328L;
   private static final long MAX_RANDOM_SEED = 140737488355327L;
-  // underlying rawConfig object data
+  // Underlying rawConfig object data
   final RawContestConfig rawConfig;
-  // this is used if we have a permutation-based tie-break mode
+  // This is used if we have a permutation-based tie-break mode
   private final ArrayList<String> candidatePermutation = new ArrayList<>();
   private final Set<String> excludedCandidates = new HashSet<>();
-  // path from which any relative paths should be resolved
+  // Path from which any relative paths should be resolved
   private final String sourceDirectory;
-  // used to track a sequential multi-seat race
+  // Used to track a sequential multi-seat race
   private final List<String> sequentialWinners = new LinkedList<>();
-  // mapping from candidate code to full name
+  // Mapping from candidate code to full name
   private Map<String, String> candidateCodeToNameMap;
-  // whether or not there are any validation errors
-  private boolean isValid;
+  // A list of any validation errors
+  private Set<ValidationError> validationErrors = new HashSet<>();
 
   private ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     this.rawConfig = rawConfig;
@@ -120,25 +116,25 @@ class ContestConfig {
   // create rawContestConfig from file - can fail for IO issues or invalid json
   // returns: new ContestConfig object if checks pass otherwise null
   static ContestConfig loadContestConfig(String configPath, boolean silentMode) {
+    ContestConfig config = null;
     if (configPath == null) {
       Logger.severe("No contest config path specified!");
-      return null;
-    }
-    ContestConfig config = null;
-    RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
-    if (rawConfig == null) {
-      Logger.severe("Failed to load contest config: %s", configPath);
     } else {
-      if (!silentMode) {
-        Logger.info("Successfully loaded contest config: %s", configPath);
+      RawContestConfig rawConfig = JsonParser.readFromFile(configPath, RawContestConfig.class);
+      if (rawConfig == null) {
+        Logger.severe("Failed to load contest config: %s", configPath);
+      } else {
+        if (!silentMode) {
+          Logger.info("Successfully loaded contest config: %s", configPath);
+        }
+        // parent folder is used as the default source folder
+        // if there is no parent folder use current working directory
+        String parentFolder = new File(configPath).getParent();
+        if (parentFolder == null) {
+          parentFolder = System.getProperty("user.dir");
+        }
+        config = loadContestConfig(rawConfig, parentFolder);
       }
-      // parent folder is used as the default source folder
-      // if there is no parent folder use current working directory
-      String parentFolder = new File(configPath).getParent();
-      if (parentFolder == null) {
-        parentFolder = System.getProperty("user.dir");
-      }
-      config = loadContestConfig(rawConfig, parentFolder);
     }
     return config;
   }
@@ -147,35 +143,34 @@ class ContestConfig {
     return loadContestConfig(configPath, false);
   }
 
-  static boolean passesBasicCvrSourceValidation(CvrSource source) {
-    boolean sourceValid = true;
-    // perform checks on source input path
+  /* Performs basic validation on CVR sources and returns a set of validation errors. **/
+  static Set<ValidationError> performBasicCvrSourceValidation(CvrSource source) {
+    Set<ValidationError> validationErrors = new HashSet<>();
     if (isNullOrBlank(source.getFilePath())) {
-      sourceValid = false;
+      validationErrors.add(ValidationError.CVR_FILE_PATH_MISSING);
       Logger.severe("filePath is required for each cast vote record file!");
     } else {
       if (!isNullOrBlank(source.getOvervoteLabel())
           && stringAlreadyInUseElsewhereInSource(
           source.getOvervoteLabel(), source, "overvoteLabel")) {
-        sourceValid = false;
+        validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
       }
       if (!isNullOrBlank(source.getUndervoteLabel())
           && stringAlreadyInUseElsewhereInSource(
           source.getUndervoteLabel(), source, "undervoteLabel")) {
-        sourceValid = false;
+        validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_INVALID);
       }
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
           && stringAlreadyInUseElsewhereInSource(
           source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
-        sourceValid = false;
+        validationErrors.add(ValidationError.CVR_UWI_LABEL_INVALID);
       }
 
       Provider provider = getProvider(source);
       if (provider == Provider.PROVIDER_UNKNOWN) {
-        sourceValid = false;
+        validationErrors.add(ValidationError.CVR_PROVIDER_INVALID);
         Logger.severe("Invalid provider for source: %s", source.getFilePath());
       } else if (provider == Provider.ESS) {
-        // ensure valid first vote column value
         if (fieldOutOfRangeOrNotInteger(
             source.getFirstVoteColumnIndex(),
             "firstVoteColumnIndex",
@@ -183,10 +178,9 @@ class ContestConfig {
             MAX_COLUMN_INDEX,
             true,
             source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_COLUMN_INVALID);
         }
 
-        // ensure valid first vote row value
         if (fieldOutOfRangeOrNotInteger(
             source.getFirstVoteRowIndex(),
             "firstVoteRowIndex",
@@ -194,10 +188,9 @@ class ContestConfig {
             MAX_ROW_INDEX,
             true,
             source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_INVALID);
         }
 
-        // ensure valid id column value
         if (fieldOutOfRangeOrNotInteger(
             source.getIdColumnIndex(),
             "idColumnIndex",
@@ -205,10 +198,9 @@ class ContestConfig {
             MAX_COLUMN_INDEX,
             false,
             source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_ID_COLUMN_INVALID);
         }
 
-        // ensure valid precinct column value
         if (fieldOutOfRangeOrNotInteger(
             source.getPrecinctColumnIndex(),
             "precinctColumnIndex",
@@ -216,14 +208,20 @@ class ContestConfig {
             MAX_COLUMN_INDEX,
             false,
             source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
         }
 
-        // See the config file documentation for an explanation of this regex.
+        // See the config file documentation for an explanation of this regex
         if (!isNullOrBlank(source.getOvervoteDelimiter())
             && source.getOvervoteDelimiter().matches(".*\\\\.*|[a-zA-Z0-9.',\\-\"\\s]+")) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_INVALID);
           Logger.severe("overvoteDelimiter is invalid.");
+        }
+
+        if (!isNullOrBlank(source.getOvervoteDelimiter())
+            && !isNullOrBlank(source.getOvervoteLabel())) {
+          validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED);
+          Logger.severe("overvoteDelimiter and overvoteLabel can't both be supplied.");
         }
       } else {
         if (provider == Provider.CDF) {
@@ -232,12 +230,12 @@ class ContestConfig {
             Logger.severe(
                 "CDF source files must be .json or .xml! Unexpected file extension for: %s",
                 source.getFilePath());
-            sourceValid = false;
+            validationErrors.add(ValidationError.CVR_CDF_FILE_PATH_INVALID);
           }
         } else {
           if (fieldIsDefinedButShouldNotBeForProvider(
               source.getOvervoteLabel(), "overvoteLabel", provider, source.getFilePath())) {
-            sourceValid = false;
+            validationErrors.add(ValidationError.CVR_OVERVOTE_UNEXPECTEDLY_DEFINED);
           }
         }
         if (fieldIsDefinedButShouldNotBeForProvider(
@@ -245,17 +243,17 @@ class ContestConfig {
             "firstVoteColumnIndex",
             provider,
             source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getIdColumnIndex(), "idColumnIndex", provider, source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
@@ -263,17 +261,17 @@ class ContestConfig {
             "precinctColumnIndex",
             provider,
             source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getOvervoteDelimiter(), "overvoteDelimiter", provider, source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getUndervoteLabel(), "undervoteLabel", provider, source.getFilePath())) {
-          sourceValid = false;
+          validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED);
         }
 
         if (source.isTreatBlankAsUndeclaredWriteIn()) {
@@ -283,6 +281,7 @@ class ContestConfig {
                       + "provider \"%s\"",
                   provider),
               source.getFilePath());
+          validationErrors.add(ValidationError.CVR_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE);
         }
       }
 
@@ -293,25 +292,25 @@ class ContestConfig {
               || provider == Provider.CDF;
 
       if (isNullOrBlank(source.getContestId()) && providerRequiresContestId) {
-        sourceValid = false;
+        validationErrors.add(ValidationError.CVR_CONTEST_ID_INVALID);
         Logger.severe(
             String.format(
                 "contestId must be defined for CVR source with provider \"%s\"!",
                 getProvider(source)));
-      } else if (!(providerRequiresContestId)
+      } else if (!providerRequiresContestId
           && fieldIsDefinedButShouldNotBeForProvider(
           source.getContestId(), "contestId", provider, source.getFilePath())) {
-        // helper will log error
-        sourceValid = false;
+        // Helper will log error
+        validationErrors.add(ValidationError.CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED);
       }
     }
-    return sourceValid;
+    return validationErrors;
   }
 
   // function: stringMatchesAnotherFieldValue(
   // purpose: Checks to make sure string value of one field doesn't match value of another field
-  // param: string string to check
-  // param: field field name of provided string
+  // param: string to check
+  // param: field name of provided string
   // param: otherFieldValue string value of the other field
   // param: otherField name of the other field
   private static boolean stringMatchesAnotherFieldValue(
@@ -398,13 +397,14 @@ class ContestConfig {
     return Provider.getByInternalLabel(cvrSource.getProvider());
   }
 
-  static boolean passesBasicCandidateValidation(Candidate candidate) {
-    boolean candidateValid = true;
+  /* Performs basic validation on candidate list and returns a set of validation errors. **/
+  static Set<ValidationError> performBasicCandidateValidation(Candidate candidate) {
+    Set<ValidationError> validationErrors = new HashSet<>();
     if (isNullOrBlank(candidate.getName())) {
-      candidateValid = false;
+      validationErrors.add(ValidationError.CANDIDATE_NAME_MISSING);
       Logger.severe("A name is required for each candidate!");
     }
-    return candidateValid;
+    return validationErrors;
   }
 
   private static boolean stringConflictsWithReservedString(String string, String field) {
@@ -419,10 +419,7 @@ class ContestConfig {
     return reserved;
   }
 
-  // function: stringAlreadyInUseElsewhere
-  // purpose: Checks to make sure string isn't reserved or used by other fields
-  // param: string string to check
-  // param: field field name of provided string
+  // Checks to make sure string isn't reserved or used by other fields
   private static boolean stringAlreadyInUseElsewhereInSource(
       String string, CvrSource source, String field) {
     boolean inUse = stringConflictsWithReservedString(string, field);
@@ -453,23 +450,23 @@ class ContestConfig {
     return rawConfig;
   }
 
-  boolean validate() {
+  /* Performs a full validation of the ContestConfig. **/
+  Set<ValidationError> validate() {
     Logger.info("Validating contest config...");
-    isValid = true;
+    validationErrors = new HashSet<>();
     validateTabulatorVersion();
     validateOutputSettings();
     validateCvrFileSources();
     validateCandidates();
     validateRules();
-    if (isValid) {
+    if (validationErrors.isEmpty()) {
       Logger.info("Contest config validation successful.");
     } else {
       Logger.severe(
           "Contest config validation failed! Please modify the contest config file and try again.\n"
               + "See config_file_documentation.txt for more details.");
     }
-
-    return isValid;
+    return validationErrors;
   }
 
   // version validation and migration logic goes here
@@ -477,24 +474,25 @@ class ContestConfig {
   // in this release we support only the current app version
   private void validateTabulatorVersion() {
     if (isNullOrBlank(getTabulatorVersion())) {
-      isValid = false;
+      validationErrors.add(ValidationError.TABULATOR_VERSION_MISSING);
       Logger.severe("tabulatorVersion is required!");
     } else {
       // ignore this check for test data, but otherwise require version to match current app version
       if (!getTabulatorVersion().equals(AUTOMATED_TEST_VERSION)
           && !getTabulatorVersion().equals(Main.APP_VERSION)) {
-        isValid = false;
+        validationErrors.add(ValidationError.TABULATOR_VERSION_NOT_SUPPORTED);
         Logger.severe("tabulatorVersion %s not supported!", getTabulatorVersion());
       }
     }
-    if (!isValid) {
+    if (validationErrors.contains(ValidationError.TABULATOR_VERSION_MISSING)
+        || validationErrors.contains(ValidationError.TABULATOR_VERSION_NOT_SUPPORTED)) {
       Logger.severe("tabulatorVersion must be set to %s!", Main.APP_VERSION);
     }
   }
 
   private void validateOutputSettings() {
     if (isNullOrBlank(getContestName())) {
-      isValid = false;
+      validationErrors.add(ValidationError.OUTPUT_CONTEST_NAME_MISSING);
       Logger.severe("contestName is required!");
     }
   }
@@ -523,62 +521,56 @@ class ContestConfig {
 
   private void validateCvrFileSources() {
     if (rawConfig.cvrFileSources == null || rawConfig.cvrFileSources.isEmpty()) {
-      isValid = false;
+      validationErrors.add(ValidationError.CVR_NO_FILES_SPECIFIED);
       Logger.severe("Contest config must contain at least 1 cast vote record file!");
     } else {
       HashSet<String> cvrFilePathSet = new HashSet<>();
       for (CvrSource source : rawConfig.cvrFileSources) {
-        if (!passesBasicCvrSourceValidation(source)) {
-          isValid = false;
-        }
+        validationErrors.addAll(performBasicCvrSourceValidation(source));
 
         String cvrPath =
             isNullOrBlank(source.getFilePath()) ? null : resolveConfigPath(source.getFilePath());
 
-        // look for duplicate paths
+        // Look for duplicate paths
         if (cvrFilePathSet.contains(cvrPath)) {
-          isValid = false;
+          validationErrors.add(ValidationError.CVR_DUPLICATE_FILE_PATHS);
           Logger.severe("Duplicate cast vote record filePaths are not allowed: %s", cvrPath);
         } else {
           cvrFilePathSet.add(cvrPath);
         }
 
-        // ensure file exists
+        // Ensure file exists
         if (cvrPath != null && !new File(cvrPath).exists()) {
-          isValid = false;
+          validationErrors.add(ValidationError.CVR_FILE_PATH_INVALID);
           Logger.severe("Cast vote record file not found: %s", cvrPath);
         }
 
         if (!isNullOrBlank(source.getOvervoteLabel())
             && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
             && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
-          isValid = false;
+          validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_OVERVOTE_RULE_MISMATCH);
           Logger.severe(
               "When overvoteLabel is supplied, overvoteRule must be either \"%s\" or \"%s\"!",
               Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT,
-              Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
+              Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
         }
 
         if (isCdf(source)) {
-          // perform CDF checks
+          // Perform CDF checks
           if (isTabulateByPrecinctEnabled()) {
-            isValid = false;
+            validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT);
             Logger.severe("tabulateByPrecinct may not be used with CDF files.");
           }
         } else if (getProvider(source) == Provider.ESS) {
-          // perform ES&S checks
+          // Perform ES&S checks
           if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
-            isValid = false;
+            validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN);
             Logger.severe(
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s", cvrPath);
           }
-          if (!isNullOrBlank(source.getOvervoteDelimiter())) {
-            if (!isNullOrBlank(source.getOvervoteLabel())) {
-              isValid = false;
-              Logger.severe("overvoteDelimiter and overvoteLabel can't both be supplied.");
-            }
-          } else if (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
-            isValid = false;
+          if (isNullOrBlank(source.getOvervoteDelimiter())
+              && getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
+            validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_MISSING);
             Logger.severe(
                 "overvoteDelimiter is required for an ES&S CVR source when overvoteRule "
                     + "is set to \"%s\".",
@@ -594,13 +586,11 @@ class ContestConfig {
     Set<String> candidateCodeSet = new HashSet<>();
 
     for (Candidate candidate : rawConfig.candidates) {
-      if (!passesBasicCandidateValidation(candidate)) {
-        isValid = false;
-      }
+      validationErrors.addAll(performBasicCandidateValidation(candidate));
 
       if (!isNullOrBlank(candidate.getName())) {
         if (candidateStringAlreadyInUseElsewhere(candidate.getName(), "name", candidateNameSet)) {
-          isValid = false;
+          validationErrors.add(ValidationError.CANDIDATE_NAME_INVALID);
         } else {
           candidateNameSet.add(candidate.getName());
         }
@@ -608,7 +598,7 @@ class ContestConfig {
 
       if (!isNullOrBlank(candidate.getCode())) {
         if (candidateStringAlreadyInUseElsewhere(candidate.getCode(), "code", candidateCodeSet)) {
-          isValid = false;
+          validationErrors.add(ValidationError.CANDIDATE_CODE_INVALID);
         } else {
           candidateCodeSet.add(candidate.getCode());
         }
@@ -616,49 +606,49 @@ class ContestConfig {
     }
 
     if (candidateCodeSet.size() > 0 && candidateCodeSet.size() != candidateNameSet.size()) {
-      isValid = false;
+      validationErrors.add(ValidationError.CANDIDATE_DUPLICATE_CODES);
       Logger.severe("If candidate codes are used, a unique code is required for each candidate!");
     }
 
     if (getNumDeclaredCandidates() < 1) {
-      isValid = false;
+      validationErrors.add(ValidationError.CANDIDATE_NO_CANDIDATES_SPECIFIED);
       Logger.severe("Contest config must contain at least 1 declared candidate!");
     } else if (getNumDeclaredCandidates() == excludedCandidates.size()) {
-      isValid = false;
+      validationErrors.add(ValidationError.CANDIDATE_ALL_EXCLUDED);
       Logger.severe("Contest config must contain at least 1 non-excluded candidate!");
     }
   }
 
   private void validateRules() {
-
     if (getTiebreakMode() == TiebreakMode.MODE_UNKNOWN) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_TIEBREAK_MODE_INVALID);
       Logger.severe("Invalid tiebreakMode!");
     }
 
     if (needsRandomSeed() && isNullOrBlank(getRandomSeedRaw())) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_RANDOM_SEED_MISSING);
       Logger.severe("When tiebreakMode involves a random element, randomSeed must be supplied!");
     }
+
     if (fieldOutOfRangeOrNotInteger(
         getRandomSeedRaw(), "randomSeed", MIN_RANDOM_SEED, MAX_RANDOM_SEED, false)) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_RANDOM_SEED_INVALID);
     }
 
     if (getOvervoteRule() == OvervoteRule.RULE_UNKNOWN) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_OVERVOTE_RULE_INVALID);
       Logger.severe("Invalid overvoteRule!");
     }
 
     if (getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_WINNER_ELECTION_MODE_INVALID);
       Logger.severe("Invalid winnerElectionMode!");
     }
 
     if (getMaxRankingsAllowed() == null
         || (getNumDeclaredCandidates() >= 1
         && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_MAX_RANKINGS_ALLOWED_INVALID);
       Logger.severe(
           "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
           MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION, MIN_MAX_RANKINGS_ALLOWED, Integer.MAX_VALUE);
@@ -666,7 +656,7 @@ class ContestConfig {
 
     if (getMaxSkippedRanksAllowed() == null
         || getMaxSkippedRanksAllowed() < MIN_MAX_SKIPPED_RANKS_ALLOWED) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_MAX_SKIPPED_RANKS_ALLOWED_INVALID);
       Logger.severe(
           "maxSkippedRanksAllowed must either be \"%s\" or an integer from %d to %d!",
           MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION,
@@ -680,7 +670,7 @@ class ContestConfig {
         MIN_NUMBER_OF_WINNERS,
         getNumDeclaredCandidates() < 1 ? Integer.MAX_VALUE : getNumDeclaredCandidates(),
         true)) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_NUMBER_OF_WINNERS_INVALID);
     }
 
     if (fieldOutOfRangeOrNotInteger(
@@ -689,7 +679,7 @@ class ContestConfig {
         MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC,
         MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC,
         true)) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC_INVALID);
     }
 
     if (fieldOutOfRangeOrNotInteger(
@@ -698,7 +688,7 @@ class ContestConfig {
         MIN_MINIMUM_VOTE_THRESHOLD,
         MAX_MINIMUM_VOTE_THRESHOLD,
         false)) {
-      isValid = false;
+      validationErrors.add(ValidationError.RULES_MIN_VOTE_THRESHOLD_INVALID);
     }
 
     if (fieldOutOfRangeOrNotInteger(
@@ -707,55 +697,66 @@ class ContestConfig {
         MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
         MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
         false)) {
-      isValid = false;
+      validationErrors.add(
+          ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
     }
 
     WinnerElectionMode winnerMode = getWinnerElectionMode();
     if (Utils.isInt(getNumberOfWinnersRaw())) {
       if (getNumberOfWinners() > 0) {
         if (isMultiSeatBottomsUpWithThresholdEnabled()) {
-          isValid = false;
+          validationErrors.add(
+              ValidationError.RULES_NUMBER_OF_WINNERS_INVALID_FOR_WINNER_ELECTION_MODE);
           Logger.severe(
               "numberOfWinners must be zero if winnerElectionMode is \"%s\"!", winnerMode);
         }
 
         if (getNumberOfWinners() > 1) {
-          if (isContinueUntilTwoCandidatesRemainEnabled()) {
-            isValid = false;
-            Logger.severe(
-                "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest!");
-          }
+          if (winnerMode != WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL) {
+            if (isContinueUntilTwoCandidatesRemainEnabled()) {
+              validationErrors.add(
+                  ValidationError.RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT);
+              Logger.severe(
+                  "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest unless "
+                      + "the winner election mode is multi-pass IRV!"
+              );
+            }
 
-          if (isBatchEliminationEnabled()) {
-            isValid = false;
-            Logger.severe("batchElimination can't be true in a multi-seat contest!");
+            if (isBatchEliminationEnabled()) {
+              validationErrors.add(ValidationError.RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT);
+              Logger.severe(
+                  "batchElimination can't be true in a multi-seat contest unless the "
+                      + "winner election mode is multi-pass IRV!"
+              );
+            }
           }
         } else { // numberOfWinners == 1
           if (!isSingleWinnerEnabled()) {
-            isValid = false;
+            validationErrors.add(
+                ValidationError.RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT);
             Logger.severe(
                 "winnerElectionMode can't be \"%s\" in a single-seat contest!", winnerMode);
           }
         }
       } else { // numberOfWinners == 0
         if (!isMultiSeatBottomsUpWithThresholdEnabled()) {
-          isValid = false;
+          validationErrors.add(ValidationError.RULES_ZERO_WINNERS_INVALID_WINNER_ELECTION_MODE);
           Logger.severe(
-              "If numberOfWinners is zero, winnerElectionMode must be \"%s\" and "
-                  + "multiSeatBottomsUpPercentageThreshold must be specified!",
+              "If numberOfWinners is zero, winnerElectionMode must be \"%s\"!",
               WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
-        } else if (getMultiSeatBottomsUpPercentageThreshold() == null) {
-          isValid = false;
-          Logger.severe(
-              "If winnerElectionMode is \"%s\", multiSeatBottomsUpPercentageThreshold "
-                  + "must be specified!",
-              winnerMode);
+        }
+
+        if (getMultiSeatBottomsUpPercentageThreshold() == null) {
+          validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
+          Logger.severe("If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
+              + "must be specified!");
         }
       }
     }
 
     if (isMultiSeatBottomsUpWithThresholdEnabled() && isBatchEliminationEnabled()) {
-      isValid = false;
+      validationErrors.add(
+          ValidationError.RULES_BOTTOMS_UP_THRESHOLD_BATCH_ELIMINATION_DISAGREEMENT);
       Logger.severe(
           "batchElimination can't be true when winnerElectionMode is \"%s\"!", winnerMode);
     }
@@ -764,19 +765,21 @@ class ContestConfig {
     if (!isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
         && !isMultiSeatAllowMultipleWinnersPerRoundEnabled()) {
       if (isNonIntegerWinningThresholdEnabled()) {
-        isValid = false;
+        validationErrors.add(
+            ValidationError.RULES_NON_INTEGER_WINNING_THRESHOLD_WINNER_ELECTION_MODE_DISAGREEMENT);
         Logger.severe(
             "nonIntegerWinningThreshold can't be true when winnerElectionMode is \"%s\"!",
             winnerMode);
       }
       if (isHareQuotaEnabled()) {
-        isValid = false;
+        validationErrors.add(ValidationError.RULES_HARE_QUOTA_WINNER_ELECTION_MODE_DISAGREEMENT);
         Logger.severe("hareQuota can't be true when winnerElectionMode is \"%s\"!", winnerMode);
       }
     }
 
     if (isNonIntegerWinningThresholdEnabled() && isHareQuotaEnabled()) {
-      isValid = false;
+      validationErrors.add(
+          ValidationError.RULES_NON_INTEGER_WINNING_THRESHOLD_HARE_QUOTA_DISAGREEMENT);
       Logger.severe(
           "nonIntegerWinningThreshold and hareQuota can't both be true at the same time!");
     }
@@ -954,7 +957,7 @@ class ContestConfig {
   }
 
   int getNumCandidates() {
-    return getCandidateCodeList().size();
+    return getCandidateCodeList().size() - excludedCandidates.size();
   }
 
   boolean candidateIsExcluded(String candidate) {
@@ -1069,6 +1072,69 @@ class ContestConfig {
       }
     }
     return includeUwi;
+  }
+
+  // Possible validation errors
+  enum ValidationError {
+    TABULATOR_VERSION_MISSING,
+    TABULATOR_VERSION_NOT_SUPPORTED,
+    OUTPUT_CONTEST_NAME_MISSING,
+    CVR_NO_FILES_SPECIFIED,
+    CVR_FILE_PATH_MISSING,
+    CVR_OVERVOTE_LABEL_INVALID,
+    CVR_UNDERVOTE_LABEL_INVALID,
+    CVR_UWI_LABEL_INVALID,
+    CVR_PROVIDER_INVALID,
+    CVR_FIRST_VOTE_COLUMN_INVALID,
+    CVR_FIRST_VOTE_ROW_INVALID,
+    CVR_ID_COLUMN_INVALID,
+    CVR_PRECINCT_COLUMN_INVALID,
+    CVR_OVERVOTE_DELIMITER_INVALID,
+    CVR_CDF_FILE_PATH_INVALID,
+    CVR_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE,
+    CVR_CONTEST_ID_INVALID,
+    CVR_DUPLICATE_FILE_PATHS,
+    CVR_FILE_PATH_INVALID,
+    CVR_OVERVOTE_LABEL_OVERVOTE_RULE_MISMATCH,
+    CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT,
+    CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN,
+    CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED,
+    CVR_OVERVOTE_DELIMITER_MISSING,
+    CVR_OVERVOTE_DELIMITER_UNEXPECTEDLY_DEFINED,
+    CVR_OVERVOTE_UNEXPECTEDLY_DEFINED,
+    CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED,
+    CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED,
+    CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED,
+    CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
+    CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED,
+    CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
+    CANDIDATE_NAME_MISSING,
+    CANDIDATE_NAME_INVALID,
+    CANDIDATE_CODE_INVALID,
+    CANDIDATE_DUPLICATE_CODES,
+    CANDIDATE_NO_CANDIDATES_SPECIFIED,
+    CANDIDATE_ALL_EXCLUDED,
+    RULES_TIEBREAK_MODE_INVALID,
+    RULES_RANDOM_SEED_INVALID,
+    RULES_RANDOM_SEED_MISSING,
+    RULES_OVERVOTE_RULE_INVALID,
+    RULES_WINNER_ELECTION_MODE_INVALID,
+    RULES_MAX_RANKINGS_ALLOWED_INVALID,
+    RULES_MAX_SKIPPED_RANKS_ALLOWED_INVALID,
+    RULES_NUMBER_OF_WINNERS_INVALID,
+    RULES_MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC_INVALID,
+    RULES_MIN_VOTE_THRESHOLD_INVALID,
+    RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID,
+    RULES_NUMBER_OF_WINNERS_INVALID_FOR_WINNER_ELECTION_MODE,
+    RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT,
+    RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT,
+    RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT,
+    RULES_ZERO_WINNERS_INVALID_WINNER_ELECTION_MODE,
+    RULES_PERCENTAGE_THRESHOLD_MISSING,
+    RULES_BOTTOMS_UP_THRESHOLD_BATCH_ELIMINATION_DISAGREEMENT,
+    RULES_NON_INTEGER_WINNING_THRESHOLD_WINNER_ELECTION_MODE_DISAGREEMENT,
+    RULES_HARE_QUOTA_WINNER_ELECTION_MODE_DISAGREEMENT,
+    RULES_NON_INTEGER_WINNING_THRESHOLD_HARE_QUOTA_DISAGREEMENT
   }
 
   enum Provider {

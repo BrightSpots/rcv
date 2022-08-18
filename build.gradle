@@ -1,10 +1,12 @@
 plugins {
     id "application"
     id "checkstyle"
+    // Latest version at: https://github.com/spotbugs/spotbugs-gradle-plugin/tags
+    id "com.github.spotbugs" version "5.0.9"
     id "idea"
-    id "java"
-    id "org.openjfx.javafxplugin" version "0.0.9"
-    id "org.beryx.jlink" version "2.20.0"
+    id "java-library"
+    id "org.beryx.jlink" version "2.25.0"
+    id "org.openjfx.javafxplugin" version "0.0.11"
 }
 
 repositories {
@@ -12,19 +14,19 @@ repositories {
 }
 
 dependencies {
-    implementation "org.apache.commons:commons-csv:1.8"
-    implementation "org.apache.poi:poi-ooxml:4.1.2"
-    implementation "com.fasterxml.jackson.core:jackson-core:2.11.1"
-    implementation "com.fasterxml.jackson.core:jackson-annotations:2.11.1"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.11.1"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.1"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.2"
+    implementation 'org.apache.commons:commons-csv:1.9.0'
+    implementation 'org.apache.poi:poi-ooxml:5.2.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 }
 
 // ### Application plugin settings
 application {
-    mainClassName = "${moduleName}.Main"
+    mainClass = "${moduleName}.Main"
 }
 
 // Uncomment below to simulate running from the CLI
@@ -35,17 +37,29 @@ application {
 
 // ### Checkstyle plugin settings
 checkstyle {
-    toolVersion = "8.36.2"
+    // Latest version at https://github.com/checkstyle/checkstyle/tags
+    toolVersion = '10.3.2'
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
-    //
-    // https://github.com/checkstyle/checkstyle/blob/checkstyle-8.36.2/src/main/resources/google_checks.xml
-    //
-    // VERY IMPORTANT: after copying a new version of the above, make sure the "SuppressionFilter"
-    // module has this line in order to actually pick up our project's Checkstyle suppression rules:
-    // value="${config_loc}/checkstyle-suppressions.xml"
-    // More info on this at: https://github.com/BrightSpots/rcv/issues/489
+    // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.3.2/src/main/resources/google_checks.xml
+    // NOTE: After updating the local version of config/checkstyle/google_checks.xml again in the
+    // future, it may be necessary to subsequently replace the following line in the local copy to
+    // prevent suppressions from being ignored:
+    // "${org.checkstyle.google.suppressionfilter.config}"
+    // with:
+    // "${config_loc}/checkstyle-suppressions.xml"
+    // Additional context: https://github.com/gradle/gradle/issues/21409
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
+    maxWarnings = 0
+    ignoreFailures = false
+}
+System.setProperty("org.checkstyle.google.suppressionfilter.config",
+        "$projectDir/config/checkstyle/checkstyle-suppressions.xml")
+
+spotbugs {
+    // Latest version at: https://github.com/spotbugs/spotbugs/tags
+    toolVersion = '4.7.1'
+    excludeFilter = file("config/spotbugs/exclude.xml")
 }
 
 // ### Idea plugin settings
@@ -56,11 +70,10 @@ idea {
 }
 
 // ### Java plugin settings
-sourceCompatibility = JavaVersion.VERSION_14
-
-compileJava.dependsOn(clean)
-compileJava {
-    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 test {
@@ -77,7 +90,7 @@ test {
 
 // ### JavaFX plugin settings
 javafx {
-    version = "14.0.1"
+    version = "18"
     modules = ["javafx.base", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 

@@ -1,40 +1,33 @@
 /*
- * Universal RCV Tabulator
- * Copyright (c) 2017-2020 Bright Spots Developers.
+ * RCTab
+ * Copyright (c) 2017-2022 Bright Spots Developers.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- * the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License along with this
- * program.  If not, see <http://www.gnu.org/licenses/>.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
 /*
- * Purpose:
- * Wrapper for console and file logging functions. All logging messages including execution,
+ * Purpose: Wrapper for logging functions.  All logging messages including execution,
  * tabulation, and audit information go through this.
- *
+ * Design:
  * log message
  *  |
  *  v
- * tabulation handler (FINE) -> tabulation "audit" file
- *  when a tabulation is in progress this captures all FINE level logging including audit info
+ * Tabulation handler (FINE) -> tabulation "audit" file
+ *  When a tabulation is in progress this captures all FINE level logging including audit info.
  *
- * execution handler (INFO) -> execution file
- *  captures all INFO level logging for the execution of a session
- *  "session" could span multiple tabulations in GUI mode
+ * Execution handler (INFO) -> execution file
+ *  Captures all INFO level logging for the execution of a session.
+ *  "session" could span multiple tabulations in GUI mode.
  *
  * GUI handler (INFO) -> textArea
- *  displays INFO level logging in GUI for user feedback in GUI mode
+ *  Displays INFO level logging in GUI for user feedback in GUI mode.
  *
- * default handler -> console
- *  displays INFO level logging in console for debugging
- *
+ * Default handler -> console
+ *  Displays INFO level logging in console for debugging.
+ * Conditions: Always.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
@@ -98,14 +91,24 @@ class Logger {
   }
 
   // adds file logging for a tabulation run
-  static void addTabulationFileLogging(String outputPath) throws IOException {
-    // use Level.FINE to capture audit info
-    tabulationHandler =
-        new FileHandler(outputPath, LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
+  static void addTabulationFileLogging(String outputFolder, String timestampString)
+      throws IOException {
+    // log file name is: outputFolder + timestamp + log index
+    // FileHandler requires % to be encoded as %%.  %g is the log index
+    String tabulationLogPattern =
+            Paths.get(outputFolder.replace("%", "%%"),
+                    String.format("%s_audit_%%g.log", timestampString))
+                    .toAbsolutePath()
+                    .toString();
+
+    tabulationHandler = new FileHandler(tabulationLogPattern,
+            LOG_FILE_MAX_SIZE_BYTES,
+            TABULATION_LOG_FILE_COUNT,
+            true);
     tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
     logger.addHandler(tabulationHandler);
-    info("Tabulation logging to: %s", outputPath.replace("%g", "*"));
+    info("Tabulation logging to: %s", tabulationLogPattern.replace("%g", "0"));
   }
 
   // remove file logging once a tabulation run is completed
@@ -116,19 +119,24 @@ class Logger {
   }
 
   static void fine(String message, Object... obj) {
-    logger.log(Level.FINE, String.format(message, obj));
+    log(Level.FINE, message, obj);
   }
 
   static void info(String message, Object... obj) {
-    logger.log(Level.INFO, String.format(message, obj));
+    log(Level.INFO, message, obj);
   }
 
   static void warning(String message, Object... obj) {
-    logger.log(Level.WARNING, String.format(message, obj));
+    log(Level.WARNING, message, obj);
   }
 
   static void severe(String message, Object... obj) {
-    logger.log(Level.SEVERE, String.format(message, obj));
+    log(Level.SEVERE, message, obj);
+  }
+
+  private static void log(Level level, String message, Object... obj) {
+    // only call format if there are format args provided
+    logger.log(level, obj.length > 0 ? String.format(message, obj) : message);
   }
 
   // add logging to the provided text area for display to user in the GUI
@@ -137,16 +145,15 @@ class Logger {
         new Handler() {
           @Override
           public void publish(LogRecord record) {
-            if (!isLoggable(record)) {
-              return;
-            }
-            String msg = getFormatter().format(record);
-            // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
-            // otherwise schedule the text update to run on the GUI thread
-            if (Platform.isFxApplicationThread()) {
-              textArea.appendText(msg);
-            } else {
-              Platform.runLater(() -> textArea.appendText(msg));
+            if (isLoggable(record)) {
+              String msg = getFormatter().format(record);
+              // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
+              // otherwise schedule the text update to run on the GUI thread
+              if (Platform.isFxApplicationThread()) {
+                textArea.appendText(msg);
+              } else {
+                Platform.runLater(() -> textArea.appendText(msg));
+              }
             }
           }
 

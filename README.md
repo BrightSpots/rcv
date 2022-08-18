@@ -1,8 +1,8 @@
-# Universal RCV Tabulator
+# RCTab
 
 ## Overview
 
-The Universal RCV Tabulator is a free, open-source application designed to quickly and accurately tabulate a wide variety of ranked choice voting (RCV) elections. It allows users to:
+RCTab is a free, open-source application designed to quickly and accurately tabulate a wide variety of ranked choice voting (RCV) elections, including both single-winner contests and various multi-winner formats (e.g. single transferable vote, a.k.a. STV). It allows users to:
 - Create contest configuration files using a graphical user interface (GUI)
 - Validate contest configuration files to ensure they are well-formed, and all values are within expected ranges
 - Tabulate a contest
@@ -30,7 +30,7 @@ The Tabulator produces the following as output:
 
 #### Method 2 (Less Easy): Compile and Run Using Gradle
 
-1. Install [JDK 14 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by verifying that the following command returns the expected version:
+1. Install [JDK 17 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by verifying that the following command returns the expected version:
     
     `$ java -version`
     

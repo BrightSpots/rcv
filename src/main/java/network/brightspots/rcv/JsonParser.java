@@ -1,22 +1,17 @@
 /*
- * Universal RCV Tabulator
- * Copyright (c) 2017-2020 Bright Spots Developers.
+ * RCTab
+ * Copyright (c) 2017-2022 Bright Spots Developers.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- * the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License along with this
- * program.  If not, see <http://www.gnu.org/licenses/>.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
 /*
- * Purpose:
- * Wrapper around Jackson JSON package for reading and writing JSON objects to disk.
+ * Purpose: Wrapper around Jackson JSON package for reading and writing JSON objects to disk.
+ * Design: Uses Jackson ObjectMapper class to serialize and deserialize JSON with nifty annotations.
+ * Conditions: During config load, save, or validation from the GUI, tabulation, and conversion.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
@@ -27,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("SameParameterValue")
 class JsonParser {
@@ -38,25 +34,28 @@ class JsonParser {
   // returns: instance of the object parsed from json or null if there was a problem
   private static <T> T readFromFile(String jsonFilePath, Class<T> valueType, boolean logsEnabled) {
     T createdObject;
-    try {
-      FileReader fileReader = new FileReader(jsonFilePath);
+    try (FileReader fileReader = new FileReader(jsonFilePath, StandardCharsets.UTF_8)) {
       ObjectMapper objectMapper = new ObjectMapper();
       createdObject = objectMapper.readValue(fileReader, valueType);
     } catch (JsonParseException | JsonMappingException exception) {
       if (logsEnabled) {
         Logger.severe(
-            "Error parsing JSON file: %s\n%s\n"
-                + "Check file formatting and values and make sure they are correct!\n"
-                + "It might help to try surrounding values causing problems with quotes (e.g. "
-                + " \"value\").\nSee config_file_documentation.txt for more details.",
+            """
+                Error parsing JSON file: %s
+                %s
+                Check file formatting and values and make sure they are correct!
+                It might help to try surrounding values causing problems with quotes (e.g. "value").
+                See config_file_documentation.txt for more details.""",
             jsonFilePath, exception);
       }
       createdObject = null;
     } catch (IOException exception) {
       if (logsEnabled) {
         Logger.severe(
-            "Error opening file: %s\n%s\n"
-                + "Check file path and permissions and make sure they are correct!",
+            """
+                Error opening file: %s
+                %s
+                Check file path and permissions and make sure they are correct!""",
             jsonFilePath, exception);
       }
       createdObject = null;

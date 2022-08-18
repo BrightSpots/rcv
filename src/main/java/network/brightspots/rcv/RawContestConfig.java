@@ -1,24 +1,18 @@
 /*
- * Universal RCV Tabulator
- * Copyright (c) 2017-2020 Bright Spots Developers.
+ * RCTab
+ * Copyright (c) 2017-2022 Bright Spots Developers.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- * the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License along with this
- * program.  If not, see <http://www.gnu.org/licenses/>.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
 /*
- * Purpose:
- * RawContestConfig defines the data model used for a contest configuration. It is used
- * by JsonParser to map JSON configuration files into Java objects.
- * We use Jackson JSON parser with annotations below to facilitate parsing.
+ * Purpose: RawContestConfig defines the data model used for a contest configuration.  It is used
+ * by JsonParser with Jackson to map JSON configuration files to Java objects and back to disk.
+ * Design: Simple container classes with Jackson annotations.
+ * Conditions: During config load, save, or validation from the GUI, tabulation, and conversion.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
@@ -27,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
+/**
+ * Contest configuration that can be serialized and deserialized.
+ */
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
@@ -40,7 +37,9 @@ public class RawContestConfig {
   RawContestConfig() {
   }
 
-  // OutputSettings: encapsulates the output settings
+  /**
+   * Output settings that can be serialized and deserialized.
+   */
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class OutputSettings {
@@ -54,8 +53,11 @@ public class RawContestConfig {
     public boolean generateCdfJson;
   }
 
-  // CvrSource: encapsulates a source cast vote record file
-  // all indexes are 1-based
+  /**
+   * Source cast vote record file that can be serialized and deserialized.
+   *
+   * <p>All indexes are 1-based. </p>
+   */
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
@@ -200,7 +202,9 @@ public class RawContestConfig {
     }
   }
 
-  // Candidate encapsulates data for each candidate in a contest
+  /**
+   * Contest candidate data that can be serialized and deserialized.
+   */
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
@@ -243,7 +247,9 @@ public class RawContestConfig {
     }
   }
 
-  // ContestRules: encapsulates the set of rules required to perform contest tabulation
+  /**
+   * Contest rules necessary for tabulation that can be serialized and deserialized.
+   */
   @SuppressWarnings({"unused", "RedundantSuppression"})
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -1,17 +1,18 @@
 /*
- * Universal RCV Tabulator
- * Copyright (c) 2017-2020 Bright Spots Developers.
+ * RCTab
+ * Copyright (c) 2017-2022 Bright Spots Developers.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- * the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License along with this
- * program.  If not, see <http://www.gnu.org/licenses/>.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+/*
+ * Purpose: Parses Clear Ballot CVR files into CastVoteRecords.
+ * Design: Clear Ballot data is stored in .csv files one row per csv.  This class uses a buffered
+ * (streaming) file reader which should be able to parse files of any size.
+ * Conditions: When reading Clear Ballot CVR data.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
@@ -20,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +50,7 @@ class ClearBallotCvrReader {
     // map for tracking unrecognized candidates during parsing
     Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
     try {
-      csvReader = new BufferedReader(new FileReader(this.cvrPath));
+      csvReader = new BufferedReader(new FileReader(this.cvrPath, StandardCharsets.UTF_8));
       // each "choice column" in the input Csv corresponds to a unique ranking: candidate+rank pair
       // we parse these rankings from the header row into a map for lookup during CVR parsing
       String firstRow = csvReader.readLine();
@@ -103,11 +105,10 @@ class ClearBallotCvrReader {
         // parse rankings
         String[] cvrData = row.split(",");
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
-        for (int columnIndex : columnIndexToRanking.keySet()) {
-          if (Integer.parseInt(cvrData[columnIndex]) == 1) {
+        for (var entry : columnIndexToRanking.entrySet()) {
+          if (Integer.parseInt(cvrData[entry.getKey()]) == 1) {
             // user marked this column
-            Pair<Integer, String> ranking = columnIndexToRanking.get(columnIndex);
-            rankings.add(ranking);
+            rankings.add(entry.getValue());
           }
         }
         // create the cast vote record

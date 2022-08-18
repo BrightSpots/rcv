@@ -1,23 +1,18 @@
 /*
- * Universal RCV Tabulator
- * Copyright (c) 2017-2020 Bright Spots Developers.
+ * RCTab
+ * Copyright (c) 2017-2022 Bright Spots Developers.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- * the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License along with this
- * program.  If not, see <http://www.gnu.org/licenses/>.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
 /*
- * Purpose:
- * Main entry point for the RCV module.
- * Parse command line and launch GUI or create and run a tabulation session.
+ * Purpose: Main entry point for the RCV module.
+ * Parse command line, configure logging and launch GUI or create and run a tabulation session.
+ * Design: NA.
+ * Conditions: Always.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
@@ -25,14 +20,17 @@ package network.brightspots.rcv;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main entry point to RCTab.
+ */
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
-  public static final String APP_NAME = "Universal RCV Tabulator";
-  public static final String APP_VERSION = "1.2.0";
+  public static final String APP_NAME = "RCTab";
+  public static final String APP_VERSION = "1.3.0";
 
   /**
-   * Main entry point to the RCV tabulator program.
+   * Main entry point to RCTab.
    *
    * @param args command-line args
    */
@@ -60,9 +58,10 @@ public class Main extends GuiApplication {
       // Check for unexpected input
       if (argsCli.size() == 0) {
         Logger.severe(
-            "No config file path provided on command line!\n"
-                + "Please provide a path to the config file!\n"
-                + "See README.md for more details.");
+            """
+                No config file path provided on command line!
+                Please provide a path to the config file!
+                See README.md for more details.""");
         System.exit(1);
       } else if (argsCli.size() > 2) {
         Logger.severe(

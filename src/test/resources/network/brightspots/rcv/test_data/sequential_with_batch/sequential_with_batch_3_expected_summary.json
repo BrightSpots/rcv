@@ -1,0 +1,22 @@
+{
+  "config" : {
+    "contest" : "Test Sequential with Batch Elimination",
+    "date" : "",
+    "jurisdiction" : "",
+    "office" : "",
+    "threshold" : "2"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "C" : "2",
+      "D" : "1",
+      "E" : "0",
+      "F" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "C",
+      "transfers" : { }
+    } ]
+  } ]
+}

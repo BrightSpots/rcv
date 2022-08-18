@@ -1,17 +1,21 @@
 /*
- * Universal RCV Tabulator
- * Copyright (c) 2017-2020 Bright Spots Developers.
+ * RCTab
+ * Copyright (c) 2017-2022 Bright Spots Developers.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- * the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License along with this
- * program.  If not, see <http://www.gnu.org/licenses/>.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+/*
+ * Purpose: GUI controller class for the JavaFX GUIApplication:
+ * Event handlers for the GUI.
+ * Logic for loading configs into the GUI, saving, and editing.
+ * Launches validate, tabulate, and convert tasks.
+ * Design: Layout resources are in GuiConfigLayout.xml.  The event handlers here are called in
+ * response to GUI events on the GUI render thread.  Longer actions are done on background threads.
+ * Conditions: Runs in GUI mode.
+ * Version history: see https://github.com/BrightSpots/rcv.
  */
 
 package network.brightspots.rcv;
@@ -25,13 +29,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -46,6 +54,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
@@ -63,6 +72,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
+import network.brightspots.rcv.ContestConfig.ValidationError;
 import network.brightspots.rcv.ContestConfigMigration.ConfigVersionIsNewerThanAppVersionException;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
@@ -72,6 +82,9 @@ import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
+/**
+ * View controller for config layout.
+ */
 @SuppressWarnings({"WeakerAccess"})
 public class GuiConfigController implements Initializable {
 
@@ -88,6 +101,8 @@ public class GuiConfigController implements Initializable {
   private static final String HINTS_VOTER_ERROR_RULES_FILENAME =
       "network/brightspots/rcv/hints_voter_error_rules.txt";
   private static final String HINTS_OUTPUT_FILENAME = "network/brightspots/rcv/hints_output.txt";
+  // It's possible for file paths to legitimately have consecutive semicolons, but unlikely
+  private static final String CVR_FILE_PATH_DELIMITER = ";;";
 
   // Used to check if changes have been made to a new config
   private String emptyConfigString;
@@ -268,14 +283,10 @@ public class GuiConfigController implements Initializable {
 
   private static String loadTxtFileIntoString(String configFileDocumentationFilename) {
     String text;
-    try {
-      text =
-          new BufferedReader(
-              new InputStreamReader(
-                  Objects.requireNonNull(
-                      ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename))))
-              .lines()
-              .collect(Collectors.joining("\n"));
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(
+        ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename)),
+        StandardCharsets.UTF_8))) {
+      text = reader.lines().collect(Collectors.joining("\n"));
     } catch (Exception exception) {
       Logger.severe(
           "Error loading text file: %s\n%s",
@@ -514,7 +525,8 @@ public class GuiConfigController implements Initializable {
    * Action when CVR file path button is clicked.
    */
   public void buttonCvrFilePathClicked() {
-    File openFile = null;
+    List<File> selectedFiles = null;
+    File selectedDirectory = null;
 
     Provider provider = getProviderChoice(choiceCvrProvider);
     switch (provider) {
@@ -522,37 +534,40 @@ public class GuiConfigController implements Initializable {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters().add(new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
-        fc.setTitle("Select " + provider + " Cast Vote Record File");
-        openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+        fc.setTitle("Select " + provider + " Cast Vote Record Files");
+        selectedFiles = fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
       }
       case CLEAR_BALLOT -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters().add(new ExtensionFilter("CSV files", "*.csv"));
-        fc.setTitle("Select " + provider + " Cast Vote Record File");
-        openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+        fc.setTitle("Select " + provider + " Cast Vote Record Files");
+        selectedFiles = fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
       }
       case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         dc.setTitle("Select " + provider + " Cast Vote Record Folder");
-        openFile = dc.showDialog(GuiContext.getInstance().getMainWindow());
+        selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
       case ESS -> {
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         fc.getExtensionFilters()
             .add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
-        fc.setTitle("Select " + provider + " Cast Vote Record File");
-        openFile = fc.showOpenDialog(GuiContext.getInstance().getMainWindow());
+        fc.setTitle("Select " + provider + " Cast Vote Record Files");
+        selectedFiles = fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
       }
       default -> {
         // Do nothing for unhandled providers
       }
     }
 
-    if (openFile != null) {
-      textFieldCvrFilePath.setText(openFile.getAbsolutePath());
+    if (selectedFiles != null) {
+      textFieldCvrFilePath.setText(selectedFiles.stream().map(File::getAbsolutePath).collect(
+          Collectors.joining(CVR_FILE_PATH_DELIMITER)));
+    } else if (selectedDirectory != null) {
+      textFieldCvrFilePath.setText(selectedDirectory.getAbsolutePath());
     }
   }
 
@@ -560,24 +575,132 @@ public class GuiConfigController implements Initializable {
    * Action when add CVR file button is clicked.
    */
   public void buttonAddCvrFileClicked() {
-    CvrSource cvrSource =
-        new CvrSource(
-            getTextOrEmptyString(textFieldCvrFilePath),
-            getTextOrEmptyString(textFieldCvrFirstVoteCol),
-            getTextOrEmptyString(textFieldCvrFirstVoteRow),
-            getTextOrEmptyString(textFieldCvrIdCol),
-            getTextOrEmptyString(textFieldCvrPrecinctCol),
-            getTextOrEmptyString(textFieldCvrOvervoteDelimiter),
-            getProviderChoice(choiceCvrProvider).getInternalLabel(),
-            getTextOrEmptyString(textFieldCvrContestId),
-            getTextOrEmptyString(textFieldCvrOvervoteLabel),
-            getTextOrEmptyString(textFieldCvrUndervoteLabel),
-            getTextOrEmptyString(textFieldCvrUndeclaredWriteInLabel),
-            checkBoxCvrTreatBlankAsUndeclaredWriteIn.isSelected()
-        );
-    if (ContestConfig.passesBasicCvrSourceValidation(cvrSource)) {
-      tableViewCvrFiles.getItems().add(cvrSource);
-      textFieldCvrFilePath.clear();
+    clearBasicCvrValidationHighlighting();
+    List<String> cvrPaths = Arrays.stream(getTextOrEmptyString(textFieldCvrFilePath).split(
+        CVR_FILE_PATH_DELIMITER)).toList();
+    List<String> failedFilePaths = new ArrayList<>();
+    String firstVoteColumnIndex = getTextOrEmptyString(textFieldCvrFirstVoteCol);
+    String firstVoteRowIndex = getTextOrEmptyString(textFieldCvrFirstVoteRow);
+    String idColumnIndex = getTextOrEmptyString(textFieldCvrIdCol);
+    String precinctColumnIndex = getTextOrEmptyString(textFieldCvrPrecinctCol);
+    String overvoteDelimiter = getTextOrEmptyString(textFieldCvrOvervoteDelimiter);
+    String provider = getProviderChoice(choiceCvrProvider).getInternalLabel();
+    String contestId = getTextOrEmptyString(textFieldCvrContestId);
+    String overvoteLabel = getTextOrEmptyString(textFieldCvrOvervoteLabel);
+    String undervoteLabel = getTextOrEmptyString(textFieldCvrUndervoteLabel);
+    String undeclaredWriteInLabel = getTextOrEmptyString(textFieldCvrUndeclaredWriteInLabel);
+    boolean treatBlankAsUndeclaredWriteIn = checkBoxCvrTreatBlankAsUndeclaredWriteIn.isSelected();
+
+    cvrPaths.forEach(filePath -> {
+      CvrSource cvrSource =
+          new CvrSource(
+              filePath,
+              firstVoteColumnIndex,
+              firstVoteRowIndex,
+              idColumnIndex,
+              precinctColumnIndex,
+              overvoteDelimiter,
+              provider,
+              contestId,
+              overvoteLabel,
+              undervoteLabel,
+              undeclaredWriteInLabel,
+              treatBlankAsUndeclaredWriteIn
+          );
+      Set<ValidationError> validationErrors =
+          ContestConfig.performBasicCvrSourceValidation(cvrSource);
+      if (validationErrors.isEmpty()) {
+        tableViewCvrFiles.getItems().add(cvrSource);
+      } else {
+        highlightInputsFailingBasicCvrValidation(validationErrors);
+        failedFilePaths.add(filePath);
+      }
+    });
+    // If any entries failed validation, preserve them in the text box so the user can try again
+    textFieldCvrFilePath.setText(String.join(CVR_FILE_PATH_DELIMITER, failedFilePaths));
+  }
+
+  private static void addErrorStyling(Control control) {
+    if (control instanceof CheckBox) {
+      control.getStyleClass().add("check-box-error");
+    } else {
+      control.getStyleClass().add("error");
+    }
+  }
+
+  private static void clearErrorStyling(Control control) {
+    if (control instanceof CheckBox) {
+      control.getStyleClass().removeAll("check-box-error");
+    } else {
+      control.getStyleClass().removeAll("error");
+    }
+  }
+
+  private void clearBasicCvrValidationHighlighting() {
+    List<Control> controlsToClear = Arrays.asList(
+        textFieldCvrFilePath,
+        textFieldCvrContestId,
+        textFieldCvrFirstVoteCol,
+        textFieldCvrFirstVoteRow,
+        textFieldCvrIdCol,
+        textFieldCvrPrecinctCol,
+        textFieldCvrOvervoteDelimiter,
+        textFieldCvrOvervoteLabel,
+        textFieldCvrUndervoteLabel,
+        textFieldCvrUndeclaredWriteInLabel
+    );
+    controlsToClear.forEach(GuiConfigController::clearErrorStyling);
+  }
+
+  private void highlightInputsFailingBasicCvrValidation(Set<ValidationError> validationErrors) {
+    // Only highlight fields if it's possible to trigger the validation errors via the GUI (i.e.
+    // don't highlight if the elements in question are disabled, and it's not possible to get into
+    // the invalid state).
+
+    if (validationErrors.contains(ValidationError.CVR_FILE_PATH_MISSING)
+        || validationErrors.contains(ValidationError.CVR_CDF_FILE_PATH_INVALID)) {
+      addErrorStyling(textFieldCvrFilePath);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_CONTEST_ID_INVALID)) {
+      addErrorStyling(textFieldCvrContestId);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_FIRST_VOTE_COLUMN_INVALID)) {
+      addErrorStyling(textFieldCvrFirstVoteCol);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_FIRST_VOTE_ROW_INVALID)) {
+      addErrorStyling(textFieldCvrFirstVoteRow);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_ID_COLUMN_INVALID)) {
+      addErrorStyling(textFieldCvrIdCol);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_PRECINCT_COLUMN_INVALID)) {
+      addErrorStyling(textFieldCvrPrecinctCol);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_OVERVOTE_DELIMITER_INVALID)) {
+      addErrorStyling(textFieldCvrOvervoteDelimiter);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_OVERVOTE_LABEL_INVALID)) {
+      addErrorStyling(textFieldCvrOvervoteLabel);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_UNDERVOTE_LABEL_INVALID)) {
+      addErrorStyling(textFieldCvrUndervoteLabel);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_UWI_LABEL_INVALID)) {
+      addErrorStyling(textFieldCvrUndeclaredWriteInLabel);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED)) {
+      addErrorStyling(textFieldCvrOvervoteDelimiter);
+      addErrorStyling(textFieldCvrOvervoteLabel);
     }
   }
 
@@ -587,10 +710,10 @@ public class GuiConfigController implements Initializable {
   public void buttonClearCvrFieldsClicked() {
     choiceCvrProvider.setValue(null);
     clearAndDisableCvrFilesTabFields();
-
   }
 
   private void clearAndDisableCvrFilesTabFields() {
+    clearBasicCvrValidationHighlighting();
     buttonAddCvrFile.setDisable(true);
     textFieldCvrFilePath.clear();
     textFieldCvrFilePath.setDisable(true);
@@ -630,14 +753,19 @@ public class GuiConfigController implements Initializable {
    * Action when add candidate button is clicked.
    */
   public void buttonAddCandidateClicked() {
+    clearErrorStyling(textFieldCandidateName);
     Candidate candidate =
         new Candidate(
             getTextOrEmptyString(textFieldCandidateName),
             getTextOrEmptyString(textFieldCandidateCode),
             checkBoxCandidateExcluded.isSelected());
-    if (ContestConfig.passesBasicCandidateValidation(candidate)) {
+    Set<ValidationError> validationErrors =
+        ContestConfig.performBasicCandidateValidation(candidate);
+    if (validationErrors.isEmpty()) {
       tableViewCandidates.getItems().add(candidate);
       buttonClearCandidateClicked();
+    } else if (validationErrors.contains(ValidationError.CANDIDATE_NAME_MISSING)) {
+      addErrorStyling(textFieldCandidateName);
     }
   }
 
@@ -645,6 +773,7 @@ public class GuiConfigController implements Initializable {
    * Action when clear candidate button is clicked.
    */
   public void buttonClearCandidateClicked() {
+    clearErrorStyling(textFieldCandidateName);
     textFieldCandidateName.clear();
     textFieldCandidateCode.clear();
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
@@ -845,7 +974,7 @@ public class GuiConfigController implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     Logger.addGuiLogging(this.textAreaStatus);
     Logger.info("Opening tabulator GUI...");
-    Logger.info("Welcome to the %s version %s!", Main.APP_NAME, Main.APP_VERSION);
+    Logger.info("Welcome to %s version %s!", Main.APP_NAME, Main.APP_VERSION);
 
     GuiContext.getInstance()
         .getMainWindow()
@@ -996,9 +1125,12 @@ public class GuiConfigController implements Initializable {
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
-        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS,
-            MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> textFieldNumberOfWinners
-            .setDisable(false);
+        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS -> textFieldNumberOfWinners.setDisable(false);
+        case MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> {
+          textFieldNumberOfWinners.setDisable(false);
+          checkBoxBatchElimination.setDisable(false);
+          checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
+        }
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldNumberOfWinners.setText("0");
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
