@@ -188,6 +188,11 @@ final class ContestConfigMigration {
         }
       }
 
+      // New rule to stop tabulation early
+      if (rules.stopTabulationEarlyRoundNumber == null) {
+        rules.stopTabulationEarlyRoundNumber = ContestConfig.MAX_NUM_ROUNDS_OPTION;
+      }
+
       Logger.info(
           "Migrated tabulator config version from %s to %s.",
           config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",

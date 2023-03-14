@@ -51,6 +51,8 @@ class ContestConfig {
   static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
+
+  static final boolean SUGGESTED_STOP_TABULATION_EARLY = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
@@ -64,6 +66,8 @@ class ContestConfig {
   static final String SUGGESTED_UNDERVOTE_LABEL = "undervote";
   static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
+
+  static final String MAX_NUM_ROUNDS_OPTION = "max";
   private static final int MIN_COLUMN_INDEX = 1;
   private static final int MAX_COLUMN_INDEX = 1000;
   private static final int MIN_ROW_INDEX = 1;
@@ -945,6 +949,13 @@ class ContestConfig {
 
   boolean isContinueUntilTwoCandidatesRemainEnabled() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
+  }
+
+  Integer stopTabulationAtRound() {
+    return stringToIntWithOption(
+            rawConfig.rules.stopTabulationEarlyRoundNumber,
+            MAX_NUM_ROUNDS_OPTION,
+            Integer.MAX_VALUE);
   }
 
   int getNumDeclaredCandidates() {
