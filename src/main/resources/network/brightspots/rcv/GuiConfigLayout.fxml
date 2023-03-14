@@ -430,6 +430,19 @@
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
                     </HBox>
+                    <HBox spacing="4.0">
+                       <children>
+                          <Label prefWidth="220.0" text="Stop Tabulation Early on Round">
+                             <HBox.margin>
+                                <Insets />
+                             </HBox.margin>
+                          </Label>
+                          <TextField fx:id="textFieldStopTabulationEarly" maxWidth="80.0" />
+                       </children>
+                       <padding>
+                          <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                       </padding>
+                    </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <CheckBox fx:id="checkBoxBatchElimination" mnemonicParsing="false"
                         text="Use Batch Elimination">
@@ -452,21 +465,6 @@
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
-                    </HBox>
-                    <HBox spacing="4.0">
-                       <children>
-                          <CheckBox fx:id="checkBoxStopTabulationEarly" mnemonicParsing="false"
-                            onAction="#stopTabulationEarlyClicked" text="Stop Tabulation Early" />
-                          <Label fx:id="labelStopTabulationEarly" disable="true" text="On Round:">
-                             <HBox.margin>
-                                <Insets left="100.0" right="25.0" />
-                             </HBox.margin>
-                          </Label>
-                          <TextField fx:id="textFieldStopTabulationEarly" disable="true" maxWidth="80.0" />
-                       </children>
-                       <padding>
-                          <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <Label prefWidth="110.0" text="Tiebreak Mode *"/>

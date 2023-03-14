@@ -51,8 +51,6 @@ class ContestConfig {
   static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
-
-  static final boolean SUGGESTED_STOP_TABULATION_EARLY = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
@@ -66,14 +64,14 @@ class ContestConfig {
   static final String SUGGESTED_UNDERVOTE_LABEL = "undervote";
   static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
-
-  static final String MAX_NUM_ROUNDS_OPTION = "max";
   private static final int MIN_COLUMN_INDEX = 1;
   private static final int MAX_COLUMN_INDEX = 1000;
   private static final int MIN_ROW_INDEX = 1;
   private static final int MAX_ROW_INDEX = 100000;
   private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
   private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
+  private static final int MIN_NUMBER_OF_ROUNDS = 0;
+  private static final int MAX_NUMBER_OF_ROUNDS = Integer.MAX_VALUE;
   private static final int MIN_NUMBER_OF_WINNERS = 0;
   private static final int MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 1;
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
@@ -705,6 +703,15 @@ class ContestConfig {
           ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
     }
 
+    if (fieldOutOfRangeOrNotInteger(
+        getStopEarlyOnRoundRaw(),
+        "stopEarlyOnRound",
+        MIN_NUMBER_OF_ROUNDS,
+        MAX_NUMBER_OF_ROUNDS,
+        false)) {
+      validationErrors.add(ValidationError.RULES_STOP_EARLY_ON_ROUND_INVALID);
+    }
+
     WinnerElectionMode winnerMode = getWinnerElectionMode();
     if (Utils.isInt(getNumberOfWinnersRaw())) {
       if (getNumberOfWinners() > 0) {
@@ -791,6 +798,10 @@ class ContestConfig {
 
   private String getNumberOfWinnersRaw() {
     return rawConfig.rules.numberOfWinners;
+  }
+
+  private String getStopEarlyOnRoundRaw() {
+    return rawConfig.rules.stopTabulationEarlyOnRound;
   }
 
   Integer getNumberOfWinners() {
@@ -951,11 +962,10 @@ class ContestConfig {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
 
-  Integer stopTabulationAtRound() {
-    return stringToIntWithOption(
-            rawConfig.rules.stopTabulationEarlyRoundNumber,
-            MAX_NUM_ROUNDS_OPTION,
-            Integer.MAX_VALUE);
+  Integer getStopTabulationAtRound() {
+    return isNullOrBlank(getStopEarlyOnRoundRaw())
+            ? Integer.MAX_VALUE
+            : Integer.parseInt(getStopEarlyOnRoundRaw());
   }
 
   int getNumDeclaredCandidates() {
@@ -1136,6 +1146,7 @@ class ContestConfig {
     RULES_MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC_INVALID,
     RULES_MIN_VOTE_THRESHOLD_INVALID,
     RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID,
+    RULES_STOP_EARLY_ON_ROUND_INVALID,
     RULES_NUMBER_OF_WINNERS_INVALID_FOR_WINNER_ELECTION_MODE,
     RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT,
     RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT,

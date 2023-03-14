@@ -189,8 +189,8 @@ final class ContestConfigMigration {
       }
 
       // New rule to stop tabulation early
-      if (rules.stopTabulationEarlyRoundNumber == null) {
-        rules.stopTabulationEarlyRoundNumber = ContestConfig.MAX_NUM_ROUNDS_OPTION;
+      if (rules.stopTabulationEarlyOnRound == null) {
+        rules.stopTabulationEarlyOnRound = "";
       }
 
       Logger.info(

@@ -240,10 +240,6 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
   @FXML
-  private CheckBox checkBoxStopTabulationEarly;
-  @FXML
-  private Label labelStopTabulationEarly;
-  @FXML
   private TextField textFieldStopTabulationEarly;
   @FXML
   private CheckBox checkBoxExhaustOnDuplicateCandidate;
@@ -790,15 +786,8 @@ public class GuiConfigController implements Initializable {
    */
   public void buttonDeleteCandidateClicked() {
     tableViewCandidates
-            .getItems()
-            .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
-  }
-
-  /**
-   * Action when Stop Tabulation Early is checked.
-   */
-  public void stopTabulationEarlyClicked() {
-    setStopTabulationEarlyEnabledStates(checkBoxStopTabulationEarly.isSelected());
+        .getItems()
+        .removeAll(tableViewCandidates.getSelectionModel().getSelectedItems());
   }
 
   private void clearAndDisableWinningRuleFields() {
@@ -808,11 +797,11 @@ public class GuiConfigController implements Initializable {
     checkBoxMaxRankingsAllowedMax.setDisable(true);
     textFieldMinimumVoteThreshold.clear();
     textFieldMinimumVoteThreshold.setDisable(true);
+    textFieldStopTabulationEarly.clear();
     checkBoxBatchElimination.setSelected(false);
     checkBoxBatchElimination.setDisable(true);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
     checkBoxContinueUntilTwoCandidatesRemain.setDisable(true);
-    setInterfaceForStopTabulationEarly(ContestConfig.MAX_NUM_ROUNDS_OPTION);
     choiceTiebreakMode.setValue(null);
     choiceTiebreakMode.setDisable(true);
     clearAndDisableTiebreakFields();
@@ -840,9 +829,7 @@ public class GuiConfigController implements Initializable {
         ContestConfig.SUGGESTED_HARE_QUOTA);
     checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
     checkBoxContinueUntilTwoCandidatesRemain
-            .setSelected(ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
-    checkBoxStopTabulationEarly
-            .setSelected(ContestConfig.SUGGESTED_STOP_TABULATION_EARLY);
+        .setSelected(ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
     textFieldDecimalPlacesForVoteArithmetic.setText(
         String.valueOf(ContestConfig.SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC));
     checkBoxMaxRankingsAllowedMax.setSelected(ContestConfig.SUGGESTED_MAX_RANKINGS_ALLOWED_MAXIMUM);
@@ -1266,46 +1253,8 @@ public class GuiConfigController implements Initializable {
     setThresholdCalculationMethodRadioButton(rules.nonIntegerWinningThreshold, rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
-    setInterfaceForStopTabulationEarly(rules.stopTabulationEarlyRoundNumber);
+    textFieldStopTabulationEarly.setText(rules.stopTabulationEarlyOnRound);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
-  }
-
-  /**
-   * Sets the Stop Tabulation Early UI (checkbox, label, textbox) based on a single config string.
-   * The UI shows the label and textbox as disabled if roundNumber is set to MAX_NUM_ROUNDS_OPTION.
-   *
-   * @param roundNumber The number to stop tabulation on.
-   */
-  private void setInterfaceForStopTabulationEarly(String roundNumber) {
-    boolean doStopEarly = !roundNumber.equals(ContestConfig.MAX_NUM_ROUNDS_OPTION);
-    checkBoxStopTabulationEarly.setSelected(doStopEarly);
-    setStopTabulationEarlyEnabledStates(doStopEarly);
-    if (doStopEarly) {
-      if (isNullOrBlank(roundNumber)) {
-        Logger.severe("If Stop Tabulation Early is set, a round number must be provided");
-      }
-
-      try {
-        int d = Integer.parseInt(roundNumber);
-      } catch (NumberFormatException nfe) {
-        Logger.severe("Invalid round number for Stop Tabulation Early: \"%s\"", roundNumber);
-      }
-
-      textFieldStopTabulationEarly.setText(roundNumber);
-    } else {
-      textFieldStopTabulationEarly.clear();
-    }
-  }
-
-  /**
-   * The disabled state of the Stop Tabulation Early label + textbox should match the
-   * selected state of the checkbox.
-   *
-   * @param doStopEarly whether the checkbox is clicked
-   */
-  private void setStopTabulationEarlyEnabledStates(boolean doStopEarly) {
-    labelStopTabulationEarly.setDisable(!doStopEarly);
-    textFieldStopTabulationEarly.setDisable(!doStopEarly);
   }
 
   private void setThresholdCalculationMethodRadioButton(boolean nonIntegerWinningThreshold,
@@ -1395,9 +1344,7 @@ public class GuiConfigController implements Initializable {
     rules.hareQuota = radioThresholdHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
-    rules.stopTabulationEarlyRoundNumber = checkBoxStopTabulationEarly.isSelected()
-        ? getTextOrEmptyString(textFieldStopTabulationEarly)
-        : ContestConfig.MAX_NUM_ROUNDS_OPTION;
+    rules.stopTabulationEarlyOnRound = getTextOrEmptyString(textFieldStopTabulationEarly);
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
     rules.rulesDescription = getTextOrEmptyString(textFieldRulesDescription);
     config.rules = rules;
