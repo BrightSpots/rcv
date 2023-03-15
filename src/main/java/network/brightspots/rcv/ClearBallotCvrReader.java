@@ -84,7 +84,7 @@ class ClearBallotCvrReader {
         String choiceName = choiceFields[RcvChoiceHeaderField.CHOICE_NAME.ordinal()];
         if (choiceName.equals(undeclaredWriteInLabel)) {
           choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-        } else if (!contestConfig.getCandidateCodeList().contains(choiceName)) {
+        } else if (!contestConfig.getCandidateNames().contains(choiceName)) {
           unrecognizedCandidateCounts.merge(choiceName, 1, Integer::sum);
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);

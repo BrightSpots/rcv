@@ -53,7 +53,7 @@ class CastVoteRecord {
   private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
-  SortedMap<Integer, Set<String>> rankToCandidateIds;
+  SortedMap<Integer, Set<String>> rankToCandidateNames;
   // contest associated with this CVR
   private String contestId;
   // tabulatorId parsed from Dominion CVR data
@@ -231,10 +231,10 @@ class CastVoteRecord {
 
   // create a sorted map of ranking to candidates selected at that rank
   private void sortRankings(List<Pair<Integer, String>> rankings) {
-    rankToCandidateIds = new TreeMap<>();
+    rankToCandidateNames = new TreeMap<>();
     for (Pair<Integer, String> ranking : rankings) {
       Set<String> candidatesAtRank =
-          rankToCandidateIds.computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
+          rankToCandidateNames.computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
       candidatesAtRank.add(ranking.getValue());
     }
   }

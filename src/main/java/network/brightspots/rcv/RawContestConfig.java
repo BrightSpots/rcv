@@ -17,9 +17,15 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Contest configuration that can be serialized and deserialized.
@@ -208,18 +214,26 @@ public class RawContestConfig {
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
-
     private String name;
-    private String code;
     private boolean excluded;
+    private Set<String> aliases = new HashSet<String>();
+
+    // The code is a special alias which is used in the output files instead of
+    // the display name. Other than output displays, it is not handled specially:
+    // it is just another alias.
+    private String code;
 
     Candidate() {
     }
 
-    Candidate(String name, String code, boolean excluded) {
+    Candidate(String name, String newlineSeparatedAliases, boolean excluded) {
       this.name = name;
-      this.code = code;
       this.excluded = excluded;
+
+      if (newlineSeparatedAliases != null) {
+        // Split by newline, and also trim whitespace
+        this.aliases = Set.of(newlineSeparatedAliases.split("\\w*\\r?\\n\\w*"));
+      }
     }
 
     public String getName() {
@@ -244,6 +258,53 @@ public class RawContestConfig {
 
     public void setExcluded(boolean excluded) {
       this.excluded = excluded;
+    }
+
+    /**
+     * A stream of all aliases (which is guaranteed to be unique) and the candidate name
+     * (which is not guaranteed to be unique, i.e. it may exist in the list twice)
+     *
+     * @return a stream containing the candidate name and all aliases, with no null elements
+     */
+    public Stream<String> getNameAndAllAliases() {
+      List<String> otherNames = new ArrayList<>();
+      if (!isNullOrBlank(this.name)) {
+        otherNames.add(this.name);
+      }
+      if (!isNullOrBlank(this.code)) {
+        otherNames.add(this.code);
+      }
+
+      return Stream.concat(this.aliases.stream(), otherNames.stream());
+    }
+
+    /**
+     * Removes whitespace around all name and alias strings.
+     */
+    public void trimNameAndAllAliases() {
+      if (name != null) {
+        name = name.trim();
+      }
+      if (code != null) {
+        code = code.trim();
+      }
+      if (aliases != null) {
+        List<String> aliasesList = aliases.stream().toList();
+        aliasesList.replaceAll(s -> s.trim());
+        aliases = Set.copyOf(aliasesList);
+      }
+    }
+
+    /**
+     * Sets aliases without trimming any of the names. If null, will convert to an empty set.
+     *
+     * @param aliases a set of zero or more aliases, or null to represent zero aliases
+     */
+    public void setAliases(Set<String> aliases) {
+      if (aliases == null) {
+        aliases = new HashSet<String>();
+      }
+      this.aliases = aliases;
     }
   }
 

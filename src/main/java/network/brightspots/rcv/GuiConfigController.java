@@ -196,9 +196,9 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCandidateName;
   @FXML
-  private TextField textFieldCandidateCode;
-  @FXML
   private CheckBox checkBoxCandidateExcluded;
+  @FXML
+  private TextField textFieldCandidateAliases;
   @FXML
   private ChoiceBox<TiebreakMode> choiceTiebreakMode;
   @FXML
@@ -757,7 +757,7 @@ public class GuiConfigController implements Initializable {
     Candidate candidate =
         new Candidate(
             getTextOrEmptyString(textFieldCandidateName),
-            getTextOrEmptyString(textFieldCandidateCode),
+            getTextOrEmptyString(textFieldCandidateAliases),
             checkBoxCandidateExcluded.isSelected());
     Set<ValidationError> validationErrors =
         ContestConfig.performBasicCandidateValidation(candidate);
@@ -775,7 +775,6 @@ public class GuiConfigController implements Initializable {
   public void buttonClearCandidateClicked() {
     clearErrorStyling(textFieldCandidateName);
     textFieldCandidateName.clear();
-    textFieldCandidateCode.clear();
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
   }
 
@@ -863,7 +862,6 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.getItems().clear();
 
     textFieldCandidateName.clear();
-    textFieldCandidateCode.clear();
     checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
@@ -1313,8 +1311,7 @@ public class GuiConfigController implements Initializable {
 
     ArrayList<Candidate> candidates = new ArrayList<>(tableViewCandidates.getItems());
     for (Candidate candidate : candidates) {
-      candidate.setName(candidate.getName() != null ? candidate.getName().trim() : "");
-      candidate.setCode(candidate.getCode() != null ? candidate.getCode().trim() : "");
+      candidate.trimNameAndAllAliases();
     }
     config.candidates = candidates;
 
