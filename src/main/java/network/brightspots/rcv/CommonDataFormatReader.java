@@ -132,6 +132,25 @@ class CommonDataFormatReader {
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
       inputStream.close();
 
+      // Some checks to provide nicer error messages.
+      // This is common with Unisyn's CDF CVR, which is not compatible with RCTab.
+      if (cvrReport.GpUnit == null) {
+        Logger.severe("Field \"GPUnit\" missing from CVR. "
+                + "This is common with older, unsupported formats.");
+        throw new CvrParseException();
+      }
+
+      // These fields are also required, but we are not aware of any standard format where
+      // they would be missing, so we group all these checks together.
+      if (cvrReport.CVR == null
+              || cvrReport.Election == null
+              || cvrReport.ReportGeneratingDeviceIds == null
+              || cvrReport.ReportingDevice == null
+              || cvrReport.Party == null) {
+        Logger.severe("Required fields are missing from CDF CVR file.");
+        throw new CvrParseException();
+      }
+
       // Parse static election data:
 
       // Find the Contest we are tabulating:
