@@ -22,9 +22,8 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -216,7 +215,7 @@ public class RawContestConfig {
   public static class Candidate {
     private String name;
     private boolean excluded;
-    private Set<String> aliases = new HashSet<String>();
+    private List<String> aliases = new ArrayList<String>();
 
     // The code is a special alias which is used in the output files instead of
     // the display name. Other than output displays, it is not handled specially:
@@ -232,7 +231,7 @@ public class RawContestConfig {
 
       if (newlineSeparatedAliases != null) {
         // Split by newline, and also trim whitespace
-        this.aliases = Set.of(newlineSeparatedAliases.split("\\w*\\r?\\n\\w*"));
+        this.aliases = Arrays.asList(newlineSeparatedAliases.split("\\W*\\r?\\n\\W*"));
       }
     }
 
@@ -242,6 +241,14 @@ public class RawContestConfig {
 
     public void setName(String name) {
       this.name = name;
+    }
+
+    public List<String> getAliases() {
+      return List.copyOf(aliases);
+    }
+
+    public void setAliases(List<String> aliases) {
+      this.aliases = List.copyOf(aliases);
     }
 
     public String getCode() {
@@ -266,7 +273,7 @@ public class RawContestConfig {
      *
      * @return a stream containing the candidate name and all aliases, with no null elements
      */
-    public Stream<String> getNameAndAllAliases() {
+    public Stream<String> createStreamOfNameAndAllAliases() {
       List<String> otherNames = new ArrayList<>();
       if (!isNullOrBlank(this.name)) {
         otherNames.add(this.name);
@@ -276,6 +283,19 @@ public class RawContestConfig {
       }
 
       return Stream.concat(this.aliases.stream(), otherNames.stream());
+    }
+
+    /**
+     * For display purposes, get a semicolon-separated list of aliases, including the code.
+     *
+     * @return a potentially-empty string
+     */
+    public String getSemicolonSeparatedAliases() {
+      Stream<String> s = this.aliases.stream();
+      if (this.code != null) {
+        s = Stream.concat(s, Stream.of(this.code));
+      }
+      return String.join("; ", s.toList());
     }
 
     /**
@@ -289,22 +309,8 @@ public class RawContestConfig {
         code = code.trim();
       }
       if (aliases != null) {
-        List<String> aliasesList = aliases.stream().toList();
-        aliasesList.replaceAll(s -> s.trim());
-        aliases = Set.copyOf(aliasesList);
+        aliases.replaceAll(s -> s.trim());
       }
-    }
-
-    /**
-     * Sets aliases without trimming any of the names. If null, will convert to an empty set.
-     *
-     * @param aliases a set of zero or more aliases, or null to represent zero aliases
-     */
-    public void setAliases(Set<String> aliases) {
-      if (aliases == null) {
-        aliases = new HashSet<String>();
-      }
-      this.aliases = aliases;
     }
   }
 

@@ -594,7 +594,7 @@ class ContestConfig {
 
       // Ensure the candidate name and all aliases are unique, both within each candidate and
       // across candidates.
-      candidate.getNameAndAllAliases().forEach(nameOrAlias -> {
+      candidate.createStreamOfNameAndAllAliases().forEach(nameOrAlias -> {
         if (candidateStringAlreadyInUseElsewhere(nameOrAlias, "name", candidateNameSet)) {
           validationErrors.add(ValidationError.CANDIDATE_NAME_INVALID);
         } else {
@@ -1046,7 +1046,7 @@ class ContestConfig {
           excludedCandidates.add(name);
         }
 
-        Stream<String> aliases = candidate.getNameAndAllAliases();
+        Stream<String> aliases = candidate.createStreamOfNameAndAllAliases();
         aliases.forEach(nameOrAlias -> {
           // duplicate names and aliases get caught in validation
           candidateAliasesToNameMap.put(nameOrAlias, name);

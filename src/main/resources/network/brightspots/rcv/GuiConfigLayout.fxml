@@ -281,7 +281,7 @@
                               <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                            </padding>
                         </Label>
-                        <TextArea fx:id="textFieldCandidateAliases" prefHeight="200.0" prefWidth="200.0" />
+                        <TextArea fx:id="textAreaCandidateAliases" prefHeight="200.0" prefWidth="200.0" />
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <CheckBox fx:id="checkBoxCandidateExcluded" mnemonicParsing="false" text="Excluded">
                     <VBox.margin>
@@ -310,7 +310,7 @@
                 <TableView fx:id="tableViewCandidates" prefHeight="414.0" prefWidth="600.0">
                   <columns>
                     <TableColumn fx:id="tableColumnCandidateName" minWidth="20.0" prefWidth="230.0" text="Name" />
-                    <TableColumn fx:id="tableColumnCandidateCode" minWidth="20.0" prefWidth="100.0" text="Code" />
+                    <TableColumn fx:id="tableColumnCandidateAliases" minWidth="20.0" prefWidth="100.0" text="Aliases" />
                     <TableColumn fx:id="tableColumnCandidateExcluded" minWidth="20.0" prefWidth="100.0" text="Excluded" />
                   </columns>
                 </TableView>

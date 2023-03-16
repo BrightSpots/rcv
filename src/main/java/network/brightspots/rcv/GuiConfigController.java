@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -70,6 +71,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.ValidationError;
@@ -190,7 +192,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<Candidate, String> tableColumnCandidateName;
   @FXML
-  private TableColumn<Candidate, String> tableColumnCandidateCode;
+  private TableColumn<Candidate, String> tableColumnCandidateAliases;
   @FXML
   private TableColumn<Candidate, Boolean> tableColumnCandidateExcluded;
   @FXML
@@ -198,7 +200,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxCandidateExcluded;
   @FXML
-  private TextField textFieldCandidateAliases;
+  private TextArea textAreaCandidateAliases;
   @FXML
   private ChoiceBox<TiebreakMode> choiceTiebreakMode;
   @FXML
@@ -757,7 +759,7 @@ public class GuiConfigController implements Initializable {
     Candidate candidate =
         new Candidate(
             getTextOrEmptyString(textFieldCandidateName),
-            getTextOrEmptyString(textFieldCandidateAliases),
+            textAreaCandidateAliases.getText(),
             checkBoxCandidateExcluded.isSelected());
     Set<ValidationError> validationErrors =
         ContestConfig.performBasicCandidateValidation(candidate);
@@ -775,6 +777,7 @@ public class GuiConfigController implements Initializable {
   public void buttonClearCandidateClicked() {
     clearErrorStyling(textFieldCandidateName);
     textFieldCandidateName.clear();
+    textAreaCandidateAliases.clear();
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
   }
 
@@ -1080,7 +1083,8 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.setEditable(false);
 
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
-    tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+    tableColumnCandidateAliases
+        .setCellValueFactory(new PropertyValueFactory<>("semicolonSeparatedAliases"));
     tableColumnCandidateExcluded.setCellValueFactory(new PropertyValueFactory<>("excluded"));
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(false);
