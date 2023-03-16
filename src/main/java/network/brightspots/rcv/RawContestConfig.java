@@ -210,7 +210,7 @@ public class RawContestConfig {
   /**
    * Contest candidate data that can be serialized and deserialized.
    */
-  @JsonIgnoreProperties(ignoreUnknown = true)
+  @JsonIgnoreProperties(ignoreUnknown = true, value = {"semicolonSeparatedAliases"})
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
     private String name;
@@ -248,7 +248,7 @@ public class RawContestConfig {
     }
 
     public void setAliases(List<String> aliases) {
-      this.aliases = List.copyOf(aliases);
+      this.aliases = new ArrayList<>(aliases);
     }
 
     public String getCode() {
@@ -296,6 +296,10 @@ public class RawContestConfig {
         s = Stream.concat(s, Stream.of(this.code));
       }
       return String.join("; ", s.toList());
+    }
+
+    public void setSemicolonSeparatedAliases(String semicolonSeparatedAliases) {
+      this.aliases = Arrays.asList(semicolonSeparatedAliases.split("\\W*;\\W*"));
     }
 
     /**
