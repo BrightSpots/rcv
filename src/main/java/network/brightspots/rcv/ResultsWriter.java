@@ -143,19 +143,21 @@ class ResultsWriter {
         c -> String.format("c-%s", sanitizeStringForOutput(c).toLowerCase()));
   }
 
-  // Instead of a map from rank to list of candidates, we need a sorted list of candidates
+  // Instead of a list mapping ranks to list of candidates, we need a sorted list of candidates
   // with the ranks they were given. (Ordinarily a candidate will have only a single rank, but they
   // could have multiple ranks if the ballot duplicates the candidate, i.e. assigns them multiple
   // ranks.)
   // We sort by the lowest (best) rank, then alphabetically by name.
   private static List<Map.Entry<String, List<Integer>>> getCandidatesWithRanksList(
-      Map<Integer, Set<String>> rankToCandidateNames) {
+      CandidateRankingsList candidateRankings) {
     Map<String, List<Integer>> candidateNameToRanks = new HashMap<>();
     // first group the ranks by candidate
-    for (var entry : rankToCandidateNames.entrySet()) {
-      for (String candidateName : entry.getValue()) {
+    for (Pair<Integer, CandidatesAtRanking> rankCandidatesPair : candidateRankings) {
+      Integer rank = rankCandidatesPair.getKey();
+      CandidatesAtRanking candidatesAtRanking = rankCandidatesPair.getValue();
+      for (String candidateName : candidatesAtRanking) {
         candidateNameToRanks.computeIfAbsent(candidateName, k -> new LinkedList<>());
-        candidateNameToRanks.get(candidateName).add(entry.getKey());
+        candidateNameToRanks.get(candidateName).add(rank);
       }
     }
     // we want the ranks for a given candidate in ascending order
@@ -561,11 +563,10 @@ class ResultsWriter {
       CastVoteRecord castVoteRecord) throws IOException {
     // for each rank determine what candidate id, overvote, or undervote occurred and print it
     for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
-      if (castVoteRecord.rankToCandidateNames.containsKey(rank)) {
-        Set<String> candidateSet = castVoteRecord.rankToCandidateNames.get(rank);
-        assert !candidateSet.isEmpty();
-        if (candidateSet.size() == 1) {
-          String selection = candidateSet.iterator().next();
+      if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
+        CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
+        if (candidates.count() == 1) {
+          String selection = candidates.get(0);
           // We map all undeclared write-ins to our constant string when we read them in,
           // so we need to translate it back to the original candidate ID here.
           if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
@@ -695,9 +696,9 @@ class ResultsWriter {
   private Map<String, Object> generateCvrSnapshotMap(
       CastVoteRecord cvr, Integer round, List<Pair<String, BigDecimal>> currentRoundSnapshotData) {
     List<Map<String, Object>> selectionMapList = new LinkedList<>();
-    List<Map.Entry<String, List<Integer>>> candidatesWithRanksList =
-        getCandidatesWithRanksList(cvr.rankToCandidateNames);
 
+    List<Map.Entry<String, List<Integer>>> candidatesWithRanksList =
+        getCandidatesWithRanksList(cvr.candidateRankings);
     for (Map.Entry<String, List<Integer>> candidateWithRanks : candidatesWithRanksList) {
       String candidateName = candidateWithRanks.getKey();
 

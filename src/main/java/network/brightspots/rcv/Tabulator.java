@@ -36,6 +36,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 
@@ -777,15 +778,15 @@ class Tabulator {
 
   // purpose: determine if any overvote has occurred for this ranking set (from a CVR)
   // and if so return how to handle it based on the rule configuration in use
-  // param: candidateSet all candidates this CVR contains at a particular rank
+  // param: candidates all candidates this CVR contains at a particular rank
   // return: an OvervoteDecision enum to be applied to the CVR under consideration
-  private OvervoteDecision getOvervoteDecision(Set<String> candidateSet) {
+  private OvervoteDecision getOvervoteDecision(CandidatesAtRanking candidates) {
     OvervoteDecision decision;
     OvervoteRule rule = config.getOvervoteRule();
-    boolean explicitOvervote = candidateSet.contains(EXPLICIT_OVERVOTE_LABEL);
+    boolean explicitOvervote = candidates.contains(EXPLICIT_OVERVOTE_LABEL);
     if (explicitOvervote) {
       // we should never have the explicit overvote flag AND other candidates for a given ranking
-      assert candidateSet.size() == 1;
+      assert candidates.count() == 1;
 
       // if we have an explicit overvote, the only valid rules are exhaust immediately or
       // always skip. (this is enforced when we load the config also)
@@ -797,7 +798,7 @@ class Tabulator {
       } else {
         decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
       }
-    } else if (candidateSet.size() <= 1) {
+    } else if (candidates.count() <= 1) {
       // if undervote or one vote which is not the overvote label, then there is no overvote
       decision = OvervoteDecision.NONE;
     } else if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
@@ -812,7 +813,8 @@ class Tabulator {
       decision = OvervoteDecision.NONE;
       // keep track if we encounter a continuing candidate
       String continuingCandidate = null;
-      for (String candidate : candidateSet) {
+      for (int candidateIndex = 0; candidateIndex < candidates.count(); ++candidateIndex) {
+        String candidate = candidates.get(candidateIndex);
         if (isCandidateContinuing(candidate)) {
           if (continuingCandidate != null) { // at least two continuing
             decision = OvervoteDecision.EXHAUST;
@@ -905,7 +907,7 @@ class Tabulator {
       }
 
       // check for a CVR with no rankings at all
-      if (cvr.rankToCandidateNames.isEmpty()) {
+      if (cvr.candidateRankings.numRankings() == 0) {
         recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
       }
 
@@ -927,8 +929,11 @@ class Tabulator {
       String selectedCandidate = null;
 
       // iterate over all ranks in this cvr from most preferred to least
-      for (int rank : cvr.rankToCandidateNames.keySet()) {
+      for (Pair<Integer, CandidatesAtRanking> rankCandidatesPair : cvr.candidateRankings) {
+        CandidatesAtRanking candidates = rankCandidatesPair.getValue();
+
         // check for undervote exhaustion
+        Integer rank = rankCandidatesPair.getKey();
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
           recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
@@ -936,14 +941,11 @@ class Tabulator {
         }
         lastRankSeen = rank;
 
-        // candidateSet contains all candidates selected at the current rank
-        // some ballots support multiple candidates selected at a single rank
-        Set<String> candidateSet = cvr.rankToCandidateNames.get(rank);
-
         // check for a duplicate candidate if enabled
         if (config.isExhaustOnDuplicateCandidateEnabled()) {
           String duplicateCandidate = null;
-          for (String candidate : candidateSet) {
+          for (int candidateIndex = 0; candidateIndex < candidates.count(); ++candidateIndex) {
+            String candidate = candidates.get(candidateIndex);
             if (candidatesSeen.contains(candidate)) {
               duplicateCandidate = candidate;
               break;
@@ -959,12 +961,12 @@ class Tabulator {
         }
 
         // check for an overvote
-        OvervoteDecision overvoteDecision = getOvervoteDecision(candidateSet);
+        OvervoteDecision overvoteDecision = getOvervoteDecision(candidates);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
           recordSelectionForCastVoteRecord(cvr, currentRound, null, "overvote");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
-          if (rank == cvr.rankToCandidateNames.lastKey()) {
+          if (rank == cvr.candidateRankings.maxRankingNumber()) {
             recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
           }
           continue;
@@ -973,7 +975,8 @@ class Tabulator {
         // the current ranking is not an overvote or undervote
         // see if any ranked candidates are continuing
 
-        for (String candidate : candidateSet) {
+        for (int candidateIndex = 0; candidateIndex < candidates.count(); ++candidateIndex) {
+          String candidate = candidates.get(candidateIndex);
           String candidateName = config.getNameFor(candidate);
           if (!isCandidateContinuing(candidateName)) {
             continue;
@@ -1005,7 +1008,7 @@ class Tabulator {
 
         // if this is the last ranking we are out of rankings and must exhaust this cvr
         // determine if the reason is skipping too many ranks, or no continuing candidates
-        if (rank == cvr.rankToCandidateNames.lastKey()) {
+        if (rank == cvr.candidateRankings.maxRankingNumber()) {
           if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
               && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
             recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");

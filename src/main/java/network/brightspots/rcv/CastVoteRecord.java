@@ -21,14 +21,10 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import javafx.util.Pair;
 
 class CastVoteRecord {
@@ -53,7 +49,7 @@ class CastVoteRecord {
   private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
-  SortedMap<Integer, Set<String>> rankToCandidateNames;
+  CandidateRankingsList candidateRankings;
   // contest associated with this CVR
   private String contestId;
   // tabulatorId parsed from Dominion CVR data
@@ -85,7 +81,7 @@ class CastVoteRecord {
     this.precinctPortion = precinctPortion;
     this.ballotTypeId = ballotTypeId;
     this.fullCvrData = null;
-    sortRankings(rankings);
+    loadRankings(rankings);
   }
 
   CastVoteRecord(
@@ -99,7 +95,7 @@ class CastVoteRecord {
     this.precinct = precinct;
     this.precinctPortion = null;
     this.fullCvrData = fullCvrData;
-    sortRankings(rankings);
+    loadRankings(rankings);
   }
 
   String getContestId() {
@@ -230,13 +226,8 @@ class CastVoteRecord {
   }
 
   // create a sorted map of ranking to candidates selected at that rank
-  private void sortRankings(List<Pair<Integer, String>> rankings) {
-    rankToCandidateNames = new TreeMap<>();
-    for (Pair<Integer, String> ranking : rankings) {
-      Set<String> candidatesAtRank =
-          rankToCandidateNames.computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
-      candidatesAtRank.add(ranking.getValue());
-    }
+  private void loadRankings(List<Pair<Integer, String>> rankings) {
+    candidateRankings = new CandidateRankingsList(rankings);
   }
 
   enum VoteOutcomeType {
