@@ -37,8 +37,6 @@ class CastVoteRecord {
   private final String precinct;
   // which precinct portion this ballot came from
   private final String precinctPortion;
-  // container for ALL CVR data parsed from the source CVR file
-  private final List<String> fullCvrData;
   // records winners to whom some fraction of this vote has been allocated
   private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // If CVR CDF output is enabled, we store the necessary info here: for each round, the list of
@@ -80,7 +78,6 @@ class CastVoteRecord {
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
     this.ballotTypeId = ballotTypeId;
-    this.fullCvrData = null;
     loadRankings(rankings);
   }
 
@@ -88,13 +85,11 @@ class CastVoteRecord {
       String computedId,
       String suppliedId,
       String precinct,
-      List<String> fullCvrData,
       List<Pair<Integer, String>> rankings) {
     this.computedId = computedId;
     this.suppliedId = suppliedId;
     this.precinct = precinct;
     this.precinctPortion = null;
-    this.fullCvrData = fullCvrData;
     loadRankings(rankings);
   }
 
@@ -153,12 +148,6 @@ class CastVoteRecord {
     // add vote value if not 1
     if (fractionalTransferValue != null && !fractionalTransferValue.equals(BigDecimal.ONE)) {
       logStringBuilder.append(" [value] ").append(fractionalTransferValue);
-    }
-
-    // add complete data for round 1 only
-    if (round == 1) {
-      logStringBuilder.append(" [Raw Data] ");
-      logStringBuilder.append(fullCvrData);
     }
 
     Logger.fine(logStringBuilder.toString());

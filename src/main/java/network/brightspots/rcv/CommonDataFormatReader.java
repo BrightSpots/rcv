@@ -252,7 +252,7 @@ class CommonDataFormatReader {
         String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
         // create the new CastVoteRecord
         CastVoteRecord newRecord =
-            new CastVoteRecord(computedCastVoteRecordId, cvr.UniqueId, precinctId, null, rankings);
+            new CastVoteRecord(computedCastVoteRecordId, cvr.UniqueId, precinctId, rankings);
         castVoteRecords.add(newRecord);
 
         // provide some user feedback on the CVR count
@@ -452,7 +452,7 @@ class CommonDataFormatReader {
       String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
       // create the new CastVoteRecord
       CastVoteRecord newRecord =
-          new CastVoteRecord(computedCastVoteRecordId, ballotId, precinctId, null, rankings);
+          new CastVoteRecord(computedCastVoteRecordId, ballotId, precinctId, rankings);
       castVoteRecords.add(newRecord);
       // provide some user feedback on the CVR count
       if (castVoteRecords.size() % 50000 == 0) {

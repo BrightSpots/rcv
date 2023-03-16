@@ -199,13 +199,16 @@ class StreamingCvrReader {
       encounteredDataErrors = true;
     }
 
+    // Log the raw data for auditing
+    Logger.fine(" [Raw Data] ");
+    Logger.fine(currentCvrData.toString());
+
     // create new cast vote record
     CastVoteRecord newRecord =
         new CastVoteRecord(
             computedCastVoteRecordId,
             currentSuppliedCvrId,
             currentPrecinct,
-            currentCvrData,
             currentRankings);
     cvrList.add(newRecord);
 
