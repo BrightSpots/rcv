@@ -135,7 +135,7 @@ class CommonDataFormatReader {
       // Some checks to provide nicer error messages.
       // This is common with Unisyn's CDF CVR, which is not compatible with RCTab.
       if (cvrReport.GpUnit == null) {
-        Logger.severe("Field \"GPUnit\" missing from CVR. "
+        Logger.severe("Field \"GPUnit\" missing from CDF CVR file! "
                 + "This is common with older, unsupported formats.");
         throw new CvrParseException();
       }
@@ -147,7 +147,7 @@ class CommonDataFormatReader {
               || cvrReport.ReportGeneratingDeviceIds == null
               || cvrReport.ReportingDevice == null
               || cvrReport.Party == null) {
-        Logger.severe("Required fields are missing from CDF CVR file.");
+        Logger.severe("Required fields are missing from CDF CVR file!");
         throw new CvrParseException();
       }
 
