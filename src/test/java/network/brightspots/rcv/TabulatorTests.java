@@ -396,7 +396,7 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("test stopping tabulation after round 2")
+  @DisplayName("test stopping tabulation early")
   void testStopTabulationEarly() {
     runTabulationTest("stop_tabulation_early_test");
   }

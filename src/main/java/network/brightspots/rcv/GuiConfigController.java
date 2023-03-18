@@ -240,7 +240,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
   @FXML
-  private TextField textFieldStopTabulationEarly;
+  private TextField textFieldStopTabulationEarlyOnRound;
   @FXML
   private CheckBox checkBoxExhaustOnDuplicateCandidate;
   @FXML
@@ -797,7 +797,8 @@ public class GuiConfigController implements Initializable {
     checkBoxMaxRankingsAllowedMax.setDisable(true);
     textFieldMinimumVoteThreshold.clear();
     textFieldMinimumVoteThreshold.setDisable(true);
-    textFieldStopTabulationEarly.clear();
+    textFieldStopTabulationEarlyOnRound.clear();
+    textFieldStopTabulationEarlyOnRound.setDisable(true);
     checkBoxBatchElimination.setSelected(false);
     checkBoxBatchElimination.setDisable(true);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
@@ -1113,6 +1114,7 @@ public class GuiConfigController implements Initializable {
       setWinningRulesDefaultValues();
       checkBoxMaxRankingsAllowedMax.setDisable(false);
       textFieldMinimumVoteThreshold.setDisable(false);
+      textFieldStopTabulationEarlyOnRound.setDisable(false);
       choiceTiebreakMode.setDisable(false);
       switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
         case STANDARD_SINGLE_WINNER -> {
@@ -1253,7 +1255,7 @@ public class GuiConfigController implements Initializable {
     setThresholdCalculationMethodRadioButton(rules.nonIntegerWinningThreshold, rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
-    textFieldStopTabulationEarly.setText(rules.stopTabulationEarlyOnRound);
+    textFieldStopTabulationEarlyOnRound.setText(rules.stopTabulationEarlyOnRound);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
   }
 
@@ -1344,7 +1346,7 @@ public class GuiConfigController implements Initializable {
     rules.hareQuota = radioThresholdHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
-    rules.stopTabulationEarlyOnRound = getTextOrEmptyString(textFieldStopTabulationEarly);
+    rules.stopTabulationEarlyOnRound = getTextOrEmptyString(textFieldStopTabulationEarlyOnRound);
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
     rules.rulesDescription = getTextOrEmptyString(textFieldRulesDescription);
     config.rules = rules;

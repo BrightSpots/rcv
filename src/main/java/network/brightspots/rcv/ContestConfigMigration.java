@@ -188,7 +188,7 @@ final class ContestConfigMigration {
         }
       }
 
-      // New rule to stop tabulation early
+      // Migrations from 1.3.0 to 1.4.0
       if (rules.stopTabulationEarlyOnRound == null) {
         rules.stopTabulationEarlyOnRound = "";
       }
