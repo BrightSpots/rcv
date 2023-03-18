@@ -461,7 +461,7 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="220.0" text="Random Seed"/>
+                      <Label prefWidth="220.0" text="Random Seed *"/>
                       <TextField maxWidth="160.0" fx:id="textFieldRandomSeed"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
