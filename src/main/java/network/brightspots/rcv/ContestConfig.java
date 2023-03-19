@@ -961,7 +961,7 @@ class ContestConfig {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
 
-  Integer getStopTabulationEarlyAtRound() {
+  Integer getStopTabulationEarlyOnRound() {
     return isNullOrBlank(getStopTabulationEarlyOnRoundRaw())
             ? Integer.MAX_VALUE
             : Integer.parseInt(getStopTabulationEarlyOnRoundRaw());
