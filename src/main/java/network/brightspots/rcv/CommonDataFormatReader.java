@@ -228,7 +228,7 @@ class CommonDataFormatReader {
               candidateName = candidate.Name;
               if (candidateName.equals(overvoteLabel)) {
                 candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-              } else if (config.getNameFor(candidateName) == null) {
+              } else if (config.getNameForCandidate(candidateName) == null) {
                 Logger.severe("Unrecognized candidate found in CVR: %s", candidateName);
                 unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
               }
@@ -398,7 +398,7 @@ class CommonDataFormatReader {
           candidateName = (String) candidate.get("Name");
           if (candidateName.equals(overvoteLabel)) {
             candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-          } else if (this.config.getNameFor(candidateName) == null) {
+          } else if (this.config.getNameForCandidate(candidateName) == null) {
             Logger.severe("Unrecognized candidate found in CVR: %s", candidateName);
             unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
           }

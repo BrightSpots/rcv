@@ -91,7 +91,7 @@ class HartCvrReader {
             String candidateName = option.Id;
             if (candidateName.equals(undeclaredWriteInLabel)) {
               candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-            } else if (contestConfig.getNameFor(candidateName) == null) {
+            } else if (contestConfig.getNameForCandidate(candidateName) == null) {
               unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
             }
             // Hart RCV election ranks are indicated by a string read left to right:

@@ -253,7 +253,7 @@ class StreamingCvrReader {
             candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           } else if (candidate.equals(undeclaredWriteInLabel)) {
             candidate = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-          } else if (config.getNameFor(candidate) == null) {
+          } else if (config.getNameForCandidate(candidate) == null) {
             // This is an unrecognized candidate, so add it to the unrecognized candidate map.
             // This helps identify problems with CVRs.
             unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);

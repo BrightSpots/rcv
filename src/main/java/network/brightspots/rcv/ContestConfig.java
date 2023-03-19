@@ -89,7 +89,7 @@ class ContestConfig {
   private final String sourceDirectory;
   // Used to track a sequential multi-seat race
   private final List<String> sequentialWinners = new LinkedList<>();
-  // Canonical candidate names (no aliases or codes)
+  // Candidate display names (no aliases or codes)
   private Set<String> candidateNames;
   // Mapping from any candidate alias to the candidate's display name
   private Map<String, String> candidateAliasesToNameMap;
@@ -596,7 +596,7 @@ class ContestConfig {
       // across candidates.
       candidate.createStreamOfNameAndAllAliases().forEach(nameOrAlias -> {
         if (candidateStringAlreadyInUseElsewhere(nameOrAlias, "name", candidateNameSet)) {
-          validationErrors.add(ValidationError.CANDIDATE_NAME_INVALID);
+          validationErrors.add(ValidationError.CANDIDATE_DUPLICATE_NAME);
         } else {
           candidateNameSet.add(nameOrAlias);
         }
@@ -1008,11 +1008,11 @@ class ContestConfig {
     return candidateNames;
   }
 
-  String getNameFor(String nameOrAlias) {
+  String getNameForCandidate(String nameOrAlias) {
     return candidateAliasesToNameMap.get(nameOrAlias);
   }
 
-  String getCodeFor(String nameOrAlias) {
+  String getCodeForCandidate(String nameOrAlias) {
     return candidateAliasesToCodeMap.get(nameOrAlias);
   }
 
@@ -1113,8 +1113,8 @@ class ContestConfig {
     CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
     CANDIDATE_NAME_MISSING,
-    CANDIDATE_NAME_INVALID,
     CANDIDATE_CODE_INVALID,
+    CANDIDATE_DUPLICATE_NAME,
     CANDIDATE_NO_CANDIDATES_SPECIFIED,
     CANDIDATE_ALL_EXCLUDED,
     RULES_TIEBREAK_MODE_INVALID,

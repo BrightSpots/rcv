@@ -974,7 +974,7 @@ class Tabulator {
         // see if any ranked candidates are continuing
 
         for (String candidate : candidateSet) {
-          String candidateName = config.getNameFor(candidate);
+          String candidateName = config.getNameForCandidate(candidate);
           if (!isCandidateContinuing(candidateName)) {
             continue;
           }
