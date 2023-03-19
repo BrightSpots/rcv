@@ -1,0 +1,33 @@
+{
+  "config" : {
+    "contest" : "Stop Tabulation Early Test",
+    "date" : "2023-03-14",
+    "jurisdiction" : "Funkytown, USA",
+    "office" : "Sergeant-at-Arms",
+    "threshold" : "4"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "George Gervin" : "3",
+      "Mookie Blaylock" : "3",
+      "Yinka Dare" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Yinka Dare",
+      "transfers" : {
+        "exhausted" : "3"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "George Gervin" : "3",
+      "Mookie Blaylock" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "George Gervin",
+      "transfers" : { }
+    } ]
+  } ]
+}

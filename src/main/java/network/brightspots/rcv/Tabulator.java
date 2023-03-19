@@ -412,7 +412,9 @@ class Tabulator {
     int numEliminatedCandidates = candidateToRoundEliminated.size();
     int numWinnersDeclared = winnerToRound.size();
     // apply config setting if specified
-    if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
+    if (currentRound >= config.getStopTabulationEarlyOnRound()) {
+      keepTabulating = false;
+    } else if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
       keepTabulating = numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()

@@ -70,6 +70,7 @@ class ContestConfig {
   private static final int MAX_ROW_INDEX = 100000;
   private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
   private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
+  private static final int MIN_NUMBER_OF_ROUNDS = 0;
   private static final int MIN_NUMBER_OF_WINNERS = 0;
   private static final int MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 1;
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
@@ -701,6 +702,15 @@ class ContestConfig {
           ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
     }
 
+    if (fieldOutOfRangeOrNotInteger(
+        getStopTabulationEarlyOnRoundRaw(),
+        "stopEarlyOnRound",
+        MIN_NUMBER_OF_ROUNDS,
+        Integer.MAX_VALUE,
+        false)) {
+      validationErrors.add(ValidationError.RULES_STOP_TABULATION_EARLY_ON_ROUND_INVALID);
+    }
+
     WinnerElectionMode winnerMode = getWinnerElectionMode();
     if (Utils.isInt(getNumberOfWinnersRaw())) {
       if (getNumberOfWinners() > 0) {
@@ -787,6 +797,10 @@ class ContestConfig {
 
   private String getNumberOfWinnersRaw() {
     return rawConfig.rules.numberOfWinners;
+  }
+
+  private String getStopTabulationEarlyOnRoundRaw() {
+    return rawConfig.rules.stopTabulationEarlyOnRound;
   }
 
   Integer getNumberOfWinners() {
@@ -945,6 +959,12 @@ class ContestConfig {
 
   boolean isContinueUntilTwoCandidatesRemainEnabled() {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
+  }
+
+  Integer getStopTabulationEarlyOnRound() {
+    return isNullOrBlank(getStopTabulationEarlyOnRoundRaw())
+            ? Integer.MAX_VALUE
+            : Integer.parseInt(getStopTabulationEarlyOnRoundRaw());
   }
 
   int getNumDeclaredCandidates() {
@@ -1125,6 +1145,7 @@ class ContestConfig {
     RULES_MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC_INVALID,
     RULES_MIN_VOTE_THRESHOLD_INVALID,
     RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID,
+    RULES_STOP_TABULATION_EARLY_ON_ROUND_INVALID,
     RULES_NUMBER_OF_WINNERS_INVALID_FOR_WINNER_ELECTION_MODE,
     RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT,
     RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT,

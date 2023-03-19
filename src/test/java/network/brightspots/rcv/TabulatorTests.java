@@ -396,6 +396,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("test stopping tabulation early")
+  void testStopTabulationEarly() {
+    runTabulationTest("stop_tabulation_early_test");
+  }
+
+  @Test
   @DisplayName("test Hare quota")
   void testHareQuota() {
     runTabulationTest("2013_minneapolis_park_hare");
