@@ -374,7 +374,7 @@
                     <TableColumn fx:id="tableColumnCandidateName" minWidth="20.0"
                       prefWidth="230.0" text="Name"/>
                     <TableColumn fx:id="tableColumnCandidateAliases" minWidth="20.0"
-                      prefWidth="200.0" text="Aliases / Code" />
+                      prefWidth="200.0" text="Aliases / Codes" />
                     <TableColumn fx:id="tableColumnCandidateExcluded" minWidth="20.0"
                       prefWidth="100.0" text="Excluded"/>
                   </columns>

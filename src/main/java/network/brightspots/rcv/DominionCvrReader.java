@@ -189,7 +189,7 @@ class DominionCvrReader {
       } else {
         candidates = new HashSet<>();
       }
-      candidates.add(config.getNameFor(candidate.getCode()));
+      candidates.add(config.getNameForCandidate(candidate.getCode()));
       contestIdToCandidateNames.put(candidate.getContestId(), candidates);
     }
 
@@ -315,11 +315,11 @@ class DominionCvrReader {
             }
             Integer candidateId = (Integer) rankingMap.get("CandidateId");
             String candidateCode = candidateId.toString();
-            String candidateName = config.getNameFor(candidateCode);
+            String candidateName = config.getNameForCandidate(candidateCode);
             Set<String> candidates = contestIdToCandidateNames.get(contestId);
             if (!candidates.contains(candidateName)) {
               Logger.severe(
-                  "Candidate code '%s' is not valid for contest '%d'!", candidateName,
+                  "Candidate name '%s' is not valid for contest '%d'!", candidateName,
                   contestId);
               throw new CvrParseException();
             }

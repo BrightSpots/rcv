@@ -975,9 +975,8 @@ class Tabulator {
         // the current ranking is not an overvote or undervote
         // see if any ranked candidates are continuing
 
-        for (int candidateIndex = 0; candidateIndex < candidates.count(); ++candidateIndex) {
-          String candidate = candidates.get(candidateIndex);
-          String candidateName = config.getNameFor(candidate);
+        for (String candidate : candidates) {
+          String candidateName = config.getNameForCandidate(candidate);
           if (!isCandidateContinuing(candidateName)) {
             continue;
           }
@@ -996,7 +995,7 @@ class Tabulator {
               roundTallyByPrecinct,
               cvr.getPrecinct());
 
-          // There can be at most one continuing candidate in candidateSet; if there were more than
+          // There can be at most one continuing candidate in candidates; if there were more than
           // one, we would have already flagged this as an overvote.
           break;
         }

@@ -336,7 +336,7 @@ class ResultsWriter {
 
     // For each candidate: for each round: output total votes
     for (String candidate : sortedCandidates) {
-      String candidateDisplayName = config.getNameFor(candidate);
+      String candidateDisplayName = config.getNameForCandidate(candidate);
       csvPrinter.print(candidateDisplayName);
       for (int round = 1; round <= numRounds; round++) {
         BigDecimal thisRoundTally = roundTallies.get(round).get(candidate);
@@ -418,7 +418,7 @@ class ResultsWriter {
       throws IOException {
     List<String> candidateDisplayNames = new ArrayList<>();
     for (String candidate : candidates) {
-      candidateDisplayNames.add(config.getNameFor(candidate));
+      candidateDisplayNames.add(config.getNameForCandidate(candidate));
     }
     // use semicolon as delimiter display in a single cell
     String candidateCellText = String.join("; ", candidateDisplayNames);
@@ -437,7 +437,7 @@ class ResultsWriter {
     Collections.sort(winningRounds);
     for (int round : winningRounds) {
       for (String candidateCode : roundToWinningCandidates.get(round)) {
-        winners.add(config.getNameFor(candidateCode));
+        winners.add(config.getNameForCandidate(candidateCode));
       }
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
@@ -572,7 +572,7 @@ class ResultsWriter {
           if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             selection = undeclaredWriteInLabel;
           } else {
-            selection = config.getCodeFor(selection);
+            selection = config.getCodeForCandidate(selection);
           }
           csvPrinter.print(selection);
         } else {
@@ -868,7 +868,7 @@ class ResultsWriter {
   private Map<String, BigDecimal> updateCandidateNamesInTally(Map<String, BigDecimal> tally) {
     Map<String, BigDecimal> newTally = new HashMap<>();
     for (var entry : tally.entrySet()) {
-      newTally.put(config.getNameFor(entry.getKey()), entry.getValue());
+      newTally.put(config.getNameForCandidate(entry.getKey()), entry.getValue());
     }
     return newTally;
   }
@@ -898,7 +898,7 @@ class ResultsWriter {
 
       for (String candidate : candidates) {
         HashMap<String, Object> action = new HashMap<>();
-        action.put(actionType, config.getNameFor(candidate));
+        action.put(actionType, config.getNameForCandidate(candidate));
         if (roundTransfers != null) {
           Map<String, BigDecimal> transfersFromCandidate = roundTransfers.get(candidate);
           if (transfersFromCandidate != null) {
@@ -906,7 +906,7 @@ class ResultsWriter {
             Map<String, BigDecimal> translatedTransfers = new HashMap<>();
             for (var entry : transfersFromCandidate.entrySet()) {
               // candidateName will be null for special values like "exhausted"
-              String candidateName = config.getNameFor(entry.getKey());
+              String candidateName = config.getNameForCandidate(entry.getKey());
               translatedTransfers.put(
                   candidateName != null ? candidateName : entry.getKey(),
                   entry.getValue());
