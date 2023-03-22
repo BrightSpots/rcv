@@ -195,6 +195,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("aliases")
+  void aliases() {
+    runTabulationTest("aliases");
+  }
+
+  @Test
   @DisplayName("NIST XML CDF 2")
   void nistXmlCdf2() {
     runTabulationTest("nist_xml_cdf_2");
