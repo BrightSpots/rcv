@@ -85,11 +85,38 @@ class CommonDataFormatReader {
 
   void parseCvrFile(List<CastVoteRecord> castVoteRecords)
       throws UnrecognizedCandidatesException, IOException, CvrParseException {
-    if (filePath.endsWith(".xml")) {
-      parseXml(castVoteRecords);
-    } else if (filePath.endsWith(".json")) {
-      parseJson(castVoteRecords);
+    try {
+      if (filePath.endsWith(".xml")) {
+        parseXml(castVoteRecords);
+      } else if (filePath.endsWith(".json")) {
+        parseJson(castVoteRecords);
+      }
+    } catch (CvrParseException e) {
+      throw e;
+    } catch (UnrecognizedCandidatesException e) {
+      throw e;
+    } catch (Exception e) {
+      Logger.severe("Unknown error. Cannot load file.");
+      throw new CvrParseException();
     }
+  }
+
+  /**
+   * Sets map[key] = value if map does not contain key already.
+   * Throws CvrParseException if it does.
+   *
+   * @param map The map to modify
+   * @param humanReadableName Used as part of the error message if the key is already in the map
+   * @throws CvrParseException if the key is already in the map
+   */
+  private static <K, V> void putIfUnique(
+          HashMap<K, V> map, K key, V value, String humanReadableName) throws CvrParseException {
+    if (map.containsKey(key)) {
+      Logger.severe("%s \"%s\" appears multiple times", humanReadableName, key);
+      throw new CvrParseException();
+    }
+
+    map.put(key, value);
   }
 
   private HashMap getCvrContestJson(HashMap cvr, String contestIdToTabulate)
@@ -174,20 +201,21 @@ class CommonDataFormatReader {
       HashMap<String, Candidate> candidateById = new HashMap<>();
       for (Election election : cvrReport.Election) {
         for (Candidate candidate : election.Candidate) {
-          candidateById.put(candidate.ObjectId, candidate);
+          putIfUnique(candidateById, candidate.ObjectId, candidate, "Candidate");
         }
       }
 
       // ContestSelections
       HashMap<String, ContestSelection> contestSelectionById = new HashMap<>();
       for (ContestSelection contestSelection : contestToTabulate.ContestSelection) {
-        contestSelectionById.put(contestSelection.ObjectId, contestSelection);
+        putIfUnique(contestSelectionById, contestSelection.ObjectId,
+                    contestSelection, "Contest Selection");
       }
 
       // build a map of GpUnits (aka precinct or district)
       HashMap<String, GpUnit> gpUnitById = new HashMap<>();
       for (GpUnit gpUnit : cvrReport.GpUnit) {
-        gpUnitById.put(gpUnit.ObjectId, gpUnit);
+        putIfUnique(gpUnitById, gpUnit.ObjectId, gpUnit, "GPUnit");
       }
 
       // process the Cvrs
@@ -333,7 +361,7 @@ class CommonDataFormatReader {
     for (Object gpUnitObject : gpUnitArray) {
       HashMap gpUnit = (HashMap) gpUnitObject;
       String gpUnitId = (String) gpUnit.get("@id");
-      gpuUnits.put(gpUnitId, gpUnit);
+      putIfUnique(gpuUnits, gpUnitId, gpUnit, "GPUUnits");
     }
 
     // Elections
@@ -346,7 +374,7 @@ class CommonDataFormatReader {
       for (Object candidateObject : candidatesArray) {
         HashMap candidate = (HashMap) candidateObject;
         String candidateId = (String) candidate.get("@id");
-        candidates.put(candidateId, candidate);
+        putIfUnique(candidates, candidateId, candidate, "Candidate");
       }
 
       // Find contest to be tabulated
@@ -371,7 +399,7 @@ class CommonDataFormatReader {
     for (Object contestSelectionObject : contestSelectionArray) {
       HashMap contestSelection = (HashMap) contestSelectionObject;
       String selectionObjectId = (String) contestSelection.get("@id");
-      contestSelections.put(selectionObjectId, contestSelection);
+      putIfUnique(contestSelections, selectionObjectId, contestSelection, "Contest Selection");
     }
 
     // process Cvrs
@@ -414,6 +442,12 @@ class CommonDataFormatReader {
           }
           String candidateObjectId = (String) candidateIds.get(0);
           HashMap candidate = (HashMap) candidates.get(candidateObjectId);
+          if (candidate == null) {
+            Logger.severe(
+                    "Candidate ID \"%s\" in Contest Selection \"%s\" is not in the candidate list.",
+                    candidateObjectId, contestSelectionId);
+            throw new CvrParseException();
+          }
           candidateId = (String) candidate.get("Name");
           if (candidateId.equals(overvoteLabel)) {
             candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
