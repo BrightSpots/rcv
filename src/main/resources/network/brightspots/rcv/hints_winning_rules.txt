@@ -22,6 +22,8 @@ Use Batch Elimination: Batch elimination, or simultaneous elimination of all can
 
 Continue until Two Candidates Remain: Single-winner ranked-choice voting elections can stop as soon as a candidate receives a majority of votes, even though 3 or more candidates may still be in the race. Selecting this option will run the round-by-round count until only two candidates remain, regardless of when a candidate wins a majority of votes. Available only when Winner Election Mode is "Single-winner majority determines winner" or "Multi-pass IRV."
 
+First Round Determines Threshold: Single-winner ranked-choice voting elections can use the first round to determine the threshold, rather than the last round. This will not affect the eventual winner. This may elect a winner that does not reach the threshold.
+
 Stop Tabulation Early on Round: If a winner is not found by the given round, tabulation stops early.
 
 Tiebreak Mode (required): Ties in ranked-choice voting contests can occur when eliminating candidates or when electing candidates. Multi-winner contests can have ties between candidates who have both crossed the threshold of election; in that case ties are broken to determine whose surplus vote value transfers first. Tiebreak procedures are set in law, either in the ranked-choice voting law used in your jurisdiction or in the elections code more generally. Select the option from this list that complies with law and procedure in your jurisdiction.

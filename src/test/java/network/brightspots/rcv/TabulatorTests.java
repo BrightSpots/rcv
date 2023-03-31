@@ -570,6 +570,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("first round determine threshold test")
+  void firstRoundDeterminesThresholdTest() {
+    runTabulationTest("first_round_determines_threshold_test");
+  }
+
+  @Test
   @DisplayName("overvote exhaust if multiple continuing test")
   void overvoteExhaustIfMultipleContinuingTest() {
     runTabulationTest("exhaust_if_multiple_continuing");

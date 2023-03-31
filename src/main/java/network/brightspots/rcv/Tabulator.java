@@ -158,7 +158,18 @@ class Tabulator {
       // votes in the first round.
       // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
       // on the number of active votes in the current round.
-      if (currentRound == 1 || config.getNumberOfWinners() <= 1) {
+      boolean doRecomputeThreshold;
+      if (config.getNumberOfWinners() > 1) {
+        // Multi-winner only computes threshold on round 1
+        doRecomputeThreshold = currentRound == 1;
+      } else {
+        // Single-Winner recomputes threshold on round 1 always,
+        // and on other rounds if First Round Determines Threshold is not set
+        doRecomputeThreshold =
+                !config.isFirstRoundDeterminesThresholdEnabled()
+                || currentRound == 1;
+      }
+      if (doRecomputeThreshold) {
         setWinningThreshold(currentRoundCandidateToTally, config.getMinimumVoteThreshold());
       }
 
