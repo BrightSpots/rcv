@@ -189,8 +189,8 @@ final class ContestConfigMigration {
       }
 
       // Migrations from 1.3.0 to 1.4.0
-      if (rules.stopTabulationEarlyOnRound == null) {
-        rules.stopTabulationEarlyOnRound = "";
+      if (rules.stopTabulationEarlyAfterRound == null) {
+        rules.stopTabulationEarlyAfterRound = "";
       }
 
       Logger.info(
