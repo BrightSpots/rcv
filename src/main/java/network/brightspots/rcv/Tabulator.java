@@ -813,8 +813,7 @@ class Tabulator {
       decision = OvervoteDecision.NONE;
       // keep track if we encounter a continuing candidate
       String continuingCandidate = null;
-      for (int candidateIndex = 0; candidateIndex < candidates.count(); ++candidateIndex) {
-        String candidate = candidates.get(candidateIndex);
+      for (String candidate : candidates) {
         if (isCandidateContinuing(candidate)) {
           if (continuingCandidate != null) { // at least two continuing
             decision = OvervoteDecision.EXHAUST;
@@ -930,10 +929,10 @@ class Tabulator {
 
       // iterate over all ranks in this cvr from most preferred to least
       for (Pair<Integer, CandidatesAtRanking> rankCandidatesPair : cvr.candidateRankings) {
+        Integer rank = rankCandidatesPair.getKey();
         CandidatesAtRanking candidates = rankCandidatesPair.getValue();
 
         // check for undervote exhaustion
-        Integer rank = rankCandidatesPair.getKey();
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
           recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
@@ -944,8 +943,7 @@ class Tabulator {
         // check for a duplicate candidate if enabled
         if (config.isExhaustOnDuplicateCandidateEnabled()) {
           String duplicateCandidate = null;
-          for (int candidateIndex = 0; candidateIndex < candidates.count(); ++candidateIndex) {
-            String candidate = candidates.get(candidateIndex);
+          for (String candidate : candidates) {
             if (candidatesSeen.contains(candidate)) {
               duplicateCandidate = candidate;
               break;

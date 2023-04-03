@@ -214,7 +214,7 @@ class CastVoteRecord {
     return winnerToFractionalValue;
   }
 
-  // create a sorted map of ranking to candidates selected at that rank
+  // initialize the CandidateRankingsList
   private void loadRankings(List<Pair<Integer, String>> rankings) {
     candidateRankings = new CandidateRankingsList(rankings);
   }

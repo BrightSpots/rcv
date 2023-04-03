@@ -34,10 +34,7 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
     }
 
     public boolean hasNext() {
-      if (iteratorIndex < list.rankings.length) {
-        return true;
-      }
-      return false;
+      return iteratorIndex < list.rankings.length;
     }
 
     public Pair<Integer, CandidatesAtRanking> next() {
@@ -45,11 +42,10 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
         throw new NoSuchElementException();
       }
 
-      iteratorIndex++;
-      while (!hasRankingAt(iteratorIndex)) {
+      do {
         iteratorIndex++;
         assert iteratorIndex <= list.rankings.length;
-      }
+      } while (!hasRankingAt(iteratorIndex));
 
       // Note: round numbers are 1-indexed externally, 0-indexed internally,
       // thus why we return a different value than what we index into here
@@ -69,32 +65,31 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
     if (rawRankings.isEmpty()) {
       this.rankings = new CandidatesAtRanking[0];
       numRankings = 0;
-      return;
-    }
+    } else {
+      rawRankings.sort(Comparator.comparingInt(Pair::getKey));
 
-    rawRankings.sort(Comparator.comparingInt(Pair::getKey));
+      // Initialize up to maxRankings, leaving empty arrays for any undervotes
+      int minRanking = rawRankings.get(0).getKey();
+      if (minRanking <= 0) {
+        throw new RuntimeException("Rankings must start at 1, but you have a ranking at %d"
+            .formatted(minRanking));
+      }
 
-    // Initialize up to maxRankings, leaving empty arrays for any undervotes
-    int minRanking = rawRankings.get(0).getKey();
-    if (minRanking <= 0) {
-      Logger.severe("Rankings must start at 1, but you have a ranking at %d", minRanking);
-      // TODO should I throw from here or not?
-    }
+      int maxRanking = rawRankings.get(rawRankings.size() - 1).getKey();
+      this.rankings = new CandidatesAtRanking[maxRanking];
+      for (int i = 0; i < maxRanking; ++i) {
+        this.rankings[i] = new CandidatesAtRanking();
+      }
 
-    int maxRanking = rawRankings.get(rawRankings.size() - 1).getKey();
-    this.rankings = new CandidatesAtRanking[maxRanking];
-    for (int i = 0; i < maxRanking; ++i) {
-      this.rankings[i] = new CandidatesAtRanking();
-    }
+      // Populate, which is most efficient in the common case of no overvotes
+      for (Pair<Integer, String> ranking : rawRankings) {
+        this.rankings[ranking.getKey() - 1].addCandidate(ranking.getValue());
+      }
 
-    // Populate, which is most efficient in the common case of no overvotes
-    for (Pair<Integer, String> ranking : rawRankings) {
-      this.rankings[ranking.getKey() - 1].addCandidate(ranking.getValue());
-    }
-
-    for (CandidatesAtRanking c : this.rankings) {
-      if (c.count() != 0) {
-        ++numRankings;
+      for (CandidatesAtRanking c : this.rankings) {
+        if (c.count() != 0) {
+          ++numRankings;
+        }
       }
     }
   }
@@ -104,7 +99,8 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
   }
 
   boolean hasRankingAt(int num) {
-    return num >= 1 && num <= rankings.length && rankings[num - 1].count() != 0;
+    assert num >= 1;
+    return num <= rankings.length && rankings[num - 1].count() != 0;
   }
 
   int maxRankingNumber() {

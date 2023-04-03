@@ -9,7 +9,7 @@
 
 /*
  * Purpose: Low-Memory container for a list of candidates at a single ranking.
- * Design: Assume that there is exactly one candidate per ranking, but supports multiple.
+ * Design: Optimized for the case of one candidate per ranking.
  * Conditions: Always.
  * Version history: see https://github.com/BrightSpots/rcv.
  */
@@ -32,10 +32,7 @@ class CandidatesAtRanking implements Iterable<String> {
     }
 
     public boolean hasNext() {
-      if (iteratorIndex < candidates.candidateNames.length) {
-        return true;
-      }
-      return false;
+      return iteratorIndex < candidates.candidateNames.length;
     }
 
     public String next() {
@@ -45,7 +42,7 @@ class CandidatesAtRanking implements Iterable<String> {
 
       iteratorIndex++;
 
-      return candidates.candidateNames[iteratorIndex - 1];
+      return candidates.get(iteratorIndex - 1);
     }
 
     public void remove() {
@@ -56,16 +53,17 @@ class CandidatesAtRanking implements Iterable<String> {
   private String[] candidateNames;
 
   int count() {
-    if (candidateNames == null) {
-      return 0;
+    int numCandidates = 0;
+    if (candidateNames != null) {
+      numCandidates = candidateNames.length;
     }
-    return candidateNames.length;
+    return numCandidates;
   }
 
   void addCandidate(String candidateName) {
     int n = count();
     String[] newList = new String[n + 1];
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; i++) {
       newList[i] = this.candidateNames[i];
     }
     newList[n] = candidateName;
