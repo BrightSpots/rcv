@@ -50,6 +50,6 @@
     "batchElimination": true,
     "exhaustOnDuplicateCandidate": false,
     "rulesDescription": "Doyle Rules",
-    "stopTabulationEarlyOnRound": "2"
+    "stopTabulationEarlyAfterRound": "2"
   }
 }
