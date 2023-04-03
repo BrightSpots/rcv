@@ -523,6 +523,14 @@ public class GuiConfigController implements Initializable {
     datePickerContestDate.setValue(null);
   }
 
+  private List<File> chooseFile(Provider provider, ExtensionFilter filter) {
+    FileChooser fc = new FileChooser();
+    fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+    fc.getExtensionFilters().add(new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
+    fc.setTitle("Select " + provider + " Cast Vote Record Files");
+    return fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
+  }
+
   /**
    * Action when CVR file path button is clicked.
    */
@@ -533,18 +541,11 @@ public class GuiConfigController implements Initializable {
     Provider provider = getProviderChoice(choiceCvrProvider);
     switch (provider) {
       case CDF -> {
-        FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-        fc.getExtensionFilters().add(new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
-        fc.setTitle("Select " + provider + " Cast Vote Record Files");
-        selectedFiles = fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
+        selectedFiles = chooseFile(provider,
+            new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
       }
-      case CLEAR_BALLOT -> {
-        FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-        fc.getExtensionFilters().add(new ExtensionFilter("CSV files", "*.csv"));
-        fc.setTitle("Select " + provider + " Cast Vote Record Files");
-        selectedFiles = fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
+      case CLEAR_BALLOT, CSV -> {
+        selectedFiles = chooseFile(provider, new ExtensionFilter("CSV files", "*.csv"));
       }
       case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
@@ -553,12 +554,7 @@ public class GuiConfigController implements Initializable {
         selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
       case ESS -> {
-        FileChooser fc = new FileChooser();
-        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-        fc.getExtensionFilters()
-            .add(new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
-        fc.setTitle("Select " + provider + " Cast Vote Record Files");
-        selectedFiles = fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
+        selectedFiles = chooseFile(provider, new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
       }
       default -> {
         // Do nothing for unhandled providers
@@ -1040,6 +1036,18 @@ public class GuiConfigController implements Initializable {
           checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(false);
           checkBoxCvrTreatBlankAsUndeclaredWriteIn
               .setSelected(ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
+        }
+        case CSV -> {
+          buttonAddCvrFile.setDisable(false);
+          textFieldCvrFilePath.setDisable(false);
+          buttonCvrFilePath.setDisable(false);
+          textFieldCvrContestId.setDisable(false);
+          textFieldCvrFirstVoteCol.setDisable(false);
+          textFieldCvrFirstVoteCol
+                  .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_COLUMN));
+          textFieldCvrFirstVoteRow.setDisable(false);
+          textFieldCvrFirstVoteRow
+                  .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
         }
         case CLEAR_BALLOT, DOMINION, HART -> {
           buttonAddCvrFile.setDisable(false);

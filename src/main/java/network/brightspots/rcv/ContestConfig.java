@@ -239,17 +239,20 @@ class ContestConfig {
             validationErrors.add(ValidationError.CVR_OVERVOTE_UNEXPECTEDLY_DEFINED);
           }
         }
-        if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getFirstVoteColumnIndex(),
-            "firstVoteColumnIndex",
-            provider,
-            source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED);
-        }
 
-        if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED);
+        if (provider != Provider.CSV) {
+          if (fieldIsDefinedButShouldNotBeForProvider(
+              source.getFirstVoteColumnIndex(),
+              "firstVoteColumnIndex",
+              provider,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED);
+          }
+
+          if (fieldIsDefinedButShouldNotBeForProvider(
+              source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED);
+          }
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
@@ -290,7 +293,8 @@ class ContestConfig {
           provider == Provider.DOMINION
               || provider == Provider.HART
               || provider == Provider.CLEAR_BALLOT
-              || provider == Provider.CDF;
+              || provider == Provider.CDF
+              || provider == Provider.CSV;
 
       if (isNullOrBlank(source.getContestId()) && providerRequiresContestId) {
         validationErrors.add(ValidationError.CVR_CONTEST_ID_INVALID);
@@ -1164,6 +1168,7 @@ class ContestConfig {
     DOMINION("dominion", "Dominion"),
     ESS("ess", "ES&S"),
     HART("hart", "Hart"),
+    CSV("genericCsv", "CSV"),
     PROVIDER_UNKNOWN("providerUnknown", "Provider unknown");
 
     private final String internalLabel;
