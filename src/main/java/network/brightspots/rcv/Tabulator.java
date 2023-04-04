@@ -833,7 +833,8 @@ class Tabulator {
   //  logs the results to audit log
   //  update tallyTransfers counts
   private void recordSelectionForCastVoteRecord(
-      CastVoteRecord cvr, int currentRound, String selectedCandidate, String outcomeDescription) {
+      CastVoteRecord cvr, int currentRound,
+      String selectedCandidate, String outcomeDescription) throws TabulationAbortedException {
     // update transfer counts (unless there's no value to transfer, which can happen if someone
     // wins with a tally that exactly matches the winning threshold)
     if (cvr.getFractionalTransferValue().signum() == 1) {
@@ -848,6 +849,7 @@ class Tabulator {
         if (precinctTallyTransfer == null) {
           Logger.severe("Precinct \"%s\" is not among the %d known precincts.",
                   precinctName, precinctNames.size());
+          throw new TabulationAbortedException(false);
         }
         precinctTallyTransfer.addTransfer(
                 currentRound,
@@ -875,7 +877,8 @@ class Tabulator {
   //  - exhaust cvrs if they should be exhausted for various reasons
   //  - assign cvrs to continuing candidates if they have been transferred or in the initial count
   // returns a map of candidate ID to vote tallies for this round
-  private Map<String, BigDecimal> computeTalliesForRound(int currentRound) {
+  private Map<String, BigDecimal> computeTalliesForRound(int currentRound)
+          throws TabulationAbortedException {
     Map<String, BigDecimal> roundTally = getNewTally();
     Map<String, Map<String, BigDecimal>> roundTallyByPrecinct = new HashMap<>();
     if (config.isTabulateByPrecinctEnabled()) {
