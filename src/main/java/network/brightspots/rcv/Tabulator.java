@@ -843,9 +843,13 @@ class Tabulator {
           selectedCandidate,
           cvr.getFractionalTransferValue());
       if (config.isTabulateByPrecinctEnabled()) {
-        precinctTallyTransfers
-            .get(cvr.getPrecinct())
-            .addTransfer(
+        String precinctName = cvr.getPrecinct();
+        TallyTransfers precinctTallyTransfer = precinctTallyTransfers.get(precinctName);
+        if (precinctTallyTransfer == null) {
+          Logger.severe("Precinct \"%s\" is not among the %d known precincts.",
+                  precinctName, precinctNames.size());
+        }
+        precinctTallyTransfer.addTransfer(
                 currentRound,
                 cvr.getCurrentRecipientOfVote(),
                 selectedCandidate,

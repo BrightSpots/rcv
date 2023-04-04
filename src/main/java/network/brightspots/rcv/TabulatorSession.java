@@ -283,7 +283,7 @@ class TabulatorSession {
           Logger.info("Reading Dominion cast vote records from folder: %s...", cvrPath);
           DominionCvrReader reader =
               new DominionCvrReader(config, cvrPath, source.getUndeclaredWriteInLabel());
-          reader.readCastVoteRecords(castVoteRecords, source.getContestId());
+          reader.readCastVoteRecords(castVoteRecords, source.getContestId(), precinctIds);
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
             ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);

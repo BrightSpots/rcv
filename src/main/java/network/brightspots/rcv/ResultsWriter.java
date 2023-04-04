@@ -272,7 +272,12 @@ class ResultsWriter {
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
           getOutputFilePathFromInstance(String.format("%s_precinct_summary", precinctFileString));
-      int numBallots = numBallotsByPrecinct.get(precinct);
+      Integer numBallotsObj = numBallotsByPrecinct.get(precinct);
+      if (numBallotsObj == null) {
+        Logger.warning("No ballots found in precinct \"%s\"", precinct, numBallotsByPrecinct);
+        numBallotsObj = 0;
+      }
+      int numBallots = numBallotsObj;
       generateSummarySpreadsheet(roundTallies, numBallots, precinct, outputPath);
       generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct), precinct, outputPath);
     }

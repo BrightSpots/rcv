@@ -134,7 +134,8 @@ class DominionCvrReader {
 
   // parse CVR JSON for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
+  // Populates precinctIds with all found precincts
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId, Set<String> precinctIds)
       throws CvrParseException, UnrecognizedCandidatesException {
     // read metadata files for precincts, precinct portions, contest, and candidates
 
@@ -148,6 +149,8 @@ class DominionCvrReader {
         Logger.severe("No precinct data found!");
         throw new CvrParseException();
       }
+
+      precinctIds.addAll(this.precincts.values());
     }
     Path precinctPortionPath = Paths.get(manifestFolder, PRECINCT_PORTION_MANIFEST);
     this.precinctPortions = getPrecinctData(precinctPortionPath.toString());
@@ -274,6 +277,10 @@ class DominionCvrReader {
       }
       String precinctPortion = this.precinctPortions.get(precinctPortionId);
       String ballotTypeId = adjudicatedData.get("BallotTypeId").toString();
+
+      if (precinct == null && precinctPortion != null) {
+        precinct = precinctPortion;
+      }
 
       ArrayList cardsList;
       // sometimes there is a "Cards" object at this level
