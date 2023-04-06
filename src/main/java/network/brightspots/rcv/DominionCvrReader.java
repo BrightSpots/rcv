@@ -22,6 +22,7 @@ package network.brightspots.rcv;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 @SuppressWarnings("rawtypes")
-class DominionCvrReader {
+class DominionCvrReader extends BaseCvrReader {
 
   // canonical manifest file names
   private static final String PRECINCT_MANIFEST = "PrecinctManifest.json";
@@ -44,9 +45,6 @@ class DominionCvrReader {
   private static final String CONTEST_MANIFEST = "ContestManifest.json";
   private static final String CVR_EXPORT = "CvrExport.json";
   private static final String CVR_EXPORT_PATTERN = "CvrExport_%d.json";
-  private final ContestConfig config;
-  private final String manifestFolder;
-  private final String undeclaredWriteInLabel;
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // map of precinct ID to precinct description
@@ -57,10 +55,13 @@ class DominionCvrReader {
   private Map<String, Contest> contests;
   private List<Candidate> candidates;
 
-  DominionCvrReader(ContestConfig config, String manifestFolder, String undeclaredWriteInLabel) {
-    this.config = config;
-    this.manifestFolder = manifestFolder;
-    this.undeclaredWriteInLabel = undeclaredWriteInLabel;
+  DominionCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
+    super(config, source);
+  }
+
+  @Override
+  public String readerName() {
+    return "Dominion";
   }
 
   // returns map of contestId to Contest parsed from input file
@@ -134,13 +135,14 @@ class DominionCvrReader {
 
   // parse CVR JSON for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
-      throws CvrParseException, UnrecognizedCandidatesException {
+  @Override
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+      throws CvrParseException, UnrecognizedCandidatesException, IOException {
     // read metadata files for precincts, precinct portions, contest, and candidates
 
     // Precinct data does not exist for earlier versions of Dominion (only precinct portion)
     // See rcv/reference/dominion/CVR export file format.pdf
-    Path precinctPath = Paths.get(manifestFolder, PRECINCT_MANIFEST);
+    Path precinctPath = Paths.get(cvrPath, PRECINCT_MANIFEST);
     File precinctFile = precinctPath.toFile();
     if (precinctFile.exists()) {
       this.precincts = getPrecinctData(precinctPath.toString());
@@ -149,26 +151,26 @@ class DominionCvrReader {
         throw new CvrParseException();
       }
     }
-    Path precinctPortionPath = Paths.get(manifestFolder, PRECINCT_PORTION_MANIFEST);
+    Path precinctPortionPath = Paths.get(cvrPath, PRECINCT_PORTION_MANIFEST);
     this.precinctPortions = getPrecinctData(precinctPortionPath.toString());
     if (this.precinctPortions == null) {
       Logger.severe("No precinct portion data found!");
       throw new CvrParseException();
     }
-    Path contestPath = Paths.get(manifestFolder, CONTEST_MANIFEST);
+    Path contestPath = Paths.get(cvrPath, CONTEST_MANIFEST);
     this.contests = parseContestData(contestPath.toString());
     if (this.contests == null) {
       Logger.severe("No contest data found!");
       throw new CvrParseException();
     }
-    Path candidatePath = Paths.get(manifestFolder, CANDIDATE_MANIFEST);
+    Path candidatePath = Paths.get(cvrPath, CANDIDATE_MANIFEST);
     this.candidates = getCandidates(candidatePath.toString());
     if (this.candidates == null) {
       Logger.severe("No candidate data found!");
       throw new CvrParseException();
     }
     // parse the cvr file(s)
-    gatherCvrsForContest(castVoteRecords, contestId);
+    gatherCvrsForContest(castVoteRecords, source.getContestId());
     if (castVoteRecords.isEmpty()) {
       Logger.severe("No cast vote record data found!");
       throw new CvrParseException();
@@ -194,8 +196,8 @@ class DominionCvrReader {
     }
 
     try {
-      Path singleCvrPath = Paths.get(manifestFolder, CVR_EXPORT);
-      Path firstCvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, 1));
+      Path singleCvrPath = Paths.get(cvrPath, CVR_EXPORT);
+      Path firstCvrPath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, 1));
       if (singleCvrPath.toFile().exists()) {
         HashMap json = JsonParser.readFromFile(singleCvrPath.toString(), HashMap.class);
         parseCvrFile(json, castVoteRecords, contestIdToLoad, contestIdToCandidateCodes);
@@ -203,9 +205,9 @@ class DominionCvrReader {
         int recordsParsed = 0;
         int recordsParsedAtLastLog = 0;
         int cvrSequence = 1;
-        Path cvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, cvrSequence));
-        while (cvrPath.toFile().exists()) {
-          HashMap json = JsonParser.readFromFile(cvrPath.toString(), HashMap.class);
+        Path cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
+        while (cvrFilePath.toFile().exists()) {
+          HashMap json = JsonParser.readFromFile(cvrFilePath.toString(), HashMap.class);
           recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad,
               contestIdToCandidateCodes);
           if (recordsParsed - recordsParsedAtLastLog > 50000) {
@@ -213,7 +215,7 @@ class DominionCvrReader {
             recordsParsedAtLastLog = recordsParsed;
           }
           cvrSequence++;
-          cvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, cvrSequence));
+          cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         }
       } else {
         throw new FileNotFoundException(String.format(
@@ -324,7 +326,7 @@ class DominionCvrReader {
             }
             // We also need to throw an error if this candidate doesn't appear in the tabulator's
             // config file for this contest.
-            if (candidateCode.equals(undeclaredWriteInLabel)) {
+            if (candidateCode.equals(source.getUndeclaredWriteInLabel())) {
               candidateCode = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             } else if (!config.getCandidateCodeList().contains(candidateCode)) {
               unrecognizedCandidateCounts.merge(candidateCode, 1, Integer::sum);

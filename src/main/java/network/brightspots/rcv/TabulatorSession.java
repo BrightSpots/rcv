@@ -268,53 +268,26 @@ class TabulatorSession {
       String cvrPath = config.resolveConfigPath(source.getFilePath());
       Provider provider = ContestConfig.getProvider(source);
       try {
-        if (ContestConfig.isCdf(source)) {
-          Logger.info("Reading CDF cast vote record file: %s...", cvrPath);
-          new CommonDataFormatReader(
-              cvrPath, config, source.getContestId(), source.getOvervoteLabel())
-              .parseCvrFile(castVoteRecords);
-          continue;
-        } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
-          Logger.info("Reading Clear Ballot cast vote records from file: %s...", cvrPath);
-          new ClearBallotCvrReader(cvrPath, config, source.getUndeclaredWriteInLabel())
-                  .readCastVoteRecords(castVoteRecords, source.getContestId());
-          continue;
-        } else if (ContestConfig.getProvider(source) == Provider.CSV) {
-          Logger.info("Reading Generic CSV cast vote records from file: %s...", cvrPath);
-          new CsvCvrReader(cvrPath, config, source)
-              .readCastVoteRecords(castVoteRecords);
-          continue;
-        } else if (provider == Provider.DOMINION) {
-          Logger.info("Reading Dominion cast vote records from folder: %s...", cvrPath);
-          DominionCvrReader reader =
-              new DominionCvrReader(config, cvrPath, source.getUndeclaredWriteInLabel());
-          reader.readCastVoteRecords(castVoteRecords, source.getContestId());
+        BaseCvrReader reader = provider.constructReader(config, source);
+        Logger.info("Reading %s cast vote record file: %s...", reader.readerName(), cvrPath);
+        reader.readCastVoteRecords(castVoteRecords, precinctIds);
+
+        if (reader.getClass() == DominionCvrReader.class) {
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
+            DominionCvrReader dominionReader = (DominionCvrReader) reader;
             ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
             this.convertedFilesWritten =
-                writer.writeGenericCvrCsv(
-                    castVoteRecords,
-                    reader.getContests().values(),
-                    config.getOutputDirectory(),
-                    source.getContestId(),
-                    source.getUndeclaredWriteInLabel());
+                    writer.writeGenericCvrCsv(
+                            castVoteRecords,
+                            dominionReader.getContests().values(),
+                            config.getOutputDirectory(),
+                            source.getContestId(),
+                            source.getUndeclaredWriteInLabel());
           } catch (IOException exception) {
             // error already logged in ResultsWriter
           }
-          continue;
-        } else if (provider == Provider.ESS) {
-          Logger.info("Reading ES&S cast vote record file: %s...", cvrPath);
-          new StreamingCvrReader(config, source).parseCvrFile(castVoteRecords, precinctIds);
-          continue;
-        } else if (provider == Provider.HART) {
-          Logger.info("Reading Hart cast vote records from folder: %s...", cvrPath);
-          new HartCvrReader(
-              cvrPath, source.getContestId(), config, source.getUndeclaredWriteInLabel())
-              .readCastVoteRecordsFromFolder(castVoteRecords);
-          continue;
         }
-        throw new UnrecognizedProviderException();
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
@@ -331,19 +304,6 @@ class TabulatorSession {
       } catch (IOException exception) {
         Logger.severe("Error opening cast vote record file: %s", cvrPath);
         Logger.info("Check file path and permissions and make sure they are correct!");
-        encounteredSourceProblem = true;
-      } catch (ParserConfigurationException
-          | SAXException
-          | OpenXML4JException
-          | POIXMLException exception) {
-        Logger.severe("Error parsing source file %s", cvrPath);
-        Logger.info(
-            "ES&S cast vote record files must be Microsoft Excel Workbook "
-                + "format.\nStrict Open XML and Open Office are not supported.");
-        encounteredSourceProblem = true;
-      } catch (CvrDataFormatException exception) {
-        Logger.severe("Data format error while parsing source file: %s", cvrPath);
-        Logger.info("See the log for details.");
         encounteredSourceProblem = true;
       } catch (UnrecognizedProviderException exception) {
         Logger.severe(

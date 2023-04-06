@@ -99,10 +99,6 @@ class ContestConfig {
     this.sourceDirectory = sourceDirectory;
   }
 
-  static boolean isCdf(CvrSource source) {
-    return getProvider(source) == Provider.CDF;
-  }
-
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
     try {
@@ -560,7 +556,7 @@ class ContestConfig {
               Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
         }
 
-        if (isCdf(source)) {
+        if (getProvider(source) == Provider.CDF) {
           // Perform CDF checks
           if (isTabulateByPrecinctEnabled()) {
             validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT);
@@ -1177,6 +1173,27 @@ class ContestConfig {
     Provider(String internalLabel, String guiLabel) {
       this.internalLabel = internalLabel;
       this.guiLabel = guiLabel;
+    }
+
+    BaseCvrReader constructReader(ContestConfig config, CvrSource source)
+            throws UnrecognizedProviderException {
+      switch (this) {
+        case CDF:
+          return new CommonDataFormatReader(config, source);
+        case CLEAR_BALLOT:
+          return new ClearBallotCvrReader(config, source);
+        case DOMINION:
+          return new DominionCvrReader(config, source);
+        case ESS:
+          return new StreamingCvrReader(config, source);
+        case HART:
+          return new HartCvrReader(config, source);
+        case CSV:
+          return new CsvCvrReader(config, source);
+        case PROVIDER_UNKNOWN:
+        default:
+          throw new UnrecognizedProviderException();
+      }
     }
 
     static Provider getByInternalLabel(String labelLookup) {

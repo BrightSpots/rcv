@@ -25,17 +25,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javafx.util.Pair;
-import network.brightspots.rcv.RawContestConfig.CvrSource;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-class CsvCvrReader {
-  private final String cvrPath;
-  private final String contestId;
-  private final String undeclaredWriteInLabel;
-  private final ContestConfig contestConfig;
+class CsvCvrReader extends BaseCvrReader {
   // 0-based column index of first ranking
   private final int firstVoteColumnIndex;
   // 0-based row index of first CVR
@@ -43,28 +39,29 @@ class CsvCvrReader {
   // map for tracking unrecognized candidates during parsing
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  CsvCvrReader(
-      String cvrPath,
-      ContestConfig contestConfig,
-      CvrSource source) {
-    this.cvrPath = cvrPath;
-    this.contestConfig = contestConfig;
-    this.contestId = source.getContestId();
-    this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
+  CsvCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
+    super(config, source);
     this.firstVoteColumnIndex = Integer.parseInt(source.getFirstVoteColumnIndex()) - 1;
     this.firstVoteRowIndex = Integer.parseInt(source.getFirstVoteRowIndex()) - 1;
   }
 
+  @Override
+  public String readerName() {
+    return "Generic CSV";
+  }
+
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-          throws CastVoteRecord.CvrParseException, IOException {
+  @Override
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds) throws
+          CastVoteRecord.CvrParseException,
+          IOException {
     Logger.info("Reading CSV cast vote record file: %s...", cvrPath);
 
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
       CSVParser parser = CSVParser.parse(inputStream,
               Charset.defaultCharset(), CSVFormat.newFormat(',').withHeader());
       List<String> candidateIds = parser.getHeaderNames();
-      int undeclaredWriteInColumn = candidateIds.indexOf(undeclaredWriteInLabel);
+      int undeclaredWriteInColumn = candidateIds.indexOf(source.getUndeclaredWriteInLabel());
 
       parser.stream().skip(firstVoteRowIndex);
 
@@ -87,7 +84,7 @@ class CsvCvrReader {
           String candidateId = candidateIds.get(col);
           if (col == undeclaredWriteInColumn) {
             candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-          } else if (!contestConfig.getCandidateCodeList().contains(candidateId)) {
+          } else if (!config.getCandidateCodeList().contains(candidateId)) {
             unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
           }
           rankings.add(new Pair<>(rankAsInt, candidateId));
@@ -96,16 +93,13 @@ class CsvCvrReader {
         // create the new CastVoteRecord
         CastVoteRecord newCvr =
                 new CastVoteRecord(
-                        contestId,
+                        source.getContestId(),
                         "no supplied ID",
                         "no precinct",
                         null,
                         rankings);
         castVoteRecords.add(newCvr);
       }
-    } catch (IOException exception) {
-      Logger.severe("Error parsing cast vote record:\n%s", exception);
-      throw exception;
     }
   }
 }

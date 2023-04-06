@@ -47,14 +47,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-class StreamingCvrReader {
+class StreamingCvrReader extends BaseCvrReader {
 
   // this indicates a missing precinct ID in output files
   private static final String MISSING_PRECINCT_ID = "missing_precinct_id";
-  // config for the contest
-  private final ContestConfig config;
-  // path of the source file
-  private final String excelFilePath;
   // name of the source file
   private final String excelFileName;
   // 0-based column index of first ranking
@@ -92,10 +88,9 @@ class StreamingCvrReader {
   // flag indicating data issues during parsing
   private boolean encounteredDataErrors = false;
 
-  StreamingCvrReader(ContestConfig config, CvrSource source) {
-    this.config = config;
-    this.excelFilePath = config.resolveConfigPath(source.getFilePath());
-    this.excelFileName = new File(excelFilePath).getName();
+  StreamingCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
+    super(config, source);
+    this.excelFileName = new File(cvrPath).getName();
 
     // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
     this.firstVoteColumnIndex = Integer.parseInt(source.getFirstVoteColumnIndex()) - 1;
@@ -113,6 +108,11 @@ class StreamingCvrReader {
     this.undervoteLabel = source.getUndervoteLabel();
     this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
     this.treatBlankAsUndeclaredWriteIn = source.isTreatBlankAsUndeclaredWriteIn();
+  }
+
+  @Override
+  public String readerName() {
+    return "ES&S";
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -267,10 +267,27 @@ class StreamingCvrReader {
     }
   }
 
+  @Override
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+          throws UnrecognizedCandidatesException, CastVoteRecord.CvrParseException, IOException {
+    try {
+      parseCvrFileInternal(castVoteRecords, precinctIds);
+    } catch (OpenXML4JException | SAXException | ParserConfigurationException e) {
+      Logger.severe("Error parsing source file %s", cvrPath);
+      Logger.info("ES&S cast vote record files must be Microsoft Excel Workbook "
+              + "format.\nStrict Open XML and Open Office are not supported.");
+      throw new CastVoteRecord.CvrParseException();
+    } catch (CvrDataFormatException exception) {
+      Logger.severe("Data format error while parsing source file: %s", cvrPath);
+      Logger.info("See the log for details.");
+      throw new CastVoteRecord.CvrParseException();
+    }
+  }
+
   // parse the given file into a List of CastVoteRecords for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
-  void parseCvrFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  private void parseCvrFileInternal(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
       throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException,
       ParserConfigurationException, CvrDataFormatException {
 
@@ -278,7 +295,7 @@ class StreamingCvrReader {
     this.precinctIds = precinctIds;
 
     // open the zip package
-    OPCPackage pkg = OPCPackage.open(excelFilePath);
+    OPCPackage pkg = OPCPackage.open(cvrPath);
     // pull out strings
     ReadOnlySharedStringsTable sharedStrings = new ReadOnlySharedStringsTable(pkg);
     // XSSF reader is used to extract styles data
