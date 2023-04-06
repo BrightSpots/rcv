@@ -750,20 +750,20 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Action when "Auto-Load Candidates" clicked
+   * Action when "Auto-Load Candidates" clicked.
    */
   public void buttonAutoLoadCandidatesClicked() {
     Set<String> unloadedNames = new HashSet<>();
     for (CvrSource source : tableViewCvrFiles.getItems()) {
       ContestConfig config =
-              ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
+            ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
       Provider provider = ContestConfig.getProvider(source);
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
         unloadedNames.addAll(reader.gatherUnknownCandidateNames());
       } catch (ContestConfig.UnrecognizedProviderException e) {
         Logger.severe("Unrecognized reader: %s", e.getMessage());
-      } catch (CastVoteRecord.CvrParseException|IOException e) {
+      } catch (CastVoteRecord.CvrParseException | IOException e) {
         Logger.severe("Failed to read file %s", source.getFilePath());
       }
     }

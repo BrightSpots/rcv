@@ -35,14 +35,14 @@ abstract class BaseCvrReader {
   }
 
   // Gather candidate names from the CVR that are not in the config.
- Set<String> gatherUnknownCandidateNames() throws CastVoteRecord.CvrParseException, IOException {
+  Set<String> gatherUnknownCandidateNames() throws CastVoteRecord.CvrParseException, IOException {
     try {
       readCastVoteRecords(new ArrayList<>(), new HashSet<>());
     } catch (TabulatorSession.UnrecognizedCandidatesException unrecognizedCandidates) {
       return unrecognizedCandidates.candidateCounts.keySet();
-   }
-   return new HashSet<String>();
- }
+    }
+    return new HashSet<String>();
+  }
 
   // parse CVR for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
