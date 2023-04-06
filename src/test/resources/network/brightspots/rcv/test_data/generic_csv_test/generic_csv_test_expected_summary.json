@@ -1,0 +1,67 @@
+{
+  "config" : {
+    "contest" : "Generic CSV Test",
+    "date" : "2023-04-03",
+    "jurisdiction" : "Portland, ME",
+    "office" : "Mayor",
+    "threshold" : "14"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "Broccoli" : "3",
+      "Cauliflower" : "4",
+      "Cucumber" : "8",
+      "Lettuce" : "5",
+      "Undeclared Write-ins" : "6"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Undeclared Write-ins",
+      "transfers" : {
+        "Broccoli" : "1",
+        "Cauliflower" : "1",
+        "Cucumber" : "2",
+        "Lettuce" : "2"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "Broccoli" : "4",
+      "Cauliflower" : "5",
+      "Cucumber" : "10",
+      "Lettuce" : "7"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Broccoli",
+      "transfers" : {
+        "Cauliflower" : "1",
+        "Lettuce" : "3"
+      }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "Cauliflower" : "6",
+      "Cucumber" : "10",
+      "Lettuce" : "10"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Cauliflower",
+      "transfers" : {
+        "Cucumber" : "4",
+        "Lettuce" : "2"
+      }
+    } ]
+  }, {
+    "round" : 4,
+    "tally" : {
+      "Cucumber" : "14",
+      "Lettuce" : "12"
+    },
+    "tallyResults" : [ {
+      "elected" : "Cucumber",
+      "transfers" : { }
+    } ]
+  } ]
+}
