@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -751,6 +753,35 @@ public class GuiConfigController implements Initializable {
    * Action when "Auto-Load Candidates" clicked
    */
   public void buttonAutoLoadCandidatesClicked() {
+    Set<String> unloadedNames = new HashSet<>();
+    for (CvrSource source : tableViewCvrFiles.getItems()) {
+      ContestConfig config =
+              ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
+      Provider provider = ContestConfig.getProvider(source);
+      try {
+        BaseCvrReader reader = provider.constructReader(config, source);
+        unloadedNames.addAll(reader.gatherUnknownCandidateNames());
+      } catch (ContestConfig.UnrecognizedProviderException e) {
+        Logger.severe("Unrecognized reader: %s", e.getMessage());
+      } catch (CastVoteRecord.CvrParseException|IOException e) {
+        Logger.severe("Failed to read file %s", source.getFilePath());
+      }
+    }
+
+    int successCount = 0;
+    for (String name : unloadedNames) {
+      Candidate candidate = new Candidate(name, "", false);
+      Set<ValidationError> validationErrors =
+              ContestConfig.performBasicCandidateValidation(candidate);
+      if (validationErrors.isEmpty()) {
+        tableViewCandidates.getItems().add(candidate);
+        successCount++;
+      } else {
+        Logger.warning("Candidate %s failed to load.", name);
+      }
+    }
+
+    Logger.info("Auto-Loaded %d candidates.", successCount);
   }
 
   /**

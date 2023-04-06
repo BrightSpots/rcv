@@ -17,6 +17,8 @@
 package network.brightspots.rcv;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -31,6 +33,16 @@ abstract class BaseCvrReader {
     this.source = source;
     this.cvrPath = config.resolveConfigPath(source.getFilePath());
   }
+
+  // Gather candidate names from the CVR that are not in the config.
+ Set<String> gatherUnknownCandidateNames() throws CastVoteRecord.CvrParseException, IOException {
+    try {
+      readCastVoteRecords(new ArrayList<>(), new HashSet<>());
+    } catch (TabulatorSession.UnrecognizedCandidatesException unrecognizedCandidates) {
+      return unrecognizedCandidates.candidateCounts.keySet();
+   }
+   return new HashSet<String>();
+ }
 
   // parse CVR for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
