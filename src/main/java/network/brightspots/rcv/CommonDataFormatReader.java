@@ -33,28 +33,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 @SuppressWarnings({"rawtypes", "unused", "RedundantSuppression"})
-class CommonDataFormatReader {
-
+class CommonDataFormatReader extends BaseCvrReader {
   private static final String STATUS_NO = "no";
   private static final String BOOLEAN_TRUE = "true";
-
-  private final String filePath;
-  private final ContestConfig config;
-  private final String contestId;
-  private final String overvoteLabel;
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  CommonDataFormatReader(
-      String filePath, ContestConfig config, String contestId, String overvoteLabel) {
-    this.filePath = filePath;
-    this.config = config;
-    this.contestId = contestId;
-    this.overvoteLabel = overvoteLabel;
+  CommonDataFormatReader(ContestConfig config, RawContestConfig.CvrSource source) {
+    super(config, source);
+  }
+
+  @Override
+  public String readerName() {
+    return "CDF";
   }
 
   // Each CVRSnapshot contains one or more CVRContest objects.
@@ -83,11 +79,12 @@ class CommonDataFormatReader {
     return cvrContestToTabulate;
   }
 
-  void parseCvrFile(List<CastVoteRecord> castVoteRecords)
-      throws UnrecognizedCandidatesException, IOException, CvrParseException {
-    if (filePath.endsWith(".xml")) {
+  @Override
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+      throws UnrecognizedCandidatesException, CvrParseException, IOException {
+    if (cvrPath.endsWith(".xml")) {
       parseXml(castVoteRecords);
-    } else if (filePath.endsWith(".json")) {
+    } else if (cvrPath.endsWith(".json")) {
       parseJson(castVoteRecords);
     }
   }
@@ -128,7 +125,7 @@ class CommonDataFormatReader {
     // load XML
     XmlMapper xmlMapper = new XmlMapper();
     xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    try (FileInputStream inputStream = new FileInputStream(filePath)) {
+    try (FileInputStream inputStream = new FileInputStream(cvrPath)) {
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
       inputStream.close();
 
@@ -158,7 +155,7 @@ class CommonDataFormatReader {
       Contest contestToTabulate = null;
       for (Election election : cvrReport.Election) {
         for (Contest contest : election.Contest) {
-          if (contest.Name.equals(this.contestId)) {
+          if (contest.Name.equals(source.getContestId())) {
             contestToTabulate = contest;
             break;
           }
@@ -166,7 +163,7 @@ class CommonDataFormatReader {
       }
 
       if (contestToTabulate == null) {
-        Logger.severe("Contest \"%s\" from config file not found!", this.contestId);
+        Logger.severe("Contest \"%s\" from config file not found!", source.getContestId());
         throw new CvrParseException();
       }
 
@@ -192,7 +189,7 @@ class CommonDataFormatReader {
 
       // process the Cvrs
       int cvrIndex = 0;
-      String fileName = new File(filePath).getName();
+      String fileName = new File(cvrPath).getName();
       for (CVR cvr : cvrReport.CVR) {
         CVRContest contest = getCvrContestXml(cvr, contestToTabulate);
         if (contest == null) {
@@ -245,7 +242,7 @@ class CommonDataFormatReader {
                 throw new CvrParseException();
               }
               candidateId = candidate.Name;
-              if (candidateId.equals(overvoteLabel)) {
+              if (candidateId.equals(source.getOvervoteLabel())) {
                 candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
               } else if (!config.getCandidateCodeList().contains(candidateId)) {
                 Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
@@ -326,7 +323,7 @@ class CommonDataFormatReader {
     HashMap<Object, Object> gpuUnits = new HashMap<>();
     HashMap<Object, Object> contestSelections = new HashMap<>();
     HashMap contestToTabulate = null;
-    HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
+    HashMap json = JsonParser.readFromFile(cvrPath, HashMap.class);
 
     // GpUnits
     ArrayList gpUnitArray = (ArrayList) json.get("GpUnit");
@@ -354,14 +351,14 @@ class CommonDataFormatReader {
       for (Object contestObject : contestArray) {
         HashMap contest = (HashMap) contestObject;
         String contestName = (String) contest.get("Name");
-        if (contestName.equals(this.contestId)) {
+        if (contestName.equals(source.getContestId())) {
           contestToTabulate = contest;
           break;
         }
       }
     }
     if (contestToTabulate == null) {
-      Logger.severe("Contest \"%s\" from config file not found!", this.contestId);
+      Logger.severe("Contest \"%s\" from config file not found!", source.getContestId());
       throw new CvrParseException();
     }
     String contestToTabulateId = (String) contestToTabulate.get("@id");
@@ -376,7 +373,7 @@ class CommonDataFormatReader {
 
     // process Cvrs
     int cvrIndex = 0;
-    String fileName = new File(filePath).getName();
+    String fileName = new File(cvrPath).getName();
 
     ArrayList cvrs = (ArrayList) json.get("CVR");
     for (Object cvrObject : cvrs) {
@@ -415,7 +412,7 @@ class CommonDataFormatReader {
           String candidateObjectId = (String) candidateIds.get(0);
           HashMap candidate = (HashMap) candidates.get(candidateObjectId);
           candidateId = (String) candidate.get("Name");
-          if (candidateId.equals(overvoteLabel)) {
+          if (candidateId.equals(source.getOvervoteLabel())) {
             candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           } else if (!this.config.getCandidateCodeList().contains(candidateId)) {
             Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
