@@ -752,6 +752,12 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
+   * Action when "Auto-Load Candidates" clicked
+   */
+  public void buttonAutoLoadCandidatesClicked() {
+  }
+
+  /**
    * Action when add candidate button is clicked.
    */
   public void buttonAddCandidateClicked() {
