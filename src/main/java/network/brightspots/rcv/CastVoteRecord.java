@@ -78,7 +78,7 @@ class CastVoteRecord {
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
     this.ballotTypeId = ballotTypeId;
-    loadRankings(rankings);
+    this.candidateRankings = new CandidateRankingsList(rankings);
   }
 
   CastVoteRecord(
@@ -90,7 +90,7 @@ class CastVoteRecord {
     this.suppliedId = suppliedId;
     this.precinct = precinct;
     this.precinctPortion = null;
-    loadRankings(rankings);
+    this.candidateRankings = new CandidateRankingsList(rankings);
   }
 
   String getContestId() {
@@ -212,11 +212,6 @@ class CastVoteRecord {
 
   Map<String, BigDecimal> getWinnerToFractionalValue() {
     return winnerToFractionalValue;
-  }
-
-  // initialize the CandidateRankingsList
-  private void loadRankings(List<Pair<Integer, String>> rankings) {
-    candidateRankings = new CandidateRankingsList(rankings);
   }
 
   enum VoteOutcomeType {

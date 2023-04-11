@@ -22,27 +22,19 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 class CandidatesAtRanking implements Iterable<String> {
-  static class CandidatesAtRankingIterator implements Iterator<String> {
+  class CandidatesAtRankingIterator implements Iterator<String> {
     private int iteratorIndex = 0;
 
-    private CandidatesAtRanking candidates;
-
-    CandidatesAtRankingIterator(CandidatesAtRanking candidates) {
-      this.candidates = candidates;
-    }
-
     public boolean hasNext() {
-      return iteratorIndex < candidates.candidateNames.length;
+      return iteratorIndex < candidateNames.length;
     }
 
     public String next() {
-      if (iteratorIndex == candidates.candidateNames.length) {
+      if (iteratorIndex == candidateNames.length) {
         throw new NoSuchElementException();
       }
 
-      iteratorIndex++;
-
-      return candidates.get(iteratorIndex - 1);
+      return get(iteratorIndex++);
     }
 
     public void remove() {
@@ -53,11 +45,7 @@ class CandidatesAtRanking implements Iterable<String> {
   private String[] candidateNames;
 
   int count() {
-    int numCandidates = 0;
-    if (candidateNames != null) {
-      numCandidates = candidateNames.length;
-    }
-    return numCandidates;
+    return candidateNames == null ? 0 : candidateNames.length;
   }
 
   void addCandidate(String candidateName) {
@@ -79,6 +67,6 @@ class CandidatesAtRanking implements Iterable<String> {
   }
 
   public Iterator<String> iterator() {
-    return new CandidatesAtRankingIterator(this);
+    return new CandidatesAtRankingIterator();
   }
 }

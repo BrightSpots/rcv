@@ -200,8 +200,7 @@ class StreamingCvrReader {
     }
 
     // Log the raw data for auditing
-    Logger.fine(" [Raw Data] ");
-    Logger.fine(currentCvrData.toString());
+    Logger.fine("[Raw Data]: " + currentCvrData.toString());
 
     // create new cast vote record
     CastVoteRecord newRecord =

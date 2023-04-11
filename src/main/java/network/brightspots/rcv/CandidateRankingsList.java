@@ -27,29 +27,23 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
   class CandidateRankingsListIterator implements Iterator<Pair<Integer, CandidatesAtRanking>> {
     private int iteratorIndex = 0;
 
-    private CandidateRankingsList list;
-
-    CandidateRankingsListIterator(CandidateRankingsList list) {
-      this.list = list;
-    }
-
     public boolean hasNext() {
-      return iteratorIndex < list.rankings.length;
+      return iteratorIndex < rankings.length;
     }
 
     public Pair<Integer, CandidatesAtRanking> next() {
-      if (iteratorIndex == list.rankings.length) {
+      if (iteratorIndex == rankings.length) {
         throw new NoSuchElementException();
       }
 
       do {
         iteratorIndex++;
-        assert iteratorIndex <= list.rankings.length;
+        assert iteratorIndex <= rankings.length;
       } while (!hasRankingAt(iteratorIndex));
 
       // Note: round numbers are 1-indexed externally, 0-indexed internally,
       // thus why we return a different value than what we index into here
-      return new Pair<>(iteratorIndex, list.rankings[iteratorIndex - 1]);
+      return new Pair<>(iteratorIndex, rankings[iteratorIndex - 1]);
     }
 
     public void remove() {
@@ -59,7 +53,6 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
 
   private CandidatesAtRanking[] rankings;
   private int numRankings;
-  private int iteratorIndex = 0;
 
   CandidateRankingsList(List<Pair<Integer, String>> rawRankings) {
     if (rawRankings.isEmpty()) {
@@ -71,17 +64,19 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
       // Initialize up to maxRankings, leaving empty arrays for any undervotes
       int minRanking = rawRankings.get(0).getKey();
       if (minRanking <= 0) {
-        throw new RuntimeException("Rankings must start at 1, but you have a ranking at %d"
+        throw new RuntimeException("Invalid ranking %d. All rankings must be positive integers"
             .formatted(minRanking));
       }
 
       int maxRanking = rawRankings.get(rawRankings.size() - 1).getKey();
       this.rankings = new CandidatesAtRanking[maxRanking];
-      for (int i = 0; i < maxRanking; ++i) {
+      for (int i = 0; i < maxRanking; i++) {
         this.rankings[i] = new CandidatesAtRanking();
       }
 
-      // Populate, which is most efficient in the common case of no overvotes
+      // Populate, which is most efficient in the common case of no overvotes.
+      // For every overvote, it will do a full copy of all previous candidates at
+      // this ranking, for O(numCandidatesAtThisRanking^2) copies.
       for (Pair<Integer, String> ranking : rawRankings) {
         this.rankings[ranking.getKey() - 1].addCandidate(ranking.getValue());
       }
@@ -98,6 +93,15 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
     return rankings[i - 1];
   }
 
+  /**
+   * Precondition: must be called with a 1-indexed ranking number.
+   * Note: just because this returns false at ranking N doesn't mean it will
+   * also return false at N+1 -- specifically, that will not be true if
+   * there are skipped rankings.
+   *
+   * @param num A value >= 1.
+   * @return Whether the candidate has a ranking at the given value.
+   */
   boolean hasRankingAt(int num) {
     assert num >= 1;
     return num <= rankings.length && rankings[num - 1].count() != 0;
@@ -112,6 +116,6 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
   }
 
   public Iterator<Pair<Integer, CandidatesAtRanking>> iterator() {
-    return new CandidateRankingsListIterator(this);
+    return new CandidateRankingsListIterator();
   }
 }
