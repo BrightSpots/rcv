@@ -78,8 +78,10 @@ java {
 
 test {
     moduleOptions {
-        addExports = ["org.junit.platform.commons/org.junit.platform.commons.util": "ALL-UNNAMED",
-                      "org.junit.platform.commons/org.junit.platform.commons.logging": "ALL-UNNAMED"]
+        addExports = [
+                "org.junit.platform.commons/org.junit.platform.commons.util"   : "ALL-UNNAMED",
+                "org.junit.platform.commons/org.junit.platform.commons.logging": "ALL-UNNAMED"
+        ]
     }
     maxHeapSize = "2056m"
     useJUnitPlatform()
@@ -95,12 +97,15 @@ javafx {
 }
 
 def JLINK_DIR = "$buildDir/rcv"
+// Necessary to explicitly include due to https://github.com/BrightSpots/rcv/issues/625
+def MODULES_TO_ADD = "com.ctc.wstx"
 
 // ### jlink plugin settings
 jlink {
     imageDir = file(JLINK_DIR)
     imageZip = file(JLINK_DIR + ".zip")
-    addOptions '--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages'
+    addOptions '--add-modules', MODULES_TO_ADD, '--strip-debug', '--compress', '2',
+            '--no-header-files', '--no-man-pages'
     mergedModule {
         requires "java.xml"
     }
