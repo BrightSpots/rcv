@@ -1,7 +1,12 @@
 name: Build Releases
 
-on: [push]
-# TODO: eventually, only build on master, and add a step to deploy when a Release is created.
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - 'master'
+      - 'develop'
 
 jobs:
   release:
@@ -10,16 +15,13 @@ jobs:
         matrix:
             os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      #- name: Create filename
-      #  id: fn
-      #  run: echo "FILENAME=build/rctab_${{ github.ref_name }}_${{ runner.os }}.zip" >> $GITHUB_OUTPUT
       - name: Create filename
         id: fn
         shell: bash
-        run: echo "FILENAME=build/rctab_v1.3.1_${{ runner.os }}.zip" >> $GITHUB_OUTPUT
+        run: echo "FILENAME=build/rctab_${{ github.ref_name }}_${{ runner.os }}.zip" >> $GITHUB_OUTPUT
           
-
       - uses: actions/checkout@v3
+
       - name: Set up JDK 17.0.2
         uses: actions/setup-java@v3
         with:
@@ -55,3 +57,16 @@ jobs:
           path: |
             ${{ github.workspace }}/${{ steps.fn.outputs.FILENAME }}
             ${{ github.workspace }}/${{ steps.fn.outputs.FILENAME }}.sha512
+            ${{ github.workspace }}/build/source.zip
+            ${{ github.workspace }}/build/source.tar.gz
+          retention-days: 90
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        if: ${{ github.event_name }} == 'release'
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/${{ steps.fn.outputs.FILENAME }}*
+          tag: ${{ github.ref_name }}
+          overwrite: true
+          file_glob: true
