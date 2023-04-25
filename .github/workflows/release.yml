@@ -3,10 +3,6 @@ name: Build Releases
 on:
   release:
     types: [published]
-  push:
-    branches:
-      - 'master'
-      - 'develop'
 
 jobs:
   release:
