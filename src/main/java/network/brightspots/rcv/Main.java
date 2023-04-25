@@ -26,6 +26,7 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
+  // TODO - sync these values with build.gradle
   public static final String APP_NAME = "RCTab";
   public static final String APP_VERSION = "1.3.1";
 

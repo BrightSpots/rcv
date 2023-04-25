@@ -20,7 +20,7 @@ runs:
         arguments: ${{ inputs.gradle-command }}
     - name: "Rename zip file"
       shell: bash
-      run: mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
+      run: ls build/jpackage & mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
 
     - name: "Generate SHA512 for Linux"
       shell: bash

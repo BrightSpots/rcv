@@ -5,8 +5,6 @@ on:
     types: [published]
   push:
     branches:
-      - 'master'
-      - 'develop'
       - 'feature/issue-57_standalone-executable'
 
 jobs:
@@ -44,12 +42,13 @@ jobs:
         id: jpackagefn
         shell: bash
         run: |
+          # TODO sync version number with Main.java and build.gradle
           if [ ${{ runner.os }} == 'Windows' ]; then
-            echo "FILEPATH=build/jpackage/rcv-1.0.exe" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/RCTab-1.3.1.exe" >> $GITHUB_OUTPUT
           elif [ ${{ runner.os }} == 'Linux' ]; then
-            echo "FILEPATH=build/jpackage/rcv/bin/rcv" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/rctab_1.3.1-1_amd64.deb" >> $GITHUB_OUTPUT
           else
-            echo "FILEPATH=build/jpackage/rcv-1.0.dmg" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/RCTab-1.3.1.dmg" >> $GITHUB_OUTPUT
           fi
       - name: "Create executable filename"
         id: exefn
