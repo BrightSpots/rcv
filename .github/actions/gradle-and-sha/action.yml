@@ -18,9 +18,9 @@ runs:
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
         arguments: ${{ inputs.gradle-command }}
-    - name: "Rename zip file"
+    - name: "Rename output file"
       shell: bash
-      run: ls build/jpackage & mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
+      run: mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
 
     - name: "Generate SHA512 for Linux"
       shell: bash

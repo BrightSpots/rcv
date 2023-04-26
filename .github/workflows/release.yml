@@ -42,7 +42,7 @@ jobs:
         id: jpackagefn
         shell: bash
         run: |
-          # TODO sync version number with Main.java and build.gradle
+          # TODO Issue-662 sync version number with Main.java and build.gradle
           if [ ${{ runner.os }} == 'Windows' ]; then
             echo "FILEPATH=build/jpackage/RCTab-1.3.1.exe" >> $GITHUB_OUTPUT
           elif [ ${{ runner.os }} == 'Linux' ]; then

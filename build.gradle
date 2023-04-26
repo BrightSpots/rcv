@@ -97,21 +97,23 @@ javafx {
 }
 
 def JLINK_DIR = "$buildDir/rcv"
+
+// Comma-separated list of modules
 // Necessary to explicitly include due to https://github.com/BrightSpots/rcv/issues/625
-def MODULE_TO_ADD = "com.ctc.wstx"
+def MODULES_TO_ADD = "com.ctc.wstx"
 
 // ### jlink plugin settings
 jlink {
     imageDir = file(JLINK_DIR)
     imageZip = file(JLINK_DIR + ".zip")
-    addOptions '--add-modules', MODULE_TO_ADD, 
+    addOptions '--add-modules', MODULES_TO_ADD,
                '--strip-debug', '--compress', '2',
                '--no-header-files', '--no-man-pages'
     mergedModule {
         requires "java.xml"
     }
     launcher {
-        // TODO sync these values with Main.java
+        // TODO Issue-662 sync these values with Main.java and release.yml
         name = "RCTab"
         version = "1.3.1"
     }
@@ -119,7 +121,7 @@ jlink {
     jpackage {
         installerOptions += [
           '--verbose',
-          '--vendor', 'The Ranked Choice Voting Resource Center'
+          '--vendor', 'Ranked Choice Voting Resource Center'
         ]
         if (org.gradle.internal.os.OperatingSystem.current().windows) {
             installerOptions += ['--win-per-user-install', '--win-dir-chooser', '--win-menu', '--win-shortcut']
