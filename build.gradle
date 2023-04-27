@@ -113,7 +113,7 @@ jlink {
         requires "java.xml"
     }
     launcher {
-        // TODO Issue-662 sync these values with Main.java and release.yml
+        // TODO Sync version number with release.yml and Main.java (github.com/BrightSpots/rcv/issues/662)
         name = "RCTab"
         version = "1.3.1"
     }

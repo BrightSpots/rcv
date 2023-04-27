@@ -26,8 +26,10 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
-  // TODO Issue-662 - sync these values with release.yml build.gradle
   public static final String APP_NAME = "RCTab";
+
+  // TODO Sync version number with release.yml and build.gradle:
+  // github.com/BrightSpots/rcv/issues/662
   public static final String APP_VERSION = "1.3.1";
 
   /**

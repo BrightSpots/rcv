@@ -34,7 +34,7 @@ jobs:
           if [ ${{ runner.os }} == 'Windows' ]; then
             echo "EXT=.exe" >> $GITHUB_OUTPUT
           elif [ ${{ runner.os }} == 'Linux' ]; then
-            echo "EXT=" >> $GITHUB_OUTPUT
+            echo "EXT=.deb" >> $GITHUB_OUTPUT
           else
             echo "EXT=.dmg" >> $GITHUB_OUTPUT
           fi
@@ -42,7 +42,10 @@ jobs:
         id: jpackagefn
         shell: bash
         run: |
-          # TODO Issue-662 sync version number with Main.java and build.gradle
+          # TODO Sync version number with Main.java and build.gradle (github.com/BrightSpots/rcv/issues/662)
+          # The version numbers are hardcoded because the files below include the version number in them,
+          # and while we could use some regex to figure out the version number automatically, it seems cleaner
+          # to know the expected version number upfront.
           if [ ${{ runner.os }} == 'Windows' ]; then
             echo "FILEPATH=build/jpackage/RCTab-1.3.1.exe" >> $GITHUB_OUTPUT
           elif [ ${{ runner.os }} == 'Linux' ]; then
