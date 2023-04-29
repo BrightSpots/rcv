@@ -941,7 +941,7 @@ class ContestConfig {
   }
 
   int getNumDeclaredCandidates() {
-    int size = candidateNames.size();
+    int size = getCandidateNames().size();
     if (undeclaredWriteInsEnabled()) {
       // we subtract one for UNDECLARED_WRITE_IN_OUTPUT_LABEL;
       size = size - 1;
@@ -950,7 +950,7 @@ class ContestConfig {
   }
 
   int getNumCandidates() {
-    return candidateNames.size() - excludedCandidates.size();
+    return getCandidateNames().size() - excludedCandidates.size();
   }
 
   boolean candidateIsExcluded(String candidate) {
@@ -1005,6 +1005,9 @@ class ContestConfig {
   }
 
   Set<String> getCandidateNames() {
+    if (candidateNames == null) {
+      candidateNames = new HashSet<>();
+    }
     return candidateNames;
   }
 

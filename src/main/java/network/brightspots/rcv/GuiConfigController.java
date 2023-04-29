@@ -865,6 +865,7 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.getItems().clear();
 
     textFieldCandidateName.clear();
+    textAreaCandidateAliases.clear();
     checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
