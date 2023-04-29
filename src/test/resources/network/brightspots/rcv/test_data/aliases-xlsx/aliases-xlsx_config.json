@@ -1,0 +1,64 @@
+{
+  "tabulatorVersion" : "1.3.0",
+  "outputSettings" : {
+    "contestName": "Aliases test (xlsx)",
+    "outputDirectory" : "output",
+    "contestDate" : "2023-04-28",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "aliases-xlsx_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "1",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "|",
+    "provider" : "ess",
+    "overvoteLabel" : "",
+    "undervoteLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "C",
+    "excluded" : false,
+    "aliases" : [ ],
+    "code" : ""
+  }, {
+    "name" : "D",
+    "excluded" : false,
+    "aliases" : [ ],
+    "code" : ""
+  }, {
+    "name" : "A",
+    "excluded" : false,
+    "aliases" : [ "A-2", "A-3", "A-4" ]
+  }, {
+    "name" : "B-2",
+    "excluded" : false,
+    "aliases" : [ "B" ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustIfMultipleContinuing",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

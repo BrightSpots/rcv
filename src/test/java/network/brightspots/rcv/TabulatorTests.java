@@ -195,9 +195,15 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("aliases")
-  void aliases() {
-    runTabulationTest("aliases");
+  @DisplayName("aliases (JSON file format)")
+  void aliasesJson() {
+    runTabulationTest("aliases-json");
+  }
+
+  @Test
+  @DisplayName("aliases (XLSX file format)")
+  void aliasesXlsx() {
+    runTabulationTest("aliases-xlsx");
   }
 
   @Test

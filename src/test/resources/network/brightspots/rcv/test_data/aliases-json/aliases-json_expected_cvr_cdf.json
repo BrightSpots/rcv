@@ -5665,7 +5665,7 @@
         "@type" : "ContestSelection",
         "CandidateIds" : [ "c-unused_display_name_candidate_a" ]
       } ],
-      "Name" : "Aliases test"
+      "Name" : "Aliases test (JSON)"
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
