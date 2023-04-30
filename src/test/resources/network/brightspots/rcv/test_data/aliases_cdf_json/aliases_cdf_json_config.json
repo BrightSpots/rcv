@@ -1,7 +1,7 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "Aliases test (JSON)",
+    "contestName": "Aliases test (JSON CDF Format)",
     "outputDirectory": "output",
     "contestDate": "2023-03-23",
     "contestJurisdiction": "TestSets_Single_winner",
@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath" : "aliases-json_file1_cvr.json",
+      "filePath" : "aliases_cdf_json_file1_cvr.json",
       "idColumnIndex" : "",
       "precinctColumnIndex" : "",
       "provider" : "cdf",
@@ -22,7 +22,7 @@
       "undeclaredWriteInLabel": ""
     },
     {
-      "filePath" : "aliases-json_file2_cvr.json",
+      "filePath" : "aliases_cdf_json_file2_cvr.json",
       "idColumnIndex" : "",
       "precinctColumnIndex" : "",
       "provider" : "cdf",

@@ -1,6 +1,6 @@
 {
   "config" : {
-    "contest" : "Aliases test (JSON)",
+    "contest" : "Aliases test (JSON CDF Format)",
     "date" : "2023-03-23",
     "jurisdiction" : "TestSets_Single_winner",
     "office" : "Aliases test",

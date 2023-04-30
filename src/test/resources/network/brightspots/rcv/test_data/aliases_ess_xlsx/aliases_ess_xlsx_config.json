@@ -1,7 +1,7 @@
 {
-  "tabulatorVersion" : "1.3.0",
+  "tabulatorVersion" : "TEST",
   "outputSettings" : {
-    "contestName": "Aliases test (xlsx)",
+    "contestName": "Aliases test (ES&S XLSX Format)",
     "outputDirectory" : "output",
     "contestDate" : "2023-04-28",
     "contestJurisdiction" : "",
@@ -10,7 +10,7 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "aliases-xlsx_cvr.xlsx",
+    "filePath" : "aliases_ess_xlsx_cvr.xlsx",
     "contestId" : "",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

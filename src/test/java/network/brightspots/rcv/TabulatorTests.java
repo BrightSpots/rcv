@@ -195,15 +195,15 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("aliases (JSON file format)")
+  @DisplayName("aliases (CDF JSON format)")
   void aliasesJson() {
-    runTabulationTest("aliases-json");
+    runTabulationTest("aliases_cdf_json");
   }
 
   @Test
-  @DisplayName("aliases (XLSX file format)")
+  @DisplayName("aliases (ES&S XLSX format)")
   void aliasesXlsx() {
-    runTabulationTest("aliases-xlsx");
+    runTabulationTest("aliases_ess_xlsx");
   }
 
   @Test
