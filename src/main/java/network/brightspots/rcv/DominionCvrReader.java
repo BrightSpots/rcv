@@ -315,25 +315,25 @@ class DominionCvrReader {
             }
             Integer candidateId = (Integer) rankingMap.get("CandidateId");
             String candidateCode = candidateId.toString();
-            String candidateName = config.getNameForCandidate(candidateCode);
+            String dominionCandidateId = config.getNameForCandidate(candidateCode);
             Set<String> candidates = contestIdToCandidateNames.get(contestId);
-            if (!candidates.contains(candidateName)) {
+            if (!candidates.contains(dominionCandidateId)) {
               Logger.severe(
-                  "Candidate name '%s' is not valid for contest '%d'!", candidateName,
+                  "Candidate ID '%s' is not valid for contest '%d'!", dominionCandidateId,
                   contestId);
               throw new CvrParseException();
             }
             // We also need to throw an error if this candidate doesn't appear in the tabulator's
             // config file for this contest.
             if (candidateCode.equals(undeclaredWriteInLabel)) {
-              candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-            } else if (candidateName == null) {
+              dominionCandidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+            } else if (dominionCandidateId == null) {
               unrecognizedCandidateCounts.merge(candidateCode, 1, Integer::sum);
               continue;
             }
 
             Integer rank = (Integer) rankingMap.get("Rank");
-            Pair<Integer, String> ranking = new Pair<>(rank, candidateName);
+            Pair<Integer, String> ranking = new Pair<>(rank, dominionCandidateId);
             rankings.add(ranking);
           }
           // create the new Cvr
