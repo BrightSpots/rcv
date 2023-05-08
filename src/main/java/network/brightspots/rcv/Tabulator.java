@@ -51,7 +51,7 @@ class Tabulator {
   // cast vote records parsed from CVR input files
   private final List<CastVoteRecord> castVoteRecords;
   // all candidate IDs for this contest parsed from the contest config
-  private final Set<String> candidateIds;
+  private final Set<String> candidateNames;
   // contest config contains specific rules and file paths to be used during tabulation
   private final ContestConfig config;
   // roundTallies is a map from round number to a map from candidate ID to vote total for the round
@@ -79,7 +79,7 @@ class Tabulator {
 
   Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config, Set<String> precinctNames) {
     this.castVoteRecords = castVoteRecords;
-    this.candidateIds = config.getCandidateCodeList();
+    this.candidateNames = config.getCandidateNames();
     this.config = config;
     this.precinctNames = precinctNames;
     if (config.isTabulateByPrecinctEnabled()) {
@@ -246,7 +246,7 @@ class Tabulator {
   private void logSummaryInfo() {
     Logger.info(
         "There are %d declared candidates for this contest:", config.getNumDeclaredCandidates());
-    for (String candidate : candidateIds) {
+    for (String candidate : candidateNames) {
       if (!candidate.equals(UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
         Logger.info(
             "%s%s",
@@ -906,7 +906,7 @@ class Tabulator {
       }
 
       // check for a CVR with no rankings at all
-      if (cvr.rankToCandidateIds.isEmpty()) {
+      if (cvr.rankToCandidateNames.isEmpty()) {
         recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
       }
 
@@ -928,7 +928,7 @@ class Tabulator {
       String selectedCandidate = null;
 
       // iterate over all ranks in this cvr from most preferred to least
-      for (int rank : cvr.rankToCandidateIds.keySet()) {
+      for (int rank : cvr.rankToCandidateNames.keySet()) {
         // check for undervote exhaustion
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
@@ -939,7 +939,7 @@ class Tabulator {
 
         // candidateSet contains all candidates selected at the current rank
         // some ballots support multiple candidates selected at a single rank
-        Set<String> candidateSet = cvr.rankToCandidateIds.get(rank);
+        Set<String> candidateSet = cvr.rankToCandidateNames.get(rank);
 
         // check for a duplicate candidate if enabled
         if (config.isExhaustOnDuplicateCandidateEnabled()) {
@@ -965,7 +965,7 @@ class Tabulator {
           recordSelectionForCastVoteRecord(cvr, currentRound, null, "overvote");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
-          if (rank == cvr.rankToCandidateIds.lastKey()) {
+          if (rank == cvr.rankToCandidateNames.lastKey()) {
             recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
           }
           continue;
@@ -975,12 +975,13 @@ class Tabulator {
         // see if any ranked candidates are continuing
 
         for (String candidate : candidateSet) {
-          if (!isCandidateContinuing(candidate)) {
+          String candidateName = config.getNameForCandidate(candidate);
+          if (!isCandidateContinuing(candidateName)) {
             continue;
           }
 
           // we found a continuing candidate so this cvr counts for them
-          selectedCandidate = candidate;
+          selectedCandidate = candidateName;
 
           // transfer cvr to selected candidate
           recordSelectionForCastVoteRecord(cvr, currentRound, selectedCandidate, selectedCandidate);
@@ -1005,7 +1006,7 @@ class Tabulator {
 
         // if this is the last ranking we are out of rankings and must exhaust this cvr
         // determine if the reason is skipping too many ranks, or no continuing candidates
-        if (rank == cvr.rankToCandidateIds.lastKey()) {
+        if (rank == cvr.rankToCandidateNames.lastKey()) {
           if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
               && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
             recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
@@ -1032,9 +1033,9 @@ class Tabulator {
   // create a new initialized tally with all continuing candidates
   private Map<String, BigDecimal> getNewTally() {
     Map<String, BigDecimal> tally = new HashMap<>();
-    for (String candidateId : candidateIds) {
-      if (isCandidateContinuing(candidateId)) {
-        tally.put(candidateId, BigDecimal.ZERO);
+    for (String candidateName : candidateNames) {
+      if (isCandidateContinuing(candidateName)) {
+        tally.put(candidateName, BigDecimal.ZERO);
       }
     }
     return tally;
