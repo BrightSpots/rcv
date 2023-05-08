@@ -4,38 +4,41 @@
     "date" : "2015-11-03",
     "jurisdiction" : "Portland, ME",
     "office" : "Mayor",
-    "threshold" : "8"
+    "threshold" : "9"
   },
   "results" : [ {
     "round" : 1,
     "tally" : {
       "Carmona, Ralph C." : "5",
-      "Haadoow, Hamza A." : "3",
-      "Vail, Christopher L." : "10"
+      "Haadoow, Hamza A." : "5",
+      "Vail, Christopher L." : "6"
     },
     "tallyResults" : [ {
-      "elected" : "Vail, Christopher L.",
-      "transfers" : { }
+      "eliminated" : "Haadoow, Hamza A.",
+      "transfers" : {
+        "exhausted" : "5"
+      }
     } ]
   }, {
     "round" : 2,
     "tally" : {
       "Carmona, Ralph C." : "5",
-      "Haadoow, Hamza A." : "3",
-      "Vail, Christopher L." : "10"
+      "Vail, Christopher L." : "6"
     },
     "tallyResults" : [ {
-      "eliminated" : "Haadoow, Hamza A.",
+      "eliminated" : "Carmona, Ralph C.",
       "transfers" : {
-        "exhausted" : "3"
+        "exhausted" : "5"
       }
     } ]
   }, {
     "round" : 3,
     "tally" : {
-      "Carmona, Ralph C." : "5",
-      "Vail, Christopher L." : "10"
+      "Vail, Christopher L." : "6"
     },
-    "tallyResults" : [ ]
+    "tallyResults" : [ {
+      "elected" : "Vail, Christopher L.",
+      "transfers" : { }
+    } ]
   } ]
 }

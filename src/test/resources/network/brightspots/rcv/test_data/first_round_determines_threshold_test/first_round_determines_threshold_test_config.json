@@ -46,7 +46,7 @@
     "winnerElectionMode" : "singleWinnerMajority",
     "randomSeed" : "0",
     "numberOfWinners" : "1",
-    "firstRoundDeterminesThreshold" : true,
+    "doesFirstRoundDetermineThreshold" : true,
     "multiSeatBottomsUpPercentageThreshold" : "",
     "decimalPlacesForVoteArithmetic" : "5",
     "minimumVoteThreshold" : "0",
