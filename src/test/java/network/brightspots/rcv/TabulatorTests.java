@@ -576,6 +576,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("first round determine threshold and tiebreaker runs test")
+  void firstRoundDeterminesTiebreakerThresholdTest() {
+    runTabulationTest("first_round_determines_threshold_tiebreaker_test");
+  }
+
+  @Test
   @DisplayName("overvote exhaust if multiple continuing test")
   void overvoteExhaustIfMultipleContinuingTest() {
     runTabulationTest("exhaust_if_multiple_continuing");
