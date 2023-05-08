@@ -340,6 +340,7 @@ public class RawContestConfig {
     public boolean hareQuota;
     public boolean batchElimination;
     public boolean continueUntilTwoCandidatesRemain;
+    public String stopTabulationEarlyAfterRound;
     public boolean exhaustOnDuplicateCandidate;
     public String rulesDescription;
 

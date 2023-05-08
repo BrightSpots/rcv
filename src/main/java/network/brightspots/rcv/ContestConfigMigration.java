@@ -188,6 +188,11 @@ final class ContestConfigMigration {
         }
       }
 
+      // Migrations from 1.3.0 to 1.4.0
+      if (rules.stopTabulationEarlyAfterRound == null) {
+        rules.stopTabulationEarlyAfterRound = "";
+      }
+
       Logger.info(
           "Migrated tabulator config version from %s to %s.",
           config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
