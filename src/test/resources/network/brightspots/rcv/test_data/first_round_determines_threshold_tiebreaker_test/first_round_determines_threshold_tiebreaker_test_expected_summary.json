@@ -37,8 +37,14 @@
       "Carmona, Ralph C." : "6"
     },
     "tallyResults" : [ {
-      "elected" : "Carmona, Ralph C.",
-      "transfers" : { }
+      "eliminated" : "Carmona, Ralph C.",
+      "transfers" : {
+        "exhausted" : "6"
+      }
     } ]
+  }, {
+    "round" : 4,
+    "tally" : { },
+    "tallyResults" : [ ]
   } ]
 }

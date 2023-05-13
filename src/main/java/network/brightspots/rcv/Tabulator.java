@@ -236,11 +236,11 @@ class Tabulator {
         }
         // 4. If we didn't do batch elimination, eliminate the remaining candidate with the lowest
         //    tally, breaking a tie if needed.
-        if (eliminated.isEmpty()) {
+        if (eliminated.isEmpty() && !currentRoundTallyToCandidates.isEmpty()) {
           eliminated = doRegularElimination(currentRoundTallyToCandidates);
         }
 
-        assert !eliminated.isEmpty();
+        // assert !eliminated.isEmpty();
         for (String loser : eliminated) {
           candidateToRoundEliminated.put(loser, currentRound);
         }
@@ -493,9 +493,13 @@ class Tabulator {
     } else {
       // We should only look for more winners if we haven't already filled all the seats.
       if (winnerToRound.size() < config.getNumberOfWinners()) {
-        // If the number of continuing candidates equals the number of seats to fill, everyone wins.
-        if (currentRoundCandidateToTally.size()
-            == config.getNumberOfWinners() - winnerToRound.size()) {
+        // In multi-winner elections, if the number of continuing candidates equals the
+        // number of seats to fill, everyone wins.
+        // This is not true in single-round elections: if nobody reaches the threshold, nobody wins.
+        // This would only be possible if firstRoundDeterminesThreshold is true.
+        int numWinners = config.getNumberOfWinners();
+        if (numWinners > 1
+            && currentRoundCandidateToTally.size() == numWinners - winnerToRound.size()) {
           selectedWinners.addAll(currentRoundCandidateToTally.keySet());
         } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
           selectWinners(currentRoundTallyToCandidates, selectedWinners);
