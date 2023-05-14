@@ -28,8 +28,12 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
@@ -110,7 +114,7 @@ class CommonDataFormatReader {
    * @param errors If not unique, adds keyName to this list
    */
   private static <K, V> void putIfUnique(
-          HashMap<K, V> map, K key, V value, String keyName, Set<String> errors) {
+          HashMap<K, V> map, K key, V value, String keyName, HashSet<String> errors) {
     if (map.containsKey(key)) {
       Logger.severe("%s \"%s\" appears multiple times", keyName, key);
       errors.add(keyName);
@@ -429,7 +433,7 @@ class CommonDataFormatReader {
       HashMap contestSelection = (HashMap) contestSelectionObject;
       String selectionObjectId = (String) contestSelection.get("@id");
       putIfUnique(contestSelections, selectionObjectId, contestSelection,
-        "Contest Selection", nonUniqueKeys);
+          "Contest Selection", nonUniqueKeys);
     }
 
     if (!nonUniqueKeys.isEmpty()) {
