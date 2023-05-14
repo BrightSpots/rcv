@@ -61,8 +61,8 @@ class ResultsWriter {
   private static final String CDF_GPU_ID_FORMAT = "gpu-%d";
   private static final String CDF_REPORTING_DEVICE_ID = "rd-001";
 
-  private static final Map<String, String> cdfCandidateCodeToContestSelectionId = new HashMap<>();
-  private static final Map<String, String> cdfCandidateCodeToCandidateId = new HashMap<>();
+  private static final Map<String, String> cdfCandidateNameToContestSelectionId = new HashMap<>();
+  private static final Map<String, String> cdfCandidateNameToCandidateId = new HashMap<>();
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
@@ -131,39 +131,41 @@ class ResultsWriter {
         : String.format("ballot-%s", cvrId);
   }
 
-  // generates an internal ContestSelectionId based on a candidate code
-  private static String getCdfContestSelectionIdForCandidateCode(String code) {
-    return cdfCandidateCodeToContestSelectionId.computeIfAbsent(code,
+  // generates an internal ContestSelectionId based on a candidate name
+  private static String getCdfContestSelectionIdForCandidateName(String name) {
+    return cdfCandidateNameToContestSelectionId.computeIfAbsent(name,
         c -> String.format("cs-%s", sanitizeStringForOutput(c).toLowerCase()));
   }
 
-  // generates an internal CandidateId based on a candidate code
-  private static String getCdfCandidateIdForCandidateCode(String code) {
-    return cdfCandidateCodeToCandidateId.computeIfAbsent(code,
+  // generates an internal CandidateId based on a candidate name
+  private static String getCdfCandidateIdForCandidateName(String name) {
+    return cdfCandidateNameToCandidateId.computeIfAbsent(name,
         c -> String.format("c-%s", sanitizeStringForOutput(c).toLowerCase()));
   }
 
-  // Instead of a map from rank to list of candidates, we need a sorted list of candidates
+  // Instead of a list mapping ranks to list of candidates, we need a sorted list of candidates
   // with the ranks they were given. (Ordinarily a candidate will have only a single rank, but they
   // could have multiple ranks if the ballot duplicates the candidate, i.e. assigns them multiple
   // ranks.)
   // We sort by the lowest (best) rank, then alphabetically by name.
   private static List<Map.Entry<String, List<Integer>>> getCandidatesWithRanksList(
-      Map<Integer, Set<String>> rankToCandidateIds) {
-    Map<String, List<Integer>> candidateIdToRanks = new HashMap<>();
+      CandidateRankingsList candidateRankings) {
+    Map<String, List<Integer>> candidateNameToRanks = new HashMap<>();
     // first group the ranks by candidate
-    for (var entry : rankToCandidateIds.entrySet()) {
-      for (String candidateId : entry.getValue()) {
-        candidateIdToRanks.computeIfAbsent(candidateId, k -> new LinkedList<>());
-        candidateIdToRanks.get(candidateId).add(entry.getKey());
+    for (Pair<Integer, CandidatesAtRanking> rankCandidatesPair : candidateRankings) {
+      Integer rank = rankCandidatesPair.getKey();
+      CandidatesAtRanking candidatesAtRanking = rankCandidatesPair.getValue();
+      for (String candidateName : candidatesAtRanking) {
+        candidateNameToRanks.computeIfAbsent(candidateName, k -> new LinkedList<>());
+        candidateNameToRanks.get(candidateName).add(rank);
       }
     }
     // we want the ranks for a given candidate in ascending order
-    for (List<Integer> list : candidateIdToRanks.values()) {
+    for (List<Integer> list : candidateNameToRanks.values()) {
       Collections.sort(list);
     }
     List<Map.Entry<String, List<Integer>>> sortedCandidatesWithRanks =
-        new LinkedList<>(candidateIdToRanks.entrySet());
+        new LinkedList<>(candidateNameToRanks.entrySet());
     // and now we sort the list of candidates with ranks
     sortedCandidatesWithRanks.sort(
         (firstObject, secondObject) -> {
@@ -334,7 +336,7 @@ class ResultsWriter {
 
     // For each candidate: for each round: output total votes
     for (String candidate : sortedCandidates) {
-      String candidateDisplayName = config.getNameForCandidateCode(candidate);
+      String candidateDisplayName = config.getNameForCandidate(candidate);
       csvPrinter.print(candidateDisplayName);
       for (int round = 1; round <= numRounds; round++) {
         BigDecimal thisRoundTally = roundTallies.get(round).get(candidate);
@@ -416,7 +418,7 @@ class ResultsWriter {
       throws IOException {
     List<String> candidateDisplayNames = new ArrayList<>();
     for (String candidate : candidates) {
-      candidateDisplayNames.add(config.getNameForCandidateCode(candidate));
+      candidateDisplayNames.add(config.getNameForCandidate(candidate));
     }
     // use semicolon as delimiter display in a single cell
     String candidateCellText = String.join("; ", candidateDisplayNames);
@@ -435,7 +437,7 @@ class ResultsWriter {
     Collections.sort(winningRounds);
     for (int round : winningRounds) {
       for (String candidateCode : roundToWinningCandidates.get(round)) {
-        winners.add(config.getNameForCandidateCode(candidateCode));
+        winners.add(config.getNameForCandidate(candidateCode));
       }
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
@@ -561,15 +563,16 @@ class ResultsWriter {
       CastVoteRecord castVoteRecord) throws IOException {
     // for each rank determine what candidate id, overvote, or undervote occurred and print it
     for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
-      if (castVoteRecord.rankToCandidateIds.containsKey(rank)) {
-        Set<String> candidateSet = castVoteRecord.rankToCandidateIds.get(rank);
-        assert !candidateSet.isEmpty();
-        if (candidateSet.size() == 1) {
-          String selection = candidateSet.iterator().next();
+      if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
+        CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
+        if (candidates.count() == 1) {
+          String selection = candidates.get(0);
           // We map all undeclared write-ins to our constant string when we read them in,
           // so we need to translate it back to the original candidate ID here.
           if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             selection = undeclaredWriteInLabel;
+          } else {
+            selection = config.getCodeForCandidate(selection);
           }
           csvPrinter.print(selection);
         } else {
@@ -693,11 +696,11 @@ class ResultsWriter {
   private Map<String, Object> generateCvrSnapshotMap(
       CastVoteRecord cvr, Integer round, List<Pair<String, BigDecimal>> currentRoundSnapshotData) {
     List<Map<String, Object>> selectionMapList = new LinkedList<>();
-    List<Map.Entry<String, List<Integer>>> candidatesWithRanksList =
-        getCandidatesWithRanksList(cvr.rankToCandidateIds);
 
+    List<Map.Entry<String, List<Integer>>> candidatesWithRanksList =
+        getCandidatesWithRanksList(cvr.candidateRankings);
     for (Map.Entry<String, List<Integer>> candidateWithRanks : candidatesWithRanksList) {
-      String candidateCode = candidateWithRanks.getKey();
+      String candidateName = candidateWithRanks.getKey();
 
       String isAllocable = "unknown";
       BigDecimal numberVotes = BigDecimal.ONE;
@@ -705,7 +708,7 @@ class ResultsWriter {
       if (currentRoundSnapshotData != null) {
         // scanning the list isn't actually expensive because it will almost always be very short
         for (Pair<String, BigDecimal> allocation : currentRoundSnapshotData) {
-          if (allocation.getKey().equals(candidateCode)) {
+          if (allocation.getKey().equals(candidateName)) {
             isAllocable = "yes";
             numberVotes = allocation.getValue();
             break;
@@ -748,7 +751,7 @@ class ResultsWriter {
 
       selectionMapList.add(
           Map.ofEntries(
-              entry("ContestSelectionId", getCdfContestSelectionIdForCandidateCode(candidateCode)),
+              entry("ContestSelectionId", getCdfContestSelectionIdForCandidateName(candidateName)),
               entry("SelectionPosition", selectionPositionMapList),
               entry("@type", "CVR.CVRContestSelection")));
     }
@@ -772,7 +775,7 @@ class ResultsWriter {
     List<Map<String, Object>> candidates = new LinkedList<>();
 
     // iterate all candidates and create Candidate and ContestSelection objects for them
-    List<String> candidateCodes = new LinkedList<>(config.getCandidateCodeList());
+    List<String> candidateNames = new LinkedList<>(config.getCandidateNames());
     // if any of the sources have overvote labels, we also need to register the explicit overvote
     // as a valid candidate/contest selection
     boolean includeExplicitOvervote = false;
@@ -783,22 +786,22 @@ class ResultsWriter {
       }
     }
     if (includeExplicitOvervote) {
-      candidateCodes.add(Tabulator.EXPLICIT_OVERVOTE_LABEL);
+      candidateNames.add(Tabulator.EXPLICIT_OVERVOTE_LABEL);
     }
-    Collections.sort(candidateCodes);
-    for (String candidateCode : candidateCodes) {
+    Collections.sort(candidateNames);
+    for (String candidateName : candidateNames) {
       candidates.add(
           Map.ofEntries(
-              entry("@id", getCdfCandidateIdForCandidateCode(candidateCode)),
-              entry("Name", candidateCode)));
+              entry("@id", getCdfCandidateIdForCandidateName(candidateName)),
+              entry("Name", candidateName)));
 
       contestSelections.add(
           Map.ofEntries(
-              entry("@id", getCdfContestSelectionIdForCandidateCode(candidateCode)),
+              entry("@id", getCdfContestSelectionIdForCandidateName(candidateName)),
               entry("@type", "ContestSelection"),
               entry(
                   "CandidateIds",
-                  new String[]{getCdfCandidateIdForCandidateCode(candidateCode)})));
+                  new String[]{getCdfCandidateIdForCandidateName(candidateName)})));
     }
 
     Map<String, Object> contestJson =
@@ -865,7 +868,7 @@ class ResultsWriter {
   private Map<String, BigDecimal> updateCandidateNamesInTally(Map<String, BigDecimal> tally) {
     Map<String, BigDecimal> newTally = new HashMap<>();
     for (var entry : tally.entrySet()) {
-      newTally.put(config.getNameForCandidateCode(entry.getKey()), entry.getValue());
+      newTally.put(config.getNameForCandidate(entry.getKey()), entry.getValue());
     }
     return newTally;
   }
@@ -895,7 +898,7 @@ class ResultsWriter {
 
       for (String candidate : candidates) {
         HashMap<String, Object> action = new HashMap<>();
-        action.put(actionType, config.getNameForCandidateCode(candidate));
+        action.put(actionType, config.getNameForCandidate(candidate));
         if (roundTransfers != null) {
           Map<String, BigDecimal> transfersFromCandidate = roundTransfers.get(candidate);
           if (transfersFromCandidate != null) {
@@ -903,7 +906,7 @@ class ResultsWriter {
             Map<String, BigDecimal> translatedTransfers = new HashMap<>();
             for (var entry : transfersFromCandidate.entrySet()) {
               // candidateName will be null for special values like "exhausted"
-              String candidateName = config.getNameForCandidateCode(entry.getKey());
+              String candidateName = config.getNameForCandidate(entry.getKey());
               translatedTransfers.put(
                   candidateName != null ? candidateName : entry.getKey(),
                   entry.getValue());

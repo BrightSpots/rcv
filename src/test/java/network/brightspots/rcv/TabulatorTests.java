@@ -195,6 +195,18 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("aliases (CDF JSON format)")
+  void aliasesJson() {
+    runTabulationTest("aliases_cdf_json");
+  }
+
+  @Test
+  @DisplayName("aliases (ES&S XLSX format)")
+  void aliasesXlsx() {
+    runTabulationTest("aliases_ess_xlsx");
+  }
+
+  @Test
   @DisplayName("NIST XML CDF 2")
   void nistXmlCdf2() {
     runTabulationTest("nist_xml_cdf_2");
@@ -393,6 +405,12 @@ class TabulatorTests {
   @DisplayName("test skipping to next candidate after overvote")
   void testSkipToNext() {
     runTabulationTest("skip_to_next_test");
+  }
+
+  @Test
+  @DisplayName("test stopping tabulation early")
+  void testStopTabulationEarly() {
+    runTabulationTest("stop_tabulation_early_test");
   }
 
   @Test

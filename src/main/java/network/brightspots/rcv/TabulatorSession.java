@@ -286,7 +286,9 @@ class TabulatorSession {
           reader.readCastVoteRecords(castVoteRecords, source.getContestId());
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
-            ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
+            ResultsWriter writer = new ResultsWriter()
+                    .setContestConfig(config)
+                    .setTimestampString(timestampString);
             this.convertedFilesWritten =
                 writer.writeGenericCvrCsv(
                     castVoteRecords,

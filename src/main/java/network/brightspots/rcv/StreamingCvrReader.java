@@ -199,13 +199,15 @@ class StreamingCvrReader {
       encounteredDataErrors = true;
     }
 
+    // Log the raw data for auditing
+    Logger.fine("[Raw Data]: " + currentCvrData.toString());
+
     // create new cast vote record
     CastVoteRecord newRecord =
         new CastVoteRecord(
             computedCastVoteRecordId,
             currentSuppliedCvrId,
             currentPrecinct,
-            currentCvrData,
             currentRankings);
     cvrList.add(newRecord);
 
@@ -253,7 +255,7 @@ class StreamingCvrReader {
             candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           } else if (candidate.equals(undeclaredWriteInLabel)) {
             candidate = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-          } else if (!config.getCandidateCodeList().contains(candidate)) {
+          } else if (config.getNameForCandidate(candidate) == null) {
             // This is an unrecognized candidate, so add it to the unrecognized candidate map.
             // This helps identify problems with CVRs.
             unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);

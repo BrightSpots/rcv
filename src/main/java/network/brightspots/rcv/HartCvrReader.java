@@ -88,11 +88,11 @@ class HartCvrReader {
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         if (contest.Options != null) {
           for (Option option : contest.Options) {
-            String candidateId = option.Id;
-            if (candidateId.equals(undeclaredWriteInLabel)) {
-              candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-            } else if (!contestConfig.getCandidateCodeList().contains(candidateId)) {
-              unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
+            String candidateName = option.Id;
+            if (candidateName.equals(undeclaredWriteInLabel)) {
+              candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+            } else if (contestConfig.getNameForCandidate(candidateName) == null) {
+              unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
             }
             // Hart RCV election ranks are indicated by a string read left to right:
             // each digit corresponds to a rank and is set to 1 if that rank was voted:
@@ -102,7 +102,7 @@ class HartCvrReader {
             for (int rank = 1; rank < option.Value.length() + 1; rank++) {
               String rankValue = option.Value.substring(rank - 1, rank);
               if (rankValue.equals("1")) {
-                rankings.add(new Pair<>(rank, candidateId));
+                rankings.add(new Pair<>(rank, candidateName));
               }
             }
           }

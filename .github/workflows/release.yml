@@ -1,0 +1,66 @@
+name: Build Releases
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+        matrix:
+            os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: "Create filename"
+        id: fn
+        shell: bash
+        run: echo "FILENAME=build/rctab_${{ github.ref_name }}_${{ runner.os }}.zip" >> $GITHUB_OUTPUT
+          
+      - uses: actions/checkout@v3
+
+      - name: "Set up JDK 17.0.2"
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17.0.2'
+          distribution: 'temurin'
+
+      - name: "Validate Gradle wrapper"
+        uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
+
+      - name: "Create zip with Gradle"
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: jlinkZip
+
+      - name: "Rename zip file"
+        run: cp build/rcv.zip ${{ steps.fn.outputs.FILENAME }}
+
+      - name: "Generate SHA512 for Linux"
+        if: runner.os == 'Linux'
+        run: sha512sum ${{ steps.fn.outputs.FILENAME }} > ${{ steps.fn.outputs.FILENAME }}.sha512
+      - name: "Generate SHA512 for Windows"
+        if: runner.os == 'Windows'
+        shell: bash
+        run: certutil -hashfile ${{ steps.fn.outputs.FILENAME }} SHA512 >> ${{ steps.fn.outputs.FILENAME }}.sha512
+      - name: "Generate SHA512 for OSX"
+        if: runner.os == 'macOS'
+        run: openssl dgst -sha512 > ${{ steps.fn.outputs.FILENAME }}.sha512
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Package
+          if-no-files-found: error
+          path: |
+            ${{ github.workspace }}/${{ steps.fn.outputs.FILENAME }}
+            ${{ github.workspace }}/${{ steps.fn.outputs.FILENAME }}.sha512
+          retention-days: 90
+
+      - name: "Upload binaries to release"
+        uses: svenstaro/upload-release-action@v2
+        if: ${{ github.event_name }} == 'release'
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/${{ steps.fn.outputs.FILENAME }}*
+          tag: ${{ github.ref_name }}
+          overwrite: true
+          file_glob: true

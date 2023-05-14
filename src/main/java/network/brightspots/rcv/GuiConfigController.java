@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -70,6 +71,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.ValidationError;
@@ -190,15 +192,15 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<Candidate, String> tableColumnCandidateName;
   @FXML
-  private TableColumn<Candidate, String> tableColumnCandidateCode;
+  private TableColumn<Candidate, String> tableColumnCandidateAliases;
   @FXML
   private TableColumn<Candidate, Boolean> tableColumnCandidateExcluded;
   @FXML
   private TextField textFieldCandidateName;
   @FXML
-  private TextField textFieldCandidateCode;
-  @FXML
   private CheckBox checkBoxCandidateExcluded;
+  @FXML
+  private TextArea textAreaCandidateAliases;
   @FXML
   private ChoiceBox<TiebreakMode> choiceTiebreakMode;
   @FXML
@@ -239,6 +241,8 @@ public class GuiConfigController implements Initializable {
   private CheckBox checkBoxBatchElimination;
   @FXML
   private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
+  @FXML
+  private TextField textFieldStopTabulationEarlyAfterRound;
   @FXML
   private CheckBox checkBoxExhaustOnDuplicateCandidate;
   @FXML
@@ -757,7 +761,7 @@ public class GuiConfigController implements Initializable {
     Candidate candidate =
         new Candidate(
             getTextOrEmptyString(textFieldCandidateName),
-            getTextOrEmptyString(textFieldCandidateCode),
+            textAreaCandidateAliases.getText(),
             checkBoxCandidateExcluded.isSelected());
     Set<ValidationError> validationErrors =
         ContestConfig.performBasicCandidateValidation(candidate);
@@ -775,7 +779,7 @@ public class GuiConfigController implements Initializable {
   public void buttonClearCandidateClicked() {
     clearErrorStyling(textFieldCandidateName);
     textFieldCandidateName.clear();
-    textFieldCandidateCode.clear();
+    textAreaCandidateAliases.clear();
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
   }
 
@@ -795,6 +799,8 @@ public class GuiConfigController implements Initializable {
     checkBoxMaxRankingsAllowedMax.setDisable(true);
     textFieldMinimumVoteThreshold.clear();
     textFieldMinimumVoteThreshold.setDisable(true);
+    textFieldStopTabulationEarlyAfterRound.clear();
+    textFieldStopTabulationEarlyAfterRound.setDisable(true);
     checkBoxBatchElimination.setSelected(false);
     checkBoxBatchElimination.setDisable(true);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
@@ -863,7 +869,7 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.getItems().clear();
 
     textFieldCandidateName.clear();
-    textFieldCandidateCode.clear();
+    textAreaCandidateAliases.clear();
     checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
@@ -1082,7 +1088,8 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.setEditable(false);
 
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
-    tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+    tableColumnCandidateAliases
+        .setCellValueFactory(new PropertyValueFactory<>("semicolonSeparatedAliases"));
     tableColumnCandidateExcluded.setCellValueFactory(new PropertyValueFactory<>("excluded"));
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(false);
@@ -1110,6 +1117,7 @@ public class GuiConfigController implements Initializable {
       setWinningRulesDefaultValues();
       checkBoxMaxRankingsAllowedMax.setDisable(false);
       textFieldMinimumVoteThreshold.setDisable(false);
+      textFieldStopTabulationEarlyAfterRound.setDisable(false);
       choiceTiebreakMode.setDisable(false);
       switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
         case STANDARD_SINGLE_WINNER -> {
@@ -1250,6 +1258,7 @@ public class GuiConfigController implements Initializable {
     setThresholdCalculationMethodRadioButton(rules.nonIntegerWinningThreshold, rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
+    textFieldStopTabulationEarlyAfterRound.setText(rules.stopTabulationEarlyAfterRound);
     checkBoxExhaustOnDuplicateCandidate.setSelected(rules.exhaustOnDuplicateCandidate);
   }
 
@@ -1313,8 +1322,7 @@ public class GuiConfigController implements Initializable {
 
     ArrayList<Candidate> candidates = new ArrayList<>(tableViewCandidates.getItems());
     for (Candidate candidate : candidates) {
-      candidate.setName(candidate.getName() != null ? candidate.getName().trim() : "");
-      candidate.setCode(candidate.getCode() != null ? candidate.getCode().trim() : "");
+      candidate.trimNameAndAllAliases();
     }
     config.candidates = candidates;
 
@@ -1340,6 +1348,8 @@ public class GuiConfigController implements Initializable {
     rules.hareQuota = radioThresholdHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
+    rules.stopTabulationEarlyAfterRound =
+        getTextOrEmptyString(textFieldStopTabulationEarlyAfterRound);
     rules.exhaustOnDuplicateCandidate = checkBoxExhaustOnDuplicateCandidate.isSelected();
     rules.rulesDescription = getTextOrEmptyString(textFieldRulesDescription);
     config.rules = rules;

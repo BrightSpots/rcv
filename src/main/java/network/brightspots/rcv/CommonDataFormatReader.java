@@ -269,11 +269,11 @@ class CommonDataFormatReader {
               Logger.severe("ContestSelection \"%s\" from CVR not found!", contestSelectionId);
               throw new CvrParseException();
             }
-            String candidateId;
+            String candidateName;
             // check for declared write-in:
             if (contestSelection.IsWriteIn != null
                 && contestSelection.IsWriteIn.equals(BOOLEAN_TRUE)) {
-              candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+              candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             } else {
               // validate candidate Ids:
               // CDF allows multiple candidate Ids to support party ticket voting options
@@ -298,15 +298,15 @@ class CommonDataFormatReader {
                     contestSelection.CandidateIds[0], contestSelection.ObjectId);
                 throw new CvrParseException();
               }
-              candidateId = candidate.Name;
-              if (candidateId.equals(overvoteLabel)) {
-                candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-              } else if (!config.getCandidateCodeList().contains(candidateId)) {
-                Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
-                unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
+              candidateName = candidate.Name;
+              if (candidateName.equals(overvoteLabel)) {
+                candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+              } else if (config.getNameForCandidate(candidateName) == null) {
+                Logger.severe("Unrecognized candidate found in CVR: %s", candidateName);
+                unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
               }
             }
-            parseRankings(cvr, contest, rankings, cvrContestSelection, candidateId);
+            parseRankings(cvr, contest, rankings, cvrContestSelection, candidateName);
           }
         }
 
@@ -325,7 +325,7 @@ class CommonDataFormatReader {
         String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
         // create the new CastVoteRecord
         CastVoteRecord newRecord =
-            new CastVoteRecord(computedCastVoteRecordId, cvr.UniqueId, precinctId, null, rankings);
+            new CastVoteRecord(computedCastVoteRecordId, cvr.UniqueId, precinctId, rankings);
         castVoteRecords.add(newRecord);
 
         // provide some user feedback on the CVR count
@@ -458,11 +458,11 @@ class CommonDataFormatReader {
           throw new CvrParseException();
         }
         HashMap contestSelection = (HashMap) contestSelections.get(contestSelectionId);
-        String candidateId;
+        String candidateName;
         if (contestSelection.containsKey("IsWriteIn")
             && contestSelection.get("IsWriteIn").equals(BOOLEAN_TRUE)) {
           // this is a write-in
-          candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+          candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
         } else {
           // lookup Candidate Name
           ArrayList candidateIds = (ArrayList) contestSelection.get("CandidateIds");
@@ -484,12 +484,12 @@ class CommonDataFormatReader {
                     candidateObjectId, contestSelectionId);
             throw new CvrParseException();
           }
-          candidateId = (String) candidate.get("Name");
-          if (candidateId.equals(overvoteLabel)) {
-            candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-          } else if (!this.config.getCandidateCodeList().contains(candidateId)) {
-            Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
-            unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
+          candidateName = (String) candidate.get("Name");
+          if (candidateName.equals(overvoteLabel)) {
+            candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+          } else if (this.config.getNameForCandidate(candidateName) == null) {
+            Logger.severe("Unrecognized candidate found in CVR: %s", candidateName);
+            unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
           }
         }
 
@@ -498,7 +498,7 @@ class CommonDataFormatReader {
         // this is an ambiguity in the nist spec
         if (cvrContestSelection.containsKey("Rank")) {
           Integer rank = (Integer) (cvrContestSelection.get("Rank"));
-          rankings.add(new Pair<>(rank, candidateId));
+          rankings.add(new Pair<>(rank, candidateName));
         } else {
           // extract all the SelectionPositions (ranks) which this selection has been assigned
           ArrayList selectionPositions = (ArrayList) cvrContestSelection.get("SelectionPosition");
@@ -506,7 +506,7 @@ class CommonDataFormatReader {
             HashMap selectionPosition = (HashMap) selectionPositionObject;
             // WriteIn can be linked at the selection position level
             if (selectionPosition.containsKey("CVRWriteIn")) {
-              candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+              candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             }
             // ignore if no indication is present (NIST 1500-103 section 3.4.2)
             if (selectionPosition.containsKey("HasIndication")
@@ -520,7 +520,7 @@ class CommonDataFormatReader {
             }
             // and finally the rank
             Integer rank = (Integer) selectionPosition.get("Rank");
-            rankings.add(new Pair<>(rank, candidateId));
+            rankings.add(new Pair<>(rank, candidateName));
           }
         }
       } // for (Object cvrContestSelectionObject : cvrContestSelections) {
@@ -541,7 +541,7 @@ class CommonDataFormatReader {
       String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
       // create the new CastVoteRecord
       CastVoteRecord newRecord =
-          new CastVoteRecord(computedCastVoteRecordId, ballotId, precinctId, null, rankings);
+          new CastVoteRecord(computedCastVoteRecordId, ballotId, precinctId, rankings);
       castVoteRecords.add(newRecord);
       // provide some user feedback on the CVR count
       if (castVoteRecords.size() % 50000 == 0) {
