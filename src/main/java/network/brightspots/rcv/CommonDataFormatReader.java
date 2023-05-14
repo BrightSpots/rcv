@@ -28,11 +28,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
@@ -103,17 +100,21 @@ class CommonDataFormatReader {
 
   /**
    * Sets map[key] = value if map does not contain key already.
-   * Throws CvrParseException if it does.
+   * If it does, returns false. The caller is responsible for throwing an error
+   * after aggregating all keys that were not unique.
    *
    * @param map The map to modify
-   * @param humanReadableName Used as part of the error message if the key is already in the map
-   * @throws CvrParseException if the key is already in the map
+   * @param key Key to check for uniqueness
+   * @param value Value to place if unique
+   * @param keyName Human-readable name of the key, used to make the error message more useful
+   * @param errors If not unique, adds keyName to this list
    */
   private static <K, V> void putIfUnique(
-          HashMap<K, V> map, K key, V value, String humanReadableName) throws CvrParseException {
+          HashMap<K, V> map, K key, V value, String keyName, Set<String> errors) {
     if (map.containsKey(key)) {
-      Logger.severe("%s \"%s\" appears multiple times", humanReadableName, key);
-      throw new CvrParseException();
+      Logger.severe("%s \"%s\" appears multiple times", keyName, key);
+      errors.add(keyName);
+      return;
     }
 
     map.put(key, value);
@@ -150,6 +151,40 @@ class CommonDataFormatReader {
     return cvrContestToTabulate;
   }
 
+  void checkForEmptyFields(CastVoteRecordReport cvrReport) throws CvrParseException {
+    // Some checks to provide nicer error messages.
+    // This is common with Unisyn's CDF CVR, which is not compatible with RCTab.
+    if (cvrReport.GpUnit == null) {
+      Logger.severe("Field \"GPUnit\" missing from CDF CVR file! "
+              + "This is common with older, unsupported formats.");
+      throw new CvrParseException();
+    }
+
+    // These fields are also required, but we are not aware of any standard format where
+    // they would be missing, so we group all these checks together.
+    ArrayList<String> missingFields = new ArrayList<>();
+    if (cvrReport.CVR == null) {
+      missingFields.add("CVR");
+    }
+    if (cvrReport.Election == null) {
+      missingFields.add("Election");
+    }
+    if (cvrReport.ReportGeneratingDeviceIds == null) {
+      missingFields.add("ReportGeneratingDeviceIds");
+    }
+    if (cvrReport.ReportingDevice == null) {
+      missingFields.add("ReportingDevice");
+    }
+    if (cvrReport.Party == null) {
+      missingFields.add("Party");
+    }
+
+    if (!missingFields.isEmpty()) {
+      Logger.severe("Required fields are missing from CDF CVR file: " + missingFields);
+      throw new CvrParseException();
+    }
+  }
+
   void parseXml(List<CastVoteRecord> castVoteRecords)
       throws CvrParseException, IOException, UnrecognizedCandidatesException {
     // load XML
@@ -159,24 +194,7 @@ class CommonDataFormatReader {
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
       inputStream.close();
 
-      // Some checks to provide nicer error messages.
-      // This is common with Unisyn's CDF CVR, which is not compatible with RCTab.
-      if (cvrReport.GpUnit == null) {
-        Logger.severe("Field \"GPUnit\" missing from CDF CVR file! "
-                + "This is common with older, unsupported formats.");
-        throw new CvrParseException();
-      }
-
-      // These fields are also required, but we are not aware of any standard format where
-      // they would be missing, so we group all these checks together.
-      if (cvrReport.CVR == null
-              || cvrReport.Election == null
-              || cvrReport.ReportGeneratingDeviceIds == null
-              || cvrReport.ReportingDevice == null
-              || cvrReport.Party == null) {
-        Logger.severe("Required fields are missing from CDF CVR file!");
-        throw new CvrParseException();
-      }
+      checkForEmptyFields(cvrReport);
 
       // Parse static election data:
 
@@ -197,11 +215,14 @@ class CommonDataFormatReader {
         throw new CvrParseException();
       }
 
+      // Aggregate all non-unique keys into this error set
+      HashSet<String> nonUniqueKeys = new HashSet<>();
+
       // build a map of Candidates
       HashMap<String, Candidate> candidateById = new HashMap<>();
       for (Election election : cvrReport.Election) {
         for (Candidate candidate : election.Candidate) {
-          putIfUnique(candidateById, candidate.ObjectId, candidate, "Candidate");
+          putIfUnique(candidateById, candidate.ObjectId, candidate, "Candidate", nonUniqueKeys);
         }
       }
 
@@ -209,13 +230,18 @@ class CommonDataFormatReader {
       HashMap<String, ContestSelection> contestSelectionById = new HashMap<>();
       for (ContestSelection contestSelection : contestToTabulate.ContestSelection) {
         putIfUnique(contestSelectionById, contestSelection.ObjectId,
-                    contestSelection, "Contest Selection");
+                    contestSelection, "Contest Selection", nonUniqueKeys);
       }
 
       // build a map of GpUnits (aka precinct or district)
       HashMap<String, GpUnit> gpUnitById = new HashMap<>();
       for (GpUnit gpUnit : cvrReport.GpUnit) {
-        putIfUnique(gpUnitById, gpUnit.ObjectId, gpUnit, "GPUnit");
+        putIfUnique(gpUnitById, gpUnit.ObjectId, gpUnit, "GPUnit", nonUniqueKeys);
+      }
+
+      if (!nonUniqueKeys.isEmpty()) {
+        Logger.severe("%d keys were not unique.", nonUniqueKeys.size());
+        throw new CvrParseException();
       }
 
       // process the Cvrs
@@ -351,17 +377,20 @@ class CommonDataFormatReader {
 
     // static election data
     HashMap<Object, Object> candidates = new HashMap<>();
-    HashMap<Object, Object> gpuUnits = new HashMap<>();
+    HashMap<Object, Object> gpUnits = new HashMap<>();
     HashMap<Object, Object> contestSelections = new HashMap<>();
     HashMap contestToTabulate = null;
     HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
+
+    // Aggregate all non-unique keys into this error set
+    HashSet<String> nonUniqueKeys = new HashSet<>();
 
     // GpUnits
     ArrayList gpUnitArray = (ArrayList) json.get("GpUnit");
     for (Object gpUnitObject : gpUnitArray) {
       HashMap gpUnit = (HashMap) gpUnitObject;
       String gpUnitId = (String) gpUnit.get("@id");
-      putIfUnique(gpuUnits, gpUnitId, gpUnit, "GPUUnits");
+      putIfUnique(gpUnits, gpUnitId, gpUnit, "GPUUnits", nonUniqueKeys);
     }
 
     // Elections
@@ -374,7 +403,7 @@ class CommonDataFormatReader {
       for (Object candidateObject : candidatesArray) {
         HashMap candidate = (HashMap) candidateObject;
         String candidateId = (String) candidate.get("@id");
-        putIfUnique(candidates, candidateId, candidate, "Candidate");
+        putIfUnique(candidates, candidateId, candidate, "Candidate", nonUniqueKeys);
       }
 
       // Find contest to be tabulated
@@ -399,8 +428,15 @@ class CommonDataFormatReader {
     for (Object contestSelectionObject : contestSelectionArray) {
       HashMap contestSelection = (HashMap) contestSelectionObject;
       String selectionObjectId = (String) contestSelection.get("@id");
-      putIfUnique(contestSelections, selectionObjectId, contestSelection, "Contest Selection");
+      putIfUnique(contestSelections, selectionObjectId, contestSelection,
+        "Contest Selection", nonUniqueKeys);
     }
+
+    if (!nonUniqueKeys.isEmpty()) {
+      Logger.severe("%d keys were not unique.", nonUniqueKeys.size());
+      throw new CvrParseException();
+    }
+
 
     // process Cvrs
     int cvrIndex = 0;
@@ -493,8 +529,8 @@ class CommonDataFormatReader {
       String precinctId = null;
       if (cvr.containsKey("BallotStyleUnitId")) {
         String unitId = (String) cvr.get("BallotStyleUnitId");
-        if (gpuUnits.containsKey(unitId)) {
-          HashMap unit = (HashMap) gpuUnits.get(cvr.get("BallotStyleUnitId"));
+        if (gpUnits.containsKey(unitId)) {
+          HashMap unit = (HashMap) gpUnits.get(cvr.get("BallotStyleUnitId"));
           precinctId = (String) unit.get("Name");
         } else {
           Logger.severe("GpUnit \"%s\" not found!", unitId);
