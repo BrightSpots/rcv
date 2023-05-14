@@ -206,8 +206,8 @@ class DominionCvrReader {
         Path cvrPath = Paths.get(manifestFolder, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         while (cvrPath.toFile().exists()) {
           HashMap json = JsonParser.readFromFile(cvrPath.toString(), HashMap.class);
-          recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad,
-              contestIdToCandidateNames);
+          recordsParsed +=
+              parseCvrFile(json, castVoteRecords, contestIdToLoad, contestIdToCandidateNames);
           if (recordsParsed - recordsParsedAtLastLog > 50000) {
             Logger.info("Parsed %d records from %d files", recordsParsed, cvrSequence);
             recordsParsedAtLastLog = recordsParsed;
@@ -314,26 +314,23 @@ class DominionCvrReader {
             if (isAmbiguous) {
               continue;
             }
-
-            Integer candidateId = (Integer) rankingMap.get("CandidateId");
-            String candidateCode = candidateId.toString();
-            String candidateName = config.getNameForCandidate(candidateCode);
-            Set<String> candidates = contestIdToCandidateNames.get(contestId);
-            if (!candidates.contains(candidateName)) {
-              Logger.severe(
-                  "Candidate name '%s' is not valid for contest '%d'!", candidateName,
-                  contestId);
-              throw new CvrParseException();
-            }
-            // We also need to throw an error if this candidate doesn't appear in the tabulator's
-            // config file for this contest.
-            if (candidateCode.equals(undeclaredWriteInLabel)) {
+            String dominionCandidateId = rankingMap.get("CandidateId").toString();
+            String candidateName;
+            if (dominionCandidateId.equals(undeclaredWriteInLabel)) {
               candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-            } else if (candidateName == null) {
-              unrecognizedCandidateCounts.merge(candidateCode, 1, Integer::sum);
-              continue;
+            } else {
+              candidateName = config.getNameForCandidate(dominionCandidateId);
+              if (candidateName == null) {
+                unrecognizedCandidateCounts.merge(dominionCandidateId, 1, Integer::sum);
+                continue;
+              }
+              Set<String> candidates = contestIdToCandidateNames.get(contestId);
+              if (!candidates.contains(candidateName)) {
+                Logger.severe(
+                    "Candidate ID '%s' is not valid for contest '%s'!", candidateName, contestId);
+                throw new CvrParseException();
+              }
             }
-
             Integer rank = (Integer) rankingMap.get("Rank");
             Pair<Integer, String> ranking = new Pair<>(rank, candidateName);
             rankings.add(ranking);
