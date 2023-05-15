@@ -30,7 +30,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -111,17 +110,17 @@ class CommonDataFormatReader {
    * @param key Key to check for uniqueness
    * @param value Value to place if unique
    * @param keyName Human-readable name of the key, used to make the error message more useful
-   * @param errors If not unique, adds keyName to this list
+   * @return true if there was an error
    */
-  private static <K, V> void putIfUnique(
-          HashMap<K, V> map, K key, V value, String keyName, HashSet<String> errors) {
+  private static <K, V> boolean putIfUnique(
+          HashMap<K, V> map, K key, V value, String keyName) {
     if (map.containsKey(key)) {
       Logger.severe("%s \"%s\" appears multiple times", keyName, key);
-      errors.add(keyName);
-      return;
+      return true;
     }
 
     map.put(key, value);
+    return false;
   }
 
   private HashMap getCvrContestJson(HashMap cvr, String contestIdToTabulate)
@@ -219,32 +218,31 @@ class CommonDataFormatReader {
         throw new CvrParseException();
       }
 
-      // Aggregate all non-unique keys into this error set
-      HashSet<String> nonUniqueKeys = new HashSet<>();
+      boolean hasError = false;
 
       // build a map of Candidates
       HashMap<String, Candidate> candidateById = new HashMap<>();
       for (Election election : cvrReport.Election) {
         for (Candidate candidate : election.Candidate) {
-          putIfUnique(candidateById, candidate.ObjectId, candidate, "Candidate", nonUniqueKeys);
+          hasError |= putIfUnique(candidateById, candidate.ObjectId, candidate, "Candidate");
         }
       }
 
       // ContestSelections
       HashMap<String, ContestSelection> contestSelectionById = new HashMap<>();
       for (ContestSelection contestSelection : contestToTabulate.ContestSelection) {
-        putIfUnique(contestSelectionById, contestSelection.ObjectId,
-                    contestSelection, "Contest Selection", nonUniqueKeys);
+        hasError |= putIfUnique(contestSelectionById, contestSelection.ObjectId,
+                    contestSelection, "Contest Selection");
       }
 
       // build a map of GpUnits (aka precinct or district)
       HashMap<String, GpUnit> gpUnitById = new HashMap<>();
       for (GpUnit gpUnit : cvrReport.GpUnit) {
-        putIfUnique(gpUnitById, gpUnit.ObjectId, gpUnit, "GPUnit", nonUniqueKeys);
+        hasError |= putIfUnique(gpUnitById, gpUnit.ObjectId, gpUnit, "GPUnit");
       }
 
-      if (!nonUniqueKeys.isEmpty()) {
-        Logger.severe("%d keys were not unique.", nonUniqueKeys.size());
+      if (hasError) {
+        Logger.severe("One or more keys were not unique.");
         throw new CvrParseException();
       }
 
@@ -386,15 +384,14 @@ class CommonDataFormatReader {
     HashMap contestToTabulate = null;
     HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
 
-    // Aggregate all non-unique keys into this error set
-    HashSet<String> nonUniqueKeys = new HashSet<>();
+    boolean hasError = false;
 
     // GpUnits
     ArrayList gpUnitArray = (ArrayList) json.get("GpUnit");
     for (Object gpUnitObject : gpUnitArray) {
       HashMap gpUnit = (HashMap) gpUnitObject;
       String gpUnitId = (String) gpUnit.get("@id");
-      putIfUnique(gpUnits, gpUnitId, gpUnit, "GPUUnits", nonUniqueKeys);
+      hasError |= putIfUnique(gpUnits, gpUnitId, gpUnit, "GPUnits");
     }
 
     // Elections
@@ -407,7 +404,7 @@ class CommonDataFormatReader {
       for (Object candidateObject : candidatesArray) {
         HashMap candidate = (HashMap) candidateObject;
         String candidateId = (String) candidate.get("@id");
-        putIfUnique(candidates, candidateId, candidate, "Candidate", nonUniqueKeys);
+        hasError |= putIfUnique(candidates, candidateId, candidate, "Candidate");
       }
 
       // Find contest to be tabulated
@@ -432,12 +429,12 @@ class CommonDataFormatReader {
     for (Object contestSelectionObject : contestSelectionArray) {
       HashMap contestSelection = (HashMap) contestSelectionObject;
       String selectionObjectId = (String) contestSelection.get("@id");
-      putIfUnique(contestSelections, selectionObjectId, contestSelection,
-          "Contest Selection", nonUniqueKeys);
+      hasError |= putIfUnique(contestSelections, selectionObjectId, contestSelection,
+          "Contest Selection");
     }
 
-    if (!nonUniqueKeys.isEmpty()) {
-      Logger.severe("%d keys were not unique.", nonUniqueKeys.size());
+    if (hasError) {
+      Logger.severe("One or more keys were not unique.");
       throw new CvrParseException();
     }
 
