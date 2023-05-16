@@ -85,11 +85,42 @@ class CommonDataFormatReader {
 
   void parseCvrFile(List<CastVoteRecord> castVoteRecords)
       throws UnrecognizedCandidatesException, IOException, CvrParseException {
-    if (filePath.endsWith(".xml")) {
-      parseXml(castVoteRecords);
-    } else if (filePath.endsWith(".json")) {
-      parseJson(castVoteRecords);
+    try {
+      if (filePath.endsWith(".xml")) {
+        parseXml(castVoteRecords);
+      } else if (filePath.endsWith(".json")) {
+        parseJson(castVoteRecords);
+      }
+    } catch (CvrParseException e) {
+      throw e;
+    } catch (UnrecognizedCandidatesException e) {
+      throw e;
+    } catch (Exception e) {
+      Logger.severe("Unknown error. Cannot load file.");
+      throw new CvrParseException();
     }
+  }
+
+  /**
+   * Sets map[key] = value if map does not contain key already.
+   * If it does, returns false. The caller is responsible for throwing an error
+   * after aggregating all keys that were not unique.
+   *
+   * @param map The map to modify
+   * @param key Key to check for uniqueness
+   * @param value Value to place if unique
+   * @param keyName Human-readable name of the key, used to make the error message more useful
+   * @return true if there was an error
+   */
+  private static <K, V> boolean putIfUnique(
+          HashMap<K, V> map, K key, V value, String keyName) {
+    if (map.containsKey(key)) {
+      Logger.severe("%s \"%s\" appears multiple times", keyName, key);
+      return true;
+    }
+
+    map.put(key, value);
+    return false;
   }
 
   private HashMap getCvrContestJson(HashMap cvr, String contestIdToTabulate)
@@ -123,6 +154,40 @@ class CommonDataFormatReader {
     return cvrContestToTabulate;
   }
 
+  void checkForEmptyFields(CastVoteRecordReport cvrReport) throws CvrParseException {
+    // Some checks to provide nicer error messages.
+    // This is common with Unisyn's CDF CVR, which is not compatible with RCTab.
+    if (cvrReport.GpUnit == null) {
+      Logger.severe("Field \"GPUnit\" missing from CDF CVR file! "
+              + "This is common with older, unsupported formats.");
+      throw new CvrParseException();
+    }
+
+    // These fields are also required, but we are not aware of any standard format where
+    // they would be missing, so we group all these checks together.
+    ArrayList<String> missingFields = new ArrayList<>();
+    if (cvrReport.CVR == null) {
+      missingFields.add("CVR");
+    }
+    if (cvrReport.Election == null) {
+      missingFields.add("Election");
+    }
+    if (cvrReport.ReportGeneratingDeviceIds == null) {
+      missingFields.add("ReportGeneratingDeviceIds");
+    }
+    if (cvrReport.ReportingDevice == null) {
+      missingFields.add("ReportingDevice");
+    }
+    if (cvrReport.Party == null) {
+      missingFields.add("Party");
+    }
+
+    if (!missingFields.isEmpty()) {
+      Logger.severe("Required fields are missing from CDF CVR file: " + missingFields);
+      throw new CvrParseException();
+    }
+  }
+
   void parseXml(List<CastVoteRecord> castVoteRecords)
       throws CvrParseException, IOException, UnrecognizedCandidatesException {
     // load XML
@@ -132,24 +197,7 @@ class CommonDataFormatReader {
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
       inputStream.close();
 
-      // Some checks to provide nicer error messages.
-      // This is common with Unisyn's CDF CVR, which is not compatible with RCTab.
-      if (cvrReport.GpUnit == null) {
-        Logger.severe("Field \"GPUnit\" missing from CDF CVR file! "
-                + "This is common with older, unsupported formats.");
-        throw new CvrParseException();
-      }
-
-      // These fields are also required, but we are not aware of any standard format where
-      // they would be missing, so we group all these checks together.
-      if (cvrReport.CVR == null
-              || cvrReport.Election == null
-              || cvrReport.ReportGeneratingDeviceIds == null
-              || cvrReport.ReportingDevice == null
-              || cvrReport.Party == null) {
-        Logger.severe("Required fields are missing from CDF CVR file!");
-        throw new CvrParseException();
-      }
+      checkForEmptyFields(cvrReport);
 
       // Parse static election data:
 
@@ -170,24 +218,32 @@ class CommonDataFormatReader {
         throw new CvrParseException();
       }
 
+      boolean hasError = false;
+
       // build a map of Candidates
       HashMap<String, Candidate> candidateById = new HashMap<>();
       for (Election election : cvrReport.Election) {
         for (Candidate candidate : election.Candidate) {
-          candidateById.put(candidate.ObjectId, candidate);
+          hasError |= putIfUnique(candidateById, candidate.ObjectId, candidate, "Candidate");
         }
       }
 
       // ContestSelections
       HashMap<String, ContestSelection> contestSelectionById = new HashMap<>();
       for (ContestSelection contestSelection : contestToTabulate.ContestSelection) {
-        contestSelectionById.put(contestSelection.ObjectId, contestSelection);
+        hasError |= putIfUnique(contestSelectionById, contestSelection.ObjectId,
+                    contestSelection, "Contest Selection");
       }
 
       // build a map of GpUnits (aka precinct or district)
       HashMap<String, GpUnit> gpUnitById = new HashMap<>();
       for (GpUnit gpUnit : cvrReport.GpUnit) {
-        gpUnitById.put(gpUnit.ObjectId, gpUnit);
+        hasError |= putIfUnique(gpUnitById, gpUnit.ObjectId, gpUnit, "GPUnit");
+      }
+
+      if (hasError) {
+        Logger.severe("One or more keys were not unique.");
+        throw new CvrParseException();
       }
 
       // process the Cvrs
@@ -323,17 +379,19 @@ class CommonDataFormatReader {
 
     // static election data
     HashMap<Object, Object> candidates = new HashMap<>();
-    HashMap<Object, Object> gpuUnits = new HashMap<>();
+    HashMap<Object, Object> gpUnits = new HashMap<>();
     HashMap<Object, Object> contestSelections = new HashMap<>();
     HashMap contestToTabulate = null;
     HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
+
+    boolean hasError = false;
 
     // GpUnits
     ArrayList gpUnitArray = (ArrayList) json.get("GpUnit");
     for (Object gpUnitObject : gpUnitArray) {
       HashMap gpUnit = (HashMap) gpUnitObject;
       String gpUnitId = (String) gpUnit.get("@id");
-      gpuUnits.put(gpUnitId, gpUnit);
+      hasError |= putIfUnique(gpUnits, gpUnitId, gpUnit, "GPUnits");
     }
 
     // Elections
@@ -346,7 +404,7 @@ class CommonDataFormatReader {
       for (Object candidateObject : candidatesArray) {
         HashMap candidate = (HashMap) candidateObject;
         String candidateId = (String) candidate.get("@id");
-        candidates.put(candidateId, candidate);
+        hasError |= putIfUnique(candidates, candidateId, candidate, "Candidate");
       }
 
       // Find contest to be tabulated
@@ -371,8 +429,15 @@ class CommonDataFormatReader {
     for (Object contestSelectionObject : contestSelectionArray) {
       HashMap contestSelection = (HashMap) contestSelectionObject;
       String selectionObjectId = (String) contestSelection.get("@id");
-      contestSelections.put(selectionObjectId, contestSelection);
+      hasError |= putIfUnique(contestSelections, selectionObjectId, contestSelection,
+          "Contest Selection");
     }
+
+    if (hasError) {
+      Logger.severe("One or more keys were not unique.");
+      throw new CvrParseException();
+    }
+
 
     // process Cvrs
     int cvrIndex = 0;
@@ -414,6 +479,12 @@ class CommonDataFormatReader {
           }
           String candidateObjectId = (String) candidateIds.get(0);
           HashMap candidate = (HashMap) candidates.get(candidateObjectId);
+          if (candidate == null) {
+            Logger.severe(
+                    "Candidate ID \"%s\" in Contest Selection \"%s\" is not in the candidate list.",
+                    candidateObjectId, contestSelectionId);
+            throw new CvrParseException();
+          }
           candidateName = (String) candidate.get("Name");
           if (candidateName.equals(overvoteLabel)) {
             candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
@@ -459,8 +530,8 @@ class CommonDataFormatReader {
       String precinctId = null;
       if (cvr.containsKey("BallotStyleUnitId")) {
         String unitId = (String) cvr.get("BallotStyleUnitId");
-        if (gpuUnits.containsKey(unitId)) {
-          HashMap unit = (HashMap) gpuUnits.get(cvr.get("BallotStyleUnitId"));
+        if (gpUnits.containsKey(unitId)) {
+          HashMap unit = (HashMap) gpUnits.get(cvr.get("BallotStyleUnitId"));
           precinctId = (String) unit.get("Name");
         } else {
           Logger.severe("GpUnit \"%s\" not found!", unitId);
