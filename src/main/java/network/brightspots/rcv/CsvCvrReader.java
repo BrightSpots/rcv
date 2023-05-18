@@ -55,7 +55,7 @@ class CsvCvrReader {
     this.firstVoteRowIndex = Integer.parseInt(source.getFirstVoteRowIndex()) - 1;
   }
 
-  // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
+  // parse CVR CSV file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
           throws CastVoteRecord.CvrParseException, IOException {
     Logger.info("Reading CSV cast vote record file: %s...", cvrPath);

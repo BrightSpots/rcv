@@ -277,7 +277,7 @@ class TabulatorSession {
         } else if (ContestConfig.getProvider(source) == Provider.CLEAR_BALLOT) {
           Logger.info("Reading Clear Ballot cast vote records from file: %s...", cvrPath);
           new ClearBallotCvrReader(cvrPath, config, source.getUndeclaredWriteInLabel())
-                  .readCastVoteRecords(castVoteRecords, source.getContestId());
+              .readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
         } else if (ContestConfig.getProvider(source) == Provider.CSV) {
           Logger.info("Reading Generic CSV cast vote records from file: %s...", cvrPath);

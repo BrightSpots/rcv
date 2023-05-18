@@ -12,7 +12,6 @@
   "cvrFileSources": [
     {
     "filePath" : "generic_csv_test_cvr.csv",
-    "contestId" : "generic contest ID",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "provider" : "genericCsv",

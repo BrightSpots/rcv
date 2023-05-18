@@ -1041,7 +1041,7 @@ public class GuiConfigController implements Initializable {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
-          textFieldCvrContestId.setDisable(false);
+          textFieldCvrContestId.setDisable(true);
           textFieldCvrFirstVoteCol.setDisable(false);
           textFieldCvrFirstVoteCol
                   .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_COLUMN));
@@ -1053,7 +1053,7 @@ public class GuiConfigController implements Initializable {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
-          textFieldCvrContestId.setDisable(false);
+          textFieldCvrContestId.setDisable(true);
         }
         case CDF -> {
           buttonAddCvrFile.setDisable(false);

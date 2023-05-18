@@ -293,8 +293,7 @@ class ContestConfig {
           provider == Provider.DOMINION
               || provider == Provider.HART
               || provider == Provider.CLEAR_BALLOT
-              || provider == Provider.CDF
-              || provider == Provider.CSV;
+              || provider == Provider.CDF;
 
       if (isNullOrBlank(source.getContestId()) && providerRequiresContestId) {
         validationErrors.add(ValidationError.CVR_CONTEST_ID_INVALID);
