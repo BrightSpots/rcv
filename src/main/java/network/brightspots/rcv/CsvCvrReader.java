@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,7 +8,7 @@
  */
 
 /*
- * Purpose: Read and parse generic CSV files
+ * Purpose: Read and parse generic CSV files.
  * Design: Parses a CSV with candidates in columns, cast vote records in rows,
  * and vote rankings in cells.
  * Conditions: The CSV must contain only one contest.
@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.Map;
 import javafx.util.Pair;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
+import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 class CsvCvrReader {
   private final String cvrPath;
-  private final String contestId;
   private final String undeclaredWriteInLabel;
   private final ContestConfig contestConfig;
   // 0-based column index of first ranking
@@ -49,7 +49,6 @@ class CsvCvrReader {
       CvrSource source) {
     this.cvrPath = cvrPath;
     this.contestConfig = contestConfig;
-    this.contestId = source.getContestId();
     this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
     this.firstVoteColumnIndex = Integer.parseInt(source.getFirstVoteColumnIndex()) - 1;
     this.firstVoteRowIndex = Integer.parseInt(source.getFirstVoteRowIndex()) - 1;
@@ -57,7 +56,7 @@ class CsvCvrReader {
 
   // parse CVR CSV file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-          throws CastVoteRecord.CvrParseException, IOException {
+          throws CastVoteRecord.CvrParseException, IOException, UnrecognizedCandidatesException {
     Logger.info("Reading CSV cast vote record file: %s...", cvrPath);
 
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
@@ -96,12 +95,16 @@ class CsvCvrReader {
         // create the new CastVoteRecord
         CastVoteRecord newCvr =
                 new CastVoteRecord(
-                        contestId,
+                        "no contest ID",
                         "no supplied ID",
                         "no precinct",
                         null,
                         rankings);
         castVoteRecords.add(newCvr);
+      }
+
+      if (unrecognizedCandidateCounts.size() > 0) {
+        throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
       }
     } catch (IOException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);

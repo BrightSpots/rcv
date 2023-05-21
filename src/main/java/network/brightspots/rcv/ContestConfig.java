@@ -171,7 +171,8 @@ class ContestConfig {
       if (provider == Provider.PROVIDER_UNKNOWN) {
         validationErrors.add(ValidationError.CVR_PROVIDER_INVALID);
         Logger.severe("Invalid provider for source: %s", source.getFilePath());
-      } else if (provider == Provider.ESS) {
+      } else if (provider == Provider.ESS || provider == Provider.CSV) {
+        // Both ESS and CSV require firstVoteColumnIndex and firstVoteRowIndex
         if (fieldOutOfRangeOrNotInteger(
             source.getFirstVoteColumnIndex(),
             "firstVoteColumnIndex",
@@ -192,24 +193,41 @@ class ContestConfig {
           validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_INVALID);
         }
 
-        if (fieldOutOfRangeOrNotInteger(
-            source.getIdColumnIndex(),
-            "idColumnIndex",
-            MIN_COLUMN_INDEX,
-            MAX_COLUMN_INDEX,
-            false,
-            source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_ID_COLUMN_INVALID);
-        }
+        if (provider == Provider.ESS) {
+          // ESS requires idColumnIndex and precinctColumnIndex
+          if (fieldOutOfRangeOrNotInteger(
+              source.getIdColumnIndex(),
+              "idColumnIndex",
+              MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX,
+              false,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_ID_COLUMN_INVALID);
+          }
 
-        if (fieldOutOfRangeOrNotInteger(
-            source.getPrecinctColumnIndex(),
-            "precinctColumnIndex",
-            MIN_COLUMN_INDEX,
-            MAX_COLUMN_INDEX,
-            false,
-            source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
+          if (fieldOutOfRangeOrNotInteger(
+              source.getPrecinctColumnIndex(),
+              "precinctColumnIndex",
+              MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX,
+              false,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
+          }
+        } else {
+          // CSV does not allow idColumnIndex or precinctColumnIndex
+          if (fieldIsDefinedButShouldNotBeForProvider(
+              source.getIdColumnIndex(), "idColumnIndex", provider, source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED);
+          }
+
+          if (fieldIsDefinedButShouldNotBeForProvider(
+              source.getPrecinctColumnIndex(),
+              "precinctColumnIndex",
+              provider,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
+          }
         }
 
         // See the config file documentation for an explanation of this regex
@@ -239,20 +257,17 @@ class ContestConfig {
             validationErrors.add(ValidationError.CVR_OVERVOTE_UNEXPECTEDLY_DEFINED);
           }
         }
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getFirstVoteColumnIndex(),
+            "firstVoteColumnIndex",
+            provider,
+            source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED);
+        }
 
-        if (provider != Provider.CSV) {
-          if (fieldIsDefinedButShouldNotBeForProvider(
-              source.getFirstVoteColumnIndex(),
-              "firstVoteColumnIndex",
-              provider,
-              source.getFilePath())) {
-            validationErrors.add(ValidationError.CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED);
-          }
-
-          if (fieldIsDefinedButShouldNotBeForProvider(
-              source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
-            validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED);
-          }
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(

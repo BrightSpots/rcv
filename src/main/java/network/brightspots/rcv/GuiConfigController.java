@@ -526,7 +526,7 @@ public class GuiConfigController implements Initializable {
   private List<File> chooseFile(Provider provider, ExtensionFilter filter) {
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-    fc.getExtensionFilters().add(new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
+    fc.getExtensionFilters().add(filter);
     fc.setTitle("Select " + provider + " Cast Vote Record Files");
     return fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
   }
@@ -1041,7 +1041,6 @@ public class GuiConfigController implements Initializable {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
-          textFieldCvrContestId.setDisable(true);
           textFieldCvrFirstVoteCol.setDisable(false);
           textFieldCvrFirstVoteCol
                   .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_COLUMN));
@@ -1053,7 +1052,7 @@ public class GuiConfigController implements Initializable {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
-          textFieldCvrContestId.setDisable(true);
+          textFieldCvrContestId.setDisable(false);
         }
         case CDF -> {
           buttonAddCvrFile.setDisable(false);

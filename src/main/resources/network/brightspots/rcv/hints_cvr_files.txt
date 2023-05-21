@@ -4,7 +4,12 @@ The tabulator needs to know where each of your CVR files is and how to interpret
 
 For each of your CVR files, provide the necessary information and then use the Add button to add it to the list.
 
-Provider (required): The vendor/machine that generated (produced) the file. After you select the field, the tabulator will fill in as many of the other fields as it can based on what it knows about that provider. You can adjust those values as necessary.
+Provider (required): The vendor/machine that generated (produced) the file. After you select the field, the tabulator will fill in as many of the other fields as it can based on what it knows about that provider. You can adjust those values as necessary. The options are:
+  * Dominion. Example: https://github.com/BrightSpots/rcv/tree/develop/src/test/resources/network/brightspots/rcv/test_data/dominion_alaska/
+  * ES&S. Example: https://github.com/BrightSpots/rcv/blob/develop/src/test/resources/network/brightspots/rcv/test_data/aliases_ess_xlsx/
+  * Hart. Example: https://github.com/BrightSpots/rcv/tree/develop/src/test/resources/network/brightspots/rcv/test_data/hart_cedar_park_school_board/
+  * CSV. Example: https://github.com/BrightSpots/rcv/tree/develop/src/test/resources/network/brightspots/rcv/test_data/generic_csv_test/
+
 
 Path (required): Location of the CVR file. Please ensure none of your file paths contain double semicolons within them, or they'll get split and treated as separate file paths (see below).
   * Example: /test data/2015-portland-mayor-cvr.xlsx
