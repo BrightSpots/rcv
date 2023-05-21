@@ -166,8 +166,8 @@ class Tabulator {
         // Single-Winner recomputes threshold on round 1 always,
         // and on other rounds if First Round Determines Threshold is not set
         shouldRecomputeThreshold =
-                !config.isFirstRoundDeterminesThresholdEnabled()
-                || currentRound == 1;
+          !config.isFirstRoundDeterminesThresholdEnabled()
+          || currentRound == 1;
       }
       if (shouldRecomputeThreshold) {
         setWinningThreshold(currentRoundCandidateToTally, config.getMinimumVoteThreshold());

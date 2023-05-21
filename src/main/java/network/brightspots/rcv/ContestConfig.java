@@ -741,6 +741,14 @@ class ContestConfig {
               );
             }
           }
+
+          if (isFirstRoundDeterminesThresholdEnabled()) {
+            validationErrors.add(
+                ValidationError.RULES_FIRST_ROUND_DETERMINES_THRESHOLD_TRUE_FOR_MULTI_SEAT);
+            Logger.severe(
+                "doesFirstRoundDetermineThreshold can't be true in a multi-seat contest!"
+            );
+          }
         } else { // numberOfWinners == 1
           if (!isSingleWinnerEnabled()) {
             validationErrors.add(
@@ -1154,6 +1162,7 @@ class ContestConfig {
     RULES_NUMBER_OF_WINNERS_INVALID_FOR_WINNER_ELECTION_MODE,
     RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT,
     RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT,
+    RULES_FIRST_ROUND_DETERMINES_THRESHOLD_TRUE_FOR_MULTI_SEAT,
     RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT,
     RULES_ZERO_WINNERS_INVALID_WINNER_ELECTION_MODE,
     RULES_PERCENTAGE_THRESHOLD_MISSING,

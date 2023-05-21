@@ -1142,7 +1142,6 @@ public class GuiConfigController implements Initializable {
           textFieldNumberOfWinners.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
           checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
-          checkBoxFirstRoundDeterminesThreshold.setDisable(false);
         }
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldNumberOfWinners.setText("0");
