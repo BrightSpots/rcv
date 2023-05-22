@@ -102,13 +102,13 @@ class CsvCvrReader {
                         rankings);
         castVoteRecords.add(newCvr);
       }
-
-      if (unrecognizedCandidateCounts.size() > 0) {
-        throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
-      }
     } catch (IOException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
       throw exception;
+    }
+
+    if (unrecognizedCandidateCounts.size() > 0) {
+      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 }
