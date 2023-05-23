@@ -279,6 +279,11 @@ class TabulatorSession {
           new ClearBallotCvrReader(cvrPath, config, source.getUndeclaredWriteInLabel())
               .readCastVoteRecords(castVoteRecords, source.getContestId());
           continue;
+        } else if (ContestConfig.getProvider(source) == Provider.CSV) {
+          Logger.info("Reading generic CSV cast vote records from file: %s...", cvrPath);
+          new CsvCvrReader(cvrPath, config, source)
+              .readCastVoteRecords(castVoteRecords);
+          continue;
         } else if (provider == Provider.DOMINION) {
           Logger.info("Reading Dominion cast vote records from folder: %s...", cvrPath);
           DominionCvrReader reader =

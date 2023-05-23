@@ -57,13 +57,13 @@ class StreamingCvrReader {
   private final String excelFilePath;
   // name of the source file
   private final String excelFileName;
-  // 1-based column index of first ranking
+  // 0-based column index of first ranking
   private final int firstVoteColumnIndex;
-  // 1-based row index of first CVR
+  // 0-based row index of first CVR
   private final int firstVoteRowIndex;
-  // 1-based column index of CVR ID (if present)
+  // 0-based column index of CVR ID (if present)
   private final Integer idColumnIndex;
-  // 1-based column index of currentPrecinct name (if present)
+  // 0-based column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
   // optional delimiter for cells that contain multiple candidates
   private final String overvoteDelimiter;

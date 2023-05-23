@@ -587,6 +587,13 @@ class TabulatorTests {
     runTabulationTest("exhaust_if_multiple_continuing");
   }
 
+
+  @Test
+  @DisplayName("generic CSV test")
+  void genericCsvTest() {
+    runTabulationTest("generic_csv_test");
+  }
+
   @Test
   @DisplayName("no one meets minimum test")
   void noOneMeetsMinimumTest() {
