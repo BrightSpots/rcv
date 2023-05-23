@@ -86,7 +86,7 @@ class CsvCvrReader {
           String candidateId = candidateIds.get(col);
           if (col == undeclaredWriteInColumn) {
             candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-          } else if (!contestConfig.getCandidateCodeList().contains(candidateId)) {
+          } else if (contestConfig.getNameForCandidate(candidateId) == null) {
             unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
           }
           rankings.add(new Pair<>(rankAsInt, candidateId));
@@ -98,7 +98,6 @@ class CsvCvrReader {
                         "no contest ID",
                         "no supplied ID",
                         "no precinct",
-                        null,
                         rankings);
         castVoteRecords.add(newCvr);
       }
