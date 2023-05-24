@@ -1,0 +1,68 @@
+{
+  "tabulatorVersion": "TEST",
+  "outputSettings": {
+    "contestName": "Aliases test (JSON CDF Format)",
+    "outputDirectory": "output",
+    "contestDate": "2023-03-23",
+    "contestJurisdiction": "TestSets_Single_winner",
+    "contestOffice": "Aliases test",
+    "tabulateByPrecinct": false,
+    "generateCdfJson": true
+  },
+  "cvrFileSources": [
+    {
+      "filePath" : "aliases_cdf_json_file1_cvr.json",
+      "idColumnIndex" : "",
+      "precinctColumnIndex" : "",
+      "provider" : "cdf",
+      "contestId": "aliases file 1",
+      "treatBlankAsUndeclaredWriteIn": false,
+      "overvoteLabel": "",
+      "undervoteLabel": "",
+      "undeclaredWriteInLabel": ""
+    },
+    {
+      "filePath" : "aliases_cdf_json_file2_cvr.json",
+      "idColumnIndex" : "",
+      "precinctColumnIndex" : "",
+      "provider" : "cdf",
+      "contestId": "aliases file 2",
+      "treatBlankAsUndeclaredWriteIn": false,
+      "overvoteLabel": "",
+      "undervoteLabel": "",
+      "undeclaredWriteInLabel": ""
+  } ],
+  "candidates" : [ {
+    "name" : "Unused Display Name Candidate A",
+    "aliases" : ["Candidate A Name File 1", "Candidate A Name File 2"],
+    "excluded" : false
+  }, {
+    "name" : "Candidate B Name File 1",
+    "aliases" : ["Candidate B Name File 2"],
+    "excluded" : false
+  }, {
+    "name" : "Candidate C Name File 1",
+    "aliases" : ["Unused Name 2", "Candidate C Name File 2"],
+    "excluded" : false
+  }, {
+    "name" : "Candidate D Name File 1",
+    "aliases" : ["Candidate D Name File 2"],
+    "excluded" : false
+  }],
+  "rules" : {
+    "tiebreakMode": "random",
+    "overvoteRule": "alwaysSkipToNextRank",
+    "winnerElectionMode": "singleWinnerMajority",
+    "randomSeed": "0",
+    "numberOfWinners": "1",
+    "decimalPlacesForVoteArithmetic": "1",
+    "minimumVoteThreshold": "0",
+    "maxSkippedRanksAllowed": "4",
+    "maxRankingsAllowed": "4",
+    "nonIntegerWinningThreshold": false,
+    "hareQuota": false,
+    "batchElimination": false,
+    "exhaustOnDuplicateCandidate": false,
+    "rulesDescription": "Duplicate choice skip"
+  }
+}

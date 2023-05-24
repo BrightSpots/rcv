@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
@@ -89,8 +90,12 @@ class ContestConfig {
   private final String sourceDirectory;
   // Used to track a sequential multi-seat race
   private final List<String> sequentialWinners = new LinkedList<>();
-  // Mapping from candidate code to full name
-  private Map<String, String> candidateCodeToNameMap;
+  // Candidate display names (no aliases or codes)
+  private Set<String> candidateNames;
+  // Mapping from any candidate alias to the candidate's display name
+  private Map<String, String> candidateAliasesToNameMap;
+  // Mapping from any candidate alias to the candidate's code
+  private Map<String, String> candidateAliasesToCodeMap;
   // A list of any validation errors
   private Set<ValidationError> validationErrors = new HashSet<>();
 
@@ -167,7 +172,8 @@ class ContestConfig {
       if (provider == Provider.PROVIDER_UNKNOWN) {
         validationErrors.add(ValidationError.CVR_PROVIDER_INVALID);
         Logger.severe("Invalid provider for source: %s", source.getFilePath());
-      } else if (provider == Provider.ESS) {
+      } else if (provider == Provider.ESS || provider == Provider.CSV) {
+        // Both ESS and CSV require firstVoteColumnIndex and firstVoteRowIndex
         if (fieldOutOfRangeOrNotInteger(
             source.getFirstVoteColumnIndex(),
             "firstVoteColumnIndex",
@@ -188,24 +194,41 @@ class ContestConfig {
           validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_INVALID);
         }
 
-        if (fieldOutOfRangeOrNotInteger(
-            source.getIdColumnIndex(),
-            "idColumnIndex",
-            MIN_COLUMN_INDEX,
-            MAX_COLUMN_INDEX,
-            false,
-            source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_ID_COLUMN_INVALID);
-        }
+        if (provider == Provider.ESS) {
+          // ESS requires idColumnIndex and precinctColumnIndex
+          if (fieldOutOfRangeOrNotInteger(
+              source.getIdColumnIndex(),
+              "idColumnIndex",
+              MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX,
+              false,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_ID_COLUMN_INVALID);
+          }
 
-        if (fieldOutOfRangeOrNotInteger(
-            source.getPrecinctColumnIndex(),
-            "precinctColumnIndex",
-            MIN_COLUMN_INDEX,
-            MAX_COLUMN_INDEX,
-            false,
-            source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
+          if (fieldOutOfRangeOrNotInteger(
+              source.getPrecinctColumnIndex(),
+              "precinctColumnIndex",
+              MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX,
+              false,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
+          }
+        } else {
+          // CSV does not allow idColumnIndex or precinctColumnIndex
+          if (fieldIsDefinedButShouldNotBeForProvider(
+              source.getIdColumnIndex(), "idColumnIndex", provider, source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED);
+          }
+
+          if (fieldIsDefinedButShouldNotBeForProvider(
+              source.getPrecinctColumnIndex(),
+              "precinctColumnIndex",
+              provider,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
+          }
         }
 
         // See the config file documentation for an explanation of this regex
@@ -236,19 +259,17 @@ class ContestConfig {
           }
         }
 
-        if (provider != Provider.CSV) {
-          if (fieldIsDefinedButShouldNotBeForProvider(
-              source.getFirstVoteColumnIndex(),
-              "firstVoteColumnIndex",
-              provider,
-              source.getFilePath())) {
-            validationErrors.add(ValidationError.CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED);
-          }
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getFirstVoteColumnIndex(),
+            "firstVoteColumnIndex",
+            provider,
+            source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED);
+        }
 
-          if (fieldIsDefinedButShouldNotBeForProvider(
-              source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
-            validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED);
-          }
+        if (fieldIsDefinedButShouldNotBeForProvider(
+            source.getFirstVoteRowIndex(), "firstVoteRowIndex", provider, source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
@@ -289,8 +310,7 @@ class ContestConfig {
           provider == Provider.DOMINION
               || provider == Provider.HART
               || provider == Provider.CLEAR_BALLOT
-              || provider == Provider.CDF
-              || provider == Provider.CSV;
+              || provider == Provider.CDF;
 
       if (isNullOrBlank(source.getContestId()) && providerRequiresContestId) {
         validationErrors.add(ValidationError.CVR_CONTEST_ID_INVALID);
@@ -584,31 +604,19 @@ class ContestConfig {
 
   private void validateCandidates() {
     Set<String> candidateNameSet = new HashSet<>();
-    Set<String> candidateCodeSet = new HashSet<>();
 
     for (Candidate candidate : rawConfig.candidates) {
       validationErrors.addAll(performBasicCandidateValidation(candidate));
 
-      if (!isNullOrBlank(candidate.getName())) {
-        if (candidateStringAlreadyInUseElsewhere(candidate.getName(), "name", candidateNameSet)) {
-          validationErrors.add(ValidationError.CANDIDATE_NAME_INVALID);
+      // Ensure the candidate name and all aliases are unique, both within each candidate and
+      // across candidates.
+      candidate.createStreamOfNameAndAllAliases().forEach(nameOrAlias -> {
+        if (candidateStringAlreadyInUseElsewhere(nameOrAlias, "name", candidateNameSet)) {
+          validationErrors.add(ValidationError.CANDIDATE_DUPLICATE_NAME);
         } else {
-          candidateNameSet.add(candidate.getName());
+          candidateNameSet.add(nameOrAlias);
         }
-      }
-
-      if (!isNullOrBlank(candidate.getCode())) {
-        if (candidateStringAlreadyInUseElsewhere(candidate.getCode(), "code", candidateCodeSet)) {
-          validationErrors.add(ValidationError.CANDIDATE_CODE_INVALID);
-        } else {
-          candidateCodeSet.add(candidate.getCode());
-        }
-      }
-    }
-
-    if (candidateCodeSet.size() > 0 && candidateCodeSet.size() != candidateNameSet.size()) {
-      validationErrors.add(ValidationError.CANDIDATE_DUPLICATE_CODES);
-      Logger.severe("If candidate codes are used, a unique code is required for each candidate!");
+      });
     }
 
     if (getNumDeclaredCandidates() < 1) {
@@ -968,7 +976,7 @@ class ContestConfig {
   }
 
   int getNumDeclaredCandidates() {
-    int size = getCandidateCodeList().size();
+    int size = getCandidateNames().size();
     if (undeclaredWriteInsEnabled()) {
       // we subtract one for UNDECLARED_WRITE_IN_OUTPUT_LABEL;
       size = size - 1;
@@ -977,7 +985,7 @@ class ContestConfig {
   }
 
   int getNumCandidates() {
-    return getCandidateCodeList().size() - excludedCandidates.size();
+    return getCandidateNames().size() - excludedCandidates.size();
   }
 
   boolean candidateIsExcluded(String candidate) {
@@ -1031,12 +1039,19 @@ class ContestConfig {
     return rawConfig.rules.exhaustOnDuplicateCandidate;
   }
 
-  Set<String> getCandidateCodeList() {
-    return candidateCodeToNameMap.keySet();
+  Set<String> getCandidateNames() {
+    if (candidateNames == null) {
+      candidateNames = new HashSet<>();
+    }
+    return candidateNames;
   }
 
-  String getNameForCandidateCode(String code) {
-    return candidateCodeToNameMap.get(code);
+  String getNameForCandidate(String nameOrAlias) {
+    return candidateAliasesToNameMap.get(nameOrAlias);
+  }
+
+  String getCodeForCandidate(String nameOrAlias) {
+    return candidateAliasesToCodeMap.get(nameOrAlias);
   }
 
   ArrayList<String> getCandidatePermutation() {
@@ -1052,32 +1067,39 @@ class ContestConfig {
   }
 
   // perform pre-processing on candidates:
-  // 1) build map of candidate ID to candidate name
+  // 1) build map of candidate aliases to candidate name
   // 2) generate tie-break ordering if needed
   // 3) add uwi candidate if needed
   private void processCandidateData() {
-    candidateCodeToNameMap = new HashMap<>();
+    candidateAliasesToNameMap = new HashMap<>();
+    candidateAliasesToCodeMap = new HashMap<>();
+    candidateNames = new HashSet<>();
+
     if (rawConfig.candidates != null) {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
-        String code = candidate.getCode();
         String name = candidate.getName();
-        if (isNullOrBlank(code)) {
-          code = name;
+        candidateNames.add(name);
+        candidatePermutation.add(name);
+        if (candidate.isExcluded()) {
+          excludedCandidates.add(name);
         }
 
-        // duplicate names or codes get caught in validation
-        candidateCodeToNameMap.put(code, name);
-        candidatePermutation.add(code);
-        if (candidate.isExcluded()) {
-          excludedCandidates.add(code);
-        }
+        Stream<String> aliases = candidate.createStreamOfNameAndAllAliases();
+        aliases.forEach(nameOrAlias -> {
+          // duplicate names and aliases get caught in validation
+          candidateAliasesToNameMap.put(nameOrAlias, name);
+          candidateAliasesToCodeMap.put(nameOrAlias, candidate.getCode());
+        });
       }
     }
 
     // If any of the sources support undeclared write-ins, we need to recognize them as a valid
     // "candidate" option.
     if (undeclaredWriteInsEnabled()) {
-      candidateCodeToNameMap.put(
+      candidateNames.add(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
+      candidateAliasesToNameMap.put(
+          Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
+      candidateAliasesToCodeMap.put(
           Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
     }
   }
@@ -1129,9 +1151,8 @@ class ContestConfig {
     CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
     CANDIDATE_NAME_MISSING,
-    CANDIDATE_NAME_INVALID,
     CANDIDATE_CODE_INVALID,
-    CANDIDATE_DUPLICATE_CODES,
+    CANDIDATE_DUPLICATE_NAME,
     CANDIDATE_NO_CANDIDATES_SPECIFIED,
     CANDIDATE_ALL_EXCLUDED,
     RULES_TIEBREAK_MODE_INVALID,
