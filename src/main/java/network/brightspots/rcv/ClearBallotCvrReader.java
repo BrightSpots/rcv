@@ -83,7 +83,7 @@ class ClearBallotCvrReader extends BaseCvrReader {
         String choiceName = choiceFields[RcvChoiceHeaderField.CHOICE_NAME.ordinal()];
         if (choiceName.equals(source.getUndeclaredWriteInLabel())) {
           choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-        } else if (!config.getCandidateCodeList().contains(choiceName)) {
+        } else if (!config.getCandidateNames().contains(choiceName)) {
           unrecognizedCandidateCounts.merge(choiceName, 1, Integer::sum);
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);

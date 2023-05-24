@@ -34,7 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.parsers.ParserConfigurationException;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
@@ -277,6 +276,7 @@ class TabulatorSession {
           try {
             DominionCvrReader dominionReader = (DominionCvrReader) reader;
             ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
+            writer.setContestConfig(config);
             this.convertedFilesWritten =
                     writer.writeGenericCvrCsv(
                             castVoteRecords,

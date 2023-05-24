@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,7 +8,7 @@
  */
 
 /*
- * Purpose: Read and parse generic CSV files
+ * Purpose: Read and parse generic CSV files.
  * Design: Parses a CSV with candidates in columns, cast vote records in rows,
  * and vote rankings in cells.
  * Conditions: The CSV must contain only one contest.
@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javafx.util.Pair;
+import network.brightspots.rcv.RawContestConfig.CvrSource;
+import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -50,11 +52,12 @@ class CsvCvrReader extends BaseCvrReader {
     return "Generic CSV";
   }
 
-  // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
+  // parse CVR CSV file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds) throws
           CastVoteRecord.CvrParseException,
-          IOException {
+          IOException,
+          UnrecognizedCandidatesException {
     Logger.info("Reading CSV cast vote record file: %s...", cvrPath);
 
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
@@ -84,7 +87,7 @@ class CsvCvrReader extends BaseCvrReader {
           String candidateId = candidateIds.get(col);
           if (col == undeclaredWriteInColumn) {
             candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-          } else if (!config.getCandidateCodeList().contains(candidateId)) {
+          } else if (config.getNameForCandidate(candidateId) == null) {
             unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
           }
           rankings.add(new Pair<>(rankAsInt, candidateId));
@@ -96,10 +99,16 @@ class CsvCvrReader extends BaseCvrReader {
                         source.getContestId(),
                         "no supplied ID",
                         "no precinct",
-                        null,
                         rankings);
         castVoteRecords.add(newCvr);
       }
+    } catch (IOException exception) {
+      Logger.severe("Error parsing cast vote record:\n%s", exception);
+      throw exception;
+    }
+
+    if (unrecognizedCandidateCounts.size() > 0) {
+      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 }

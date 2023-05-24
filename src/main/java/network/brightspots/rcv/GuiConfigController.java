@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -70,6 +71,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.ValidationError;
@@ -190,15 +192,15 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<Candidate, String> tableColumnCandidateName;
   @FXML
-  private TableColumn<Candidate, String> tableColumnCandidateCode;
+  private TableColumn<Candidate, String> tableColumnCandidateAliases;
   @FXML
   private TableColumn<Candidate, Boolean> tableColumnCandidateExcluded;
   @FXML
   private TextField textFieldCandidateName;
   @FXML
-  private TextField textFieldCandidateCode;
-  @FXML
   private CheckBox checkBoxCandidateExcluded;
+  @FXML
+  private TextArea textAreaCandidateAliases;
   @FXML
   private ChoiceBox<TiebreakMode> choiceTiebreakMode;
   @FXML
@@ -526,7 +528,7 @@ public class GuiConfigController implements Initializable {
   private List<File> chooseFile(Provider provider, ExtensionFilter filter) {
     FileChooser fc = new FileChooser();
     fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-    fc.getExtensionFilters().add(new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
+    fc.getExtensionFilters().add(filter);
     fc.setTitle("Select " + provider + " Cast Vote Record Files");
     return fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
   }
@@ -755,7 +757,7 @@ public class GuiConfigController implements Initializable {
     Candidate candidate =
         new Candidate(
             getTextOrEmptyString(textFieldCandidateName),
-            getTextOrEmptyString(textFieldCandidateCode),
+            textAreaCandidateAliases.getText(),
             checkBoxCandidateExcluded.isSelected());
     Set<ValidationError> validationErrors =
         ContestConfig.performBasicCandidateValidation(candidate);
@@ -773,7 +775,7 @@ public class GuiConfigController implements Initializable {
   public void buttonClearCandidateClicked() {
     clearErrorStyling(textFieldCandidateName);
     textFieldCandidateName.clear();
-    textFieldCandidateCode.clear();
+    textAreaCandidateAliases.clear();
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
   }
 
@@ -863,7 +865,7 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.getItems().clear();
 
     textFieldCandidateName.clear();
-    textFieldCandidateCode.clear();
+    textAreaCandidateAliases.clear();
     checkBoxCandidateExcluded.setSelected(false);
     tableViewCandidates.getItems().clear();
 
@@ -1041,7 +1043,6 @@ public class GuiConfigController implements Initializable {
           buttonAddCvrFile.setDisable(false);
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
-          textFieldCvrContestId.setDisable(false);
           textFieldCvrFirstVoteCol.setDisable(false);
           textFieldCvrFirstVoteCol
                   .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_COLUMN));
@@ -1094,7 +1095,8 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles.setEditable(false);
 
     tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
-    tableColumnCandidateCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+    tableColumnCandidateAliases
+        .setCellValueFactory(new PropertyValueFactory<>("semicolonSeparatedAliases"));
     tableColumnCandidateExcluded.setCellValueFactory(new PropertyValueFactory<>("excluded"));
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(false);
@@ -1327,8 +1329,7 @@ public class GuiConfigController implements Initializable {
 
     ArrayList<Candidate> candidates = new ArrayList<>(tableViewCandidates.getItems());
     for (Candidate candidate : candidates) {
-      candidate.setName(candidate.getName() != null ? candidate.getName().trim() : "");
-      candidate.setCode(candidate.getCode() != null ? candidate.getCode().trim() : "");
+      candidate.trimNameAndAllAliases();
     }
     config.candidates = candidates;
 

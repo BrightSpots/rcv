@@ -1,0 +1,49 @@
+{
+  "config" : {
+    "contest" : "Aliases test (JSON CDF Format)",
+    "date" : "2023-03-23",
+    "jurisdiction" : "TestSets_Single_winner",
+    "office" : "Aliases test",
+    "threshold" : "16"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "Candidate B Name File 1" : "10",
+      "Candidate C Name File 1" : "6",
+      "Candidate D Name File 1" : "4",
+      "Unused Display Name Candidate A" : "10"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Candidate D Name File 1",
+      "transfers" : {
+        "Candidate C Name File 1" : "2",
+        "Unused Display Name Candidate A" : "2"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "Candidate B Name File 1" : "10",
+      "Candidate C Name File 1" : "8",
+      "Unused Display Name Candidate A" : "12"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Candidate C Name File 1",
+      "transfers" : {
+        "Candidate B Name File 1" : "4",
+        "Unused Display Name Candidate A" : "4"
+      }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "Candidate B Name File 1" : "14",
+      "Unused Display Name Candidate A" : "16"
+    },
+    "tallyResults" : [ {
+      "elected" : "Unused Display Name Candidate A",
+      "transfers" : { }
+    } ]
+  } ]
+}

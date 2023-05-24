@@ -195,6 +195,18 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("aliases (CDF JSON format)")
+  void aliasesJson() {
+    runTabulationTest("aliases_cdf_json");
+  }
+
+  @Test
+  @DisplayName("aliases (ES&S XLSX format)")
+  void aliasesXlsx() {
+    runTabulationTest("aliases_ess_xlsx");
+  }
+
+  @Test
   @DisplayName("NIST XML CDF 2")
   void nistXmlCdf2() {
     runTabulationTest("nist_xml_cdf_2");

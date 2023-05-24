@@ -4,6 +4,9 @@ Fill in the fields and click the Add button:
 
 Name (required): E.g.: Dave Harris.
 
-Code (optional): Some CVR files use codes in lieu of full candidate name. E.g.: "JCD" or "14".
+Aliases, codes, and other spellings (one per line) (optional): Enter one code or alias per line.
+Codes are used by some CVR files in lieu of full candidate name. E.g.: "JCD" or "14".
+Aliases are helpful when candidate names are not normalized across jurisdictions, e.g. "Jim" may be an alias for "James".
+
 
 Excluded (optional): When checked, the candidate will be ignored during tabulation. An example of when this might be used: a candidate dropped out after the ballots were printed.
