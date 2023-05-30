@@ -58,7 +58,9 @@ class CsvCvrReader extends BaseCvrReader {
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
       CSVParser parser =
           CSVParser.parse(
-              inputStream, Charset.defaultCharset(), CSVFormat.newFormat(',').withHeader());
+              inputStream,
+              Charset.defaultCharset(),
+              CSVFormat.Builder.create().setHeader().build());
       List<String> candidateIds = parser.getHeaderNames();
       int undeclaredWriteInColumn = candidateIds.indexOf(source.getUndeclaredWriteInLabel());
 
