@@ -32,7 +32,6 @@ import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -110,11 +109,6 @@ class StreamingCvrReader extends BaseCvrReader {
     this.treatBlankAsUndeclaredWriteIn = source.isTreatBlankAsUndeclaredWriteIn();
   }
 
-  @Override
-  public String readerName() {
-    return "ES&S";
-  }
-
   // given Excel-style address string return the cell address as a pair of Integers
   // representing zero-based column and row of the cell address
   private static Pair<Integer, Integer> getCellAddress(String address) {
@@ -146,6 +140,11 @@ class StreamingCvrReader extends BaseCvrReader {
       result += charValue;
     }
     return result - 1;
+  }
+
+  @Override
+  public String readerName() {
+    return "ES&S";
   }
 
   // purpose: Handle empty cells encountered while parsing a CVR. Unlike empty rows, empty cells
@@ -205,10 +204,7 @@ class StreamingCvrReader extends BaseCvrReader {
     // create new cast vote record
     CastVoteRecord newRecord =
         new CastVoteRecord(
-            computedCastVoteRecordId,
-            currentSuppliedCvrId,
-            currentPrecinct,
-            currentRankings);
+            computedCastVoteRecordId, currentSuppliedCvrId, currentPrecinct, currentRankings);
     cvrList.add(newRecord);
 
     // provide some user feedback on the CVR count
@@ -239,7 +235,7 @@ class StreamingCvrReader extends BaseCvrReader {
       if (!isNullOrBlank(overvoteDelimiter)) {
         candidates = cellString.split(Pattern.quote(overvoteDelimiter));
       } else {
-        candidates = new String[]{cellString};
+        candidates = new String[] {cellString};
       }
 
       for (String candidate : candidates) {
@@ -271,12 +267,13 @@ class StreamingCvrReader extends BaseCvrReader {
 
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
-          throws UnrecognizedCandidatesException, CastVoteRecord.CvrParseException, IOException {
+      throws UnrecognizedCandidatesException, CastVoteRecord.CvrParseException, IOException {
     try {
       parseCvrFileInternal(castVoteRecords, precinctIds);
     } catch (OpenXML4JException | SAXException | ParserConfigurationException e) {
       Logger.severe("Error parsing source file %s", cvrPath);
-      Logger.info("ES&S cast vote record files must be Microsoft Excel Workbook "
+      Logger.info(
+          "ES&S cast vote record files must be Microsoft Excel Workbook "
               + "format.\nStrict Open XML and Open Office are not supported.");
       throw new CastVoteRecord.CvrParseException();
     } catch (CvrDataFormatException exception) {
@@ -290,8 +287,12 @@ class StreamingCvrReader extends BaseCvrReader {
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   private void parseCvrFileInternal(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
-      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException,
-      ParserConfigurationException, CvrDataFormatException {
+      throws UnrecognizedCandidatesException,
+          OpenXML4JException,
+          SAXException,
+          IOException,
+          ParserConfigurationException,
+          CvrDataFormatException {
 
     cvrList = castVoteRecords;
     this.precinctIds = precinctIds;
@@ -363,7 +364,5 @@ class StreamingCvrReader extends BaseCvrReader {
     }
   }
 
-  static class CvrDataFormatException extends Exception {
-
-  }
+  static class CvrDataFormatException extends Exception {}
 }

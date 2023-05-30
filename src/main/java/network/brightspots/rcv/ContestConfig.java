@@ -1224,6 +1224,19 @@ class ContestConfig {
           .orElse(PROVIDER_UNKNOWN);
     }
 
+    BaseCvrReader constructReader(ContestConfig config, CvrSource source)
+        throws UnrecognizedProviderException {
+      return switch (this) {
+        case CDF -> new CommonDataFormatReader(config, source);
+        case CLEAR_BALLOT -> new ClearBallotCvrReader(config, source);
+        case DOMINION -> new DominionCvrReader(config, source);
+        case ESS -> new StreamingCvrReader(config, source);
+        case HART -> new HartCvrReader(config, source);
+        case CSV -> new CsvCvrReader(config, source);
+        default -> throw new UnrecognizedProviderException();
+      };
+    }
+
     @Override
     public String toString() {
       return guiLabel;

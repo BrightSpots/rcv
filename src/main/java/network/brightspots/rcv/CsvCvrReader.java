@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2023 Bright Spots Developers.
+ * Copyright (c) 2017-2022 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javafx.util.Pair;
-import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -49,20 +48,19 @@ class CsvCvrReader extends BaseCvrReader {
 
   @Override
   public String readerName() {
-    return "Generic CSV";
+    return "generic CSV";
   }
 
   // parse CVR CSV file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds) throws
-          CastVoteRecord.CvrParseException,
-          IOException,
-          UnrecognizedCandidatesException {
-    Logger.info("Reading CSV cast vote record file: %s...", cvrPath);
-
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+      throws CastVoteRecord.CvrParseException, IOException, UnrecognizedCandidatesException {
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
-      CSVParser parser = CSVParser.parse(inputStream,
-              Charset.defaultCharset(), CSVFormat.newFormat(',').withHeader());
+      CSVParser parser =
+          CSVParser.parse(
+              inputStream,
+              Charset.defaultCharset(),
+              CSVFormat.Builder.create().setHeader().build());
       List<String> candidateIds = parser.getHeaderNames();
       int undeclaredWriteInColumn = candidateIds.indexOf(source.getUndeclaredWriteInLabel());
 
@@ -79,8 +77,9 @@ class CsvCvrReader extends BaseCvrReader {
           try {
             rankAsInt = Integer.parseInt(rankAsString);
           } catch (NumberFormatException e) {
-            Logger.severe("Row %s expected number at column %d, but got \"%s\" instead.",
-                    csvRecord.get(0), col, rankAsString);
+            Logger.severe(
+                "Row %s expected number at column %d, but got \"%s\" instead.",
+                csvRecord.get(0), col, rankAsString);
             throw new CastVoteRecord.CvrParseException();
           }
 
@@ -95,11 +94,7 @@ class CsvCvrReader extends BaseCvrReader {
 
         // create the new CastVoteRecord
         CastVoteRecord newCvr =
-                new CastVoteRecord(
-                        source.getContestId(),
-                        "no supplied ID",
-                        "no precinct",
-                        rankings);
+            new CastVoteRecord(source.getContestId(), "no supplied ID", "no precinct", rankings);
         castVoteRecords.add(newCvr);
       }
     } catch (IOException exception) {
