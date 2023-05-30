@@ -27,32 +27,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javafx.util.Pair;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
-class HartCvrReader {
-
-  private final String cvrPath;
-  private final String contestId;
-  private final String undeclaredWriteInLabel;
-  private final ContestConfig contestConfig;
-  // map for tracking unrecognized candidates during parsing
+class HartCvrReader extends BaseCvrReader {
   private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
-  HartCvrReader(
-      String cvrPath,
-      String contestId,
-      ContestConfig contestConfig,
-      String undeclaredWriteInLabel) {
-    this.cvrPath = cvrPath;
-    this.contestId = contestId;
-    this.contestConfig = contestConfig;
-    this.undeclaredWriteInLabel = undeclaredWriteInLabel;
+  HartCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
+    super(config, source);
+  }
+
+  @Override
+  public String readerName() {
+    return "Hart";
   }
 
   // iterate all xml files in the source input folder
-  void readCastVoteRecordsFromFolder(List<CastVoteRecord> castVoteRecords)
-      throws IOException, UnrecognizedCandidatesException {
+  @Override
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+      throws CastVoteRecord.CvrParseException,
+          TabulatorSession.UnrecognizedCandidatesException,
+          IOException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
@@ -63,7 +59,7 @@ class HartCvrReader {
       }
     } else {
       Logger.severe("Unable to find any files in directory: %s", cvrRoot.getAbsolutePath());
-      throw new IOException();
+      throw new CastVoteRecord.CvrParseException();
     }
 
     if (unrecognizedCandidateCounts.size() > 0) {
@@ -72,7 +68,8 @@ class HartCvrReader {
   }
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
-  void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path) throws IOException {
+  private void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
+      throws IOException {
     Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
     XmlMapper xmlMapper = new XmlMapper();
@@ -81,7 +78,7 @@ class HartCvrReader {
       HartCvrXml xmlCvr = xmlMapper.readValue(inputStream, HartCvrXml.class);
 
       for (Contest contest : xmlCvr.Contests) {
-        if (!contest.Id.equals(this.contestId)) {
+        if (!contest.Id.equals(source.getContestId())) {
           continue;
         }
 
@@ -89,9 +86,9 @@ class HartCvrReader {
         if (contest.Options != null) {
           for (Option option : contest.Options) {
             String candidateName = option.Id;
-            if (candidateName.equals(undeclaredWriteInLabel)) {
+            if (candidateName.equals(source.getUndeclaredWriteInLabel())) {
               candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-            } else if (contestConfig.getNameForCandidate(candidateName) == null) {
+            } else if (config.getNameForCandidate(candidateName) == null) {
               unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
             }
             // Hart RCV election ranks are indicated by a string read left to right:
@@ -125,9 +122,6 @@ class HartCvrReader {
           Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
       }
-    } catch (IOException exception) {
-      Logger.severe("Error parsing cast vote record:\n%s", exception);
-      throw exception;
     }
   }
 

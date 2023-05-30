@@ -104,10 +104,6 @@ class ContestConfig {
     this.sourceDirectory = sourceDirectory;
   }
 
-  static boolean isCdf(CvrSource source) {
-    return getProvider(source) == Provider.CDF;
-  }
-
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
     try {
@@ -262,6 +258,7 @@ class ContestConfig {
             validationErrors.add(ValidationError.CVR_OVERVOTE_UNEXPECTEDLY_DEFINED);
           }
         }
+
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getFirstVoteColumnIndex(),
             "firstVoteColumnIndex",
@@ -579,7 +576,7 @@ class ContestConfig {
               Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
         }
 
-        if (isCdf(source)) {
+        if (getProvider(source) == Provider.CDF) {
           // Perform CDF checks
           if (isTabulateByPrecinctEnabled()) {
             validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT);
@@ -1204,6 +1201,19 @@ class ContestConfig {
           .filter(v -> v.internalLabel.equals(labelLookup))
           .findAny()
           .orElse(PROVIDER_UNKNOWN);
+    }
+
+    BaseCvrReader constructReader(ContestConfig config, CvrSource source)
+        throws UnrecognizedProviderException {
+      return switch (this) {
+        case CDF -> new CommonDataFormatReader(config, source);
+        case CLEAR_BALLOT -> new ClearBallotCvrReader(config, source);
+        case DOMINION -> new DominionCvrReader(config, source);
+        case ESS -> new StreamingCvrReader(config, source);
+        case HART -> new HartCvrReader(config, source);
+        case CSV -> new CsvCvrReader(config, source);
+        default -> throw new UnrecognizedProviderException();
+      };
     }
 
     @Override
