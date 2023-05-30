@@ -50,7 +50,9 @@ class CandidatesAtRanking implements Iterable<String> {
   void addCandidate(String candidateName) {
     int n = count();
     String[] newList = new String[n + 1];
-    if (n >= 0) System.arraycopy(this.candidateNames, 0, newList, 0, n);
+    if (n >= 0) {
+      System.arraycopy(this.candidateNames, 0, newList, 0, n);
+    }
     newList[n] = candidateName;
     this.candidateNames = newList;
   }
