@@ -45,8 +45,8 @@ class HartCvrReader extends BaseCvrReader {
 
   // iterate all xml files in the source input folder
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds) throws
-          CastVoteRecord.CvrParseException,
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+      throws CastVoteRecord.CvrParseException,
           TabulatorSession.UnrecognizedCandidatesException,
           IOException {
     File cvrRoot = new File(this.cvrPath);
@@ -68,7 +68,8 @@ class HartCvrReader extends BaseCvrReader {
   }
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
-  void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path) throws IOException {
+  private void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
+      throws IOException {
     Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
     XmlMapper xmlMapper = new XmlMapper();

@@ -39,11 +39,7 @@ import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
-import network.brightspots.rcv.StreamingCvrReader.CvrDataFormatException;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
-import org.apache.poi.ooxml.POIXMLException;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.xml.sax.SAXException;
 
 @SuppressWarnings("RedundantSuppression")
 class TabulatorSession {
@@ -145,8 +141,8 @@ class TabulatorSession {
       Logger.info("Config file: %s", configPath);
       try {
         Logger.fine("Begin config file contents:");
-        BufferedReader reader = new BufferedReader(
-            new FileReader(configPath, StandardCharsets.UTF_8));
+        BufferedReader reader =
+            new BufferedReader(new FileReader(configPath, StandardCharsets.UTF_8));
         String line = reader.readLine();
         while (line != null) {
           Logger.fine(line);
@@ -192,7 +188,8 @@ class TabulatorSession {
         }
         // revert config to original state
         config.setNumberOfWinners(numWinners);
-        config.getSequentialWinners()
+        config
+            .getSequentialWinners()
             .forEach(winner -> config.setCandidateExclusionStatus(winner, false));
         tabulationSuccess = true;
       } else {
@@ -268,22 +265,22 @@ class TabulatorSession {
       Provider provider = ContestConfig.getProvider(source);
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
-        Logger.info("Reading %s cast vote record file: %s...", reader.readerName(), cvrPath);
+        Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
         reader.readCastVoteRecords(castVoteRecords, precinctIds);
 
         if (reader.getClass() == DominionCvrReader.class) {
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
             DominionCvrReader dominionReader = (DominionCvrReader) reader;
-            ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
-            writer.setContestConfig(config);
+            ResultsWriter writer =
+                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
             this.convertedFilesWritten =
-                    writer.writeGenericCvrCsv(
-                            castVoteRecords,
-                            dominionReader.getContests().values(),
-                            config.getOutputDirectory(),
-                            source.getContestId(),
-                            source.getUndeclaredWriteInLabel());
+                writer.writeGenericCvrCsv(
+                    castVoteRecords,
+                    dominionReader.getContests().values(),
+                    config.getOutputDirectory(),
+                    source.getContestId(),
+                    source.getUndeclaredWriteInLabel());
           } catch (IOException exception) {
             // error already logged in ResultsWriter
           }
@@ -291,9 +288,14 @@ class TabulatorSession {
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
-        exception.candidateCounts.keySet().forEach(candidate -> Logger.severe(
-            "Unrecognized candidate \"%s\" appears %d time(s)!",
-            candidate, exception.candidateCounts.get(candidate)));
+        exception
+            .candidateCounts
+            .keySet()
+            .forEach(
+                candidate ->
+                    Logger.severe(
+                        "Unrecognized candidate \"%s\" appears %d time(s)!",
+                        candidate, exception.candidateCounts.get(candidate)));
         // various incorrect settings can lead to UnrecognizedCandidatesException, so it's hard
         // to know exactly what the problem is
         Logger.info(

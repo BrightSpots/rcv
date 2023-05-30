@@ -36,8 +36,8 @@ abstract class BaseCvrReader {
   // them to the input list
   abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
       throws CastVoteRecord.CvrParseException,
-             TabulatorSession.UnrecognizedCandidatesException,
-             IOException;
+          TabulatorSession.UnrecognizedCandidatesException,
+          IOException;
 
   // Human-readable name for output logs
   public abstract String readerName();

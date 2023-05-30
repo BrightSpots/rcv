@@ -22,7 +22,6 @@ package network.brightspots.rcv;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -57,11 +56,6 @@ class DominionCvrReader extends BaseCvrReader {
 
   DominionCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
-  }
-
-  @Override
-  public String readerName() {
-    return "Dominion";
   }
 
   // returns map of contestId to Contest parsed from input file
@@ -129,6 +123,11 @@ class DominionCvrReader extends BaseCvrReader {
     return candidates;
   }
 
+  @Override
+  public String readerName() {
+    return "Dominion";
+  }
+
   Map<String, Contest> getContests() {
     return contests;
   }
@@ -137,7 +136,7 @@ class DominionCvrReader extends BaseCvrReader {
   // them to the input list
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
-      throws CvrParseException, UnrecognizedCandidatesException, IOException {
+      throws CvrParseException, UnrecognizedCandidatesException {
     // read metadata files for precincts, precinct portions, contest, and candidates
 
     // Precinct data does not exist for earlier versions of Dominion (only precinct portion)
