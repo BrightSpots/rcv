@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 import java.util.List;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
