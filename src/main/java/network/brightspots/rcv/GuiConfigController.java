@@ -770,7 +770,7 @@ public class GuiConfigController implements Initializable {
 
     int successCount = 0;
     for (String name : unloadedNames) {
-      Candidate candidate = new Candidate(name, "", false);
+      Candidate candidate = new Candidate(name, null, false);
       Set<ValidationError> validationErrors =
               ContestConfig.performBasicCandidateValidation(candidate);
       if (validationErrors.isEmpty()) {

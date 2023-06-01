@@ -338,13 +338,12 @@
                       <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                     </padding>
                   </HBox>
-                  <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <Label text="Code" prefWidth="50.0"/>
-                    <TextField prefHeight="25.0" prefWidth="100.0" fx:id="textFieldCandidateCode"/>
-                    <padding>
-                      <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                    </padding>
-                  </HBox>
+                  <Label text="Aliases, codes, and other spellings (one per line):">
+                  </Label>
+                  <TextArea fx:id="textAreaCandidateAliases" prefHeight="200.0" prefWidth="200.0" />
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
                     <CheckBox fx:id="checkBoxCandidateExcluded" mnemonicParsing="false"
                       text="Excluded">
@@ -371,33 +370,6 @@
                     <Insets bottom="8.0" top="8.0"/>
                   </padding>
                 </Separator>
-                <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Name *" prefWidth="50.0"/>
-                  <TextField prefHeight="25.0" prefWidth="300.0" fx:id="textFieldCandidateName"/>
-                  <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                  </padding>
-                </HBox>
-                <Label text="Aliases, codes, and other spellings (one per line):">
-                  <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-                  </padding>
-                </Label>
-                <TextArea fx:id="textAreaCandidateAliases" prefHeight="200.0" prefWidth="200.0" />
-                <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <CheckBox fx:id="checkBoxCandidateExcluded" mnemonicParsing="false"
-                    text="Excluded">
-                    <VBox.margin>
-                      <Insets top="10.0"/>
-                    </VBox.margin>
-                  </CheckBox>
-                  <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                  </padding>
-                </HBox>
-                <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                </padding>
                 <VBox.margin>
                   <Insets bottom="8.0" left="8.0" right="4.0"/>
                 </VBox.margin>

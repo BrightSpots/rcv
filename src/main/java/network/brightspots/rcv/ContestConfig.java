@@ -527,7 +527,7 @@ class ContestConfig {
     boolean inUse = false;
     if (candidateStringsSeen.contains(candidateString)) {
       inUse = true;
-      Logger.severe("Duplicate candidate %ss are not allowed: %s", field, candidateString);
+      Logger.severe("Duplicate candidate %ss are not allowed: \"%s\"", field, candidateString);
     } else {
       for (CvrSource source : getRawConfig().cvrFileSources) {
         inUse =
