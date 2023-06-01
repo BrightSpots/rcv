@@ -45,7 +45,7 @@ class HartCvrReader extends BaseCvrReader {
 
   // iterate all xml files in the source input folder
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException,
           TabulatorSession.UnrecognizedCandidatesException,
           IOException {

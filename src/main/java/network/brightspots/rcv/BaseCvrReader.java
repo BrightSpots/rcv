@@ -18,7 +18,6 @@ package network.brightspots.rcv;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 
 abstract class BaseCvrReader {
@@ -34,7 +33,7 @@ abstract class BaseCvrReader {
 
   // parse CVR for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
-  abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException,
           TabulatorSession.UnrecognizedCandidatesException,
           IOException;
