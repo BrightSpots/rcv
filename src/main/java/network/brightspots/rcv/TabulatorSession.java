@@ -268,6 +268,17 @@ class TabulatorSession {
         Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
         reader.readCastVoteRecords(castVoteRecords, precinctIds);
 
+        // Check for unrecognized candidates
+        Map<String, Integer> unrecognizedCandidateCounts =
+            reader.gatherUnknownCandidates(castVoteRecords);
+
+        if (unrecognizedCandidateCounts.size() > 0) {
+          throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
+        }
+
+        // Check for any other reader-specific validations
+        reader.runAdditionalValidations(castVoteRecords);
+
         if (reader.getClass() == DominionCvrReader.class) {
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {

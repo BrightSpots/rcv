@@ -17,10 +17,11 @@
 package network.brightspots.rcv;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import javafx.util.Pair;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 
 abstract class BaseCvrReader {
@@ -34,22 +35,39 @@ abstract class BaseCvrReader {
     this.cvrPath = config.resolveConfigPath(source.getFilePath());
   }
 
-  // Gather candidate names from the CVR that are not in the config.
-  Set<String> gatherUnknownCandidateNames() throws CastVoteRecord.CvrParseException, IOException {
-    try {
-      readCastVoteRecords(new ArrayList<>(), new HashSet<>());
-    } catch (TabulatorSession.UnrecognizedCandidatesException unrecognizedCandidates) {
-      return unrecognizedCandidates.candidateCounts.keySet();
-    }
-    return new HashSet<String>();
-  }
-
   // parse CVR for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
   abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
-      throws CastVoteRecord.CvrParseException,
-          TabulatorSession.UnrecognizedCandidatesException,
+          throws CastVoteRecord.CvrParseException,
           IOException;
+
+  public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
+      throws CastVoteRecord.CvrParseException {
+  }
+
+  // Gather candidate names from the CVR that are not in the config.
+  Map<String, Integer> gatherUnknownCandidates(List<CastVoteRecord> castVoteRecords) {
+    Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
+    for (CastVoteRecord cvr : castVoteRecords) {
+      for (Pair<Integer, CandidatesAtRanking> ranking : cvr.candidateRankings) {
+        for (String candidateName : ranking.getValue()) {
+          if (candidateName.equals(source.getUndeclaredWriteInLabel())) {
+            continue;
+          }
+          if (candidateName.equals(source.getOvervoteLabel())) {
+            continue;
+          }
+          if (config.getNameForCandidate(candidateName) != null) {
+            continue;
+          }
+
+          unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
+        }
+      }
+    }
+
+    return unrecognizedCandidateCounts;
+  }
 
   // Human-readable name for output logs
   public abstract String readerName();

@@ -759,8 +759,10 @@ public class GuiConfigController implements Initializable {
             ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
       Provider provider = ContestConfig.getProvider(source);
       try {
+        List<CastVoteRecord> castVoteRecords = new ArrayList<>();
         BaseCvrReader reader = provider.constructReader(config, source);
-        unloadedNames.addAll(reader.gatherUnknownCandidateNames());
+        reader.readCastVoteRecords(castVoteRecords, new HashSet<>());
+        unloadedNames.addAll(reader.gatherUnknownCandidates(castVoteRecords).keySet());
       } catch (ContestConfig.UnrecognizedProviderException e) {
         Logger.severe("Unrecognized reader: %s", e.getMessage());
       } catch (CastVoteRecord.CvrParseException | IOException e) {
