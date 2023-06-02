@@ -23,6 +23,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -42,6 +43,9 @@ class GuiApplication extends Application {
       Parent root = FXMLLoader.load(getClass().getResource(resourcePath));
       window.setTitle(Main.APP_NAME);
       window.setScene(new Scene(root));
+
+      Image icon = new Image(getClass().getResourceAsStream("/network/brightspots/rcv/icon.png"));
+      window.getIcons().add(icon);
     } catch (IOException exception) {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
