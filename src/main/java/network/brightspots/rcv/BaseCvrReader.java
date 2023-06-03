@@ -38,12 +38,10 @@ abstract class BaseCvrReader {
   // parse CVR for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
   abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
-          throws CastVoteRecord.CvrParseException,
-          IOException;
+      throws CastVoteRecord.CvrParseException, IOException;
 
   public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
-      throws CastVoteRecord.CvrParseException {
-  }
+      throws CastVoteRecord.CvrParseException {}
 
   // Gather candidate names from the CVR that are not in the config.
   Map<String, Integer> gatherUnknownCandidates(List<CastVoteRecord> castVoteRecords) {
@@ -51,13 +49,9 @@ abstract class BaseCvrReader {
     for (CastVoteRecord cvr : castVoteRecords) {
       for (Pair<Integer, CandidatesAtRanking> ranking : cvr.candidateRankings) {
         for (String candidateName : ranking.getValue()) {
-          if (candidateName.equals(source.getUndeclaredWriteInLabel())) {
-            continue;
-          }
-          if (candidateName.equals(source.getOvervoteLabel())) {
-            continue;
-          }
-          if (config.getNameForCandidate(candidateName) != null) {
+          if (candidateName.equals(source.getUndeclaredWriteInLabel())
+              || candidateName.equals(source.getOvervoteLabel())
+              || config.getNameForCandidate(candidateName) != null) {
             continue;
           }
 

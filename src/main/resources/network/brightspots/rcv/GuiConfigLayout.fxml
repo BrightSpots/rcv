@@ -299,7 +299,7 @@
                     <padding>
                       <Insets left="8.0" right="8.0" bottom="8.0" top="8.0"/>
                     </padding>
-                    <Label text="Auto-Load Candidates From CVRs" style="-fx-font-weight: bold"/>
+                    <Label text="Auto-Load Candidates from CVRs" style="-fx-font-weight: bold"/>
                     <Text
                         text="Search through all CVRs and load each unique candidate name found."
                         wrappingWidth="250"

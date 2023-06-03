@@ -287,20 +287,34 @@ public class GuiConfigController implements Initializable {
 
   private static String loadTxtFileIntoString(String configFileDocumentationFilename) {
     String text;
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(
-        ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename)),
-        StandardCharsets.UTF_8))) {
+    try (BufferedReader reader =
+        new BufferedReader(
+            new InputStreamReader(
+                Objects.requireNonNull(
+                    ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename)),
+                StandardCharsets.UTF_8))) {
       text = reader.lines().collect(Collectors.joining("\n"));
     } catch (Exception exception) {
-      Logger.severe(
-          "Error loading text file: %s\n%s",
-          configFileDocumentationFilename,
-          exception);
-      text =
-          String.format(
-              "<Error loading text file: %s>", configFileDocumentationFilename);
+      Logger.severe("Error loading text file: %s\n%s", configFileDocumentationFilename, exception);
+      text = String.format("<Error loading text file: %s>", configFileDocumentationFilename);
     }
     return text;
+  }
+
+  private static void addErrorStyling(Control control) {
+    if (control instanceof CheckBox) {
+      control.getStyleClass().add("check-box-error");
+    } else {
+      control.getStyleClass().add("error");
+    }
+  }
+
+  private static void clearErrorStyling(Control control) {
+    if (control instanceof CheckBox) {
+      control.getStyleClass().removeAll("check-box-error");
+    } else {
+      control.getStyleClass().removeAll("error");
+    }
   }
 
   private String getOvervoteRuleChoice() {
@@ -542,22 +556,18 @@ public class GuiConfigController implements Initializable {
 
     Provider provider = getProviderChoice(choiceCvrProvider);
     switch (provider) {
-      case CDF -> {
-        selectedFiles = chooseFile(provider,
-            new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
-      }
-      case CLEAR_BALLOT, CSV -> {
-        selectedFiles = chooseFile(provider, new ExtensionFilter("CSV files", "*.csv"));
-      }
+      case CDF -> selectedFiles =
+          chooseFile(provider, new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
+      case CLEAR_BALLOT, CSV -> selectedFiles =
+          chooseFile(provider, new ExtensionFilter("CSV files", "*.csv"));
       case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         dc.setTitle("Select " + provider + " Cast Vote Record Folder");
         selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
-      case ESS -> {
-        selectedFiles = chooseFile(provider, new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
-      }
+      case ESS -> selectedFiles =
+          chooseFile(provider, new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
       default -> {
         // Do nothing for unhandled providers
       }
@@ -618,22 +628,6 @@ public class GuiConfigController implements Initializable {
     });
     // If any entries failed validation, preserve them in the text box so the user can try again
     textFieldCvrFilePath.setText(String.join(CVR_FILE_PATH_DELIMITER, failedFilePaths));
-  }
-
-  private static void addErrorStyling(Control control) {
-    if (control instanceof CheckBox) {
-      control.getStyleClass().add("check-box-error");
-    } else {
-      control.getStyleClass().add("error");
-    }
-  }
-
-  private static void clearErrorStyling(Control control) {
-    if (control instanceof CheckBox) {
-      control.getStyleClass().removeAll("check-box-error");
-    } else {
-      control.getStyleClass().removeAll("error");
-    }
   }
 
   private void clearBasicCvrValidationHighlighting() {
@@ -749,9 +743,7 @@ public class GuiConfigController implements Initializable {
         .removeAll(tableViewCvrFiles.getSelectionModel().getSelectedItems());
   }
 
-  /**
-   * Action when "Auto-Load Candidates" clicked.
-   */
+  /** Action when "Auto-Load Candidates" button is clicked. */
   public void buttonAutoLoadCandidatesClicked() {
     Set<String> unloadedNames = new HashSet<>();
     for (CvrSource source : tableViewCvrFiles.getItems()) {
@@ -764,9 +756,11 @@ public class GuiConfigController implements Initializable {
         reader.readCastVoteRecords(castVoteRecords, new HashSet<>());
         unloadedNames.addAll(reader.gatherUnknownCandidates(castVoteRecords).keySet());
       } catch (ContestConfig.UnrecognizedProviderException e) {
-        Logger.severe("Unrecognized reader: %s", e.getMessage());
+        Logger.severe(
+            "Unrecognized provider \"%s\" in source file \"%s\": %s",
+            source.getProvider(), source.getFilePath(), e.getMessage());
       } catch (CastVoteRecord.CvrParseException | IOException e) {
-        Logger.severe("Failed to read file %s", source.getFilePath());
+        Logger.severe("Failed to read source file \"%s\": ", source.getFilePath(), e.getMessage());
       }
     }
 
@@ -779,11 +773,11 @@ public class GuiConfigController implements Initializable {
         tableViewCandidates.getItems().add(candidate);
         successCount++;
       } else {
-        Logger.warning("Candidate %s failed to load.", name);
+        Logger.warning("Candidate \"%s\" failed to load.", name);
       }
     }
 
-    Logger.info("Auto-Loaded %d candidates.", successCount);
+    Logger.info("Auto-loaded %d candidates.", successCount);
   }
 
   /**
