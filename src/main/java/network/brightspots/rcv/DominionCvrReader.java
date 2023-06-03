@@ -230,14 +230,14 @@ class DominionCvrReader extends BaseCvrReader {
   private void gatherCvrsForContest(List<CastVoteRecord> castVoteRecords, String contestIdToLoad) {
     try {
       Path singleCvrPath = Paths.get(cvrPath, CVR_EXPORT);
-      Path firstCvrPath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, 1));
+      Path firstCvrPath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, 0));
       if (singleCvrPath.toFile().exists()) {
         HashMap json = JsonParser.readFromFile(singleCvrPath.toString(), HashMap.class);
         parseCvrFile(json, castVoteRecords, contestIdToLoad);
       } else if (firstCvrPath.toFile().exists()) {
         int recordsParsed = 0;
         int recordsParsedAtLastLog = 0;
-        int cvrSequence = 1;
+        int cvrSequence = 0;
         Path cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         while (cvrFilePath.toFile().exists()) {
           HashMap json = JsonParser.readFromFile(cvrFilePath.toString(), HashMap.class);
