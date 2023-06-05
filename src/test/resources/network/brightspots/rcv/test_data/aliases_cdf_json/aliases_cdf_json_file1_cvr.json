@@ -800,7 +800,7 @@
       "ContestSelection" : [ {
         "@id" : "cs-a",
         "@type" : "CandidateSelection",
-        "CandidateIds" : [ "candidate-a" ]
+        "CandidateIds" : [ "candidate-A", "candidate-a" ]
       }, {
         "@id" : "cs-b",
         "@type" : "CandidateSelection",

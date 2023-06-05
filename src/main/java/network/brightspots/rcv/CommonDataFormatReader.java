@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -284,20 +285,11 @@ class CommonDataFormatReader extends BaseCvrReader {
                     "CandidateSelection \"%s\" has no CandidateIds!", contestSelection.ObjectId);
                 throw new CvrParseException();
               }
-              if (contestSelection.CandidateIds.length > 1) {
-                Logger.warning(
-                    "CandidateSelection \"%s\" has multiple CandidateIds. "
-                        + "Only the first one will be processed.",
-                    contestSelection.ObjectId);
-              }
 
-              Candidate candidate = candidateById.get(contestSelection.CandidateIds[0]);
-              if (candidate == null) {
-                Logger.severe(
-                    "CandidateId \"%s\" from ContestSelectionId \"%s\" not found!",
-                    contestSelection.CandidateIds[0], contestSelection.ObjectId);
-                throw new CvrParseException();
-              }
+              Candidate candidate = getFirstMatchingCandidate(
+                  Arrays.asList(contestSelection.CandidateIds),
+                  candidateById,
+                  contestSelectionId);
               candidateName = candidate.Name;
               if (candidateName.equals(source.getOvervoteLabel())) {
                 candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
@@ -337,6 +329,29 @@ class CommonDataFormatReader extends BaseCvrReader {
         throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
       }
     }
+  }
+
+  private <K, T> T getFirstMatchingCandidate(
+        List potentialCandidateIds,
+        HashMap<K, T> knownCandidates,
+        String contestSelectionId) throws CvrParseException {
+    // Look through candidate ID list and find the first matching ID
+    T candidate;
+    int candidateIndex = 0;
+    do {
+      String candidateId = (String) potentialCandidateIds.get(candidateIndex);
+      candidate = (T) knownCandidates.get(candidateId);
+      ++candidateIndex;
+    } while (candidate == null && candidateIndex < potentialCandidateIds.size());
+
+    if (candidate == null) {
+      Logger.severe(
+              "Candidate IDs [%s] in Contest Selection \"%s\" not in the candidate list.",
+              String.join(", ", potentialCandidateIds), contestSelectionId);
+      throw new CvrParseException();
+    }
+
+    return candidate;
   }
 
   private void parseRankings(
@@ -472,20 +487,9 @@ class CommonDataFormatReader extends BaseCvrReader {
             Logger.severe("CandidateSelection \"%s\" has no CandidateIds!", contestSelectionId);
             throw new CvrParseException();
           }
-          if (candidateIds.size() > 1) {
-            Logger.warning(
-                "CandidateSelection \"%s\" has multiple CandidateIds. "
-                    + "Only the first one will be processed.",
-                contestSelectionId);
-          }
-          String candidateObjectId = (String) candidateIds.get(0);
-          HashMap candidate = (HashMap) candidates.get(candidateObjectId);
-          if (candidate == null) {
-            Logger.severe(
-                "Candidate ID \"%s\" in Contest Selection \"%s\" is not in the candidate list.",
-                candidateObjectId, contestSelectionId);
-            throw new CvrParseException();
-          }
+
+          HashMap candidate = (HashMap) getFirstMatchingCandidate(
+              candidateIds, candidates, contestSelectionId);
           candidateName = (String) candidate.get("Name");
           if (candidateName.equals(source.getOvervoteLabel())) {
             candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
