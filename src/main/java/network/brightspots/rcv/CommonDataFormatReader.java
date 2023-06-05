@@ -100,7 +100,7 @@ class CommonDataFormatReader extends BaseCvrReader {
   }
 
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws UnrecognizedCandidatesException, CvrParseException {
     try {
       if (cvrPath.endsWith(".xml")) {

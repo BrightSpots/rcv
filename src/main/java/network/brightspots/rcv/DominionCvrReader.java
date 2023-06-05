@@ -135,7 +135,7 @@ class DominionCvrReader extends BaseCvrReader {
   // parse CVR JSON for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CvrParseException, UnrecognizedCandidatesException {
     // read metadata files for precincts, precinct portions, contest, and candidates
 

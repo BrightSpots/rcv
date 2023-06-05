@@ -72,17 +72,24 @@ class Tabulator {
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // precincts which may appear in the cast vote records
-  private final Set<String> precinctNames;
+  private final Set<String> precinctNames = new HashSet<>();
   // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
   // tracks required winning threshold
   private BigDecimal winningThreshold;
 
-  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config, Set<String> precinctNames) {
+  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config) {
     this.castVoteRecords = castVoteRecords;
     this.candidateNames = config.getCandidateNames();
     this.config = config;
-    this.precinctNames = precinctNames;
+
+    for (CastVoteRecord cvr : castVoteRecords) {
+      String precinctName = cvr.getPrecinct();
+      if (precinctName != null) {
+        precinctNames.add(precinctName);
+      }
+    }
+
     if (config.isTabulateByPrecinctEnabled()) {
       initPrecinctRoundTallies();
     }

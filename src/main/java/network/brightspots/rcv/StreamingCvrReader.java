@@ -80,8 +80,6 @@ class StreamingCvrReader extends BaseCvrReader {
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
   private List<CastVoteRecord> cvrList;
-  // store precinct IDs (new IDs will be added as we parse)
-  private Set<String> precinctIds;
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
   // flag indicating data issues during parsing
@@ -186,7 +184,6 @@ class StreamingCvrReader extends BaseCvrReader {
             "Precinct identifier not found for cast vote record: %s", computedCastVoteRecordId);
         currentPrecinct = MISSING_PRECINCT_ID;
       }
-      precinctIds.add(currentPrecinct);
     }
 
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
@@ -266,10 +263,10 @@ class StreamingCvrReader extends BaseCvrReader {
   }
 
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws UnrecognizedCandidatesException, CastVoteRecord.CvrParseException, IOException {
     try {
-      parseCvrFileInternal(castVoteRecords, precinctIds);
+      parseCvrFileInternal(castVoteRecords);
     } catch (OpenXML4JException | SAXException | ParserConfigurationException e) {
       Logger.severe("Error parsing source file %s", cvrPath);
       Logger.info(
@@ -286,7 +283,7 @@ class StreamingCvrReader extends BaseCvrReader {
   // parse the given file into a List of CastVoteRecords for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
-  private void parseCvrFileInternal(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  private void parseCvrFileInternal(List<CastVoteRecord> castVoteRecords)
       throws UnrecognizedCandidatesException,
           OpenXML4JException,
           SAXException,
@@ -295,7 +292,6 @@ class StreamingCvrReader extends BaseCvrReader {
           CvrDataFormatException {
 
     cvrList = castVoteRecords;
-    this.precinctIds = precinctIds;
 
     // open the zip package
     OPCPackage pkg = OPCPackage.open(cvrPath);
