@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,26 +26,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
-class ClearBallotCvrReader {
+class ClearBallotCvrReader extends BaseCvrReader {
+  ClearBallotCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
+    super(config, source);
+  }
 
-  private final String cvrPath;
-  private final ContestConfig contestConfig;
-  private final String undeclaredWriteInLabel;
-
-  ClearBallotCvrReader(String cvrPath, ContestConfig contestConfig, String undeclaredWriteInLabel) {
-    this.cvrPath = cvrPath;
-    this.contestConfig = contestConfig;
-    this.undeclaredWriteInLabel = undeclaredWriteInLabel;
+  @Override
+  public String readerName() {
+    return "Clear Ballot";
   }
 
   // parse Cvr json into CastVoteRecord objects and append them to the input castVoteRecords list
   // see Clear Ballot 2.1 RCV Format Specification for details
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
-      throws CvrParseException, UnrecognizedCandidatesException {
+  @Override
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+      throws CvrParseException, UnrecognizedCandidatesException, IOException {
     BufferedReader csvReader;
     // map for tracking unrecognized candidates during parsing
     Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
@@ -77,21 +77,21 @@ class ClearBallotCvrReader {
         }
         // filter by contest
         String contestName = choiceFields[RcvChoiceHeaderField.CONTEST_NAME.ordinal()];
-        if (!contestName.equals(contestId)) {
+        if (!contestName.equals(source.getContestId())) {
           continue;
         }
         // validate and store the ranking associated with this choice column
         String choiceName = choiceFields[RcvChoiceHeaderField.CHOICE_NAME.ordinal()];
-        if (choiceName.equals(undeclaredWriteInLabel)) {
+        if (choiceName.equals(source.getUndeclaredWriteInLabel())) {
           choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-        } else if (!contestConfig.getCandidateCodeList().contains(choiceName)) {
+        } else if (!config.getCandidateNames().contains(choiceName)) {
           unrecognizedCandidateCounts.merge(choiceName, 1, Integer::sum);
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
-        if (rank > this.contestConfig.getMaxRankingsAllowed()) {
+        if (rank > this.config.getMaxRankingsAllowed()) {
           Logger.severe(
               "Rank: %d exceeds max rankings allowed in config: %d",
-              rank, this.contestConfig.getMaxRankingsAllowed());
+              rank, this.config.getMaxRankingsAllowed());
           throw new CvrParseException();
         }
         columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
@@ -114,7 +114,7 @@ class ClearBallotCvrReader {
         // create the cast vote record
         CastVoteRecord castVoteRecord =
             new CastVoteRecord(
-                contestId,
+                source.getContestId(),
                 cvrData[CvrColumnField.ScanComputerName.ordinal()],
                 null,
                 cvrData[CvrColumnField.BallotID.ordinal()],
@@ -132,8 +132,6 @@ class ClearBallotCvrReader {
       csvReader.close();
     } catch (FileNotFoundException exception) {
       Logger.severe("Cast vote record file not found!\n%s", exception);
-    } catch (IOException exception) {
-      Logger.severe("Error reading file!\n%s", exception);
     }
 
     if (unrecognizedCandidateCounts.size() > 0) {

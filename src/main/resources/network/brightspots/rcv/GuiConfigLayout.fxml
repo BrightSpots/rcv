@@ -2,42 +2,21 @@
 
 <!--
   ~ RCTab
-  ~ Copyright (c) 2017-2022 Bright Spots Developers.
+  ~ Copyright (c) 2017-2023 Bright Spots Developers.
   ~
   ~ This Source Code Form is subject to the terms of the Mozilla Public
   ~ License, v. 2.0. If a copy of the MPL was not distributed with this
   ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
--->
+  -->
 
 <!--suppress JavaFxRedundantPropertyValue -->
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-  prefHeight="955.0" prefWidth="1165.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
-  xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-  fx:controller="network.brightspots.rcv.GuiConfigController">
+            prefHeight="955.0" prefWidth="1165.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
+            xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="network.brightspots.rcv.GuiConfigController">
   <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
     prefHeight="955.0" prefWidth="1165.0">
     <top>
@@ -336,13 +315,12 @@
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                   </padding>
                 </HBox>
-                <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Code" prefWidth="50.0"/>
-                  <TextField prefHeight="25.0" prefWidth="100.0" fx:id="textFieldCandidateCode"/>
+                <Label text="Aliases, codes, and other spellings (one per line):">
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
-                </HBox>
+                </Label>
+                <TextArea fx:id="textAreaCandidateAliases" prefHeight="200.0" prefWidth="200.0" />
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <CheckBox fx:id="checkBoxCandidateExcluded" mnemonicParsing="false"
                     text="Excluded">
@@ -374,8 +352,8 @@
                   <columns>
                     <TableColumn fx:id="tableColumnCandidateName" minWidth="20.0"
                       prefWidth="230.0" text="Name"/>
-                    <TableColumn fx:id="tableColumnCandidateCode" minWidth="20.0"
-                      prefWidth="100.0" text="Code"/>
+                    <TableColumn fx:id="tableColumnCandidateAliases" minWidth="20.0"
+                      prefWidth="200.0" text="Aliases / Codes" />
                     <TableColumn fx:id="tableColumnCandidateExcluded" minWidth="20.0"
                       prefWidth="100.0" text="Excluded"/>
                   </columns>

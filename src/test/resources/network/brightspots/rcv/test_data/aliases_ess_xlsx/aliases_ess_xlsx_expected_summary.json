@@ -1,0 +1,47 @@
+{
+  "config" : {
+    "contest" : "Aliases test (ES&S XLSX Format)",
+    "date" : "2023-04-28",
+    "jurisdiction" : "",
+    "office" : "",
+    "threshold" : "5"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "A" : "3",
+      "B-2" : "3",
+      "C" : "2",
+      "D" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "A" : "3",
+      "B-2" : "3",
+      "C" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "C",
+      "transfers" : {
+        "A" : "2"
+      }
+    } ]
+  }, {
+    "round" : 3,
+    "tally" : {
+      "A" : "5",
+      "B-2" : "3"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    } ]
+  } ]
+}
