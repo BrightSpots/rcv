@@ -149,8 +149,6 @@ class DominionCvrReader extends BaseCvrReader {
         Logger.severe("No precinct data found!");
         throw new CvrParseException();
       }
-
-      precinctIds.addAll(this.precincts.values());
     }
     Path precinctPortionPath = Paths.get(cvrPath, PRECINCT_PORTION_MANIFEST);
     this.precinctPortions = getPrecinctData(precinctPortionPath.toString());
@@ -278,10 +276,6 @@ class DominionCvrReader extends BaseCvrReader {
       }
       String precinctPortion = this.precinctPortions.get(precinctPortionId);
       String ballotTypeId = adjudicatedData.get("BallotTypeId").toString();
-
-      if (precinct == null && precinctPortion != null) {
-        precinct = precinctPortion;
-      }
 
       ArrayList cardsList;
       // sometimes there is a "Cards" object at this level

@@ -852,6 +852,11 @@ class Tabulator {
           selectedCandidate,
           cvr.getFractionalTransferValue());
       if (config.isTabulateByPrecinctEnabled()) {
+        if (precinctNames.size() == 0) {
+          Logger.severe("\"Tabulate by Precinct\" enabled, but CVRs don't list precincts.");
+          throw new TabulationAbortedException(false);
+        }
+
         String precinctName = cvr.getPrecinct();
         TallyTransfers precinctTallyTransfer = precinctTallyTransfers.get(precinctName);
         if (precinctTallyTransfer == null) {
