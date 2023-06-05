@@ -40,6 +40,7 @@ abstract class BaseCvrReader {
   abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
       throws CastVoteRecord.CvrParseException, IOException;
 
+  // Any reader-specific validations can override this function.
   public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {}
 
