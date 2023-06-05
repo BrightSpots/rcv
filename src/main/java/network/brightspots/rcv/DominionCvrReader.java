@@ -208,8 +208,7 @@ class DominionCvrReader extends BaseCvrReader {
           String candidateName = config.getNameForCandidate(candidateId);
           // Note: candidateId is replaced with Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL when
           // reading in the CVRs.
-          if (candidateId.equals(source.getOvervoteLabel())
-              || candidateId.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
+          if (candidateId.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             continue;
           }
           if (!candidates.contains(candidateName)) {
