@@ -31,18 +31,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
-import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 @SuppressWarnings({"rawtypes", "unused", "RedundantSuppression"})
 class CommonDataFormatReader extends BaseCvrReader {
   private static final String STATUS_NO = "no";
   private static final String BOOLEAN_TRUE = "true";
-  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
   CommonDataFormatReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
@@ -101,14 +98,14 @@ class CommonDataFormatReader extends BaseCvrReader {
 
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
-      throws UnrecognizedCandidatesException, CvrParseException {
+      throws CvrParseException {
     try {
       if (cvrPath.endsWith(".xml")) {
         parseXml(castVoteRecords);
       } else if (cvrPath.endsWith(".json")) {
         parseJson(castVoteRecords);
       }
-    } catch (CvrParseException | UnrecognizedCandidatesException e) {
+    } catch (CvrParseException e) {
       throw e;
     } catch (Exception e) {
       Logger.severe("Unknown error. Cannot load file.");
@@ -183,7 +180,7 @@ class CommonDataFormatReader extends BaseCvrReader {
   }
 
   void parseXml(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException, IOException, UnrecognizedCandidatesException {
+      throws CvrParseException, IOException {
     // load XML
     XmlMapper xmlMapper = new XmlMapper();
     xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -301,9 +298,6 @@ class CommonDataFormatReader extends BaseCvrReader {
               candidateName = candidate.Name;
               if (candidateName.equals(source.getOvervoteLabel())) {
                 candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-              } else if (config.getNameForCandidate(candidateName) == null) {
-                Logger.severe("Unrecognized candidate found in CVR: %s", candidateName);
-                unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
               }
             }
             parseRankings(cvr, contest, rankings, cvrContestSelection, candidateName);
@@ -332,9 +326,6 @@ class CommonDataFormatReader extends BaseCvrReader {
         if (castVoteRecords.size() % 50000 == 0) {
           Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
-      }
-      if (unrecognizedCandidateCounts.size() > 0) {
-        throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
       }
     }
   }
@@ -377,7 +368,7 @@ class CommonDataFormatReader extends BaseCvrReader {
 
   // parse cdf json CastVoteRecordReport into CastVoteRecords and append them to input list
   void parseJson(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException, UnrecognizedCandidatesException {
+      throws CvrParseException {
 
     // static election data
     HashMap<Object, Object> candidates = new HashMap<>();
@@ -489,9 +480,6 @@ class CommonDataFormatReader extends BaseCvrReader {
           candidateName = (String) candidate.get("Name");
           if (candidateName.equals(source.getOvervoteLabel())) {
             candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-          } else if (this.config.getNameForCandidate(candidateName) == null) {
-            Logger.severe("Unrecognized candidate found in CVR: %s", candidateName);
-            unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
           }
         }
 
@@ -549,10 +537,6 @@ class CommonDataFormatReader extends BaseCvrReader {
       if (castVoteRecords.size() % 50000 == 0) {
         Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
       }
-    } // for (Object cvr : cvrs) {
-
-    if (unrecognizedCandidateCounts.size() > 0) {
-      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 

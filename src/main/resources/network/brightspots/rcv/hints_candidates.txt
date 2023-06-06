@@ -1,5 +1,9 @@
 Hints for this tab
 
+For Automatic Entry:
+"Auto-Load": Parse the CVR files provided in the CVR tab to load all candidate names found in those files.
+
+For Manual Entry:
 Fill in the fields and click the Add button:
 
 Name (required): E.g.: Dave Harris.

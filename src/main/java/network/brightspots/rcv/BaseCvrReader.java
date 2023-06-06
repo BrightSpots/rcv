@@ -17,8 +17,11 @@
 package network.brightspots.rcv;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import javafx.util.Pair;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 
 abstract class BaseCvrReader {
@@ -35,9 +38,31 @@ abstract class BaseCvrReader {
   // parse CVR for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
   abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
-      throws CastVoteRecord.CvrParseException,
-          TabulatorSession.UnrecognizedCandidatesException,
-          IOException;
+      throws CastVoteRecord.CvrParseException, IOException;
+
+  // Any reader-specific validations can override this function.
+  public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
+      throws CastVoteRecord.CvrParseException {}
+
+  // Gather candidate names from the CVR that are not in the config.
+  Map<String, Integer> gatherUnknownCandidates(List<CastVoteRecord> castVoteRecords) {
+    Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
+    for (CastVoteRecord cvr : castVoteRecords) {
+      for (Pair<Integer, CandidatesAtRanking> ranking : cvr.candidateRankings) {
+        for (String candidateName : ranking.getValue()) {
+          if (candidateName.equals(source.getUndeclaredWriteInLabel())
+              || candidateName.equals(source.getOvervoteLabel())
+              || config.getNameForCandidate(candidateName) != null) {
+            continue;
+          }
+
+          unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
+        }
+      }
+    }
+
+    return unrecognizedCandidateCounts;
+  }
 
   // Human-readable name for output logs
   public abstract String readerName();
