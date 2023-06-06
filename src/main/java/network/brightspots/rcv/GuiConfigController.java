@@ -1388,47 +1388,51 @@ public class GuiConfigController implements Initializable {
     @Override
     protected Task<Void> createTask() {
       Task<Void> task =
-              new Task<>() {
-                @Override
-                protected Void call() {
-                  // Gather unloaded names from each of the sources and place into the HashSet
-                  Set<String> unloadedNames = new HashSet<>();
-                  for (CvrSource source : sources) {
-                    Provider provider = ContestConfig.getProvider(source);
-                    try {
-                      List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-                      BaseCvrReader reader = provider.constructReader(config, source);
-                      reader.readCastVoteRecords(castVoteRecords, new HashSet<>());
-                      unloadedNames.addAll(
-                          reader.gatherUnknownCandidates(castVoteRecords).keySet());
-                    } catch (ContestConfig.UnrecognizedProviderException e) {
-                      Logger.severe(
-                          "Unrecognized provider \"%s\" in source file \"%s\": %s",
-                          source.getProvider(), source.getFilePath(), e.getMessage());
-                    } catch (CastVoteRecord.CvrParseException | IOException e) {
-                      Logger.severe("Failed to read source file \"%s\": ",
-                          source.getFilePath(), e.getMessage());
-                    }
-                  }
-
-                  // Validate each name and add to the table of candidates
-                  int successCount = 0;
-                  for (String name : unloadedNames) {
-                    Candidate candidate = new Candidate(name, null, false);
-                    Set<ValidationError> validationErrors =
-                            ContestConfig.performBasicCandidateValidation(candidate);
-                    if (validationErrors.isEmpty()) {
-                      tableViewCandidates.getItems().add(candidate);
-                      successCount++;
-                    } else {
-                      Logger.warning("Candidate \"%s\" failed to load.", name);
-                    }
-                  }
-
-                  Logger.info("Auto-loaded %d candidates.", successCount);
-                  return null;
+          new Task<>() {
+            @Override
+            protected Void call() {
+              Logger.info("Auto-loading candidates from CVR files...");
+              if (sources.isEmpty()) {
+                Logger.warning("No CVR files specified!");
+                return null;
+              }
+              // Gather unloaded names from each of the sources and place into the HashSet
+              Set<String> unloadedNames = new HashSet<>();
+              for (CvrSource source : sources) {
+                Provider provider = ContestConfig.getProvider(source);
+                try {
+                  List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+                  BaseCvrReader reader = provider.constructReader(config, source);
+                  reader.readCastVoteRecords(castVoteRecords, new HashSet<>());
+                  unloadedNames.addAll(reader.gatherUnknownCandidates(castVoteRecords).keySet());
+                } catch (ContestConfig.UnrecognizedProviderException e) {
+                  Logger.severe(
+                      "Unrecognized provider \"%s\" in source file \"%s\": %s",
+                      source.getProvider(), source.getFilePath(), e.getMessage());
+                } catch (CastVoteRecord.CvrParseException | IOException e) {
+                  Logger.severe(
+                      "Failed to read source file \"%s\": ", source.getFilePath(), e.getMessage());
                 }
-              };
+              }
+
+              // Validate each name and add to the table of candidates
+              int successCount = 0;
+              for (String name : unloadedNames) {
+                Candidate candidate = new Candidate(name, null, false);
+                Set<ValidationError> validationErrors =
+                    ContestConfig.performBasicCandidateValidation(candidate);
+                if (validationErrors.isEmpty()) {
+                  tableViewCandidates.getItems().add(candidate);
+                  successCount++;
+                } else {
+                  Logger.severe("Failed to load candidate \"%s\"!", name);
+                }
+              }
+
+              Logger.info("Auto-loaded %d candidates.", successCount);
+              return null;
+            }
+          };
       task.setOnFailed(
               arg0 ->
                       Logger.severe(
