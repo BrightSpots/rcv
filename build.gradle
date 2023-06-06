@@ -123,19 +123,23 @@ jlink {
           '--verbose',
           '--vendor', 'Ranked Choice Voting Resource Center'
         ]
-        if (org.gradle.internal.os.OperatingSystem.current().linux) {
+        if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
             installerOptions += [
               '--linux-package-name', 'rctab',
               '--linux-deb-maintainer', 'info@rcvresources.org',
               '--linux-shortcut'
             ]
         }
-        if (org.gradle.internal.os.OperatingSystem.current().windows) {
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
             installerOptions += [
               '--win-per-user-install',
               '--win-dir-chooser',
               '--win-menu',
               '--win-shortcut'
+            ]
+        }
+        if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+            installerOptions += [
             ]
         }
     }

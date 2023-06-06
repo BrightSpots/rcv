@@ -35,7 +35,7 @@ jobs:
           elif [ ${{ runner.os }} == 'Linux' ]; then
             echo "EXT=.deb" >> $GITHUB_OUTPUT
           else
-            echo "EXT=.dmg" >> $GITHUB_OUTPUT
+            echo "EXT=.app" >> $GITHUB_OUTPUT
           fi
       - name: "Get jpackage output filepath"
         id: jpackagefn
@@ -50,7 +50,7 @@ jobs:
           elif [ ${{ runner.os }} == 'Linux' ]; then
             echo "FILEPATH=build/jpackage/rctab_1.3.1-1_amd64.deb" >> $GITHUB_OUTPUT
           else
-            echo "FILEPATH=build/jpackage/RCTab-1.3.1.dmg" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/RCTab.app" >> $GITHUB_OUTPUT
           fi
       - name: "Create executable filename"
         id: exefn
@@ -97,7 +97,6 @@ jobs:
           security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $PWD build.keychain
           /usr/bin/codesign --force -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }} -v
-
 
       - uses: actions/upload-artifact@v3
         with:
