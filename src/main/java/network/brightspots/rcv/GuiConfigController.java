@@ -1403,7 +1403,7 @@ public class GuiConfigController implements Initializable {
                 try {
                   List<CastVoteRecord> castVoteRecords = new ArrayList<>();
                   BaseCvrReader reader = provider.constructReader(config, source);
-                  reader.readCastVoteRecords(castVoteRecords, new HashSet<>());
+                  reader.readCastVoteRecords(castVoteRecords);
                   unloadedNames.addAll(reader.gatherUnknownCandidates(castVoteRecords).keySet());
                 } catch (ContestConfig.UnrecognizedProviderException e) {
                   Logger.severe(
