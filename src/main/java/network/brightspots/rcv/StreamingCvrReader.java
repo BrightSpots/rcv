@@ -22,17 +22,14 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
@@ -66,8 +63,6 @@ class StreamingCvrReader extends BaseCvrReader {
   private final String undervoteLabel;
   private final String undeclaredWriteInLabel;
   private final boolean treatBlankAsUndeclaredWriteIn;
-  // map for tracking unrecognized candidates during parsing
-  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // used for generating CVR IDs
   private int cvrIndex = 0;
   // list of currentRankings for CVR in progress
@@ -248,10 +243,6 @@ class StreamingCvrReader extends BaseCvrReader {
             candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           } else if (candidate.equals(undeclaredWriteInLabel)) {
             candidate = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-          } else if (config.getNameForCandidate(candidate) == null) {
-            // This is an unrecognized candidate, so add it to the unrecognized candidate map.
-            // This helps identify problems with CVRs.
-            unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
           }
           Pair<Integer, String> ranking = new Pair<>(currentRank, candidate);
           currentRankings.add(ranking);
@@ -264,7 +255,7 @@ class StreamingCvrReader extends BaseCvrReader {
 
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-      throws UnrecognizedCandidatesException, CastVoteRecord.CvrParseException, IOException {
+      throws CastVoteRecord.CvrParseException, IOException {
     try {
       parseCvrFileInternal(castVoteRecords);
     } catch (OpenXML4JException | SAXException | ParserConfigurationException e) {
@@ -284,8 +275,7 @@ class StreamingCvrReader extends BaseCvrReader {
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
   private void parseCvrFileInternal(List<CastVoteRecord> castVoteRecords)
-      throws UnrecognizedCandidatesException,
-          OpenXML4JException,
+      throws OpenXML4JException,
           SAXException,
           IOException,
           ParserConfigurationException,
@@ -350,10 +340,6 @@ class StreamingCvrReader extends BaseCvrReader {
     xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));
     // close zip file without saving
     pkg.revert();
-
-    if (unrecognizedCandidateCounts.size() > 0) {
-      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
-    }
 
     if (encounteredDataErrors) {
       throw new CvrDataFormatException();
