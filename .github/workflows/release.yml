@@ -3,6 +3,9 @@ name: Build Releases
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - 'feature/issue-57_standalone-executable'
 
 jobs:
   release:
@@ -78,6 +81,23 @@ jobs:
           gradle-command: jpackage
           intermediate-filepath: ${{ steps.jpackagefn.outputs.FILEPATH }}
           final-filepath: ${{ steps.exefn.outputs.FILEPATH }}
+
+      - name: Codesign executable
+        if: matrix.os == 'macOS-latest'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          export PWD=temporary-password-to-avoid-GUI-prompt
+          export IDENTITY_PUBLIC_KEY=A257HB4NS4
+          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+          security create-keychain -p $PWD build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p $PWD build.keychain
+          security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $PWD build.keychain
+          /usr/bin/codesign --force -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }} -v
+
 
       - uses: actions/upload-artifact@v3
         with:
