@@ -140,6 +140,12 @@ jlink {
         }
         if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
             installerOptions += [
+              '--type', 'dmg',
+              '--mac-sign',
+              '--mac-signing-key-user-name', 'Developer ID Installer: Election Administration Resource Center (A257HB4NS4)',
+              '--mac-signing-keychain', 'build.keychain',
+              '--mac-package-name', 'RCTab',
+              '--mac-package-signing-prefix', 'network.brightspots.rcv'
             ]
         }
     }

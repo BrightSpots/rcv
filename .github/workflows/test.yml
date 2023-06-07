@@ -1,4 +1,4 @@
-name: Run Build, Lint, and Test
+name: Build, Lint, and Test
 
 on: [push]
 

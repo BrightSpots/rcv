@@ -1,6 +1,9 @@
 name: Run gradle command and create SHA512
 
 inputs:
+  build-keychain-password:
+    required: false
+    type: string
   gradle-command:
     required: true
     type: string
@@ -15,9 +18,16 @@ runs:
   using: "composite"
   steps:
     - name: "Run gradle command"
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      with:
-        arguments: ${{ inputs.gradle-command }}
+      shell: bash
+      run: |
+        if [ $(which security) ] && [ "${{ inputs.build-keychain-password }}" != "" ]; then
+          echo "Unlocking keychain"
+          security default-keychain -s build.keychain
+          security unlock-keychain -p ${{ inputs.build-keychain-password }} build.keychain
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ inputs.build-keychain-password }} build.keychain
+        fi
+        ./gradlew ${{ inputs.gradle-command }}
+
     - name: "Rename output file"
       shell: bash
       run: mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
