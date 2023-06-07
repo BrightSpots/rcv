@@ -72,7 +72,7 @@ class Tabulator {
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // precincts which may appear in the cast vote records
-  private final Set<String> precinctNames = new HashSet<>();
+  private final Set<String> precinctIds = new HashSet<>();
   // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
   // tracks required winning threshold
@@ -84,9 +84,9 @@ class Tabulator {
     this.config = config;
 
     for (CastVoteRecord cvr : castVoteRecords) {
-      String precinctName = cvr.getPrecinct();
-      if (precinctName != null) {
-        precinctNames.add(precinctName);
+      String precinctId = cvr.getPrecinct();
+      if (precinctId != null) {
+        precinctIds.add(precinctId);
       }
     }
 
@@ -685,7 +685,7 @@ class Tabulator {
             .setContestConfig(config)
             .setTimestampString(timestamp)
             .setWinningThreshold(winningThreshold)
-            .setPrecinctIds(precinctNames)
+            .setPrecinctIds(precinctIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
     writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, castVoteRecords.size());
@@ -1071,10 +1071,10 @@ class Tabulator {
   }
 
   private void initPrecinctRoundTallies() {
-    for (String precinctName : precinctNames) {
-      precinctRoundTallies.put(precinctName, new HashMap<>());
-      precinctTallyTransfers.put(precinctName, new TallyTransfers());
-      assert !isNullOrBlank(precinctName);
+    for (String precinctId : precinctIds) {
+      precinctRoundTallies.put(precinctId, new HashMap<>());
+      precinctTallyTransfers.put(precinctId, new TallyTransfers());
+      assert !isNullOrBlank(precinctId);
     }
   }
 
