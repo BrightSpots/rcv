@@ -32,6 +32,7 @@
 
 package network.brightspots.rcv;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -59,6 +60,7 @@ class Logger {
   private static final java.util.logging.Formatter formatter = new LogFormatter();
   private static java.util.logging.Logger logger;
   private static java.util.logging.FileHandler tabulationHandler;
+  private static String tabulationLogPattern;
 
   static void setup() {
     logger = java.util.logging.Logger.getLogger("");
@@ -95,7 +97,7 @@ class Logger {
       throws IOException {
     // log file name is: outputFolder + timestamp + log index
     // FileHandler requires % to be encoded as %%.  %g is the log index
-    String tabulationLogPattern =
+    tabulationLogPattern =
             Paths.get(outputFolder.replace("%", "%%"),
                     String.format("%s_audit_%%g.log", timestampString))
                     .toAbsolutePath()
@@ -116,6 +118,16 @@ class Logger {
     tabulationHandler.flush();
     tabulationHandler.close();
     logger.removeHandler(tabulationHandler);
+
+    int index = 0;
+    while (true) {
+      File file = new File(tabulationLogPattern.replace("%g", String.valueOf(index)));
+      if (!file.exists()) {
+        break;
+      }
+      assert file.setReadOnly();
+      index++;
+    }
   }
 
   static void fine(String message, Object... obj) {

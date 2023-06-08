@@ -116,6 +116,7 @@ class ResultsWriter {
 
     try {
       jsonWriter.writeValue(outFile, json);
+      assert outFile.setReadOnly();
     } catch (IOException exception) {
       Logger.severe(
           "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
@@ -381,6 +382,9 @@ class ResultsWriter {
     try {
       csvPrinter.flush();
       csvPrinter.close();
+
+      File file = new File(csvPath);
+      assert file.setReadOnly();
     } catch (IOException exception) {
       Logger.severe("Error saving file: %s\n%s", outputPath, exception);
       throw exception;
@@ -549,6 +553,9 @@ class ResultsWriter {
         csvPrinter.close();
         filesWritten.add(outputPath.toString());
         Logger.info("Successfully wrote: %s", outputPath.toString());
+
+        File file = new File(outputPath.toString());
+        assert file.setReadOnly();
       }
     } catch (IOException exception) {
       Logger.severe(
