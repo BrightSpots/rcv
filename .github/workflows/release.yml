@@ -35,7 +35,7 @@ jobs:
           elif [ ${{ runner.os }} == 'Linux' ]; then
             echo "EXT=.deb" >> $GITHUB_OUTPUT
           else
-            echo "EXT=.app" >> $GITHUB_OUTPUT
+            echo "EXT=.dmg" >> $GITHUB_OUTPUT
           fi
       - name: "Get jpackage output filepath"
         id: jpackagefn
@@ -50,7 +50,7 @@ jobs:
           elif [ ${{ runner.os }} == 'Linux' ]; then
             echo "FILEPATH=build/jpackage/rctab_1.3.1-1_amd64.deb" >> $GITHUB_OUTPUT
           else
-            echo "FILEPATH=build/jpackage/RCTab.app" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/RCTab-1.3.1.dmg" >> $GITHUB_OUTPUT
           fi
       - name: "Create executable filename"
         id: exefn
@@ -97,7 +97,6 @@ jobs:
       - name: "Create executable with jpackage (and sign, on MacOS)"
         uses: ./.github/actions/gradle-and-sha
         with:
-          build-keychain-password: temporary-password-to-avoid-GUI-prompt
           gradle-command: jpackage
           intermediate-filepath: ${{ steps.jpackagefn.outputs.FILEPATH }}
           final-filepath: ${{ steps.exefn.outputs.FILEPATH }}
@@ -114,7 +113,12 @@ jobs:
           security unlock-keychain -p temporary-password-to-avoid-GUI-prompt build.keychain
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temporary-password-to-avoid-GUI-prompt build.keychain
           echo "Sign all necessary files"
-          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }} -v
+          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/runtime/Contents/Home/lib/* -v
+          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/runtime/Contents/Home/lib/*/* -v
+          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/runtime/Contents/Home/bin/* -v
+          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/runtime/Contents/MacOS/libjli.dylib -v
+          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/MacOS/RCTab -v
+          ##codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }} -v
           #echo "Create keychain profile"
           #xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_PWD"
           #echo "Creating temp notarization archive"
