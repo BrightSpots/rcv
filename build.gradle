@@ -124,6 +124,10 @@ jlink {
           '--vendor', 'Ranked Choice Voting Resource Center'
         ]
         if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
+            imageOptions += [
+              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.png',
+            ]
+
             installerOptions += [
               '--linux-package-name', 'rctab',
               '--linux-deb-maintainer', 'info@rcvresources.org',
@@ -131,6 +135,10 @@ jlink {
             ]
         }
         if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            imageOptions += [
+              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.png',
+            ]
+
             installerOptions += [
               '--win-per-user-install',
               '--win-dir-chooser',
@@ -139,8 +147,20 @@ jlink {
             ]
         }
         if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+            // .App is signed with the Application certificate
+            imageOptions += [
+              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
+              '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
+              '--mac-sign',
+              '--mac-signing-key-user-name', 'Developer ID Application: Election Administration Resource Center (A257HB4NS4',
+              '--mac-signing-keychain', 'build.keychain'
+            ]
+
+            // DMG is signed with the Installer certificate
             installerOptions += [
               '--type', 'dmg', 
+              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
+              '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
               '--mac-sign',
               '--mac-signing-key-user-name', 'Developer ID Installer: Election Administration Resource Center (A257HB4NS4)',
               '--mac-signing-keychain', 'build.keychain',

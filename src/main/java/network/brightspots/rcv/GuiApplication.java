@@ -39,12 +39,13 @@ class GuiApplication extends Application {
     context.setMainWindow(window);
 
     String resourcePath = "/network/brightspots/rcv/GuiConfigLayout.fxml";
+    String iconPath = "/network/brightspots/rcv/launcher.png";
     try {
       Parent root = FXMLLoader.load(getClass().getResource(resourcePath));
       window.setTitle(Main.APP_NAME);
       window.setScene(new Scene(root));
 
-      Image icon = new Image(getClass().getResourceAsStream("/network/brightspots/rcv/icon.png"));
+      Image icon = new Image(getClass().getResourceAsStream(iconPath));
       window.getIcons().add(icon);
     } catch (IOException exception) {
       StringWriter sw = new StringWriter();

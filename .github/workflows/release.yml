@@ -112,21 +112,14 @@ jobs:
           echo "Unlock keychain"
           security unlock-keychain -p temporary-password-to-avoid-GUI-prompt build.keychain
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temporary-password-to-avoid-GUI-prompt build.keychain
-          echo "Sign all necessary files"
-          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/runtime/Contents/Home/lib/* -v
-          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/runtime/Contents/Home/lib/*/* -v
-          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/runtime/Contents/Home/bin/* -v
-          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/runtime/Contents/MacOS/libjli.dylib -v
-          #codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }}/Contents/MacOS/RCTab -v
-          ##codesign --deep --force --timestamp --options runtime -s $IDENTITY_PUBLIC_KEY ${{ steps.exefn.outputs.FILEPATH }} -v
-          #echo "Create keychain profile"
-          #xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_PWD"
-          #echo "Creating temp notarization archive"
-          #ditto -c -k --sequesterRsrc --keepParent ${{ steps.exefn.outputs.FILEPATH }} "notarization.zip"
-          #echo "Notarize app -- this may take a few minutes"
-          #xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait
-          #echo "Attach staple"
-          #xcrun stapler staple ${{ steps.exefn.outputs.FILEPATH }}
+          echo "Create keychain profile"
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_PWD"
+          echo "Creating temp notarization archive"
+          ditto -c -k --sequesterRsrc --keepParent ${{ steps.exefn.outputs.FILEPATH }} "notarization.zip"
+          echo "Notarize app -- this may take a few minutes"
+          xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait
+          echo "Attach staple"
+          xcrun stapler staple ${{ steps.exefn.outputs.FILEPATH }}
 
       - uses: actions/upload-artifact@v3
         with:
