@@ -453,10 +453,11 @@ public class GuiConfigController implements Initializable {
    * changes, and creates and launches TabulatorService from the saved config path.
    */
   public void menuItemTabulateClicked() {
-    if (checkForSaveAndExecute()) {
+    String filepath = commitConfigToFileAndGetFilepath();
+    if (filepath != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
-        TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
+        TabulatorService service = new TabulatorService(filepath);
         setUpAndStartService(service);
       } else {
         Logger.warning("Please load a contest config file before attempting to tabulate!");
@@ -469,10 +470,11 @@ public class GuiConfigController implements Initializable {
    * create and launches ConvertToCdfService from the saved config path.
    */
   public void menuItemConvertToCdfClicked() {
-    if (checkForSaveAndExecute()) {
+    String filepath = commitConfigToFileAndGetFilepath();
+    if (filepath != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
-        ConvertToCdfService service = new ConvertToCdfService(selectedFile.getAbsolutePath());
+        ConvertToCdfService service = new ConvertToCdfService(filepath);
         setUpAndStartService(service);
       } else {
         Logger.warning(
@@ -906,13 +908,13 @@ public class GuiConfigController implements Initializable {
         needsSaving = false;
       } else if (GuiContext.getInstance().getConfig() != null) {
         // Compare to version currently saved on the hard drive
+        RawContestConfig configFromFile = JsonParser.readFromFileWithoutLogging(
+                selectedFile.getAbsolutePath(), RawContestConfig.class);
         String savedConfigString =
             new ObjectMapper()
                 .writer()
                 .withDefaultPrettyPrinter()
-                .writeValueAsString(
-                    JsonParser.readFromFileWithoutLogging(
-                        selectedFile.getAbsolutePath(), RawContestConfig.class));
+                .writeValueAsString(configFromFile);
         needsSaving = !currentConfigString.equals(savedConfigString);
       }
     } catch (JsonProcessingException exception) {
@@ -953,29 +955,35 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private boolean checkForSaveAndExecute() {
-    boolean willContinue = false;
+  private String commitConfigToFileAndGetFilepath() {
+    String filename = null;
     if (checkIfNeedsSaving()) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
+      ButtonType dontSaveButton = new ButtonType("Proceed without Saving", ButtonBar.ButtonData.NO);
       Alert alert =
           new Alert(
               AlertType.WARNING,
               "You must either save your changes before continuing or load a new contest config!",
               saveButton,
-              ButtonType.CANCEL);
+              dontSaveButton);
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
       if (result.isPresent() && result.get() == saveButton) {
         File fileToSave = getSaveFile();
         if (fileToSave != null) {
           saveFile(fileToSave);
-          willContinue = true;
+          filename = fileToSave.getAbsolutePath();
         }
+      } else if (result.get() == dontSaveButton) {
+        File tempFile = new File(selectedFile.getAbsolutePath() + "_temp");
+        filename = tempFile.getAbsolutePath();
+        saveFile(tempFile);
+        tempFile.deleteOnExit();
       }
     } else {
-      willContinue = true;
+      filename = selectedFile.getAbsolutePath();
     }
-    return willContinue;
+    return filename;
   }
 
   @Override
