@@ -502,7 +502,8 @@ class Tabulator {
               && currentRoundCandidateToTally.size() - 1 == config.getNumberOfWinners()) {
           // Edge case: if nobody meets the threshold, but we're on the penultimate round when
           // isFirstRoundDeterminesThresholdEnabled is true, select the max vote getters as
-          // the winners.
+          // the winners. If isFirstRoundDeterminesThresholdEnabled isn't enabled, it should be
+          // impossible for a single-winner election to end up here.
           BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
           selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
         } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
@@ -512,10 +513,11 @@ class Tabulator {
       }
 
       // Edge case: if we've identified multiple winners in this round, but we're only supposed to
-      // elect one winner per round, pick the top vote-getter. If this is a multi-winner election,
-      // defer the others to subsequent rounds. If this is a single-winner election where its
-      // possible  for no candidate to reach the threshold (i.e. "first round determines threshold"
-      // is set), the tiebreaker will choose the only winner.
+      // elect one winner per round, pick the top vote-getter.
+      // * If this is a multi-winner election, defer the others to subsequent rounds.
+      // * If this is a single-winner election in which it's possible for no candidate to reach the
+      //   threshold (i.e. "first round determines threshold" is set), the tiebreaker will choose
+      //   the only winner.
       boolean useTiebreakerIfNeeded = config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
           || config.isFirstRoundDeterminesThresholdEnabled();
       if (useTiebreakerIfNeeded && selectedWinners.size() > 1) {
