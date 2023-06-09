@@ -852,23 +852,24 @@ class Tabulator {
           selectedCandidate,
           cvr.getFractionalTransferValue());
       if (config.isTabulateByPrecinctEnabled()) {
-        if (precinctNames.size() == 0) {
+        if (precinctIds.size() == 0) {
           Logger.severe("\"Tabulate by Precinct\" enabled, but CVRs don't list precincts.");
           throw new TabulationAbortedException(false);
         }
 
-        String precinctName = cvr.getPrecinct();
-        TallyTransfers precinctTallyTransfer = precinctTallyTransfers.get(precinctName);
+        String precinctId = cvr.getPrecinct();
+        TallyTransfers precinctTallyTransfer = precinctTallyTransfers.get(precinctId);
         if (precinctTallyTransfer == null) {
-          Logger.severe("Precinct \"%s\" is not among the %d known precincts.",
-                  precinctName, precinctNames.size());
+          Logger.severe(
+              "Precinct \"%s\" is not among the %d known precincts.",
+              precinctId, precinctIds.size());
           throw new TabulationAbortedException(false);
         }
         precinctTallyTransfer.addTransfer(
-                currentRound,
-                cvr.getCurrentRecipientOfVote(),
-                selectedCandidate,
-                cvr.getFractionalTransferValue());
+            currentRound,
+            cvr.getCurrentRecipientOfVote(),
+            selectedCandidate,
+            cvr.getFractionalTransferValue());
       }
     }
 
