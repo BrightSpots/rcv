@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javafx.util.Pair;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 
@@ -37,7 +36,7 @@ abstract class BaseCvrReader {
 
   // parse CVR for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
-  abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException, IOException;
 
   // Any reader-specific validations can override this function.
