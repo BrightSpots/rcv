@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -285,20 +287,34 @@ public class GuiConfigController implements Initializable {
 
   private static String loadTxtFileIntoString(String configFileDocumentationFilename) {
     String text;
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(
-        ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename)),
-        StandardCharsets.UTF_8))) {
+    try (BufferedReader reader =
+        new BufferedReader(
+            new InputStreamReader(
+                Objects.requireNonNull(
+                    ClassLoader.getSystemResourceAsStream(configFileDocumentationFilename)),
+                StandardCharsets.UTF_8))) {
       text = reader.lines().collect(Collectors.joining("\n"));
     } catch (Exception exception) {
-      Logger.severe(
-          "Error loading text file: %s\n%s",
-          configFileDocumentationFilename,
-          exception);
-      text =
-          String.format(
-              "<Error loading text file: %s>", configFileDocumentationFilename);
+      Logger.severe("Error loading text file: %s\n%s", configFileDocumentationFilename, exception);
+      text = String.format("<Error loading text file: %s>", configFileDocumentationFilename);
     }
     return text;
+  }
+
+  private static void addErrorStyling(Control control) {
+    if (control instanceof CheckBox) {
+      control.getStyleClass().add("check-box-error");
+    } else {
+      control.getStyleClass().add("error");
+    }
+  }
+
+  private static void clearErrorStyling(Control control) {
+    if (control instanceof CheckBox) {
+      control.getStyleClass().removeAll("check-box-error");
+    } else {
+      control.getStyleClass().removeAll("error");
+    }
   }
 
   private String getOvervoteRuleChoice() {
@@ -540,22 +556,18 @@ public class GuiConfigController implements Initializable {
 
     Provider provider = getProviderChoice(choiceCvrProvider);
     switch (provider) {
-      case CDF -> {
-        selectedFiles = chooseFile(provider,
-            new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
-      }
-      case CLEAR_BALLOT, CSV -> {
-        selectedFiles = chooseFile(provider, new ExtensionFilter("CSV files", "*.csv"));
-      }
+      case CDF -> selectedFiles =
+          chooseFile(provider, new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
+      case CLEAR_BALLOT, CSV -> selectedFiles =
+          chooseFile(provider, new ExtensionFilter("CSV files", "*.csv"));
       case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         dc.setTitle("Select " + provider + " Cast Vote Record Folder");
         selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
-      case ESS -> {
-        selectedFiles = chooseFile(provider, new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
-      }
+      case ESS -> selectedFiles =
+          chooseFile(provider, new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
       default -> {
         // Do nothing for unhandled providers
       }
@@ -616,22 +628,6 @@ public class GuiConfigController implements Initializable {
     });
     // If any entries failed validation, preserve them in the text box so the user can try again
     textFieldCvrFilePath.setText(String.join(CVR_FILE_PATH_DELIMITER, failedFilePaths));
-  }
-
-  private static void addErrorStyling(Control control) {
-    if (control instanceof CheckBox) {
-      control.getStyleClass().add("check-box-error");
-    } else {
-      control.getStyleClass().add("error");
-    }
-  }
-
-  private static void clearErrorStyling(Control control) {
-    if (control instanceof CheckBox) {
-      control.getStyleClass().removeAll("check-box-error");
-    } else {
-      control.getStyleClass().removeAll("error");
-    }
   }
 
   private void clearBasicCvrValidationHighlighting() {
@@ -745,6 +741,18 @@ public class GuiConfigController implements Initializable {
     tableViewCvrFiles
         .getItems()
         .removeAll(tableViewCvrFiles.getSelectionModel().getSelectedItems());
+  }
+
+  /** Action when "Auto-Load Candidates" button is clicked. */
+  public void buttonAutoLoadCandidatesClicked() {
+    setGuiIsBusy(true);
+    ContestConfig config =
+          ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
+    AutoLoadCandidatesService service = new AutoLoadCandidatesService(
+          config,
+          tableViewCvrFiles.getItems(),
+          tableViewCandidates);
+    setUpAndStartService(service);
   }
 
   /**
@@ -1360,6 +1368,78 @@ public class GuiConfigController implements Initializable {
     config.rules = rules;
 
     return config;
+  }
+
+
+  private static class AutoLoadCandidatesService extends Service<Void> {
+
+    private final ContestConfig config;
+    private final List<CvrSource> sources;
+    private final TableView<Candidate> tableViewCandidates;
+
+    AutoLoadCandidatesService(ContestConfig config,
+                              List<CvrSource> sources,
+                              TableView<Candidate> tableViewCandidates) {
+      this.config = config;
+      this.sources = sources;
+      this.tableViewCandidates = tableViewCandidates;
+    }
+
+    @Override
+    protected Task<Void> createTask() {
+      Task<Void> task =
+          new Task<>() {
+            @Override
+            protected Void call() {
+              Logger.info("Auto-loading candidates from CVR files...");
+              if (sources.isEmpty()) {
+                Logger.warning("No CVR files specified!");
+                return null;
+              }
+              // Gather unloaded names from each of the sources and place into the HashSet
+              Set<String> unloadedNames = new HashSet<>();
+              for (CvrSource source : sources) {
+                Provider provider = ContestConfig.getProvider(source);
+                try {
+                  List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+                  BaseCvrReader reader = provider.constructReader(config, source);
+                  reader.readCastVoteRecords(castVoteRecords);
+                  unloadedNames.addAll(reader.gatherUnknownCandidates(castVoteRecords).keySet());
+                } catch (ContestConfig.UnrecognizedProviderException e) {
+                  Logger.severe(
+                      "Unrecognized provider \"%s\" in source file \"%s\": %s",
+                      source.getProvider(), source.getFilePath(), e.getMessage());
+                } catch (CastVoteRecord.CvrParseException | IOException e) {
+                  Logger.severe(
+                      "Failed to read source file \"%s\": ", source.getFilePath(), e.getMessage());
+                }
+              }
+
+              // Validate each name and add to the table of candidates
+              int successCount = 0;
+              for (String name : unloadedNames) {
+                Candidate candidate = new Candidate(name, null, false);
+                Set<ValidationError> validationErrors =
+                    ContestConfig.performBasicCandidateValidation(candidate);
+                if (validationErrors.isEmpty()) {
+                  tableViewCandidates.getItems().add(candidate);
+                  successCount++;
+                } else {
+                  Logger.severe("Failed to load candidate \"%s\"!", name);
+                }
+              }
+
+              Logger.info("Auto-loaded %d candidates.", successCount);
+              return null;
+            }
+          };
+      task.setOnFailed(
+              arg0 ->
+                      Logger.severe(
+                              "Error when trying to auto-load candidates:\n%s\nAuto-load failed!",
+                              task.getException()));
+      return task;
+    }
   }
 
 

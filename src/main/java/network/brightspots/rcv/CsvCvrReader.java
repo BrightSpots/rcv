@@ -22,12 +22,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javafx.util.Pair;
-import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -37,8 +34,6 @@ class CsvCvrReader extends BaseCvrReader {
   private final int firstVoteColumnIndex;
   // 0-based row index of first CVR
   private final int firstVoteRowIndex;
-  // map for tracking unrecognized candidates during parsing
-  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
 
   CsvCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
@@ -54,7 +49,7 @@ class CsvCvrReader extends BaseCvrReader {
   // parse CVR CSV file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-      throws CastVoteRecord.CvrParseException, IOException, UnrecognizedCandidatesException {
+      throws CastVoteRecord.CvrParseException, IOException {
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
       CSVParser parser =
           CSVParser.parse(
@@ -86,8 +81,6 @@ class CsvCvrReader extends BaseCvrReader {
           String candidateId = candidateIds.get(col);
           if (col == undeclaredWriteInColumn) {
             candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-          } else if (config.getNameForCandidate(candidateId) == null) {
-            unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
           }
           rankings.add(new Pair<>(rankAsInt, candidateId));
         }
@@ -100,10 +93,6 @@ class CsvCvrReader extends BaseCvrReader {
     } catch (IOException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
       throw exception;
-    }
-
-    if (unrecognizedCandidateCounts.size() > 0) {
-      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 }

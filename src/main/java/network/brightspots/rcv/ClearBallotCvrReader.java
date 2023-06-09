@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
-import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 class ClearBallotCvrReader extends BaseCvrReader {
   ClearBallotCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
@@ -45,10 +44,8 @@ class ClearBallotCvrReader extends BaseCvrReader {
   // see Clear Ballot 2.1 RCV Format Specification for details
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException, UnrecognizedCandidatesException, IOException {
+      throws CvrParseException, IOException {
     BufferedReader csvReader;
-    // map for tracking unrecognized candidates during parsing
-    Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
     try {
       csvReader = new BufferedReader(new FileReader(this.cvrPath, StandardCharsets.UTF_8));
       // each "choice column" in the input Csv corresponds to a unique ranking: candidate+rank pair
@@ -84,8 +81,6 @@ class ClearBallotCvrReader extends BaseCvrReader {
         String choiceName = choiceFields[RcvChoiceHeaderField.CHOICE_NAME.ordinal()];
         if (choiceName.equals(source.getUndeclaredWriteInLabel())) {
           choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-        } else if (!config.getCandidateNames().contains(choiceName)) {
-          unrecognizedCandidateCounts.merge(choiceName, 1, Integer::sum);
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
         if (rank > this.config.getMaxRankingsAllowed()) {
@@ -132,10 +127,6 @@ class ClearBallotCvrReader extends BaseCvrReader {
       csvReader.close();
     } catch (FileNotFoundException exception) {
       Logger.severe("Cast vote record file not found!\n%s", exception);
-    }
-
-    if (unrecognizedCandidateCounts.size() > 0) {
-      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 

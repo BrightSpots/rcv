@@ -24,16 +24,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javafx.util.Pair;
-import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 class HartCvrReader extends BaseCvrReader {
-  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
-
   HartCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
   }
@@ -47,7 +42,6 @@ class HartCvrReader extends BaseCvrReader {
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException,
-          TabulatorSession.UnrecognizedCandidatesException,
           IOException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
@@ -60,10 +54,6 @@ class HartCvrReader extends BaseCvrReader {
     } else {
       Logger.severe("Unable to find any files in directory: %s", cvrRoot.getAbsolutePath());
       throw new CastVoteRecord.CvrParseException();
-    }
-
-    if (unrecognizedCandidateCounts.size() > 0) {
-      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 
@@ -88,8 +78,6 @@ class HartCvrReader extends BaseCvrReader {
             String candidateName = option.Id;
             if (candidateName.equals(source.getUndeclaredWriteInLabel())) {
               candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-            } else if (config.getNameForCandidate(candidateName) == null) {
-              unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
             }
             // Hart RCV election ranks are indicated by a string read left to right:
             // each digit corresponds to a rank and is set to 1 if that rank was voted:
