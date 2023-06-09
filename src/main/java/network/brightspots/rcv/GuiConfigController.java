@@ -973,19 +973,27 @@ public class GuiConfigController implements Initializable {
     String filename = null;
     ConfigComparisonResult comparisonResult = compareConfigs();
     if (comparisonResult != ConfigComparisonResult.SAME) {
+      // Three possible buttons, but only Save/Cancel shown unless version is TEST
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
-      ButtonType dontSaveButton = new ButtonType("Proceed without Saving", ButtonBar.ButtonData.NO);
-      ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.NO);
-      ButtonType noButton = comparisonResult
-          == ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST ? dontSaveButton : cancelButton;
-      Alert alert =
-          new Alert(
-              AlertType.WARNING,
-              "You must either save your changes before continuing or load a new contest config!",
-              saveButton,
-              noButton);
+      ButtonType dontSaveButton = new ButtonType("Generate Temp File", ButtonBar.ButtonData.OTHER);
+      ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+      // Pop up either a two-button or three-button alert
+      Alert alert;
+      if (comparisonResult == ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST) {
+        alert = new Alert(AlertType.WARNING,
+            "You are using a test config. Either save the file, or generate a temporary file "
+            + "which will be deleted when the program exits",
+            saveButton, dontSaveButton, cancelButton);
+      } else {
+        alert = new Alert(AlertType.WARNING,
+            "You must either save your changes before continuing or load a new contest config!",
+            saveButton, cancelButton);
+      }
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
+
+      // Process the result, handling all three buttons and the "X"
       if (result.isPresent() && result.get() == saveButton) {
         File fileToSave = getSaveFile();
         if (fileToSave != null) {
