@@ -217,11 +217,6 @@ public class RawContestConfig {
     private boolean excluded;
     private List<String> aliases = new ArrayList<String>();
 
-    // The code is a special alias which is used in the output files instead of
-    // the display name. Other than output displays, it is not handled specially:
-    // it is just another alias.
-    private String code;
-
     Candidate() {
     }
 
@@ -251,20 +246,21 @@ public class RawContestConfig {
       this.aliases = new ArrayList<>(aliases);
     }
 
-    public String getCode() {
-      return code;
-    }
-
-    public void setCode(String code) {
-      this.code = code;
-    }
-
     public boolean isExcluded() {
       return excluded;
     }
 
     public void setExcluded(boolean excluded) {
       this.excluded = excluded;
+    }
+
+
+    // This is deprecated and replaced by aliases, but we need to leave it in place
+    // here for the purpose of supporting automatic migration from older config versions.
+    private void setCode(String code) {
+      if (code != null && !code.isEmpty()) {
+        this.aliases.add(code);
+      }
     }
 
     /**
@@ -278,23 +274,17 @@ public class RawContestConfig {
       if (!isNullOrBlank(this.name)) {
         otherNames.add(this.name);
       }
-      if (!isNullOrBlank(this.code)) {
-        otherNames.add(this.code);
-      }
 
       return Stream.concat(this.aliases.stream(), otherNames.stream());
     }
 
     /**
-     * For display purposes, get a semicolon-separated list of aliases, including the code.
+     * For display purposes, get a semicolon-separated list of aliases.
      *
      * @return a potentially-empty string
      */
     public String getSemicolonSeparatedAliases() {
       Stream<String> s = this.aliases.stream();
-      if (this.code != null) {
-        s = Stream.concat(s, Stream.of(this.code));
-      }
       return String.join("; ", s.toList());
     }
 
@@ -308,9 +298,6 @@ public class RawContestConfig {
     public void trimNameAndAllAliases() {
       if (name != null) {
         name = name.trim();
-      }
-      if (code != null) {
-        code = code.trim();
       }
       if (aliases != null) {
         aliases.replaceAll(s -> s.trim());

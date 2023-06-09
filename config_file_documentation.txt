@@ -123,9 +123,9 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
       example: "Duson, Jill C."
       value: string of length [1..1000]
 
-    "code" optional
-      candidate code which may appear in CVRs in lieu of full candidate name
-      example: "JCD"
+    "aliases" optional
+      aliases which may appear in CVRs in addition to candidate name
+      example: ["JCD"], or ["Jimmy", "Jim"]
       value: string of length [1..1000]
 
     "excluded" optional

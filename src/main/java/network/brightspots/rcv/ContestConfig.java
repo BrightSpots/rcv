@@ -1050,10 +1050,6 @@ class ContestConfig {
     return candidateAliasesToNameMap.get(nameOrAlias);
   }
 
-  String getCodeForCandidate(String nameOrAlias) {
-    return candidateAliasesToCodeMap.get(nameOrAlias);
-  }
-
   ArrayList<String> getCandidatePermutation() {
     return candidatePermutation;
   }
@@ -1088,7 +1084,6 @@ class ContestConfig {
         aliases.forEach(nameOrAlias -> {
           // duplicate names and aliases get caught in validation
           candidateAliasesToNameMap.put(nameOrAlias, name);
-          candidateAliasesToCodeMap.put(nameOrAlias, candidate.getCode());
         });
       }
     }
