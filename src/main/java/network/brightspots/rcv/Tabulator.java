@@ -122,6 +122,11 @@ class Tabulator {
   // run the main tabulation routine to determine contest results
   // returns: set containing winner(s)
   Set<String> tabulate() throws TabulationAbortedException {
+    if (config.isTabulateByPrecinctEnabled() && precinctIds.isEmpty()) {
+      Logger.severe("\"Tabulate by precinct\" requested but no precincts found in CVR.");
+      throw new TabulationAbortedException(false);
+    }
+
     if (config.needsRandomSeed()) {
       Random random = new Random(config.getRandomSeed());
       if (config.getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION) {

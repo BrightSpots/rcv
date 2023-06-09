@@ -576,13 +576,7 @@ class ContestConfig {
               Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
         }
 
-        if (getProvider(source) == Provider.CDF) {
-          // Perform CDF checks
-          if (isTabulateByPrecinctEnabled()) {
-            validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT);
-            Logger.severe("tabulateByPrecinct may not be used with CDF files.");
-          }
-        } else if (getProvider(source) == Provider.ESS) {
+        if (getProvider(source) == Provider.ESS) {
           // Perform ES&S checks
           if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
             validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN);
@@ -1138,7 +1132,6 @@ class ContestConfig {
     CVR_DUPLICATE_FILE_PATHS,
     CVR_FILE_PATH_INVALID,
     CVR_OVERVOTE_LABEL_OVERVOTE_RULE_MISMATCH,
-    CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT,
     CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN,
     CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED,
     CVR_OVERVOTE_DELIMITER_MISSING,
