@@ -78,7 +78,8 @@ class Tabulator {
   // tracks required winning threshold
   private BigDecimal winningThreshold;
 
-  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config) {
+  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config)
+      throws TabulationAbortedException {
     this.castVoteRecords = castVoteRecords;
     this.candidateNames = config.getCandidateNames();
     this.config = config;
@@ -91,6 +92,11 @@ class Tabulator {
     }
 
     if (config.isTabulateByPrecinctEnabled()) {
+      if (precinctIds.size() == 0) {
+        Logger.severe("\"Tabulate by Precinct\" enabled, but CVRs don't list precincts.");
+        throw new TabulationAbortedException(false);
+      }
+
       initPrecinctRoundTallies();
     }
   }
@@ -852,11 +858,6 @@ class Tabulator {
           selectedCandidate,
           cvr.getFractionalTransferValue());
       if (config.isTabulateByPrecinctEnabled()) {
-        if (precinctIds.size() == 0) {
-          Logger.severe("\"Tabulate by Precinct\" enabled, but CVRs don't list precincts.");
-          throw new TabulationAbortedException(false);
-        }
-
         String precinctId = cvr.getPrecinct();
         TallyTransfers precinctTallyTransfer = precinctTallyTransfers.get(precinctId);
         if (precinctTallyTransfer == null) {
