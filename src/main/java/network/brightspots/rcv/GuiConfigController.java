@@ -895,8 +895,13 @@ public class GuiConfigController implements Initializable {
     setDefaultValues();
   }
 
-  private boolean checkIfNeedsSaving() {
-    boolean needsSaving = true;
+  /*
+   * Compares the GUI configuration with the on-disk configuration.
+   * If they differ, also tells you if the on-disk version is "TEST" --
+   * in which case, you may be okay with a difference for ease of development.
+   */
+  private ConfigComparisonResult compareConfigs() {
+    ConfigComparisonResult needsSaving = ConfigComparisonResult.DIFFERENT;
     try {
       String currentConfigString =
           new ObjectMapper()
@@ -905,7 +910,7 @@ public class GuiConfigController implements Initializable {
               .writeValueAsString(createRawContestConfig());
       if (selectedFile == null && currentConfigString.equals(emptyConfigString)) {
         // All fields are currently empty / default values so no point in asking to save
-        needsSaving = false;
+        needsSaving = ConfigComparisonResult.SAME;
       } else if (GuiContext.getInstance().getConfig() != null) {
         // Compare to version currently saved on the hard drive
         RawContestConfig configFromFile = JsonParser.readFromFileWithoutLogging(
@@ -915,7 +920,15 @@ public class GuiConfigController implements Initializable {
                 .writer()
                 .withDefaultPrettyPrinter()
                 .writeValueAsString(configFromFile);
-        needsSaving = !currentConfigString.equals(savedConfigString);
+        if (currentConfigString.equals(savedConfigString)) {
+          needsSaving = ConfigComparisonResult.SAME;
+        } else {
+          if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
+            needsSaving = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
+          } else {
+            needsSaving = ConfigComparisonResult.DIFFERENT;
+          }
+        }
       }
     } catch (JsonProcessingException exception) {
       Logger.warning(
@@ -928,7 +941,8 @@ public class GuiConfigController implements Initializable {
 
   private boolean checkForSaveAndContinue() {
     boolean willContinue = false;
-    if (checkIfNeedsSaving()) {
+    ConfigComparisonResult comparisonResult = compareConfigs();
+    if (comparisonResult != ConfigComparisonResult.SAME) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
       ButtonType doNotSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
       Alert alert =
@@ -957,15 +971,19 @@ public class GuiConfigController implements Initializable {
 
   private String commitConfigToFileAndGetFilepath() {
     String filename = null;
-    if (checkIfNeedsSaving()) {
+    ConfigComparisonResult comparisonResult = compareConfigs();
+    if (comparisonResult != ConfigComparisonResult.SAME) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
       ButtonType dontSaveButton = new ButtonType("Proceed without Saving", ButtonBar.ButtonData.NO);
+      ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.NO);
+      ButtonType noButton = comparisonResult
+          == ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST ? dontSaveButton : cancelButton;
       Alert alert =
           new Alert(
               AlertType.WARNING,
               "You must either save your changes before continuing or load a new contest config!",
               saveButton,
-              dontSaveButton);
+              noButton);
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
       if (result.isPresent() && result.get() == saveButton) {
@@ -979,6 +997,8 @@ public class GuiConfigController implements Initializable {
         filename = tempFile.getAbsolutePath();
         saveFile(tempFile);
         tempFile.deleteOnExit();
+      } else if (result.get() == cancelButton) {
+        filename = null;
       }
     } else {
       filename = selectedFile.getAbsolutePath();
@@ -1535,4 +1555,11 @@ public class GuiConfigController implements Initializable {
       return task;
     }
   }
+
+  private enum ConfigComparisonResult {
+    SAME,
+    DIFFERENT,
+    DIFFERENT_BUT_VERSION_IS_TEST,
+  }
+
 }
