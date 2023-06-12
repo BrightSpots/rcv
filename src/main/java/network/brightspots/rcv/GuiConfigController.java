@@ -1546,7 +1546,9 @@ public class GuiConfigController implements Initializable {
     protected void cleanUp() {
       if (deleteConfigOnCompletion) {
         boolean succeeded = new File(configPath).delete();
-        assert succeeded;
+        if (!succeeded) {
+          Logger.warning("File %s failed to delete. Is it open elsewhere?", configPath);
+        }
       }
     }
 
