@@ -978,11 +978,11 @@ public class GuiConfigController implements Initializable {
   /**
    * Takes the configuration specified in the UI and returns a filename.
    * If the UI config is equal to the filename on disk, returns that.
-   * If not:
+   * Otherwise:
    *   If the on-disk config has version TEST, user has the option to write a temporary file.
    *   Otherwise, user must save a file, and it returns that filename.
    *
-   * @return the filename, and whether it's a temporary file or not.
+   * @return the filename and whether it's a temporary file or not.
    */
   private Pair<String, Boolean> commitConfigToFileAndGetFilePath() {
     Pair<String, Boolean> filePathAndTempStatus = null;
@@ -1536,7 +1536,7 @@ public class GuiConfigController implements Initializable {
   private abstract static class ConfigReaderService extends Service<Void> {
     protected String configPath;
 
-    protected boolean deleteConfigOnCompletion;
+    private final boolean deleteConfigOnCompletion;
 
     ConfigReaderService(String configPath, boolean deleteConfigOnCompletion) {
       this.configPath = configPath;
@@ -1547,12 +1547,12 @@ public class GuiConfigController implements Initializable {
       if (deleteConfigOnCompletion) {
         boolean succeeded = new File(configPath).delete();
         if (!succeeded) {
-          Logger.warning("File %s failed to delete. Is it open elsewhere?", configPath);
+          Logger.warning("Failed to delete temporary config file: %s", configPath);
         }
       }
     }
 
-    protected void setUpTaskCompletionTriggers(Task task, String failureMessage) {
+    protected void setUpTaskCompletionTriggers(Task<Void> task, String failureMessage) {
       task.setOnFailed(
           arg0 -> {
             Logger.severe(failureMessage, task.getException());
