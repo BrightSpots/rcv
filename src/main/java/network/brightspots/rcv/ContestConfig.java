@@ -53,6 +53,7 @@ class ContestConfig {
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
+  static final boolean SUGGESTED_FIRST_ROUND_DETERMINES_THRESHOLD = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
@@ -748,6 +749,14 @@ class ContestConfig {
               );
             }
           }
+
+          if (isFirstRoundDeterminesThresholdEnabled()) {
+            validationErrors.add(
+                ValidationError.RULES_FIRST_ROUND_DETERMINES_THRESHOLD_TRUE_FOR_MULTI_SEAT);
+            Logger.severe(
+                "doesFirstRoundDetermineThreshold can't be true in a multi-seat contest!"
+            );
+          }
         } else { // numberOfWinners == 1
           if (!isSingleWinnerEnabled()) {
             validationErrors.add(
@@ -852,6 +861,10 @@ class ContestConfig {
 
   boolean isSingleWinnerEnabled() {
     return getWinnerElectionMode() == WinnerElectionMode.STANDARD_SINGLE_WINNER;
+  }
+
+  boolean isFirstRoundDeterminesThresholdEnabled() {
+    return rawConfig.rules.doesFirstRoundDetermineThreshold;
   }
 
   boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {
@@ -1165,6 +1178,7 @@ class ContestConfig {
     RULES_NUMBER_OF_WINNERS_INVALID_FOR_WINNER_ELECTION_MODE,
     RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT,
     RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT,
+    RULES_FIRST_ROUND_DETERMINES_THRESHOLD_TRUE_FOR_MULTI_SEAT,
     RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT,
     RULES_ZERO_WINNERS_INVALID_WINNER_ELECTION_MODE,
     RULES_PERCENTAGE_THRESHOLD_MISSING,
