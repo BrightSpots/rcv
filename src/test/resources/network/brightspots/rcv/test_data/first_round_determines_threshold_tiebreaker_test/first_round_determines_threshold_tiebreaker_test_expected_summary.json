@@ -1,0 +1,33 @@
+{
+  "config" : {
+    "contest" : "Portland 2015 Mayoral Race",
+    "date" : "2015-11-03",
+    "jurisdiction" : "Portland, ME",
+    "office" : "Mayor",
+    "threshold" : "9"
+  },
+  "results" : [ {
+    "round" : 1,
+    "tally" : {
+      "Carmona, Ralph C." : "6",
+      "Haadoow, Hamza A." : "5",
+      "Vail, Christopher L." : "6"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Haadoow, Hamza A.",
+      "transfers" : {
+        "exhausted" : "5"
+      }
+    } ]
+  }, {
+    "round" : 2,
+    "tally" : {
+      "Carmona, Ralph C." : "6",
+      "Vail, Christopher L." : "6"
+    },
+    "tallyResults" : [ {
+      "elected" : "Vail, Christopher L.",
+      "transfers" : { }
+    } ]
+  } ]
+}
