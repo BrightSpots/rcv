@@ -1545,7 +1545,8 @@ public class GuiConfigController implements Initializable {
 
     protected void cleanUp() {
       if (deleteConfigOnCompletion) {
-        assert new File(configPath).delete();
+        boolean succeeded = new File(configPath).delete();
+        assert succeeded;
       }
     }
 
