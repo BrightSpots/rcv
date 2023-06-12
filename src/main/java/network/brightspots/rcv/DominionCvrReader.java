@@ -181,7 +181,7 @@ class DominionCvrReader extends BaseCvrReader {
 
   private void validateNamesAreInContest(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {
-    // build a lookup map for candidates codes to optimize Cvr parsing
+    // build a lookup map to optimize CVR parsing
     Map<String, Set<String>> contestIdToCandidateNames = new HashMap<>();
     for (Candidate candidate : this.candidates) {
       Set<String> candidates;
