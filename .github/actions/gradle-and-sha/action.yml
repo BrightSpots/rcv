@@ -1,20 +1,21 @@
-name: Run gradle command and create SHA512
+name: "Run Gradle command and create SHA512"
+description: "Runs a Gradle command and creates SHA512 hashes"
 
 inputs:
   gradle-command:
+    description: "The Gradle command to run"
     required: true
-    type: string
   intermediate-filepath:
+    description: "The initial path of the output file"
     required: true
-    type: string
   final-filepath:
+    description: "The desired final path of the output file"
     required: true
-    type: string
 
 runs:
   using: "composite"
   steps:
-    - name: "Run gradle command"
+    - name: "Run Gradle command"
       shell: bash
       run: |
         ./gradlew ${{ inputs.gradle-command }}

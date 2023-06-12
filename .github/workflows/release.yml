@@ -1,4 +1,4 @@
-name: Generate Releases
+name: "Generate Releases"
 
 on:
   release:
