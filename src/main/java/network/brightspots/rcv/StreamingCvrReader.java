@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -22,18 +22,14 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import network.brightspots.rcv.RawContestConfig.CvrSource;
-import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
@@ -47,23 +43,19 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-class StreamingCvrReader {
+class StreamingCvrReader extends BaseCvrReader {
 
   // this indicates a missing precinct ID in output files
   private static final String MISSING_PRECINCT_ID = "missing_precinct_id";
-  // config for the contest
-  private final ContestConfig config;
-  // path of the source file
-  private final String excelFilePath;
   // name of the source file
   private final String excelFileName;
-  // 1-based column index of first ranking
+  // 0-based column index of first ranking
   private final int firstVoteColumnIndex;
-  // 1-based row index of first CVR
+  // 0-based row index of first CVR
   private final int firstVoteRowIndex;
-  // 1-based column index of CVR ID (if present)
+  // 0-based column index of CVR ID (if present)
   private final Integer idColumnIndex;
-  // 1-based column index of currentPrecinct name (if present)
+  // 0-based column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
   // optional delimiter for cells that contain multiple candidates
   private final String overvoteDelimiter;
@@ -71,8 +63,6 @@ class StreamingCvrReader {
   private final String undervoteLabel;
   private final String undeclaredWriteInLabel;
   private final boolean treatBlankAsUndeclaredWriteIn;
-  // map for tracking unrecognized candidates during parsing
-  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
   // used for generating CVR IDs
   private int cvrIndex = 0;
   // list of currentRankings for CVR in progress
@@ -85,17 +75,14 @@ class StreamingCvrReader {
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
   private List<CastVoteRecord> cvrList;
-  // store precinct IDs (new IDs will be added as we parse)
-  private Set<String> precinctIds;
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
   // flag indicating data issues during parsing
   private boolean encounteredDataErrors = false;
 
-  StreamingCvrReader(ContestConfig config, CvrSource source) {
-    this.config = config;
-    this.excelFilePath = config.resolveConfigPath(source.getFilePath());
-    this.excelFileName = new File(excelFilePath).getName();
+  StreamingCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
+    super(config, source);
+    this.excelFileName = new File(cvrPath).getName();
 
     // to keep our code simple, we convert 1-indexed user-supplied values to 0-indexed here
     this.firstVoteColumnIndex = Integer.parseInt(source.getFirstVoteColumnIndex()) - 1;
@@ -148,6 +135,11 @@ class StreamingCvrReader {
     return result - 1;
   }
 
+  @Override
+  public String readerName() {
+    return "ES&S";
+  }
+
   // purpose: Handle empty cells encountered while parsing a CVR. Unlike empty rows, empty cells
   // do not trigger parsing callbacks so their existence must be inferred and handled when they
   // occur in a rankings cell.
@@ -187,7 +179,6 @@ class StreamingCvrReader {
             "Precinct identifier not found for cast vote record: %s", computedCastVoteRecordId);
         currentPrecinct = MISSING_PRECINCT_ID;
       }
-      precinctIds.add(currentPrecinct);
     }
 
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
@@ -199,14 +190,13 @@ class StreamingCvrReader {
       encounteredDataErrors = true;
     }
 
+    // Log the raw data for auditing
+    Logger.fine("[Raw Data]: " + currentCvrData.toString());
+
     // create new cast vote record
     CastVoteRecord newRecord =
         new CastVoteRecord(
-            computedCastVoteRecordId,
-            currentSuppliedCvrId,
-            currentPrecinct,
-            currentCvrData,
-            currentRankings);
+            computedCastVoteRecordId, currentSuppliedCvrId, currentPrecinct, currentRankings);
     cvrList.add(newRecord);
 
     // provide some user feedback on the CVR count
@@ -237,7 +227,7 @@ class StreamingCvrReader {
       if (!isNullOrBlank(overvoteDelimiter)) {
         candidates = cellString.split(Pattern.quote(overvoteDelimiter));
       } else {
-        candidates = new String[]{cellString};
+        candidates = new String[] {cellString};
       }
 
       for (String candidate : candidates) {
@@ -253,10 +243,6 @@ class StreamingCvrReader {
             candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           } else if (candidate.equals(undeclaredWriteInLabel)) {
             candidate = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-          } else if (!config.getCandidateCodeList().contains(candidate)) {
-            // This is an unrecognized candidate, so add it to the unrecognized candidate map.
-            // This helps identify problems with CVRs.
-            unrecognizedCandidateCounts.merge(candidate, 1, Integer::sum);
           }
           Pair<Integer, String> ranking = new Pair<>(currentRank, candidate);
           currentRankings.add(ranking);
@@ -267,18 +253,38 @@ class StreamingCvrReader {
     }
   }
 
+  @Override
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
+      throws CastVoteRecord.CvrParseException, IOException {
+    try {
+      parseCvrFileInternal(castVoteRecords);
+    } catch (OpenXML4JException | SAXException | ParserConfigurationException e) {
+      Logger.severe("Error parsing source file %s", cvrPath);
+      Logger.info(
+          "ES&S cast vote record files must be Microsoft Excel Workbook "
+              + "format.\nStrict Open XML and Open Office are not supported.");
+      throw new CastVoteRecord.CvrParseException();
+    } catch (CvrDataFormatException exception) {
+      Logger.severe("Data format error while parsing source file: %s", cvrPath);
+      Logger.info("See the log for details.");
+      throw new CastVoteRecord.CvrParseException();
+    }
+  }
+
   // parse the given file into a List of CastVoteRecords for tabulation
   // param: castVoteRecords existing list to append new CastVoteRecords to
   // param: precinctIDs existing set of precinctIDs discovered during CVR parsing
-  void parseCvrFile(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
-      throws UnrecognizedCandidatesException, OpenXML4JException, SAXException, IOException,
-      ParserConfigurationException, CvrDataFormatException {
+  private void parseCvrFileInternal(List<CastVoteRecord> castVoteRecords)
+      throws OpenXML4JException,
+          SAXException,
+          IOException,
+          ParserConfigurationException,
+          CvrDataFormatException {
 
     cvrList = castVoteRecords;
-    this.precinctIds = precinctIds;
 
     // open the zip package
-    OPCPackage pkg = OPCPackage.open(excelFilePath);
+    OPCPackage pkg = OPCPackage.open(cvrPath);
     // pull out strings
     ReadOnlySharedStringsTable sharedStrings = new ReadOnlySharedStringsTable(pkg);
     // XSSF reader is used to extract styles data
@@ -335,16 +341,10 @@ class StreamingCvrReader {
     // close zip file without saving
     pkg.revert();
 
-    if (unrecognizedCandidateCounts.size() > 0) {
-      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
-    }
-
     if (encounteredDataErrors) {
       throw new CvrDataFormatException();
     }
   }
 
-  static class CvrDataFormatException extends Exception {
-
-  }
+  static class CvrDataFormatException extends Exception {}
 }

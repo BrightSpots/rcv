@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,14 +21,10 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import javafx.util.Pair;
 
 class CastVoteRecord {
@@ -41,8 +37,6 @@ class CastVoteRecord {
   private final String precinct;
   // which precinct portion this ballot came from
   private final String precinctPortion;
-  // container for ALL CVR data parsed from the source CVR file
-  private final List<String> fullCvrData;
   // records winners to whom some fraction of this vote has been allocated
   private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // If CVR CDF output is enabled, we store the necessary info here: for each round, the list of
@@ -53,7 +47,7 @@ class CastVoteRecord {
   private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
-  SortedMap<Integer, Set<String>> rankToCandidateIds;
+  CandidateRankingsList candidateRankings;
   // contest associated with this CVR
   private String contestId;
   // tabulatorId parsed from Dominion CVR data
@@ -84,22 +78,19 @@ class CastVoteRecord {
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
     this.ballotTypeId = ballotTypeId;
-    this.fullCvrData = null;
-    sortRankings(rankings);
+    this.candidateRankings = new CandidateRankingsList(rankings);
   }
 
   CastVoteRecord(
       String computedId,
       String suppliedId,
       String precinct,
-      List<String> fullCvrData,
       List<Pair<Integer, String>> rankings) {
     this.computedId = computedId;
     this.suppliedId = suppliedId;
     this.precinct = precinct;
     this.precinctPortion = null;
-    this.fullCvrData = fullCvrData;
-    sortRankings(rankings);
+    this.candidateRankings = new CandidateRankingsList(rankings);
   }
 
   String getContestId() {
@@ -157,12 +148,6 @@ class CastVoteRecord {
     // add vote value if not 1
     if (fractionalTransferValue != null && !fractionalTransferValue.equals(BigDecimal.ONE)) {
       logStringBuilder.append(" [value] ").append(fractionalTransferValue);
-    }
-
-    // add complete data for round 1 only
-    if (round == 1) {
-      logStringBuilder.append(" [Raw Data] ");
-      logStringBuilder.append(fullCvrData);
     }
 
     Logger.fine(logStringBuilder.toString());
@@ -227,16 +212,6 @@ class CastVoteRecord {
 
   Map<String, BigDecimal> getWinnerToFractionalValue() {
     return winnerToFractionalValue;
-  }
-
-  // create a sorted map of ranking to candidates selected at that rank
-  private void sortRankings(List<Pair<Integer, String>> rankings) {
-    rankToCandidateIds = new TreeMap<>();
-    for (Pair<Integer, String> ranking : rankings) {
-      Set<String> candidatesAtRank =
-          rankToCandidateIds.computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
-      candidatesAtRank.add(ranking.getValue());
-    }
   }
 
   enum VoteOutcomeType {

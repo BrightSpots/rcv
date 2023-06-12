@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 import java.util.List;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
@@ -192,6 +191,18 @@ class TabulatorTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
+  }
+
+  @Test
+  @DisplayName("aliases (CDF JSON format)")
+  void aliasesJson() {
+    runTabulationTest("aliases_cdf_json");
+  }
+
+  @Test
+  @DisplayName("aliases (ES&S XLSX format)")
+  void aliasesXlsx() {
+    runTabulationTest("aliases_ess_xlsx");
   }
 
   @Test
@@ -570,14 +581,40 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("first round determine threshold test")
+  void firstRoundDeterminesThresholdTest() {
+    runTabulationTest("first_round_determines_threshold_test");
+  }
+
+  @Test
+  @DisplayName("first round determine threshold and tiebreaker runs test")
+  void firstRoundDeterminesTiebreakerThresholdTest() {
+    runTabulationTest("first_round_determines_threshold_tiebreaker_test");
+  }
+
+  @Test
   @DisplayName("overvote exhaust if multiple continuing test")
   void overvoteExhaustIfMultipleContinuingTest() {
     runTabulationTest("exhaust_if_multiple_continuing");
+  }
+
+
+  @Test
+  @DisplayName("generic CSV test")
+  void genericCsvTest() {
+    runTabulationTest("generic_csv_test");
   }
 
   @Test
   @DisplayName("no one meets minimum test")
   void noOneMeetsMinimumTest() {
     runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());
+  }
+
+  @Test
+  @DisplayName("gracefully fail when tabulate-by-precinct option set without any precincts in CVR")
+  void tabulateByPrecinctWithoutPrecincts() {
+    runTabulationTest("tabulate_by_precinct_without_precincts",
+        TabulationAbortedException.class.toString());
   }
 }

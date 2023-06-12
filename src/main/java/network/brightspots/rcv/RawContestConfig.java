@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,9 +17,14 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.Utils.isNullOrBlank;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Contest configuration that can be serialized and deserialized.
@@ -205,21 +210,29 @@ public class RawContestConfig {
   /**
    * Contest candidate data that can be serialized and deserialized.
    */
-  @JsonIgnoreProperties(ignoreUnknown = true)
+  @JsonIgnoreProperties(ignoreUnknown = true, value = {"semicolonSeparatedAliases"})
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
-
     private String name;
-    private String code;
     private boolean excluded;
+    private List<String> aliases = new ArrayList<String>();
+
+    // The code is a special alias which is used in the output files instead of
+    // the display name. Other than output displays, it is not handled specially:
+    // it is just another alias.
+    private String code;
 
     Candidate() {
     }
 
-    Candidate(String name, String code, boolean excluded) {
+    Candidate(String name, String newlineSeparatedAliases, boolean excluded) {
       this.name = name;
-      this.code = code;
       this.excluded = excluded;
+
+      if (newlineSeparatedAliases != null) {
+        // Split by newline, and also trim whitespace
+        this.aliases = Arrays.asList(newlineSeparatedAliases.split("\\W*\\r?\\n\\W*"));
+      }
     }
 
     public String getName() {
@@ -228,6 +241,14 @@ public class RawContestConfig {
 
     public void setName(String name) {
       this.name = name;
+    }
+
+    public List<String> getAliases() {
+      return List.copyOf(aliases);
+    }
+
+    public void setAliases(List<String> aliases) {
+      this.aliases = new ArrayList<>(aliases);
     }
 
     public String getCode() {
@@ -244,6 +265,56 @@ public class RawContestConfig {
 
     public void setExcluded(boolean excluded) {
       this.excluded = excluded;
+    }
+
+    /**
+     * A stream of all aliases (which is guaranteed to be unique) and the candidate name
+     * (which is not guaranteed to be unique, i.e. it may exist in the list twice)
+     *
+     * @return a stream containing the candidate name and all aliases, with no null elements
+     */
+    public Stream<String> createStreamOfNameAndAllAliases() {
+      List<String> otherNames = new ArrayList<>();
+      if (!isNullOrBlank(this.name)) {
+        otherNames.add(this.name);
+      }
+      if (!isNullOrBlank(this.code)) {
+        otherNames.add(this.code);
+      }
+
+      return Stream.concat(this.aliases.stream(), otherNames.stream());
+    }
+
+    /**
+     * For display purposes, get a semicolon-separated list of aliases, including the code.
+     *
+     * @return a potentially-empty string
+     */
+    public String getSemicolonSeparatedAliases() {
+      Stream<String> s = this.aliases.stream();
+      if (this.code != null) {
+        s = Stream.concat(s, Stream.of(this.code));
+      }
+      return String.join("; ", s.toList());
+    }
+
+    public void setSemicolonSeparatedAliases(String semicolonSeparatedAliases) {
+      this.aliases = Arrays.asList(semicolonSeparatedAliases.split("\\W*;\\W*"));
+    }
+
+    /**
+     * Removes whitespace around all name and alias strings.
+     */
+    public void trimNameAndAllAliases() {
+      if (name != null) {
+        name = name.trim();
+      }
+      if (code != null) {
+        code = code.trim();
+      }
+      if (aliases != null) {
+        aliases.replaceAll(s -> s.trim());
+      }
     }
   }
 
@@ -266,6 +337,7 @@ public class RawContestConfig {
     public String maxSkippedRanksAllowed;
     public String maxRankingsAllowed;
     public boolean nonIntegerWinningThreshold;
+    public boolean doesFirstRoundDetermineThreshold;
     public boolean hareQuota;
     public boolean batchElimination;
     public boolean continueUntilTwoCandidatesRemain;

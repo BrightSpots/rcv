@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -31,30 +31,43 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
-import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 @SuppressWarnings({"rawtypes", "unused", "RedundantSuppression"})
-class CommonDataFormatReader {
-
+class CommonDataFormatReader extends BaseCvrReader {
   private static final String STATUS_NO = "no";
   private static final String BOOLEAN_TRUE = "true";
 
-  private final String filePath;
-  private final ContestConfig config;
-  private final String contestId;
-  private final String overvoteLabel;
-  private final Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
+  CommonDataFormatReader(ContestConfig config, RawContestConfig.CvrSource source) {
+    super(config, source);
+  }
 
-  CommonDataFormatReader(
-      String filePath, ContestConfig config, String contestId, String overvoteLabel) {
-    this.filePath = filePath;
-    this.config = config;
-    this.contestId = contestId;
-    this.overvoteLabel = overvoteLabel;
+  /**
+   * Sets map[key] = value if map does not contain key already. If it does, returns false. The
+   * caller is responsible for throwing an error after aggregating all keys that were not unique.
+   *
+   * @param map The map to modify
+   * @param key Key to check for uniqueness
+   * @param value Value to place if unique
+   * @param keyName Human-readable name of the key, used to make the error message more useful
+   * @return true if there was an error
+   */
+  private static <K, V> boolean putIfUnique(HashMap<K, V> map, K key, V value, String keyName) {
+    if (map.containsKey(key)) {
+      Logger.severe("%s \"%s\" appears multiple times", keyName, key);
+      return true;
+    }
+
+    map.put(key, value);
+    return false;
+  }
+
+  @Override
+  public String readerName() {
+    return "CDF";
   }
 
   // Each CVRSnapshot contains one or more CVRContest objects.
@@ -83,12 +96,20 @@ class CommonDataFormatReader {
     return cvrContestToTabulate;
   }
 
-  void parseCvrFile(List<CastVoteRecord> castVoteRecords)
-      throws UnrecognizedCandidatesException, IOException, CvrParseException {
-    if (filePath.endsWith(".xml")) {
-      parseXml(castVoteRecords);
-    } else if (filePath.endsWith(".json")) {
-      parseJson(castVoteRecords);
+  @Override
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
+      throws CvrParseException {
+    try {
+      if (cvrPath.endsWith(".xml")) {
+        parseXml(castVoteRecords);
+      } else if (cvrPath.endsWith(".json")) {
+        parseJson(castVoteRecords);
+      }
+    } catch (CvrParseException e) {
+      throw e;
+    } catch (Exception e) {
+      Logger.severe("Unknown error. Cannot load file.");
+      throw new CvrParseException();
     }
   }
 
@@ -123,33 +144,51 @@ class CommonDataFormatReader {
     return cvrContestToTabulate;
   }
 
+  void checkForEmptyFields(CastVoteRecordReport cvrReport) throws CvrParseException {
+    // Some checks to provide nicer error messages.
+    // This is common with Unisyn's CDF CVR, which is not compatible with RCTab.
+    if (cvrReport.GpUnit == null) {
+      Logger.severe(
+          "Field \"GPUnit\" missing from CDF CVR file! "
+              + "This is common with older, unsupported formats.");
+      throw new CvrParseException();
+    }
+
+    // These fields are also required, but we are not aware of any standard format where
+    // they would be missing, so we group all these checks together.
+    ArrayList<String> missingFields = new ArrayList<>();
+    if (cvrReport.CVR == null) {
+      missingFields.add("CVR");
+    }
+    if (cvrReport.Election == null) {
+      missingFields.add("Election");
+    }
+    if (cvrReport.ReportGeneratingDeviceIds == null) {
+      missingFields.add("ReportGeneratingDeviceIds");
+    }
+    if (cvrReport.ReportingDevice == null) {
+      missingFields.add("ReportingDevice");
+    }
+    if (cvrReport.Party == null) {
+      missingFields.add("Party");
+    }
+
+    if (!missingFields.isEmpty()) {
+      Logger.severe("Required fields are missing from CDF CVR file: " + missingFields);
+      throw new CvrParseException();
+    }
+  }
+
   void parseXml(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException, IOException, UnrecognizedCandidatesException {
+      throws CvrParseException, IOException {
     // load XML
     XmlMapper xmlMapper = new XmlMapper();
     xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    try (FileInputStream inputStream = new FileInputStream(filePath)) {
+    try (FileInputStream inputStream = new FileInputStream(cvrPath)) {
       CastVoteRecordReport cvrReport = xmlMapper.readValue(inputStream, CastVoteRecordReport.class);
       inputStream.close();
 
-      // Some checks to provide nicer error messages.
-      // This is common with Unisyn's CDF CVR, which is not compatible with RCTab.
-      if (cvrReport.GpUnit == null) {
-        Logger.severe("Field \"GPUnit\" missing from CDF CVR file! "
-                + "This is common with older, unsupported formats.");
-        throw new CvrParseException();
-      }
-
-      // These fields are also required, but we are not aware of any standard format where
-      // they would be missing, so we group all these checks together.
-      if (cvrReport.CVR == null
-              || cvrReport.Election == null
-              || cvrReport.ReportGeneratingDeviceIds == null
-              || cvrReport.ReportingDevice == null
-              || cvrReport.Party == null) {
-        Logger.severe("Required fields are missing from CDF CVR file!");
-        throw new CvrParseException();
-      }
+      checkForEmptyFields(cvrReport);
 
       // Parse static election data:
 
@@ -158,7 +197,7 @@ class CommonDataFormatReader {
       Contest contestToTabulate = null;
       for (Election election : cvrReport.Election) {
         for (Contest contest : election.Contest) {
-          if (contest.Name.equals(this.contestId)) {
+          if (contest.Name.equals(source.getContestId())) {
             contestToTabulate = contest;
             break;
           }
@@ -166,33 +205,45 @@ class CommonDataFormatReader {
       }
 
       if (contestToTabulate == null) {
-        Logger.severe("Contest \"%s\" from config file not found!", this.contestId);
+        Logger.severe("Contest \"%s\" from config file not found!", source.getContestId());
         throw new CvrParseException();
       }
+
+      boolean hasError = false;
 
       // build a map of Candidates
       HashMap<String, Candidate> candidateById = new HashMap<>();
       for (Election election : cvrReport.Election) {
         for (Candidate candidate : election.Candidate) {
-          candidateById.put(candidate.ObjectId, candidate);
+          hasError |= putIfUnique(candidateById, candidate.ObjectId, candidate, "Candidate");
         }
       }
 
       // ContestSelections
       HashMap<String, ContestSelection> contestSelectionById = new HashMap<>();
       for (ContestSelection contestSelection : contestToTabulate.ContestSelection) {
-        contestSelectionById.put(contestSelection.ObjectId, contestSelection);
+        hasError |=
+            putIfUnique(
+                contestSelectionById,
+                contestSelection.ObjectId,
+                contestSelection,
+                "Contest Selection");
       }
 
       // build a map of GpUnits (aka precinct or district)
       HashMap<String, GpUnit> gpUnitById = new HashMap<>();
       for (GpUnit gpUnit : cvrReport.GpUnit) {
-        gpUnitById.put(gpUnit.ObjectId, gpUnit);
+        hasError |= putIfUnique(gpUnitById, gpUnit.ObjectId, gpUnit, "GPUnit");
+      }
+
+      if (hasError) {
+        Logger.severe("One or more keys were not unique.");
+        throw new CvrParseException();
       }
 
       // process the Cvrs
       int cvrIndex = 0;
-      String fileName = new File(filePath).getName();
+      String fileName = new File(cvrPath).getName();
       for (CVR cvr : cvrReport.CVR) {
         CVRContest contest = getCvrContestXml(cvr, contestToTabulate);
         if (contest == null) {
@@ -215,11 +266,11 @@ class CommonDataFormatReader {
               Logger.severe("ContestSelection \"%s\" from CVR not found!", contestSelectionId);
               throw new CvrParseException();
             }
-            String candidateId;
+            String candidateName;
             // check for declared write-in:
             if (contestSelection.IsWriteIn != null
                 && contestSelection.IsWriteIn.equals(BOOLEAN_TRUE)) {
-              candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+              candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             } else {
               // validate candidate Ids:
               // CDF allows multiple candidate Ids to support party ticket voting options
@@ -244,15 +295,12 @@ class CommonDataFormatReader {
                     contestSelection.CandidateIds[0], contestSelection.ObjectId);
                 throw new CvrParseException();
               }
-              candidateId = candidate.Name;
-              if (candidateId.equals(overvoteLabel)) {
-                candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-              } else if (!config.getCandidateCodeList().contains(candidateId)) {
-                Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
-                unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
+              candidateName = candidate.Name;
+              if (candidateName.equals(source.getOvervoteLabel())) {
+                candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
               }
             }
-            parseRankings(cvr, contest, rankings, cvrContestSelection, candidateId);
+            parseRankings(cvr, contest, rankings, cvrContestSelection, candidateName);
           }
         }
 
@@ -271,7 +319,7 @@ class CommonDataFormatReader {
         String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
         // create the new CastVoteRecord
         CastVoteRecord newRecord =
-            new CastVoteRecord(computedCastVoteRecordId, cvr.UniqueId, precinctId, null, rankings);
+            new CastVoteRecord(computedCastVoteRecordId, cvr.UniqueId, precinctId, rankings);
         castVoteRecords.add(newRecord);
 
         // provide some user feedback on the CVR count
@@ -279,14 +327,16 @@ class CommonDataFormatReader {
           Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
         }
       }
-      if (unrecognizedCandidateCounts.size() > 0) {
-        throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
-      }
     }
   }
 
-  private void parseRankings(CVR cvr, CVRContest contest, List<Pair<Integer, String>> rankings,
-      CVRContestSelection cvrContestSelection, String candidateId) throws CvrParseException {
+  private void parseRankings(
+      CVR cvr,
+      CVRContest contest,
+      List<Pair<Integer, String>> rankings,
+      CVRContestSelection cvrContestSelection,
+      String candidateId)
+      throws CvrParseException {
     // parse the selected rankings for the specified contest into the provided rankings list
     if (cvrContestSelection.Rank == null) {
       for (SelectionPosition selectionPosition : cvrContestSelection.SelectionPosition) {
@@ -304,8 +354,7 @@ class CommonDataFormatReader {
         }
         if (selectionPosition.Rank == null) {
           Logger.severe(
-              "No Rank found on CVR \"%s\" Contest \"%s\"!", cvr.UniqueId,
-              contest.ContestId);
+              "No Rank found on CVR \"%s\" Contest \"%s\"!", cvr.UniqueId, contest.ContestId);
           throw new CvrParseException();
         }
         Integer rank = Integer.parseInt(selectionPosition.Rank);
@@ -319,21 +368,23 @@ class CommonDataFormatReader {
 
   // parse cdf json CastVoteRecordReport into CastVoteRecords and append them to input list
   void parseJson(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException, UnrecognizedCandidatesException {
+      throws CvrParseException {
 
     // static election data
     HashMap<Object, Object> candidates = new HashMap<>();
-    HashMap<Object, Object> gpuUnits = new HashMap<>();
+    HashMap<Object, Object> gpUnits = new HashMap<>();
     HashMap<Object, Object> contestSelections = new HashMap<>();
     HashMap contestToTabulate = null;
-    HashMap json = JsonParser.readFromFile(filePath, HashMap.class);
+    HashMap json = JsonParser.readFromFile(cvrPath, HashMap.class);
+
+    boolean hasError = false;
 
     // GpUnits
     ArrayList gpUnitArray = (ArrayList) json.get("GpUnit");
     for (Object gpUnitObject : gpUnitArray) {
       HashMap gpUnit = (HashMap) gpUnitObject;
       String gpUnitId = (String) gpUnit.get("@id");
-      gpuUnits.put(gpUnitId, gpUnit);
+      hasError |= putIfUnique(gpUnits, gpUnitId, gpUnit, "GPUnits");
     }
 
     // Elections
@@ -346,7 +397,7 @@ class CommonDataFormatReader {
       for (Object candidateObject : candidatesArray) {
         HashMap candidate = (HashMap) candidateObject;
         String candidateId = (String) candidate.get("@id");
-        candidates.put(candidateId, candidate);
+        hasError |= putIfUnique(candidates, candidateId, candidate, "Candidate");
       }
 
       // Find contest to be tabulated
@@ -354,14 +405,14 @@ class CommonDataFormatReader {
       for (Object contestObject : contestArray) {
         HashMap contest = (HashMap) contestObject;
         String contestName = (String) contest.get("Name");
-        if (contestName.equals(this.contestId)) {
+        if (contestName.equals(source.getContestId())) {
           contestToTabulate = contest;
           break;
         }
       }
     }
     if (contestToTabulate == null) {
-      Logger.severe("Contest \"%s\" from config file not found!", this.contestId);
+      Logger.severe("Contest \"%s\" from config file not found!", source.getContestId());
       throw new CvrParseException();
     }
     String contestToTabulateId = (String) contestToTabulate.get("@id");
@@ -371,12 +422,18 @@ class CommonDataFormatReader {
     for (Object contestSelectionObject : contestSelectionArray) {
       HashMap contestSelection = (HashMap) contestSelectionObject;
       String selectionObjectId = (String) contestSelection.get("@id");
-      contestSelections.put(selectionObjectId, contestSelection);
+      hasError |=
+          putIfUnique(contestSelections, selectionObjectId, contestSelection, "Contest Selection");
+    }
+
+    if (hasError) {
+      Logger.severe("One or more keys were not unique.");
+      throw new CvrParseException();
     }
 
     // process Cvrs
     int cvrIndex = 0;
-    String fileName = new File(filePath).getName();
+    String fileName = new File(cvrPath).getName();
 
     ArrayList cvrs = (ArrayList) json.get("CVR");
     for (Object cvrObject : cvrs) {
@@ -394,11 +451,11 @@ class CommonDataFormatReader {
           throw new CvrParseException();
         }
         HashMap contestSelection = (HashMap) contestSelections.get(contestSelectionId);
-        String candidateId;
+        String candidateName;
         if (contestSelection.containsKey("IsWriteIn")
             && contestSelection.get("IsWriteIn").equals(BOOLEAN_TRUE)) {
           // this is a write-in
-          candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+          candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
         } else {
           // lookup Candidate Name
           ArrayList candidateIds = (ArrayList) contestSelection.get("CandidateIds");
@@ -414,12 +471,15 @@ class CommonDataFormatReader {
           }
           String candidateObjectId = (String) candidateIds.get(0);
           HashMap candidate = (HashMap) candidates.get(candidateObjectId);
-          candidateId = (String) candidate.get("Name");
-          if (candidateId.equals(overvoteLabel)) {
-            candidateId = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-          } else if (!this.config.getCandidateCodeList().contains(candidateId)) {
-            Logger.severe("Unrecognized candidate found in CVR: %s", candidateId);
-            unrecognizedCandidateCounts.merge(candidateId, 1, Integer::sum);
+          if (candidate == null) {
+            Logger.severe(
+                "Candidate ID \"%s\" in Contest Selection \"%s\" is not in the candidate list.",
+                candidateObjectId, contestSelectionId);
+            throw new CvrParseException();
+          }
+          candidateName = (String) candidate.get("Name");
+          if (candidateName.equals(source.getOvervoteLabel())) {
+            candidateName = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           }
         }
 
@@ -428,7 +488,7 @@ class CommonDataFormatReader {
         // this is an ambiguity in the nist spec
         if (cvrContestSelection.containsKey("Rank")) {
           Integer rank = (Integer) (cvrContestSelection.get("Rank"));
-          rankings.add(new Pair<>(rank, candidateId));
+          rankings.add(new Pair<>(rank, candidateName));
         } else {
           // extract all the SelectionPositions (ranks) which this selection has been assigned
           ArrayList selectionPositions = (ArrayList) cvrContestSelection.get("SelectionPosition");
@@ -436,7 +496,7 @@ class CommonDataFormatReader {
             HashMap selectionPosition = (HashMap) selectionPositionObject;
             // WriteIn can be linked at the selection position level
             if (selectionPosition.containsKey("CVRWriteIn")) {
-              candidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+              candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             }
             // ignore if no indication is present (NIST 1500-103 section 3.4.2)
             if (selectionPosition.containsKey("HasIndication")
@@ -450,7 +510,7 @@ class CommonDataFormatReader {
             }
             // and finally the rank
             Integer rank = (Integer) selectionPosition.get("Rank");
-            rankings.add(new Pair<>(rank, candidateId));
+            rankings.add(new Pair<>(rank, candidateName));
           }
         }
       } // for (Object cvrContestSelectionObject : cvrContestSelections) {
@@ -459,8 +519,8 @@ class CommonDataFormatReader {
       String precinctId = null;
       if (cvr.containsKey("BallotStyleUnitId")) {
         String unitId = (String) cvr.get("BallotStyleUnitId");
-        if (gpuUnits.containsKey(unitId)) {
-          HashMap unit = (HashMap) gpuUnits.get(cvr.get("BallotStyleUnitId"));
+        if (gpUnits.containsKey(unitId)) {
+          HashMap unit = (HashMap) gpUnits.get(cvr.get("BallotStyleUnitId"));
           precinctId = (String) unit.get("Name");
         } else {
           Logger.severe("GpUnit \"%s\" not found!", unitId);
@@ -471,16 +531,12 @@ class CommonDataFormatReader {
       String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
       // create the new CastVoteRecord
       CastVoteRecord newRecord =
-          new CastVoteRecord(computedCastVoteRecordId, ballotId, precinctId, null, rankings);
+          new CastVoteRecord(computedCastVoteRecordId, ballotId, precinctId, rankings);
       castVoteRecords.add(newRecord);
       // provide some user feedback on the CVR count
       if (castVoteRecords.size() % 50000 == 0) {
         Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
       }
-    } // for (Object cvr : cvrs) {
-
-    if (unrecognizedCandidateCounts.size() > 0) {
-      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 
@@ -504,22 +560,18 @@ class CommonDataFormatReader {
     @JacksonXmlElementWrapper(useWrapping = false)
     String[] CandidateIds;
     // boolean-like
-    @JacksonXmlProperty()
-    String IsWriteIn;
+    @JacksonXmlProperty() String IsWriteIn;
 
     // PartySelection fields
-    @JacksonXmlProperty()
-    String[] PartyIds;
+    @JacksonXmlProperty() String[] PartyIds;
 
     // BallotMeasureSelection fields
-    @JacksonXmlProperty()
-    String Selection;
+    @JacksonXmlProperty() String Selection;
   }
 
   static class CVRWriteIn {
 
-    @JacksonXmlProperty()
-    String Text;
+    @JacksonXmlProperty() String Text;
   }
 
   static class SelectionPosition {
@@ -528,27 +580,17 @@ class CommonDataFormatReader {
     @JacksonXmlElementWrapper(useWrapping = false)
     Code[] Code;
 
-    @JacksonXmlProperty()
-    String FractionalVotes;
-    @JacksonXmlProperty()
-    String HasIndication;
-    @JacksonXmlProperty()
-    String IsAllocable;
+    @JacksonXmlProperty() String FractionalVotes;
+    @JacksonXmlProperty() String HasIndication;
+    @JacksonXmlProperty() String IsAllocable;
     // boolean-like
-    @JacksonXmlProperty()
-    String IsGenerated;
-    @JacksonXmlProperty()
-    String MarkMetricValue;
-    @JacksonXmlProperty()
-    Integer NumberVotes;
-    @JacksonXmlProperty()
-    String Position;
-    @JacksonXmlProperty()
-    String Rank;
-    @JacksonXmlProperty()
-    String Status;
-    @JacksonXmlProperty()
-    String OtherStatus;
+    @JacksonXmlProperty() String IsGenerated;
+    @JacksonXmlProperty() String MarkMetricValue;
+    @JacksonXmlProperty() Integer NumberVotes;
+    @JacksonXmlProperty() String Position;
+    @JacksonXmlProperty() String Rank;
+    @JacksonXmlProperty() String Status;
+    @JacksonXmlProperty() String OtherStatus;
 
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
@@ -557,20 +599,13 @@ class CommonDataFormatReader {
 
   static class CVRContestSelection {
 
-    @JacksonXmlProperty()
-    Integer OptionPosition;
-    @JacksonXmlProperty()
-    String Rank;
-    @JacksonXmlProperty()
-    String Status;
-    @JacksonXmlProperty()
-    String OtherStatus;
-    @JacksonXmlProperty()
-    String TotalFractionalVotes;
-    @JacksonXmlProperty()
-    Integer TotalNumberVotes;
-    @JacksonXmlProperty()
-    String ContestSelectionId;
+    @JacksonXmlProperty() Integer OptionPosition;
+    @JacksonXmlProperty() String Rank;
+    @JacksonXmlProperty() String Status;
+    @JacksonXmlProperty() String OtherStatus;
+    @JacksonXmlProperty() String TotalFractionalVotes;
+    @JacksonXmlProperty() Integer TotalNumberVotes;
+    @JacksonXmlProperty() String ContestSelectionId;
 
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
@@ -579,21 +614,16 @@ class CommonDataFormatReader {
 
   static class CVRContest {
 
-    @JacksonXmlProperty()
-    String ContestId;
+    @JacksonXmlProperty() String ContestId;
 
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     CVRContestSelection[] CVRContestSelection;
 
-    @JacksonXmlProperty()
-    String Overvotes;
-    @JacksonXmlProperty()
-    String Selections;
-    @JacksonXmlProperty()
-    String Undervotes;
-    @JacksonXmlProperty()
-    String WriteIns;
+    @JacksonXmlProperty() String Overvotes;
+    @JacksonXmlProperty() String Selections;
+    @JacksonXmlProperty() String Undervotes;
+    @JacksonXmlProperty() String WriteIns;
   }
 
   static class CVRSnapshot {
@@ -605,12 +635,9 @@ class CommonDataFormatReader {
     @JacksonXmlProperty()
     CVRContest[] CVRContest;
 
-    @JacksonXmlProperty()
-    String Status;
-    @JacksonXmlProperty()
-    String OtherStatus;
-    @JacksonXmlProperty()
-    String Type;
+    @JacksonXmlProperty() String Status;
+    @JacksonXmlProperty() String OtherStatus;
+    @JacksonXmlProperty() String Type;
   }
 
   static class Party {
@@ -618,10 +645,8 @@ class CommonDataFormatReader {
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
 
-    @JacksonXmlProperty()
-    String Abbreviation;
-    @JacksonXmlProperty()
-    String Name;
+    @JacksonXmlProperty() String Abbreviation;
+    @JacksonXmlProperty() String Name;
   }
 
   static class ReportingDevice {
@@ -629,20 +654,13 @@ class CommonDataFormatReader {
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
 
-    @JacksonXmlProperty()
-    String Application;
-    @JacksonXmlProperty()
-    Code Code;
-    @JacksonXmlProperty()
-    String Manufacturer;
-    @JacksonXmlProperty()
-    String MarkMetricType;
-    @JacksonXmlProperty()
-    String Model;
-    @JacksonXmlProperty()
-    String Notes;
-    @JacksonXmlProperty()
-    String SerialNumber;
+    @JacksonXmlProperty() String Application;
+    @JacksonXmlProperty() Code Code;
+    @JacksonXmlProperty() String Manufacturer;
+    @JacksonXmlProperty() String MarkMetricType;
+    @JacksonXmlProperty() String Model;
+    @JacksonXmlProperty() String Notes;
+    @JacksonXmlProperty() String SerialNumber;
   }
 
   static class GpUnit {
@@ -650,26 +668,18 @@ class CommonDataFormatReader {
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
 
-    @JacksonXmlProperty()
-    Code Code;
-    @JacksonXmlProperty()
-    String Name;
-    @JacksonXmlProperty()
-    String Type;
-    @JacksonXmlProperty()
-    String OtherType;
-    @JacksonXmlProperty()
-    ReportingDevice[] ReportingDevice;
+    @JacksonXmlProperty() Code Code;
+    @JacksonXmlProperty() String Name;
+    @JacksonXmlProperty() String Type;
+    @JacksonXmlProperty() String OtherType;
+    @JacksonXmlProperty() ReportingDevice[] ReportingDevice;
   }
 
   static class Code {
 
-    @JacksonXmlProperty()
-    String Type;
-    @JacksonXmlProperty()
-    String Value;
-    @JacksonXmlProperty()
-    String OtherType;
+    @JacksonXmlProperty() String Type;
+    @JacksonXmlProperty() String Value;
+    @JacksonXmlProperty() String OtherType;
   }
 
   static class Candidate {
@@ -677,12 +687,9 @@ class CommonDataFormatReader {
     @JacksonXmlProperty(isAttribute = true)
     String ObjectId;
 
-    @JacksonXmlProperty()
-    String Name;
-    @JacksonXmlProperty()
-    String PartyId;
-    @JacksonXmlProperty()
-    Code Code;
+    @JacksonXmlProperty() String Name;
+    @JacksonXmlProperty() String PartyId;
+    @JacksonXmlProperty() Code Code;
   }
 
   static class Contest {
@@ -693,32 +700,23 @@ class CommonDataFormatReader {
     @JacksonXmlProperty(isAttribute = true)
     String type;
 
-    @JacksonXmlProperty()
-    String Abbreviation;
-    @JacksonXmlProperty()
-    Code Code;
-    @JacksonXmlProperty()
-    String Name;
-    @JacksonXmlProperty()
-    String VoteVariation;
-    @JacksonXmlProperty()
-    String OtherVoteVariation;
+    @JacksonXmlProperty() String Abbreviation;
+    @JacksonXmlProperty() Code Code;
+    @JacksonXmlProperty() String Name;
+    @JacksonXmlProperty() String VoteVariation;
+    @JacksonXmlProperty() String OtherVoteVariation;
 
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     ContestSelection[] ContestSelection;
 
     // CandidateContest fields
-    @JacksonXmlProperty()
-    Integer NumberElected;
-    @JacksonXmlProperty()
-    Integer VotesAllowed;
-    @JacksonXmlProperty()
-    String PrimaryPartyId;
+    @JacksonXmlProperty() Integer NumberElected;
+    @JacksonXmlProperty() Integer VotesAllowed;
+    @JacksonXmlProperty() String PrimaryPartyId;
 
     // RetentionContest fields
-    @JacksonXmlProperty()
-    String CandidateId;
+    @JacksonXmlProperty() String CandidateId;
   }
 
   static class Election {
@@ -743,52 +741,35 @@ class CommonDataFormatReader {
 
   static class CVR {
 
-    @JacksonXmlProperty()
-    String ElectionId;
+    @JacksonXmlProperty() String ElectionId;
     // GpUnit
-    @JacksonXmlProperty()
-    String BallotStyleUnitId;
+    @JacksonXmlProperty() String BallotStyleUnitId;
     // ReportingDevice
-    @JacksonXmlProperty()
-    String CreatingDeviceId;
-    @JacksonXmlProperty()
-    String PartyId;
-    @JacksonXmlProperty()
-    String CurrentSnapshotId;
+    @JacksonXmlProperty() String CreatingDeviceId;
+    @JacksonXmlProperty() String PartyId;
+    @JacksonXmlProperty() String CurrentSnapshotId;
 
     @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     CVRSnapshot[] CVRSnapshot;
 
-    @JacksonXmlProperty()
-    String BallotAuditId;
-    @JacksonXmlProperty()
-    String BallotPrePrintedId;
-    @JacksonXmlProperty()
-    String BatchSequenceId;
-    @JacksonXmlProperty()
-    String BallotSheetId;
-    @JacksonXmlProperty()
-    String BallotStyleId;
-    @JacksonXmlProperty()
-    String BatchId;
-    @JacksonXmlProperty()
-    String UniqueId;
+    @JacksonXmlProperty() String BallotAuditId;
+    @JacksonXmlProperty() String BallotPrePrintedId;
+    @JacksonXmlProperty() String BatchSequenceId;
+    @JacksonXmlProperty() String BallotSheetId;
+    @JacksonXmlProperty() String BallotStyleId;
+    @JacksonXmlProperty() String BatchId;
+    @JacksonXmlProperty() String UniqueId;
   }
 
   // top-level cdf structure
   static class CastVoteRecordReport {
 
-    @JacksonXmlProperty()
-    String GeneratedDate;
-    @JacksonXmlProperty()
-    String Notes;
-    @JacksonXmlProperty()
-    String ReportType;
-    @JacksonXmlProperty()
-    String OtherReportType;
-    @JacksonXmlProperty()
-    String Version;
+    @JacksonXmlProperty() String GeneratedDate;
+    @JacksonXmlProperty() String Notes;
+    @JacksonXmlProperty() String ReportType;
+    @JacksonXmlProperty() String OtherReportType;
+    @JacksonXmlProperty() String Version;
 
     // Cvr records
     @JacksonXmlProperty()
