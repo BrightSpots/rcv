@@ -72,6 +72,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Pair;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.ValidationError;
@@ -453,11 +454,12 @@ public class GuiConfigController implements Initializable {
    * changes, and creates and launches TabulatorService from the saved config path.
    */
   public void menuItemTabulateClicked() {
-    String filePath = commitConfigToFileAndGetFilePath();
-    if (filePath != null) {
+    Pair<String, Boolean> filePathAndTempStatus = commitConfigToFileAndGetFilePath();
+    if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
-        TabulatorService service = new TabulatorService(filePath);
+        TabulatorService service = new TabulatorService(
+            filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
         setUpAndStartService(service);
       } else {
         Logger.warning("Please load a contest config file before attempting to tabulate!");
@@ -470,11 +472,12 @@ public class GuiConfigController implements Initializable {
    * create and launches ConvertToCdfService from the saved config path.
    */
   public void menuItemConvertToCdfClicked() {
-    String filePath = commitConfigToFileAndGetFilePath();
-    if (filePath != null) {
+    Pair<String, Boolean> filePathAndTempStatus = commitConfigToFileAndGetFilePath();
+    if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
-        ConvertToCdfService service = new ConvertToCdfService(filePath);
+        ConvertToCdfService service = new ConvertToCdfService(
+            filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
         setUpAndStartService(service);
       } else {
         Logger.warning("Please load a contest config file before attempting to convert to CDF!");
@@ -966,8 +969,17 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private String commitConfigToFileAndGetFilePath() {
-    String filename = null;
+  /**
+   * Takes the configuration specified in the UI and returns a filename.
+   * If the UI config is equal to the filename on disk, returns that.
+   * If not:
+   *   If the on-disk config has version TEST, user has the option to write a temporary file.
+   *   Otherwise, user must save a file, and it returns that filename.
+   *
+   * @return the filename, and whether it's a temporary file or not.
+   */
+  private Pair<String, Boolean> commitConfigToFileAndGetFilePath() {
+    Pair<String, Boolean> filePathAndTempStatus = null;
     ConfigComparisonResult comparisonResult = compareConfigs();
     if (comparisonResult != ConfigComparisonResult.SAME) {
       // Three possible buttons, but only Save/Cancel shown unless version is TEST
@@ -999,19 +1011,18 @@ public class GuiConfigController implements Initializable {
         File fileToSave = getSaveFile();
         if (fileToSave != null) {
           saveFile(fileToSave);
-          filename = fileToSave.getAbsolutePath();
+          filePathAndTempStatus = new Pair<>(fileToSave.getAbsolutePath(), false);
         }
       } else if (result.isPresent() && result.get() == useTempButton) {
         File tempFile = new File(selectedFile.getAbsolutePath() + ".temp");
-        filename = tempFile.getAbsolutePath();
         saveFile(tempFile);
-        tempFile.deleteOnExit();
+        filePathAndTempStatus = new Pair<>(tempFile.getAbsolutePath(), true);
       }
       // The cancel or "X" button shouldn't cause any action to be taken, and return a null filename
     } else {
-      filename = selectedFile.getAbsolutePath();
+      filePathAndTempStatus = new Pair<>(selectedFile.getAbsolutePath(), false);
     }
-    return filename;
+    return filePathAndTempStatus;
   }
 
   @Override
@@ -1513,13 +1524,38 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  // TabulatorService runs a tabulation in the background
-  private static class TabulatorService extends Service<Void> {
+  private abstract static class ConfigReaderService extends Service<Void> {
+    protected String configPath;
 
-    private final String configPath;
+    protected boolean deleteConfigOnCompletion;
 
-    TabulatorService(String configPath) {
+    ConfigReaderService(String configPath, boolean deleteConfigOnCompletion) {
       this.configPath = configPath;
+      this.deleteConfigOnCompletion = deleteConfigOnCompletion;
+    }
+
+    protected void cleanUp() {
+      if (deleteConfigOnCompletion) {
+        assert new File(configPath).delete();
+      }
+    }
+
+    protected void setUpTaskCompletionTriggers(Task task, String failureMessage) {
+      task.setOnFailed(
+          arg0 -> {
+            Logger.severe(failureMessage, task.getException());
+            cleanUp();
+          });
+      task.setOnCancelled(arg0 -> cleanUp());
+      task.setOnSucceeded(arg0 -> cleanUp());
+    }
+  }
+
+  // TabulatorService runs a tabulation in the background
+  private static class TabulatorService extends ConfigReaderService {
+
+    TabulatorService(String configPath, boolean deleteConfigOnCompletion) {
+      super(configPath, deleteConfigOnCompletion);
     }
 
     @Override
@@ -1533,22 +1569,16 @@ public class GuiConfigController implements Initializable {
               return null;
             }
           };
-      task.setOnFailed(
-          arg0 ->
-              Logger.severe(
-                  "Error during tabulation:\n%s\nTabulation failed!",
-                  task.getException()));
+
+      setUpTaskCompletionTriggers(task, "Error during tabulation:\n%s\nTabulation failed!");
       return task;
     }
   }
 
   // ConvertToCdfService runs a CDF conversion in the background
-  private static class ConvertToCdfService extends Service<Void> {
-
-    private final String configPath;
-
-    ConvertToCdfService(String configPath) {
-      this.configPath = configPath;
+  private static class ConvertToCdfService extends ConfigReaderService {
+    ConvertToCdfService(String configPath, boolean deleteConfigOnCompletion) {
+      super(configPath, deleteConfigOnCompletion);
     }
 
     @Override
@@ -1559,14 +1589,12 @@ public class GuiConfigController implements Initializable {
             protected Void call() {
               TabulatorSession session = new TabulatorSession(configPath);
               session.convertToCdf();
+
               return null;
             }
           };
-      task.setOnFailed(
-          arg0 ->
-              Logger.severe(
-                  "Error when attempting to convert to CDF:\n%s\nConversion failed!",
-                  task.getException()));
+      setUpTaskCompletionTriggers(task,
+          "Error when attempting to convert to CDF:\n%s\nConversion failed!");
       return task;
     }
   }
