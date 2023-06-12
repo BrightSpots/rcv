@@ -981,8 +981,8 @@ public class GuiConfigController implements Initializable {
         alert =
             new Alert(
                 AlertType.WARNING,
-                "You are using a test config. You must either save your changes, or use a temporary config file"
-                    + " which will be deleted when you exit the program.",
+                "You are using a test config. You must either save your changes, or use a "
+                    + "temporary config file which will be deleted when you exit the program.",
                 saveButton,
                 useTempButton,
                 cancelButton);
