@@ -453,11 +453,11 @@ public class GuiConfigController implements Initializable {
    * changes, and creates and launches TabulatorService from the saved config path.
    */
   public void menuItemTabulateClicked() {
-    String filepath = commitConfigToFileAndGetFilepath();
-    if (filepath != null) {
+    String filePath = commitConfigToFileAndGetFilePath();
+    if (filePath != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
-        TabulatorService service = new TabulatorService(filepath);
+        TabulatorService service = new TabulatorService(filePath);
         setUpAndStartService(service);
       } else {
         Logger.warning("Please load a contest config file before attempting to tabulate!");
@@ -470,15 +470,14 @@ public class GuiConfigController implements Initializable {
    * create and launches ConvertToCdfService from the saved config path.
    */
   public void menuItemConvertToCdfClicked() {
-    String filepath = commitConfigToFileAndGetFilepath();
-    if (filepath != null) {
+    String filePath = commitConfigToFileAndGetFilePath();
+    if (filePath != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
-        ConvertToCdfService service = new ConvertToCdfService(filepath);
+        ConvertToCdfService service = new ConvertToCdfService(filePath);
         setUpAndStartService(service);
       } else {
-        Logger.warning(
-            "Please load a contest config file before attempting to convert to CDF!");
+        Logger.warning("Please load a contest config file before attempting to convert to CDF!");
       }
     }
   }
@@ -901,7 +900,7 @@ public class GuiConfigController implements Initializable {
    * in which case, you may be okay with a difference for ease of development.
    */
   private ConfigComparisonResult compareConfigs() {
-    ConfigComparisonResult needsSaving = ConfigComparisonResult.DIFFERENT;
+    ConfigComparisonResult comparisonResult = ConfigComparisonResult.DIFFERENT;
     try {
       String currentConfigString =
           new ObjectMapper()
@@ -910,10 +909,11 @@ public class GuiConfigController implements Initializable {
               .writeValueAsString(createRawContestConfig());
       if (selectedFile == null && currentConfigString.equals(emptyConfigString)) {
         // All fields are currently empty / default values so no point in asking to save
-        needsSaving = ConfigComparisonResult.SAME;
+        comparisonResult = ConfigComparisonResult.SAME;
       } else if (GuiContext.getInstance().getConfig() != null) {
         // Compare to version currently saved on the hard drive
-        RawContestConfig configFromFile = JsonParser.readFromFileWithoutLogging(
+        RawContestConfig configFromFile =
+            JsonParser.readFromFileWithoutLogging(
                 selectedFile.getAbsolutePath(), RawContestConfig.class);
         String savedConfigString =
             new ObjectMapper()
@@ -921,14 +921,11 @@ public class GuiConfigController implements Initializable {
                 .withDefaultPrettyPrinter()
                 .writeValueAsString(configFromFile);
         if (currentConfigString.equals(savedConfigString)) {
-          needsSaving = ConfigComparisonResult.SAME;
-        } else {
-          if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
-            needsSaving = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
-          } else {
-            needsSaving = ConfigComparisonResult.DIFFERENT;
-          }
+          comparisonResult = ConfigComparisonResult.SAME;
+        } else if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
+          comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
         }
+        // Otherwise, comparisonResult should remain ConfigComparisonResult.DIFFERENT
       }
     } catch (JsonProcessingException exception) {
       Logger.warning(
@@ -936,7 +933,7 @@ public class GuiConfigController implements Initializable {
               + "for save just in case...\n%s",
           exception);
     }
-    return needsSaving;
+    return comparisonResult;
   }
 
   private boolean checkForSaveAndContinue() {
@@ -969,22 +966,26 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private String commitConfigToFileAndGetFilepath() {
+  private String commitConfigToFileAndGetFilePath() {
     String filename = null;
     ConfigComparisonResult comparisonResult = compareConfigs();
     if (comparisonResult != ConfigComparisonResult.SAME) {
       // Three possible buttons, but only Save/Cancel shown unless version is TEST
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
-      ButtonType dontSaveButton = new ButtonType("Generate Temp File", ButtonBar.ButtonData.OTHER);
+      ButtonType useTempButton = new ButtonType("Use Temporary Config", ButtonBar.ButtonData.NO);
       ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
       // Pop up either a two-button or three-button alert
       Alert alert;
       if (comparisonResult == ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST) {
-        alert = new Alert(AlertType.WARNING,
-            "You are using a test config. Either save the file, or generate a temporary file "
-            + "which will be deleted when the program exits",
-            saveButton, dontSaveButton, cancelButton);
+        alert =
+            new Alert(
+                AlertType.WARNING,
+                "You are using a test config. You must either save your changes, or use a temporary config file"
+                    + " which will be deleted when you exit the program.",
+                saveButton,
+                useTempButton,
+                cancelButton);
       } else {
         alert = new Alert(AlertType.WARNING,
             "You must either save your changes before continuing or load a new contest config!",
@@ -1000,14 +1001,13 @@ public class GuiConfigController implements Initializable {
           saveFile(fileToSave);
           filename = fileToSave.getAbsolutePath();
         }
-      } else if (result.get() == dontSaveButton) {
-        File tempFile = new File(selectedFile.getAbsolutePath() + "_temp");
+      } else if (result.isPresent() && result.get() == useTempButton) {
+        File tempFile = new File(selectedFile.getAbsolutePath() + ".temp");
         filename = tempFile.getAbsolutePath();
         saveFile(tempFile);
         tempFile.deleteOnExit();
-      } else if (result.get() == cancelButton) {
-        filename = null;
       }
+      // The cancel or "X" button shouldn't cause any action to be taken, and return a null filename
     } else {
       filename = selectedFile.getAbsolutePath();
     }
@@ -1406,6 +1406,11 @@ public class GuiConfigController implements Initializable {
     return config;
   }
 
+  private enum ConfigComparisonResult {
+    SAME,
+    DIFFERENT,
+    DIFFERENT_BUT_VERSION_IS_TEST,
+  }
 
   private static class AutoLoadCandidatesService extends Service<Void> {
 
@@ -1413,9 +1418,8 @@ public class GuiConfigController implements Initializable {
     private final List<CvrSource> sources;
     private final TableView<Candidate> tableViewCandidates;
 
-    AutoLoadCandidatesService(ContestConfig config,
-                              List<CvrSource> sources,
-                              TableView<Candidate> tableViewCandidates) {
+    AutoLoadCandidatesService(
+        ContestConfig config, List<CvrSource> sources, TableView<Candidate> tableViewCandidates) {
       this.config = config;
       this.sources = sources;
       this.tableViewCandidates = tableViewCandidates;
@@ -1477,7 +1481,6 @@ public class GuiConfigController implements Initializable {
       return task;
     }
   }
-
 
   private static class ValidatorService extends Service<Void> {
 
@@ -1562,12 +1565,6 @@ public class GuiConfigController implements Initializable {
                   task.getException()));
       return task;
     }
-  }
-
-  private enum ConfigComparisonResult {
-    SAME,
-    DIFFERENT,
-    DIFFERENT_BUT_VERSION_IS_TEST,
   }
 
 }
