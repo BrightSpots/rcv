@@ -598,4 +598,11 @@ class TabulatorTests {
   void noOneMeetsMinimumTest() {
     runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());
   }
+
+  @Test
+  @DisplayName("gracefully fail when tabulate-by-precinct option set without any precincts in CVR")
+  void tabulateByPrecinctWithoutPrecincts() {
+    runTabulationTest("tabulate_by_precinct_without_precincts",
+        TabulationAbortedException.class.toString());
+  }
 }

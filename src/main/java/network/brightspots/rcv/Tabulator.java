@@ -72,18 +72,31 @@ class Tabulator {
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // precincts which may appear in the cast vote records
-  private final Set<String> precinctNames;
+  private final Set<String> precinctIds = new HashSet<>();
   // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
   // tracks required winning threshold
   private BigDecimal winningThreshold;
 
-  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config, Set<String> precinctNames) {
+  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config)
+      throws TabulationAbortedException {
     this.castVoteRecords = castVoteRecords;
     this.candidateNames = config.getCandidateNames();
     this.config = config;
-    this.precinctNames = precinctNames;
+
+    for (CastVoteRecord cvr : castVoteRecords) {
+      String precinctId = cvr.getPrecinct();
+      if (precinctId != null) {
+        precinctIds.add(precinctId);
+      }
+    }
+
     if (config.isTabulateByPrecinctEnabled()) {
+      if (precinctIds.size() == 0) {
+        Logger.severe("\"Tabulate by Precinct\" enabled, but CVRs don't list precincts.");
+        throw new TabulationAbortedException(false);
+      }
+
       initPrecinctRoundTallies();
     }
   }
@@ -678,7 +691,7 @@ class Tabulator {
             .setContestConfig(config)
             .setTimestampString(timestamp)
             .setWinningThreshold(winningThreshold)
-            .setPrecinctIds(precinctNames)
+            .setPrecinctIds(precinctIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
     writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, castVoteRecords.size());
@@ -834,7 +847,8 @@ class Tabulator {
   //  logs the results to audit log
   //  update tallyTransfers counts
   private void recordSelectionForCastVoteRecord(
-      CastVoteRecord cvr, int currentRound, String selectedCandidate, String outcomeDescription) {
+      CastVoteRecord cvr, int currentRound,
+      String selectedCandidate, String outcomeDescription) throws TabulationAbortedException {
     // update transfer counts (unless there's no value to transfer, which can happen if someone
     // wins with a tally that exactly matches the winning threshold)
     if (cvr.getFractionalTransferValue().signum() == 1) {
@@ -844,13 +858,19 @@ class Tabulator {
           selectedCandidate,
           cvr.getFractionalTransferValue());
       if (config.isTabulateByPrecinctEnabled()) {
-        precinctTallyTransfers
-            .get(cvr.getPrecinct())
-            .addTransfer(
-                currentRound,
-                cvr.getCurrentRecipientOfVote(),
-                selectedCandidate,
-                cvr.getFractionalTransferValue());
+        String precinctId = cvr.getPrecinct();
+        TallyTransfers precinctTallyTransfer = precinctTallyTransfers.get(precinctId);
+        if (precinctTallyTransfer == null) {
+          Logger.severe(
+              "Precinct \"%s\" is not among the %d known precincts.",
+              precinctId, precinctIds.size());
+          throw new TabulationAbortedException(false);
+        }
+        precinctTallyTransfer.addTransfer(
+            currentRound,
+            cvr.getCurrentRecipientOfVote(),
+            selectedCandidate,
+            cvr.getFractionalTransferValue());
       }
     }
 
@@ -872,7 +892,8 @@ class Tabulator {
   //  - exhaust cvrs if they should be exhausted for various reasons
   //  - assign cvrs to continuing candidates if they have been transferred or in the initial count
   // returns a map of candidate ID to vote tallies for this round
-  private Map<String, BigDecimal> computeTalliesForRound(int currentRound) {
+  private Map<String, BigDecimal> computeTalliesForRound(int currentRound)
+          throws TabulationAbortedException {
     Map<String, BigDecimal> roundTally = getNewTally();
     Map<String, Map<String, BigDecimal>> roundTallyByPrecinct = new HashMap<>();
     if (config.isTabulateByPrecinctEnabled()) {
@@ -1064,10 +1085,10 @@ class Tabulator {
   }
 
   private void initPrecinctRoundTallies() {
-    for (String precinctName : precinctNames) {
-      precinctRoundTallies.put(precinctName, new HashMap<>());
-      precinctTallyTransfers.put(precinctName, new TallyTransfers());
-      assert !isNullOrBlank(precinctName);
+    for (String precinctId : precinctIds) {
+      precinctRoundTallies.put(precinctId, new HashMap<>());
+      precinctTallyTransfers.put(precinctId, new TallyTransfers());
+      assert !isNullOrBlank(precinctId);
     }
   }
 

@@ -43,7 +43,7 @@ class ClearBallotCvrReader extends BaseCvrReader {
   // parse Cvr json into CastVoteRecord objects and append them to the input castVoteRecords list
   // see Clear Ballot 2.1 RCV Format Specification for details
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CvrParseException, IOException {
     BufferedReader csvReader;
     try {
