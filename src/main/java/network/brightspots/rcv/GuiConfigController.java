@@ -72,6 +72,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Pair;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.ValidationError;
@@ -455,10 +456,12 @@ public class GuiConfigController implements Initializable {
    * changes, and creates and launches TabulatorService from the saved config path.
    */
   public void menuItemTabulateClicked() {
-    if (checkForSaveAndExecute()) {
+    Pair<String, Boolean> filePathAndTempStatus = commitConfigToFileAndGetFilePath();
+    if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
-        TabulatorService service = new TabulatorService(selectedFile.getAbsolutePath());
+        TabulatorService service = new TabulatorService(
+            filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
         setUpAndStartService(service);
       } else {
         Logger.warning("Please load a contest config file before attempting to tabulate!");
@@ -471,14 +474,15 @@ public class GuiConfigController implements Initializable {
    * create and launches ConvertToCdfService from the saved config path.
    */
   public void menuItemConvertToCdfClicked() {
-    if (checkForSaveAndExecute()) {
+    Pair<String, Boolean> filePathAndTempStatus = commitConfigToFileAndGetFilePath();
+    if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
-        ConvertToCdfService service = new ConvertToCdfService(selectedFile.getAbsolutePath());
+        ConvertToCdfService service = new ConvertToCdfService(
+            filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
         setUpAndStartService(service);
       } else {
-        Logger.warning(
-            "Please load a contest config file before attempting to convert to CDF!");
+        Logger.warning("Please load a contest config file before attempting to convert to CDF!");
       }
     }
   }
@@ -899,8 +903,13 @@ public class GuiConfigController implements Initializable {
     setDefaultValues();
   }
 
-  private boolean checkIfNeedsSaving() {
-    boolean needsSaving = true;
+  /*
+   * Compares the GUI configuration with the on-disk configuration.
+   * If they differ, also tells you if the on-disk version is "TEST" --
+   * in which case, you may be okay with a difference for ease of development.
+   */
+  private ConfigComparisonResult compareConfigs() {
+    ConfigComparisonResult comparisonResult = ConfigComparisonResult.DIFFERENT;
     try {
       String currentConfigString =
           new ObjectMapper()
@@ -909,17 +918,23 @@ public class GuiConfigController implements Initializable {
               .writeValueAsString(createRawContestConfig());
       if (selectedFile == null && currentConfigString.equals(emptyConfigString)) {
         // All fields are currently empty / default values so no point in asking to save
-        needsSaving = false;
+        comparisonResult = ConfigComparisonResult.SAME;
       } else if (GuiContext.getInstance().getConfig() != null) {
         // Compare to version currently saved on the hard drive
+        RawContestConfig configFromFile =
+            JsonParser.readFromFileWithoutLogging(
+                selectedFile.getAbsolutePath(), RawContestConfig.class);
         String savedConfigString =
             new ObjectMapper()
                 .writer()
                 .withDefaultPrettyPrinter()
-                .writeValueAsString(
-                    JsonParser.readFromFileWithoutLogging(
-                        selectedFile.getAbsolutePath(), RawContestConfig.class));
-        needsSaving = !currentConfigString.equals(savedConfigString);
+                .writeValueAsString(configFromFile);
+        if (currentConfigString.equals(savedConfigString)) {
+          comparisonResult = ConfigComparisonResult.SAME;
+        } else if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
+          comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
+        }
+        // Otherwise, comparisonResult should remain ConfigComparisonResult.DIFFERENT
       }
     } catch (JsonProcessingException exception) {
       Logger.warning(
@@ -927,12 +942,13 @@ public class GuiConfigController implements Initializable {
               + "for save just in case...\n%s",
           exception);
     }
-    return needsSaving;
+    return comparisonResult;
   }
 
   private boolean checkForSaveAndContinue() {
     boolean willContinue = false;
-    if (checkIfNeedsSaving()) {
+    ConfigComparisonResult comparisonResult = compareConfigs();
+    if (comparisonResult != ConfigComparisonResult.SAME) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
       ButtonType doNotSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
       Alert alert =
@@ -959,29 +975,60 @@ public class GuiConfigController implements Initializable {
     return willContinue;
   }
 
-  private boolean checkForSaveAndExecute() {
-    boolean willContinue = false;
-    if (checkIfNeedsSaving()) {
+  /**
+   * Takes the configuration specified in the UI and returns a filename.
+   * If the UI config is equal to the filename on disk, returns that.
+   * Otherwise:
+   *   If the on-disk config has version TEST, user has the option to write a temporary file.
+   *   Otherwise, user must save a file, and it returns that filename.
+   *
+   * @return the filename and whether it's a temporary file or not.
+   */
+  private Pair<String, Boolean> commitConfigToFileAndGetFilePath() {
+    Pair<String, Boolean> filePathAndTempStatus = null;
+    ConfigComparisonResult comparisonResult = compareConfigs();
+    if (comparisonResult != ConfigComparisonResult.SAME) {
+      // Three possible buttons, but only Save/Cancel shown unless version is TEST
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
-      Alert alert =
-          new Alert(
-              AlertType.WARNING,
-              "You must either save your changes before continuing or load a new contest config!",
-              saveButton,
-              ButtonType.CANCEL);
+      ButtonType useTempButton = new ButtonType("Use Temporary Config", ButtonBar.ButtonData.NO);
+      ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+      // Pop up either a two-button or three-button alert
+      Alert alert;
+      if (comparisonResult == ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST) {
+        alert =
+            new Alert(
+                AlertType.WARNING,
+                "You are using a test config. You must either save your changes, or use a "
+                    + "temporary config file which will be deleted when you exit the program.",
+                saveButton,
+                useTempButton,
+                cancelButton);
+      } else {
+        alert = new Alert(AlertType.WARNING,
+            "You must either save your changes before continuing or load a new contest config!",
+            saveButton, cancelButton);
+      }
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
+
+      // Process the result, handling all three buttons and the "X"
       if (result.isPresent() && result.get() == saveButton) {
         File fileToSave = getSaveFile();
         if (fileToSave != null) {
           saveFile(fileToSave);
-          willContinue = true;
+          filePathAndTempStatus = new Pair<>(fileToSave.getAbsolutePath(), false);
         }
+      } else if (result.isPresent() && result.get() == useTempButton) {
+        File tempFile = new File(selectedFile.getAbsolutePath() + ".temp");
+        saveFile(tempFile);
+        filePathAndTempStatus = new Pair<>(tempFile.getAbsolutePath(), true);
       }
+      // The cancel or "X" button shouldn't cause any action to be taken, and return a null filename
     } else {
-      willContinue = true;
+      filePathAndTempStatus = new Pair<>(selectedFile.getAbsolutePath(), false);
     }
-    return willContinue;
+    return filePathAndTempStatus;
   }
 
   @Override
@@ -1379,6 +1426,12 @@ public class GuiConfigController implements Initializable {
     return config;
   }
 
+  private enum ConfigComparisonResult {
+    SAME,
+    DIFFERENT,
+    DIFFERENT_BUT_VERSION_IS_TEST,
+  }
+
   private static class AutoLoadCandidatesService extends Service<Void> {
 
     private final ContestConfig config;
@@ -1453,7 +1506,6 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-
   private static class ValidatorService extends Service<Void> {
 
     private final ContestConfig contestConfig;
@@ -1481,13 +1533,41 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  // TabulatorService runs a tabulation in the background
-  private static class TabulatorService extends Service<Void> {
+  private abstract static class ConfigReaderService extends Service<Void> {
+    protected String configPath;
 
-    private final String configPath;
+    private final boolean deleteConfigOnCompletion;
 
-    TabulatorService(String configPath) {
+    ConfigReaderService(String configPath, boolean deleteConfigOnCompletion) {
       this.configPath = configPath;
+      this.deleteConfigOnCompletion = deleteConfigOnCompletion;
+    }
+
+    protected void cleanUp() {
+      if (deleteConfigOnCompletion) {
+        boolean succeeded = new File(configPath).delete();
+        if (!succeeded) {
+          Logger.warning("Failed to delete temporary config file: %s", configPath);
+        }
+      }
+    }
+
+    protected void setUpTaskCompletionTriggers(Task<Void> task, String failureMessage) {
+      task.setOnFailed(
+          arg0 -> {
+            Logger.severe(failureMessage, task.getException());
+            cleanUp();
+          });
+      task.setOnCancelled(arg0 -> cleanUp());
+      task.setOnSucceeded(arg0 -> cleanUp());
+    }
+  }
+
+  // TabulatorService runs a tabulation in the background
+  private static class TabulatorService extends ConfigReaderService {
+
+    TabulatorService(String configPath, boolean deleteConfigOnCompletion) {
+      super(configPath, deleteConfigOnCompletion);
     }
 
     @Override
@@ -1501,22 +1581,16 @@ public class GuiConfigController implements Initializable {
               return null;
             }
           };
-      task.setOnFailed(
-          arg0 ->
-              Logger.severe(
-                  "Error during tabulation:\n%s\nTabulation failed!",
-                  task.getException()));
+
+      setUpTaskCompletionTriggers(task, "Error during tabulation:\n%s\nTabulation failed!");
       return task;
     }
   }
 
   // ConvertToCdfService runs a CDF conversion in the background
-  private static class ConvertToCdfService extends Service<Void> {
-
-    private final String configPath;
-
-    ConvertToCdfService(String configPath) {
-      this.configPath = configPath;
+  private static class ConvertToCdfService extends ConfigReaderService {
+    ConvertToCdfService(String configPath, boolean deleteConfigOnCompletion) {
+      super(configPath, deleteConfigOnCompletion);
     }
 
     @Override
@@ -1527,15 +1601,14 @@ public class GuiConfigController implements Initializable {
             protected Void call() {
               TabulatorSession session = new TabulatorSession(configPath);
               session.convertToCdf();
+
               return null;
             }
           };
-      task.setOnFailed(
-          arg0 ->
-              Logger.severe(
-                  "Error when attempting to convert to CDF:\n%s\nConversion failed!",
-                  task.getException()));
+      setUpTaskCompletionTriggers(task,
+          "Error when attempting to convert to CDF:\n%s\nConversion failed!");
       return task;
     }
   }
+
 }
