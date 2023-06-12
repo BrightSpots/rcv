@@ -172,7 +172,18 @@ class Tabulator {
       // votes in the first round.
       // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
       // on the number of active votes in the current round.
-      if (currentRound == 1 || config.getNumberOfWinners() <= 1) {
+      boolean shouldRecomputeThreshold;
+      if (config.getNumberOfWinners() > 1) {
+        // Multi-winner only computes threshold on round 1
+        shouldRecomputeThreshold = currentRound == 1;
+      } else {
+        // Single-Winner recomputes threshold on round 1 always,
+        // and on other rounds if First Round Determines Threshold is not set
+        shouldRecomputeThreshold =
+          !config.isFirstRoundDeterminesThresholdEnabled()
+          || currentRound == 1;
+      }
+      if (shouldRecomputeThreshold) {
         setWinningThreshold(currentRoundCandidateToTally, config.getMinimumVoteThreshold());
       }
 
@@ -496,19 +507,34 @@ class Tabulator {
     } else {
       // We should only look for more winners if we haven't already filled all the seats.
       if (winnerToRound.size() < config.getNumberOfWinners()) {
-        // If the number of continuing candidates equals the number of seats to fill, everyone wins.
         if (currentRoundCandidateToTally.size()
             == config.getNumberOfWinners() - winnerToRound.size()) {
+          // If the number of continuing candidates equals the number of seats to fill,
+          // everyone wins.
           selectedWinners.addAll(currentRoundCandidateToTally.keySet());
+        } else if (config.isFirstRoundDeterminesThresholdEnabled()
+              && currentRoundCandidateToTally.size() - 1 == config.getNumberOfWinners()) {
+          // Edge case: if nobody meets the threshold, but we're on the penultimate round when
+          // isFirstRoundDeterminesThresholdEnabled is true, select the max vote getters as
+          // the winners. If isFirstRoundDeterminesThresholdEnabled isn't enabled, it should be
+          // impossible for a single-winner election to end up here.
+          BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
+          selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
         } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
+          // Otherwise, select all winners above the threshold
           selectWinners(currentRoundTallyToCandidates, selectedWinners);
         }
       }
 
       // Edge case: if we've identified multiple winners in this round, but we're only supposed to
-      // elect one winner per round, pick the top vote-getter and defer the others to subsequent
-      // rounds.
-      if (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
+      // elect one winner per round, pick the top vote-getter.
+      // * If this is a multi-winner election, defer the others to subsequent rounds.
+      // * If this is a single-winner election in which it's possible for no candidate to reach the
+      //   threshold (i.e. "first round determines threshold" is set), the tiebreaker will choose
+      //   the only winner.
+      boolean useTiebreakerIfNeeded = config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
+          || config.isFirstRoundDeterminesThresholdEnabled();
+      if (useTiebreakerIfNeeded && selectedWinners.size() > 1) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
         selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
