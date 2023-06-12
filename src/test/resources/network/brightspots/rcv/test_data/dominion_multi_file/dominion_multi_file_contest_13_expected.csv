@@ -1,26 +1,26 @@
 Contest Id,Tabulator Id,Batch Id,Record Id,Precinct,Precinct Portion,Rank 1,Rank 2,Rank 3,Rank 4
 13,26,876,28,,PCT 7341,undervote,undervote,undervote,undervote
-13,27,892,56,,PCT 7317,Stephen (Lulu) Schwartz,Aaron Peskin,Danny Sauter,Spencer Simonson
-13,27,892,6,,PCT 7324,Aaron Peskin,undervote,undervote,undervote
+13,27,892,56,,PCT 7317,30,27,28,29
+13,27,892,6,,PCT 7324,27,undervote,undervote,undervote
 13,27,892,20,,PCT 7316,undervote,undervote,undervote,undervote
 13,27,892,65,,PCT 7313,undervote,undervote,undervote,undervote
 13,27,892,2,,PCT 7346,undervote,undervote,undervote,undervote
-13,27,892,98,,PCT 7302,Stephen (Lulu) Schwartz,Danny Sauter,Spencer Simonson,Aaron Peskin
+13,27,892,98,,PCT 7302,30,28,29,27
 13,27,892,78,,PCT 7305,undervote,undervote,undervote,undervote
-13,27,892,26,,PCT 7325,Stephen (Lulu) Schwartz,Danny Sauter,Spencer Simonson,Aaron Peskin
+13,27,892,26,,PCT 7325,30,28,29,27
 13,27,892,101,,PCT 7336,undervote,undervote,undervote,undervote
 13,27,892,111,,PCT 7342,undervote,undervote,undervote,undervote
-13,27,892,93,,PCT 7317,Aaron Peskin,Spencer Simonson,Danny Sauter,Stephen (Lulu) Schwartz
-13,27,892,49,,PCT 7311,Aaron Peskin,undervote,undervote,undervote
-13,27,892,75,,PCT 7315,Danny Sauter,Spencer Simonson,Aaron Peskin,Stephen (Lulu) Schwartz
-13,27,892,83,,PCT 7317,Aaron Peskin,Stephen (Lulu) Schwartz,Danny Sauter,Spencer Simonson
-13,27,892,89,,PCT 7329,Aaron Peskin,Spencer Simonson,Danny Sauter,Stephen (Lulu) Schwartz
-13,18,504,51,,PCT 7335,Danny Sauter,undervote,undervote,undervote
-13,18,504,37,,PCT 7311,Danny Sauter,Spencer Simonson,undervote,undervote
-13,18,504,20,,PCT 7331,Aaron Peskin,Danny Sauter,Stephen (Lulu) Schwartz,Spencer Simonson
-13,18,504,3,,PCT 7348,Aaron Peskin,undervote,undervote,undervote
+13,27,892,93,,PCT 7317,27,29,28,30
+13,27,892,49,,PCT 7311,27,undervote,undervote,undervote
+13,27,892,75,,PCT 7315,28,29,27,30
+13,27,892,83,,PCT 7317,27,30,28,29
+13,27,892,89,,PCT 7329,27,29,28,30
+13,18,504,51,,PCT 7335,28,undervote,undervote,undervote
+13,18,504,37,,PCT 7311,28,29,undervote,undervote
+13,18,504,20,,PCT 7331,27,28,30,29
+13,18,504,3,,PCT 7348,27,undervote,undervote,undervote
 13,18,504,22,,PCT 7317,undervote,undervote,undervote,undervote
-13,18,504,25,,PCT 7315,Spencer Simonson,Stephen (Lulu) Schwartz,Aaron Peskin,Danny Sauter
-13,18,504,4,,PCT 7348,Aaron Peskin,Danny Sauter,undervote,undervote
-13,19,664,45,,PCT 7326,Aaron Peskin,Danny Sauter,Spencer Simonson,Stephen (Lulu) Schwartz
-13,19,664,67,,PCT 7321,Danny Sauter,Spencer Simonson,Stephen (Lulu) Schwartz,undervote
+13,18,504,25,,PCT 7315,29,30,27,28
+13,18,504,4,,PCT 7348,27,28,undervote,undervote
+13,19,664,45,,PCT 7326,27,28,29,30
+13,19,664,67,,PCT 7321,28,29,30,undervote
