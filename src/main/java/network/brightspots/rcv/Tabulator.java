@@ -254,7 +254,9 @@ class Tabulator {
           eliminated = doRegularElimination(currentRoundTallyToCandidates);
         }
 
-        assert !eliminated.isEmpty();
+        if (eliminated.isEmpty()) {
+          throw new AssertionError();
+        }
         for (String loser : eliminated) {
           candidateToRoundEliminated.put(loser, currentRound);
         }
@@ -826,12 +828,16 @@ class Tabulator {
     boolean explicitOvervote = candidates.contains(EXPLICIT_OVERVOTE_LABEL);
     if (explicitOvervote) {
       // we should never have the explicit overvote flag AND other candidates for a given ranking
-      assert candidates.count() == 1;
+      if (candidates.count() != 1) {
+        throw new AssertionError();
+      }
 
       // if we have an explicit overvote, the only valid rules are exhaust immediately or
       // always skip. (this is enforced when we load the config also)
-      assert rule == OvervoteRule.EXHAUST_IMMEDIATELY
-          || rule == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
+      if (rule != OvervoteRule.EXHAUST_IMMEDIATELY
+          && rule != OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
+        throw new AssertionError();
+      }
 
       if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
         decision = OvervoteDecision.EXHAUST;
@@ -1114,7 +1120,9 @@ class Tabulator {
     for (String precinctId : precinctIds) {
       precinctRoundTallies.put(precinctId, new HashMap<>());
       precinctTallyTransfers.put(precinctId, new TallyTransfers());
-      assert !isNullOrBlank(precinctId);
+      if (isNullOrBlank(precinctId)) {
+        throw new AssertionError();
+      }
     }
   }
 

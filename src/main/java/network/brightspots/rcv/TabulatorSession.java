@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -174,7 +173,9 @@ class TabulatorSession {
             Logger.severe(exception.getMessage());
             break;
           }
-          assert newWinnerSet.size() == 1;
+          if (newWinnerSet.size() != 1) {
+            throw new AssertionError();
+          }
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
