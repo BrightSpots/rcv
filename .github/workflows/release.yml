@@ -134,10 +134,10 @@ jobs:
 
       - name: "Upload binaries to release"
         uses: svenstaro/upload-release-action@v2
-        if: ${{ github.event_name }} == 'release'
+        if: github.event_name == 'release'
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}*
+          file: build/${{ steps.basefn.outputs.FILEPATH }}*
           tag: ${{ github.ref_name }}
           overwrite: true
           file_glob: true
