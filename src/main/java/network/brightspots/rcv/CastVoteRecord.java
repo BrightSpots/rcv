@@ -171,9 +171,6 @@ class CastVoteRecord {
   }
 
   void exhaust() {
-    if (isExhausted) {
-      throw new AssertionError();
-    }
     isExhausted = true;
   }
 

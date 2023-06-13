@@ -174,7 +174,10 @@ class TabulatorSession {
             break;
           }
           if (newWinnerSet.size() != 1) {
-            throw new AssertionError();
+            Logger.severe(
+                "Expected to find exactly one new winner and found %d!", newWinnerSet.size());
+            exceptionsEncountered.add(TabulationAbortedException.class.toString());
+            break;
           }
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);

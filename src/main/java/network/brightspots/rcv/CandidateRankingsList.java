@@ -95,7 +95,7 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
       do {
         iteratorIndex++;
         if (iteratorIndex > rankings.length) {
-          throw new AssertionError();
+          throw new NoSuchElementException();
         }
       } while (!hasRankingAt(iteratorIndex));
 
