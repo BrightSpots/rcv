@@ -19,14 +19,14 @@ The Ranked Choice Voting Resource Center, a nonpartisan 501(c)(3), and the Brigh
 - We adhere to the EAC's [VVSG V1.0](https://github.com/BrightSpots/rcv/blob/develop/reference/VVSG/VVSG-2005.1.0.VOL.1.pdf) software coding standards from section _5.2 Software Design and Coding Standards_.  We recommend reading this.  
 - We use an Intellij [inspection tool](https://github.com/BrightSpots/rcv/blob/develop/.idea/inspectionProfiles/Project_Default.xml) to enforce nested scope limits required by the VVSG. 
 - We use [Google Java Style](https://google.github.io/styleguide/javaguide.html).  Intellij has a [plugin](https://checkstyle.sourceforge.io/google_style.html) for it which we recommend.
-- [Fork our repo](https://docs.github.com/en/get-started/quickstart/contributing-to-projects) and use GitHub flow.
+- [Fork our repo](https://docs.github.com/en/get-started/quickstart/contributing-to-projects) and use the [GitFlow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model.
 - All commit messages should hash-reference the issue number in the text e.g. "Don't log config file contents #520"
-5. Run the Gradle "check" target, which runs code / style checks, and the regression tests.  This ensures your changes do not break existing code. 
-6. Create a pull request and make changes suggested by the reviewers.  If the suggested changes significantly expand the scope of an issue, consider breaking them out into a new issue.
-7. Merge your pull request and celebrate!  It's a lot of work and we really appreciate your contribution.
+5. Run the Gradle "check" target, which runs code / style checks, and the regression tests.  This ensures your changes do not break existing code.
+6. If you're using IntelliJ, please check all the boxes under the "Commit Checks" section (e.g. Reformat code, Rearrange code, etc.) when creating commits.
+7. Create a pull request and make changes suggested by the reviewers.  If the suggested changes significantly expand the scope of an issue, consider breaking them out into a new issue.
+8. Merge your pull request and celebrate!  It's a lot of work and we really appreciate your contribution.
 
-If you have any questions or feedback please reach out to Rene Rojas by email at rene.rojas@rcvresources.org.  
- 
+If you have any questions or feedback please reach out to Chris Hughes by email at chris.hughes@rcvresources.org.  
 
 - The RCTab Team
 
