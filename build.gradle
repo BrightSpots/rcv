@@ -136,7 +136,7 @@ jlink {
         }
         if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
             imageOptions += [
-              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.png',
+              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.ico',
             ]
 
             installerOptions += [
