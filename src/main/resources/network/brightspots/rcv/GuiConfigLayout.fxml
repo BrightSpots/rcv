@@ -325,10 +325,15 @@
                             text="You can manually add candidates if auto-loading fails to produce acceptable results."
                             wrappingWidth="350"
                     />
-                    <Text
-                            text="NOTE: Candidate names must match names in CVR files exactly!"
+                    <VBox>
+                      <Text text="NOTE: Candidate names are case-sensitive and must match the CVR exactly, including any HTML tags or other special characters!"
                             wrappingWidth="350"
-                    />
+                            style="-fx-font-weight: bold; -fx-font-style: italic; -fx-font-size: 11">
+                      </Text>
+                      <padding>
+                        <Insets left="8.0" right="8.0" top="8.0"/>
+                      </padding>
+                    </VBox>
                   </VBox>
                   <Separator>
                     <padding>
