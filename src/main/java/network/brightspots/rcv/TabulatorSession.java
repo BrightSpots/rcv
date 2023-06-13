@@ -278,7 +278,8 @@ class TabulatorSession {
           // Before we tabulate, we output a converted generic CSV for the CVRs.
           try {
             DominionCvrReader dominionReader = (DominionCvrReader) reader;
-            ResultsWriter writer = new ResultsWriter().setTimestampString(timestampString);
+            ResultsWriter writer =
+                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
             this.convertedFilesWritten =
                 writer.writeGenericCvrCsv(
                     castVoteRecords,
