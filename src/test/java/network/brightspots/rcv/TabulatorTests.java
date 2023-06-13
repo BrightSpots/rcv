@@ -18,6 +18,7 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.ContestConfigMigration.isVersionNewer;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -191,6 +192,22 @@ class TabulatorTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
+  }
+
+  @Test
+  @DisplayName("test isVersionNewer")
+  void testVersionComparison() {
+    // Basic checks: version numbers work fine
+    assertFalse(isVersionNewer("1.3.0", "1.3.0"));
+    assertFalse(isVersionNewer("1.2.0", "1.3.0"));
+    assertFalse(isVersionNewer("1.3.0", "1.3.1"));
+    assertTrue(isVersionNewer("1.3.1", "1.3.0"));
+
+    // Version comparison ignores the -alpha specifier
+    assertFalse(isVersionNewer("1.2.0-alpha", "1.3.0"));
+    assertTrue(isVersionNewer("1.4.0-alpha", "1.3.0"));
+    assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0"));
+    assertFalse(isVersionNewer("1.4.0", "1.4.0-alpha"));
   }
 
   @Test
