@@ -322,8 +322,12 @@
                     </padding>
                     <Label text="Manually Add Candidate" style="-fx-font-weight: bold"/>
                     <Text
-                      text="You can manually add candidates if auto-loading fails to produce acceptable results."
-                      wrappingWidth="350"
+                            text="You can manually add candidates if auto-loading fails to produce acceptable results."
+                            wrappingWidth="350"
+                    />
+                    <Text
+                            text="NOTE: Candidate names must match names in CVR files exactly!"
+                            wrappingWidth="350"
                     />
                   </VBox>
                   <Separator>
