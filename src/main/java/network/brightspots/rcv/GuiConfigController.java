@@ -44,7 +44,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -65,9 +64,11 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.ChoiceBoxTableCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -135,7 +136,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxGenerateCdfJson;
   @FXML
-  private TableView<CvrSource> tableViewCvrFiles;
+  private EditableTableView<CvrSource> tableViewCvrFiles;
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrFilePath;
   @FXML
@@ -189,7 +190,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxCvrTreatBlankAsUndeclaredWriteIn;
   @FXML
-  private TableView<Candidate> tableViewCandidates;
+  private EditableTableView<Candidate> tableViewCandidates;
   @FXML
   private TableColumn<Candidate, String> tableColumnCandidateName;
   @FXML
@@ -1130,35 +1131,48 @@ public class GuiConfigController implements Initializable {
             "Unexpected value: " + getProviderChoice(choiceCvrProvider));
       }
     });
-    tableColumnCvrFilePath.setCellValueFactory(new PropertyValueFactory<>("filePath"));
-    tableColumnCvrFirstVoteCol.setCellValueFactory(
-        new PropertyValueFactory<>("firstVoteColumnIndex"));
-    tableColumnCvrFirstVoteRow.setCellValueFactory(new PropertyValueFactory<>("firstVoteRowIndex"));
-    tableColumnCvrIdCol.setCellValueFactory(new PropertyValueFactory<>("idColumnIndex"));
-    tableColumnCvrPrecinctCol.setCellValueFactory(
-        new PropertyValueFactory<>("precinctColumnIndex"));
-    tableColumnCvrOvervoteDelimiter.setCellValueFactory(
-        new PropertyValueFactory<>("overvoteDelimiter"));
-    tableColumnCvrProvider.setCellValueFactory(
-        c -> new SimpleStringProperty(
-            Provider.getByInternalLabel(c.getValue().getProvider()).toString())
-    );
-    tableColumnCvrContestId.setCellValueFactory(new PropertyValueFactory<>("contestId"));
-    tableColumnCvrOvervoteLabel.setCellValueFactory(new PropertyValueFactory<>("overvoteLabel"));
-    tableColumnCvrUndervoteLabel.setCellValueFactory(new PropertyValueFactory<>("undervoteLabel"));
-    tableColumnCvrUndeclaredWriteInLabel
-        .setCellValueFactory(new PropertyValueFactory<>("undeclaredWriteInLabel"));
-    tableColumnCvrTreatBlankAsUndeclaredWriteIn
-        .setCellValueFactory(new PropertyValueFactory<>("treatBlankAsUndeclaredWriteIn"));
-    tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    tableViewCvrFiles.setEditable(false);
+    EditableColumn[] cvrStringColumnsAndProperties = new EditableColumn[]{
+        new EditableColumnString(tableColumnCvrFilePath, "filePath"),
+        new EditableColumnString(tableColumnCvrFirstVoteCol, "firstVoteColumnIndex"),
+        new EditableColumnString(tableColumnCvrFirstVoteRow, "firstVoteRowIndex"),
+        new EditableColumnString(tableColumnCvrIdCol, "idColumnIndex"),
+        new EditableColumnString(tableColumnCvrPrecinctCol, "precinctColumnIndex"),
+        new EditableColumnString(tableColumnCvrOvervoteDelimiter, "overvoteDelimiter"),
+        new EditableColumnString(tableColumnCvrProvider, "provider"),
+        new EditableColumnString(tableColumnCvrContestId, "contestId"),
+        new EditableColumnString(tableColumnCvrOvervoteLabel, "overvoteLabel"),
+        new EditableColumnString(tableColumnCvrUndervoteLabel, "undervoteLabel"),
+        new EditableColumnString(tableColumnCvrUndeclaredWriteInLabel, "undeclaredWriteInLabel"),
+        new EditableColumnBoolean(tableColumnCvrTreatBlankAsUndeclaredWriteIn, "treatBlankAsUndeclaredWriteIn"),
+    };
+    setUpEditableTableStrings(cvrStringColumnsAndProperties);
 
-    tableColumnCandidateName.setCellValueFactory(new PropertyValueFactory<>("name"));
-    tableColumnCandidateAliases
-        .setCellValueFactory(new PropertyValueFactory<>("semicolonSeparatedAliases"));
-    tableColumnCandidateExcluded.setCellValueFactory(new PropertyValueFactory<>("excluded"));
+    // Don't allow editing of Provider to avoid the complexity of creating a dropdown here,
+    // it's probably not going to be frequently edited anyway, and the UI for Provider selection
+    // is cleaner anyway since it nicely disables and enables supported fields.
+    tableColumnCvrProvider.setEditable(false);
+
+    tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    tableViewCvrFiles.setEditable(true);
+
+    EditableColumn[] candidateStringColumnsAndProperties = new EditableColumn[]{
+        new EditableColumnString(tableColumnCandidateName, "name"),
+        new EditableColumnList(tableColumnCandidateAliases, "aliases"),
+        new EditableColumnBoolean(tableColumnCandidateExcluded, "excluded")
+    };
+    setUpEditableTableStrings(candidateStringColumnsAndProperties);
+
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    tableViewCandidates.setEditable(false);
+    tableViewCandidates.setEditable(true);
+
+    // Let's also catch programming errors -- all of these properties must have corresponding functions
+    // in order to have the PropertyValueFactory work correctly.
+    if (!doAllPropertyValueFactoryFunctionsExist(cvrStringColumnsAndProperties, CvrSource.class)) {
+      throw new RuntimeException("Not all PropertyValueFactory functions exist for CvrSource");
+    }
+    if (!doAllPropertyValueFactoryFunctionsExist(candidateStringColumnsAndProperties, Candidate.class)) {
+      throw new RuntimeException("Not all PropertyValueFactory functions exist for Candidate");
+    }
 
     clearAndDisableWinningRuleFields();
     choiceTiebreakMode.getItems().addAll(TiebreakMode.values());
@@ -1254,6 +1268,37 @@ public class GuiConfigController implements Initializable {
         textAreaHelp.setText(hints);
       }
     });
+  }
+
+  private void setUpEditableTableStrings(EditableColumn[] editableColumns) {
+    for (EditableColumn editableColumn : editableColumns) {
+      editableColumn.setCellFactoryValue();
+      editableColumn.setCellFactory();
+    }
+  }
+
+  private boolean doAllPropertyValueFactoryFunctionsExist(EditableColumn[] columnsAndProperties, Class rowType) {
+    boolean doAllExist = true;
+    for (EditableColumn editableColumn : columnsAndProperties) {
+      String setter = "set"
+          + editableColumn.propertyName.substring(0, 1).toUpperCase()
+          + editableColumn.propertyName.substring(1);
+      String getter = "get"
+          + editableColumn.propertyName.substring(0, 1).toUpperCase()
+          + editableColumn.propertyName.substring(1);
+      String property = editableColumn.propertyName + "Property";
+
+      try {
+        rowType.getMethod(getter);
+        rowType.getMethod(setter, editableColumn.propertyType());
+        rowType.getMethod(property);
+      } catch (NoSuchMethodException e) {
+        Logger.severe("Could not find required function %s", e.getMessage());
+        doAllExist = false;
+      }
+    }
+
+    return doAllExist;
   }
 
   private void loadConfig(ContestConfig config) throws ConfigVersionIsNewerThanAppVersionException {
@@ -1436,10 +1481,10 @@ public class GuiConfigController implements Initializable {
 
     private final ContestConfig config;
     private final List<CvrSource> sources;
-    private final TableView<Candidate> tableViewCandidates;
+    private final EditableTableView<Candidate> tableViewCandidates;
 
     AutoLoadCandidatesService(
-        ContestConfig config, List<CvrSource> sources, TableView<Candidate> tableViewCandidates) {
+        ContestConfig config, List<CvrSource> sources, EditableTableView<Candidate> tableViewCandidates) {
       this.config = config;
       this.sources = sources;
       this.tableViewCandidates = tableViewCandidates;
@@ -1611,4 +1656,93 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  private static abstract class EditableColumn {
+    protected final TableColumn column;
+    protected final String propertyName;
+
+    public EditableColumn(TableColumn column, String propertyName) {
+      this.propertyName = propertyName;
+      this.column = column;
+    }
+
+    public String getPropertyName() {
+      return propertyName;
+    }
+
+    public TableColumn getColumn() {
+      return column;
+    }
+
+    public void setCellFactoryValue() {
+      column.setCellValueFactory(new PropertyValueFactory<>(propertyName));
+    }
+
+    public abstract void setCellFactory();
+
+    public abstract Class propertyType();
+  }
+
+  private static class EditableColumnString extends EditableColumn {
+    public EditableColumnString(TableColumn column, String propertyName) {
+      super(column, propertyName);
+    }
+
+    @Override
+    public Class propertyType() {
+      return String.class;
+    }
+
+    @Override
+    public void setCellFactory() {
+      column.setCellFactory(EditableTableCell.forTableColumn());
+    }
+  }
+
+  private static class EditableColumnBoolean extends EditableColumn {
+    public EditableColumnBoolean(TableColumn column, String propertyName) {
+      super(column, propertyName);
+    }
+
+    @Override
+    public Class propertyType() {
+      return Boolean.class;
+    }
+
+    @Override
+    public void setCellFactory() {
+      column.setCellFactory(CheckBoxTableCell.forTableColumn(column));
+    }
+  }
+
+  private static class EditableColumnList extends EditableColumn {
+    public EditableColumnList(TableColumn column, String propertyName) {
+      super(column, propertyName);
+    }
+
+    @Override
+    public Class propertyType() {
+      return List.class;
+    }
+
+    @Override
+    public void setCellFactory() {
+      column.setCellFactory(ComboBoxTableCell.forTableColumn(column));
+    }
+  }
+
+  private static class EditableColumnEnum extends EditableColumn {
+    public EditableColumnEnum(TableColumn column, String propertyName) {
+      super(column, propertyName);
+    }
+
+    @Override
+    public Class propertyType() {
+      return Enum.class;
+    }
+
+    @Override
+    public void setCellFactory() {
+      column.setCellFactory(ChoiceBoxTableCell.forTableColumn(column));
+    }
+  }
 }
