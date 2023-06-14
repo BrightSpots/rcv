@@ -125,7 +125,10 @@ class Logger {
       if (!file.exists()) {
         break;
       }
-      assert file.setReadOnly();
+      boolean readOnlySucceeded = file.setReadOnly();
+      if (!readOnlySucceeded) {
+        warning("Failed to set file to read-only: %s", file.getAbsolutePath());
+      }
       index++;
     }
   }
