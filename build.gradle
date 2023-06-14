@@ -97,6 +97,8 @@ javafx {
 }
 
 def JLINK_DIR = "$buildDir/rcv"
+
+// Comma-separated list of modules
 // Necessary to explicitly include due to https://github.com/BrightSpots/rcv/issues/625
 def MODULES_TO_ADD = "com.ctc.wstx"
 
@@ -104,13 +106,69 @@ def MODULES_TO_ADD = "com.ctc.wstx"
 jlink {
     imageDir = file(JLINK_DIR)
     imageZip = file(JLINK_DIR + ".zip")
-    addOptions '--add-modules', MODULES_TO_ADD, '--strip-debug', '--compress', '2',
-            '--no-header-files', '--no-man-pages'
+    addOptions '--add-modules', MODULES_TO_ADD,
+               '--strip-debug', '--compress', '2',
+               '--no-header-files', '--no-man-pages'
     mergedModule {
         requires "java.xml"
     }
     launcher {
-        name = "rcv"
+        // TODO Sync version number with release.yml and Main.java (github.com/BrightSpots/rcv/issues/662)
+        name = "RCTab"
+        version = "1.4.0-alpha"
+    }
+
+    jpackage {
+        installerOptions += [
+          '--verbose',
+          '--vendor', 'Ranked Choice Voting Resource Center'
+        ]
+        if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
+            imageOptions += [
+              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.png',
+            ]
+
+            installerOptions += [
+              '--linux-package-name', 'rctab',
+              '--linux-deb-maintainer', 'info@rcvresources.org',
+              '--linux-shortcut'
+            ]
+        }
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            imageOptions += [
+              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.ico',
+            ]
+
+            installerOptions += [
+              '--win-per-user-install',
+              '--win-dir-chooser',
+              '--win-menu',
+              '--win-shortcut'
+            ]
+        }
+        if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+            // .App is signed with the Application certificate
+            imageOptions += [
+              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
+              '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
+              '--mac-sign',
+              '--mac-signing-key-user-name', 'Developer ID Application: Election Administration Resource Center (A257HB4NS4',
+              '--mac-signing-keychain', 'build.keychain'
+            ]
+
+            // DMG is signed with the Installer certificate
+            installerOptions += [
+              '--type', 'dmg', 
+              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
+              '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
+              '--mac-sign',
+              '--mac-signing-key-user-name', 'Developer ID Installer: Election Administration Resource Center (A257HB4NS4)',
+              '--mac-signing-keychain', 'build.keychain',
+              '--mac-package-name', 'RCTab',
+              '--mac-package-identifier', 'network.brightspots.rcv',
+              '--mac-package-signing-prefix', 'network.brightspots.rcv'
+            ]
+        }
     }
 }
 
