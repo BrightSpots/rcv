@@ -91,12 +91,10 @@ class ContestConfig {
   private final String sourceDirectory;
   // Used to track a sequential multi-seat race
   private final List<String> sequentialWinners = new LinkedList<>();
-  // Candidate display names (no aliases or codes)
+  // Candidate display names (no aliases)
   private Set<String> candidateNames;
   // Mapping from any candidate alias to the candidate's display name
   private Map<String, String> candidateAliasesToNameMap;
-  // Mapping from any candidate alias to the candidate's code
-  private Map<String, String> candidateAliasesToCodeMap;
   // A list of any validation errors
   private Set<ValidationError> validationErrors = new HashSet<>();
 
@@ -519,20 +517,20 @@ class ContestConfig {
     }
   }
 
-  // checks for conflicts between a candidate name and other name/codes or other reserved strings
-  // param: candidateString is a candidate name or code
-  // param: field is either "name" or "code"
-  // param: candidateStringsSeen is a running set of names/codes we've already encountered
+  // checks for conflicts between a candidate name and other aliases or reserved strings
+  // param: candidateString is a candidate name or alias
+  // param: candidateStringsSeen is a running set of names / aliases we've already encountered
   private boolean candidateStringAlreadyInUseElsewhere(
-      String candidateString, String field, Set<String> candidateStringsSeen) {
+      String candidateString, Set<String> candidateStringsSeen) {
     boolean inUse = false;
     if (candidateStringsSeen.contains(candidateString)) {
       inUse = true;
-      Logger.severe("Duplicate candidate %ss are not allowed: %s", field, candidateString);
+      Logger.severe("Duplicate candidate names or aliases are not allowed: %s", candidateString);
     } else {
       for (CvrSource source : getRawConfig().cvrFileSources) {
         inUse =
-            stringAlreadyInUseElsewhereInSource(candidateString, source, "a candidate " + field);
+            stringAlreadyInUseElsewhereInSource(
+                candidateString, source, "a candidate name or alias");
         if (inUse) {
           break;
         }
@@ -611,13 +609,16 @@ class ContestConfig {
 
       // Ensure the candidate name and all aliases are unique, both within each candidate and
       // across candidates.
-      candidate.createStreamOfNameAndAllAliases().forEach(nameOrAlias -> {
-        if (candidateStringAlreadyInUseElsewhere(nameOrAlias, "name", candidateNameSet)) {
-          validationErrors.add(ValidationError.CANDIDATE_DUPLICATE_NAME);
-        } else {
-          candidateNameSet.add(nameOrAlias);
-        }
-      });
+      candidate
+          .createStreamOfNameAndAllAliases()
+          .forEach(
+              nameOrAlias -> {
+                if (candidateStringAlreadyInUseElsewhere(nameOrAlias, candidateNameSet)) {
+                  validationErrors.add(ValidationError.CANDIDATE_DUPLICATE_NAME);
+                } else {
+                  candidateNameSet.add(nameOrAlias);
+                }
+              });
     }
 
     if (getNumDeclaredCandidates() < 1) {
@@ -1063,19 +1064,15 @@ class ContestConfig {
     return candidateAliasesToNameMap.get(nameOrAlias);
   }
 
-  String getCodeForCandidate(String nameOrAlias) {
-    return candidateAliasesToCodeMap.get(nameOrAlias);
-  }
-
   ArrayList<String> getCandidatePermutation() {
     return candidatePermutation;
   }
 
-  void setCandidateExclusionStatus(String candidateCode, boolean excluded) {
+  void setCandidateExclusionStatus(String candidateName, boolean excluded) {
     if (excluded) {
-      excludedCandidates.add(candidateCode);
+      excludedCandidates.add(candidateName);
     } else {
-      excludedCandidates.remove(candidateCode);
+      excludedCandidates.remove(candidateName);
     }
   }
 
@@ -1085,7 +1082,6 @@ class ContestConfig {
   // 3) add uwi candidate if needed
   private void processCandidateData() {
     candidateAliasesToNameMap = new HashMap<>();
-    candidateAliasesToCodeMap = new HashMap<>();
     candidateNames = new HashSet<>();
 
     if (rawConfig.candidates != null) {
@@ -1101,7 +1097,6 @@ class ContestConfig {
         aliases.forEach(nameOrAlias -> {
           // duplicate names and aliases get caught in validation
           candidateAliasesToNameMap.put(nameOrAlias, name);
-          candidateAliasesToCodeMap.put(nameOrAlias, candidate.getCode());
         });
       }
     }
@@ -1111,8 +1106,6 @@ class ContestConfig {
     if (undeclaredWriteInsEnabled()) {
       candidateNames.add(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
       candidateAliasesToNameMap.put(
-          Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
-      candidateAliasesToCodeMap.put(
           Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
     }
   }
@@ -1164,7 +1157,6 @@ class ContestConfig {
     CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
     CANDIDATE_NAME_MISSING,
-    CANDIDATE_CODE_INVALID,
     CANDIDATE_DUPLICATE_NAME,
     CANDIDATE_NO_CANDIDATES_SPECIFIED,
     CANDIDATE_ALL_EXCLUDED,

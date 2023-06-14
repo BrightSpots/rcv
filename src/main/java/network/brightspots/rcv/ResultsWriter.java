@@ -441,8 +441,8 @@ class ResultsWriter {
     // make sure we list them in order of election
     Collections.sort(winningRounds);
     for (int round : winningRounds) {
-      for (String candidateCode : roundToWinningCandidates.get(round)) {
-        winners.add(config.getNameForCandidate(candidateCode));
+      for (String candidateName : roundToWinningCandidates.get(round)) {
+        winners.add(config.getNameForCandidate(candidateName));
       }
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
@@ -577,7 +577,7 @@ class ResultsWriter {
           if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             selection = undeclaredWriteInLabel;
           } else {
-            selection = config.getCodeForCandidate(selection);
+            selection = config.getNameForCandidate(selection);
           }
           csvPrinter.print(selection);
         } else {

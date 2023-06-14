@@ -123,10 +123,10 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
       example: "Duson, Jill C."
       value: string of length [1..1000]
 
-    "code" optional
-      candidate code which may appear in CVRs in lieu of full candidate name
-      example: "JCD"
-      value: string of length [1..1000]
+    "aliases" optional
+      aliases which may appear in CVRs in addition to candidate name
+      example: ["JCD"], or ["Jimmy", "Jim"]
+      value: list containing string(s) of length [1..1000]
 
     "excluded" optional
       candidate should be ignored during tabulation
@@ -178,8 +178,9 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
           if selecting a loser the tied candidate who appears latest is selected as the loser
 
         "generatePermutation"
-          on config load candidate names are sorted alphabetically by candidate code, or if code is not present, candidate name
-          a randomly ordered candidate permutation is created using Collections.shuffle() with the randomSeed specified in the input config file
+          on config load candidate names are sorted alphabetically by candidate name
+          a randomly ordered candidate permutation is created using Collections.shuffle() with the randomSeed specified
+          in the input config file
           during tabulation, in the event of a tie at the end of a round, this permutation is consulted
           if selecting a winner: the tied candidate in this round who appears earliest is selected
           if selecting a loser: the tied candidate who appears latest is selected
