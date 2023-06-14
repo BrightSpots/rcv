@@ -322,9 +322,18 @@
                     </padding>
                     <Label text="Manually Add Candidate" style="-fx-font-weight: bold"/>
                     <Text
-                      text="You can manually add candidates if auto-loading fails to produce acceptable results."
-                      wrappingWidth="350"
+                            text="You can manually add candidates if auto-loading fails to produce acceptable results."
+                            wrappingWidth="350"
                     />
+                    <VBox>
+                      <Text text="NOTE: Candidate names are case-sensitive and must match the CVR exactly, including any HTML tags or other special characters!"
+                            wrappingWidth="350"
+                            style="-fx-font-weight: bold; -fx-font-style: italic; -fx-font-size: 11">
+                      </Text>
+                      <padding>
+                        <Insets left="8.0" right="8.0" top="8.0"/>
+                      </padding>
+                    </VBox>
                   </VBox>
                   <Separator>
                     <padding>
@@ -465,6 +474,18 @@
                       <CheckBox fx:id="checkBoxContinueUntilTwoCandidatesRemain"
                         mnemonicParsing="false"
                         text="Continue until Two Candidates Remain">
+                        <VBox.margin>
+                          <Insets top="8.0" bottom="8.0"/>
+                        </VBox.margin>
+                      </CheckBox>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <CheckBox fx:id="checkBoxFirstRoundDeterminesThreshold"
+                                mnemonicParsing="false"
+                                text="First Round Determines Threshold">
                         <VBox.margin>
                           <Insets top="8.0" bottom="8.0"/>
                         </VBox.margin>

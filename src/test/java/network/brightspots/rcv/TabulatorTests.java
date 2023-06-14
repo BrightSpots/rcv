@@ -586,6 +586,18 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("first round determine threshold test")
+  void firstRoundDeterminesThresholdTest() {
+    runTabulationTest("first_round_determines_threshold_test");
+  }
+
+  @Test
+  @DisplayName("first round determine threshold and tiebreaker runs test")
+  void firstRoundDeterminesTiebreakerThresholdTest() {
+    runTabulationTest("first_round_determines_threshold_tiebreaker_test");
+  }
+
+  @Test
   @DisplayName("overvote exhaust if multiple continuing test")
   void overvoteExhaustIfMultipleContinuingTest() {
     runTabulationTest("exhaust_if_multiple_continuing");
@@ -602,5 +614,12 @@ class TabulatorTests {
   @DisplayName("no one meets minimum test")
   void noOneMeetsMinimumTest() {
     runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());
+  }
+
+  @Test
+  @DisplayName("gracefully fail when tabulate-by-precinct option set without any precincts in CVR")
+  void tabulateByPrecinctWithoutPrecincts() {
+    runTabulationTest("tabulate_by_precinct_without_precincts",
+        TabulationAbortedException.class.toString());
   }
 }

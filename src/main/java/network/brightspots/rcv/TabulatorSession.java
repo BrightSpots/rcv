@@ -15,7 +15,7 @@
  * Output results
  * Design: TabulatorSession also stores state metadata which exists outside tabulation results:
  * config object, resolved output, and logging paths, tabulation object, and CVR data including
- * precinct codes discovered while parsing CVR files.
+ * precinct IDs discovered while parsing CVR files.
  * Conditions: During tabulation, validation, and conversion.
  * Version history: see https://github.com/BrightSpots/rcv.
  */
@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +44,6 @@ import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 class TabulatorSession {
 
   private final String configPath;
-  // precinct IDs discovered during CVR parsing to support testing
-  private final Set<String> precinctIds = new HashSet<>();
   private final String timestampString;
   private String outputPath;
   private List<String> convertedFilesWritten;
@@ -102,7 +99,7 @@ class TabulatorSession {
       checkConfigVersionMatchesApp(config);
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
+        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
         if (castVoteRecords == null) {
           Logger.severe("Aborting conversion due to cast vote record errors!");
         } else {
@@ -110,8 +107,7 @@ class TabulatorSession {
               new ResultsWriter()
                   .setNumRounds(0)
                   .setContestConfig(config)
-                  .setTimestampString(timestampString)
-                  .setPrecinctIds(precinctIds);
+                  .setTimestampString(timestampString);
           try {
             writer.generateCdfJson(castVoteRecords);
           } catch (RoundSnapshotDataMissingException exception) {
@@ -164,7 +160,7 @@ class TabulatorSession {
           Logger.info(
               "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
           // Read cast vote records and precinct IDs from CVR files
-          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
+          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
           if (castVoteRecords == null) {
             Logger.severe("Aborting tabulation due to cast vote record errors!");
             break;
@@ -195,7 +191,7 @@ class TabulatorSession {
       } else {
         // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
         // Read cast vote records and precinct IDs from CVR files
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, precinctIds);
+        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
         if (castVoteRecords == null) {
           Logger.severe("Aborting tabulation due to cast vote record errors!");
         } else {
@@ -240,7 +236,7 @@ class TabulatorSession {
       ContestConfig config, List<CastVoteRecord> castVoteRecords)
       throws TabulationAbortedException {
     Set<String> winners;
-    Tabulator tabulator = new Tabulator(castVoteRecords, config, precinctIds);
+    Tabulator tabulator = new Tabulator(castVoteRecords, config);
     winners = tabulator.tabulate();
     try {
       tabulator.generateSummaryFiles(timestampString);
@@ -252,9 +248,8 @@ class TabulatorSession {
 
   // parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
-  // param: precinctIds a set of precinct IDs which will be populated during cvr parsing
   // returns: list of parsed CVRs or null if an error was encountered
-  private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config, Set<String> precinctIds) {
+  private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config) {
     Logger.info("Parsing cast vote records...");
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     boolean encounteredSourceProblem = false;
@@ -266,7 +261,7 @@ class TabulatorSession {
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
         Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
-        reader.readCastVoteRecords(castVoteRecords, precinctIds);
+        reader.readCastVoteRecords(castVoteRecords);
 
         // Check for unrecognized candidates
         Map<String, Integer> unrecognizedCandidateCounts =

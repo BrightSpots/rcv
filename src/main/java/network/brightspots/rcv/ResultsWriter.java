@@ -275,7 +275,12 @@ class ResultsWriter {
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
           getOutputFilePathFromInstance(String.format("%s_precinct_summary", precinctFileString));
-      int numBallots = numBallotsByPrecinct.get(precinct);
+      Integer numBallotsObj = numBallotsByPrecinct.get(precinct);
+      if (numBallotsObj == null) {
+        Logger.warning("No ballots found in precinct \"%s\"", precinct, numBallotsByPrecinct);
+        numBallotsObj = 0;
+      }
+      int numBallots = numBallotsObj;
       generateSummarySpreadsheet(roundTallies, numBallots, precinct, outputPath);
       generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct), precinct, outputPath);
     }
@@ -440,8 +445,8 @@ class ResultsWriter {
     // make sure we list them in order of election
     Collections.sort(winningRounds);
     for (int round : winningRounds) {
-      for (String candidateCode : roundToWinningCandidates.get(round)) {
-        winners.add(config.getNameForCandidate(candidateCode));
+      for (String candidateName : roundToWinningCandidates.get(round)) {
+        winners.add(config.getNameForCandidate(candidateName));
       }
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
@@ -579,7 +584,7 @@ class ResultsWriter {
           if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             selection = undeclaredWriteInLabel;
           } else {
-            selection = config.getCodeForCandidate(selection);
+            selection = config.getNameForCandidate(selection);
           }
           csvPrinter.print(selection);
         } else {

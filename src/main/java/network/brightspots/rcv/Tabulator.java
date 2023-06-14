@@ -72,18 +72,31 @@ class Tabulator {
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // precincts which may appear in the cast vote records
-  private final Set<String> precinctNames;
+  private final Set<String> precinctIds = new HashSet<>();
   // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
   // tracks required winning threshold
   private BigDecimal winningThreshold;
 
-  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config, Set<String> precinctNames) {
+  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config)
+      throws TabulationAbortedException {
     this.castVoteRecords = castVoteRecords;
     this.candidateNames = config.getCandidateNames();
     this.config = config;
-    this.precinctNames = precinctNames;
+
+    for (CastVoteRecord cvr : castVoteRecords) {
+      String precinctId = cvr.getPrecinct();
+      if (precinctId != null) {
+        precinctIds.add(precinctId);
+      }
+    }
+
     if (config.isTabulateByPrecinctEnabled()) {
+      if (precinctIds.size() == 0) {
+        Logger.severe("\"Tabulate by Precinct\" enabled, but CVRs don't list precincts.");
+        throw new TabulationAbortedException(false);
+      }
+
       initPrecinctRoundTallies();
     }
   }
@@ -159,7 +172,18 @@ class Tabulator {
       // votes in the first round.
       // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
       // on the number of active votes in the current round.
-      if (currentRound == 1 || config.getNumberOfWinners() <= 1) {
+      boolean shouldRecomputeThreshold;
+      if (config.getNumberOfWinners() > 1) {
+        // Multi-winner only computes threshold on round 1
+        shouldRecomputeThreshold = currentRound == 1;
+      } else {
+        // Single-Winner recomputes threshold on round 1 always,
+        // and on other rounds if First Round Determines Threshold is not set
+        shouldRecomputeThreshold =
+          !config.isFirstRoundDeterminesThresholdEnabled()
+          || currentRound == 1;
+      }
+      if (shouldRecomputeThreshold) {
         setWinningThreshold(currentRoundCandidateToTally, config.getMinimumVoteThreshold());
       }
 
@@ -483,19 +507,34 @@ class Tabulator {
     } else {
       // We should only look for more winners if we haven't already filled all the seats.
       if (winnerToRound.size() < config.getNumberOfWinners()) {
-        // If the number of continuing candidates equals the number of seats to fill, everyone wins.
         if (currentRoundCandidateToTally.size()
             == config.getNumberOfWinners() - winnerToRound.size()) {
+          // If the number of continuing candidates equals the number of seats to fill,
+          // everyone wins.
           selectedWinners.addAll(currentRoundCandidateToTally.keySet());
+        } else if (config.isFirstRoundDeterminesThresholdEnabled()
+              && currentRoundCandidateToTally.size() - 1 == config.getNumberOfWinners()) {
+          // Edge case: if nobody meets the threshold, but we're on the penultimate round when
+          // isFirstRoundDeterminesThresholdEnabled is true, select the max vote getters as
+          // the winners. If isFirstRoundDeterminesThresholdEnabled isn't enabled, it should be
+          // impossible for a single-winner election to end up here.
+          BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
+          selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
         } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
+          // Otherwise, select all winners above the threshold
           selectWinners(currentRoundTallyToCandidates, selectedWinners);
         }
       }
 
       // Edge case: if we've identified multiple winners in this round, but we're only supposed to
-      // elect one winner per round, pick the top vote-getter and defer the others to subsequent
-      // rounds.
-      if (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
+      // elect one winner per round, pick the top vote-getter.
+      // * If this is a multi-winner election, defer the others to subsequent rounds.
+      // * If this is a single-winner election in which it's possible for no candidate to reach the
+      //   threshold (i.e. "first round determines threshold" is set), the tiebreaker will choose
+      //   the only winner.
+      boolean useTiebreakerIfNeeded = config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
+          || config.isFirstRoundDeterminesThresholdEnabled();
+      if (useTiebreakerIfNeeded && selectedWinners.size() > 1) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
         selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
@@ -678,7 +717,7 @@ class Tabulator {
             .setContestConfig(config)
             .setTimestampString(timestamp)
             .setWinningThreshold(winningThreshold)
-            .setPrecinctIds(precinctNames)
+            .setPrecinctIds(precinctIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
     writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, castVoteRecords.size());
@@ -834,7 +873,8 @@ class Tabulator {
   //  logs the results to audit log
   //  update tallyTransfers counts
   private void recordSelectionForCastVoteRecord(
-      CastVoteRecord cvr, int currentRound, String selectedCandidate, String outcomeDescription) {
+      CastVoteRecord cvr, int currentRound,
+      String selectedCandidate, String outcomeDescription) throws TabulationAbortedException {
     // update transfer counts (unless there's no value to transfer, which can happen if someone
     // wins with a tally that exactly matches the winning threshold)
     if (cvr.getFractionalTransferValue().signum() == 1) {
@@ -844,13 +884,19 @@ class Tabulator {
           selectedCandidate,
           cvr.getFractionalTransferValue());
       if (config.isTabulateByPrecinctEnabled()) {
-        precinctTallyTransfers
-            .get(cvr.getPrecinct())
-            .addTransfer(
-                currentRound,
-                cvr.getCurrentRecipientOfVote(),
-                selectedCandidate,
-                cvr.getFractionalTransferValue());
+        String precinctId = cvr.getPrecinct();
+        TallyTransfers precinctTallyTransfer = precinctTallyTransfers.get(precinctId);
+        if (precinctTallyTransfer == null) {
+          Logger.severe(
+              "Precinct \"%s\" is not among the %d known precincts.",
+              precinctId, precinctIds.size());
+          throw new TabulationAbortedException(false);
+        }
+        precinctTallyTransfer.addTransfer(
+            currentRound,
+            cvr.getCurrentRecipientOfVote(),
+            selectedCandidate,
+            cvr.getFractionalTransferValue());
       }
     }
 
@@ -872,7 +918,8 @@ class Tabulator {
   //  - exhaust cvrs if they should be exhausted for various reasons
   //  - assign cvrs to continuing candidates if they have been transferred or in the initial count
   // returns a map of candidate ID to vote tallies for this round
-  private Map<String, BigDecimal> computeTalliesForRound(int currentRound) {
+  private Map<String, BigDecimal> computeTalliesForRound(int currentRound)
+          throws TabulationAbortedException {
     Map<String, BigDecimal> roundTally = getNewTally();
     Map<String, Map<String, BigDecimal>> roundTallyByPrecinct = new HashMap<>();
     if (config.isTabulateByPrecinctEnabled()) {
@@ -1064,10 +1111,10 @@ class Tabulator {
   }
 
   private void initPrecinctRoundTallies() {
-    for (String precinctName : precinctNames) {
-      precinctRoundTallies.put(precinctName, new HashMap<>());
-      precinctTallyTransfers.put(precinctName, new TallyTransfers());
-      assert !isNullOrBlank(precinctName);
+    for (String precinctId : precinctIds) {
+      precinctRoundTallies.put(precinctId, new HashMap<>());
+      precinctTallyTransfers.put(precinctId, new TallyTransfers());
+      assert !isNullOrBlank(precinctId);
     }
   }
 

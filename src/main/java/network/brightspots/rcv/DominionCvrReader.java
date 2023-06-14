@@ -132,7 +132,7 @@ class DominionCvrReader extends BaseCvrReader {
   // parse CVR JSON for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CvrParseException {
     // read metadata files for precincts, precinct portions, contest, and candidates
 
@@ -181,7 +181,7 @@ class DominionCvrReader extends BaseCvrReader {
 
   private void validateNamesAreInContest(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {
-    // build a lookup map for candidates codes to optimize Cvr parsing
+    // build a lookup map to optimize CVR parsing
     Map<String, Set<String>> contestIdToCandidateNames = new HashMap<>();
     for (Candidate candidate : this.candidates) {
       Set<String> candidates;

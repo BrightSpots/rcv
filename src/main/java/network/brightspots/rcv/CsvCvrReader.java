@@ -48,7 +48,7 @@ class CsvCvrReader extends BaseCvrReader {
 
   // parse CVR CSV file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, Set<String> precinctIds)
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException, IOException {
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
       CSVParser parser =
