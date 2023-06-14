@@ -116,6 +116,10 @@ class ResultsWriter {
 
     try {
       jsonWriter.writeValue(outFile, json);
+      boolean readOnlySucceeded = outFile.setReadOnly();
+      if (!readOnlySucceeded) {
+        Logger.warning("Failed to set file to read-only: %s", outFile.getAbsolutePath());
+      }
     } catch (IOException exception) {
       Logger.severe(
           "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
@@ -379,6 +383,12 @@ class ResultsWriter {
     try {
       csvPrinter.flush();
       csvPrinter.close();
+
+      File file = new File(csvPath);
+      boolean readOnlySucceeded = file.setReadOnly();
+      if (!readOnlySucceeded) {
+        Logger.warning("Failed to set file to read-only: %s", file.getAbsolutePath());
+      }
     } catch (IOException exception) {
       Logger.severe("Error saving file: %s\n%s", outputPath, exception);
       throw exception;
@@ -547,6 +557,12 @@ class ResultsWriter {
         csvPrinter.close();
         filesWritten.add(outputPath.toString());
         Logger.info("Successfully wrote: %s", outputPath.toString());
+
+        File file = new File(outputPath.toString());
+        boolean readOnlySucceeded = file.setReadOnly();
+        if (!readOnlySucceeded) {
+          Logger.warning("Failed to set file to read-only: %s", file.getAbsolutePath());
+        }
       }
     } catch (IOException exception) {
       Logger.severe(

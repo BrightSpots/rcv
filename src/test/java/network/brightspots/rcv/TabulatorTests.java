@@ -145,6 +145,15 @@ class TabulatorTests {
       for (File file : files) {
         if (!file.isDirectory()) {
           try {
+            // Every ephemeral file must be set to read-only on close, including audit logs
+            assertFalse(
+                file.canWrite(),
+                "File must be set to read-only: %s".formatted(file.getAbsolutePath()));
+            // Then set it writeable so it can be deleted
+            boolean writeableSucceeded = file.setWritable(true);
+            if (!writeableSucceeded) {
+              Logger.warning("Failed to set file to writeable: %s", file.getAbsolutePath());
+            }
             Files.delete(file.toPath());
           } catch (IOException exception) {
             Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
