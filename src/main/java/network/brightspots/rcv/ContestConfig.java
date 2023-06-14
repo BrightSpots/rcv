@@ -1007,6 +1007,9 @@ class ContestConfig {
   }
 
   private String getMaxSkippedRanksAllowedRaw() {
+    if (rawConfig.rules.maxSkippedRanksAllowed.equals("")) {
+      return "";
+    }
     return rawConfig.rules.maxSkippedRanksAllowed;
   }
 
