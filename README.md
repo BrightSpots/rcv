@@ -24,9 +24,11 @@ The Tabulator produces the following as output:
 
 1. Download the pre-compiled Tabulator for your OS from the GitHub [releases page](https://github.com/BrightSpots/rcv/releases).
 
-    **Note**: this download should be a "jlink image", which means you don't even need to have Java installed on your machine to run it!
+    **Note**: this download is a "jlink package", which means you don't even need to have Java installed on your machine to run it!
 
 2. Unzip the file, navigate to the `bin` directory, and launch the RCV Tabulator GUI by running the `rcv` script if using MacOS or Linux, or `rcv.bat` if using Windows.
+
+On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch the tabulator GUI.
 
 #### Method 2 (Less Easy): Compile and Run Using Gradle
 
