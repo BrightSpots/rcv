@@ -23,31 +23,19 @@ import java.util.NoSuchElementException;
 import javafx.util.Pair;
 
 class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRanking>> {
-  class CandidateRankingsListIterator implements Iterator<Pair<Integer, CandidatesAtRanking>> {
-    private int iteratorIndex = 0;
-
-    public boolean hasNext() {
-      return iteratorIndex < rankings.length;
+  /**
+   * Precondition: must be called with a 1-indexed ranking number. Note: just because this returns
+   * false at ranking N doesn't mean it will also return false at N+1 -- specifically, that will not
+   * be true if there are skipped rankings.
+   *
+   * @param num A value >= 1.
+   * @return Whether the candidate has a ranking at the given value.
+   */
+  boolean hasRankingAt(int num) {
+    if (num < 1) {
+      throw new IllegalArgumentException();
     }
-
-    public Pair<Integer, CandidatesAtRanking> next() {
-      if (iteratorIndex == rankings.length) {
-        throw new NoSuchElementException();
-      }
-
-      do {
-        iteratorIndex++;
-        assert iteratorIndex <= rankings.length;
-      } while (!hasRankingAt(iteratorIndex));
-
-      // Note: round numbers are 1-indexed externally, 0-indexed internally,
-      // thus why we return a different value than what we index into here
-      return new Pair<>(iteratorIndex, rankings[iteratorIndex - 1]);
-    }
-
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
+    return num <= rankings.length && rankings[num - 1].count() != 0;
   }
 
   private final CandidatesAtRanking[] rankings;
@@ -92,18 +80,33 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
     return rankings[i - 1];
   }
 
-  /**
-   * Precondition: must be called with a 1-indexed ranking number.
-   * Note: just because this returns false at ranking N doesn't mean it will
-   * also return false at N+1 -- specifically, that will not be true if
-   * there are skipped rankings.
-   *
-   * @param num A value >= 1.
-   * @return Whether the candidate has a ranking at the given value.
-   */
-  boolean hasRankingAt(int num) {
-    assert num >= 1;
-    return num <= rankings.length && rankings[num - 1].count() != 0;
+  class CandidateRankingsListIterator implements Iterator<Pair<Integer, CandidatesAtRanking>> {
+    private int iteratorIndex = 0;
+
+    public boolean hasNext() {
+      return iteratorIndex < rankings.length;
+    }
+
+    public Pair<Integer, CandidatesAtRanking> next() {
+      if (iteratorIndex >= rankings.length) {
+        throw new NoSuchElementException();
+      }
+
+      do {
+        iteratorIndex++;
+        if (iteratorIndex > rankings.length) {
+          throw new NoSuchElementException();
+        }
+      } while (!hasRankingAt(iteratorIndex));
+
+      // Note: round numbers are 1-indexed externally, 0-indexed internally,
+      // thus why we return a different value than what we index into here
+      return new Pair<>(iteratorIndex, rankings[iteratorIndex - 1]);
+    }
+
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
   }
 
   int maxRankingNumber() {

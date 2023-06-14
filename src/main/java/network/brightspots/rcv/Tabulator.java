@@ -254,7 +254,10 @@ class Tabulator {
           eliminated = doRegularElimination(currentRoundTallyToCandidates);
         }
 
-        assert !eliminated.isEmpty();
+        if (eliminated.isEmpty()) {
+          Logger.severe("Failed to eliminate any candidates!");
+          throw new TabulationAbortedException(false);
+        }
         for (String loser : eliminated) {
           candidateToRoundEliminated.put(loser, currentRound);
         }
@@ -820,18 +823,27 @@ class Tabulator {
   // and if so return how to handle it based on the rule configuration in use
   // param: candidates all candidates this CVR contains at a particular rank
   // return: an OvervoteDecision enum to be applied to the CVR under consideration
-  private OvervoteDecision getOvervoteDecision(CandidatesAtRanking candidates) {
+  private OvervoteDecision getOvervoteDecision(CandidatesAtRanking candidates)
+      throws TabulationAbortedException {
     OvervoteDecision decision;
     OvervoteRule rule = config.getOvervoteRule();
     boolean explicitOvervote = candidates.contains(EXPLICIT_OVERVOTE_LABEL);
     if (explicitOvervote) {
       // we should never have the explicit overvote flag AND other candidates for a given ranking
-      assert candidates.count() == 1;
+      if (candidates.count() != 1) {
+        Logger.severe("Found multiple candidates when explicit overvote label was provided!");
+        throw new TabulationAbortedException(false);
+      }
 
       // if we have an explicit overvote, the only valid rules are exhaust immediately or
       // always skip. (this is enforced when we load the config also)
-      assert rule == OvervoteRule.EXHAUST_IMMEDIATELY
-          || rule == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
+      if (rule != OvervoteRule.EXHAUST_IMMEDIATELY
+          && rule != OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
+        Logger.severe(
+            "Invalid overvote rule \"%s\" selected when explicit overvote label was provided!",
+            rule);
+        throw new TabulationAbortedException(false);
+      }
 
       if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
         decision = OvervoteDecision.EXHAUST;
@@ -1110,11 +1122,14 @@ class Tabulator {
     }
   }
 
-  private void initPrecinctRoundTallies() {
+  private void initPrecinctRoundTallies() throws TabulationAbortedException {
     for (String precinctId : precinctIds) {
+      if (isNullOrBlank(precinctId)) {
+        Logger.severe("Null precinct found in precinct list: %s", precinctIds);
+        throw new TabulationAbortedException(false);
+      }
       precinctRoundTallies.put(precinctId, new HashMap<>());
       precinctTallyTransfers.put(precinctId, new TallyTransfers());
-      assert !isNullOrBlank(precinctId);
     }
   }
 
