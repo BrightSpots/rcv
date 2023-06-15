@@ -24,6 +24,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ModifiableObservableListBase;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -174,8 +178,23 @@ public class RawContestConfig {
       return provider.get();
     }
 
-    public void setProvider(String provider) {
-      this.provider.set(ContestConfig.Provider.getByInternalLabel(provider).toString());
+    /**
+     * Set the provider by either its GUI label or its internal label.
+     * Supporting both means we don't have to translate between internal and GUI labels
+     * each time we serialize/deserialize in the table.
+     *
+     * @param providerString The provider's internal or GUI label.
+     */
+    public void setProvider(String providerString) {
+      // First, try to get the provider by its public name
+      ContestConfig.Provider provider = ContestConfig.Provider.getByGuiLabel(providerString);
+
+      // If that fails, try its internal name
+      if (provider == ContestConfig.Provider.PROVIDER_UNKNOWN) {
+        provider = ContestConfig.Provider.getByInternalLabel(providerString);
+      }
+
+      this.provider.set(provider.getInternalLabel());
     }
 
     public String getOvervoteLabel() {
@@ -266,12 +285,15 @@ public class RawContestConfig {
   /**
    * Contest candidate data that can be serialized and deserialized.
    */
-  @JsonIgnoreProperties(ignoreUnknown = true, value = {"semicolonSeparatedAliases"})
+  @JsonIgnoreProperties(ignoreUnknown = true, value = {"observableAliases"})
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
     private SimpleStringProperty name = new SimpleStringProperty();
     private SimpleBooleanProperty excluded = new SimpleBooleanProperty();
-    private SimpleListProperty<String> aliases = new SimpleListProperty<>();
+    // The actual list of aliases, observable by the UI
+    private ObservableList<String> observableAliases = FXCollections.observableArrayList();
+    // A property that wraps the observable list, so that it can be serialized
+    private SimpleListProperty<String> aliases = new SimpleListProperty<>(observableAliases);
 
     Candidate() {
     }
@@ -336,20 +358,6 @@ public class RawContestConfig {
     }
 
     /**
-     * For display purposes, get a semicolon-separated list of aliases.
-     *
-     * @return a potentially-empty string
-     */
-    public String getSemicolonSeparatedAliases() {
-      Stream<String> s = this.aliases.stream();
-      return String.join("; ", s.toList());
-    }
-
-    public void setSemicolonSeparatedAliases(String semicolonSeparatedAliases) {
-      this.aliases.setAll(semicolonSeparatedAliases.split("\\W*;\\W*"));
-    }
-
-    /**
      * Removes whitespace around all name and alias strings.
      */
     public void trimNameAndAllAliases() {
@@ -369,7 +377,7 @@ public class RawContestConfig {
       return name;
     }
 
-    public SimpleListProperty aliasesProperty() {
+    public SimpleListProperty<String> aliasesProperty() {
       return aliases;
     }
 

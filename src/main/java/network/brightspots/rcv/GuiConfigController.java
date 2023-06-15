@@ -44,6 +44,11 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -73,6 +78,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
@@ -1726,23 +1732,19 @@ public class GuiConfigController implements Initializable {
 
     @Override
     public void setCellFactory() {
-      column.setCellFactory(ComboBoxTableCell.forTableColumn(column));
+      column.setCellFactory(EditableTableCell.forTableColumn(new ListStringConverter()));
     }
   }
 
-  private static class EditableColumnEnum extends EditableColumn {
-    public EditableColumnEnum(TableColumn column, String propertyName) {
-      super(column, propertyName);
+  private static class ListStringConverter extends StringConverter<List> {
+    @Override
+    public String toString(List list) {
+      return list != null ? String.join("; ", list) : "";
     }
 
     @Override
-    public Class propertyType() {
-      return Enum.class;
-    }
-
-    @Override
-    public void setCellFactory() {
-      column.setCellFactory(ChoiceBoxTableCell.forTableColumn(column));
+    public List fromString(String string) {
+      return FXCollections.observableArrayList(string.split("\\W*;\\W*"));
     }
   }
 }
