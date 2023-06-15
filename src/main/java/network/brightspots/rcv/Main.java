@@ -27,7 +27,10 @@ import java.util.List;
 public class Main extends GuiApplication {
 
   public static final String APP_NAME = "RCTab";
-  public static final String APP_VERSION = "1.4.0.alpha";
+
+  // TODO Sync version number with release.yml and build.gradle:
+  // github.com/BrightSpots/rcv/issues/662
+  public static final String APP_VERSION = "1.4.0-alpha";
 
   /**
    * Main entry point to RCTab.

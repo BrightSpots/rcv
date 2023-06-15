@@ -15,7 +15,7 @@
  * Output results
  * Design: TabulatorSession also stores state metadata which exists outside tabulation results:
  * config object, resolved output, and logging paths, tabulation object, and CVR data including
- * precinct codes discovered while parsing CVR files.
+ * precinct IDs discovered while parsing CVR files.
  * Conditions: During tabulation, validation, and conversion.
  * Version history: see https://github.com/BrightSpots/rcv.
  */
@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -174,7 +173,12 @@ class TabulatorSession {
             Logger.severe(exception.getMessage());
             break;
           }
-          assert newWinnerSet.size() == 1;
+          if (newWinnerSet.size() != 1) {
+            Logger.severe(
+                "Expected to find exactly one new winner and found %d!", newWinnerSet.size());
+            exceptionsEncountered.add(TabulationAbortedException.class.toString());
+            break;
+          }
           String newWinner = (String) newWinnerSet.toArray()[0];
           config.setCandidateExclusionStatus(newWinner, true);
           config.addSequentialWinner(newWinner);
