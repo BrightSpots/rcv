@@ -21,18 +21,14 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ModifiableObservableListBase;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Contest configuration that can be serialized and deserialized.

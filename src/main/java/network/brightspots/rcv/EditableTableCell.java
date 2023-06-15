@@ -1,12 +1,27 @@
-/**
- * TODO
+/*
+ * RCTab
+ * Copyright (c) 2017-2023 Bright Spots Developers.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
+/*
+ * Purpose: Generates an editable table cell that commits an edit when focus is lost, and
+ * cancels an edit when escape is pressed.
+ * Design: A single cell to be used in an editable table. This file copies code and comments from
+ * TextFieldTableCell and CellUtils and adapts it. Since TextFieldTableCell uses a private TextField
+ * and CellUtils is package protected, we cannot easily extend those without duplicating some code.
+ * Conditions: Runs in GUI mode.
+ * Version history: see https://github.com/BrightSpots/rcv.
+ */
+
 package network.brightspots.rcv;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -21,221 +36,152 @@ import javafx.util.converter.DefaultStringConverter;
 /**
  * A class containing a {@link TableCell} implementation that draws a
  * {@link TextField} node inside the cell. If the TextField is
- * left, the value is commited.
- *
+ * left, the value is committed.
  */
 
-public class EditableTableCell<S,T> extends TableCell<S,T> {
-
-/***************************************************************************
- *                                     *
- * Static cell factories                           *
- *                                     *
- **************************************************************************/
-
-  /**
-   * Provides a {@link TextField} that allows editing of the cell content when
-   * the cell is double-clicked, or when
-   * {@link TableView#edit(int, javafx.scene.control.TableColumn)} is called.
-   * This method will only  work on {@link TableColumn} instances which are of
-   * type String.
-   *
-   * @return A {@link Callback} that can be inserted into the
-   *    {@link TableColumn#cellFactoryProperty() cell factory property} of a
-   *    TableColumn, that enables textual editing of the content.
-   */
-  public static <S> Callback<TableColumn<S,String>, TableCell<S,String>> forTableColumn() {
-    return forTableColumn(new DefaultStringConverter());
-  }
-
-  /**
-   * Provides a {@link TextField} that allows editing of the cell content when
-   * the cell is double-clicked, or when
-   * {@link TableView#edit(int, javafx.scene.control.TableColumn) } is called.
-   * This method will work  on any {@link TableColumn} instance, regardless of
-   * its generic type. However, to enable this, a {@link StringConverter} must
-   * be provided that will convert the given String (from what the user typed
-   * in) into an instance of type T. This item will then be passed along to the
-   * {@link TableColumn#onEditCommitProperty()} callback.
-   *
-   * @param converter A {@link StringConverter} that can convert the given String
-   *    (from what the user typed in) into an instance of type T.
-   * @return A {@link Callback} that can be inserted into the
-   *    {@link TableColumn#cellFactoryProperty() cell factory property} of a
-   *    TableColumn, that enables textual editing of the content.
-   */
-  public static <S,T> Callback<TableColumn<S,T>, TableCell<S,T>> forTableColumn(
-      final StringConverter<T> converter) {
-    return list -> new EditableTableCell<S,T>(converter);
-  }
-
-
-  /**
-   * Fields
-   */
-
+public class EditableTableCell<S, T> extends TableCell<S, T> {
   private TextField textField;
   private boolean escapePressed = false;
   private TablePosition<S, ?> tablePos = null;
 
-
-/**
- * Constructors
- */
+  private final ObjectProperty<StringConverter<T>> converter =
+      new SimpleObjectProperty<>(this, "converter");
 
   /**
-   * Creates a default TextFieldTableCell with a null converter. Without a
-   * {@link StringConverter} specified, this cell will not be able to accept
-   * input from the TextField (as it will not know how to convert this back
-   * to the domain object). It is therefore strongly encouraged to not use
-   * this constructor unless you intend to set the converter separately.
-   */
-  public EditableTableCell() {
-    this(null);
-  }
-
-  /**
-   * Creates a TextFieldTableCell that provides a {@link TextField} when put
-   * into editing mode that allows editing of the cell content. This method
-   * will work on any TableColumn instance, regardless of its generic type.
-   * However, to enable this, a {@link StringConverter} must be provided that
-   * will convert the given String (from what the user typed in) into an
-   * instance of type T. This item will then be passed along to the
-   * {@link TableColumn#onEditCommitProperty()} callback.
-   *
-   * @param converter A {@link StringConverter converter} that can convert
-   *    the given String (from what the user typed in) into an instance of
-   *    type T.
+   * Provides a TextFieldTableCell that allows editing of the cell content with any type.
+   * This method will only work on any type, but you'll need to provide a StringConverter.
    */
   public EditableTableCell(StringConverter<T> converter) {
     this.getStyleClass().add("text-field-table-cell");
     setConverter(converter);
   }
 
-
+  /**
+   * Provides a TextField that allows editing of the cell content when
+   * the cell is double-clicked, or when TableView.edit is called.
+   * This method will only work on TableColumn instances which are of
+   * type String.
+   */
+  public static <S> Callback<TableColumn<S, String>, TableCell<S, String>> forTableColumn() {
+    return forTableColumn(new DefaultStringConverter());
+  }
 
   /**
-   * Properties
+   * Provides a TextField that allows editing of the cell content when
+   * the cell is double-clicked, or when TableView.edit is called.
+   * This method will only work on any type, but you'll need to provide a StringConverter.
    */
+  public static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forTableColumn(
+      final StringConverter<T> converter) {
+    return list -> new EditableTableCell<>(converter);
+  }
 
-// --- converter
-  private ObjectProperty<StringConverter<T>> converter =
-      new SimpleObjectProperty<StringConverter<T>>(this, "converter");
-
-  /**
-   * The {@link StringConverter} property.
-   */
-  public final ObjectProperty<StringConverter<T>> converterProperty() {
+  private ObjectProperty<StringConverter<T>> converterProperty() {
     return converter;
   }
 
-  /**
-   * Sets the {@link StringConverter} to be used in this cell.
-   */
-  public final void setConverter(StringConverter<T> value) {
-    converterProperty().set(value);
-  }
-
-  /**
-   * Returns the {@link StringConverter} used in this cell.
-   */
-  public final StringConverter<T> getConverter() {
+  private StringConverter<T> getConverter() {
     return converterProperty().get();
   }
 
+  private void setConverter(StringConverter<T> value) {
+    converterProperty().set(value);
+  }
 
+  @Override
+  public void startEdit() {
+    if (isEditable()
+        && getTableView().isEditable()
+        && getTableColumn().isEditable()) {
+      super.startEdit();
 
-/***************************************************************************
- *                                     *
- * Public API                                *
- *                                     *
- **************************************************************************/
+      if (isEditing()) {
+        // Update members
+        escapePressed = false;
+        tablePos = getTableView().getEditingCell();
 
-  /** {@inheritDoc} */
-  @Override public void startEdit() {
-    if (! isEditable()
-        || ! getTableView().isEditable()
-        || ! getTableColumn().isEditable()) {
-      return;
-    }
-    super.startEdit();
+        // Update the textfield
+        if (textField == null) {
+          textField = getTextField();
+        }
+        textField.setText(getItemText());
 
-    if (isEditing()) {
-      if (textField == null) {
-        textField = getTextField();
+        // Update the cell graphics
+        setText(null);
+        setGraphic(textField);
+        textField.selectAll();
+
+        // requesting focus so that key input can immediately go into the
+        // TextField (see RT-28132)
+        textField.requestFocus();
       }
-      escapePressed=false;
-      startEdit(textField);
+    }
+  }
+
+  @Override
+  public void commitEdit(T newValue) {
+    if (isEditing()) {
       final TableView<S> table = getTableView();
-      tablePos=table.getEditingCell();
-    }
-  }
+      if (table != null) {
+        // Inform the TableView of the edit being ready to be committed
+        CellEditEvent editEvent = new CellEditEvent(
+                table,
+                tablePos,
+                TableColumn.editCommitEvent(),
+                newValue
+        );
 
-  /** {@inheritDoc} */
-  @Override public void commitEdit(T newValue) {
-    if (! isEditing())
-      return;
+        Event.fireEvent(getTableColumn(), editEvent);
+      }
 
-    final TableView<S> table = getTableView();
-    if (table != null) {
-      // Inform the TableView of the edit being ready to be committed.
-      CellEditEvent editEvent = new CellEditEvent(
-          table,
-          tablePos,
-          TableColumn.editCommitEvent(),
-          newValue
-      );
+      // We need to setEditing(false):
+      super.cancelEdit(); // this fires an invalid EditCancelEvent
 
-      Event.fireEvent(getTableColumn(), editEvent);
-    }
+      // Update the item within this cell, so that it represents the new value
+      updateItem(newValue, false);
 
-    // we need to setEditing(false):
-    super.cancelEdit(); // this fires an invalid EditCancelEvent.
-
-    // update the item within this cell, so that it represents the new value
-    updateItem(newValue, false);
-
-    if (table != null) {
-      // reset the editing cell on the TableView
-      table.edit(-1, null);
-
-      // request focus back onto the table, only if the current focus
-      // owner has the table as a parent (otherwise the user might have
-      // clicked out of the table entirely and given focus to something else.
-      // It would be rude of us to request it back again.
-      // requestFocusOnControlOnlyIfCurrentFocusOwnerIsChild(table);
+      // Reset the editing cell on the TableView
+      if (table != null) {
+        table.edit(-1, null);
+      }
     }
   }
 
 
-  /** {@inheritDoc} */
-  @Override public void cancelEdit() {
-    if(escapePressed) {
+  @Override
+  public void cancelEdit() {
+    if (escapePressed) {
       // this is a cancel event after escape key
       super.cancelEdit();
       setText(getItemText()); // restore the original text in the view
-    }
-    else {
+    } else {
       // this is not a cancel event after escape key
       // we interpret it as commit.
       String newText = textField.getText(); // get the new text from the view
       this.commitEdit(getConverter().fromString(newText)); // commit the new text to the model
     }
+
     setGraphic(null); // stop editing with TextField
-
   }
 
-  /** {@inheritDoc} */
-  @Override public void updateItem(T item, boolean empty) {
+  @Override
+  public void updateItem(T item, boolean empty) {
     super.updateItem(item, empty);
-    updateItem();
-  }
 
-  /***************************************************************************
-   *                                     *
-   *  // djw code taken and adapted from package protected CellUtils.    *
-   *                                     *
-   **************************************************************************/
+    if (isEmpty()) {
+      setText(null);
+      setGraphic(null);
+    } else if (isEditing()) {
+      if (textField != null) {
+        textField.setText(getItemText());
+      }
+      setText(null);
+      setGraphic(textField);
+    } else {
+      setText(getItemText());
+      setGraphic(null);
+    }
+  }
 
   private TextField getTextField() {
     final TextField textField = new TextField(getItemText());
@@ -252,7 +198,7 @@ public class EditableTableCell<S,T> extends TableCell<S,T> {
       this.commitEdit(getConverter().fromString(textField.getText()));
       event.consume();
     });
-    textField.setOnKeyPressed(t -> { if (t.getCode() == KeyCode.ESCAPE) escapePressed = true; else escapePressed = false; });
+    textField.setOnKeyPressed(t -> escapePressed = t.getCode() == KeyCode.ESCAPE);
     textField.setOnKeyReleased(t -> {
       if (t.getCode() == KeyCode.ESCAPE) {
         // djw the code may depend on java version / expose incompatibilities:
@@ -263,40 +209,8 @@ public class EditableTableCell<S,T> extends TableCell<S,T> {
   }
 
   private String getItemText() {
-    return getConverter() == null ?
-        getItem() == null ? "" : getItem().toString() :
-        getConverter().toString(getItem());
-  }
-
-  private void updateItem() {
-    if (isEmpty()) {
-      setText(null);
-      setGraphic(null);
-    } else {
-      if (isEditing()) {
-        if (textField != null) {
-          textField.setText(getItemText());
-        }
-        setText(null);
-        setGraphic(textField);
-      } else {
-        setText(getItemText());
-        setGraphic(null);
-      }
-    }
-  }
-
-  private void startEdit(final TextField textField) {
-    if (textField != null) {
-      textField.setText(getItemText());
-    }
-
-    setText(null);
-    setGraphic(textField);
-    textField.selectAll();
-
-    // requesting focus so that key input can immediately go into the
-    // TextField (see RT-28132)
-    textField.requestFocus();
+    return getConverter() == null
+        ? getItem() == null ? "" : getItem().toString()
+        : getConverter().toString(getItem());
   }
 }

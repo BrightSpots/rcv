@@ -44,11 +44,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -69,16 +65,14 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.ChoiceBoxTableCell;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
@@ -142,7 +136,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxGenerateCdfJson;
   @FXML
-  private EditableTableView<CvrSource> tableViewCvrFiles;
+  private TableView<CvrSource> tableViewCvrFiles;
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrFilePath;
   @FXML
@@ -196,7 +190,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxCvrTreatBlankAsUndeclaredWriteIn;
   @FXML
-  private EditableTableView<Candidate> tableViewCandidates;
+  private TableView<Candidate> tableViewCandidates;
   @FXML
   private TableColumn<Candidate, String> tableColumnCandidateName;
   @FXML
@@ -1148,8 +1142,10 @@ public class GuiConfigController implements Initializable {
         new EditableColumnString(tableColumnCvrContestId, "contestId"),
         new EditableColumnString(tableColumnCvrOvervoteLabel, "overvoteLabel"),
         new EditableColumnString(tableColumnCvrUndervoteLabel, "undervoteLabel"),
-        new EditableColumnString(tableColumnCvrUndeclaredWriteInLabel, "undeclaredWriteInLabel"),
-        new EditableColumnBoolean(tableColumnCvrTreatBlankAsUndeclaredWriteIn, "treatBlankAsUndeclaredWriteIn"),
+        new EditableColumnString(tableColumnCvrUndeclaredWriteInLabel,
+           "undeclaredWriteInLabel"),
+        new EditableColumnBoolean(tableColumnCvrTreatBlankAsUndeclaredWriteIn,
+           "treatBlankAsUndeclaredWriteIn"),
     };
     setUpEditableTableStrings(cvrStringColumnsAndProperties);
 
@@ -1171,12 +1167,12 @@ public class GuiConfigController implements Initializable {
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
 
-    // Let's also catch programming errors -- all of these properties must have corresponding functions
-    // in order to have the PropertyValueFactory work correctly.
-    if (!doAllPropertyValueFactoryFunctionsExist(cvrStringColumnsAndProperties, CvrSource.class)) {
+    // Let's also catch programming errors -- all of these properties must have corresponding
+    // functions in order to have the PropertyValueFactory work correctly.
+    if (isAnyPropertyValueFunctionMissing(cvrStringColumnsAndProperties, CvrSource.class)) {
       throw new RuntimeException("Not all PropertyValueFactory functions exist for CvrSource");
     }
-    if (!doAllPropertyValueFactoryFunctionsExist(candidateStringColumnsAndProperties, Candidate.class)) {
+    if (isAnyPropertyValueFunctionMissing(candidateStringColumnsAndProperties, Candidate.class)) {
       throw new RuntimeException("Not all PropertyValueFactory functions exist for Candidate");
     }
 
@@ -1283,7 +1279,8 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private boolean doAllPropertyValueFactoryFunctionsExist(EditableColumn[] columnsAndProperties, Class rowType) {
+  private boolean isAnyPropertyValueFunctionMissing(EditableColumn[] columnsAndProperties,
+      Class<?> rowType) {
     boolean doAllExist = true;
     for (EditableColumn editableColumn : columnsAndProperties) {
       String setter = "set"
@@ -1304,7 +1301,7 @@ public class GuiConfigController implements Initializable {
       }
     }
 
-    return doAllExist;
+    return !doAllExist;
   }
 
   private void loadConfig(ContestConfig config) throws ConfigVersionIsNewerThanAppVersionException {
@@ -1487,10 +1484,10 @@ public class GuiConfigController implements Initializable {
 
     private final ContestConfig config;
     private final List<CvrSource> sources;
-    private final EditableTableView<Candidate> tableViewCandidates;
+    private final TableView<Candidate> tableViewCandidates;
 
     AutoLoadCandidatesService(
-        ContestConfig config, List<CvrSource> sources, EditableTableView<Candidate> tableViewCandidates) {
+        ContestConfig config, List<CvrSource> sources, TableView<Candidate> tableViewCandidates) {
       this.config = config;
       this.sources = sources;
       this.tableViewCandidates = tableViewCandidates;
@@ -1549,10 +1546,9 @@ public class GuiConfigController implements Initializable {
             }
           };
       task.setOnFailed(
-              arg0 ->
-                      Logger.severe(
-                              "Error when trying to auto-load candidates:\n%s\nAuto-load failed!",
-                              task.getException()));
+          arg0 -> Logger.severe(
+              "Error when trying to auto-load candidates:\n%s\nAuto-load failed!",
+              task.getException()));
       return task;
     }
   }
@@ -1662,7 +1658,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private static abstract class EditableColumn {
+  private abstract static class EditableColumn {
     protected final TableColumn column;
     protected final String propertyName;
 

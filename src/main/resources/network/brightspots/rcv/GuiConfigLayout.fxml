@@ -14,7 +14,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
-<?import network.brightspots.rcv.EditableTableView?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="955.0" prefWidth="1165.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
             xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
@@ -246,7 +245,7 @@
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                   </padding>
                 </HBox>
-                <EditableTableView fx:id="tableViewCvrFiles">
+                <TableView fx:id="tableViewCvrFiles">
                   <columns>
                     <TableColumn fx:id="tableColumnCvrFilePath" minWidth="20.0"
                       prefWidth="300.0" text="Path"/>
@@ -279,7 +278,7 @@
                     <TableColumn fx:id="tableColumnCvrTreatBlankAsUndeclaredWriteIn" minWidth="20.0"
                       prefWidth="120.0" text="Treat Blank&#10;As Undeclared&#10;Write-In"/>
                   </columns>
-                </EditableTableView>
+                </TableView>
                 <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                 </padding>
@@ -393,7 +392,7 @@
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                   </padding>
                 </HBox>
-                <EditableTableView fx:id="tableViewCandidates" prefHeight="414.0" prefWidth="600.0">
+                <TableView fx:id="tableViewCandidates" prefHeight="414.0" prefWidth="600.0">
                   <columns>
                     <TableColumn fx:id="tableColumnCandidateName" minWidth="20.0"
                       prefWidth="230.0" text="Name"/>
@@ -402,7 +401,7 @@
                     <TableColumn fx:id="tableColumnCandidateExcluded" minWidth="20.0"
                       prefWidth="100.0" text="Excluded"/>
                   </columns>
-                </EditableTableView>
+                </TableView>
                 <padding>
                   <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                 </padding>
