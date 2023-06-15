@@ -9,7 +9,7 @@
 
 /*
  * Purpose: These tests check configuration files.
- * Design: Unit tests, and other tests that don't run a tabulation..
+ * Design: Unit tests, and other tests that don't run a tabulation.
  * Conditions: During automated testing.
  * Version history: see https://github.com/BrightSpots/rcv.
  */
@@ -45,10 +45,6 @@ class ContestConfigTests {
     assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0"));
     assertFalse(isVersionNewer("1.4.0", "1.4.0-alpha"));
 
-    // -beta and -alpha are considered the same version
-    assertFalse(isVersionNewer("1.4.0-beta", "1.4.0-alpha"));
-    assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0-beta"));
-
     // Sane things with false versions
     assertFalse(isVersionNewer("goober", "1.0.0"));
     assertTrue(isVersionNewer("1.0.0", "goober"));
@@ -58,5 +54,14 @@ class ContestConfigTests {
     assertFalse(isVersionNewer("1.0.0", "1.0"));
     assertFalse(isVersionNewer("1.0.0", "1"));
     assertFalse(isVersionNewer("1", "1.0"));
+
+    // snapshot info is ignored, though it shouldn't be.
+    // The following tests check the current state, though we have an Issue open with
+    // jackson-core to address.
+    // https://github.com/FasterXML/jackson-core/issues/1050
+    assertFalse(isVersionNewer("1.4.0-beta", "1.4.0-alpha"));
+    assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0-beta"));
+    assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0"));
+    assertFalse(isVersionNewer("1.4.0", "1.4.0-alpha"));
   }
 }
