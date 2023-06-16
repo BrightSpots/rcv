@@ -42,6 +42,9 @@ import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 
 @SuppressWarnings("RedundantSuppression")
 class TabulatorSession {
+  // In order to allow multiple tests to write to the same output file at the same millisecond,
+  // we track the session count and append it to the timestamp string.
+  private static int sessionCount = 0;
 
   private final String configPath;
   private final String timestampString;
@@ -51,7 +54,8 @@ class TabulatorSession {
   TabulatorSession(String configPath) {
     this.configPath = configPath;
     // current date-time formatted as a string used for creating unique output files names
-    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS").format(new Date());
+    String dateString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS").format(new Date());
+    timestampString = "%s_%03d".format(dateString, sessionCount++);
   }
 
   // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI
