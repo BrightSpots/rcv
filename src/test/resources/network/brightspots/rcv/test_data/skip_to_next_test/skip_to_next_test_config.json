@@ -10,7 +10,7 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "skip_to_next_test_cvr.xlsx",
+    "filePath" : "../_shared/skipped_ranking_cvr.xlsx",
     "contestId" : "",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

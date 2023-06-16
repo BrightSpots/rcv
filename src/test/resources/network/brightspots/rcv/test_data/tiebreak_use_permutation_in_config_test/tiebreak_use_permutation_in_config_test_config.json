@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-    "filePath" : "tiebreak_use_permutation_in_config_test_cvr.xlsx",
+    "filePath" : "../_shared/simple_ess_test.xlsx",
     "firstVoteColumnIndex" : 2,
     "firstVoteRowIndex" : 2,
     "idColumnIndex" : "",
