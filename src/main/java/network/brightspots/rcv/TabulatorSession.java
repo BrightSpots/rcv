@@ -103,9 +103,11 @@ class TabulatorSession {
         if (castVoteRecords == null) {
           Logger.severe("Aborting conversion due to cast vote record errors!");
         } else {
+          Set<String> precinctIds = new Tabulator(castVoteRecords, config).getPrecinctIds();
           ResultsWriter writer =
               new ResultsWriter()
                   .setNumRounds(0)
+                  .setPrecinctIds(precinctIds)
                   .setContestConfig(config)
                   .setTimestampString(timestampString);
           try {
@@ -115,7 +117,9 @@ class TabulatorSession {
             // translating the input to CDF, not the tabulation results.
           }
         }
-      } catch (IOException | UnableToCreateDirectoryException exception) {
+      } catch (IOException
+             | UnableToCreateDirectoryException
+             | TabulationAbortedException exception) {
         Logger.severe("CDF JSON generation failed.");
       }
     } else {

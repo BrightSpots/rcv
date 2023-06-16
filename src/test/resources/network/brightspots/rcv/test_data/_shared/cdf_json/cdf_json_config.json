@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath" : "aliases_cdf_json_file1_cvr.json",
+      "filePath" : "cdf_json_file1_cvr.json",
       "idColumnIndex" : "",
       "precinctColumnIndex" : "",
       "provider" : "cdf",
@@ -22,7 +22,7 @@
       "undeclaredWriteInLabel": ""
     },
     {
-      "filePath" : "aliases_cdf_json_file2_cvr.json",
+      "filePath" : "cdf_json_file2_cvr.json",
       "idColumnIndex" : "",
       "precinctColumnIndex" : "",
       "provider" : "cdf",
