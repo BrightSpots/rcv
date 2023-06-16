@@ -285,7 +285,8 @@ class ResultsWriter {
       }
       int numBallots = numBallotsObj;
       generateSummarySpreadsheet(roundTallies, numBallots, precinct, outputPath);
-      generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct), precinct, outputPath);
+      generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct),
+            numBallots, precinct, outputPath);
     }
   }
 
@@ -326,7 +327,7 @@ class ResultsWriter {
       throw exception;
     }
 
-    addHeaderRows(csvPrinter, precinct);
+    addHeaderRows(csvPrinter, precinct, numBallots);
     csvPrinter.print("Rounds");
     for (int round = 1; round <= numRounds; round++) {
       String label = String.format("Round %d", round);
@@ -440,7 +441,8 @@ class ResultsWriter {
     csvPrinter.print(candidateCellText);
   }
 
-  private void addHeaderRows(CSVPrinter csvPrinter, String precinct) throws IOException {
+  private void addHeaderRows(CSVPrinter csvPrinter, String precinct, int numBallots)
+        throws IOException {
     csvPrinter.printRecord("Contest", config.getContestName());
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
     csvPrinter.printRecord("Office", config.getContestOffice());
@@ -457,6 +459,7 @@ class ResultsWriter {
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
     csvPrinter.printRecord("Threshold", winningThreshold);
+    csvPrinter.printRecord("TotalBallotsCast", numBallots);
     if (!isNullOrBlank(precinct)) {
       csvPrinter.printRecord("Precinct", precinct);
     }
@@ -493,7 +496,7 @@ class ResultsWriter {
       throws IOException {
     String outputPath = getOutputFilePathFromInstance("summary");
     generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
-    generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
+    generateSummaryJson(roundTallies, tallyTransfers, numBallots, null, outputPath);
   }
 
   // write CastVoteRecords for the specified contest to the provided folder
@@ -846,6 +849,7 @@ class ResultsWriter {
   private void generateSummaryJson(
       Map<Integer, Map<String, BigDecimal>> roundTallies,
       TallyTransfers tallyTransfers,
+      int numBallots,
       String precinct,
       String outputPath)
       throws IOException {
@@ -859,6 +863,7 @@ class ResultsWriter {
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
     configData.put("threshold", winningThreshold);
+    configData.put("totalVotesCast", numBallots);
     if (!isNullOrBlank(precinct)) {
       configData.put("precinct", precinct);
     }
