@@ -22,6 +22,7 @@
 package network.brightspots.rcv;
 
 import static network.brightspots.rcv.Utils.isNullOrBlank;
+import static network.brightspots.rcv.CastVoteRecord.BallotStatus;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -723,19 +724,33 @@ class Tabulator {
             .setPrecinctIds(precinctIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
-    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, castVoteRecords.size());
+    // Count first-round undervotes
+    int numUndervotes = 0;
+    for (CastVoteRecord cvr : castVoteRecords) {
+      if (cvr.getBallotStatus() == BallotStatus.INACTIVE_BY_UNDERVOTE) {
+        numUndervotes++;
+      }
+    }
+
+    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, castVoteRecords.size(), numUndervotes);
 
     if (config.isTabulateByPrecinctEnabled()) {
       Map<String, Integer> numBallotsByPrecinct = new HashMap<>();
+      Map<String, Integer> numUndervotesByPrecinct = new HashMap<>();
       for (CastVoteRecord cvr : castVoteRecords) {
         String precinct = cvr.getPrecinct();
         if (!isNullOrBlank(precinct)) {
-          int currentTally = numBallotsByPrecinct.getOrDefault(precinct, 0);
-          numBallotsByPrecinct.put(precinct, currentTally + 1);
+          int currentNumBallots = numBallotsByPrecinct.getOrDefault(precinct, 0);
+          numBallotsByPrecinct.put(precinct, currentNumBallots + 1);
+
+          if (cvr.getBallotStatus() == BallotStatus.INACTIVE_BY_UNDERVOTE) {
+            int currentNumUndervotes = numUndervotesByPrecinct.getOrDefault(precinct, 0);
+            numUndervotesByPrecinct.put(precinct, currentNumUndervotes + 1);
+          }
         }
       }
       writer.generatePrecinctSummaryFiles(
-          precinctRoundTallies, precinctTallyTransfers, numBallotsByPrecinct);
+          precinctRoundTallies, precinctTallyTransfers, numBallotsByPrecinct, numUndervotesByPrecinct);
     }
 
     if (config.isGenerateCdfJsonEnabled()) {
@@ -890,7 +905,8 @@ class Tabulator {
   //  update tallyTransfers counts
   private void recordSelectionForCastVoteRecord(
       CastVoteRecord cvr, int currentRound,
-      String selectedCandidate, String outcomeDescription) throws TabulationAbortedException {
+      String selectedCandidate, BallotStatus ballotStatus,
+      String additionalLogText) throws TabulationAbortedException {
     // update transfer counts (unless there's no value to transfer, which can happen if someone
     // wins with a tally that exactly matches the winning threshold)
     if (cvr.getFractionalTransferValue().signum() == 1) {
@@ -918,7 +934,20 @@ class Tabulator {
 
     cvr.setCurrentRecipientOfVote(selectedCandidate);
     if (selectedCandidate == null) {
-      cvr.exhaust();
+      cvr.exhaustBy(ballotStatus);
+    }
+
+    String outcomeDescription;
+    switch (ballotStatus) {
+      case ACTIVE -> outcomeDescription = selectedCandidate;
+      case INACTIVE_BY_UNDERVOTE -> outcomeDescription = "underote" + additionalLogText;
+      case INACTIVE_BY_OVERVOTE -> outcomeDescription = "overvote" + additionalLogText;
+      case INACTIVE_BY_SKIPPED_RANKING -> outcomeDescription = "exhausted by skipped ranking" + additionalLogText;
+      case INACTIVE_BY_REPEATED_RANKING -> outcomeDescription = "duplicate candidate" + additionalLogText;
+      case INACTIVE_BY_EXHAUSTED_CHOICES -> outcomeDescription = "no continuing candidate" + additionalLogText;
+      // When we encounter a continuing candidate, we record it with this string in the output logs
+      default ->
+        throw new RuntimeException("Unexpected ballot status: " + ballotStatus);
     }
     VoteOutcomeType outcomeType =
         selectedCandidate == null ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
@@ -971,7 +1000,7 @@ class Tabulator {
 
       // check for a CVR with no rankings at all
       if (cvr.candidateRankings.numRankings() == 0) {
-        recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
+        recordSelectionForCastVoteRecord(cvr, currentRound, null, BallotStatus.INACTIVE_BY_UNDERVOTE, "");
       }
 
       // iterate through the rankings in this cvr from most to least preferred.
@@ -999,7 +1028,7 @@ class Tabulator {
         // check for undervote exhaustion
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
-          recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
+          recordSelectionForCastVoteRecord(cvr, currentRound, null, BallotStatus.INACTIVE_BY_SKIPPED_RANKING, "");
           break;
         }
         lastRankSeen = rank;
@@ -1017,7 +1046,7 @@ class Tabulator {
           // if duplicate was found exhaust cvr
           if (!isNullOrBlank(duplicateCandidate)) {
             recordSelectionForCastVoteRecord(
-                cvr, currentRound, null, "duplicate candidate: " + duplicateCandidate);
+                cvr, currentRound, null, BallotStatus.INACTIVE_BY_REPEATED_RANKING, " " + duplicateCandidate);
             break;
           }
         }
@@ -1025,11 +1054,14 @@ class Tabulator {
         // check for an overvote
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidates);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          recordSelectionForCastVoteRecord(cvr, currentRound, null, "overvote");
+          recordSelectionForCastVoteRecord(cvr, currentRound, null, BallotStatus.INACTIVE_BY_OVERVOTE, "");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           if (rank == cvr.candidateRankings.maxRankingNumber()) {
-            recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
+            // See discussion here: https://github.com/BrightSpots/rcv/issues/633#issuecomment-1596197857
+            // If the final ranking is an overvote, even if we're trying to skip to the next rank,
+            // we consider this inactive by overvote.
+            recordSelectionForCastVoteRecord(cvr, currentRound, null, BallotStatus.INACTIVE_BY_OVERVOTE, "");
           }
           continue;
         }
@@ -1047,7 +1079,7 @@ class Tabulator {
           selectedCandidate = candidateName;
 
           // transfer cvr to selected candidate
-          recordSelectionForCastVoteRecord(cvr, currentRound, selectedCandidate, selectedCandidate);
+          recordSelectionForCastVoteRecord(cvr, currentRound, selectedCandidate, BallotStatus.ACTIVE, "");
 
           // If enabled, this will also update the roundTallyByPrecinct
           incrementTallies(
@@ -1072,9 +1104,9 @@ class Tabulator {
         if (rank == cvr.candidateRankings.maxRankingNumber()) {
           if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
               && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
-            recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
+            recordSelectionForCastVoteRecord(cvr, currentRound, null, BallotStatus.INACTIVE_BY_UNDERVOTE, "");
           } else {
-            recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
+            recordSelectionForCastVoteRecord(cvr, currentRound, null, BallotStatus.INACTIVE_BY_EXHAUSTED_CHOICES, "");
           }
         }
       } // end looping over the rankings within one ballot

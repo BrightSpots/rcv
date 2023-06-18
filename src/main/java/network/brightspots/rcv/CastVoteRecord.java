@@ -28,6 +28,14 @@ import java.util.Map.Entry;
 import javafx.util.Pair;
 
 class CastVoteRecord {
+  enum BallotStatus {
+    ACTIVE,
+    INACTIVE_BY_UNDERVOTE,
+    INACTIVE_BY_OVERVOTE,
+    INACTIVE_BY_SKIPPED_RANKING,
+    INACTIVE_BY_REPEATED_RANKING,
+    INACTIVE_BY_EXHAUSTED_CHOICES
+  }
 
   // computed unique ID for this CVR (source file + line number)
   private final String computedId;
@@ -57,7 +65,7 @@ class CastVoteRecord {
   // ballotTypeId parsed from Dominion CVR data
   private String ballotTypeId;
   // whether this CVR is exhausted or not
-  private boolean isExhausted;
+  private BallotStatus ballotStatus = BallotStatus.ACTIVE;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -170,12 +178,16 @@ class CastVoteRecord {
     cdfSnapshotData.put(round, data);
   }
 
-  void exhaust() {
-    isExhausted = true;
+  void exhaustBy(BallotStatus status) {
+    this.ballotStatus = status;
   }
 
   boolean isExhausted() {
-    return isExhausted;
+    return ballotStatus != BallotStatus.ACTIVE;
+  }
+
+  BallotStatus getBallotStatus() {
+    return ballotStatus;
   }
 
   // fractional transfer value is one by default but can be less if this

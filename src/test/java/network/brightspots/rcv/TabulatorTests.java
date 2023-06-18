@@ -18,6 +18,7 @@
 
 package network.brightspots.rcv;
 
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -164,7 +165,7 @@ class TabulatorTests {
             // Every ephemeral file must be set to read-only on close, including audit logs
             assertFalse(
                 file.canWrite(),
-                "File must be set to read-only: %s".formatted(file.getAbsolutePath()));
+                "File must not be writeable: %s".formatted(file.getAbsolutePath()));
             // Then set it writeable so it can be deleted
             boolean writeableSucceeded = file.setWritable(true);
             if (!writeableSucceeded) {
@@ -207,6 +208,15 @@ class TabulatorTests {
                 + "_expected_"
                 + outputType
                 + extension);
+
+    // Overwrite expected file with the generated one
+    // try {
+    //   new File(expectedPath).setWritable(true);
+    //   copyFile(new File(actualOutputPath), new File(expectedPath));
+    // } catch (IOException e) {
+    //   fail(e);
+    // }
+
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
     if (fileCompare(expectedPath, actualOutputPath)) {
       Logger.info("Files are equal.");

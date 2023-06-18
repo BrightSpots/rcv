@@ -269,7 +269,8 @@ class ResultsWriter {
   void generatePrecinctSummaryFiles(
       Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies,
       Map<String, TallyTransfers> precinctTallyTransfers,
-      Map<String, Integer> numBallotsByPrecinct)
+      Map<String, Integer> numBallotsByPrecinct,
+      Map<String, Integer> numUndervotesByPrecinct)
       throws IOException {
     Set<String> filenames = new HashSet<>();
     for (var entry : precinctRoundTallies.entrySet()) {
@@ -283,8 +284,15 @@ class ResultsWriter {
         Logger.warning("No ballots found in precinct \"%s\"", precinct, numBallotsByPrecinct);
         numBallotsObj = 0;
       }
+      Integer numUndervotesObj = numUndervotesByPrecinct.get(precinct);
+      if (numUndervotesObj == null) {
+        Logger.warning("No undervote tally found in precinct \"%s\"",
+            precinct, numUndervotesByPrecinct);
+        numBallotsObj = 0;
+      }
       int numBallots = numBallotsObj;
-      generateSummarySpreadsheet(roundTallies, numBallots, precinct, outputPath);
+      int numUndervotes = numUndervotesObj;
+      generateSummarySpreadsheet(roundTallies, numBallots, numUndervotes, precinct, outputPath);
       generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct),
             numBallots, precinct, outputPath);
     }
@@ -296,6 +304,7 @@ class ResultsWriter {
   private void generateSummarySpreadsheet(
       Map<Integer, Map<String, BigDecimal>> roundTallies,
       int numBallots,
+      int numUndervotes,
       String precinct,
       String outputPath)
       throws IOException {
@@ -327,7 +336,8 @@ class ResultsWriter {
       throw exception;
     }
 
-    addHeaderRows(csvPrinter, precinct, numBallots);
+    addContestInformationRows(csvPrinter, precinct);
+    addContestSummaryRows(csvPrinter, numBallots, numUndervotes);
     csvPrinter.print("Rounds");
     for (int round = 1; round <= numRounds; round++) {
       String label = String.format("Round %d", round);
@@ -441,8 +451,9 @@ class ResultsWriter {
     csvPrinter.print(candidateCellText);
   }
 
-  private void addHeaderRows(CSVPrinter csvPrinter, String precinct, int numBallots)
+  private void addContestInformationRows(CSVPrinter csvPrinter, String precinct)
         throws IOException {
+    csvPrinter.printRecord("Contest Information");
     csvPrinter.printRecord("Contest", config.getContestName());
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
     csvPrinter.printRecord("Office", config.getContestOffice());
@@ -459,10 +470,21 @@ class ResultsWriter {
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
     csvPrinter.printRecord("Threshold", winningThreshold);
-    csvPrinter.printRecord("TotalBallotsCast", numBallots);
     if (!isNullOrBlank(precinct)) {
       csvPrinter.printRecord("Precinct", precinct);
     }
+    csvPrinter.println();
+  }
+
+  private void addContestSummaryRows(CSVPrinter csvPrinter, int numBallots, int numUndervotes)
+        throws IOException {
+    csvPrinter.printRecord("Contest Summary");
+    csvPrinter.printRecord("Type of Election",
+          config.isSingleWinnerEnabled() ? "Single-Winner" : "Multi-Winner");
+    csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
+    csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
+    csvPrinter.printRecord("Number of Votes Cast", numBallots);
+    csvPrinter.printRecord("Number of Undervotes", numUndervotes);
     csvPrinter.println();
   }
 
@@ -492,10 +514,11 @@ class ResultsWriter {
   void generateOverallSummaryFiles(
       Map<Integer, Map<String, BigDecimal>> roundTallies,
       TallyTransfers tallyTransfers,
-      int numBallots)
+      int numBallots,
+      int numUndervotes)
       throws IOException {
     String outputPath = getOutputFilePathFromInstance("summary");
-    generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
+    generateSummarySpreadsheet(roundTallies, numBallots, numUndervotes, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, numBallots, null, outputPath);
   }
 
