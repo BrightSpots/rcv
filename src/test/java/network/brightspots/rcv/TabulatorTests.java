@@ -236,6 +236,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Test Convert to CDF works for ESS")
+  void convertToCdfFromEss() {
+    runConvertToCdfTest("convert_to_cdf_from_ess");
+  }
+
+  @Test
   @DisplayName("aliases (CDF JSON format)")
   void aliasesJson() {
     runTabulationTest("aliases_cdf_json");

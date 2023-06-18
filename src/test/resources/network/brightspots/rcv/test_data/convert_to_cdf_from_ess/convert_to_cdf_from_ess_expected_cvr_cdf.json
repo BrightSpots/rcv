@@ -1,0 +1,337 @@
+{
+  "@type" : "CVR.CastVoteRecordReport",
+  "CVR" : [ {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-1",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-1",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-mookie_blaylock",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-1",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-2",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-2",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-mookie_blaylock",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-2",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-3",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-3",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-mookie_blaylock",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-3",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-4",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-4",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-mookie_blaylock",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-4",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-5",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-5",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-yinka_dare",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-5",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-6",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-6",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-yinka_dare",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-6",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-7",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-7",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-yinka_dare",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-7",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-8",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-8",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-george_gervin",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-8",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-9",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-9",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-george_gervin",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-yinka_dare",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-9",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "simple_ess_cvr.xlsx-10",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-simple_ess_cvr.xlsx-10",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-sedale_threatt",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-george_gervin",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    } ],
+    "CurrentSnapshotId" : "ballot-simple_ess_cvr.xlsx-10",
+    "ElectionId" : "election-001"
+  } ],
+  "Election" : [ {
+    "@id" : "election-001",
+    "@type" : "Election",
+    "Candidate" : [ {
+      "@id" : "c-george_gervin",
+      "Name" : "George Gervin"
+    }, {
+      "@id" : "c-mookie_blaylock",
+      "Name" : "Mookie Blaylock"
+    }, {
+      "@id" : "c-sedale_threatt",
+      "Name" : "Sedale Threatt"
+    }, {
+      "@id" : "c-yinka_dare",
+      "Name" : "Yinka Dare"
+    }, {
+      "@id" : "c-overvote",
+      "Name" : "overvote"
+    } ],
+    "Contest" : [ {
+      "@id" : "contest-001",
+      "@type" : "CandidateContest",
+      "ContestSelection" : [ {
+        "@id" : "cs-george_gervin",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-george_gervin" ]
+      }, {
+        "@id" : "cs-mookie_blaylock",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-mookie_blaylock" ]
+      }, {
+        "@id" : "cs-sedale_threatt",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-sedale_threatt" ]
+      }, {
+        "@id" : "cs-yinka_dare",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-yinka_dare" ]
+      }, {
+        "@id" : "cs-overvote",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-overvote" ]
+      } ],
+      "Name" : "Tiebreak test"
+    } ],
+    "ElectionScopeId" : "gpu-election"
+  } ],
+  "GeneratedDate" : "2023-06-18T17:42:07-04:00",
+  "GpUnit" : [ {
+    "@id" : "gpu-election",
+    "@type" : "GpUnit",
+    "Name" : "Funkytown, USA",
+    "OtherType" : "Election Scope Jurisdiction",
+    "Type" : "other"
+  } ],
+  "ReportGeneratingDeviceIds" : [ "rd-001" ],
+  "ReportingDevice" : [ {
+    "@id" : "rd-001",
+    "@type" : "CVR.ReportingDevice",
+    "Application" : "RCTab",
+    "Manufacturer" : "Bright Spots"
+  } ],
+  "Version" : "1.0.0"
+}
