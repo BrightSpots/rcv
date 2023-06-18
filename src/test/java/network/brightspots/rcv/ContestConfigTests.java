@@ -39,11 +39,9 @@ class ContestConfigTests {
     assertFalse(isVersionNewer("1.3.0", "1.3.1"));
     assertTrue(isVersionNewer("1.3.1", "1.3.0"));
 
-    // Version comparison ignores the -alpha specifier
+    // Version comparison ignores the -alpha specifier when version numbers don't match
     assertFalse(isVersionNewer("1.2.0-alpha", "1.3.0"));
     assertTrue(isVersionNewer("1.4.0-alpha", "1.3.0"));
-    assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0"));
-    assertFalse(isVersionNewer("1.4.0", "1.4.0-alpha"));
 
     // Sane things with false versions
     assertFalse(isVersionNewer("goober", "1.0.0"));
@@ -59,6 +57,7 @@ class ContestConfigTests {
     // The following tests check the current state, though we have an Issue open with
     // jackson-core to address.
     // https://github.com/FasterXML/jackson-core/issues/1050
+    // Once that issue is addressed, the following tests should flip from False to True
     assertFalse(isVersionNewer("1.4.0-beta", "1.4.0-alpha"));
     assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0-beta"));
     assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0"));
