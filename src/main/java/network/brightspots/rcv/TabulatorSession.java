@@ -99,34 +99,32 @@ class TabulatorSession {
     if (config != null && config.validate().isEmpty()) {
       checkConfigVersionMatchesApp(config);
 
-      if (!setUpLogging(config.getOutputDirectory())) {
-        Logger.severe("Failed to set up logging.");
-      }
-
-      try {
-        FileUtils.createOutputDirectory(config.getOutputDirectory());
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
-        if (castVoteRecords == null) {
-          Logger.severe("Aborting conversion due to cast vote record errors!");
-        } else {
-          Set<String> precinctIds = new Tabulator(castVoteRecords, config).getPrecinctIds();
-          ResultsWriter writer =
-              new ResultsWriter()
-                  .setNumRounds(0)
-                  .setPrecinctIds(precinctIds)
-                  .setContestConfig(config)
-                  .setTimestampString(timestampString);
-          try {
-            writer.generateCdfJson(castVoteRecords);
-          } catch (RoundSnapshotDataMissingException exception) {
-            // This will never actually happen because no snapshots are involved when you're just
-            // translating the input to CDF, not the tabulation results.
+      if (setUpLogging(config.getOutputDirectory())) {
+        try {
+          FileUtils.createOutputDirectory(config.getOutputDirectory());
+          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
+          if (castVoteRecords == null) {
+            Logger.severe("Aborting conversion due to cast vote record errors!");
+          } else {
+            Set<String> precinctIds = new Tabulator(castVoteRecords, config).getPrecinctIds();
+            ResultsWriter writer =
+                new ResultsWriter()
+                    .setNumRounds(0)
+                    .setPrecinctIds(precinctIds)
+                    .setContestConfig(config)
+                    .setTimestampString(timestampString);
+            try {
+              writer.generateCdfJson(castVoteRecords);
+            } catch (RoundSnapshotDataMissingException exception) {
+              // This will never actually happen because no snapshots are involved when you're just
+              // translating the input to CDF, not the tabulation results.
+            }
           }
+        } catch (IOException
+               | UnableToCreateDirectoryException
+               | TabulationAbortedException exception) {
+          Logger.severe("CDF JSON generation failed.");
         }
-      } catch (IOException
-             | UnableToCreateDirectoryException
-             | TabulationAbortedException exception) {
-        Logger.severe("CDF JSON generation failed.");
       }
     } else {
       Logger.severe("Failed to load config.");
