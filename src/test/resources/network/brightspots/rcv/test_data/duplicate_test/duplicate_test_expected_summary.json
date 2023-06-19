@@ -4,7 +4,8 @@
     "date" : "2018-05-21",
     "jurisdiction" : "Funkytown, USA",
     "office" : "Director of Produce",
-    "threshold" : "5"
+    "threshold" : "5",
+    "totalVotesCast" : 11
   },
   "results" : [ {
     "round" : 1,

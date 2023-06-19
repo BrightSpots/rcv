@@ -4,7 +4,8 @@
     "date" : "2023-04-03",
     "jurisdiction" : "Portland, ME",
     "office" : "Mayor",
-    "threshold" : "14"
+    "threshold" : "14",
+    "totalVotesCast" : 26
   },
   "results" : [ {
     "round" : 1,

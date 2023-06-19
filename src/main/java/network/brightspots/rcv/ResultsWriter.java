@@ -291,7 +291,7 @@ class ResultsWriter {
         numBallotsObj = 0;
       }
       int numBallots = numBallotsObj;
-      int numUndervotes = numUndervotesObj;
+      int numUndervotes = numUndervotesObj == null ? 0 : numUndervotesObj;
       generateSummarySpreadsheet(roundTallies, numBallots, numUndervotes, precinct, outputPath);
       generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct),
             numBallots, precinct, outputPath);

@@ -4,7 +4,8 @@
     "date" : "2015-11-03",
     "jurisdiction" : "Portland, ME",
     "office" : "Mayor",
-    "threshold" : "48"
+    "threshold" : "48",
+    "totalVotesCast" : 99
   },
   "results" : [ {
     "round" : 1,

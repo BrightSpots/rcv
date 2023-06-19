@@ -4,7 +4,8 @@
     "date" : "",
     "jurisdiction" : "Minneapolis",
     "office" : "Park and Recreation Commissioner",
-    "threshold" : "18458"
+    "threshold" : "18458",
+    "totalVotesCast" : 80101
   },
   "results" : [ {
     "round" : 1,

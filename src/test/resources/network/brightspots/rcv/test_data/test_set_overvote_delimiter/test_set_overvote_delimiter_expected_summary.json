@@ -4,7 +4,8 @@
     "date" : "2020-08-23",
     "jurisdiction" : "",
     "office" : "",
-    "threshold" : "5"
+    "threshold" : "5",
+    "totalVotesCast" : 9
   },
   "results" : [ {
     "round" : 1,

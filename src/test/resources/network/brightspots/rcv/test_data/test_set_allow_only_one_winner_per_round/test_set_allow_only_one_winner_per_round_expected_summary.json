@@ -4,7 +4,8 @@
     "date" : "2019-01-18",
     "jurisdiction" : "",
     "office" : "",
-    "threshold" : "2.2501"
+    "threshold" : "2.2501",
+    "totalVotesCast" : 9
   },
   "results" : [ {
     "round" : 1,

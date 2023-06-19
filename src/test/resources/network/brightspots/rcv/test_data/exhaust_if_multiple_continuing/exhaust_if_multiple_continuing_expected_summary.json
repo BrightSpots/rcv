@@ -4,7 +4,8 @@
     "date" : "2022-08-15",
     "jurisdiction" : "",
     "office" : "",
-    "threshold" : "3"
+    "threshold" : "3",
+    "totalVotesCast" : 9
   },
   "results" : [ {
     "round" : 1,

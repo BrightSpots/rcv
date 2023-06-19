@@ -210,12 +210,15 @@ class TabulatorTests {
                 + extension);
 
     // Overwrite expected file with the generated one
-    // try {
-    //   new File(expectedPath).setWritable(true);
-    //   copyFile(new File(actualOutputPath), new File(expectedPath));
-    // } catch (IOException e) {
-    //   fail(e);
-    // }
+    Boolean rewriteAllExpectedFiles = false;
+    if (rewriteAllExpectedFiles) {
+      try {
+        new File(expectedPath).setWritable(true);
+        copyFile(new File(actualOutputPath), new File(expectedPath));
+      } catch (IOException e) {
+        fail(e);
+      }
+    }
 
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
     if (fileCompare(expectedPath, actualOutputPath)) {
