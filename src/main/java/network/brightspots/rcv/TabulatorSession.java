@@ -51,7 +51,7 @@ class TabulatorSession {
   TabulatorSession(String configPath) {
     this.configPath = configPath;
     // current date-time formatted as a string used for creating unique output files names
-    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS").format(new Date());
+    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
   // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI
@@ -94,9 +94,15 @@ class TabulatorSession {
   // special mode to just export the CVR as CDF JSON instead of tabulating
   void convertToCdf() {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
+
     // If there are no validation errors
     if (config != null && config.validate().isEmpty()) {
       checkConfigVersionMatchesApp(config);
+
+      if (!setUpLogging(config.getOutputDirectory())) {
+        Logger.severe("Failed to set up logging.");
+      }
+
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
@@ -125,6 +131,8 @@ class TabulatorSession {
     } else {
       Logger.severe("Failed to load config.");
     }
+
+    Logger.removeTabulationFileLogging();
   }
 
   // Returns a List of exception class names that were thrown while tabulating.

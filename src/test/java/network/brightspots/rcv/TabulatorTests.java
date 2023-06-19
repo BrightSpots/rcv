@@ -92,13 +92,6 @@ class TabulatorTests {
     return result;
   }
 
-  // given stem and suffix returns path to file in the shared test asset folder
-  private static String getSharedAssetFilePath(String stem, String suffix) {
-    return Paths.get(System.getProperty("user.dir"), TEST_SHARED_ASSET_FOLDER, stem, stem + suffix)
-          .toAbsolutePath()
-          .toString();
-  }
-
   // given stem and suffix returns path to file in test asset folder
   private static String getTestFilePath(String stem, String suffix) {
     return Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem, stem + suffix)
@@ -106,27 +99,15 @@ class TabulatorTests {
         .toString();
   }
 
-  // given stem and suffix returns path to file in shared test asset folder
-  private static String getTestOrSharedFilePath(String testStem, String sharedStem, String suffix) {
-    return sharedStem == null
-          ? getTestFilePath(testStem, suffix)
-          : getSharedAssetFilePath(sharedStem, suffix);
-  }
-
   private static void runTabulationTest(String testStem) {
-    runTabulationTest(testStem, null, null);
-  }
-
-  private static void runTabulationTest(String testStem, String sharedStem) {
-    runTabulationTest(testStem, sharedStem, null);
+    runTabulationTest(testStem, null);
   }
 
   // helper function to support running various tabulation tests
-  private static void runTabulationTest(String testStem,
-        String sharedStem, String expectedException) {
-    String configPath = getTestOrSharedFilePath(testStem, sharedStem, "_config.json");
+  private static void runTabulationTest(String stem, String expectedException) {
+    String configPath = getTestFilePath(stem, "_config.json");
 
-    Logger.info("Running tabulation test: %s\nTabulating config file: %s...", testStem, configPath);
+    Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
     List<String> exceptionsEncountered = session.tabulate();
     if (expectedException != null) {
@@ -140,10 +121,10 @@ class TabulatorTests {
 
     if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-        compareJsons(config, testStem, timestampString, Integer.toString(i));
+        compareJsons(config, stem, timestampString, Integer.toString(i));
       }
     } else {
-      compareJsons(config, testStem, timestampString, null);
+      compareJsons(config, stem, timestampString, null);
     }
 
     // If this is a Dominion tabulation test, also check the converted output file.
@@ -153,12 +134,30 @@ class TabulatorTests {
     if (isDominion) {
       String expectedPath =
           getTestFilePath(
-              testStem,
+              stem,
               "_contest_"
                   + config.rawConfig.cvrFileSources.get(0).getContestId()
                   + "_expected.csv");
       assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
     }
+
+    cleanOutputFolder(session);
+  }
+
+  // helper function to support running convert-to-cdf function
+  private static void runConvertToCdfTest(String stem) {
+    String configPath = getTestFilePath(stem, "_config.json");
+    TabulatorSession session = new TabulatorSession(configPath);
+    session.convertToCdf();
+
+    String timestampString = session.getTimestampString();
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    compareJson(config, stem, "cvr_cdf", timestampString, null);
+
+    cleanOutputFolder(session);
+  }
+
+  private static void cleanOutputFolder(TabulatorSession session) {
     // test passed so cleanup test output folder
     File outputFolder = new File(session.getOutputPath());
     File[] files = outputFolder.listFiles();
@@ -183,17 +182,6 @@ class TabulatorTests {
       }
     }
     Logger.info("Test complete.");
-  }
-
-  // helper function to support running convert-to-cdf function
-  private static void runConvertToCdfTest(String testStem, String sharedStem) {
-    String configPath = getSharedAssetFilePath(sharedStem, "_config.json");
-    TabulatorSession session = new TabulatorSession(configPath);
-    session.convertToCdf();
-
-    String timestampString = session.getTimestampString();
-    ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    compareJson(config, testStem, "cvr_cdf", timestampString, null);
   }
 
   private static void compareJsons(
@@ -238,19 +226,19 @@ class TabulatorTests {
   @Test
   @DisplayName("Test Convert to CDF works for CDF")
   void convertToCdfFromCdf() {
-    runConvertToCdfTest("convert_to_cdf_from_cdf", "cdf_json");
+    runConvertToCdfTest("convert_to_cdf_from_cdf");
   }
 
   @Test
   @DisplayName("Test Convert to CDF works for Dominion")
   void convertToCdfFromDominion() {
-    runConvertToCdfTest("convert_to_cdf_from_dominion", "dominion_alaska");
+    runConvertToCdfTest("convert_to_cdf_from_dominion");
   }
 
   @Test
   @DisplayName("aliases (CDF JSON format)")
   void aliasesJson() {
-    runTabulationTest("aliases_cdf_json", "cdf_json");
+    runTabulationTest("aliases_cdf_json");
   }
 
   @Test
@@ -328,7 +316,7 @@ class TabulatorTests {
   @Test
   @DisplayName("Dominion test - Alaska test data")
   void testDominionAlaska() {
-    runTabulationTest("dominion_alaska", "dominion_alaska");
+    runTabulationTest("dominion_alaska");
   }
 
   @Test
@@ -663,13 +651,13 @@ class TabulatorTests {
   @DisplayName("no one meets minimum test")
   void noOneMeetsMinimumTest() {
     runTabulationTest("no_one_meets_minimum",
-          null, TabulationAbortedException.class.toString());
+          TabulationAbortedException.class.toString());
   }
 
   @Test
   @DisplayName("gracefully fail when tabulate-by-precinct option set without any precincts in CVR")
   void tabulateByPrecinctWithoutPrecincts() {
     runTabulationTest("tabulate_by_precinct_without_precincts",
-        null, TabulationAbortedException.class.toString());
+        TabulationAbortedException.class.toString());
   }
 }
