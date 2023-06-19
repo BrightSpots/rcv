@@ -300,9 +300,11 @@ class ResultsWriter {
 
   // create a summary spreadsheet .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
+  // param: ballotStatusTallies is the round-by-count count of ballot statuses
   // param: precinct indicates which precinct we're reporting results for (null means all)
   private void generateSummarySpreadsheet(
       Map<Integer, Map<String, BigDecimal>> roundTallies,
+      Map<Integer, Map<BallotStatus, BigDecimal>> ballotStatusTallies,
       int numBallots,
       int numUndervotes,
       String precinct,
@@ -340,8 +342,9 @@ class ResultsWriter {
     addContestSummaryRows(csvPrinter, numBallots, numUndervotes);
     csvPrinter.print("Rounds");
     for (int round = 1; round <= numRounds; round++) {
-      String label = String.format("Round %d", round);
-      csvPrinter.print(label);
+      csvPrinter.print(String.format("Round %d Votes", round));
+      csvPrinter.print("% of vote");
+      csvPrinter.print("transfer");
     }
     csvPrinter.println();
 
@@ -364,24 +367,43 @@ class ResultsWriter {
         if (thisRoundTally == null) {
           thisRoundTally = BigDecimal.ZERO;
         }
+
+        // Vote count
         csvPrinter.print(thisRoundTally);
+
+        // Vote %
+        csvPrinter.print(thisRoundTally / totalActiveVotesPerRound.get(round));
+
+        // Transfer
+        if (round < numRounds) {
+          BigDecimal nextRoundTally = roundTallies.get(round + 1).get(candidate);
+          if (thisRoundTally == null) {
+            nextRoundTally = BigDecimal.ZERO;
+          }
+          csvPrinter.print(nextRoundTally - thisRoundTally);
+        } else {
+          csvPrinter.print(0);
+        }
       }
       csvPrinter.println();
     }
 
-    csvPrinter.print("Inactive ballots");
+    csvPrinter.print("Inactive Ballots by Overvotes");
+    csvPrinter.print("Inactive Ballots by Skipped Rankings");
+    csvPrinter.print("Inactive Ballots by Exhausted Choices");
+    csvPrinter.print("Inactive Ballots by Repeat Ranking");
+    csvPrinter.print("Inactive Ballots Total");
     for (int round = 1; round <= numRounds; round++) {
       // Exhausted/inactive count is the difference between the total ballots and the total votes
       // still active or counting as residual surplus votes in the current round.
-      BigDecimal thisRoundInactive =
+      BigDecimal expectedTotalInactive =
           new BigDecimal(numBallots).subtract(totalActiveVotesPerRound.get(round));
 
       if (precinct == null) {
         // We don't have the concept of residual surplus at the precinct level (see comment below),
         // so we'll just incorporate that part (if any) into the inactive count.
-        thisRoundInactive = thisRoundInactive.subtract(roundToResidualSurplus.get(round));
+        expectedTotalInactive = thisRoundInactive.subtract(roundToResidualSurplus.get(round));
       }
-      csvPrinter.print(thisRoundInactive);
     }
     csvPrinter.println();
 
@@ -414,6 +436,15 @@ class ResultsWriter {
     Logger.info("Summary spreadsheet generated successfully.");
   }
 
+  private void printInactiveBallotsByType(CSVPrinter csvPrinter, BallotStatus type) {
+      Map<Integer, Map<BallotStatus, BigDecimal>> ballotStatusTallies,
+      CSVPrinter csvPrinter,
+      BallotStatus ballotStatus,
+    for (int round = 1; round <= numRounds; round++) {
+      csvPrinter.print(ballotStatusTallies.get(round).get(type));
+    }
+  }
+
   // "action" rows describe which candidates were eliminated or elected
   private void addActionRows(CSVPrinter csvPrinter) throws IOException {
     csvPrinter.print("Eliminated");
@@ -424,6 +455,10 @@ class ResultsWriter {
       } else {
         csvPrinter.print("");
       }
+
+      // Empty % of vote and transfer columns
+      csvPrinter.print("");
+      csvPrinter.print("");
     }
     csvPrinter.println();
 
@@ -435,6 +470,10 @@ class ResultsWriter {
       } else {
         csvPrinter.print("");
       }
+
+      // Empty % of vote and transfer columns
+      csvPrinter.print("");
+      csvPrinter.print("");
     }
     csvPrinter.println();
   }
@@ -453,6 +492,9 @@ class ResultsWriter {
 
   private void addContestInformationRows(CSVPrinter csvPrinter, String precinct)
         throws IOException {
+    csvPrinter.printRecord("RCTab Version", Main.APP_VERSION);
+    csvPrinter.printRecord("Type of Election",
+          config.isSingleWinnerEnabled() ? "Single-Winner" : "Multi-Winner");
     csvPrinter.printRecord("Contest Information");
     csvPrinter.printRecord("Contest", config.getContestName());
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
@@ -479,8 +521,6 @@ class ResultsWriter {
   private void addContestSummaryRows(CSVPrinter csvPrinter, int numBallots, int numUndervotes)
         throws IOException {
     csvPrinter.printRecord("Contest Summary");
-    csvPrinter.printRecord("Type of Election",
-          config.isSingleWinnerEnabled() ? "Single-Winner" : "Multi-Winner");
     csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
     csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
     csvPrinter.printRecord("Number of Votes Cast", numBallots);
