@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-    "filePath" : "../_shared/minneapolis_multi_seat_cvr.xlsx",
+    "filePath" : "minneapolis_multi_seat_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
