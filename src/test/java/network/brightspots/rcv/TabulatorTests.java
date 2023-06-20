@@ -158,7 +158,7 @@ class TabulatorTests {
   }
 
   private static void cleanOutputFolder(TabulatorSession session) {
-    // test passed so cleanup test output folder
+    // Test passed so clean up test output folder
     File outputFolder = new File(session.getOutputPath());
     File[] files = outputFolder.listFiles();
     if (files != null) {

@@ -93,16 +93,13 @@ class TabulatorSession {
 
   // special mode to just export the CVR as CDF JSON instead of tabulating
   void convertToCdf() {
+    Logger.info("Starting CDF conversion session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    checkConfigVersionMatchesApp(config);
+    boolean conversionSuccess = false;
 
-    // If there are no validation errors
-    if (config != null && config.validate().isEmpty()) {
-      checkConfigVersionMatchesApp(config);
-
-      if (!setUpLogging(config.getOutputDirectory())) {
-        Logger.severe("Failed to set up logging.");
-      }
-
+    if (setUpLogging(config.getOutputDirectory()) && config.validate().isEmpty()) {
+      Logger.info("Converting CVR(s) to CDF...");
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
@@ -116,22 +113,24 @@ class TabulatorSession {
                   .setPrecinctIds(precinctIds)
                   .setContestConfig(config)
                   .setTimestampString(timestampString);
-          try {
-            writer.generateCdfJson(castVoteRecords);
-          } catch (RoundSnapshotDataMissingException exception) {
-            // This will never actually happen because no snapshots are involved when you're just
-            // translating the input to CDF, not the tabulation results.
-          }
+          writer.generateCdfJson(castVoteRecords);
+          conversionSuccess = true;
         }
       } catch (IOException
-             | UnableToCreateDirectoryException
-             | TabulationAbortedException exception) {
-        Logger.severe("CDF JSON generation failed.");
+          | UnableToCreateDirectoryException
+          | TabulationAbortedException
+          | RoundSnapshotDataMissingException exception) {
+        Logger.severe("Failed to convert CVR(s) to CDF: %s", exception.getMessage());
       }
-    } else {
-      Logger.severe("Failed to load config.");
     }
 
+    if (conversionSuccess) {
+      Logger.info("Successfully converted CVR(s) to CDF.");
+    } else {
+      Logger.severe("Failed to convert CVR(s) to CDF!");
+    }
+
+    Logger.info("CDF conversion session completed.");
     Logger.removeTabulationFileLogging();
   }
 
