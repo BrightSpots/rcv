@@ -43,6 +43,8 @@ class TabulatorTests {
   // folder where we store test inputs
   private static final String TEST_ASSET_FOLDER =
       "src/test/resources/network/brightspots/rcv/test_data";
+  private static final String TEST_SHARED_ASSET_FOLDER =
+        "src/test/resources/network/brightspots/rcv/test_data/_shared";
   // limit log output to avoid spam
   private static final Integer MAX_LOG_ERRORS = 10;
 
@@ -97,13 +99,14 @@ class TabulatorTests {
         .toString();
   }
 
-  private static void runTabulationTest(String stem) {
-    runTabulationTest(stem, null);
+  private static void runTabulationTest(String testStem) {
+    runTabulationTest(testStem, null);
   }
 
   // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem, String expectedException) {
     String configPath = getTestFilePath(stem, "_config.json");
+
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
     List<String> exceptionsEncountered = session.tabulate();
@@ -137,7 +140,25 @@ class TabulatorTests {
                   + "_expected.csv");
       assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
     }
-    // test passed so cleanup test output folder
+
+    cleanOutputFolder(session);
+  }
+
+  // helper function to support running convert-to-cdf function
+  private static void runConvertToCdfTest(String stem) {
+    String configPath = getTestFilePath(stem, "_config.json");
+    TabulatorSession session = new TabulatorSession(configPath);
+    session.convertToCdf();
+
+    String timestampString = session.getTimestampString();
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    compareJson(config, stem, "cvr_cdf", timestampString, null);
+
+    cleanOutputFolder(session);
+  }
+
+  private static void cleanOutputFolder(TabulatorSession session) {
+    // Test passed so clean up test output folder
     File outputFolder = new File(session.getOutputPath());
     File[] files = outputFolder.listFiles();
     if (files != null) {
@@ -200,6 +221,18 @@ class TabulatorTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
+  }
+
+  @Test
+  @DisplayName("Test Convert to CDF works for CDF")
+  void convertToCdfFromCdf() {
+    runConvertToCdfTest("convert_to_cdf_from_cdf");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CDF works for Dominion")
+  void convertToCdfFromDominion() {
+    runConvertToCdfTest("convert_to_cdf_from_dominion");
   }
 
   @Test
@@ -617,7 +650,8 @@ class TabulatorTests {
   @Test
   @DisplayName("no one meets minimum test")
   void noOneMeetsMinimumTest() {
-    runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());
+    runTabulationTest("no_one_meets_minimum",
+          TabulationAbortedException.class.toString());
   }
 
   @Test
