@@ -748,6 +748,10 @@ class Tabulator {
     }
   }
 
+  Set<String> getPrecinctIds() throws IOException {
+    return precinctIds;
+  }
+
   // Function: runBatchElimination
   // Purpose: applies batch elimination logic to the input vote counts to remove multiple candidates
   //   in a single round if their vote counts are so low that they could not possibly end up winning
