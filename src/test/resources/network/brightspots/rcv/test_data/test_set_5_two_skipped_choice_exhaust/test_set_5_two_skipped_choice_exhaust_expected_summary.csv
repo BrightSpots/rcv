@@ -1,0 +1,15 @@
+Contest,Test Set 5
+Jurisdiction,TestSets_Single_winner
+Office,Skipped choice_allow 1
+Date,2019-03-06
+Winner(s),Candidate B Name
+Threshold,8
+
+Rounds,Round 1,Round 2,Round 3
+Eliminated,Candidate D Name,Candidate C Name,
+Elected,,,Candidate B Name
+Candidate B Name,7,7,9
+Candidate A Name,5,5,5
+Candidate C Name,2,3,0
+Candidate D Name,1,0,0
+Inactive ballots,0,0,1

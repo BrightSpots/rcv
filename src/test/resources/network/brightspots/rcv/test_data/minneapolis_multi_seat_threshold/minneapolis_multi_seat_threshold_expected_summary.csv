@@ -1,0 +1,17 @@
+Contest,Multi_winner2
+Jurisdiction,Multi-winner
+Office,Multi_winner2
+Date,2018-09-30
+Winner(s),"C, A, B"
+Threshold,8
+
+Rounds,Round 1,Round 2,Round 3,Round 4,Round 5,Round 6
+Eliminated,D,,F,E,,
+Elected,,C,,,A; B,
+C,7,8,8.0000,8.0000,8.0000,8.0000
+A,6,6,6,7,10.0000,8.0000
+E,6,6,6.0000,6.0000,0,0
+B,5,5,5,7.0000,10.0000,8.0000
+F,3,3,3.0000,0,0,0
+D,2,0,0,0,0,0
+Inactive ballots,1,2,2.0000,2.0000,2.0000,6.0000

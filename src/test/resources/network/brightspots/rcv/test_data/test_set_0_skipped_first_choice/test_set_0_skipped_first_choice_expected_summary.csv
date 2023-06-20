@@ -1,0 +1,15 @@
+Contest,Test Set 0
+Jurisdiction,TestSets_Single_winner
+Office,Skiptonext_Skiponovervote
+Date,2019-03-06
+Winner(s),Candidate B Name
+Threshold,6
+
+Rounds,Round 1,Round 2,Round 3
+Eliminated,Candidate D Name,Candidate C Name,
+Elected,,,Candidate B Name
+Candidate A Name,4,4,4
+Candidate B Name,4,5,7
+Candidate C Name,3,3,0
+Candidate D Name,1,0,0
+Inactive ballots,0,0,1

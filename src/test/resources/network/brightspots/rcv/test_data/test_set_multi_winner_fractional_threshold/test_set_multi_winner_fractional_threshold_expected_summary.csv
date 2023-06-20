@@ -1,0 +1,18 @@
+Contest,test set multi winner fractional
+Jurisdiction,Multi-winner
+Office,Multi_winner2
+Date,2019-01-18
+Winner(s),"Candidate C Name, Candidate A Name, Candidate B Name"
+Threshold,7.2501
+
+Rounds,Round 1,Round 2,Round 3,Round 4,Round 5,Round 6
+Eliminated,Candidate D Name,,Candidate F Name,Candidate E Name,,
+Elected,,Candidate C Name,,,Candidate A Name; Candidate B Name,
+Candidate C Name,7,8,7.2501,7.2501,7.2501,7.2501
+Candidate A Name,6,6,6,7,10.2811,7.2501
+Candidate E Name,6,6,6.6559,6.6559,0,0
+Candidate B Name,5,5,5,7.0937,10.0937,7.2501
+Candidate F Name,3,3,3.0937,0,0,0
+Candidate D Name,2,0,0,0,0,0
+Inactive ballots,1,2,2.0000,2.0000,2.3748,8.2489
+Residual surplus,0,0,0.0003,0.0003,0.0003,0.0008

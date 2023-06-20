@@ -1,0 +1,18 @@
+Contest,Continue Until Two + Batch Elimination Test
+Jurisdiction,
+Office,
+Date,
+Winner(s),A
+Threshold,39
+
+Rounds,Round 1,Round 2,Round 3,Round 4
+Eliminated,,D; E; F; G,B,
+Elected,A,,,
+A,60,60,60,60
+B,15,15,15,0
+C,14,14,16,16
+D,5,5,0,0
+E,4,4,0,0
+F,1,1,0,0
+G,1,1,0,0
+Inactive ballots,0,0,9,24

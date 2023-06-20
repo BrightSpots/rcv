@@ -1,0 +1,30 @@
+Contest,Precinct example
+Jurisdiction,"Minneapolis, MN"
+Office,Mayor
+Date,2017-11-07
+Winner(s),Betsy Hodges
+Threshold,42
+
+Rounds,Round 1,Round 2,Round 3,Round 4,Round 5
+Eliminated,Undeclared Write-ins,Aswar Rahman; David Rosenfeld; L.A. Nik; Christopher Zimmerman; Ronald Lischeid; Ian Simpson; Charlie Gers; Captain Jack Sparrow; Theron Preston Washington; David John Wilson; Gregg A. Iverson; Troy Benjegerdes; Al Flowers; Nekima Levy-Pounds,Tom Hoch,Raymond Dehn,
+Elected,,,,,Betsy Hodges
+Jacob Frey,28,28,30,39,41
+Betsy Hodges,20,20,25,28,42
+Tom Hoch,17,17,19,0,0
+Raymond Dehn,17,17,22,23,0
+Nekima Levy-Pounds,12,12,0,0,0
+David Rosenfeld,1,1,0,0,0
+Charlie Gers,1,1,0,0,0
+Captain Jack Sparrow,1,1,0,0,0
+Al Flowers,1,1,0,0,0
+Aswar Rahman,0,0,0,0,0
+L.A. Nik,0,0,0,0,0
+Christopher Zimmerman,0,0,0,0,0
+Ronald Lischeid,0,0,0,0,0
+Ian Simpson,0,0,0,0,0
+Theron Preston Washington,0,0,0,0,0
+David John Wilson,0,0,0,0,0
+Gregg A. Iverson,0,0,0,0,0
+Troy Benjegerdes,0,0,0,0,0
+Undeclared Write-ins,1,0,0,0,0
+Inactive ballots,1,2,4,10,17

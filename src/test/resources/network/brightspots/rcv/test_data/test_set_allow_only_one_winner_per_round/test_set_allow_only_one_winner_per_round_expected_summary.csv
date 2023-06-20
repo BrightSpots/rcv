@@ -1,0 +1,16 @@
+Contest,Allow Only One Winner per Round Test
+Jurisdiction,
+Office,
+Date,2019-01-18
+Winner(s),"A, B, C"
+Threshold,2.2501
+
+Rounds,Round 1,Round 2,Round 3,Round 4
+Eliminated,,,,
+Elected,A,B,C,
+A,3,2.2501,2.2501,2.2501
+B,3,3.7497,2.2501,2.2501
+C,3,3,4.4994,2.2501
+D,0,0,0,2.0994
+Inactive ballots,0,0.0000,0.0000,0.1497
+Residual surplus,0,0.0002,0.0004,0.0006

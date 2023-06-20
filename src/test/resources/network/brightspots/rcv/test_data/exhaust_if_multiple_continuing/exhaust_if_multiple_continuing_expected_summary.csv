@@ -1,0 +1,15 @@
+Contest,Overvote Exhaust If Multiple Continuing Test
+Jurisdiction,
+Office,
+Date,2022-08-15
+Winner(s),B
+Threshold,3
+
+Rounds,Round 1,Round 2,Round 3
+Eliminated,A,D,
+Elected,,,B
+B,3,3,3
+C,2,2,2
+D,1,1,0
+A,0,0,0
+Inactive ballots,3,3,4

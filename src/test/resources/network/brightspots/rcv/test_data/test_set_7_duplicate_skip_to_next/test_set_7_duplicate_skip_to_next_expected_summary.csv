@@ -1,0 +1,15 @@
+Contest,Test Set 6
+Jurisdiction,TestSets_Single_winner
+Office,Duplicate choice skip
+Date,2019-03-06
+Winner(s),Candidate A Name
+Threshold,8
+
+Rounds,Round 1,Round 2,Round 3
+Eliminated,Candidate D Name,Candidate C Name,
+Elected,,,Candidate A Name
+Candidate A Name,5,6,8
+Candidate B Name,5,5,7
+Candidate C Name,3,4,0
+Candidate D Name,2,0,0
+Inactive ballots,0,0,0

@@ -1,0 +1,18 @@
+Contest,test set multi winner whole
+Jurisdiction,Multi-winner
+Office,Multi_winner2
+Date,2019-01-18
+Winner(s),"Candidate C Name, Candidate A Name, Candidate B Name"
+Threshold,8
+
+Rounds,Round 1,Round 2,Round 3,Round 4,Round 5,Round 6
+Eliminated,,Candidate D Name,Candidate F Name,Candidate E Name,,
+Elected,Candidate C Name,,,,Candidate A Name; Candidate B Name,
+Candidate C Name,9,8,8,8,8,8
+Candidate A Name,6,6,6,7.1111,10.3333,8
+Candidate B Name,5,5,5,7.1111,9.2222,8
+Candidate E Name,4,4.7777,5.7777,5.7777,0,0
+Candidate F Name,3,3.1111,3.2222,0,0,0
+Candidate D Name,2,2.1111,0,0,0,0
+Inactive ballots,1,1.0000,2.0000,2.0000,2.4444,5.9993
+Residual surplus,0,0.0001,0.0001,0.0001,0.0001,0.0007
