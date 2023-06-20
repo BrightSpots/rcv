@@ -20,7 +20,7 @@
 package network.brightspots.rcv;
 
 import static java.util.Map.entry;
-import static network.brightspots.rcv.CastVoteRecord.BallotStatus;
+import static network.brightspots.rcv.CastVoteRecord.StatusForRound;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -365,18 +365,18 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    Pair<String, BallotStatus>[] statusesToPrint = new Pair[]{
-        new Pair<>("by Overvotes", BallotStatus.INACTIVE_BY_OVERVOTE),
-        new Pair<>("by Skipped Rankings", BallotStatus.INACTIVE_BY_SKIPPED_RANKING),
-        new Pair<>("by Exhausted Choices", BallotStatus.INACTIVE_BY_EXHAUSTED_CHOICES),
-        new Pair<>("by Repeated Rankings", BallotStatus.INACTIVE_BY_REPEATED_RANKING)
+    Pair<String, StatusForRound>[] statusesToPrint = new Pair[]{
+        new Pair<>("by Overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
+        new Pair<>("by Skipped Rankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
+        new Pair<>("by Exhausted Choices", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
+        new Pair<>("by Repeated Rankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING)
     };
 
     Map<Integer, BigDecimal> inactiveVoteTotals = new HashMap<>();
     for (int round = 1; round <= numRounds; round++) {
       inactiveVoteTotals.put(round, BigDecimal.ZERO);
     }
-    for (Pair<String, BallotStatus> statusToPrint : statusesToPrint) {
+    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
       csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
       for (int round = 1; round <= numRounds; round++) {
         BigDecimal thisTypeInactiveVotes =

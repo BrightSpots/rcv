@@ -28,8 +28,18 @@ import java.util.Map.Entry;
 import javafx.util.Pair;
 
 class CastVoteRecord {
-  enum BallotStatus {
-    ACTIVE,
+  // StatusForRound represents the ballot's status on a given round.
+  // This CastVoteRecord will have different statuses each round,
+  // and this provides a more detailed breakdown than a simple
+  // active/inactive binary. It is only useful in results reporting;
+  // as far as tabulation is concerned, all that matters is whether
+  // it is active or not.
+  enum StatusForRound {
+    // The candidate just received this CVR's vote
+    ACTIVE_JUST_RECEIVED,
+    // This CVR voted for this candidate in a previous round
+    ACTIVE_REMAINED_ON_CANDIDATE,
+    // The following fields represent inactive ballots' status
     INACTIVE_BY_UNDERVOTE,
     INACTIVE_BY_OVERVOTE,
     INACTIVE_BY_SKIPPED_RANKING,
@@ -64,8 +74,8 @@ class CastVoteRecord {
   private String batchId;
   // ballotTypeId parsed from Dominion CVR data
   private String ballotTypeId;
-  // whether this CVR is exhausted or not
-  private BallotStatus ballotStatus = BallotStatus.ACTIVE;
+  // whether this CVR is exhausted or not. This will change as tabulation progresses.
+  private StatusForRound currentRoundStatus = StatusForRound.ACTIVE_JUST_RECEIVED;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -178,16 +188,17 @@ class CastVoteRecord {
     cdfSnapshotData.put(round, data);
   }
 
-  void exhaustBy(BallotStatus status) {
-    this.ballotStatus = status;
+  void exhaustBy(StatusForRound status) {
+    this.currentRoundStatus = status;
   }
 
   boolean isExhausted() {
-    return ballotStatus != BallotStatus.ACTIVE;
+    return currentRoundStatus != StatusForRound.ACTIVE_JUST_RECEIVED
+        && currentRoundStatus != StatusForRound.ACTIVE_REMAINED_ON_CANDIDATE;
   }
 
-  BallotStatus getBallotStatus() {
-    return ballotStatus;
+  StatusForRound getBallotStatus() {
+    return currentRoundStatus;
   }
 
   // fractional transfer value is one by default but can be less if this

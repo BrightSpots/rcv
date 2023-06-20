@@ -21,7 +21,7 @@
 
 package network.brightspots.rcv;
 
-import static network.brightspots.rcv.CastVoteRecord.BallotStatus;
+import static network.brightspots.rcv.CastVoteRecord.StatusForRound;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.io.IOException;
@@ -744,7 +744,7 @@ class Tabulator {
     // Count ballot statuses
     Integer numUndervotes = 0;
     for (CastVoteRecord cvr : castVoteRecords) {
-      if (cvr.getBallotStatus() == BallotStatus.INACTIVE_BY_UNDERVOTE) {
+      if (cvr.getBallotStatus() == StatusForRound.INACTIVE_BY_UNDERVOTE) {
         numUndervotes++;
       }
     }
@@ -756,7 +756,7 @@ class Tabulator {
       for (CastVoteRecord cvr : castVoteRecords) {
         String precinct = cvr.getPrecinct();
         if (!isNullOrBlank(precinct)) {
-          if (cvr.getBallotStatus() == BallotStatus.INACTIVE_BY_UNDERVOTE) {
+          if (cvr.getBallotStatus() == StatusForRound.INACTIVE_BY_UNDERVOTE) {
             int currentNumUndervotes = numUndervotesByPrecinct.getOrDefault(precinct, 0);
             numUndervotesByPrecinct.put(precinct, currentNumUndervotes + 1);
           }
@@ -918,7 +918,7 @@ class Tabulator {
   //  update tallyTransfers counts
   private void recordSelectionForCastVoteRecord(
       CastVoteRecord cvr, RoundTally currentRound,
-      String selectedCandidate, BallotStatus ballotStatus,
+      String selectedCandidate, StatusForRound statusForRound,
       String additionalLogText) throws TabulationAbortedException {
     // update transfer counts (unless there's no value to transfer, which can happen if someone
     // wins with a tally that exactly matches the winning threshold)
@@ -947,14 +947,16 @@ class Tabulator {
 
     cvr.setCurrentRecipientOfVote(selectedCandidate);
     if (selectedCandidate == null) {
-      cvr.exhaustBy(ballotStatus);
+      cvr.exhaustBy(statusForRound);
     }
 
-    currentRound.addBallotWithStatus(ballotStatus);
+    currentRound.addBallotWithStatus(statusForRound);
 
     String outcomeDescription;
-    switch (ballotStatus) {
-      case ACTIVE ->
+    switch (statusForRound) {
+      case ACTIVE_JUST_RECEIVED ->
+          outcomeDescription = selectedCandidate;
+      case ACTIVE_REMAINED_ON_CANDIDATE ->
           outcomeDescription = selectedCandidate;
       case INACTIVE_BY_UNDERVOTE ->
           outcomeDescription = "underote" + additionalLogText;
@@ -968,7 +970,7 @@ class Tabulator {
           outcomeDescription = "no continuing candidate" + additionalLogText;
       // When we encounter a continuing candidate, we record it with this string in the output logs
       default ->
-        throw new RuntimeException("Unexpected ballot status: " + ballotStatus);
+        throw new RuntimeException("Unexpected ballot status: " + statusForRound);
     }
     VoteOutcomeType outcomeType =
         selectedCandidate == null ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
@@ -1016,13 +1018,15 @@ class Tabulator {
             cvr.getCurrentRecipientOfVote(),
             roundTallyByPrecinct,
             cvr.getPrecinct());
+        recordSelectionForCastVoteRecord(cvr, roundTally, cvr.getCurrentRecipientOfVote(),
+            StatusForRound.ACTIVE_REMAINED_ON_CANDIDATE, "");
         continue;
       }
 
       // check for a CVR with no rankings at all
       if (cvr.candidateRankings.numRankings() == 0) {
         recordSelectionForCastVoteRecord(cvr, roundTally, null,
-            BallotStatus.INACTIVE_BY_UNDERVOTE, "");
+            StatusForRound.INACTIVE_BY_UNDERVOTE, "");
       }
 
       // iterate through the rankings in this cvr from most to least preferred.
@@ -1051,7 +1055,7 @@ class Tabulator {
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
           recordSelectionForCastVoteRecord(cvr, roundTally, null,
-              BallotStatus.INACTIVE_BY_SKIPPED_RANKING, "");
+              StatusForRound.INACTIVE_BY_SKIPPED_RANKING, "");
           break;
         }
         lastRankSeen = rank;
@@ -1070,7 +1074,7 @@ class Tabulator {
           if (!isNullOrBlank(duplicateCandidate)) {
             recordSelectionForCastVoteRecord(
                 cvr, roundTally, null,
-                BallotStatus.INACTIVE_BY_REPEATED_RANKING, " " + duplicateCandidate);
+                StatusForRound.INACTIVE_BY_REPEATED_RANKING, " " + duplicateCandidate);
             break;
           }
         }
@@ -1079,14 +1083,14 @@ class Tabulator {
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidates);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
           recordSelectionForCastVoteRecord(cvr, roundTally, null,
-              BallotStatus.INACTIVE_BY_OVERVOTE, "");
+              StatusForRound.INACTIVE_BY_OVERVOTE, "");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           if (rank == cvr.candidateRankings.maxRankingNumber()) {
             // If the final ranking is an overvote, even if we're trying to skip to the next rank,
             // we consider this inactive by exhausted choices -- not an overvote.
             recordSelectionForCastVoteRecord(cvr, roundTally, null,
-                BallotStatus.INACTIVE_BY_EXHAUSTED_CHOICES, "");
+                StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES, "");
           }
           continue;
         }
@@ -1105,7 +1109,7 @@ class Tabulator {
 
           // transfer cvr to selected candidate
           recordSelectionForCastVoteRecord(cvr, roundTally, selectedCandidate,
-              BallotStatus.ACTIVE, "");
+              StatusForRound.ACTIVE_JUST_RECEIVED, "");
 
           // If enabled, this will also update the roundTallyByPrecinct
           incrementTallies(
@@ -1131,10 +1135,10 @@ class Tabulator {
           if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
               && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
             recordSelectionForCastVoteRecord(cvr, roundTally, null,
-                BallotStatus.INACTIVE_BY_UNDERVOTE, "");
+                StatusForRound.INACTIVE_BY_UNDERVOTE, "");
           } else {
             recordSelectionForCastVoteRecord(cvr, roundTally, null,
-                BallotStatus.INACTIVE_BY_EXHAUSTED_CHOICES, "");
+                StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES, "");
           }
         }
       } // end looping over the rankings within one ballot

@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 class RoundTally {
   private final int roundNumber;
   private final Map<String, BigDecimal> candidateTallies;
-  private final Map<CastVoteRecord.BallotStatus, BigDecimal> ballotStatusTallies;
+  private final Map<CastVoteRecord.StatusForRound, BigDecimal> ballotStatusTallies;
   private BigDecimal numBallots;
 
   private boolean isFinalized = false;
@@ -45,8 +45,8 @@ class RoundTally {
     });
 
     ballotStatusTallies = new HashMap<>();
-    for (CastVoteRecord.BallotStatus ballotStatus : CastVoteRecord.BallotStatus.values()) {
-      ballotStatusTallies.put(ballotStatus, BigDecimal.ZERO);
+    for (CastVoteRecord.StatusForRound statusForRound : CastVoteRecord.StatusForRound.values()) {
+      ballotStatusTallies.put(statusForRound, BigDecimal.ZERO);
     }
   }
 
@@ -92,16 +92,16 @@ class RoundTally {
   }
 
   // Adds to the votes for this candidate
-  BigDecimal addBallotWithStatus(CastVoteRecord.BallotStatus ballotStatus) {
+  BigDecimal addBallotWithStatus(CastVoteRecord.StatusForRound statusForRound) {
     ensureNotFinalized();
-    BigDecimal newVal = ballotStatusTallies.get(ballotStatus).add(BigDecimal.ONE);
-    return ballotStatusTallies.put(ballotStatus, newVal);
+    BigDecimal newVal = ballotStatusTallies.get(statusForRound).add(BigDecimal.ONE);
+    return ballotStatusTallies.put(statusForRound, newVal);
   }
 
   // Get the number of inactive ballots by type
-  BigDecimal getBallotStatusTally(CastVoteRecord.BallotStatus ballotStatus) {
+  BigDecimal getBallotStatusTally(CastVoteRecord.StatusForRound statusForRound) {
     ensureFinalized();
-    return ballotStatusTallies.get(ballotStatus);
+    return ballotStatusTallies.get(statusForRound);
   }
 
   // Get the number af active ballots in this round
