@@ -4,8 +4,7 @@
     "date" : "2020-07-19",
     "jurisdiction" : "Wyoming",
     "office" : "Democratic Primary",
-    "threshold" : "398",
-    "totalVotesCast" : 1000
+    "threshold" : "398"
   },
   "results" : [ {
     "round" : 1,

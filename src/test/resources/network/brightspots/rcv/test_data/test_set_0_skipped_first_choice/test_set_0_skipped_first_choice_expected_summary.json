@@ -4,8 +4,7 @@
     "date" : "2019-03-06",
     "jurisdiction" : "TestSets_Single_winner",
     "office" : "Skiptonext_Skiponovervote",
-    "threshold" : "6",
-    "totalVotesCast" : 12
+    "threshold" : "6"
   },
   "results" : [ {
     "round" : 1,

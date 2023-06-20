@@ -4,8 +4,7 @@
     "date" : "2018-06-12",
     "jurisdiction" : "Maine",
     "office" : "Governor",
-    "threshold" : "58627",
-    "totalVotesCast" : 132250
+    "threshold" : "58627"
   },
   "results" : [ {
     "round" : 1,

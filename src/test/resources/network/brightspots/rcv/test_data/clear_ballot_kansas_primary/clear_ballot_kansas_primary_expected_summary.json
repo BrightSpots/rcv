@@ -4,8 +4,7 @@
     "date" : "",
     "jurisdiction" : "Kansas",
     "office" : "Democratic Presidential Primary",
-    "threshold" : "26",
-    "totalVotesCast" : 50
+    "threshold" : "26"
   },
   "results" : [ {
     "round" : 1,

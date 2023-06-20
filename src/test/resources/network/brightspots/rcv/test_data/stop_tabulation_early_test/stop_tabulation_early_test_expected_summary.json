@@ -4,8 +4,7 @@
     "date" : "2023-03-14",
     "jurisdiction" : "Funkytown, USA",
     "office" : "Sergeant-at-Arms",
-    "threshold" : "4",
-    "totalVotesCast" : 9
+    "threshold" : "4"
   },
   "results" : [ {
     "round" : 1,

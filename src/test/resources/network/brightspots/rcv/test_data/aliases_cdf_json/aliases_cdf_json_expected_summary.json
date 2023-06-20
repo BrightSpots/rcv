@@ -4,8 +4,7 @@
     "date" : "2023-03-23",
     "jurisdiction" : "TestSets_Single_winner",
     "office" : "Aliases test",
-    "threshold" : "16",
-    "totalVotesCast" : 30
+    "threshold" : "16"
   },
   "results" : [ {
     "round" : 1,

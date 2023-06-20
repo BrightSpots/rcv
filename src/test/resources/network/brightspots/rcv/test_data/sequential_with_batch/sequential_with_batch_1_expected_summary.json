@@ -4,8 +4,7 @@
     "date" : "",
     "jurisdiction" : "",
     "office" : "",
-    "threshold" : "5",
-    "totalVotesCast" : 9
+    "threshold" : "5"
   },
   "results" : [ {
     "round" : 1,

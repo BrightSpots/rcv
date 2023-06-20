@@ -4,8 +4,7 @@
     "date" : "2018-08-06",
     "jurisdiction" : "Funkytown, USA",
     "office" : "Exhausted",
-    "threshold" : "7",
-    "totalVotesCast" : 15
+    "threshold" : "7"
   },
   "results" : [ {
     "round" : 1,

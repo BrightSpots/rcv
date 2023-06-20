@@ -56,7 +56,7 @@ class Tiebreak {
   private final BigDecimal numVotes;
   // roundTallies: map from round number to map of candidate ID to vote total (for that round)
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
-  private final Map<Integer, Map<String, BigDecimal>> roundTallies;
+  private final Map<Integer, RoundTally> roundTallies;
   private final boolean isSelectingWinner;
   private String selectedCandidate;
   private String explanation;
@@ -74,7 +74,7 @@ class Tiebreak {
       TiebreakMode tiebreakMode,
       int round,
       BigDecimal numVotes,
-      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      Map<Integer, RoundTally> roundTallies,
       ArrayList<String> candidatePermutation) {
     this.isSelectingWinner = isSelectingWinner;
     this.allTiedCandidates = allTiedCandidates;

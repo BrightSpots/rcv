@@ -4,8 +4,7 @@
     "date" : "2018-01-07",
     "jurisdiction" : "Funkytown, USA",
     "office" : "Sergeant-at-Arms",
-    "threshold" : "6",
-    "totalVotesCast" : 10
+    "threshold" : "6"
   },
   "results" : [ {
     "round" : 1,

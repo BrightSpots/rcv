@@ -4,8 +4,7 @@
     "date" : "2019-03-06",
     "jurisdiction" : "TestSets_Single_winner",
     "office" : "",
-    "threshold" : "7",
-    "totalVotesCast" : 15
+    "threshold" : "7"
   },
   "results" : [ {
     "round" : 1,

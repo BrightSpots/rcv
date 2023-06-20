@@ -4,8 +4,7 @@
     "date" : "2019-03-06",
     "jurisdiction" : "TestSets_Single_winner",
     "office" : "Duplicate choice skip",
-    "threshold" : "8",
-    "totalVotesCast" : 15
+    "threshold" : "8"
   },
   "results" : [ {
     "round" : 1,

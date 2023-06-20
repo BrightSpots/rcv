@@ -20,6 +20,7 @@
 package network.brightspots.rcv;
 
 import static java.util.Map.entry;
+import static network.brightspots.rcv.CastVoteRecord.BallotStatus;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -32,6 +33,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -267,34 +269,21 @@ class ResultsWriter {
   // param: precinctTallyTransfers is a map from precinct to tally transfers for that precinct
   // param: numBallotsByPrecinct is the total count of ballots per precinct
   void generatePrecinctSummaryFiles(
-      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies,
+      Map<String, Map<Integer, RoundTally>> precinctRoundTallies,
       Map<String, TallyTransfers> precinctTallyTransfers,
-      Map<String, Integer> numBallotsByPrecinct,
       Map<String, Integer> numUndervotesByPrecinct)
       throws IOException {
     Set<String> filenames = new HashSet<>();
     for (var entry : precinctRoundTallies.entrySet()) {
       String precinct = entry.getKey();
-      Map<Integer, Map<String, BigDecimal>> roundTallies = entry.getValue();
+      Map<Integer, RoundTally> roundTallies = entry.getValue();
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
           getOutputFilePathFromInstance(String.format("%s_precinct_summary", precinctFileString));
-      Integer numBallotsObj = numBallotsByPrecinct.get(precinct);
-      if (numBallotsObj == null) {
-        Logger.warning("No ballots found in precinct \"%s\"", precinct, numBallotsByPrecinct);
-        numBallotsObj = 0;
-      }
-      Integer numUndervotesObj = numUndervotesByPrecinct.get(precinct);
-      if (numUndervotesObj == null) {
-        Logger.warning("No undervote tally found in precinct \"%s\"",
-            precinct, numUndervotesByPrecinct);
-        numBallotsObj = 0;
-      }
-      int numBallots = numBallotsObj;
-      int numUndervotes = numUndervotesObj == null ? 0 : numUndervotesObj;
-      generateSummarySpreadsheet(roundTallies, numBallots, numUndervotes, precinct, outputPath);
+      Integer numUndervotes = numUndervotesByPrecinct.get(precinct);
+      generateSummarySpreadsheet(roundTallies, numUndervotes, precinct, outputPath);
       generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct),
-            numBallots, precinct, outputPath);
+            precinct, outputPath);
     }
   }
 
@@ -303,29 +292,13 @@ class ResultsWriter {
   // param: ballotStatusTallies is the round-by-count count of ballot statuses
   // param: precinct indicates which precinct we're reporting results for (null means all)
   private void generateSummarySpreadsheet(
-      Map<Integer, Map<String, BigDecimal>> roundTallies,
-      Map<Integer, Map<BallotStatus, BigDecimal>> ballotStatusTallies,
-      int numBallots,
-      int numUndervotes,
+      Map<Integer, RoundTally> roundTallies,
+      Integer numUndervotes,
       String precinct,
       String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
     Logger.info("Generating summary spreadsheet: %s...", csvPath);
-
-    // totalActiveVotesPerRound is a map of round to active votes in each round
-    Map<Integer, BigDecimal> totalActiveVotesPerRound = new HashMap<>();
-    for (int round = 1; round <= numRounds; round++) {
-      // tally is map of candidate to tally for the current round
-      Map<String, BigDecimal> tallies = roundTallies.get(round);
-      // total will contain total votes for all candidates in this round
-      // this is used for calculating other derived data
-      BigDecimal total = BigDecimal.ZERO;
-      for (BigDecimal tally : tallies.values()) {
-        total = total.add(tally);
-      }
-      totalActiveVotesPerRound.put(round, total);
-    }
 
     CSVPrinter csvPrinter;
     try {
@@ -339,7 +312,7 @@ class ResultsWriter {
     }
 
     addContestInformationRows(csvPrinter, precinct);
-    addContestSummaryRows(csvPrinter, numBallots, numUndervotes);
+    addContestSummaryRows(csvPrinter, roundTallies.get(1), numUndervotes);
     csvPrinter.print("Rounds");
     for (int round = 1; round <= numRounds; round++) {
       csvPrinter.print(String.format("Round %d Votes", round));
@@ -354,15 +327,14 @@ class ResultsWriter {
     }
 
     // Get all candidates sorted by their first round tally. This determines the display order.
-    Map<String, BigDecimal> firstRoundTally = roundTallies.get(1);
-    List<String> sortedCandidates = sortCandidatesByTally(firstRoundTally);
+    List<String> sortedCandidates = roundTallies.get(1).getSortedCandidatesByTally();
 
     // For each candidate: for each round: output total votes
     for (String candidate : sortedCandidates) {
       String candidateDisplayName = config.getNameForCandidate(candidate);
       csvPrinter.print(candidateDisplayName);
       for (int round = 1; round <= numRounds; round++) {
-        BigDecimal thisRoundTally = roundTallies.get(round).get(candidate);
+        BigDecimal thisRoundTally = roundTallies.get(round).getCandidateTally(candidate);
         // not all candidates may have a tally in every round
         if (thisRoundTally == null) {
           thisRoundTally = BigDecimal.ZERO;
@@ -372,15 +344,20 @@ class ResultsWriter {
         csvPrinter.print(thisRoundTally);
 
         // Vote %
-        csvPrinter.print(thisRoundTally / totalActiveVotesPerRound.get(round));
+        BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
+        if (activeBallots != BigDecimal.ZERO) {
+          csvPrinter.print(thisRoundTally.divide(activeBallots, MathContext.DECIMAL32));
+        } else {
+          csvPrinter.print("");
+        }
 
         // Transfer
         if (round < numRounds) {
-          BigDecimal nextRoundTally = roundTallies.get(round + 1).get(candidate);
-          if (thisRoundTally == null) {
+          BigDecimal nextRoundTally = roundTallies.get(round + 1).getCandidateTally(candidate);
+          if (nextRoundTally == null) {
             nextRoundTally = BigDecimal.ZERO;
           }
-          csvPrinter.print(nextRoundTally - thisRoundTally);
+          csvPrinter.print(nextRoundTally.subtract(thisRoundTally));
         } else {
           csvPrinter.print(0);
         }
@@ -388,22 +365,53 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    csvPrinter.print("Inactive Ballots by Overvotes");
-    csvPrinter.print("Inactive Ballots by Skipped Rankings");
-    csvPrinter.print("Inactive Ballots by Exhausted Choices");
-    csvPrinter.print("Inactive Ballots by Repeat Ranking");
+    Pair<String, BallotStatus>[] statusesToPrint = new Pair[]{
+        new Pair<>("by Overvotes", BallotStatus.INACTIVE_BY_OVERVOTE),
+        new Pair<>("by Skipped Rankings", BallotStatus.INACTIVE_BY_SKIPPED_RANKING),
+        new Pair<>("by Exhausted Choices", BallotStatus.INACTIVE_BY_EXHAUSTED_CHOICES),
+        new Pair<>("by Repeated Rankings", BallotStatus.INACTIVE_BY_REPEATED_RANKING)
+    };
+
+    Map<Integer, BigDecimal> inactiveVoteTotals = new HashMap<>();
+    for (int round = 1; round <= numRounds; round++) {
+      inactiveVoteTotals.put(round, BigDecimal.ZERO);
+    }
+    for (Pair<String, BallotStatus> statusToPrint : statusesToPrint) {
+      csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
+      for (int round = 1; round <= numRounds; round++) {
+        BigDecimal thisTypeInactiveVotes =
+            roundTallies.get(round).getBallotStatusTally(statusToPrint.getValue());
+        csvPrinter.print(thisTypeInactiveVotes);
+        csvPrinter.print("");
+        csvPrinter.print("");
+        inactiveVoteTotals.put(round, inactiveVoteTotals.get(round).add(thisTypeInactiveVotes));
+      }
+    }
+
     csvPrinter.print("Inactive Ballots Total");
+    BigDecimal numBallotsRound1 = roundTallies.get(1).numActiveBallots();
     for (int round = 1; round <= numRounds; round++) {
       // Exhausted/inactive count is the difference between the total ballots and the total votes
       // still active or counting as residual surplus votes in the current round.
       BigDecimal expectedTotalInactive =
-          new BigDecimal(numBallots).subtract(totalActiveVotesPerRound.get(round));
+          numBallotsRound1.subtract(roundTallies.get(round).numActiveBallots());
 
       if (precinct == null) {
         // We don't have the concept of residual surplus at the precinct level (see comment below),
         // so we'll just incorporate that part (if any) into the inactive count.
-        expectedTotalInactive = thisRoundInactive.subtract(roundToResidualSurplus.get(round));
+        expectedTotalInactive = expectedTotalInactive.subtract(roundToResidualSurplus.get(round));
       }
+
+      BigDecimal actualInactiveBallotsTotal = inactiveVoteTotals.get(round);
+      if (!actualInactiveBallotsTotal.equals(expectedTotalInactive)) {
+        //throw new RuntimeException(String.format(
+        //    "Math did not add up. Expected %s inactive ballots but got %s",
+        //    expectedTotalInactive,
+        //    actualInactiveBallotsTotal));
+      }
+      csvPrinter.print(actualInactiveBallotsTotal);
+      csvPrinter.print("");
+      csvPrinter.print("");
     }
     csvPrinter.println();
 
@@ -416,6 +424,8 @@ class ResultsWriter {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round));
+        csvPrinter.print("");
+        csvPrinter.print("");
       }
       csvPrinter.println();
     }
@@ -434,15 +444,6 @@ class ResultsWriter {
       throw exception;
     }
     Logger.info("Summary spreadsheet generated successfully.");
-  }
-
-  private void printInactiveBallotsByType(CSVPrinter csvPrinter, BallotStatus type) {
-      Map<Integer, Map<BallotStatus, BigDecimal>> ballotStatusTallies,
-      CSVPrinter csvPrinter,
-      BallotStatus ballotStatus,
-    for (int round = 1; round <= numRounds; round++) {
-      csvPrinter.print(ballotStatusTallies.get(round).get(type));
-    }
   }
 
   // "action" rows describe which candidates were eliminated or elected
@@ -518,48 +519,25 @@ class ResultsWriter {
     csvPrinter.println();
   }
 
-  private void addContestSummaryRows(CSVPrinter csvPrinter, int numBallots, int numUndervotes)
-        throws IOException {
+  private void addContestSummaryRows(CSVPrinter csvPrinter,
+        RoundTally round1Tally, Integer numUndervotes) throws IOException {
     csvPrinter.printRecord("Contest Summary");
     csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
     csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
-    csvPrinter.printRecord("Number of Votes Cast", numBallots);
+    csvPrinter.printRecord("Number of Votes Cast", round1Tally.numActiveBallots());
     csvPrinter.printRecord("Number of Undervotes", numUndervotes);
     csvPrinter.println();
   }
 
-  // return a list of all input candidates sorted from the highest tally to lowest
-  private List<String> sortCandidatesByTally(Map<String, BigDecimal> tally) {
-    List<Map.Entry<String, BigDecimal>> entries = new ArrayList<>(tally.entrySet());
-    entries.sort(
-        (firstObject, secondObject) -> {
-          int ret;
-          if (firstObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-            ret = 1;
-          } else if (secondObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-            ret = -1;
-          } else {
-            ret = (secondObject.getValue()).compareTo(firstObject.getValue());
-          }
-          return ret;
-        });
-    List<String> sortedCandidates = new LinkedList<>();
-    for (var entry : entries) {
-      sortedCandidates.add(entry.getKey());
-    }
-    return sortedCandidates;
-  }
-
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a precinct)
   void generateOverallSummaryFiles(
-      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      Map<Integer, RoundTally> roundTallies,
       TallyTransfers tallyTransfers,
-      int numBallots,
-      int numUndervotes)
+      Integer numUndervotes)
       throws IOException {
     String outputPath = getOutputFilePathFromInstance("summary");
-    generateSummarySpreadsheet(roundTallies, numBallots, numUndervotes, null, outputPath);
-    generateSummaryJson(roundTallies, tallyTransfers, numBallots, null, outputPath);
+    generateSummarySpreadsheet(roundTallies, numUndervotes, null, outputPath);
+    generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
   // write CastVoteRecords for the specified contest to the provided folder
@@ -910,9 +888,8 @@ class ResultsWriter {
 
   // create summary json data for use with external visualizer software, unit tests and other tools
   private void generateSummaryJson(
-      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      Map<Integer, RoundTally> roundTallies,
       TallyTransfers tallyTransfers,
-      int numBallots,
       String precinct,
       String outputPath)
       throws IOException {
@@ -926,7 +903,8 @@ class ResultsWriter {
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
     configData.put("threshold", winningThreshold);
-    configData.put("totalVotesCast", numBallots);
+    // To be re-enabled later
+    // configData.put("totalVotesCast", roundTallies.get(1).numActiveBallots().toBigInteger());
     if (!isNullOrBlank(precinct)) {
       configData.put("precinct", precinct);
     }
@@ -954,10 +932,11 @@ class ResultsWriter {
     generateJsonFile(jsonPath, outputJson);
   }
 
-  private Map<String, BigDecimal> updateCandidateNamesInTally(Map<String, BigDecimal> tally) {
+  private Map<String, BigDecimal> updateCandidateNamesInTally(RoundTally roundSummary) {
     Map<String, BigDecimal> newTally = new HashMap<>();
-    for (var entry : tally.entrySet()) {
-      newTally.put(config.getNameForCandidate(entry.getKey()), entry.getValue());
+    for (String candidateName : roundSummary.getCandidates()) {
+      newTally.put(config.getNameForCandidate(candidateName),
+          roundSummary.getCandidateTally(candidateName));
     }
     return newTally;
   }

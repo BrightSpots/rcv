@@ -4,8 +4,7 @@
     "date" : "2017-11-07",
     "jurisdiction" : "Minneapolis, MN",
     "office" : "Mayor",
-    "threshold" : "2",
-    "totalVotesCast" : 4
+    "threshold" : "2"
   },
   "results" : [ {
     "round" : 1,

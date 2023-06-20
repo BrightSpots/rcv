@@ -4,8 +4,7 @@
     "date" : "2019-01-18",
     "jurisdiction" : "Multi-winner",
     "office" : "Multi_winner2",
-    "threshold" : "8",
-    "totalVotesCast" : 30
+    "threshold" : "8"
   },
   "results" : [ {
     "round" : 1,

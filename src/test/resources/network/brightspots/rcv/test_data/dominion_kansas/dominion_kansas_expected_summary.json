@@ -4,8 +4,7 @@
     "date" : "2020-07-19",
     "jurisdiction" : "Kansas",
     "office" : "Democratic Primary",
-    "threshold" : "1962",
-    "totalVotesCast" : 5000
+    "threshold" : "1962"
   },
   "results" : [ {
     "round" : 1,

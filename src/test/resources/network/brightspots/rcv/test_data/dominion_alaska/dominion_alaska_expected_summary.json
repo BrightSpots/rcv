@@ -4,8 +4,7 @@
     "date" : "2020-07-19",
     "jurisdiction" : "Alaska",
     "office" : "Democratic Primary",
-    "threshold" : "397",
-    "totalVotesCast" : 1000
+    "threshold" : "397"
   },
   "results" : [ {
     "round" : 1,
