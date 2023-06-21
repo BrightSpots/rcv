@@ -1,0 +1,19 @@
+Contest,Multi-Seat Bottoms-up With Threshold
+Jurisdiction,
+Office,
+Date,
+Winner(s),"A, B, C, G"
+Threshold,3.1500
+
+Rounds,Round 1,Round 2,Round 3,Round 4,Round 5
+Eliminated,F,E,H,D,
+Elected,,,,,A; B; C; G
+A,5,5,5,5,5
+B,5,5,5,5,5
+C,4,4,4,4,4
+D,3,3,3,3,0
+G,3,3,3,4,7
+H,1,1,1,0,0
+E,0,0,0,0,0
+F,0,0,0,0,0
+Inactive ballots,0,0,0,0,0

@@ -152,7 +152,7 @@ class TabulatorTests {
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    compareJson(config, stem, "cvr_cdf", timestampString, null);
+    compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null);
 
     cleanOutputFolder(session);
   }
@@ -186,29 +186,31 @@ class TabulatorTests {
 
   private static void compareJsons(
       ContestConfig config, String stem, String timestampString, String sequentialId) {
-    compareJson(config, stem, "summary", timestampString, sequentialId);
+    compareFiles(config, stem, "summary", ".json", timestampString, sequentialId);
+    compareFiles(config, stem, "summary", ".csv", timestampString, sequentialId);
     if (config.isGenerateCdfJsonEnabled()) {
-      compareJson(config, stem, "cvr_cdf", timestampString, sequentialId);
+      compareFiles(config, stem, "cvr_cdf", ".json", timestampString, sequentialId);
     }
   }
 
-  private static void compareJson(
+  private static void compareFiles(
       ContestConfig config,
       String stem,
-      String jsonType,
+      String outputType,
+      String extension,
       String timestampString,
       String sequentialId) {
     String actualOutputPath =
         ResultsWriter.getOutputFilePath(
-            config.getOutputDirectory(), jsonType, timestampString, sequentialId)
-            + ".json";
+            config.getOutputDirectory(), outputType, timestampString, sequentialId)
+            + extension;
     String expectedPath =
         getTestFilePath(
             stem,
             ResultsWriter.sequentialSuffixForOutputPath(sequentialId)
                 + "_expected_"
-                + jsonType
-                + ".json");
+                + outputType
+                + extension);
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
     if (fileCompare(expectedPath, actualOutputPath)) {
       Logger.info("Files are equal.");

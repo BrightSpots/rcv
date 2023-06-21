@@ -1,0 +1,15 @@
+Contest,Overvote2
+Jurisdiction,"Funkytown, USA"
+Office,Exhausted
+Date,2018-07-28
+Winner(s),B
+Threshold,8
+
+Rounds,Round 1,Round 2,Round 3
+Eliminated,D,C,
+Elected,,,B
+B,6,6,8
+A,5,5,6
+C,3,4,0
+D,1,0,0
+Inactive ballots,0,0,1

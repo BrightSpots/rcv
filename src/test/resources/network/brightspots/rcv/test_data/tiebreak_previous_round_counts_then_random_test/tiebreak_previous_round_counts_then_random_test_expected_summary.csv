@@ -1,0 +1,15 @@
+Contest,Tiebreak test
+Jurisdiction,"Funkytown, USA"
+Office,Sergeant-at-Arms
+Date,2017-12-03
+Winner(s),Dopey
+Threshold,2
+
+Rounds,Round 1,Round 2,Round 3,Round 4
+Eliminated,Happy,Grumpy,Sneezy,
+Elected,,,,Dopey
+Sneezy,3,3,3,0
+Dopey,3,3,3,3
+Grumpy,2,3,0,0
+Happy,1,0,0,0
+Inactive ballots,0,0,3,6

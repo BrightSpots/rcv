@@ -1,0 +1,30 @@
+Contest,Missing Precinct example
+Jurisdiction,"Minneapolis, MN"
+Office,Mayor
+Date,2017-11-07
+Winner(s),Jacob Frey
+Threshold,2
+
+Rounds,Round 1,Round 2,Round 3,Round 4,Round 5
+Eliminated,Aswar Rahman; David Rosenfeld; Raymond Dehn; L.A. Nik; Undeclared Write-ins; Christopher Zimmerman; Ronald Lischeid; Ian Simpson; Charlie Gers; Captain Jack Sparrow; Theron Preston Washington; David John Wilson; Gregg A. Iverson; Troy Benjegerdes; Al Flowers,Nekima Levy-Pounds,Tom Hoch,Betsy Hodges,
+Elected,,,,,Jacob Frey
+Tom Hoch,1,1,1,0,0
+Betsy Hodges,1,1,2,2,0
+Jacob Frey,1,1,1,2,2
+Nekima Levy-Pounds,1,1,0,0,0
+Aswar Rahman,0,0,0,0,0
+David Rosenfeld,0,0,0,0,0
+Raymond Dehn,0,0,0,0,0
+L.A. Nik,0,0,0,0,0
+Christopher Zimmerman,0,0,0,0,0
+Ronald Lischeid,0,0,0,0,0
+Ian Simpson,0,0,0,0,0
+Charlie Gers,0,0,0,0,0
+Captain Jack Sparrow,0,0,0,0,0
+Theron Preston Washington,0,0,0,0,0
+David John Wilson,0,0,0,0,0
+Gregg A. Iverson,0,0,0,0,0
+Troy Benjegerdes,0,0,0,0,0
+Al Flowers,0,0,0,0,0
+Undeclared Write-ins,0,0,0,0,0
+Inactive ballots,0,0,0,0,2

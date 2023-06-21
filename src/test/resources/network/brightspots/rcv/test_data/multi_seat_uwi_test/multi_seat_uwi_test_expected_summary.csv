@@ -1,0 +1,15 @@
+Contest,Multi-Seat UWI Test
+Jurisdiction,
+Office,
+Date,
+Winner(s),"A, B"
+Threshold,6
+
+Rounds,Round 1,Round 2,Round 3,Round 4,Round 5
+Eliminated,,Undeclared Write-ins,C,,
+Elected,A,,,B,
+A,6,6.0000,6.0000,6.0000,6.0000
+B,3,3,3,3,3.0000
+C,2,2,2,0,0
+Undeclared Write-ins,4,4,0,0,0
+Inactive ballots,0,0.0000,4.0000,6.0000,6.0000

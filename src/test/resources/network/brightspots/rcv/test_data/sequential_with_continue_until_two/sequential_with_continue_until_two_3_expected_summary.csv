@@ -1,0 +1,15 @@
+Contest,Test Sequential with Continue until Two
+Jurisdiction,
+Office,
+Date,
+Winner(s),C
+Threshold,2
+
+Rounds,Round 1,Round 2,Round 3,Round 4
+Eliminated,,F,E,
+Elected,C,,,
+C,2,2,2,2
+D,1,1,1,1
+E,0,0,0,0
+F,0,0,0,0
+Inactive ballots,6,6,6,6
