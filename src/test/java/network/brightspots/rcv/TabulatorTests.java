@@ -43,18 +43,14 @@ class TabulatorTests {
   // folder where we store test inputs
   private static final String TEST_ASSET_FOLDER =
       "src/test/resources/network/brightspots/rcv/test_data";
-  private static final String TEST_SHARED_ASSET_FOLDER =
-        "src/test/resources/network/brightspots/rcv/test_data/_shared";
   // limit log output to avoid spam
   private static final Integer MAX_LOG_ERRORS = 10;
 
   // compare file contents line by line to identify differences
   private static boolean fileCompare(String path1, String path2) {
     boolean result = true;
-    try (
-        BufferedReader br1 = new BufferedReader(new FileReader(path1, StandardCharsets.UTF_8));
-        BufferedReader br2 = new BufferedReader(new FileReader(path2, StandardCharsets.UTF_8))
-    ) {
+    try (BufferedReader br1 = new BufferedReader(new FileReader(path1, StandardCharsets.UTF_8));
+        BufferedReader br2 = new BufferedReader(new FileReader(path2, StandardCharsets.UTF_8))) {
       int currentLine = 1;
       int errorCount = 0;
 
@@ -235,6 +231,12 @@ class TabulatorTests {
   @DisplayName("Test Convert to CDF works for Dominion")
   void convertToCdfFromDominion() {
     runConvertToCdfTest("convert_to_cdf_from_dominion");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CDF works for ES&S")
+  void convertToCdfFromEss() {
+    runConvertToCdfTest("convert_to_cdf_from_ess");
   }
 
   @Test
@@ -642,7 +644,6 @@ class TabulatorTests {
     runTabulationTest("exhaust_if_multiple_continuing");
   }
 
-
   @Test
   @DisplayName("generic CSV test")
   void genericCsvTest() {
@@ -652,14 +653,13 @@ class TabulatorTests {
   @Test
   @DisplayName("no one meets minimum test")
   void noOneMeetsMinimumTest() {
-    runTabulationTest("no_one_meets_minimum",
-          TabulationAbortedException.class.toString());
+    runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());
   }
 
   @Test
   @DisplayName("gracefully fail when tabulate-by-precinct option set without any precincts in CVR")
   void tabulateByPrecinctWithoutPrecincts() {
-    runTabulationTest("tabulate_by_precinct_without_precincts",
-        TabulationAbortedException.class.toString());
+    runTabulationTest(
+        "tabulate_by_precinct_without_precincts", TabulationAbortedException.class.toString());
   }
 }

@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-    "filePath" : "2013_minneapolis_park_bottoms_up_cvr.xlsx",
+    "filePath" : "../_shared/2013_minneapolis_park_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",

@@ -1,9 +1,9 @@
 {
   "tabulatorVersion": "TEST",
   "outputSettings": {
-    "contestName": "Stop Tabulation Early Test",
+    "contestName": "Tiebreak test",
     "outputDirectory": "output",
-    "contestDate": "2023-03-14",
+    "contestDate": "2017-12-03",
     "contestJurisdiction": "Funkytown, USA",
     "contestOffice": "Sergeant-at-Arms",
     "tabulateByPrecinct": false,
@@ -11,17 +11,17 @@
   },
   "cvrFileSources": [
     {
-    "filePath" : "../_shared/tiebreak_cvr.xlsx",
-    "firstVoteColumnIndex" : "2",
-    "firstVoteRowIndex" : "2",
-    "idColumnIndex" : "1",
-    "precinctColumnIndex" : "",
-    "provider" : "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": ""
-  } ],
+      "filePath" : "../_shared/simple_ess_cvr.xlsx",
+      "firstVoteColumnIndex" : "2",
+      "firstVoteRowIndex" : "2",
+      "idColumnIndex" : "",
+      "precinctColumnIndex" : "",
+      "provider" : "ess",
+      "treatBlankAsUndeclaredWriteIn": false,
+      "overvoteLabel": "overvote",
+      "undervoteLabel": "undervote",
+      "undeclaredWriteInLabel": ""
+    } ],
   "candidates" : [ {
     "name" : "Mookie Blaylock",
     "code" : "",
@@ -31,15 +31,19 @@
     "code" : "",
     "excluded" : false
   }, {
+    "name" : "Sedale Threatt",
+    "code" : "",
+    "excluded" : false
+  }, {
     "name" : "George Gervin",
     "code" : "",
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "random",
+    "tiebreakMode": "stopCountingAndAsk",
     "overvoteRule": "alwaysSkipToNextRank",
     "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "1",
+    "randomSeed": "",
     "numberOfWinners": "1",
     "decimalPlacesForVoteArithmetic": "4",
     "minimumVoteThreshold": "0",
@@ -49,7 +53,6 @@
     "hareQuota": false,
     "batchElimination": true,
     "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Doyle Rules",
-    "stopTabulationEarlyAfterRound": "2"
+    "rulesDescription": "Doyle Rules"
   }
 }

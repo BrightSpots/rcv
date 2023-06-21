@@ -10,7 +10,7 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath": "CVRArchive_18_9_0_6298/",
+    "filePath": "../_shared/hart_cvr_archive",
     "firstVoteColumnIndex": "",
     "firstVoteRowIndex": "",
     "idColumnIndex": "",
