@@ -1,0 +1,15 @@
+Contest,Aliases test (JSON CDF Format)
+Jurisdiction,TestSets_Single_winner
+Office,Aliases test
+Date,2023-03-23
+Winner(s),Unused Display Name Candidate A
+Threshold,16
+
+Rounds,Round 1,Round 2,Round 3
+Eliminated,Candidate D Name File 1,Candidate C Name File 1,
+Elected,,,Unused Display Name Candidate A
+Candidate B Name File 1,10,10,14
+Unused Display Name Candidate A,10,12,16
+Candidate C Name File 1,6,8,0
+Candidate D Name File 1,4,0,0
+Inactive ballots,0,0,0

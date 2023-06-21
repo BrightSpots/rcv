@@ -1,0 +1,16 @@
+Contest,Generic CSV Test
+Jurisdiction,"Portland, ME"
+Office,Mayor
+Date,2023-04-03
+Winner(s),Cucumber
+Threshold,14
+
+Rounds,Round 1,Round 2,Round 3,Round 4
+Eliminated,Undeclared Write-ins,Broccoli,Cauliflower,
+Elected,,,,Cucumber
+Cucumber,8,10,10,14
+Lettuce,5,7,10,12
+Cauliflower,4,5,6,0
+Broccoli,3,4,0,0
+Undeclared Write-ins,6,0,0,0
+Inactive ballots,0,0,0,0

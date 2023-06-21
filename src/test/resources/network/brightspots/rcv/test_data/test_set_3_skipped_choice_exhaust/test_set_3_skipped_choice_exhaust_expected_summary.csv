@@ -1,0 +1,15 @@
+Contest,test set 3
+Jurisdiction,"Funkytown, USA"
+Office,Exhausted
+Date,2018-08-06
+Winner(s),Candidate B Name
+Threshold,7
+
+Rounds,Round 1,Round 2,Round 3
+Eliminated,Candidate D Name,Candidate C Name,
+Elected,,,Candidate B Name
+Candidate B Name,6,6,7
+Candidate A Name,5,5,5
+Candidate C Name,2,3,0
+Candidate D Name,1,0,0
+Inactive ballots,1,1,3
