@@ -34,6 +34,7 @@ class RoundTally {
   private final int roundNumber;
   private final Map<String, BigDecimal> candidateTallies;
   private final Map<StatusForRound, BigDecimal> ballotStatusTallies;
+  private BigDecimal winningThreshold;
   private BigDecimal numActiveBallots;
   private BigDecimal numInactiveBallots;
 
@@ -101,6 +102,16 @@ class RoundTally {
   void setCandidateTallyViaSurplusAdjustment(String candidateId, BigDecimal tally) {
     ensureIsMakingSurplusAdjustment();
     candidateTallies.put(candidateId, tally);
+  }
+
+  // Sets the winning threshold for this round.
+  void setWinningThreshold(BigDecimal winningThreshold) {
+    this.winningThreshold = winningThreshold;
+  }
+
+  // Gets the winning threshold for this round.
+  BigDecimal getWinningThreshold() {
+    return winningThreshold;
   }
 
   // Adds to the votes for this candidate

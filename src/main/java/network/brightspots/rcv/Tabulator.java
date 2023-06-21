@@ -76,8 +76,6 @@ class Tabulator {
   private final Set<String> precinctIds = new HashSet<>();
   // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
-  // tracks required winning threshold
-  private BigDecimal winningThreshold;
 
   Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config)
       throws TabulationAbortedException {
@@ -157,14 +155,14 @@ class Tabulator {
       currentRound++;
       Logger.info("Round: %d", currentRound);
 
-      // currentRoundCandidateToTally is a map of candidate ID to vote tally for the current round.
+      // currentRoundTally maps candidate IDs to vote tallies for the current round.
       // At each iteration of this loop that involves eliminating candidates, the eliminatedRound
       // object will gain entries.
-      // Conversely, the currentRoundCandidateToTally object returned here will contain fewer
+      // Conversely, the currentRoundTally object returned here will contain fewer
       // entries, each of which will have as many or more votes than they did in prior rounds.
       // Eventually the winner(s) will be chosen.
-      RoundTally currentRoundCandidateToTally = computeTalliesForRound(currentRound);
-      roundTallies.put(currentRound, currentRoundCandidateToTally);
+      RoundTally currentRoundTally = computeTalliesForRound(currentRound);
+      roundTallies.put(currentRound, currentRoundTally);
       roundToResidualSurplus.put(
           currentRound,
           currentRound == 1 ? BigDecimal.ZERO : roundToResidualSurplus.get(currentRound - 1));
@@ -185,15 +183,18 @@ class Tabulator {
           || currentRound == 1;
       }
       if (shouldRecomputeThreshold) {
-        setWinningThreshold(currentRoundCandidateToTally, config.getMinimumVoteThreshold());
+        setWinningThreshold(currentRoundTally, config.getMinimumVoteThreshold());
+      } else {
+        BigDecimal lastRoundThreshold = roundTallies.get(currentRound - 1).getWinningThreshold();
+        currentRoundTally.setWinningThreshold(lastRoundThreshold);
       }
 
       // "invert" map and look for winners
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates =
           buildTallyToCandidates(
-              currentRoundCandidateToTally, currentRoundCandidateToTally.getCandidates(), true);
+              currentRoundTally, currentRoundTally.getCandidates(), true);
       List<String> winners =
-          identifyWinners(currentRoundCandidateToTally, currentRoundTallyToCandidates);
+          identifyWinners(currentRoundTally, currentRoundTallyToCandidates);
 
       if (winners.size() > 0) {
         for (String winner : winners) {
@@ -203,9 +204,10 @@ class Tabulator {
         // is enabled.
         if (config.getNumberOfWinners() > 1 && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
           for (String winner : winners) {
-            BigDecimal candidateVotes = currentRoundCandidateToTally.getCandidateTally(winner);
+            BigDecimal candidateVotes = currentRoundTally.getCandidateTally(winner);
             // number that were surplus (beyond the required threshold)
-            BigDecimal extraVotes = candidateVotes.subtract(winningThreshold);
+            BigDecimal extraVotes =
+                candidateVotes.subtract(currentRoundTally.getWinningThreshold());
             // fractional transfer percentage
             BigDecimal surplusFraction =
                 extraVotes.signum() == 1
@@ -233,7 +235,7 @@ class Tabulator {
         List<String> eliminated;
         // Four mutually exclusive ways to eliminate candidates.
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
-        eliminated = dropUndeclaredWriteIns(currentRoundCandidateToTally);
+        eliminated = dropUndeclaredWriteIns(currentRoundTally);
         // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
         if (eliminated.isEmpty()) {
           eliminated = dropCandidatesBelowThreshold(currentRoundTallyToCandidates);
@@ -376,12 +378,13 @@ class Tabulator {
       // the winner's new total to be exactly the winning threshold value.
       for (String winner : winnersRequiringComputation) {
         BigDecimal winnerTally = roundTally.getCandidateTally(winner);
-        BigDecimal winnerResidual = winnerTally.subtract(winningThreshold);
+        BigDecimal winnerResidual = winnerTally.subtract(roundTally.getWinningThreshold());
         if (winnerResidual.signum() == 1) {
           Logger.info("%s had residual surplus of %s.", winner, winnerResidual);
           roundToResidualSurplus.put(
               currentRound, roundToResidualSurplus.get(currentRound).add(winnerResidual));
-          roundTally.setCandidateTallyViaSurplusAdjustment(winner, winningThreshold);
+          roundTally.setCandidateTallyViaSurplusAdjustment(winner,
+              roundTally.getWinningThreshold());
           tallyTransfers.addTransfer(
               currentRound, winner, TallyTransfers.RESIDUAL_TARGET, winnerResidual);
 
@@ -393,10 +396,11 @@ class Tabulator {
   }
 
   // determine and store the threshold to win
-  private void setWinningThreshold(RoundTally currentRoundCandidateToTally,
+  private void setWinningThreshold(RoundTally currentRoundTally,
       BigDecimal minimumVoteThreshold) {
-    BigDecimal currentRoundTotalVotes = currentRoundCandidateToTally.numActiveBallots();
+    BigDecimal currentRoundTotalVotes = currentRoundTally.numActiveBallots();
 
+    BigDecimal winningThreshold;
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       winningThreshold =
           currentRoundTotalVotes.multiply(config.getMultiSeatBottomsUpPercentageThreshold());
@@ -440,6 +444,7 @@ class Tabulator {
       winningThreshold = minimumVoteThreshold;
     }
 
+    currentRoundTally.setWinningThreshold(winningThreshold);
     Logger.info("Winning threshold set to %s.", winningThreshold);
   }
 
@@ -507,8 +512,8 @@ class Tabulator {
 
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       // if everyone meets the threshold, select them all as winners
-      boolean allMeet =
-          currentRoundTally.getCandidatesWithMoreVotesThan(winningThreshold).size()
+      boolean allMeet = currentRoundTally.getCandidatesWithMoreVotesThan(
+          currentRoundTally.getWinningThreshold()).size()
           == currentRoundTally.numActiveCandidates();
       if (allMeet) {
         selectedWinners.addAll(currentRoundTally.getCandidates());
@@ -531,7 +536,9 @@ class Tabulator {
           selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
         } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
           // Otherwise, select all winners above the threshold
-          selectWinners(currentRoundTallyToCandidates, selectedWinners);
+          selectWinners(currentRoundTallyToCandidates,
+              currentRoundTally.getWinningThreshold(),
+              selectedWinners);
         }
       }
 
@@ -583,8 +590,9 @@ class Tabulator {
     return selectedWinners;
   }
 
-  private void selectWinners(SortedMap<BigDecimal,
-      LinkedList<String>> currentRoundTallyToCandidates,
+  private void selectWinners(
+      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates,
+      BigDecimal winningThreshold,
       List<String> selectedWinners) {
     // select all candidates which have equaled or exceeded the winning threshold and add them to
     // the selectedWinners List
@@ -603,19 +611,19 @@ class Tabulator {
 
   // function: dropUndeclaredWriteIns
   // purpose: eliminate all undeclared write in candidates
-  // param: currentRoundCandidateToTally map of candidate IDs to their tally for a given round
+  // param: currentRoundTally map of candidate IDs to their tally for a given round
   // returns: eliminated candidates
   private List<String> dropUndeclaredWriteIns(
-      RoundTally currentRoundCandidateToTally) {
+      RoundTally currentRoundTally) {
     List<String> eliminated = new LinkedList<>();
     String label = UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-    if (currentRoundCandidateToTally.getCandidateTally(label) != null
-        && currentRoundCandidateToTally.getCandidateTally(label).signum() == 1) {
+    if (currentRoundTally.getCandidateTally(label) != null
+        && currentRoundTally.getCandidateTally(label).signum() == 1) {
       eliminated.add(label);
       Logger.info(
           "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It "
               + "had %s votes.",
-          label, currentRound, currentRoundCandidateToTally.getCandidateTally(label));
+          label, currentRound, currentRoundTally.getCandidateTally(label));
     }
     return eliminated;
   }
@@ -726,7 +734,7 @@ class Tabulator {
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
             .setTimestampString(timestamp)
-            .setWinningThreshold(winningThreshold)
+            .setWinningThreshold(roundTallies.get(roundTallies.size()).getWinningThreshold())
             .setPrecinctIds(precinctIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
