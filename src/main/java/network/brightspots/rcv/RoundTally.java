@@ -65,12 +65,13 @@ class RoundTally {
     countBallots();
   }
 
-  // Surplus computation requires both reading and writing -- temporarily allow that
+  // Surplus computation allows writing to the tally after the round is locked in, and
+  // it does not affect the number of ACTIVE ballots when adjusted.
   void unlockForSurplusCalculation() {
     unlockedForSurplusCalculation = true;
   }
 
-  // Revert to standard functionality when surplus computation is done
+  // Close the surplus calculation window and recompute ballot totals.
   void relockAfterSurplusCalculation() {
     unlockedForSurplusCalculation = false;
     countBallots();
@@ -104,6 +105,7 @@ class RoundTally {
 
   // Adds to the votes for this candidate
   BigDecimal addInactiveBallot(StatusForRound statusForRound, BigDecimal value) {
+    ensureNotFinalized();
     if (statusForRound == StatusForRound.ACTIVE) {
       throw new RuntimeException("Cannot add an active ballot as inactive");
     }
@@ -146,18 +148,16 @@ class RoundTally {
     return candidateTallies.size();
   }
 
-  // return a list of all candidates, if any, with votes greater than the given threshold
+  // Return a list of all candidates, if any, with votes greater than the given threshold
   public List<String> getCandidatesWithMoreVotesThan(BigDecimal threshold) {
     ensureFinalized();
-
     return getCandidates().stream().filter(
         candidate -> getCandidateTally(candidate).compareTo(threshold) > 0).toList();
   }
 
-  // return a list of all input candidates sorted from the highest tally to lowest
+  // Return a list of all input candidates sorted from the highest tally to lowest
   public List<String> getSortedCandidatesByTally() {
     ensureFinalized();
-
     List<Map.Entry<String, BigDecimal>> entries = new ArrayList<>(candidateTallies.entrySet());
     entries.sort(
         (firstObject, secondObject) -> {

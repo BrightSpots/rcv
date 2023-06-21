@@ -36,7 +36,6 @@ class CastVoteRecord {
   // it is active or not.
   enum StatusForRound {
     ACTIVE,
-    // The following fields represent inactive ballots' status
     INACTIVE_BY_UNDERVOTE,
     INACTIVE_BY_OVERVOTE,
     INACTIVE_BY_SKIPPED_RANKING,
