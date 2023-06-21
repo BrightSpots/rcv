@@ -303,6 +303,9 @@ class Tabulator {
     RoundTally roundTally = roundTallies.get(currentRound);
     RoundTally previousRoundTally = roundTallies.get(currentRound - 1);
     roundTally.unlockForSurplusCalculation();
+    if (previousRoundTally != null) {
+      previousRoundTally.unlockForSurplusCalculation();
+    }
 
     List<String> winnersToProcess = new LinkedList<>();
     Set<String> winnersRequiringComputation = new HashSet<>();
@@ -393,6 +396,9 @@ class Tabulator {
     }
 
     roundTally.relockAfterSurplusCalculation();
+    if (previousRoundTally != null) {
+      previousRoundTally.relockAfterSurplusCalculation();
+    }
   }
 
   // determine and store the threshold to win

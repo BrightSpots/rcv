@@ -208,6 +208,18 @@ class TabulatorTests {
                 + "_expected_"
                 + outputType
                 + extension);
+
+    // Overwrite expected file with the generated one
+    Boolean rewriteAllExpectedFiles = false;
+    if (rewriteAllExpectedFiles) {
+      try {
+        new File(expectedPath).setWritable(true);
+        copyFile(new File(actualOutputPath), new File(expectedPath));
+      } catch (IOException e) {
+        fail(e);
+      }
+    }
+
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
     if (fileCompare(expectedPath, actualOutputPath)) {
       Logger.info("Files are equal.");
