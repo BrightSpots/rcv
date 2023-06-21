@@ -63,9 +63,6 @@ class Tabulator {
   // precinctRoundTallies is a map from precinct to roundTallies for that precinct
   private final Map<String, Map<Integer, RoundTally>> precinctRoundTallies =
       new HashMap<>();
-  // precinctBallotStatusTallies is a map from precinct to roundTallies for that precinct
-  private final Map<String, Map<Integer, RoundTally>> precinctBallotStatusTallies =
-      new HashMap<>();
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
   // map from candidate ID to the round in which they won

@@ -59,7 +59,7 @@ class RoundTally {
   void lockInRound() {
     ensureNotFinalized();
     isFinalized = true;
-    this.numBallots = countBallots();
+    numBallots = countBallots();
   }
 
   // Surplus computation requires both reading and writing -- temporarily allow that
@@ -70,7 +70,7 @@ class RoundTally {
   // Revert to standard functionality when surplus computation is done
   void relockAfterSurplusCalculation() {
     unlockedForSurplusCalculation = false;
-    this.numBallots = countBallots();
+    numBallots = countBallots();
   }
 
   // Get the number of votes this candidate has this round
