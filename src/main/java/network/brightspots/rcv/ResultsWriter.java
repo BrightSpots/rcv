@@ -449,16 +449,6 @@ class ResultsWriter {
     csvPrinter.println();
   }
 
-  private void addContestSummaryRows(CSVPrinter csvPrinter,
-        RoundTally round1Tally, Integer numUndervotes) throws IOException {
-    csvPrinter.printRecord("Contest Summary");
-    csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
-    csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
-    csvPrinter.printRecord("Number of Votes Cast", round1Tally.numActiveBallots());
-    csvPrinter.printRecord("Number of Undervotes", numUndervotes);
-    csvPrinter.println();
-  }
-
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a precinct)
   void generateOverallSummaryFiles(
       Map<Integer, RoundTally> roundTallies,
@@ -833,8 +823,6 @@ class ResultsWriter {
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
     configData.put("threshold", winningThreshold);
-    // To be re-enabled later
-    // configData.put("totalVotesCast", roundTallies.get(1).numActiveBallots().toBigInteger());
     if (!isNullOrBlank(precinct)) {
       configData.put("precinct", precinct);
     }
