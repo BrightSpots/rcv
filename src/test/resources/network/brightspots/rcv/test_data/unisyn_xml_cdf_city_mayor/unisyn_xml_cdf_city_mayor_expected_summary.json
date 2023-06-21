@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "For City C Mayor (1/3)",
     "date" : "2019-03-06",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "9"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Carrol Wilson" : "1",
@@ -26,8 +33,15 @@
     "tallyResults" : [ {
       "eliminated" : "Undeclared Write-ins",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Carrol Wilson" : "1",
@@ -48,8 +62,15 @@
       "transfers" : {
         "Josh Bennett" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Carrol Wilson" : "1",
@@ -69,8 +90,15 @@
       "transfers" : {
         "Karen Petersen" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Chelsey Williams" : "3",
@@ -90,8 +118,15 @@
         "Danielle Davis" : "1",
         "Jerry Meyer" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Chelsey Williams" : "3",
@@ -111,8 +146,15 @@
         "Nadia Freeman" : "1",
         "Tess Soto" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "Chelsey Williams" : "3",
@@ -131,8 +173,15 @@
         "Nadia Freeman" : "1",
         "Steven Wilkins" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "Chelsey Williams" : "3",
@@ -150,8 +199,15 @@
         "Jerry Meyer" : "1",
         "Karen Petersen" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 8,
     "tally" : {
       "Danielle Davis" : "6",
@@ -168,8 +224,15 @@
         "Nadia Freeman" : "1",
         "exhausted" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 9,
     "tally" : {
       "Danielle Davis" : "6",
@@ -184,8 +247,15 @@
         "Nadia Freeman" : "1",
         "exhausted" : "3"
       }
-    } ]
+    } ],
+    "threshold" : "14"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "5",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 10,
     "tally" : {
       "Danielle Davis" : "6",
@@ -200,8 +270,15 @@
         "Nadia Freeman" : "1",
         "exhausted" : "3"
       }
-    } ]
+    } ],
+    "threshold" : "13"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "8",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 11,
     "tally" : {
       "Danielle Davis" : "6",
@@ -214,8 +291,15 @@
         "Nadia Freeman" : "1",
         "exhausted" : "5"
       }
-    } ]
+    } ],
+    "threshold" : "11"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "13",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 12,
     "tally" : {
       "Jerry Meyer" : "7",
@@ -224,6 +308,14 @@
     "tallyResults" : [ {
       "elected" : "Nadia Freeman",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "9"
+  } ],
+  "summary" : {
+    "finalThreshold" : "9",
+    "numCandidates" : 13,
+    "numWinners" : 1,
+    "totalNumBallots" : "35",
+    "undervotes" : 6
+  }
 }

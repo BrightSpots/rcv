@@ -303,9 +303,6 @@ class Tabulator {
     RoundTally roundTally = roundTallies.get(currentRound);
     RoundTally previousRoundTally = roundTallies.get(currentRound - 1);
     roundTally.unlockForSurplusCalculation();
-    if (previousRoundTally != null) {
-      previousRoundTally.unlockForSurplusCalculation();
-    }
 
     List<String> winnersToProcess = new LinkedList<>();
     Set<String> winnersRequiringComputation = new HashSet<>();
@@ -396,9 +393,6 @@ class Tabulator {
     }
 
     roundTally.relockAfterSurplusCalculation();
-    if (previousRoundTally != null) {
-      previousRoundTally.relockAfterSurplusCalculation();
-    }
   }
 
   // determine and store the threshold to win
@@ -740,33 +734,14 @@ class Tabulator {
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
             .setTimestampString(timestamp)
-            .setWinningThreshold(roundTallies.get(roundTallies.size()).getWinningThreshold())
             .setPrecinctIds(precinctIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
-    // Count ballot statuses
-    Integer numUndervotes = 0;
-    for (CastVoteRecord cvr : castVoteRecords) {
-      if (cvr.getBallotStatus() == StatusForRound.INACTIVE_BY_UNDERVOTE) {
-        numUndervotes++;
-      }
-    }
-
-    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, numUndervotes);
+    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers);
 
     if (config.isTabulateByPrecinctEnabled()) {
-      Map<String, Integer> numUndervotesByPrecinct = new HashMap<>();
-      for (CastVoteRecord cvr : castVoteRecords) {
-        String precinct = cvr.getPrecinct();
-        if (!isNullOrBlank(precinct)) {
-          if (cvr.getBallotStatus() == StatusForRound.INACTIVE_BY_UNDERVOTE) {
-            int currentNumUndervotes = numUndervotesByPrecinct.getOrDefault(precinct, 0);
-            numUndervotesByPrecinct.put(precinct, currentNumUndervotes + 1);
-          }
-        }
-      }
       writer.generatePrecinctSummaryFiles(
-          precinctRoundTallies, precinctTallyTransfers, numUndervotesByPrecinct);
+          precinctRoundTallies, precinctTallyTransfers);
     }
 
     if (config.isGenerateCdfJsonEnabled()) {

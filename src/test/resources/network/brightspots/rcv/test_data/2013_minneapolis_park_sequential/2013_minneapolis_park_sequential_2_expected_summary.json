@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "2013 Minneapolis Park Board",
     "date" : "",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Minneapolis",
-    "office" : "Park and Recreation Commissioner",
-    "threshold" : "18458"
+    "office" : "Park and Recreation Commissioner"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2129",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "ANNIE YOUNG" : "12947",
@@ -34,8 +41,15 @@
         "TOM NORDYKE" : "7",
         "exhausted" : "300"
       }
-    } ]
+    } ],
+    "threshold" : "28701"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2429",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "ANNIE YOUNG" : "12956",
@@ -61,8 +75,15 @@
         "TOM NORDYKE" : "136",
         "exhausted" : "366"
       }
-    } ]
+    } ],
+    "threshold" : "28551"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2795",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "ANNIE YOUNG" : "13196",
@@ -86,8 +107,15 @@
         "TOM NORDYKE" : "267",
         "exhausted" : "1047"
       }
-    } ]
+    } ],
+    "threshold" : "28368"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "3842",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "ANNIE YOUNG" : "14168",
@@ -109,8 +137,15 @@
         "TOM NORDYKE" : "232",
         "exhausted" : "1296"
       }
-    } ]
+    } ],
+    "threshold" : "27845"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "5138",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "ANNIE YOUNG" : "14958",
@@ -130,8 +165,15 @@
         "TOM NORDYKE" : "619",
         "exhausted" : "2118"
       }
-    } ]
+    } ],
+    "threshold" : "27197"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "7256",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "ANNIE YOUNG" : "15489",
@@ -149,8 +191,15 @@
         "TOM NORDYKE" : "169",
         "exhausted" : "3585"
       }
-    } ]
+    } ],
+    "threshold" : "26138"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "10841",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "ANNIE YOUNG" : "16010",
@@ -166,8 +215,15 @@
         "TOM NORDYKE" : "1347",
         "exhausted" : "4211"
       }
-    } ]
+    } ],
+    "threshold" : "24345"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "15052",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 8,
     "tally" : {
       "ANNIE YOUNG" : "18744",
@@ -181,8 +237,15 @@
         "TOM NORDYKE" : "1238",
         "exhausted" : "7564"
       }
-    } ]
+    } ],
+    "threshold" : "22240"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "22616",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 9,
     "tally" : {
       "ANNIE YOUNG" : "22305",
@@ -191,6 +254,14 @@
     "tallyResults" : [ {
       "elected" : "ANNIE YOUNG",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "18458"
+  } ],
+  "summary" : {
+    "finalThreshold" : "18458",
+    "numCandidates" : 11,
+    "numWinners" : 1,
+    "totalNumBallots" : "80101",
+    "undervotes" : 20571
+  }
 }

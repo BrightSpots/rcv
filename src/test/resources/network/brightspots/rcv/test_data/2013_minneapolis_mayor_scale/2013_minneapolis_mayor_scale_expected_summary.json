@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "2013 Minneapolis Mayor",
     "date" : "",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "414662"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1339",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 1,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4550",
@@ -73,8 +80,15 @@
         "TONY LANE" : "13",
         "exhausted" : "481"
       }
-    } ]
+    } ],
+    "threshold" : "515529"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "234",
+      "overvotes" : "1352",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 2,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4563",
@@ -136,8 +150,15 @@
         "TROY BENJEGERDES" : "13",
         "exhausted" : "78"
       }
-    } ]
+    } ],
+    "threshold" : "515288"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "234",
+      "overvotes" : "1352",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 3,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4563",
@@ -198,8 +219,15 @@
         "STEPHANIE WOODRUFF" : "13",
         "exhausted" : "65"
       }
-    } ]
+    } ],
+    "threshold" : "515249"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "247",
+      "overvotes" : "1352",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 4,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4563",
@@ -258,8 +286,15 @@
         "STEPHANIE WOODRUFF" : "13",
         "exhausted" : "143"
       }
-    } ]
+    } ],
+    "threshold" : "515217"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "260",
+      "overvotes" : "1352",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 5,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4576",
@@ -323,8 +358,15 @@
         "TONY LANE" : "13",
         "exhausted" : "130"
       }
-    } ]
+    } ],
+    "threshold" : "515145"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "312",
+      "overvotes" : "1352",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 6,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4589",
@@ -384,8 +426,15 @@
         "TROY BENJEGERDES" : "26",
         "exhausted" : "221"
       }
-    } ]
+    } ],
+    "threshold" : "515080"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "377",
+      "overvotes" : "1352",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 7,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4615",
@@ -442,8 +491,15 @@
         "TROY BENJEGERDES" : "52",
         "exhausted" : "156"
       }
-    } ]
+    } ],
+    "threshold" : "514970"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "442",
+      "overvotes" : "1352",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 8,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4615",
@@ -506,8 +562,15 @@
         "TROY BENJEGERDES" : "13",
         "exhausted" : "221"
       }
-    } ]
+    } ],
+    "threshold" : "514892"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "468",
+      "overvotes" : "1352",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 9,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4615",
@@ -570,8 +633,15 @@
         "TROY BENJEGERDES" : "13",
         "exhausted" : "429"
       }
-    } ]
+    } ],
+    "threshold" : "514781"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "663",
+      "overvotes" : "1365",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 10,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4680",
@@ -629,8 +699,15 @@
         "TONY LANE" : "13",
         "exhausted" : "377"
       }
-    } ]
+    } ],
+    "threshold" : "514567"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "845",
+      "overvotes" : "1378",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 11,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4732",
@@ -690,8 +767,15 @@
         "TROY BENJEGERDES" : "78",
         "exhausted" : "429"
       }
-    } ]
+    } ],
+    "threshold" : "514378"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1040",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 12,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4771",
@@ -747,8 +831,15 @@
         "TROY BENJEGERDES" : "39",
         "exhausted" : "481"
       }
-    } ]
+    } ],
+    "threshold" : "514164"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1183",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 13,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4836",
@@ -804,8 +895,15 @@
         "TONY LANE" : "78",
         "exhausted" : "286"
       }
-    } ]
+    } ],
+    "threshold" : "513923"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1391",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 14,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4901",
@@ -856,8 +954,15 @@
         "TONY LANE" : "26",
         "exhausted" : "520"
       }
-    } ]
+    } ],
+    "threshold" : "513780"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1742",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 15,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4901",
@@ -907,8 +1012,15 @@
         "TONY LANE" : "52",
         "exhausted" : "663"
       }
-    } ]
+    } ],
+    "threshold" : "513520"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2015",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 16,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4953",
@@ -956,8 +1068,15 @@
         "TONY LANE" : "13",
         "exhausted" : "377"
       }
-    } ]
+    } ],
+    "threshold" : "513189"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2288",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 17,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "4979",
@@ -1005,8 +1124,15 @@
         "TONY LANE" : "65",
         "exhausted" : "325"
       }
-    } ]
+    } ],
+    "threshold" : "513000"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2535",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 18,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "5018",
@@ -1051,8 +1177,15 @@
         "TONY LANE" : "91",
         "exhausted" : "936"
       }
-    } ]
+    } ],
+    "threshold" : "512838"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2899",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 19,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "5083",
@@ -1095,8 +1228,15 @@
         "TONY LANE" : "169",
         "exhausted" : "702"
       }
-    } ]
+    } ],
+    "threshold" : "512370"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "3510",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 20,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "5109",
@@ -1136,8 +1276,15 @@
         "STEPHANIE WOODRUFF" : "52",
         "exhausted" : "728"
       }
-    } ]
+    } ],
+    "threshold" : "512019"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "4108",
+      "overvotes" : "1391",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 21,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "5109",
@@ -1177,8 +1324,15 @@
         "STEPHANIE WOODRUFF" : "13",
         "exhausted" : "1287"
       }
-    } ]
+    } ],
+    "threshold" : "511655"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "5265",
+      "overvotes" : "1404",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 22,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "5122",
@@ -1216,8 +1370,15 @@
         "STEPHANIE WOODRUFF" : "104",
         "exhausted" : "1612"
       }
-    } ]
+    } ],
+    "threshold" : "511011"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "6578",
+      "overvotes" : "1417",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 23,
     "tally" : {
       "ABDUL M RAHAMAN THE ROCK" : "5330",
@@ -1253,8 +1414,15 @@
         "STEPHANIE WOODRUFF" : "208",
         "exhausted" : "3510"
       }
-    } ]
+    } ],
+    "threshold" : "510205"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "8671",
+      "overvotes" : "1430",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 24,
     "tally" : {
       "ALICIA K. BENNETT" : "5720",
@@ -1288,8 +1456,15 @@
         "STEPHANIE WOODRUFF" : "910",
         "exhausted" : "1846"
       }
-    } ]
+    } ],
+    "threshold" : "508450"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "9971",
+      "overvotes" : "1430",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 25,
     "tally" : {
       "BETSY HODGES" : "383227",
@@ -1320,8 +1495,15 @@
         "STEPHANIE WOODRUFF" : "156",
         "exhausted" : "1573"
       }
-    } ]
+    } ],
+    "threshold" : "507527"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "11206",
+      "overvotes" : "1430",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 26,
     "tally" : {
       "BETSY HODGES" : "384553",
@@ -1351,8 +1533,15 @@
         "STEPHANIE WOODRUFF" : "52",
         "exhausted" : "6617"
       }
-    } ]
+    } ],
+    "threshold" : "506741"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "15184",
+      "overvotes" : "1443",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 27,
     "tally" : {
       "BETSY HODGES" : "384735",
@@ -1380,8 +1569,15 @@
         "STEPHANIE WOODRUFF" : "481",
         "exhausted" : "4810"
       }
-    } ]
+    } ],
+    "threshold" : "503432"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "19552",
+      "overvotes" : "1456",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 28,
     "tally" : {
       "BETSY HODGES" : "390442",
@@ -1407,8 +1603,15 @@
         "STEPHANIE WOODRUFF" : "260",
         "exhausted" : "5954"
       }
-    } ]
+    } ],
+    "threshold" : "501027"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "22945",
+      "overvotes" : "1482",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 29,
     "tally" : {
       "BETSY HODGES" : "393614",
@@ -1432,8 +1635,15 @@
         "MARK ANDREW" : "1651",
         "exhausted" : "3900"
       }
-    } ]
+    } ],
+    "threshold" : "498050"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "26013",
+      "overvotes" : "1495",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 30,
     "tally" : {
       "BETSY HODGES" : "398593",
@@ -1455,8 +1665,15 @@
         "MARK ANDREW" : "2483",
         "exhausted" : "9529"
       }
-    } ]
+    } ],
+    "threshold" : "496100"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "32968",
+      "overvotes" : "1521",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 31,
     "tally" : {
       "BETSY HODGES" : "402376",
@@ -1484,8 +1701,15 @@
         "MARK ANDREW" : "5928",
         "exhausted" : "10322"
       }
-    } ]
+    } ],
+    "threshold" : "491336"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "51246",
+      "overvotes" : "1599",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 32,
     "tally" : {
       "BETSY HODGES" : "423371",
@@ -1507,8 +1731,15 @@
         "MARK ANDREW" : "12532",
         "exhausted" : "81770"
       }
-    } ]
+    } ],
+    "threshold" : "478524"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "152997",
+      "overvotes" : "1820",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "611"
+    },
     "round" : 33,
     "tally" : {
       "BETSY HODGES" : "505076",
@@ -1517,6 +1748,14 @@
     "tallyResults" : [ {
       "elected" : "BETSY HODGES",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "414662"
+  } ],
+  "summary" : {
+    "finalThreshold" : "414662",
+    "numCandidates" : 36,
+    "numWinners" : 1,
+    "totalNumBallots" : "1041313",
+    "undervotes" : 8307
+  }
 }
