@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,6 +57,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 class ResultsWriter {
+  private static final boolean ALLOW_CSV_CHANGES = false;
 
   private static final String CDF_CONTEST_ID = "contest-001";
   private static final String CDF_ELECTION_ID = "election-001";
@@ -312,12 +314,18 @@ class ResultsWriter {
     }
 
     addContestInformationRows(csvPrinter, precinct);
-    addContestSummaryRows(csvPrinter, roundTallies.get(1), numUndervotes);
+    if (ALLOW_CSV_CHANGES) {
+      addContestSummaryRows(csvPrinter, roundTallies.get(1), numUndervotes);
+    }
     csvPrinter.print("Rounds");
     for (int round = 1; round <= numRounds; round++) {
-      csvPrinter.print(String.format("Round %d Votes", round));
-      csvPrinter.print("% of vote");
-      csvPrinter.print("transfer");
+      if (ALLOW_CSV_CHANGES) {
+        csvPrinter.print(String.format("Round %d Votes", round));
+        csvPrinter.print("% of vote");
+        csvPrinter.print("transfer");
+      } else {
+        csvPrinter.print(String.format("Round %d", round));
+      }
     }
     csvPrinter.println();
 
@@ -343,75 +351,70 @@ class ResultsWriter {
         // Vote count
         csvPrinter.print(thisRoundTally);
 
-        // Vote %
-        BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
-        if (activeBallots != BigDecimal.ZERO) {
-          csvPrinter.print(thisRoundTally.divide(activeBallots, MathContext.DECIMAL32));
-        } else {
-          csvPrinter.print("");
-        }
-
-        // Transfer
-        if (round < numRounds) {
-          BigDecimal nextRoundTally = roundTallies.get(round + 1).getCandidateTally(candidate);
-          if (nextRoundTally == null) {
-            nextRoundTally = BigDecimal.ZERO;
+        if (ALLOW_CSV_CHANGES) {
+          // Vote %
+          BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
+          if (activeBallots != BigDecimal.ZERO) {
+            csvPrinter.print(thisRoundTally.divide(activeBallots, MathContext.DECIMAL32));
+          } else {
+            csvPrinter.print("");
           }
-          csvPrinter.print(nextRoundTally.subtract(thisRoundTally));
-        } else {
-          csvPrinter.print(0);
+
+          // Transfer
+          if (round < numRounds) {
+            BigDecimal nextRoundTally = roundTallies.get(round + 1).getCandidateTally(candidate);
+            if (nextRoundTally == null) {
+              nextRoundTally = BigDecimal.ZERO;
+            }
+            csvPrinter.print(nextRoundTally.subtract(thisRoundTally));
+          } else {
+            csvPrinter.print(0);
+          }
         }
       }
       csvPrinter.println();
     }
 
-    Pair<String, StatusForRound>[] statusesToPrint = new Pair[]{
-        new Pair<>("by Overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
-        new Pair<>("by Skipped Rankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
-        new Pair<>("by Exhausted Choices", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
-        new Pair<>("by Repeated Rankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING)
-    };
+    if (ALLOW_CSV_CHANGES) {
+      Pair<String, StatusForRound>[] statusesToPrint = new Pair[]{
+          new Pair<>("by Overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
+          new Pair<>("by Skipped Rankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
+          new Pair<>("by Exhausted Choices", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
+          new Pair<>("by Repeated Rankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING)
+      };
 
-    Map<Integer, BigDecimal> inactiveVoteTotals = new HashMap<>();
-    for (int round = 1; round <= numRounds; round++) {
-      inactiveVoteTotals.put(round, BigDecimal.ZERO);
-    }
-    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
-      csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
-      for (int round = 1; round <= numRounds; round++) {
-        BigDecimal thisTypeInactiveVotes =
-            roundTallies.get(round).getBallotStatusTally(statusToPrint.getValue());
-        csvPrinter.print(thisTypeInactiveVotes);
-        csvPrinter.print("");
-        csvPrinter.print("");
-        inactiveVoteTotals.put(round, inactiveVoteTotals.get(round).add(thisTypeInactiveVotes));
+      for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
+        csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
+        for (int round = 1; round <= numRounds; round++) {
+          BigDecimal thisTypeInactiveVotes =
+              roundTallies.get(round).getBallotStatusTally(statusToPrint.getValue());
+          csvPrinter.print(thisTypeInactiveVotes);
+          csvPrinter.print("");
+          csvPrinter.print("");
+        }
+        csvPrinter.println();
       }
     }
 
-    csvPrinter.print("Inactive Ballots Total");
-    BigDecimal numBallotsRound1 = roundTallies.get(1).numActiveBallots();
+    csvPrinter.print(ALLOW_CSV_CHANGES ? "Inactive Ballots Total" : "Inactive ballots");
     for (int round = 1; round <= numRounds; round++) {
-      // Exhausted/inactive count is the difference between the total ballots and the total votes
-      // still active or counting as residual surplus votes in the current round.
-      BigDecimal expectedTotalInactive =
-          numBallotsRound1.subtract(roundTallies.get(round).numActiveBallots());
+      BigDecimal inactiveBallots = roundTallies.get(round).numInactiveBallots();
 
-      if (precinct == null) {
-        // We don't have the concept of residual surplus at the precinct level (see comment below),
-        // so we'll just incorporate that part (if any) into the inactive count.
-        expectedTotalInactive = expectedTotalInactive.subtract(roundToResidualSurplus.get(round));
+      if (!ALLOW_CSV_CHANGES) {
+        // The previous method of calculating inactive ballots was to sum values that included
+        // active ballots, leading to additional but unnecessary precision.
+        // Mimic that behavior here so there is no change in the test files.
+        BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
+        if (inactiveBallots.scale() < activeBallots.scale()) {
+          inactiveBallots = inactiveBallots.setScale(activeBallots.scale(), RoundingMode.HALF_UP);
+        }
       }
 
-      BigDecimal actualInactiveBallotsTotal = inactiveVoteTotals.get(round);
-      if (!actualInactiveBallotsTotal.equals(expectedTotalInactive)) {
-        //throw new RuntimeException(String.format(
-        //    "Math did not add up. Expected %s inactive ballots but got %s",
-        //    expectedTotalInactive,
-        //    actualInactiveBallotsTotal));
+      csvPrinter.print(inactiveBallots);
+      if (ALLOW_CSV_CHANGES) {
+        csvPrinter.print("");
+        csvPrinter.print("");
       }
-      csvPrinter.print(actualInactiveBallotsTotal);
-      csvPrinter.print("");
-      csvPrinter.print("");
     }
     csvPrinter.println();
 
@@ -424,8 +427,10 @@ class ResultsWriter {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round));
-        csvPrinter.print("");
-        csvPrinter.print("");
+        if (ALLOW_CSV_CHANGES) {
+          csvPrinter.print("");
+          csvPrinter.print("");
+        }
       }
       csvPrinter.println();
     }
@@ -458,8 +463,10 @@ class ResultsWriter {
       }
 
       // Empty % of vote and transfer columns
-      csvPrinter.print("");
-      csvPrinter.print("");
+      if (ALLOW_CSV_CHANGES) {
+        csvPrinter.print("");
+        csvPrinter.print("");
+      }
     }
     csvPrinter.println();
 
@@ -473,8 +480,10 @@ class ResultsWriter {
       }
 
       // Empty % of vote and transfer columns
-      csvPrinter.print("");
-      csvPrinter.print("");
+      if (ALLOW_CSV_CHANGES) {
+        csvPrinter.print("");
+        csvPrinter.print("");
+      }
     }
     csvPrinter.println();
   }
@@ -493,10 +502,12 @@ class ResultsWriter {
 
   private void addContestInformationRows(CSVPrinter csvPrinter, String precinct)
         throws IOException {
-    csvPrinter.printRecord("RCTab Version", Main.APP_VERSION);
-    csvPrinter.printRecord("Type of Election",
+    if (ALLOW_CSV_CHANGES) {
+      csvPrinter.printRecord("RCTab Version", Main.APP_VERSION);
+      csvPrinter.printRecord("Type of Election",
           config.isSingleWinnerEnabled() ? "Single-Winner" : "Multi-Winner");
-    csvPrinter.printRecord("Contest Information");
+      csvPrinter.printRecord("Contest Information");
+    }
     csvPrinter.printRecord("Contest", config.getContestName());
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
     csvPrinter.printRecord("Office", config.getContestOffice());

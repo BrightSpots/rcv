@@ -118,10 +118,10 @@ class TabulatorTests {
 
     if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-        compareJsons(config, stem, timestampString, Integer.toString(i));
+        compareFiles(config, stem, timestampString, Integer.toString(i));
       }
     } else {
-      compareJsons(config, stem, timestampString, null);
+      compareFiles(config, stem, timestampString, null);
     }
 
     // If this is a Dominion tabulation test, also check the converted output file.
@@ -181,7 +181,7 @@ class TabulatorTests {
     Logger.info("Test complete.");
   }
 
-  private static void compareJsons(
+  private static void compareFiles(
       ContestConfig config, String stem, String timestampString, String sequentialId) {
     compareFiles(config, stem, "summary", ".json", timestampString, sequentialId);
     compareFiles(config, stem, "summary", ".csv", timestampString, sequentialId);

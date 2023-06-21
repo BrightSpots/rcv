@@ -320,8 +320,7 @@ class Tabulator {
 
     // initialize or populate overall tally
     for (String winner : winnersToProcess) {
-      roundTally.setCandidateTally(
-          winner,
+      roundTally.setCandidateTallyViaSurplusAdjustment(winner,
           winnersRequiringComputation.contains(winner)
               ? BigDecimal.ZERO
               : previousRoundTally.getCandidateTally(winner));
@@ -335,8 +334,7 @@ class Tabulator {
         RoundTally roundTallyForPrecinct = roundTalliesForPrecinct.get(currentRound);
         roundTallyForPrecinct.unlockForSurplusCalculation();
         for (String winner : winnersToProcess) {
-          roundTallyForPrecinct.setCandidateTally(
-              winner,
+          roundTallyForPrecinct.setCandidateTallyViaSurplusAdjustment(winner,
               winnersRequiringComputation.contains(winner)
                   ? BigDecimal.ZERO
                   : roundTalliesForPrecinct.get(currentRound - 1).getCandidateTally(winner));
@@ -357,12 +355,12 @@ class Tabulator {
           }
           BigDecimal fractionalTransferValue = entry.getValue();
 
-          incrementTally(roundTally, fractionalTransferValue, winner);
+          roundTally.addToCandidateTallyViaSurplusAdjustment(winner, fractionalTransferValue);
           if (config.isTabulateByPrecinctEnabled() && cvr.getPrecinct() != null) {
-            incrementTally(
-                precinctRoundTallies.get(cvr.getPrecinct()).get(currentRound),
-                fractionalTransferValue,
-                winner);
+            Map<Integer, RoundTally> precinctTally = precinctRoundTallies.get(cvr.getPrecinct());
+            RoundTally precinctRoundTally = precinctTally.get(currentRound);
+            precinctRoundTally.addToCandidateTallyViaSurplusAdjustment(
+                winner, fractionalTransferValue);
           }
         }
       }
@@ -386,7 +384,7 @@ class Tabulator {
           Logger.info("%s had residual surplus of %s.", winner, winnerResidual);
           roundToResidualSurplus.put(
               currentRound, roundToResidualSurplus.get(currentRound).add(winnerResidual));
-          roundTally.setCandidateTally(winner, winningThreshold);
+          roundTally.setCandidateTallyViaSurplusAdjustment(winner, winningThreshold);
           tallyTransfers.addTransfer(
               currentRound, winner, TallyTransfers.RESIDUAL_TARGET, winnerResidual);
 
@@ -947,13 +945,13 @@ class Tabulator {
       cvr.exhaustBy(statusForRound);
     }
 
-    currentRound.addBallotWithStatus(statusForRound);
+    if (statusForRound != StatusForRound.ACTIVE) {
+      currentRound.addInactiveBallot(statusForRound, cvr.getFractionalTransferValue());
+    }
 
     String outcomeDescription;
     switch (statusForRound) {
-      case ACTIVE_JUST_RECEIVED ->
-          outcomeDescription = selectedCandidate;
-      case ACTIVE_REMAINED_ON_CANDIDATE ->
+      case ACTIVE ->
           outcomeDescription = selectedCandidate;
       case INACTIVE_BY_UNDERVOTE ->
           outcomeDescription = "underote" + additionalLogText;
@@ -1002,6 +1000,7 @@ class Tabulator {
     //  remain exhausted
     for (CastVoteRecord cvr : castVoteRecords) {
       if (cvr.isExhausted()) {
+        roundTally.addInactiveBallot(cvr.getBallotStatus(), cvr.getFractionalTransferValue());
         continue;
       }
 
@@ -1015,8 +1014,6 @@ class Tabulator {
             cvr.getCurrentRecipientOfVote(),
             roundTallyByPrecinct,
             cvr.getPrecinct());
-        recordSelectionForCastVoteRecord(cvr, roundTally, cvr.getCurrentRecipientOfVote(),
-            StatusForRound.ACTIVE_REMAINED_ON_CANDIDATE, "");
         continue;
       }
 
@@ -1106,7 +1103,7 @@ class Tabulator {
 
           // transfer cvr to selected candidate
           recordSelectionForCastVoteRecord(cvr, roundTally, selectedCandidate,
-              StatusForRound.ACTIVE_JUST_RECEIVED, "");
+              StatusForRound.ACTIVE, "");
 
           // If enabled, this will also update the roundTallyByPrecinct
           incrementTallies(

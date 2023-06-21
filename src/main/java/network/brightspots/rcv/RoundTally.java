@@ -19,6 +19,8 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.CastVoteRecord.StatusForRound;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,8 +33,9 @@ import java.util.stream.Stream;
 class RoundTally {
   private final int roundNumber;
   private final Map<String, BigDecimal> candidateTallies;
-  private final Map<CastVoteRecord.StatusForRound, BigDecimal> ballotStatusTallies;
-  private BigDecimal numBallots;
+  private final Map<StatusForRound, BigDecimal> ballotStatusTallies;
+  private BigDecimal numActiveBallots;
+  private BigDecimal numInactiveBallots;
 
   private boolean isFinalized = false;
   private boolean unlockedForSurplusCalculation = false;
@@ -45,7 +48,7 @@ class RoundTally {
     });
 
     ballotStatusTallies = new HashMap<>();
-    for (CastVoteRecord.StatusForRound statusForRound : CastVoteRecord.StatusForRound.values()) {
+    for (StatusForRound statusForRound : StatusForRound.values()) {
       ballotStatusTallies.put(statusForRound, BigDecimal.ZERO);
     }
   }
@@ -59,7 +62,7 @@ class RoundTally {
   void lockInRound() {
     ensureNotFinalized();
     isFinalized = true;
-    numBallots = countBallots();
+    countBallots();
   }
 
   // Surplus computation requires both reading and writing -- temporarily allow that
@@ -70,7 +73,7 @@ class RoundTally {
   // Revert to standard functionality when surplus computation is done
   void relockAfterSurplusCalculation() {
     unlockedForSurplusCalculation = false;
-    numBallots = countBallots();
+    countBallots();
   }
 
   // Get the number of votes this candidate has this round
@@ -82,24 +85,40 @@ class RoundTally {
   // Adds to the votes for this candidate
   BigDecimal addToCandidateTally(String candidateId, BigDecimal tally) {
     ensureNotFinalized();
+    addBallotWithStatus(StatusForRound.ACTIVE, tally);
     return candidateTallies.put(candidateId, candidateTallies.get(candidateId).add(tally));
   }
 
-  // Sets the number of votes this candidate has this round
-  BigDecimal setCandidateTally(String candidateId, BigDecimal tally) {
-    ensureNotFinalized();
-    return candidateTallies.put(candidateId, tally);
+  // Adds votes without adjusting the number of BallotStatus.ACTIVE ballots.
+  void addToCandidateTallyViaSurplusAdjustment(String candidateId, BigDecimal tally) {
+    ensureIsMakingSurplusAdjustment();
+    BigDecimal prevTally = candidateTallies.get(candidateId);
+    setCandidateTallyViaSurplusAdjustment(candidateId, prevTally.add(tally));
+  }
+
+  // Sets vote totals without adjusting the number of BallotStatus.ACTIVE ballots.
+  void setCandidateTallyViaSurplusAdjustment(String candidateId, BigDecimal tally) {
+    ensureIsMakingSurplusAdjustment();
+    candidateTallies.put(candidateId, tally);
   }
 
   // Adds to the votes for this candidate
-  BigDecimal addBallotWithStatus(CastVoteRecord.StatusForRound statusForRound) {
+  BigDecimal addInactiveBallot(StatusForRound statusForRound, BigDecimal value) {
+    if (statusForRound == StatusForRound.ACTIVE) {
+      throw new RuntimeException("Cannot add an active ballot as inactive");
+    }
+    return addBallotWithStatus(statusForRound, value);
+  }
+
+  // Adds to the votes for this candidate
+  private BigDecimal addBallotWithStatus(StatusForRound statusForRound, BigDecimal value) {
     ensureNotFinalized();
-    BigDecimal newVal = ballotStatusTallies.get(statusForRound).add(BigDecimal.ONE);
+    BigDecimal newVal = ballotStatusTallies.get(statusForRound).add(value);
     return ballotStatusTallies.put(statusForRound, newVal);
   }
 
   // Get the number of inactive ballots by type
-  BigDecimal getBallotStatusTally(CastVoteRecord.StatusForRound statusForRound) {
+  BigDecimal getBallotStatusTally(StatusForRound statusForRound) {
     ensureFinalized();
     return ballotStatusTallies.get(statusForRound);
   }
@@ -107,7 +126,13 @@ class RoundTally {
   // Get the number af active ballots in this round
   BigDecimal numActiveBallots() {
     ensureFinalized();
-    return numBallots;
+    return numActiveBallots;
+  }
+
+  // Get the number af active ballots in this round
+  BigDecimal numInactiveBallots() {
+    ensureFinalized();
+    return numInactiveBallots;
   }
 
   // Get all candidate names
@@ -153,23 +178,32 @@ class RoundTally {
     return sortedCandidates;
   }
 
-  private BigDecimal countBallots() {
-    BigDecimal total = BigDecimal.ZERO;
-    for (BigDecimal tally : candidateTallies.values()) {
-      total = total.add(tally);
-    }
-    return total;
+  private void countBallots() {
+    numInactiveBallots = BigDecimal.ZERO;
+    ballotStatusTallies.forEach((statusForRound, tally) -> {
+      if (statusForRound != StatusForRound.ACTIVE) {
+        numInactiveBallots = numInactiveBallots.add(tally);
+      }
+    });
+
+    numActiveBallots = ballotStatusTallies.get(StatusForRound.ACTIVE);
   }
 
   private void ensureFinalized() {
-    if (!isFinalized && !unlockedForSurplusCalculation) {
+    if (!isFinalized) {
       throw new RuntimeException("Cannot retrieve data until round is finalized.");
     }
   }
 
   private void ensureNotFinalized() {
-    if (isFinalized && !unlockedForSurplusCalculation) {
+    if (isFinalized) {
       throw new RuntimeException("Cannot set data after round is finalized.");
+    }
+  }
+
+  private void ensureIsMakingSurplusAdjustment() {
+    if (!unlockedForSurplusCalculation) {
+      throw new RuntimeException("This action is only available during surplus adjustment.");
     }
   }
 }

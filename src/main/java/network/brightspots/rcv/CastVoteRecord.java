@@ -35,10 +35,7 @@ class CastVoteRecord {
   // as far as tabulation is concerned, all that matters is whether
   // it is active or not.
   enum StatusForRound {
-    // The candidate just received this CVR's vote
-    ACTIVE_JUST_RECEIVED,
-    // This CVR voted for this candidate in a previous round
-    ACTIVE_REMAINED_ON_CANDIDATE,
+    ACTIVE,
     // The following fields represent inactive ballots' status
     INACTIVE_BY_UNDERVOTE,
     INACTIVE_BY_OVERVOTE,
@@ -75,7 +72,7 @@ class CastVoteRecord {
   // ballotTypeId parsed from Dominion CVR data
   private String ballotTypeId;
   // whether this CVR is exhausted or not. This will change as tabulation progresses.
-  private StatusForRound currentRoundStatus = StatusForRound.ACTIVE_JUST_RECEIVED;
+  private StatusForRound currentRoundStatus = StatusForRound.ACTIVE;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -193,8 +190,7 @@ class CastVoteRecord {
   }
 
   boolean isExhausted() {
-    return currentRoundStatus != StatusForRound.ACTIVE_JUST_RECEIVED
-        && currentRoundStatus != StatusForRound.ACTIVE_REMAINED_ON_CANDIDATE;
+    return currentRoundStatus != StatusForRound.ACTIVE;
   }
 
   StatusForRound getBallotStatus() {
