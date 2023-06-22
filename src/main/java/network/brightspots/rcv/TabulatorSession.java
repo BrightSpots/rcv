@@ -290,22 +290,19 @@ class TabulatorSession {
         // Check for any other reader-specific validations
         reader.runAdditionalValidations(castVoteRecords);
 
-        if (reader.getClass() == DominionCvrReader.class) {
-          // Before we tabulate, we output a converted generic CSV for the CVRs.
-          try {
-            DominionCvrReader dominionReader = (DominionCvrReader) reader;
-            ResultsWriter writer =
-                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-            this.convertedFilesWritten =
-                writer.writeGenericCvrCsv(
-                    castVoteRecords,
-                    dominionReader.getContests().values(),
-                    config.getOutputDirectory(),
-                    source.getContestId(),
-                    source.getUndeclaredWriteInLabel());
-          } catch (IOException exception) {
-            // error already logged in ResultsWriter
-          }
+        // Before we tabulate, we output a converted generic CSV for the CVRs.
+        try {
+          ResultsWriter writer =
+              new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+          this.convertedFilesWritten =
+              writer.writeGenericCvrCsv(
+                  castVoteRecords,
+                  reader.getMaxRankingsAllowed(source.getContestId()),
+                  config.getOutputDirectory(),
+                  source.getContestId(),
+                  source.getUndeclaredWriteInLabel());
+        } catch (IOException exception) {
+          // error already logged in ResultsWriter
         }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);

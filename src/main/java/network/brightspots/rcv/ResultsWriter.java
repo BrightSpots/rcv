@@ -37,7 +37,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,7 +47,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javafx.util.Pair;
-import network.brightspots.rcv.DominionCvrReader.Contest;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -500,76 +498,68 @@ class ResultsWriter {
   // returns a list of files written
   List<String> writeGenericCvrCsv(
       List<CastVoteRecord> castVoteRecords,
-      Collection<Contest> contests,
+      Integer numRanks,
       String csvOutputFolder,
       String contestId,
       String undeclaredWriteInLabel)
       throws IOException {
     List<String> filesWritten = new ArrayList<>();
     try {
-      for (Contest contest : contests) {
-        if (!contest.getId().equals(contestId)) {
-          // We already skipped loading CVRs for the other contests. This just ensures that we
-          // don't generate empty CSVs for them.
-          continue;
+      Path outputPath =
+          Paths.get(
+              getOutputFilePath(
+                  csvOutputFolder,
+                  "dominion_conversion_contest",
+                  timestampString,
+                  contestId)
+                  + ".csv");
+      Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
+      CSVPrinter csvPrinter;
+      BufferedWriter writer = Files.newBufferedWriter(outputPath);
+      csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
+      // print header:
+      // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
+      // rank 2 selection, ... rank maxRanks selection
+      csvPrinter.print("Contest Id");
+      csvPrinter.print("Tabulator Id");
+      csvPrinter.print("Batch Id");
+      csvPrinter.print("Record Id");
+      csvPrinter.print("Precinct");
+      csvPrinter.print("Precinct Portion");
+      for (int rank = 1; rank <= numRanks; rank++) {
+        String label = String.format("Rank %d", rank);
+        csvPrinter.print(label);
+      }
+      csvPrinter.println();
+      // print rows:
+      for (CastVoteRecord castVoteRecord : castVoteRecords) {
+        csvPrinter.print(castVoteRecord.getContestId());
+        csvPrinter.print(castVoteRecord.getTabulatorId());
+        csvPrinter.print(castVoteRecord.getBatchId());
+        csvPrinter.print(castVoteRecord.getId());
+        if (castVoteRecord.getPrecinct() == null) {
+          csvPrinter.print("");
+        } else {
+          csvPrinter.print(castVoteRecord.getPrecinct());
         }
-        Path outputPath =
-            Paths.get(
-                getOutputFilePath(
-                    csvOutputFolder,
-                    "dominion_conversion_contest",
-                    timestampString,
-                    contest.getId())
-                    + ".csv");
-        Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
-        CSVPrinter csvPrinter;
-        BufferedWriter writer = Files.newBufferedWriter(outputPath);
-        csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
-        // print header:
-        // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
-        // rank 2 selection, ... rank maxRanks selection
-        csvPrinter.print("Contest Id");
-        csvPrinter.print("Tabulator Id");
-        csvPrinter.print("Batch Id");
-        csvPrinter.print("Record Id");
-        csvPrinter.print("Precinct");
-        csvPrinter.print("Precinct Portion");
-        Integer numRanks = contest.getMaxRanks();
-        for (int rank = 1; rank <= numRanks; rank++) {
-          String label = String.format("Rank %d", rank);
-          csvPrinter.print(label);
+        if (castVoteRecord.getPrecinctPortion() == null) {
+          csvPrinter.print("");
+        } else {
+          csvPrinter.print(castVoteRecord.getPrecinctPortion());
         }
+        printRankings(undeclaredWriteInLabel, numRanks, csvPrinter, castVoteRecord);
         csvPrinter.println();
-        // print rows:
-        for (CastVoteRecord castVoteRecord : castVoteRecords) {
-          csvPrinter.print(castVoteRecord.getContestId());
-          csvPrinter.print(castVoteRecord.getTabulatorId());
-          csvPrinter.print(castVoteRecord.getBatchId());
-          csvPrinter.print(castVoteRecord.getId());
-          if (castVoteRecord.getPrecinct() == null) {
-            csvPrinter.print("");
-          } else {
-            csvPrinter.print(castVoteRecord.getPrecinct());
-          }
-          if (castVoteRecord.getPrecinctPortion() == null) {
-            csvPrinter.print("");
-          } else {
-            csvPrinter.print(castVoteRecord.getPrecinctPortion());
-          }
-          printRankings(undeclaredWriteInLabel, contest, csvPrinter, castVoteRecord);
-          csvPrinter.println();
-        }
-        // finalize the file
-        csvPrinter.flush();
-        csvPrinter.close();
-        filesWritten.add(outputPath.toString());
-        Logger.info("Successfully wrote: %s", outputPath.toString());
+      }
+      // finalize the file
+      csvPrinter.flush();
+      csvPrinter.close();
+      filesWritten.add(outputPath.toString());
+      Logger.info("Successfully wrote: %s", outputPath.toString());
 
-        File file = new File(outputPath.toString());
-        boolean readOnlySucceeded = file.setReadOnly();
-        if (!readOnlySucceeded) {
-          Logger.warning("Failed to set file to read-only: %s", file.getAbsolutePath());
-        }
+      File file = new File(outputPath.toString());
+      boolean readOnlySucceeded = file.setReadOnly();
+      if (!readOnlySucceeded) {
+        Logger.warning("Failed to set file to read-only: %s", file.getAbsolutePath());
       }
     } catch (IOException exception) {
       Logger.severe(
@@ -580,10 +570,10 @@ class ResultsWriter {
     return filesWritten;
   }
 
-  private void printRankings(String undeclaredWriteInLabel, Contest contest, CSVPrinter csvPrinter,
+  private void printRankings(String undeclaredWriteInLabel, Integer maxRanks, CSVPrinter csvPrinter,
       CastVoteRecord castVoteRecord) throws IOException {
     // for each rank determine what candidate id, overvote, or undervote occurred and print it
-    for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
+    for (Integer rank = 1; rank <= maxRanks; rank++) {
       if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
         CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
         if (candidates.count() == 1) {
