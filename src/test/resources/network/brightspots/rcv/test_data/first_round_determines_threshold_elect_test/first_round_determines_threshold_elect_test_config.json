@@ -1,7 +1,7 @@
 {
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
-    "contestName" : "Portland 2015 Mayoral Race",
+    "contestName" : "First Round Determines Threshold: Final round elects",
     "outputDirectory" : "output",
     "contestDate" : "2015-11-03",
     "contestJurisdiction" : "Portland, ME",
@@ -10,7 +10,7 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "first_round_determines_threshold_test_cvr.xlsx",
+    "filePath" : "../_shared/first_round_determines_threshold_nobody_meets_it_cvr.xlsx",
     "contestId" : "",
     "firstVoteColumnIndex" : "4",
     "firstVoteRowIndex" : "2",
@@ -58,6 +58,7 @@
     "continueUntilTwoCandidatesRemain" : true,
     "exhaustOnDuplicateCandidate" : false,
     "rulesDescription" : "First Round Determines Threshold Test",
-    "treatBlankAsUndeclaredWriteIn" : false
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "preventOneCandidateInFinalRound": true
   }
 }

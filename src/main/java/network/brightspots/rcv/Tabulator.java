@@ -516,11 +516,14 @@ class Tabulator {
           // everyone wins.
           selectedWinners.addAll(currentRoundCandidateToTally.keySet());
         } else if (config.isFirstRoundDeterminesThresholdEnabled()
-              && currentRoundCandidateToTally.size() - 1 == config.getNumberOfWinners()) {
-          // Edge case: if nobody meets the threshold, but we're on the penultimate round when
-          // isFirstRoundDeterminesThresholdEnabled is true, select the max vote getters as
-          // the winners. If isFirstRoundDeterminesThresholdEnabled isn't enabled, it should be
-          // impossible for a single-winner election to end up here.
+              && currentRoundCandidateToTally.size() - 1 == config.getNumberOfWinners()
+              && config.doPreventOneCandidateInFinalRound()) {
+          // Edge case: select the max vote getters as the winners, regardless of whether they've
+          // reached the threshold, if all of the following conditions are met:
+          //  1. nobody has met the threshold
+          //  2. we're on the penultimate round
+          //  3. isFirstRoundDeterminesThresholdEnabled is true
+          //  4. doPreventOneCandidateInFinalRound is true
           BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
           selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
         } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {

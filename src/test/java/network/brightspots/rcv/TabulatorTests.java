@@ -633,9 +633,15 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("first round determine threshold test")
-  void firstRoundDeterminesThresholdTest() {
-    runTabulationTest("first_round_determines_threshold_test");
+  @DisplayName("first round determine threshold test: elect on final round")
+  void firstRoundDeterminesThresholdElectTest() {
+    runTabulationTest("first_round_determines_threshold_elect_test");
+  }
+
+  @Test
+  @DisplayName("first round determine threshold test: eliminate on final round")
+  void firstRoundDeterminesThresholdEliminateTest() {
+    runTabulationTest("first_round_determines_threshold_eliminate_test");
   }
 
   @Test
