@@ -20,6 +20,7 @@
 package network.brightspots.rcv;
 
 import static java.util.Map.entry;
+import static network.brightspots.rcv.CastVoteRecord.StatusForRound;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -32,6 +33,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,7 +57,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 class ResultsWriter {
-
   private static final String CDF_CONTEST_ID = "contest-001";
   private static final String CDF_ELECTION_ID = "election-001";
   private static final String CDF_GPU_ID = "gpu-election";
@@ -263,57 +265,40 @@ class ResultsWriter {
   }
 
   // creates summary files for the votes in each precinct
-  // param: roundTallies is map from precinct to the round-by-round vote count in the precinct
+  // param: precinctRoundTallies is map from precinct to the round-by-round vote tallies
   // param: precinctTallyTransfers is a map from precinct to tally transfers for that precinct
-  // param: numBallotsByPrecinct is the total count of ballots per precinct
+  // param: numUndervotesByPrecinct is the total count of undervotes per precinct
   void generatePrecinctSummaryFiles(
-      Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies,
+      Map<String, Map<Integer, RoundTally>> precinctRoundTallies,
       Map<String, TallyTransfers> precinctTallyTransfers,
-      Map<String, Integer> numBallotsByPrecinct)
+      Map<String, Integer> numUndervotesByPrecinct)
       throws IOException {
     Set<String> filenames = new HashSet<>();
     for (var entry : precinctRoundTallies.entrySet()) {
       String precinct = entry.getKey();
-      Map<Integer, Map<String, BigDecimal>> roundTallies = entry.getValue();
+      Map<Integer, RoundTally> roundTallies = entry.getValue();
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
           getOutputFilePathFromInstance(String.format("%s_precinct_summary", precinctFileString));
-      Integer numBallotsObj = numBallotsByPrecinct.get(precinct);
-      if (numBallotsObj == null) {
-        Logger.warning("No ballots found in precinct \"%s\"", precinct, numBallotsByPrecinct);
-        numBallotsObj = 0;
-      }
-      int numBallots = numBallotsObj;
-      generateSummarySpreadsheet(roundTallies, numBallots, precinct, outputPath);
-      generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct), precinct, outputPath);
+      Integer numUndervotes = numUndervotesByPrecinct.get(precinct);
+      generateSummarySpreadsheet(roundTallies, numUndervotes, precinct, outputPath);
+      generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct),
+            precinct, outputPath);
     }
   }
 
   // create a summary spreadsheet .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
   // param: precinct indicates which precinct we're reporting results for (null means all)
+  // param: outputPath is the path to the output file, minus its extension
   private void generateSummarySpreadsheet(
-      Map<Integer, Map<String, BigDecimal>> roundTallies,
-      int numBallots,
+      Map<Integer, RoundTally> roundTallies,
+      Integer numUndervotes,
       String precinct,
       String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
     Logger.info("Generating summary spreadsheet: %s...", csvPath);
-
-    // totalActiveVotesPerRound is a map of round to active votes in each round
-    Map<Integer, BigDecimal> totalActiveVotesPerRound = new HashMap<>();
-    for (int round = 1; round <= numRounds; round++) {
-      // tally is map of candidate to tally for the current round
-      Map<String, BigDecimal> tallies = roundTallies.get(round);
-      // total will contain total votes for all candidates in this round
-      // this is used for calculating other derived data
-      BigDecimal total = BigDecimal.ZERO;
-      for (BigDecimal tally : tallies.values()) {
-        total = total.add(tally);
-      }
-      totalActiveVotesPerRound.put(round, total);
-    }
 
     CSVPrinter csvPrinter;
     try {
@@ -326,11 +311,10 @@ class ResultsWriter {
       throw exception;
     }
 
-    addHeaderRows(csvPrinter, precinct);
+    addContestInformationRows(csvPrinter, precinct);
     csvPrinter.print("Rounds");
     for (int round = 1; round <= numRounds; round++) {
-      String label = String.format("Round %d", round);
-      csvPrinter.print(label);
+      csvPrinter.print(String.format("Round %d", round));
     }
     csvPrinter.println();
 
@@ -340,19 +324,20 @@ class ResultsWriter {
     }
 
     // Get all candidates sorted by their first round tally. This determines the display order.
-    Map<String, BigDecimal> firstRoundTally = roundTallies.get(1);
-    List<String> sortedCandidates = sortCandidatesByTally(firstRoundTally);
+    List<String> sortedCandidates = roundTallies.get(1).getSortedCandidatesByTally();
 
     // For each candidate: for each round: output total votes
     for (String candidate : sortedCandidates) {
       String candidateDisplayName = config.getNameForCandidate(candidate);
       csvPrinter.print(candidateDisplayName);
       for (int round = 1; round <= numRounds; round++) {
-        BigDecimal thisRoundTally = roundTallies.get(round).get(candidate);
+        BigDecimal thisRoundTally = roundTallies.get(round).getCandidateTally(candidate);
         // not all candidates may have a tally in every round
         if (thisRoundTally == null) {
           thisRoundTally = BigDecimal.ZERO;
         }
+
+        // Vote count
         csvPrinter.print(thisRoundTally);
       }
       csvPrinter.println();
@@ -360,17 +345,17 @@ class ResultsWriter {
 
     csvPrinter.print("Inactive ballots");
     for (int round = 1; round <= numRounds; round++) {
-      // Exhausted/inactive count is the difference between the total ballots and the total votes
-      // still active or counting as residual surplus votes in the current round.
-      BigDecimal thisRoundInactive =
-          new BigDecimal(numBallots).subtract(totalActiveVotesPerRound.get(round));
+      BigDecimal inactiveBallots = roundTallies.get(round).numInactiveBallots();
 
-      if (precinct == null) {
-        // We don't have the concept of residual surplus at the precinct level (see comment below),
-        // so we'll just incorporate that part (if any) into the inactive count.
-        thisRoundInactive = thisRoundInactive.subtract(roundToResidualSurplus.get(round));
+      // The previous method of calculating inactive ballots was to sum values that included
+      // active ballots, leading to additional but unnecessary precision.
+      // Mimic that behavior here so there is no change in the test files.
+      BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
+      if (inactiveBallots.scale() < activeBallots.scale()) {
+        inactiveBallots = inactiveBallots.setScale(activeBallots.scale(), RoundingMode.HALF_UP);
       }
-      csvPrinter.print(thisRoundInactive);
+
+      csvPrinter.print(inactiveBallots);
     }
     csvPrinter.println();
 
@@ -440,7 +425,8 @@ class ResultsWriter {
     csvPrinter.print(candidateCellText);
   }
 
-  private void addHeaderRows(CSVPrinter csvPrinter, String precinct) throws IOException {
+  private void addContestInformationRows(CSVPrinter csvPrinter, String precinct)
+        throws IOException {
     csvPrinter.printRecord("Contest", config.getContestName());
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
     csvPrinter.printRecord("Office", config.getContestOffice());
@@ -463,36 +449,14 @@ class ResultsWriter {
     csvPrinter.println();
   }
 
-  // return a list of all input candidates sorted from the highest tally to lowest
-  private List<String> sortCandidatesByTally(Map<String, BigDecimal> tally) {
-    List<Map.Entry<String, BigDecimal>> entries = new ArrayList<>(tally.entrySet());
-    entries.sort(
-        (firstObject, secondObject) -> {
-          int ret;
-          if (firstObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-            ret = 1;
-          } else if (secondObject.getKey().equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-            ret = -1;
-          } else {
-            ret = (secondObject.getValue()).compareTo(firstObject.getValue());
-          }
-          return ret;
-        });
-    List<String> sortedCandidates = new LinkedList<>();
-    for (var entry : entries) {
-      sortedCandidates.add(entry.getKey());
-    }
-    return sortedCandidates;
-  }
-
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a precinct)
   void generateOverallSummaryFiles(
-      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      Map<Integer, RoundTally> roundTallies,
       TallyTransfers tallyTransfers,
-      int numBallots)
+      Integer numUndervotes)
       throws IOException {
     String outputPath = getOutputFilePathFromInstance("summary");
-    generateSummarySpreadsheet(roundTallies, numBallots, null, outputPath);
+    generateSummarySpreadsheet(roundTallies, numUndervotes, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
@@ -844,7 +808,7 @@ class ResultsWriter {
 
   // create summary json data for use with external visualizer software, unit tests and other tools
   private void generateSummaryJson(
-      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      Map<Integer, RoundTally> roundTallies,
       TallyTransfers tallyTransfers,
       String precinct,
       String outputPath)
@@ -886,10 +850,11 @@ class ResultsWriter {
     generateJsonFile(jsonPath, outputJson);
   }
 
-  private Map<String, BigDecimal> updateCandidateNamesInTally(Map<String, BigDecimal> tally) {
+  private Map<String, BigDecimal> updateCandidateNamesInTally(RoundTally roundSummary) {
     Map<String, BigDecimal> newTally = new HashMap<>();
-    for (var entry : tally.entrySet()) {
-      newTally.put(config.getNameForCandidate(entry.getKey()), entry.getValue());
+    for (String candidateName : roundSummary.getCandidates()) {
+      newTally.put(config.getNameForCandidate(candidateName),
+          roundSummary.getCandidateTally(candidateName));
     }
     return newTally;
   }
