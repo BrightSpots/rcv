@@ -265,9 +265,9 @@ class ResultsWriter {
   }
 
   // creates summary files for the votes in each precinct
-  // param: roundTallies is map from precinct to the round-by-round vote count in the precinct
+  // param: precinctRoundTallies is map from precinct to the round-by-round vote tallies
   // param: precinctTallyTransfers is a map from precinct to tally transfers for that precinct
-  // param: numBallotsByPrecinct is the total count of ballots per precinct
+  // param: numUndervotesByPrecinct is the total count of undervotes per precinct
   void generatePrecinctSummaryFiles(
       Map<String, Map<Integer, RoundTally>> precinctRoundTallies,
       Map<String, TallyTransfers> precinctTallyTransfers,
@@ -289,8 +289,8 @@ class ResultsWriter {
 
   // create a summary spreadsheet .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
-  // param: ballotStatusTallies is the round-by-count count of ballot statuses
   // param: precinct indicates which precinct we're reporting results for (null means all)
+  // param: outputPath is the path to the output file, minus its extension
   private void generateSummarySpreadsheet(
       Map<Integer, RoundTally> roundTallies,
       Integer numUndervotes,

@@ -914,14 +914,14 @@ class Tabulator {
   //  logs the results to audit log
   //  update tallyTransfers counts
   private void recordSelectionForCastVoteRecord(
-      CastVoteRecord cvr, RoundTally currentRound,
+      CastVoteRecord cvr, RoundTally currentRoundTally,
       String selectedCandidate, StatusForRound statusForRound,
       String additionalLogText) throws TabulationAbortedException {
     // update transfer counts (unless there's no value to transfer, which can happen if someone
     // wins with a tally that exactly matches the winning threshold)
     if (cvr.getFractionalTransferValue().signum() == 1) {
       tallyTransfers.addTransfer(
-          currentRound.getRoundNumber(),
+          currentRoundTally.getRoundNumber(),
           cvr.getCurrentRecipientOfVote(),
           selectedCandidate,
           cvr.getFractionalTransferValue());
@@ -935,7 +935,7 @@ class Tabulator {
           throw new TabulationAbortedException(false);
         }
         precinctTallyTransfer.addTransfer(
-            currentRound.getRoundNumber(),
+            currentRoundTally.getRoundNumber(),
             cvr.getCurrentRecipientOfVote(),
             selectedCandidate,
             cvr.getFractionalTransferValue());
@@ -948,7 +948,7 @@ class Tabulator {
     }
 
     if (statusForRound != StatusForRound.ACTIVE) {
-      currentRound.addInactiveBallot(statusForRound, cvr.getFractionalTransferValue());
+      currentRoundTally.addInactiveBallot(statusForRound, cvr.getFractionalTransferValue());
     }
 
     String outcomeDescription;
@@ -956,7 +956,7 @@ class Tabulator {
       case ACTIVE ->
           outcomeDescription = selectedCandidate;
       case INACTIVE_BY_UNDERVOTE ->
-          outcomeDescription = "underote" + additionalLogText;
+          outcomeDescription = "undervote" + additionalLogText;
       case INACTIVE_BY_OVERVOTE ->
           outcomeDescription = "overvote" + additionalLogText;
       case INACTIVE_BY_SKIPPED_RANKING ->
@@ -965,17 +965,17 @@ class Tabulator {
           outcomeDescription = "duplicate candidate" + additionalLogText;
       case INACTIVE_BY_EXHAUSTED_CHOICES ->
           outcomeDescription = "no continuing candidate" + additionalLogText;
-      // When we encounter a continuing candidate, we record it with this string in the output logs
       default ->
-        throw new RuntimeException("Unexpected ballot status: " + statusForRound);
+          // Programming error: we missed a status here
+          throw new RuntimeException("Unexpected ballot status: " + statusForRound);
     }
     VoteOutcomeType outcomeType =
         selectedCandidate == null ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
-    cvr.logRoundOutcome(currentRound.getRoundNumber(), outcomeType, outcomeDescription,
+    cvr.logRoundOutcome(currentRoundTally.getRoundNumber(), outcomeType, outcomeDescription,
         cvr.getFractionalTransferValue());
 
     if (config.isGenerateCdfJsonEnabled()) {
-      cvr.logCdfSnapshotData(currentRound.getRoundNumber());
+      cvr.logCdfSnapshotData(currentRoundTally.getRoundNumber());
     }
   }
 
@@ -1160,12 +1160,6 @@ class Tabulator {
     return new RoundTally(roundNumber, candidateNames.stream().filter(this::isCandidateContinuing));
   }
 
-  // add a vote (or fractional share of a vote) to a tally
-  private void incrementTally(
-      RoundTally tally, BigDecimal fractionalTransferValue, String selectedCandidate) {
-    tally.addToCandidateTally(selectedCandidate, fractionalTransferValue);
-  }
-
   // transfer vote to round tally and (if valid) the precinct round tally
   private void incrementTallies(
       RoundTally roundTally,
@@ -1173,10 +1167,10 @@ class Tabulator {
       String selectedCandidate,
       Map<String, RoundTally> roundTallyByPrecinct,
       String precinct) {
-    incrementTally(roundTally, fractionalTransferValue, selectedCandidate);
+    roundTally.addToCandidateTally(selectedCandidate, fractionalTransferValue);
     if (config.isTabulateByPrecinctEnabled() && !isNullOrBlank(precinct)) {
-      incrementTally(
-          roundTallyByPrecinct.get(precinct), fractionalTransferValue, selectedCandidate);
+      roundTallyByPrecinct.get(precinct).addToCandidateTally(
+          selectedCandidate, fractionalTransferValue);
     }
   }
 

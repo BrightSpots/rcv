@@ -70,7 +70,7 @@ class CastVoteRecord {
   private String batchId;
   // ballotTypeId parsed from Dominion CVR data
   private String ballotTypeId;
-  // whether this CVR is exhausted or not. This will change as tabulation progresses.
+  // the ballot status for the current round, which will change as tabulation progresses.
   private StatusForRound currentRoundStatus = StatusForRound.ACTIVE;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;

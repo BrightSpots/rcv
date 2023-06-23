@@ -252,7 +252,7 @@ class CommonDataFormatReader extends BaseCvrReader {
         }
         List<Pair<Integer, String>> rankings = new ArrayList<>();
         // parse CVRContestSelections into rankings
-        // they will be null for an undervote
+        // they will be null for a skipped ranking
         if (contest.CVRContestSelection != null) {
           for (CVRContestSelection cvrContestSelection : contest.CVRContestSelection) {
             if (cvrContestSelection.Status != null

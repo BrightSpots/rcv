@@ -114,7 +114,7 @@ class RoundTally {
     return winningThreshold;
   }
 
-  // Adds to the votes for this candidate
+  // Adds to the count of inactive ballots
   BigDecimal addInactiveBallot(StatusForRound statusForRound, BigDecimal value) {
     ensureNotFinalized();
     if (statusForRound == StatusForRound.ACTIVE) {
@@ -123,7 +123,7 @@ class RoundTally {
     return addBallotWithStatus(statusForRound, value);
   }
 
-  // Adds to the votes for this candidate
+  // Adds to the votes for this round
   private BigDecimal addBallotWithStatus(StatusForRound statusForRound, BigDecimal value) {
     ensureNotFinalized();
     BigDecimal newVal = ballotStatusTallies.get(statusForRound).add(value);
