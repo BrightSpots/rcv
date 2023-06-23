@@ -535,14 +535,21 @@ class Tabulator {
       // * If this is a single-winner election in which it's possible for no candidate to reach the
       //   threshold (i.e. "first round determines threshold" is set), the tiebreaker will choose
       //   the only winner.
-      boolean useTiebreakerIfNeeded = config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
-          || config.isFirstRoundDeterminesThresholdEnabled();
-      if (useTiebreakerIfNeeded && selectedWinners.size() > 1) {
+      boolean needsTiebreakMultipleWinners = selectedWinners.size() > 1
+          && (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
+              || config.isFirstRoundDeterminesThresholdEnabled());
+      // Edge case: there are two candidates remaining, and we are not allowed to go down to
+      // one candidate in the final round. Break the tie with an election here, instead of
+      // an elimination later.
+      boolean needsTiebreakNoWinners = selectedWinners.size() == 0
+          && (currentRoundCandidateToTally.size() == 2
+              && config.doPreventOneCandidateInFinalRound());
+      if (needsTiebreakMultipleWinners || needsTiebreakNoWinners) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
         selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
         // But if there are multiple candidates tied for the max tally, we need to break the tie.
-        if (selectedWinners.size() > 1) {
+        if (selectedWinners.size() > 1 || (selectedWinners.size() == 0)) {
           Tiebreak tiebreak =
               new Tiebreak(
                   true,
@@ -678,7 +685,7 @@ class Tabulator {
     LinkedList<String> lastPlaceCandidates = currentRoundTallyToCandidates.get(minVotes);
     if (lastPlaceCandidates.size() > 1) {
       // there was a tie for last place
-      // create new Tiebreak object to pick a loser
+      // create new Tiebreak object to pick a winner
       Tiebreak tiebreak =
           new Tiebreak(
               false,
@@ -688,7 +695,6 @@ class Tabulator {
               minVotes,
               roundTallies,
               config.getCandidatePermutation());
-
       eliminatedCandidate = tiebreak.selectCandidate();
       Logger.info(
           "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s "

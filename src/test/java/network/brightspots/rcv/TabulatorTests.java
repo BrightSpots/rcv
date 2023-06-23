@@ -501,9 +501,15 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("test tiebreak seed")
-  void testTiebreakSeed() {
-    runTabulationTest("tiebreak_seed_test");
+  @DisplayName("test tiebreak seed: final round eliminates")
+  void testTiebreakSeedEliminate() {
+    runTabulationTest("tiebreak_seed_test_eliminate");
+  }
+
+  @Test
+  @DisplayName("test tiebreak seed: final round elects")
+  void testTiebreakSeedElect() {
+    runTabulationTest("tiebreak_seed_test_elect");
   }
 
   @Test

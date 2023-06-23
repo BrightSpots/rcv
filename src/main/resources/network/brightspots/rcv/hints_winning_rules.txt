@@ -24,6 +24,8 @@ Continue until Two Candidates Remain: Single-winner ranked-choice voting electio
 
 First Round Determines Threshold: Single-winner ranked-choice voting elections can use the first round to determine the winning threshold, rather than the last round. This will not affect the eventual winner. This may elect a winner that does not reach the threshold.
 
+Prevent Final Round From Having Just One Candidate: If two candidates remain and neither has met the threshold, select one as the winner instead of running an elimination round.
+
 Stop Tabulation Early After Round: If a winner is not found by the given round, tabulation stops early after tabulating this round.
 
 Tiebreak Mode (required): Ties in ranked-choice voting contests can occur when eliminating candidates or when electing candidates. Multi-winner contests can have ties between candidates who have both crossed the threshold of election; in that case ties are broken to determine whose surplus vote value transfers first. Tiebreak procedures are set in law, either in the ranked-choice voting law used in your jurisdiction or in the elections code more generally. Select the option from this list that complies with law and procedure in your jurisdiction.
