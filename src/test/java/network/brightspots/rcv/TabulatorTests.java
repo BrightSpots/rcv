@@ -123,34 +123,28 @@ class TabulatorTests {
       compareJsons(config, stem, timestampString, null);
     }
 
-    // If this is a Dominion tabulation test, also check the converted output file.
-    boolean isDominion =
-        config.rawConfig.cvrFileSources.stream()
-            .anyMatch(source -> ContestConfig.getProvider(source) == Provider.DOMINION);
-    if (isDominion) {
-      String expectedPath =
-          getTestFilePath(
-              stem,
-              "_contest_"
-                  + config.rawConfig.cvrFileSources.get(0).getContestId()
-                  + "_expected.csv");
-      assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
-    }
-
     cleanOutputFolder(session);
   }
 
-  // helper function to support running convert-to-cdf function
-  private static void runConvertToCdfTest(String stem) {
+  // helper function to support running convert-to-cdf and convert-to-csv functions
+  private static void runConvertToCdfAndCsvTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
-    TabulatorSession session = new TabulatorSession(configPath);
-    session.convertToCdf();
 
-    String timestampString = session.getTimestampString();
+    // Convert to CDF and check
+    TabulatorSession sessionCdf = new TabulatorSession(configPath);
+    sessionCdf.convertToCdf();
+    String timestampString = sessionCdf.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null);
 
-    cleanOutputFolder(session);
+    // Convert to CSV and check -- done automatically before tabulation
+    TabulatorSession sessionCsv = new TabulatorSession(configPath);
+    sessionCsv.tabulate();
+    String expectedPath = getTestFilePath(stem, "_expected.csv");
+    assertTrue(fileCompare(sessionCsv.getConvertedFilesWritten().get(0), expectedPath));
+
+    cleanOutputFolder(sessionCsv);
+    cleanOutputFolder(sessionCdf);
   }
 
   private static void cleanOutputFolder(TabulatorSession session) {
@@ -224,19 +218,19 @@ class TabulatorTests {
   @Test
   @DisplayName("Test Convert to CDF works for CDF")
   void convertToCdfFromCdf() {
-    runConvertToCdfTest("convert_to_cdf_from_cdf");
+    runConvertToCdfAndCsvTest("convert_to_cdf_from_cdf");
   }
 
   @Test
   @DisplayName("Test Convert to CDF works for Dominion")
   void convertToCdfFromDominion() {
-    runConvertToCdfTest("convert_to_cdf_from_dominion");
+    runConvertToCdfAndCsvTest("convert_to_cdf_from_dominion");
   }
 
   @Test
   @DisplayName("Test Convert to CDF works for ES&S")
   void convertToCdfFromEss() {
-    runConvertToCdfTest("convert_to_cdf_from_ess");
+    runConvertToCdfAndCsvTest("convert_to_cdf_from_ess");
   }
 
   @Test

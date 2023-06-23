@@ -91,6 +91,7 @@ class ResultsWriter {
       String outputType,
       String timestampString,
       String sequentialTabulationId) {
+    outputType = sanitizeStringForOutput(outputType);
     String fileName =
         String.format(
             "%s_%s%s",
@@ -99,7 +100,7 @@ class ResultsWriter {
   }
 
   static String sanitizeStringForOutput(String s) {
-    return s.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
+    return s == null ? "" : s.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
   }
 
   private static void generateJsonFile(String path, Map<String, Object> json) throws IOException {
@@ -511,7 +512,7 @@ class ResultsWriter {
                   csvOutputFolder,
                   "dominion_conversion_contest",
                   timestampString,
-                  contestId)
+                  sanitizeStringForOutput(contestId))
                   + ".csv");
       Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
       CSVPrinter csvPrinter;
