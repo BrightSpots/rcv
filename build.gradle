@@ -115,7 +115,7 @@ jlink {
     launcher {
         // TODO Sync version number with release.yml and Main.java (github.com/BrightSpots/rcv/issues/662)
         name = "RCTab"
-        version = "1.4.0-alpha"
+        version = "1.4.0"
     }
 
     jpackage {
