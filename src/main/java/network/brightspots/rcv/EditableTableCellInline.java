@@ -28,8 +28,8 @@ import javafx.event.Event;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -98,7 +98,7 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
   }
 
   /**
-   * Disables or enables both controls and tabs requested by lockWhileEditing
+   * Disables or enables both controls and tabs requested by lockWhileEditing.
    */
   private static void setDisabledForEditing(boolean doLock) {
     for (Control control : controlsToDisableWhileEditing) {

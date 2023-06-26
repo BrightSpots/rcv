@@ -175,7 +175,7 @@ public class RawContestConfig {
     }
 
     /**
-     * Set the provider by its GUI label
+     * Set the provider by its GUI label.
      */
     public void setProvider(String providerString) {
       // First, try to get the provider by its public name
@@ -217,7 +217,7 @@ public class RawContestConfig {
     }
 
     /**
-     * The following properties are marked as unused by an editor, but
+     * The following properties might be marked as unused by an IDE, but
      * are necessary to save edits to a cell. See PropertyValueFactory.
      */
     public SimpleStringProperty filePathProperty() {
@@ -357,7 +357,7 @@ public class RawContestConfig {
     }
 
     /**
-     * The following properties are marked as unused by an editor, but
+     * The following properties might be marked as unused by an IDE, but
      * are necessary to save edits to a cell. See PropertyValueFactory.
      */
     public SimpleStringProperty nameProperty() {
