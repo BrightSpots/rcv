@@ -26,9 +26,9 @@ Candidate F Name,3,10.34%,0,3,10.71%,0.0937,3.0937,14.9%,-3.0937,0,0.0%,0,0,0.0%
 Candidate D Name,2,6.89%,-2,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,,0
 Active Ballots,29,,,28,,,20.7496,,,20.7496,,,20.3748,,,0,,
 Current Round Threshold,7.2501,,,7.2501,,,7.2501,,,7.2501,,,7.2501,,,7.2501,,
-Inactive Ballots by by Overvotes,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Skipped Rankings,1,1,,2,0,,2,0,,2,0.1874,,2.1874,0.8582,,3.0456,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,,0,0,,0,3.8760,,3.8760,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots Total,1,1,,2,0,,2,0,,2,0.3748,,2.3748,5.8741,,8.2489,0,
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,1,,1,2,,0,2,,0,2,,0.1874,2.1874,,0.8582,3.0456,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,3.8760,3.8760,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots Total,1,,1,2,,0,2,,0,2,,0.3748,2.3748,,5.8741,8.2489,,0
 Residual surplus,0,,,0,,,0.0003,,,0.0003,,,0.0003,,,0.0008,,

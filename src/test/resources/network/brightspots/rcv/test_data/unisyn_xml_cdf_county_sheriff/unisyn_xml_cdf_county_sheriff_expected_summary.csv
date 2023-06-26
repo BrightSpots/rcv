@@ -28,8 +28,8 @@ Beth Small,2,6.89%,0,2,6.89%,-2,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0
 Undeclared Write-ins,2,6.89%,-2,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,29,,,29,,,29,,,29,,,29,,,29,,,24,,,17,,
 Current Round Threshold,15,,,15,,,15,,,15,,,15,,,15,,,13,,,9,,
-Inactive Ballots by by Overvotes,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Skipped Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,,0,0,,0,0,,0,5,,5,7,,12,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots Total,0,0,,0,0,,0,0,,0,0,,0,0,,0,5,,5,7,,12,0,
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,5,5,,7,12,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0,0,,0,0,,5,5,,7,12,,0
