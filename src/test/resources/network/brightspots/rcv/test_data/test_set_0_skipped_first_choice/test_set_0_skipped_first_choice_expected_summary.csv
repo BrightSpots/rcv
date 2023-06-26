@@ -24,8 +24,8 @@ Candidate C Name,3,25.0%,0,3,25.0%,-3,0,0.0%,0
 Candidate D Name,1,8.33%,-1,0,0.0%,0,0,0.0%,0
 Active Ballots,12,,,12,,,11,,
 Current Round Threshold,7,,,7,,,6,,
-Inactive Ballots by by Overvotes,0,0,,0,1,,1,0,
-Inactive Ballots by by Skipped Rankings,0,0,,0,0,,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,
-Inactive Ballots Total,0,0,,0,1,,1,0,
+Inactive Ballots by Overvotes,0,,0,0,,1,1,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0
+Inactive Ballots Total,0,,0,0,,1,1,,0

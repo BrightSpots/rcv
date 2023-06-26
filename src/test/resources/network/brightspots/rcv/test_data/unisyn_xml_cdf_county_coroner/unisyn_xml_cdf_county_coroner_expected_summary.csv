@@ -29,8 +29,8 @@ Walter Gerber,3,10.34%,0,3,10.34%,1,4,13.79%,0,4,13.79%,0,4,13.79%,-4,0,0.0%,0,0
 Undeclared Write-ins,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,29,,,29,,,29,,,29,,,29,,,25,,,24,,,18,,,9,,
 Current Round Threshold,15,,,15,,,15,,,15,,,15,,,13,,,13,,,10,,,5,,
-Inactive Ballots by by Overvotes,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Skipped Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,,0,0,,0,4,,4,1,,5,6,,11,9,,20,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots Total,0,0,,0,0,,0,0,,0,0,,0,4,,4,1,,5,6,,11,9,,20,0,
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,4,4,,1,5,,6,11,,9,20,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0,0,,4,4,,1,5,,6,11,,9,20,,0
