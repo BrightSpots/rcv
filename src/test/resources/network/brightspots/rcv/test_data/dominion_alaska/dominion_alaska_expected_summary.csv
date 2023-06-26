@@ -29,8 +29,8 @@ Elizabeth Warren,96,10.18%,15,111,11.77%,8,119,12.61%,-119,0,0.0%,0,0,0.0%,0,0,0
 Undeclared Write-ins,104,11.02%,-104,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,943,,,943,,,943,,,943,,,942,,,938,,,894,,,793,,
 Current Round Threshold,472,,,472,,,472,,,472,,,472,,,470,,,448,,,397,,
-Inactive Ballots by by Overvotes,2,0,,2,0,,2,0,,2,1,,3,2,,5,1,,6,1,,7,0,
-Inactive Ballots by by Skipped Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots Total,2,0,,2,0,,2,0,,2,1,,3,4,,7,44,,51,101,,152,0,
+Inactive Ballots by Overvotes,2,,0,2,,0,2,,0,2,,1,3,,2,5,,1,6,,1,7,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots Total,2,,0,2,,0,2,,0,2,,1,3,,4,7,,44,51,,101,152,,0

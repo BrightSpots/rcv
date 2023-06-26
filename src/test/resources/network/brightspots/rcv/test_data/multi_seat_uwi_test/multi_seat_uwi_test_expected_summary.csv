@@ -24,8 +24,8 @@ C,2,13.33%,0,2,22.22%,0,2,40.0%,-2,0,0.0%,0,0,,0
 Undeclared Write-ins,4,26.66%,0,4,44.44%,-4,0,0.0%,0,0,0.0%,0,0,,0
 Active Ballots,15,,,9,,,5,,,3,,,0,,
 Current Round Threshold,6,,,6,,,6,,,6,,,6,,
-Inactive Ballots by by Overvotes,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Skipped Rankings,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots Total,0,0.0000,,0.0000,4.0000,,4.0000,2.0000,,6.0000,0.0000,,6.0000,0,
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots Total,0,,0.0000,0.0000,,4.0000,4.0000,,2.0000,6.0000,,0.0000,6.0000,,0

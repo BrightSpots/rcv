@@ -28,8 +28,8 @@ Elected,,,,,,,,,,"Mills, Janet T.",,
 Write-in,748,0.59%,-748,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,126139,,,124093,,,122512,,,117253,,
 Current Round Threshold,63070,,,62047,,,61257,,,58627,,
-Inactive Ballots by by Overvotes,430,42,,472,35,,507,73,,580,0,
-Inactive Ballots by by Skipped Rankings,146,45,,191,28,,219,78,,297,0,
-Inactive Ballots by by Exhausted Choices,0,119,,119,61,,180,92,,272,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots Total,576,2046,,2622,1581,,4203,5259,,9462,0,
+Inactive Ballots by Overvotes,430,,42,472,,35,507,,73,580,,0
+Inactive Ballots by Skipped Rankings,146,,45,191,,28,219,,78,297,,0
+Inactive Ballots by Exhausted Choices,0,,119,119,,61,180,,92,272,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots Total,576,,2046,2622,,1581,4203,,5259,9462,,0
