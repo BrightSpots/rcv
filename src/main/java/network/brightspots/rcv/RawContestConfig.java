@@ -300,7 +300,7 @@ public class RawContestConfig {
 
       if (newlineSeparatedAliases != null) {
         // Split by newline, and also trim whitespace
-        this.aliases.setAll(newlineSeparatedAliases.split("\\W*\\r?\\n\\W*"));
+        this.aliases.setAll(Utils.splitByNewline(newlineSeparatedAliases));
       }
     }
 

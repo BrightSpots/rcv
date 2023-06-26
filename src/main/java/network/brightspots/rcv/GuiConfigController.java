@@ -1164,13 +1164,13 @@ public class GuiConfigController implements Initializable {
     };
     setUpEditableTableStrings(candidateStringColumnsAndProperties);
 
-    EditableTableCell.lockWhileEditing(tabContestInfo);
-    EditableTableCell.lockWhileEditing(tabCvrFiles);
-    EditableTableCell.lockWhileEditing(tabCandidates);
-    EditableTableCell.lockWhileEditing(tabWinningRules);
-    EditableTableCell.lockWhileEditing(tabVoterErrorRules);
-    EditableTableCell.lockWhileEditing(tabOutput);
-    EditableTableCell.lockWhileEditing(menuBar);
+    EditableTableCellInline.lockWhileEditing(tabContestInfo);
+    EditableTableCellInline.lockWhileEditing(tabCvrFiles);
+    EditableTableCellInline.lockWhileEditing(tabCandidates);
+    EditableTableCellInline.lockWhileEditing(tabWinningRules);
+    EditableTableCellInline.lockWhileEditing(tabVoterErrorRules);
+    EditableTableCellInline.lockWhileEditing(tabOutput);
+    EditableTableCellInline.lockWhileEditing(menuBar);
 
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
@@ -1704,7 +1704,7 @@ public class GuiConfigController implements Initializable {
 
     @Override
     public void setCellFactory() {
-      column.setCellFactory(EditableTableCell.forTableColumn());
+      column.setCellFactory(EditableTableCellInline.forTableColumn());
     }
   }
 
@@ -1736,19 +1736,7 @@ public class GuiConfigController implements Initializable {
 
     @Override
     public void setCellFactory() {
-      column.setCellFactory(EditableTableCell.forTableColumn(new ListStringConverter()));
-    }
-  }
-
-  private static class ListStringConverter extends StringConverter<List> {
-    @Override
-    public String toString(List list) {
-      return list != null ? String.join("; ", list) : "";
-    }
-
-    @Override
-    public List fromString(String string) {
-      return FXCollections.observableArrayList(string.split("\\W*;\\W*"));
+      column.setCellFactory(tc -> new EditableTableCellPopup<Candidate>());
     }
   }
 }

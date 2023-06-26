@@ -20,14 +20,16 @@
 
 package network.brightspots.rcv;
 
+import java.util.ArrayList;
+import java.util.List;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -36,16 +38,13 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A class containing a {@link TableCell} implementation that draws a
  * {@link TextField} node inside the cell. If the TextField is
  * left, the value is committed.
  */
 
-public class EditableTableCell<S, T> extends TableCell<S, T> {
+public class EditableTableCellInline<S, T> extends TableCell<S, T> {
   private TextField textField;
   private boolean escapePressed = false;
   private TablePosition<S, ?> tablePos = null;
@@ -59,7 +58,7 @@ public class EditableTableCell<S, T> extends TableCell<S, T> {
    * Provides a TextFieldTableCell that allows editing of the cell content with any type.
    * This method will only work on any type, but you'll need to provide a StringConverter.
    */
-  public EditableTableCell(StringConverter<T> converter) {
+  public EditableTableCellInline(StringConverter<T> converter) {
     this.getStyleClass().add("text-field-table-cell");
     setConverter(converter);
   }
@@ -81,7 +80,7 @@ public class EditableTableCell<S, T> extends TableCell<S, T> {
    */
   public static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forTableColumn(
       final StringConverter<T> converter) {
-    return list -> new EditableTableCell<>(converter);
+    return list -> new EditableTableCellInline<>(converter);
   }
 
   /**
