@@ -36,7 +36,6 @@ import java.util.Set;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
-import network.brightspots.rcv.ContestConfigMigration.ConfigVersionIsNewerThanAppVersionException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
@@ -55,24 +54,24 @@ class TabulatorSession {
     timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
-  // validation will catch a mismatch and abort anyway, but add another safety check just in case
-  private static void checkConfigVersionMatchesApp(ContestConfig config)
-      throws ConfigVersionIsNewerThanAppVersionException {
+  // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI
+  // here also
+  private static void checkConfigVersionMatchesApp(ContestConfig config) {
     String version = config.getRawConfig().tabulatorVersion;
-
     if (!version.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
-      if (ContestConfigMigration.isConfigVersionNewerThanAppVersion(version)) {
-        // In practice, this should never be thrown because we should have checked the version
-        // while loading the config, and the version number can never change after a load+migration.
-        // Still, as a safety check, we'll throw here.
-        throw new ConfigVersionIsNewerThanAppVersionException();
-      } else if (ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
+      // Below already logs a severe message, so no need to check and add another one
+      boolean isConfigVersionNewerThanAppVersion =
+          ContestConfigMigration.isConfigVersionNewerThanAppVersion(version);
+      if (!isConfigVersionNewerThanAppVersion
+          && ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
         Logger.severe(
             "Can't use a config with older version %s in newer version %s of the app! To "
                 + "automatically migrate the config to the newer version, load it in the graphical "
                 + "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
             version, Main.APP_VERSION);
       }
+      // No need to throw errors for these, because they'll be caught by validateTabulatorVersion()
+      // during validation
     }
   }
 
@@ -98,12 +97,12 @@ class TabulatorSession {
   void convertToCdf() {
     Logger.info("Starting CDF conversion session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    checkConfigVersionMatchesApp(config);
     boolean conversionSuccess = false;
 
     if (setUpLogging(config.getOutputDirectory()) && config.validate().isEmpty()) {
       Logger.info("Converting CVR(s) to CDF...");
       try {
-        checkConfigVersionMatchesApp(config);
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
         if (castVoteRecords == null) {
@@ -122,7 +121,6 @@ class TabulatorSession {
       } catch (IOException
           | UnableToCreateDirectoryException
           | TabulationAbortedException
-          | ConfigVersionIsNewerThanAppVersionException
           | RoundSnapshotDataMissingException exception) {
         Logger.severe("Failed to convert CVR(s) to CDF: %s", exception.getMessage());
       }
@@ -143,6 +141,7 @@ class TabulatorSession {
     Logger.info("Starting tabulation session...");
     List<String> exceptionsEncountered = new LinkedList<>();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
 
     if (setUpLogging(config.getOutputDirectory()) && config.validate().isEmpty()) {
@@ -150,7 +149,6 @@ class TabulatorSession {
       Logger.info("User name: %s", Utils.getUserName());
       Logger.info("Config file: %s", configPath);
       try {
-        checkConfigVersionMatchesApp(config);
         Logger.fine("Begin config file contents:");
         BufferedReader reader =
             new BufferedReader(new FileReader(configPath, StandardCharsets.UTF_8));
@@ -161,7 +159,7 @@ class TabulatorSession {
         }
         Logger.fine("End config file contents.");
         reader.close();
-      } catch (IOException | ConfigVersionIsNewerThanAppVersionException exception) {
+      } catch (IOException exception) {
         exceptionsEncountered.add(exception.getClass().toString());
         Logger.severe("Error logging config file: %s\n%s", configPath, exception);
       }
