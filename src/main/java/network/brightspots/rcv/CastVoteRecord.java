@@ -28,6 +28,20 @@ import java.util.Map.Entry;
 import javafx.util.Pair;
 
 class CastVoteRecord {
+  // StatusForRound represents the ballot's status on a given round.
+  // This CastVoteRecord will have different statuses each round,
+  // and this provides a more detailed breakdown than a simple
+  // active/inactive binary. It is only useful in results reporting;
+  // as far as tabulation is concerned, all that matters is whether
+  // it is active or not.
+  enum StatusForRound {
+    ACTIVE,
+    INACTIVE_BY_UNDERVOTE,
+    INACTIVE_BY_OVERVOTE,
+    INACTIVE_BY_SKIPPED_RANKING,
+    INACTIVE_BY_REPEATED_RANKING,
+    INACTIVE_BY_EXHAUSTED_CHOICES
+  }
 
   // computed unique ID for this CVR (source file + line number)
   private final String computedId;
@@ -56,8 +70,8 @@ class CastVoteRecord {
   private String batchId;
   // ballotTypeId parsed from Dominion CVR data
   private String ballotTypeId;
-  // whether this CVR is exhausted or not
-  private boolean isExhausted;
+  // the ballot status for the current round, which will change as tabulation progresses.
+  private StatusForRound currentRoundStatus = StatusForRound.ACTIVE;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -170,12 +184,16 @@ class CastVoteRecord {
     cdfSnapshotData.put(round, data);
   }
 
-  void exhaust() {
-    isExhausted = true;
+  void exhaustBy(StatusForRound status) {
+    this.currentRoundStatus = status;
   }
 
   boolean isExhausted() {
-    return isExhausted;
+    return currentRoundStatus != StatusForRound.ACTIVE;
+  }
+
+  StatusForRound getBallotStatus() {
+    return currentRoundStatus;
   }
 
   // fractional transfer value is one by default but can be less if this

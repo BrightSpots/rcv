@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "For City C Chief of Police (1/3)",
     "date" : "2019-03-06",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "13"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Emily Stevens" : "3",
@@ -21,8 +28,15 @@
     "tallyResults" : [ {
       "eliminated" : "Undeclared Write-ins",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Emily Stevens" : "3",
@@ -39,8 +53,15 @@
         "Jessie James" : "1",
         "Kenneth Parker" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Emily Stevens" : "3",
@@ -56,8 +77,15 @@
         "Ivan Hillerman" : "2",
         "Jessie James" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Ivan Hillerman" : "6",
@@ -73,8 +101,15 @@
         "Kenneth Parker" : "2",
         "Sandra Berringer" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Ivan Hillerman" : "7",
@@ -88,8 +123,15 @@
         "Ivan Hillerman" : "5",
         "Kenneth Parker" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "Ivan Hillerman" : "12",
@@ -103,8 +145,15 @@
         "Kenneth Parker" : "2",
         "exhausted" : "4"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "4",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "Ivan Hillerman" : "13",
@@ -113,6 +162,14 @@
     "tallyResults" : [ {
       "elected" : "Ivan Hillerman",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "13"
+  } ],
+  "summary" : {
+    "finalThreshold" : "13",
+    "numCandidates" : 8,
+    "numWinners" : 1,
+    "totalNumBallots" : "35",
+    "undervotes" : 6
+  }
 }
