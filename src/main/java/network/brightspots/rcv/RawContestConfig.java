@@ -175,20 +175,11 @@ public class RawContestConfig {
     }
 
     /**
-     * Set the provider by either its GUI label or its internal label.
-     * Supporting both means we don't have to translate between internal and GUI labels
-     * each time we serialize/deserialize in the table.
-     *
-     * @param providerString The provider's internal or GUI label.
+     * Set the provider by its GUI label
      */
     public void setProvider(String providerString) {
       // First, try to get the provider by its public name
-      ContestConfig.Provider provider = ContestConfig.Provider.getByGuiLabel(providerString);
-
-      // If that fails, try its internal name
-      if (provider == ContestConfig.Provider.PROVIDER_UNKNOWN) {
-        provider = ContestConfig.Provider.getByInternalLabel(providerString);
-      }
+      ContestConfig.Provider provider = ContestConfig.Provider.getByInternalLabel(providerString);
 
       this.provider.set(provider.getInternalLabel());
     }

@@ -44,7 +44,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -1138,7 +1138,6 @@ public class GuiConfigController implements Initializable {
         new EditableColumnString(tableColumnCvrIdCol, "idColumnIndex"),
         new EditableColumnString(tableColumnCvrPrecinctCol, "precinctColumnIndex"),
         new EditableColumnString(tableColumnCvrOvervoteDelimiter, "overvoteDelimiter"),
-        new EditableColumnString(tableColumnCvrProvider, "provider"),
         new EditableColumnString(tableColumnCvrContestId, "contestId"),
         new EditableColumnString(tableColumnCvrOvervoteLabel, "overvoteLabel"),
         new EditableColumnString(tableColumnCvrUndervoteLabel, "undervoteLabel"),
@@ -1149,10 +1148,13 @@ public class GuiConfigController implements Initializable {
     };
     setUpEditableTableStrings(cvrStringColumnsAndProperties);
 
-    // Don't allow editing of Provider to avoid the complexity of creating a dropdown here,
-    // it's probably not going to be frequently edited anyway, and the UI for Provider selection
-    // is cleaner anyway since it nicely disables and enables supported fields.
-    tableColumnCvrProvider.setEditable(false);
+    // Don't allow editing of Provider to avoid:
+    // (1) the complexity of creating a dropdown
+    // (2) the complexity of mapping between the GUI label and the internal label
+    tableColumnCvrProvider.setCellValueFactory(
+        c -> new SimpleStringProperty(
+            Provider.getByInternalLabel(c.getValue().getProvider()).toString())
+    );
 
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCvrFiles.setEditable(true);
@@ -1671,16 +1673,16 @@ public class GuiConfigController implements Initializable {
     protected final String propertyName;
 
     public EditableColumn(TableColumn column, String propertyName) {
-      this.propertyName = propertyName;
       this.column = column;
-    }
-
-    public String getPropertyName() {
-      return propertyName;
+      this.propertyName = propertyName;
     }
 
     public TableColumn getColumn() {
       return column;
+    }
+
+    public String getPropertyName() {
+      return propertyName;
     }
 
     public void setCellFactoryValue() {

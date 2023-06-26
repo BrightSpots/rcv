@@ -1202,13 +1202,6 @@ class ContestConfig {
       this.guiLabel = guiLabel;
     }
 
-    static Provider getByGuiLabel(String labelLookup) {
-      return Arrays.stream(Provider.values())
-          .filter(v -> v.guiLabel.equals(labelLookup))
-          .findAny()
-          .orElse(PROVIDER_UNKNOWN);
-    }
-
     static Provider getByInternalLabel(String labelLookup) {
       return Arrays.stream(Provider.values())
           .filter(v -> v.internalLabel.equals(labelLookup))
