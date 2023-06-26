@@ -1164,6 +1164,14 @@ public class GuiConfigController implements Initializable {
     };
     setUpEditableTableStrings(candidateStringColumnsAndProperties);
 
+    EditableTableCell.lockWhileEditing(tabContestInfo);
+    EditableTableCell.lockWhileEditing(tabCvrFiles);
+    EditableTableCell.lockWhileEditing(tabCandidates);
+    EditableTableCell.lockWhileEditing(tabWinningRules);
+    EditableTableCell.lockWhileEditing(tabVoterErrorRules);
+    EditableTableCell.lockWhileEditing(tabOutput);
+    EditableTableCell.lockWhileEditing(menuBar);
+
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
 

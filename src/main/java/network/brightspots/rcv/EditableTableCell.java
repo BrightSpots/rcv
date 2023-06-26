@@ -11,8 +11,9 @@
  * Purpose: Generates an editable table cell that commits an edit when focus is lost, and
  * cancels an edit when escape is pressed.
  * Design: A single cell to be used in an editable table. This file copies code and comments from
- * TextFieldTableCell and CellUtils and adapts it. Since TextFieldTableCell uses a private TextField
- * and CellUtils is package protected, we cannot easily extend those without duplicating some code.
+ * JavaFX's TextFieldTableCell and CellUtils and adapts it. Since TextFieldTableCell uses a private
+ * TextField and CellUtils is package protected, we cannot easily extend those without duplicating
+ * some code.
  * Conditions: Runs in GUI mode.
  * Version history: see https://github.com/BrightSpots/rcv.
  */
@@ -22,6 +23,8 @@ package network.brightspots.rcv;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
+import javafx.scene.control.Control;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -33,6 +36,9 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A class containing a {@link TableCell} implementation that draws a
  * {@link TextField} node inside the cell. If the TextField is
@@ -43,6 +49,8 @@ public class EditableTableCell<S, T> extends TableCell<S, T> {
   private TextField textField;
   private boolean escapePressed = false;
   private TablePosition<S, ?> tablePos = null;
+  private static List<Control> controlsToDisableWhileEditing = new ArrayList<>();
+  private static List<Tab> tabsToDisableWhileEditing = new ArrayList<>();
 
   private final ObjectProperty<StringConverter<T>> converter =
       new SimpleObjectProperty<>(this, "converter");
@@ -76,6 +84,34 @@ public class EditableTableCell<S, T> extends TableCell<S, T> {
     return list -> new EditableTableCell<>(converter);
   }
 
+  /**
+   * Prevent the user from leaving the UI without commiting.
+   */
+  public static void lockWhileEditing(Control control) {
+    controlsToDisableWhileEditing.add(control);
+  }
+
+  /**
+   * Prevent the user from leaving the UI without commiting.
+   */
+  public static void lockWhileEditing(Tab tab) {
+    tabsToDisableWhileEditing.add(tab);
+  }
+
+  /**
+   * Disables or enables both controls and tabs requested by lockWhileEditing
+   */
+  private static void setDisabledForEditing(boolean doLock) {
+    for (Control control : controlsToDisableWhileEditing) {
+      control.setDisable(doLock);
+    }
+    for (Tab tab : tabsToDisableWhileEditing) {
+      if (!tab.isSelected()) {
+        tab.setDisable(doLock);
+      }
+    }
+  }
+
   private ObjectProperty<StringConverter<T>> converterProperty() {
     return converter;
   }
@@ -94,6 +130,8 @@ public class EditableTableCell<S, T> extends TableCell<S, T> {
         && getTableView().isEditable()
         && getTableColumn().isEditable()) {
       super.startEdit();
+
+      setDisabledForEditing(true);
 
       if (isEditing()) {
         // Update members
@@ -145,6 +183,8 @@ public class EditableTableCell<S, T> extends TableCell<S, T> {
         table.edit(-1, null);
       }
     }
+
+    setDisabledForEditing(false);
   }
 
 
@@ -160,6 +200,8 @@ public class EditableTableCell<S, T> extends TableCell<S, T> {
       String newText = textField.getText(); // get the new text from the view
       this.commitEdit(getConverter().fromString(newText)); // commit the new text to the model
     }
+
+    setDisabledForEditing(false);
 
     setGraphic(null); // stop editing with TextField
   }
@@ -185,7 +227,6 @@ public class EditableTableCell<S, T> extends TableCell<S, T> {
 
   private TextField getTextField() {
     final TextField textField = new TextField(getItemText());
-
     // Use onAction here rather than onKeyReleased (with check for Enter),
     // as otherwise we encounter RT-34685
     textField.setOnAction(event -> {
@@ -198,13 +239,10 @@ public class EditableTableCell<S, T> extends TableCell<S, T> {
       this.commitEdit(getConverter().fromString(textField.getText()));
       event.consume();
     });
+
     textField.setOnKeyPressed(t -> escapePressed = t.getCode() == KeyCode.ESCAPE);
-    textField.setOnKeyReleased(t -> {
-      if (t.getCode() == KeyCode.ESCAPE) {
-        // djw the code may depend on java version / expose incompatibilities:
-        throw new IllegalArgumentException("did not expect esc key releases here.");
-      }
-    });
+    textField.setOnKeyReleased(t -> escapePressed = t.getCode() == KeyCode.ESCAPE);
+
     return textField;
   }
 
