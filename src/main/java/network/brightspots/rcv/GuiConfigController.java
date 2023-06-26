@@ -68,6 +68,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -460,6 +461,7 @@ public class GuiConfigController implements Initializable {
     if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
+        askUserForName();
         TabulatorService service = new TabulatorService(
             filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
         setUpAndStartService(service);
@@ -478,6 +480,7 @@ public class GuiConfigController implements Initializable {
     if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         setGuiIsBusy(true);
+        askUserForName();
         ConvertToCdfService service = new ConvertToCdfService(
             filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
         setUpAndStartService(service);
@@ -943,6 +946,21 @@ public class GuiConfigController implements Initializable {
           exception);
     }
     return comparisonResult;
+  }
+
+  private void askUserForName() {
+    TextInputDialog dialog = new TextInputDialog();
+    dialog.setTitle("Enter your name");
+    dialog.setHeaderText("For auditing purposes, enter the name(s) of everyone currently "
+        + "operating this machine.");
+    dialog.setContentText("Name:");
+    Optional<String> result = dialog.showAndWait();
+
+    if (result.isPresent()) {
+      Logger.info("Name(s) of operators, as entered interactively: " + result.get());
+    } else {
+      Logger.info("Operator(s) did not enter a name.");
+    }
   }
 
   private boolean checkForSaveAndContinue() {

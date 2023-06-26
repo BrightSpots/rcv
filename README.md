@@ -79,23 +79,23 @@ The Tabulator includes several example contest configuration files and associate
 
 ## Command-Line Interface
 
-Alternatively, you can run the Tabulator using the command-line interface by including the flag `-cli` and then supplying a path to an existing config file, e.g.:
+Alternatively, you can run the Tabulator using the command-line interface by including the flag `--cli` and then supplying a path to an existing config file, e.g.:
 
-`$ rcv -cli path/to/config`
+`$ rcv --cli path/to/config`
 
 Or, if you're compiling and running using Gradle:
 
-`$ gradlew run --args="-cli path/to/config"`
+`$ gradlew run --args="--cli path/to/config"`
 
 You can also activate a special `convert-to-cdf` function via the command line to export the CVR as a NIST common data format (CDF) .json instead of tabulating the results, e.g.:
 
-`$ rcv -cli path/to/config convert-to-cdf`
+`$ rcv --cli path/to/config convert-to-cdf`
 
 This option is available in the GUI by selecting the "Conversion > Convert CVRs in Current Config to CDF" menu option.
 
 Or, again, if you're compiling and running using Gradle:
 
-`$ gradlew run --args="-cli path/to/config  convert-to-cdf"`
+`$ gradlew run --args="--cli path/to/config  convert-to-cdf"`
 
 Note: if you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, the label will be represented differently in the generated CDF source file than it was in the original CVR source. When you create a new config using this generated CDF source file and you need to set overvoteLabel, you should use "overvote". If you need to set undeclaredWriteInLabel, you should use "Undeclared Write-ins".
 

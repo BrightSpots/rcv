@@ -11,6 +11,7 @@ module network.brightspots.rcv {
   requires javafx.graphics;
   requires java.xml;
   requires org.apache.poi.ooxml;
+  requires commons.cli;
   // enable reflexive calls from network.brightspots.rcv into javafx.fxml
   opens network.brightspots.rcv;
   // our main module

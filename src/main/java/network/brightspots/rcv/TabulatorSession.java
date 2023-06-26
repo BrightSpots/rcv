@@ -67,7 +67,7 @@ class TabulatorSession {
         Logger.severe(
             "Can't use a config with older version %s in newer version %s of the app! To "
                 + "automatically migrate the config to the newer version, load it in the graphical "
-                + "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
+                + "version of the app (i.e. don't use the --cli flag when starting the tabulator).",
             version, Main.APP_VERSION);
       }
     }
