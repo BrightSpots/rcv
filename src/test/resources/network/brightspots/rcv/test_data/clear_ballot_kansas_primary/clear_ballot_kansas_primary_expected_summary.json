@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Democratic Primary",
     "date" : "",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Kansas",
-    "office" : "Democratic Presidential Primary",
-    "threshold" : "26"
+    "office" : "Democratic Presidential Primary"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Amy Klobuchar" : "20",
@@ -32,8 +39,15 @@
     }, {
       "eliminated" : "Steven Bullock",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "26"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Amy Klobuchar" : "21",
@@ -50,8 +64,15 @@
       "transfers" : {
         "Amy Klobuchar" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "26"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Amy Klobuchar" : "23",
@@ -67,8 +88,15 @@
       "transfers" : {
         "Amy Klobuchar" : "3"
       }
-    } ]
+    } ],
+    "threshold" : "26"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Amy Klobuchar" : "26",
@@ -81,6 +109,14 @@
     "tallyResults" : [ {
       "elected" : "Amy Klobuchar",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "26"
+  } ],
+  "summary" : {
+    "finalThreshold" : "26",
+    "numCandidates" : 11,
+    "numWinners" : 1,
+    "totalNumBallots" : "50",
+    "undervotes" : 0
+  }
 }

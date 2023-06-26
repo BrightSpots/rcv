@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Precinct example",
     "date" : "2017-11-07",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Minneapolis, MN",
-    "office" : "Mayor",
-    "threshold" : "42"
+    "office" : "Mayor"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Al Flowers" : "1",
@@ -34,8 +41,15 @@
       "transfers" : {
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "50"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Al Flowers" : "1",
@@ -113,8 +127,15 @@
         "Tom Hoch" : "1",
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "50"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Betsy Hodges" : "25",
@@ -130,8 +151,15 @@
         "Raymond Dehn" : "1",
         "exhausted" : "6"
       }
-    } ]
+    } ],
+    "threshold" : "49"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "3",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Betsy Hodges" : "28",
@@ -145,8 +173,15 @@
         "Jacob Frey" : "2",
         "exhausted" : "7"
       }
-    } ]
+    } ],
+    "threshold" : "46"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "10",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Betsy Hodges" : "42",
@@ -155,6 +190,14 @@
     "tallyResults" : [ {
       "elected" : "Betsy Hodges",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "42"
+  } ],
+  "summary" : {
+    "finalThreshold" : "42",
+    "numCandidates" : 19,
+    "numWinners" : 1,
+    "totalNumBallots" : "100",
+    "undervotes" : 1
+  }
 }

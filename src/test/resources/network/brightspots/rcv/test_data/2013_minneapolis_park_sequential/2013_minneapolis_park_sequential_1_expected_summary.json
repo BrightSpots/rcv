@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "2013 Minneapolis Park Board",
     "date" : "",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Minneapolis",
-    "office" : "Park and Recreation Commissioner",
-    "threshold" : "20163"
+    "office" : "Park and Recreation Commissioner"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "67",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "ANNIE YOUNG" : "9294",
@@ -36,8 +43,15 @@
         "TOM NORDYKE" : "3",
         "exhausted" : "289"
       }
-    } ]
+    } ],
+    "threshold" : "29732"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "356",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "ANNIE YOUNG" : "9302",
@@ -65,8 +79,15 @@
         "TOM NORDYKE" : "81",
         "exhausted" : "298"
       }
-    } ]
+    } ],
+    "threshold" : "29588"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "654",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "ANNIE YOUNG" : "9452",
@@ -92,8 +113,15 @@
         "TOM NORDYKE" : "128",
         "exhausted" : "950"
       }
-    } ]
+    } ],
+    "threshold" : "29439"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1604",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "ANNIE YOUNG" : "9983",
@@ -117,8 +145,15 @@
         "TOM NORDYKE" : "210",
         "exhausted" : "1002"
       }
-    } ]
+    } ],
+    "threshold" : "28964"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2606",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "ANNIE YOUNG" : "10942",
@@ -140,8 +175,15 @@
         "TOM NORDYKE" : "436",
         "exhausted" : "1650"
       }
-    } ]
+    } ],
+    "threshold" : "28463"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "4256",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "ANNIE YOUNG" : "11353",
@@ -161,8 +203,15 @@
         "TOM NORDYKE" : "139",
         "exhausted" : "3247"
       }
-    } ]
+    } ],
+    "threshold" : "27638"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "7503",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "ANNIE YOUNG" : "11839",
@@ -180,8 +229,15 @@
         "TOM NORDYKE" : "738",
         "exhausted" : "2059"
       }
-    } ]
+    } ],
+    "threshold" : "26014"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "9562",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 8,
     "tally" : {
       "ANNIE YOUNG" : "13163",
@@ -197,8 +253,15 @@
         "MEG FORNEY" : "976",
         "exhausted" : "2700"
       }
-    } ]
+    } ],
+    "threshold" : "24985"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "12262",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 9,
     "tally" : {
       "ANNIE YOUNG" : "13914",
@@ -212,8 +275,15 @@
         "JOHN ERWIN" : "1340",
         "exhausted" : "6944"
       }
-    } ]
+    } ],
+    "threshold" : "23635"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "19206",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 10,
     "tally" : {
       "ANNIE YOUNG" : "17334",
@@ -222,6 +292,14 @@
     "tallyResults" : [ {
       "elected" : "JOHN ERWIN",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "20163"
+  } ],
+  "summary" : {
+    "finalThreshold" : "20163",
+    "numCandidates" : 11,
+    "numWinners" : 1,
+    "totalNumBallots" : "80101",
+    "undervotes" : 20571
+  }
 }

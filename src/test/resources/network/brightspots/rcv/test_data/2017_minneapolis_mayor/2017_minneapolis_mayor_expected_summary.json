@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "2017 Minneapolis mayoral race",
     "date" : "2017-11-07",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Minneapolis, MN",
-    "office" : "Mayor",
-    "threshold" : "40838"
+    "office" : "Mayor"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "37",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "38"
+    },
     "round" : 1,
     "tally" : {
       "Al Flowers" : "711",
@@ -47,8 +54,15 @@
         "Troy Benjegerdes" : "1",
         "exhausted" : "86"
       }
-    } ]
+    } ],
+    "threshold" : "52243"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "74",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "38"
+    },
     "round" : 2,
     "tally" : {
       "Al Flowers" : "713",
@@ -188,8 +202,15 @@
         "Tom Hoch" : "107",
         "exhausted" : "206"
       }
-    } ]
+    } ],
+    "threshold" : "52200"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1608",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "38"
+    },
     "round" : 3,
     "tally" : {
       "Betsy Hodges" : "19457",
@@ -207,8 +228,15 @@
         "Tom Hoch" : "1842",
         "exhausted" : "2118"
       }
-    } ]
+    } ],
+    "threshold" : "50933"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2899",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "38"
+    },
     "round" : 4,
     "tally" : {
       "Betsy Hodges" : "23501",
@@ -224,8 +252,15 @@
         "Raymond Dehn" : "3330",
         "exhausted" : "6169"
       }
-    } ]
+    } ],
+    "threshold" : "49874"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "6495",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "38"
+    },
     "round" : 5,
     "tally" : {
       "Betsy Hodges" : "26865",
@@ -239,8 +274,15 @@
         "Raymond Dehn" : "7613",
         "exhausted" : "11904"
       }
-    } ]
+    } ],
+    "threshold" : "46790"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "15768",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "38"
+    },
     "round" : 6,
     "tally" : {
       "Jacob Frey" : "46704",
@@ -249,6 +291,14 @@
     "tallyResults" : [ {
       "elected" : "Jacob Frey",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "40838"
+  } ],
+  "summary" : {
+    "finalThreshold" : "40838",
+    "numCandidates" : 19,
+    "numWinners" : 1,
+    "totalNumBallots" : "105928",
+    "undervotes" : 1369
+  }
 }

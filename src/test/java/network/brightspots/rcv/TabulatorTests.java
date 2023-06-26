@@ -208,6 +208,7 @@ class TabulatorTests {
                 + "_expected_"
                 + outputType
                 + extension);
+
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
     if (fileCompare(expectedPath, actualOutputPath)) {
       Logger.info("Files are equal.");
