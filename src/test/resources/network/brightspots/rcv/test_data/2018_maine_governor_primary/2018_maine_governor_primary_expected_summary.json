@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Maine 2018 Democratic Governor Primary race",
     "date" : "2018-06-12",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Maine",
-    "office" : "Governor",
-    "threshold" : "58627"
+    "office" : "Governor"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "430",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "146"
+    },
     "round" : 1,
     "tally" : {
       "Cote, Adam Roland" : "35478",
@@ -54,8 +61,15 @@
         "Sweet, Elizabeth A." : "1128",
         "exhausted" : "285"
       }
-    } ]
+    } ],
+    "threshold" : "63070"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "119",
+      "overvotes" : "472",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "191"
+    },
     "round" : 2,
     "tally" : {
       "Cote, Adam Roland" : "37543",
@@ -71,8 +85,15 @@
         "Sweet, Elizabeth A." : "6957",
         "exhausted" : "1581"
       }
-    } ]
+    } ],
+    "threshold" : "62047"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "180",
+      "overvotes" : "507",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "219"
+    },
     "round" : 3,
     "tally" : {
       "Cote, Adam Roland" : "42623",
@@ -86,8 +107,15 @@
         "Mills, Janet T." : "13442",
         "exhausted" : "5259"
       }
-    } ]
+    } ],
+    "threshold" : "61257"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "272",
+      "overvotes" : "580",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "297"
+    },
     "round" : 4,
     "tally" : {
       "Cote, Adam Roland" : "53866",
@@ -96,6 +124,14 @@
     "tallyResults" : [ {
       "elected" : "Mills, Janet T.",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "58627"
+  } ],
+  "summary" : {
+    "finalThreshold" : "58627",
+    "numCandidates" : 8,
+    "numWinners" : 1,
+    "totalNumBallots" : "132250",
+    "undervotes" : 5535
+  }
 }

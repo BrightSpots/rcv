@@ -6,6 +6,7 @@
 
 ### Test output
 src/test/resources/network/brightspots/rcv/test_data/*/output/
+src/test/resources/network/brightspots/rcv/test_data/_shared/*/output/
 
 ### Project-specific exclusions
 .DS_Store

@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "sequential_with_batch_cvr.xlsx",
+      "filePath": "../_shared/simple_sequential_cvr.xlsx",
       "contestId": "",
       "firstVoteColumnIndex": "2",
       "firstVoteRowIndex": "2",

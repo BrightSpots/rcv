@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Multi-file Dominion test",
     "date" : "2020-11-03",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "San Francisco",
-    "office" : "Board of Supervisors District 3",
-    "threshold" : "9"
+    "office" : "Board of Supervisors District 3"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Aaron Peskin" : "9",
@@ -18,6 +25,14 @@
     "tallyResults" : [ {
       "elected" : "Aaron Peskin",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "9"
+  } ],
+  "summary" : {
+    "finalThreshold" : "9",
+    "numCandidates" : 5,
+    "numWinners" : 1,
+    "totalNumBallots" : "25",
+    "undervotes" : 8
+  }
 }

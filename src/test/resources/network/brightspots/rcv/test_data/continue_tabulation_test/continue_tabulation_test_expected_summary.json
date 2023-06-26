@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Portland 2015 Mayoral Race",
     "date" : "2015-11-03",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Portland, ME",
-    "office" : "Mayor",
-    "threshold" : "10"
+    "office" : "Mayor"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Carmona, Ralph C." : "5",
@@ -16,8 +23,15 @@
     "tallyResults" : [ {
       "elected" : "Vail, Christopher L.",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "10"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Carmona, Ralph C." : "5",
@@ -29,13 +43,28 @@
       "transfers" : {
         "Vail, Christopher L." : "3"
       }
-    } ]
+    } ],
+    "threshold" : "10"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Carmona, Ralph C." : "5",
       "Vail, Christopher L." : "13"
     },
-    "tallyResults" : [ ]
-  } ]
+    "tallyResults" : [ ],
+    "threshold" : "10"
+  } ],
+  "summary" : {
+    "finalThreshold" : "10",
+    "numCandidates" : 4,
+    "numWinners" : 1,
+    "totalNumBallots" : "18",
+    "undervotes" : 0
+  }
 }

@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Tiebreak test",
     "date" : "2017-12-03",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Funkytown, USA",
-    "office" : "Sergeant-at-Arms",
-    "threshold" : "3"
+    "office" : "Sergeant-at-Arms"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "George Gervin" : "2",
@@ -19,8 +26,15 @@
       "transfers" : {
         "George Gervin" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "6"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "George Gervin" : "3",
@@ -33,8 +47,15 @@
         "Yinka Dare" : "1",
         "exhausted" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "6"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Mookie Blaylock" : "4",
@@ -45,8 +66,15 @@
       "transfers" : {
         "exhausted" : "4"
       }
-    } ]
+    } ],
+    "threshold" : "5"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Mookie Blaylock" : "4"
@@ -54,6 +82,14 @@
     "tallyResults" : [ {
       "elected" : "Mookie Blaylock",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "3"
+  } ],
+  "summary" : {
+    "finalThreshold" : "3",
+    "numCandidates" : 4,
+    "numWinners" : 1,
+    "totalNumBallots" : "10",
+    "undervotes" : 0
+  }
 }

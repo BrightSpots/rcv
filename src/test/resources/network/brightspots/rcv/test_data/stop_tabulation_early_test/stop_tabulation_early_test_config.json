@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-    "filePath" : "stop_tabulation_early_test_cvr.xlsx",
+    "filePath" : "../_shared/tiebreak_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",

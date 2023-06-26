@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "For City C Council Member (1/3)",
     "date" : "2019-03-06",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "7"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Carrie Underwood" : "4",
@@ -24,8 +31,15 @@
       "transfers" : {
         "Stephen Miller" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Carrie Underwood" : "4",
@@ -43,8 +57,15 @@
         "Fred Wallace" : "1",
         "Nolan Ryder" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Carrie Underwood" : "4",
@@ -62,8 +83,15 @@
         "Stephen Miller" : "1",
         "Terry Williams" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Carrie Underwood" : "4",
@@ -80,8 +108,15 @@
         "Stephen Miller" : "1",
         "Terry Williams" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Fred Wallace" : "5",
@@ -96,8 +131,15 @@
         "Lonnie Alsup" : "1",
         "Terry Williams" : "3"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "Fred Wallace" : "5",
@@ -112,8 +154,15 @@
         "Stephen Miller" : "2",
         "exhausted" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "Lonnie Alsup" : "7",
@@ -125,8 +174,15 @@
       "transfers" : {
         "exhausted" : "7"
       }
-    } ]
+    } ],
+    "threshold" : "14"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "9",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 8,
     "tally" : {
       "Stephen Miller" : "10",
@@ -138,8 +194,15 @@
         "Stephen Miller" : "2",
         "exhausted" : "8"
       }
-    } ]
+    } ],
+    "threshold" : "11"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "17",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 9,
     "tally" : {
       "Stephen Miller" : "12"
@@ -147,6 +210,14 @@
     "tallyResults" : [ {
       "elected" : "Stephen Miller",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "7"
+  } ],
+  "summary" : {
+    "finalThreshold" : "7",
+    "numCandidates" : 9,
+    "numWinners" : 1,
+    "totalNumBallots" : "35",
+    "undervotes" : 6
+  }
 }

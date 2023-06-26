@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Multi-Seat UWI Test",
     "date" : "",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "6"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "A" : "6",
@@ -17,8 +24,15 @@
     "tallyResults" : [ {
       "elected" : "A",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "6"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "A" : "6.0000",
@@ -31,8 +45,15 @@
       "transfers" : {
         "exhausted" : "4"
       }
-    } ]
+    } ],
+    "threshold" : "6"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "A" : "6.0000",
@@ -44,8 +65,15 @@
       "transfers" : {
         "exhausted" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "6"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "A" : "6.0000",
@@ -54,13 +82,28 @@
     "tallyResults" : [ {
       "elected" : "B",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "6"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "A" : "6.0000",
       "B" : "3.0000"
     },
-    "tallyResults" : [ ]
-  } ]
+    "tallyResults" : [ ],
+    "threshold" : "6"
+  } ],
+  "summary" : {
+    "finalThreshold" : "6",
+    "numCandidates" : 4,
+    "numWinners" : 2,
+    "totalNumBallots" : "15",
+    "undervotes" : 0
+  }
 }

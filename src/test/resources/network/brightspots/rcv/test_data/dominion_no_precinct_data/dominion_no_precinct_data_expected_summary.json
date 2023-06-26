@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Wyoming Dominion test",
     "date" : "2020-07-19",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Wyoming",
-    "office" : "Democratic Primary",
-    "threshold" : "398"
+    "office" : "Democratic Primary"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Amy Klobuchar" : "114",
@@ -31,8 +38,15 @@
         "Tom Steyer" : "9",
         "Tulsi Gabbard" : "19"
       }
-    } ]
+    } ],
+    "threshold" : "470"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Amy Klobuchar" : "128",
@@ -55,8 +69,15 @@
         "Pete Buttigieg" : "11",
         "Tulsi Gabbard" : "22"
       }
-    } ]
+    } ],
+    "threshold" : "470"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Amy Klobuchar" : "145",
@@ -77,8 +98,15 @@
         "Pete Buttigieg" : "23",
         "Tulsi Gabbard" : "19"
       }
-    } ]
+    } ],
+    "threshold" : "470"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Amy Klobuchar" : "165",
@@ -97,8 +125,15 @@
         "Pete Buttigieg" : "30",
         "Tulsi Gabbard" : "26"
       }
-    } ]
+    } ],
+    "threshold" : "470"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Amy Klobuchar" : "193",
@@ -116,8 +151,15 @@
         "Pete Buttigieg" : "38",
         "exhausted" : "4"
       }
-    } ]
+    } ],
+    "threshold" : "470"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "5",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "Amy Klobuchar" : "227",
@@ -133,8 +175,15 @@
         "Pete Buttigieg" : "60",
         "exhausted" : "32"
       }
-    } ]
+    } ],
+    "threshold" : "468"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "6",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "Bernie Sanders" : "311",
@@ -148,8 +197,15 @@
         "Michael R. Bloomberg" : "87",
         "exhausted" : "108"
       }
-    } ]
+    } ],
+    "threshold" : "452"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "7",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 8,
     "tally" : {
       "Bernie Sanders" : "404",
@@ -158,6 +214,14 @@
     "tallyResults" : [ {
       "elected" : "Bernie Sanders",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "398"
+  } ],
+  "summary" : {
+    "finalThreshold" : "398",
+    "numCandidates" : 9,
+    "numWinners" : 1,
+    "totalNumBallots" : "1000",
+    "undervotes" : 57
+  }
 }

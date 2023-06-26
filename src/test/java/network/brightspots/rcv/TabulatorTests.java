@@ -18,6 +18,7 @@
 
 package network.brightspots.rcv;
 
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,10 +50,8 @@ class TabulatorTests {
   // compare file contents line by line to identify differences
   private static boolean fileCompare(String path1, String path2) {
     boolean result = true;
-    try (
-        BufferedReader br1 = new BufferedReader(new FileReader(path1, StandardCharsets.UTF_8));
-        BufferedReader br2 = new BufferedReader(new FileReader(path2, StandardCharsets.UTF_8))
-    ) {
+    try (BufferedReader br1 = new BufferedReader(new FileReader(path1, StandardCharsets.UTF_8));
+        BufferedReader br2 = new BufferedReader(new FileReader(path2, StandardCharsets.UTF_8))) {
       int currentLine = 1;
       int errorCount = 0;
 
@@ -97,13 +96,14 @@ class TabulatorTests {
         .toString();
   }
 
-  private static void runTabulationTest(String stem) {
-    runTabulationTest(stem, null);
+  private static void runTabulationTest(String testStem) {
+    runTabulationTest(testStem, null);
   }
 
   // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem, String expectedException) {
     String configPath = getTestFilePath(stem, "_config.json");
+
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
     List<String> exceptionsEncountered = session.tabulate();
@@ -118,10 +118,10 @@ class TabulatorTests {
 
     if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
       for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-        compareJsons(config, stem, timestampString, Integer.toString(i));
+        compareFiles(config, stem, timestampString, Integer.toString(i));
       }
     } else {
-      compareJsons(config, stem, timestampString, null);
+      compareFiles(config, stem, timestampString, null);
     }
 
     // If this is a Dominion tabulation test, also check the converted output file.
@@ -137,7 +137,25 @@ class TabulatorTests {
                   + "_expected.csv");
       assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
     }
-    // test passed so cleanup test output folder
+
+    cleanOutputFolder(session);
+  }
+
+  // helper function to support running convert-to-cdf function
+  private static void runConvertToCdfTest(String stem) {
+    String configPath = getTestFilePath(stem, "_config.json");
+    TabulatorSession session = new TabulatorSession(configPath);
+    session.convertToCdf();
+
+    String timestampString = session.getTimestampString();
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null);
+
+    cleanOutputFolder(session);
+  }
+
+  private static void cleanOutputFolder(TabulatorSession session) {
+    // Test passed so clean up test output folder
     File outputFolder = new File(session.getOutputPath());
     File[] files = outputFolder.listFiles();
     if (files != null) {
@@ -147,7 +165,7 @@ class TabulatorTests {
             // Every ephemeral file must be set to read-only on close, including audit logs
             assertFalse(
                 file.canWrite(),
-                "File must be set to read-only: %s".formatted(file.getAbsolutePath()));
+                "File must not be writeable: %s".formatted(file.getAbsolutePath()));
             // Then set it writeable so it can be deleted
             boolean writeableSucceeded = file.setWritable(true);
             if (!writeableSucceeded) {
@@ -163,31 +181,34 @@ class TabulatorTests {
     Logger.info("Test complete.");
   }
 
-  private static void compareJsons(
+  private static void compareFiles(
       ContestConfig config, String stem, String timestampString, String sequentialId) {
-    compareJson(config, stem, "summary", timestampString, sequentialId);
+    compareFiles(config, stem, "summary", ".json", timestampString, sequentialId);
+    compareFiles(config, stem, "summary", ".csv", timestampString, sequentialId);
     if (config.isGenerateCdfJsonEnabled()) {
-      compareJson(config, stem, "cvr_cdf", timestampString, sequentialId);
+      compareFiles(config, stem, "cvr_cdf", ".json", timestampString, sequentialId);
     }
   }
 
-  private static void compareJson(
+  private static void compareFiles(
       ContestConfig config,
       String stem,
-      String jsonType,
+      String outputType,
+      String extension,
       String timestampString,
       String sequentialId) {
     String actualOutputPath =
         ResultsWriter.getOutputFilePath(
-            config.getOutputDirectory(), jsonType, timestampString, sequentialId)
-            + ".json";
+            config.getOutputDirectory(), outputType, timestampString, sequentialId)
+            + extension;
     String expectedPath =
         getTestFilePath(
             stem,
             ResultsWriter.sequentialSuffixForOutputPath(sequentialId)
                 + "_expected_"
-                + jsonType
-                + ".json");
+                + outputType
+                + extension);
+
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
     if (fileCompare(expectedPath, actualOutputPath)) {
       Logger.info("Files are equal.");
@@ -200,6 +221,24 @@ class TabulatorTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
+  }
+
+  @Test
+  @DisplayName("Test Convert to CDF works for CDF")
+  void convertToCdfFromCdf() {
+    runConvertToCdfTest("convert_to_cdf_from_cdf");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CDF works for Dominion")
+  void convertToCdfFromDominion() {
+    runConvertToCdfTest("convert_to_cdf_from_dominion");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CDF works for ES&S")
+  void convertToCdfFromEss() {
+    runConvertToCdfTest("convert_to_cdf_from_ess");
   }
 
   @Test
@@ -607,7 +646,6 @@ class TabulatorTests {
     runTabulationTest("exhaust_if_multiple_continuing");
   }
 
-
   @Test
   @DisplayName("generic CSV test")
   void genericCsvTest() {
@@ -623,7 +661,7 @@ class TabulatorTests {
   @Test
   @DisplayName("gracefully fail when tabulate-by-precinct option set without any precincts in CVR")
   void tabulateByPrecinctWithoutPrecincts() {
-    runTabulationTest("tabulate_by_precinct_without_precincts",
-        TabulationAbortedException.class.toString());
+    runTabulationTest(
+        "tabulate_by_precinct_without_precincts", TabulationAbortedException.class.toString());
   }
 }

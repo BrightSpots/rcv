@@ -17,61 +17,25 @@
 
 package network.brightspots.rcv;
 
+import static com.fasterxml.jackson.core.util.VersionUtil.parseVersion;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.core.Version;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 final class ContestConfigMigration {
-
-  private static final Pattern versionNumPattern = Pattern.compile("(\\d+).*");
-
   private ContestConfigMigration() {
   }
 
-  private static ArrayList<Integer> parseVersionString(String version) {
-    ArrayList<Integer> parsed = new ArrayList<>();
-    String[] arr = version.split("\\.");
-    for (String numString : arr) {
-      Matcher m = versionNumPattern.matcher(numString);
-      if (m.matches()) {
-        parsed.add(Integer.parseInt(m.group(1)));
-      }
-    }
-
-    return parsed;
-  }
-
   // not intended to be used if either version is null
-  private static boolean isVersionNewer(String version1, String version2) {
-    boolean isNewer = false;
-    if (!version1.equals(version2)) {
-      ArrayList<Integer> version1Parsed = parseVersionString(version1);
-      ArrayList<Integer> version2Parsed = parseVersionString(version2);
-
-      for (int i = 0; i < version1Parsed.size(); i++) {
-        if (version2Parsed.size() <= i) {
-          isNewer = true;
-          break;
-        }
-        int version1Num = version1Parsed.get(i);
-        int version2Num = version2Parsed.get(i);
-        if (version1Num > version2Num) {
-          isNewer = true;
-          break;
-        } else if (version2Num > version1Num) {
-          break;
-        }
-      }
-    }
-
-    return isNewer;
+  public static boolean isVersionNewer(String version1, String version2) {
+    Version version1Parsed = parseVersion(version1, null, null);
+    Version version2Parsed = parseVersion(version2, null, null);
+    return version1Parsed.compareTo(version2Parsed) > 0;
   }
 
   static boolean isConfigVersionOlderThanAppVersion(String configVersion) {
