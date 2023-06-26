@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "For County Tax Collector (1/3)",
     "date" : "2019-03-06",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "13"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Brady Gordon" : "2",
@@ -24,8 +31,15 @@
       "transfers" : {
         "Brady Gordon" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Brady Gordon" : "3",
@@ -43,8 +57,15 @@
         "Sandy Wallace" : "1",
         "Wendy Simpson" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Brady Gordon" : "3",
@@ -60,8 +81,15 @@
       "transfers" : {
         "Wendy McDonald" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Brady Gordon" : "3",
@@ -77,8 +105,15 @@
         "Mel Bonham" : "2",
         "Sandy Wallace" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Daniel Gregory" : "3",
@@ -94,8 +129,15 @@
         "Sandy Wallace" : "1",
         "Wendy Simpson" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "Mel Bonham" : "8",
@@ -110,8 +152,15 @@
         "Sandy Wallace" : "2",
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "Mel Bonham" : "10",
@@ -125,8 +174,15 @@
         "Sandy Wallace" : "2",
         "exhausted" : "3"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "4",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 8,
     "tally" : {
       "Mel Bonham" : "11",
@@ -135,6 +191,14 @@
     "tallyResults" : [ {
       "elected" : "Sandy Wallace",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "13"
+  } ],
+  "summary" : {
+    "finalThreshold" : "13",
+    "numCandidates" : 9,
+    "numWinners" : 1,
+    "totalNumBallots" : "35",
+    "undervotes" : 6
+  }
 }

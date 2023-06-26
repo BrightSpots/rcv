@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Portland 2015 Mayoral Race",
     "date" : "2015-11-03",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Portland, ME",
-    "office" : "Mayor",
-    "threshold" : "48"
+    "office" : "Mayor"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Bragdon, Charles E." : "11",
@@ -34,8 +41,15 @@
       "transfers" : {
         "Vail, Christopher L." : "1"
       }
-    } ]
+    } ],
+    "threshold" : "50"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Bragdon, Charles E." : "11",
@@ -58,8 +72,15 @@
       "transfers" : {
         "Mavodones, Nicholas M. Jr." : "2"
       }
-    } ]
+    } ],
+    "threshold" : "50"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Bragdon, Charles E." : "11",
@@ -81,8 +102,15 @@
       "transfers" : {
         "Miller, Markos S." : "2"
       }
-    } ]
+    } ],
+    "threshold" : "50"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Bragdon, Charles E." : "11",
@@ -103,8 +131,15 @@
       "transfers" : {
         "Duson, Jill C." : "3"
       }
-    } ]
+    } ],
+    "threshold" : "50"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Bragdon, Charles E." : "11",
@@ -124,8 +159,15 @@
       "transfers" : {
         "Mavodones, Nicholas M. Jr." : "5"
       }
-    } ]
+    } ],
+    "threshold" : "50"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "Bragdon, Charles E." : "11",
@@ -146,8 +188,15 @@
         "Bryant, Peter G." : "2",
         "Carmona, Ralph C." : "1"
       }
-    } ]
+    } ],
+    "threshold" : "50"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "Bragdon, Charles E." : "14",
@@ -166,8 +215,15 @@
         "Mavodones, Nicholas M. Jr." : "6",
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "50"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "1"
+    },
     "round" : 8,
     "tally" : {
       "Bragdon, Charles E." : "14",
@@ -185,8 +241,15 @@
         "Haadoow, Hamza A." : "1",
         "Mavodones, Nicholas M. Jr." : "6"
       }
-    } ]
+    } ],
+    "threshold" : "49"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "1"
+    },
     "round" : 9,
     "tally" : {
       "Bragdon, Charles E." : "14",
@@ -204,8 +267,15 @@
         "Dodge, Richard A." : "5",
         "Mavodones, Nicholas M. Jr." : "2"
       }
-    } ]
+    } ],
+    "threshold" : "49"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "1"
+    },
     "round" : 10,
     "tally" : {
       "Bragdon, Charles E." : "14",
@@ -221,8 +291,15 @@
         "Carmona, Ralph C." : "2",
         "Mavodones, Nicholas M. Jr." : "7"
       }
-    } ]
+    } ],
+    "threshold" : "49"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "1"
+    },
     "round" : 11,
     "tally" : {
       "Bragdon, Charles E." : "14",
@@ -238,8 +315,15 @@
         "Carmona, Ralph C." : "2",
         "Mavodones, Nicholas M. Jr." : "1"
       }
-    } ]
+    } ],
+    "threshold" : "49"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "1"
+    },
     "round" : 12,
     "tally" : {
       "Bragdon, Charles E." : "23",
@@ -254,8 +338,15 @@
         "Carmona, Ralph C." : "11",
         "Mavodones, Nicholas M. Jr." : "3"
       }
-    } ]
+    } ],
+    "threshold" : "49"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "1"
+    },
     "round" : 13,
     "tally" : {
       "Bragdon, Charles E." : "24",
@@ -269,8 +360,15 @@
         "Mavodones, Nicholas M. Jr." : "9",
         "exhausted" : "3"
       }
-    } ]
+    } ],
+    "threshold" : "49"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "1"
+    },
     "round" : 14,
     "tally" : {
       "Carmona, Ralph C." : "40",
@@ -279,6 +377,14 @@
     "tallyResults" : [ {
       "elected" : "Mavodones, Nicholas M. Jr.",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "48"
+  } ],
+  "summary" : {
+    "finalThreshold" : "48",
+    "numCandidates" : 16,
+    "numWinners" : 1,
+    "totalNumBallots" : "99",
+    "undervotes" : 0
+  }
 }

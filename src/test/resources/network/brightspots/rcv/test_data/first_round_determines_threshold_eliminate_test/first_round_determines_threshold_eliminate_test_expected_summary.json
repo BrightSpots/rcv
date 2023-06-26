@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "First Round Determines Threshold: Final round eliminates",
     "date" : "2015-11-03",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Portland, ME",
-    "office" : "Mayor",
-    "threshold" : "9"
+    "office" : "Mayor"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Carmona, Ralph C." : "5",
@@ -18,8 +25,15 @@
       "transfers" : {
         "exhausted" : "5"
       }
-    } ]
+    } ],
+    "threshold" : "9"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Carmona, Ralph C." : "5",
@@ -30,8 +44,15 @@
       "transfers" : {
         "exhausted" : "5"
       }
-    } ]
+    } ],
+    "threshold" : "9"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Vail, Christopher L." : "6"
@@ -39,6 +60,14 @@
     "tallyResults" : [ {
       "elected" : "Vail, Christopher L.",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "9"
+  } ],
+  "summary" : {
+    "finalThreshold" : "9",
+    "numCandidates" : 4,
+    "numWinners" : 1,
+    "totalNumBallots" : "19",
+    "undervotes" : 3
+  }
 }
