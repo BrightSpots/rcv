@@ -2,18 +2,19 @@ name: "Generate Releases"
 
 on:
   release:
-    types: [published]
-#      To test this workflow without creating a release, uncomment the following and add a branch name:
-#      push:
-#        branches:
-#          - 'branch-name'
+    types: [ published ]
+## To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
+##  is at the same indent level as "release":
+#  push:
+#    branches:
+#      - 'branch-name'
 
 jobs:
   release:
     runs-on: ${{ matrix.os }}
     strategy:
-        matrix:
-            os: [ubuntu-latest, windows-latest, macos-latest]
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     steps:
       - name: "Create base filename for all artifacts"
         id: basefn
@@ -57,7 +58,7 @@ jobs:
         id: exefn
         shell: bash
         run: echo "FILEPATH=build/${{ steps.basefn.outputs.FILEPATH }}${{ steps.ext.outputs.EXT }}" >> $GITHUB_OUTPUT
-          
+
       - uses: actions/checkout@v3
 
       - name: "Set up JDK 20.0.1"
