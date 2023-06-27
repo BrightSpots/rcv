@@ -375,10 +375,10 @@ class ResultsWriter {
     csvPrinter.println();
 
     Pair<String, StatusForRound>[] statusesToPrint = new Pair[]{
-        new Pair<>("by Overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
-        new Pair<>("by Skipped Rankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
-        new Pair<>("by Exhausted Choices", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
-        new Pair<>("by Repeated Rankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING)
+        new Pair<>("Overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
+        new Pair<>("Skipped Rankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
+        new Pair<>("Exhausted Choices", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
+        new Pair<>("Repeated Rankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING)
     };
 
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
@@ -387,6 +387,11 @@ class ResultsWriter {
         StatusForRound status = statusToPrint.getValue();
         BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
         csvPrinter.print(thisRoundInactive);
+
+        // Don't display percentage of inactive ballots
+        csvPrinter.print("");
+
+        // Do display transfer of inactive ballots
         if (round != numRounds) {
           BigDecimal nextRoundInactive = roundTallies.get(round + 1).getBallotStatusTally(status);
           BigDecimal diff = nextRoundInactive.subtract(thisRoundInactive);
@@ -394,9 +399,6 @@ class ResultsWriter {
         } else {
           csvPrinter.print(0);
         }
-
-        // Don't display percentage of inactive ballots
-        csvPrinter.print("");
       }
       csvPrinter.println();
     }
@@ -411,6 +413,10 @@ class ResultsWriter {
       BigDecimal thisRoundInactive = roundTallies.get(round).numInactiveBallots();
       csvPrinter.print(thisRoundInactive.subtract(numUndervotes));
 
+      // Don't display percentage of inactive ballots
+      csvPrinter.print("");
+
+      // Do display transfer of inactive ballots
       if (round != numRounds) {
         // Note: we don't need to subtract num undervotes here since we'd be subtracting the
         // same value from both sides of the equation, so it cancels out.
@@ -420,9 +426,6 @@ class ResultsWriter {
       } else {
         csvPrinter.print(0);
       }
-
-      // Don't display percentage of inactive ballots
-      csvPrinter.print("");
     }
     csvPrinter.println();
 

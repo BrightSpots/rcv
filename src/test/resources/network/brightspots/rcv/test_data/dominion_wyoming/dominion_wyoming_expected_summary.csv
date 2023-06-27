@@ -29,8 +29,8 @@ Tulsi Gabbard,89,9.47%,19,108,11.5%,22,130,13.84%,19,149,15.86%,26,175,18.63%,-1
 Undeclared Write-ins,117,12.46%,-117,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,939,,,939,,,939,,,939,,,939,,,935,,,903,,,795,,
 Current Round Threshold,470,,,470,,,470,,,470,,,470,,,468,,,452,,,398,,
-Inactive Ballots by by Overvotes,4,0,,4,0,,4,0,,4,0,,4,1,,5,1,,6,1,,7,0,
-Inactive Ballots by by Skipped Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots Total,4,0,,4,0,,4,0,,4,0,,4,4,,8,32,,40,108,,148,0,
+Inactive Ballots by Overvotes,4,,0,4,,0,4,,0,4,,0,4,,1,5,,1,6,,1,7,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots Total,4,,0,4,,0,4,,0,4,,0,4,,4,8,,32,40,,108,148,,0

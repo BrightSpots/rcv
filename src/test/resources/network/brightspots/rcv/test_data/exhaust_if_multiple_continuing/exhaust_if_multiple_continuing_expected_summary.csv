@@ -24,8 +24,8 @@ D,1,16.66%,0,1,16.66%,-1,0,0.0%,0
 A,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,6,,,6,,,5,,
 Current Round Threshold,4,,,4,,,3,,
-Inactive Ballots by by Overvotes,3,0,,3,0,,3,0,
-Inactive Ballots by by Skipped Rankings,0,0,,0,0,,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,
-Inactive Ballots Total,3,0,,3,1,,4,0,
+Inactive Ballots by Overvotes,3,,0,3,,0,3,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0
+Inactive Ballots Total,3,,0,3,,1,4,,0

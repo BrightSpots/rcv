@@ -23,8 +23,8 @@ George Gervin,3,33.33%,0,3,50.0%,-3,0,0.0%,0
 Mookie Blaylock,3,33.33%,0,3,50.0%,0,3,100.0%,0
 Active Ballots,9,,,6,,,3,,
 Current Round Threshold,5,,,4,,,2,,
-Inactive Ballots by by Overvotes,0,0,,0,0,,0,0,
-Inactive Ballots by by Skipped Rankings,0,0,,0,0,,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,
-Inactive Ballots Total,0,3,,3,3,,6,0,
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0
+Inactive Ballots Total,0,,3,3,,3,6,,0
