@@ -238,6 +238,7 @@
               </VBox>
               <VBox styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <Text text="Double click to edit. Enter accepts changes, Escape cancels." />
                   <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
                   <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
                     styleClass="disableWhileEditingTable"
@@ -386,6 +387,7 @@
               </HBox>
               <VBox styleClass="bordered-box" maxWidth="800.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <Text text="Double click to edit. Enter accepts changes, Escape cancels." />
                   <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
                   <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
                     styleClass="disableWhileEditingTable"
