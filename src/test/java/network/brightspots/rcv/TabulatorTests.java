@@ -206,36 +206,36 @@ class TabulatorTests {
     List<String> exceptionsEncountered = session.tabulate();
     if (expectedException != null) {
       assertTrue(exceptionsEncountered.contains(expectedException));
-      return;
-    }
-    Logger.info("Examining tabulation test results...");
-    String timestampString = session.getTimestampString();
-    ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    assertNotNull(config);
-
-    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
-      for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-        compareFiles(config, stem, timestampString, Integer.toString(i));
-      }
     } else {
-      compareFiles(config, stem, timestampString, null);
-    }
+      Logger.info("Examining tabulation test results...");
+      String timestampString = session.getTimestampString();
+      ContestConfig config = ContestConfig.loadContestConfig(configPath);
+      assertNotNull(config);
 
-    // If this is a Dominion tabulation test, also check the converted output file.
-    boolean isDominion =
-        config.rawConfig.cvrFileSources.stream()
-            .anyMatch(source -> ContestConfig.getProvider(source) == Provider.DOMINION);
-    if (isDominion) {
-      String expectedPath =
-          getTestFilePath(
-              stem,
-              "_contest_"
-                  + config.rawConfig.cvrFileSources.get(0).getContestId()
-                  + "_expected.csv");
-      assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
-    }
+      if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
+        for (int i = 1; i <= config.getNumberOfWinners(); i++) {
+          compareFiles(config, stem, timestampString, Integer.toString(i));
+        }
+      } else {
+        compareFiles(config, stem, timestampString, null);
+      }
 
-    cleanOutputFolder(session);
+      // If this is a Dominion tabulation test, also check the converted output file.
+      boolean isDominion =
+          config.rawConfig.cvrFileSources.stream()
+              .anyMatch(source -> ContestConfig.getProvider(source) == Provider.DOMINION);
+      if (isDominion) {
+        String expectedPath =
+            getTestFilePath(
+                stem,
+                "_contest_"
+                    + config.rawConfig.cvrFileSources.get(0).getContestId()
+                    + "_expected.csv");
+        assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
+      }
+
+      cleanOutputFolder(session);
+    }
   }
 
   // helper function to support running convert-to-cdf function
