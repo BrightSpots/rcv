@@ -460,11 +460,12 @@ public class GuiConfigController implements Initializable {
     Pair<String, Boolean> filePathAndTempStatus = commitConfigToFileAndGetFilePath();
     if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
-        setGuiIsBusy(true);
-        askUserForName();
-        TabulatorService service = new TabulatorService(
-            filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
-        setUpAndStartService(service);
+        if (askUserForName()) {
+          setGuiIsBusy(true);
+          TabulatorService service = new TabulatorService(
+              filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
+          setUpAndStartService(service);
+        }
       } else {
         Logger.warning("Please load a contest config file before attempting to tabulate!");
       }
@@ -479,11 +480,12 @@ public class GuiConfigController implements Initializable {
     Pair<String, Boolean> filePathAndTempStatus = commitConfigToFileAndGetFilePath();
     if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
-        setGuiIsBusy(true);
-        askUserForName();
-        ConvertToCdfService service = new ConvertToCdfService(
-            filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
-        setUpAndStartService(service);
+        if (askUserForName()) {
+          setGuiIsBusy(true);
+          ConvertToCdfService service = new ConvertToCdfService(
+              filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
+          setUpAndStartService(service);
+        }
       } else {
         Logger.warning("Please load a contest config file before attempting to convert to CDF!");
       }
@@ -948,7 +950,10 @@ public class GuiConfigController implements Initializable {
     return comparisonResult;
   }
 
-  private void askUserForName() {
+  /**
+   * Returns whether or not user entered a name
+   */
+  private Boolean askUserForName() {
     TextInputDialog dialog = new TextInputDialog();
     dialog.setTitle("Enter your name");
     dialog.setHeaderText("For auditing purposes, enter the name(s) of everyone currently "
@@ -958,9 +963,9 @@ public class GuiConfigController implements Initializable {
 
     if (result.isPresent()) {
       Logger.info("Name(s) of operators, as entered interactively: " + result.get());
-    } else {
-      Logger.info("Operator(s) did not enter a name.");
     }
+
+    return result.isPresent();
   }
 
   private boolean checkForSaveAndContinue() {

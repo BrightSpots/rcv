@@ -56,6 +56,8 @@ public class Main extends GuiApplication {
       // --cli not found. Launch the GUI
       launch(args);
     } else {
+      Logger.info("Tabulator is being used via the CLI");
+
       CommandLine cmd = parseArgsForCli(args);
       String path = cmd.getOptionValue("cli");
       String name = cmd.getOptionValue("name");
@@ -63,21 +65,23 @@ public class Main extends GuiApplication {
 
       if (name == null || name.isEmpty()) {
         // Prompt user for their name
-        System.out.println("Enter name(s) of operators for auditing purposes:");
+        Logger.info("Enter name(s) of operators for auditing purposes:");
 
         Scanner sc = new Scanner(System.in, StandardCharsets.UTF_8);
         if (sc.hasNextLine()) {
           name = sc.nextLine();
-          Logger.info("Name(s) of operators, as entered interactively: " + name);
-        } else {
+        }
+
+        // If they didn't enter one, exit.
+        if (name == null || name.isEmpty()) {
           Logger.severe("Must supply name(s) as a CLI argument or run on an interactive shell");
           System.exit(1);
         }
+
+        Logger.info("Name(s) of operators, as entered interactively: " + name);
       } else {
         Logger.info("Name(s) of operators, as entered in a command-line argument: " + name);
       }
-
-      Logger.info("Tabulator is being used via the CLI");
 
       TabulatorSession session = new TabulatorSession(path);
       if (convertToCdf) {

@@ -143,8 +143,8 @@ class TabulatorSession {
     boolean tabulationSuccess = false;
 
     if (setUpLogging(config.getOutputDirectory()) && config.validate().isEmpty()) {
-      Logger.info("Computer name: %s", Utils.getComputerName());
-      Logger.info("User name: %s", Utils.getUserName());
+      Logger.info("Computer machine name: %s", Utils.getComputerName());
+      Logger.info("Computer user name: %s", Utils.getUserName());
       Logger.info("Config file: %s", configPath);
       try {
         Logger.fine("Begin config file contents:");
