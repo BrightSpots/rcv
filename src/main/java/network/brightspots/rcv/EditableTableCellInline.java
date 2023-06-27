@@ -25,6 +25,7 @@ import java.util.List;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.Event;
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
@@ -50,6 +51,7 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
   private TablePosition<S, ?> tablePos = null;
   private static List<Control> controlsToDisableWhileEditing = new ArrayList<>();
   private static List<Tab> tabsToDisableWhileEditing = new ArrayList<>();
+  private static List<Node> nodesToDisableWhileEditing = new ArrayList<>();
 
   private final ObjectProperty<StringConverter<T>> converter =
       new SimpleObjectProperty<>(this, "converter");
@@ -98,6 +100,13 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
   }
 
   /**
+   * Prevent the user from leaving the UI without commiting.
+   */
+  public static void lockWhileEditing(Node node) {
+    nodesToDisableWhileEditing.add(node);
+  }
+
+  /**
    * Disables or enables both controls and tabs requested by lockWhileEditing.
    */
   private static void setDisabledForEditing(boolean doLock) {
@@ -108,6 +117,9 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
       if (!tab.isSelected()) {
         tab.setDisable(doLock);
       }
+    }
+    for (Node node : nodesToDisableWhileEditing) {
+      node.setDisable(doLock);
     }
   }
 

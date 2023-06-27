@@ -49,6 +49,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -1173,6 +1174,11 @@ public class GuiConfigController implements Initializable {
     EditableTableCellInline.lockWhileEditing(tabVoterErrorRules);
     EditableTableCellInline.lockWhileEditing(tabOutput);
     EditableTableCellInline.lockWhileEditing(menuBar);
+    // Also disable all visible buttons. This is pretty hacky, but the shortest path to
+    // find all visible buttons without traversing the entire scene.
+    for (Node child : tableViewCandidates.getParent().getParent().lookupAll(".button")) {
+      EditableTableCellInline.lockWhileEditing(child);
+    }
 
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
