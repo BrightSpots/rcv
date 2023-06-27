@@ -108,7 +108,7 @@
           </Tab>
           <Tab text="CVR Files" fx:id="tabCvrFiles">
             <VBox>
-              <VBox styleClass="bordered-box" maxWidth="700.0">
+              <VBox styleClass="bordered-box, disableWhileEditingTable" maxWidth="700.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <Label text="Add CVR File" style="-fx-font-weight: bold"/>
                   <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
@@ -240,6 +240,7 @@
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
                   <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
+                    styleClass="disableWhileEditingTable"
                     text="Delete Selected"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
@@ -293,7 +294,7 @@
           </Tab>
           <Tab text="Candidates" fx:id="tabCandidates">
             <VBox spacing="20.0">
-              <HBox alignment="CENTER" spacing="75.0">
+              <HBox styleClass="disableWhileEditingTable" alignment="CENTER" spacing="75.0">
                 <VBox styleClass="bordered-box" maxWidth="300.0">
                   <VBox alignment="TOP_CENTER">
                     <padding>
@@ -387,6 +388,7 @@
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
                   <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
+                    styleClass="disableWhileEditingTable"
                     text="Delete Selected"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>

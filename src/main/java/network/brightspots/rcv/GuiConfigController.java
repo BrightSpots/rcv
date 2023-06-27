@@ -1176,7 +1176,7 @@ public class GuiConfigController implements Initializable {
     EditableTableCellInline.lockWhileEditing(menuBar);
     // Also disable all visible buttons. This is pretty hacky, but the shortest path to
     // find all visible buttons without traversing the entire scene.
-    for (Node child : tableViewCandidates.getParent().getParent().lookupAll(".button")) {
+    for (Node child : tabPane.lookupAll(".disableWhileEditingTable")) {
       EditableTableCellInline.lockWhileEditing(child);
     }
 
