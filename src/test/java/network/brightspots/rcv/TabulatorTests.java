@@ -127,13 +127,12 @@ class TabulatorTests {
     cleanOutputFolder(session);
   }
 
-  // helper function to support running convert-to-cdf functions
+  // helper function to support running convert-to-cdf function
   private static void runConvertToCdfTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
-
-    // Convert to CDF and check
     TabulatorSession session = new TabulatorSession(configPath);
     session.convertToCdf();
+
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null);
@@ -141,13 +140,12 @@ class TabulatorTests {
     cleanOutputFolder(session);
   }
 
-  // helper function to support running convert-to-cli functions (GUI only)
+  // Validate convert-to-CSV action, run before every tabulation
   private static void runConvertToCsvTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
-
-    // Convert to CSV and check -- done automatically before tabulation
     TabulatorSession session = new TabulatorSession(configPath);
     session.tabulate();
+
     String expectedPath = getTestFilePath(stem, "_expected.csv");
     assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
 
