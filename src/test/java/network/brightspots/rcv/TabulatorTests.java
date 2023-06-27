@@ -126,26 +126,33 @@ class TabulatorTests {
     cleanOutputFolder(session);
   }
 
-  // helper function to support running convert-to-cdf and convert-to-csv functions
-  private static void runConvertToCdfAndCsvTest(String stem) {
+  // helper function to support running convert-to-cdf functions
+  private static void runConvertToCdfTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
 
     // Convert to CDF and check
-    TabulatorSession sessionCdf = new TabulatorSession(configPath);
-    sessionCdf.convertToCdf();
-    String timestampString = sessionCdf.getTimestampString();
+    TabulatorSession session = new TabulatorSession(configPath);
+    session.convertToCdf();
+    String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null);
 
-    // Convert to CSV and check -- done automatically before tabulation
-    TabulatorSession sessionCsv = new TabulatorSession(configPath);
-    sessionCsv.tabulate();
-    String expectedPath = getTestFilePath(stem, "_expected.csv");
-    assertTrue(fileCompare(sessionCsv.getConvertedFilesWritten().get(0), expectedPath));
-
-    cleanOutputFolder(sessionCsv);
-    cleanOutputFolder(sessionCdf);
+    cleanOutputFolder(session);
   }
+
+  // helper function to support running convert-to-cli functions (GUI only)
+  private static void runConvertToCsvTest(String stem) {
+    String configPath = getTestFilePath(stem, "_config.json");
+
+    // Convert to CSV and check -- done automatically before tabulation
+    TabulatorSession session = new TabulatorSession(configPath);
+    session.tabulate();
+    String expectedPath = getTestFilePath(stem, "_expected.csv");
+    assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
+
+    cleanOutputFolder(session);
+  }
+
 
   private static void cleanOutputFolder(TabulatorSession session) {
     // Test passed so clean up test output folder
@@ -218,19 +225,37 @@ class TabulatorTests {
   @Test
   @DisplayName("Test Convert to CDF works for CDF")
   void convertToCdfFromCdf() {
-    runConvertToCdfAndCsvTest("convert_to_cdf_from_cdf");
+    runConvertToCdfTest("convert_to_cdf_from_cdf");
   }
 
   @Test
   @DisplayName("Test Convert to CDF works for Dominion")
   void convertToCdfFromDominion() {
-    runConvertToCdfAndCsvTest("convert_to_cdf_from_dominion");
+    runConvertToCdfTest("convert_to_cdf_from_dominion");
   }
 
   @Test
   @DisplayName("Test Convert to CDF works for ES&S")
   void convertToCdfFromEss() {
-    runConvertToCdfAndCsvTest("convert_to_cdf_from_ess");
+    runConvertToCdfTest("convert_to_cdf_from_ess");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CSV works for CDF")
+  void convertToCsvFromCdf() {
+    runConvertToCsvTest("convert_to_cdf_from_cdf");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CSV works for Dominion")
+  void convertToCsvFromDominion() {
+    runConvertToCsvTest("convert_to_cdf_from_dominion");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CSV works for ES&S")
+  void convertToCsvFromEss() {
+    runConvertToCsvTest("convert_to_cdf_from_ess");
   }
 
   @Test

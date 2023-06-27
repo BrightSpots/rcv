@@ -51,7 +51,7 @@ class TabulatorSession {
   TabulatorSession(String configPath) {
     this.configPath = configPath;
     // current date-time formatted as a string used for creating unique output files names
-    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS").format(new Date());
+    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
   }
 
   // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI
