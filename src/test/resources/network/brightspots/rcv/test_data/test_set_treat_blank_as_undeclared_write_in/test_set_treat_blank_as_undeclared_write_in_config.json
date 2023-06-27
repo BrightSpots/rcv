@@ -19,7 +19,7 @@
     "provider": "ess",
     "treatBlankAsUndeclaredWriteIn": true,
     "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
+    "skippedRankLabel": "undervote",
     "undeclaredWriteInLabel": "UWI"
   } ],
   "candidates" : [ {

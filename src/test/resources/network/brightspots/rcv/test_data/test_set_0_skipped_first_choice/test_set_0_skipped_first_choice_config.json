@@ -18,7 +18,7 @@
     "contestId": "Nist Test Set 0 Skipped First Choice",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
-    "undervoteLabel": "",
+    "skippedRankLabel": "",
     "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {

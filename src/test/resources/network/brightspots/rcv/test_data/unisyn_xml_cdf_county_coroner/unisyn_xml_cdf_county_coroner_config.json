@@ -18,7 +18,7 @@
       "contestId": "For County Coroner (1/2)",
       "treatBlankAsUndeclaredWriteIn": false,
       "overvoteLabel": "",
-      "undervoteLabel": "",
+      "skippedRankLabel": "",
       "undeclaredWriteInLabel": "UWI"
     }
   ],

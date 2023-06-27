@@ -76,9 +76,12 @@ public class RawContestConfig {
     private String overvoteDelimiter;
     private String provider;
     private String overvoteLabel;
-    private String undervoteLabel;
+    private String skippedRankLabel;
     private String undeclaredWriteInLabel;
     private boolean treatBlankAsUndeclaredWriteIn;
+
+    // Deprecated fields
+    private String undervoteLabel;
 
     CvrSource() {
     }
@@ -93,7 +96,7 @@ public class RawContestConfig {
         String provider,
         String contestId,
         String overvoteLabel,
-        String undervoteLabel,
+        String skippedRankLabel,
         String undeclaredWriteInLabel,
         boolean treatBlankAsUndeclaredWriteIn) {
       this.filePath = filePath;
@@ -105,7 +108,7 @@ public class RawContestConfig {
       this.provider = provider;
       this.contestId = contestId;
       this.overvoteLabel = overvoteLabel;
-      this.undervoteLabel = undervoteLabel;
+      this.skippedRankLabel = skippedRankLabel;
       this.undeclaredWriteInLabel = undeclaredWriteInLabel;
       this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
@@ -182,12 +185,12 @@ public class RawContestConfig {
       this.overvoteLabel = overvoteLabel;
     }
 
-    public String getUndervoteLabel() {
-      return undervoteLabel;
+    public String getSkippedRankLabel() {
+      return skippedRankLabel;
     }
 
-    public void setUndervoteLabel(String undervoteLabel) {
-      this.undervoteLabel = undervoteLabel;
+    public void setSkippedRankLabel(String skippedRankLabel) {
+      this.skippedRankLabel = skippedRankLabel;
     }
 
     public String getUndeclaredWriteInLabel() {
@@ -205,17 +208,21 @@ public class RawContestConfig {
     public void setTreatBlankAsUndeclaredWriteIn(boolean treatBlankAsUndeclaredWriteIn) {
       this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
+
+    // Deprecated fields
+    public String getUndervoteLabel() {
+      return undervoteLabel;
+    }
   }
 
   /**
    * Contest candidate data that can be serialized and deserialized.
    */
-  @JsonIgnoreProperties(ignoreUnknown = true, value = {"semicolonSeparatedAliases"})
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
     private String name;
     private boolean excluded;
-    private List<String> aliases = new ArrayList<String>();
+    private List<String> aliases = new ArrayList<>();
 
     Candidate() {
     }

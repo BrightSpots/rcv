@@ -18,7 +18,7 @@
     "contestId": "test set multi winner whole",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
-    "undervoteLabel": "",
+    "skippedRankLabel": "",
     "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
