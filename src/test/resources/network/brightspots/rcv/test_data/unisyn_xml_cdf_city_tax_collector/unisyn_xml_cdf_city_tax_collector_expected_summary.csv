@@ -29,8 +29,8 @@ Brady Gordon,2,6.89%,1,3,10.34%,0,3,10.34%,0,3,10.34%,-3,0,0.0%,0,0,0.0%,0,0,0.0
 Undeclared Write-ins,1,3.44%,-1,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,29,,,29,,,29,,,29,,,29,,,29,,,28,,,25,,
 Current Round Threshold,15,,,15,,,15,,,15,,,15,,,15,,,15,,,13,,
-Inactive Ballots by by Overvotes,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Skipped Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,,0,0,,0,0,,0,0,,0,0,,0,1,,1,3,,4,0,
-Inactive Ballots by by Repeated Rankings,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,
-Inactive Ballots Total,0,0,,0,0,,0,0,,0,0,,0,0,,0,1,,1,3,,4,0,
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,1,1,,3,4,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0,0,,0,0,,1,1,,3,4,,0

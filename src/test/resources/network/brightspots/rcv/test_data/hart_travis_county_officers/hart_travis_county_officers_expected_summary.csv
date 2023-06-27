@@ -25,8 +25,8 @@ Jim Sylvester,0,0.0%,0
 Bruce Elfant,0,0.0%,0
 Active Ballots,1,,
 Current Round Threshold,1,,
-Inactive Ballots by by Overvotes,6,0,
-Inactive Ballots by by Skipped Rankings,0,0,
-Inactive Ballots by by Exhausted Choices,0,0,
-Inactive Ballots by by Repeated Rankings,0,0,
-Inactive Ballots Total,6,0,
+Inactive Ballots by Overvotes,6,,0
+Inactive Ballots by Skipped Rankings,0,,0
+Inactive Ballots by Exhausted Choices,0,,0
+Inactive Ballots by Repeated Rankings,0,,0
+Inactive Ballots Total,6,,0
