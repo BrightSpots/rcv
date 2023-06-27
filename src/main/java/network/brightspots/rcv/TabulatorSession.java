@@ -58,18 +58,20 @@ class TabulatorSession {
   // here also
   private static void checkConfigVersionMatchesApp(ContestConfig config) {
     String version = config.getRawConfig().tabulatorVersion;
-
     if (!version.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
-      //noinspection StatementWithEmptyBody
-      if (ContestConfigMigration.isConfigVersionNewerThanAppVersion(version)) {
-        // It will log a severe message already, so no need to add one here.
-      } else if (ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
+      // Below already logs a severe message, so no need to check and add another one
+      boolean isConfigVersionNewerThanAppVersion =
+          ContestConfigMigration.isConfigVersionNewerThanAppVersion(version);
+      if (!isConfigVersionNewerThanAppVersion
+          && ContestConfigMigration.isConfigVersionOlderThanAppVersion(version)) {
         Logger.severe(
             "Can't use a config with older version %s in newer version %s of the app! To "
                 + "automatically migrate the config to the newer version, load it in the graphical "
                 + "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
             version, Main.APP_VERSION);
       }
+      // No need to throw errors for these, because they'll be caught by validateTabulatorVersion()
+      // during validation
     }
   }
 

@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Allow Only One Winner per Round Test",
     "date" : "2019-01-18",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "2.2501"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "A" : "3",
@@ -20,8 +27,15 @@
         "B" : "0.7497",
         "residual surplus" : "0.0002"
       }
-    } ]
+    } ],
+    "threshold" : "2.2501"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "A" : "2.2501",
@@ -35,8 +49,15 @@
         "C" : "1.4994",
         "residual surplus" : "0.0002"
       }
-    } ]
+    } ],
+    "threshold" : "2.2501"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "A" : "2.2501",
@@ -51,8 +72,15 @@
         "exhausted" : "0.1497",
         "residual surplus" : "0.0002"
       }
-    } ]
+    } ],
+    "threshold" : "2.2501"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0.1497",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "A" : "2.2501",
@@ -60,6 +88,14 @@
       "C" : "2.2501",
       "D" : "2.0994"
     },
-    "tallyResults" : [ ]
-  } ]
+    "tallyResults" : [ ],
+    "threshold" : "2.2501"
+  } ],
+  "summary" : {
+    "finalThreshold" : "2.2501",
+    "numCandidates" : 4,
+    "numWinners" : 3,
+    "totalNumBallots" : "9",
+    "undervotes" : 0
+  }
 }

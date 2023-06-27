@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "For County Coroner (1/2)",
     "date" : "2019-03-06",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "13"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Angela Thompson" : "4",
@@ -22,8 +29,15 @@
       "transfers" : {
         "Terry Halloran" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Angela Thompson" : "4",
@@ -40,8 +54,15 @@
         "Esteban Ferraro" : "1",
         "Susan Brown" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Angela Thompson" : "5",
@@ -57,8 +78,15 @@
         "Esteban Ferraro" : "1",
         "Terry Halloran" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Angela Thompson" : "6",
@@ -74,8 +102,15 @@
         "Terry Halloran" : "2",
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Esteban Ferraro" : "9",
@@ -89,8 +124,15 @@
         "Terry Halloran" : "4",
         "exhausted" : "4"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "5",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "Susan Brown" : "10",
@@ -99,6 +141,14 @@
     "tallyResults" : [ {
       "elected" : "Terry Halloran",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "13"
+  } ],
+  "summary" : {
+    "finalThreshold" : "13",
+    "numCandidates" : 7,
+    "numWinners" : 1,
+    "totalNumBallots" : "35",
+    "undervotes" : 6
+  }
 }

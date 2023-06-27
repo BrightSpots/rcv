@@ -48,7 +48,7 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
     } else {
       rawRankings.sort(Comparator.comparingInt(Pair::getKey));
 
-      // Initialize up to maxRankings, leaving empty arrays for any undervotes
+      // Initialize up to maxRankings, leaving empty arrays for any skipped rankings
       int minRanking = rawRankings.get(0).getKey();
       if (minRanking <= 0) {
         throw new RuntimeException("Invalid ranking %d. All rankings must be positive integers"

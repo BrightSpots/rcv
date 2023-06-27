@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Test Sequential with Batch Elimination",
     "date" : "",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "2"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "4",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "B" : "2",
@@ -26,8 +33,15 @@
     }, {
       "eliminated" : "F",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "3"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "5",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "B" : "2",
@@ -38,8 +52,15 @@
       "transfers" : {
         "exhausted" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "3"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "7",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "B" : "2"
@@ -47,6 +68,14 @@
     "tallyResults" : [ {
       "elected" : "B",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "2"
+  } ],
+  "summary" : {
+    "finalThreshold" : "2",
+    "numCandidates" : 6,
+    "numWinners" : 1,
+    "totalNumBallots" : "9",
+    "undervotes" : 0
+  }
 }
