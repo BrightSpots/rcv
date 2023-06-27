@@ -85,6 +85,6 @@ final class Utils {
   }
 
   static String[] splitByNewline(String s) {
-    return s.split("\\W*\\r?\\n\\W*");
+    return s.split("\\s*\\r?\\n\\s*");
   }
 }
