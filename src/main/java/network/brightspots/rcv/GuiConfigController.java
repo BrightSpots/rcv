@@ -951,7 +951,7 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Returns whether or not user entered a name
+   * Returns whether user entered a name.
    */
   private Boolean askUserForName() {
     TextInputDialog dialog = new TextInputDialog();
