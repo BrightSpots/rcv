@@ -29,9 +29,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-/**
- * Main entry point to RCTab.
- */
+/** Main entry point to RCTab. */
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
@@ -61,26 +59,39 @@ public class Main extends GuiApplication {
       CommandLine cmd = parseArgsForCli(args);
       String path = cmd.getOptionValue("cli");
       String name = cmd.getOptionValue("name");
-      Boolean convertToCdf = cmd.hasOption("convert-to-cdf");
+      boolean convertToCdf = cmd.hasOption("convert-to-cdf");
 
-      if (name == null || name.isEmpty()) {
-        // Prompt user for their name
-        Logger.info("Enter name(s) of operators for auditing purposes:");
+      boolean validNameProvided = false;
+      if (name != null) {
+        // Name was provided via CLI arg
+        name = name.trim();
+        if (!name.isEmpty()) {
+          validNameProvided = true;
+          Logger.info("Operator name(s), as entered via command-line argument: " + name);
+        }
+      } else {
+        // Name wasn't provided via CLI arg, so prompt user to enter
+        Logger.info("Enter operator name(s), for auditing purposes:");
 
         Scanner sc = new Scanner(System.in, StandardCharsets.UTF_8);
         if (sc.hasNextLine()) {
           name = sc.nextLine();
         }
 
-        // If they didn't enter one, exit.
-        if (name == null || name.isEmpty()) {
-          Logger.severe("Must supply name(s) as a CLI argument or run on an interactive shell");
-          System.exit(1);
+        if (name != null) {
+          name = name.trim();
+          if (!name.isEmpty()) {
+            validNameProvided = true;
+            Logger.info("Operator name(s), as entered interactively: " + name);
+          }
         }
+      }
 
-        Logger.info("Name(s) of operators, as entered interactively: " + name);
-      } else {
-        Logger.info("Name(s) of operators, as entered in a command-line argument: " + name);
+      if (!validNameProvided) {
+        Logger.severe(
+            "Must supply --name as a CLI argument, or run via an interactive shell and actually provide"
+                + " operator name(s)!");
+        System.exit(1);
       }
 
       TabulatorSession session = new TabulatorSession(path);
@@ -104,15 +115,17 @@ public class Main extends GuiApplication {
 
     Options options = new Options();
 
-    Option inputPath = new Option("c", "cli", true, "launch command-line version");
+    Option inputPath =
+        new Option("c", "cli", true, "launch command-line version, providing path to config file");
     inputPath.setRequired(true);
     options.addOption(inputPath);
 
-    Option doConvert = new Option("x", "convert-to-cdf", false, "convert to CDF");
+    Option doConvert =
+        new Option("x", "convert-to-cdf", false, "convert CVR(s) to CDF (instead of tabulating)");
     doConvert.setRequired(false);
     options.addOption(doConvert);
 
-    Option name = new Option("n", "name", true, "name of current operator");
+    Option name = new Option("n", "name", true, "current operator name(s), for auditing purposes");
     name.setRequired(false);
     options.addOption(name);
 
