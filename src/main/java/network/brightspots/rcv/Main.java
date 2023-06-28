@@ -58,36 +58,20 @@ public class Main extends GuiApplication {
 
       CommandLine cmd = parseArgsForCli(args);
       String path = cmd.getOptionValue("cli");
-      String name = cmd.getOptionValue("name");
+      String operatorName = cmd.getOptionValue("name");
       boolean convertToCdf = cmd.hasOption("convert-to-cdf");
 
-      boolean validNameProvided = false;
-      if (name != null) {
-        // Name was provided via CLI arg
-        name = name.trim();
-        if (!name.isEmpty()) {
-          validNameProvided = true;
-          Logger.info("Operator name(s), as entered via command-line argument: " + name);
-        }
-      } else {
+      if (operatorName == null) {
         // Name wasn't provided via CLI arg, so prompt user to enter
         Logger.info("Enter operator name(s), for auditing purposes:");
 
         Scanner sc = new Scanner(System.in, StandardCharsets.UTF_8);
         if (sc.hasNextLine()) {
-          name = sc.nextLine();
-        }
-
-        if (name != null) {
-          name = name.trim();
-          if (!name.isEmpty()) {
-            validNameProvided = true;
-            Logger.info("Operator name(s), as entered interactively: " + name);
-          }
+          operatorName = sc.nextLine();
         }
       }
 
-      if (!validNameProvided) {
+      if (operatorName == null || operatorName.isEmpty()) {
         Logger.severe(
             "Must supply --name as a CLI argument, or run via an interactive shell and actually"
                 + " provide operator name(s)!");
@@ -98,7 +82,8 @@ public class Main extends GuiApplication {
       if (convertToCdf) {
         session.convertToCdf();
       } else {
-        session.tabulate();
+        operatorName = operatorName.trim();
+        session.tabulate(operatorName);
       }
     }
 

@@ -137,17 +137,24 @@ class TabulatorSession {
   }
 
   // Returns a List of exception class names that were thrown while tabulating.
-  List<String> tabulate() {
+  // Operator name is required for the audit logs.
+  List<String> tabulate(String operatorName) {
     Logger.info("Starting tabulation session...");
     List<String> exceptionsEncountered = new LinkedList<>();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
+    boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory());
 
-    if (setUpLogging(config.getOutputDirectory()) && config.validate().isEmpty()) {
+    if (operatorName == null || operatorName.isEmpty()) {
+      Logger.severe("Operator name is required for the audit logs.");
+      exceptionsEncountered.add(TabulationAbortedException.class.toString());
+    } else if (setUpLoggingSuccess && config.validate().isEmpty()) {
       Logger.info("Computer machine name: %s", Utils.getComputerName());
       Logger.info("Computer user name: %s", Utils.getUserName());
+      Logger.info("Operator name: %s", operatorName);
       Logger.info("Config file: %s", configPath);
+
       try {
         Logger.fine("Begin config file contents:");
         BufferedReader reader =
