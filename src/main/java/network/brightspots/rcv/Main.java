@@ -89,8 +89,8 @@ public class Main extends GuiApplication {
 
       if (!validNameProvided) {
         Logger.severe(
-            "Must supply --name as a CLI argument, or run via an interactive shell and actually provide"
-                + " operator name(s)!");
+            "Must supply --name as a CLI argument, or run via an interactive shell and actually"
+                + " provide operator name(s)!");
         System.exit(1);
       }
 
