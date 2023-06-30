@@ -201,9 +201,9 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="174.0" text="Undervote Label"/>
+                      <Label prefWidth="174.0" text="Skipped-Rank Label"/>
                       <TextField prefHeight="25.0" prefWidth="200.0"
-                        fx:id="textFieldCvrUndervoteLabel"/>
+                        fx:id="textFieldCvrSkippedRankLabel"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
@@ -272,8 +272,8 @@
                       prefWidth="80.0" text="Overvote&#10;Label"
                       fx:id="tableColumnCvrOvervoteLabel"/>
                     <TableColumn minWidth="20.0"
-                      prefWidth="90.0" text="Undervote&#10;Label"
-                      fx:id="tableColumnCvrUndervoteLabel"/>
+                      prefWidth="90.0" text="Skipped Rank&#10;Label"
+                      fx:id="tableColumnCvrSkippedRankLabel"/>
                     <TableColumn minWidth="20.0"
                       prefWidth="90.0" text="Undeclared&#10;Write-In&#10;Label"
                       fx:id="tableColumnCvrUndeclaredWriteInLabel"/>

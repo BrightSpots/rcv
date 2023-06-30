@@ -16,7 +16,7 @@
 		"contestId": "13",
 		"treatBlankAsUndeclaredWriteIn": false,
 		"overvoteLabel": "",
-		"undervoteLabel": "",
+		"skippedRankLabel": "",
 		"undeclaredWriteInLabel": "122"
 	  }
 	],
