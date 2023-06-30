@@ -22,9 +22,13 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * Contest configuration that can be serialized and deserialized.
@@ -67,18 +71,18 @@ public class RawContestConfig {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
 
-    private String filePath;
-    private String contestId;
-    private String firstVoteColumnIndex;
-    private String firstVoteRowIndex;
-    private String idColumnIndex;
-    private String precinctColumnIndex;
-    private String overvoteDelimiter;
-    private String provider;
-    private String overvoteLabel;
-    private String skippedRankLabel;
-    private String undeclaredWriteInLabel;
-    private boolean treatBlankAsUndeclaredWriteIn;
+    private SimpleStringProperty filePath = new SimpleStringProperty();
+    private SimpleStringProperty contestId = new SimpleStringProperty();
+    private SimpleStringProperty firstVoteColumnIndex = new SimpleStringProperty();
+    private SimpleStringProperty firstVoteRowIndex = new SimpleStringProperty();
+    private SimpleStringProperty idColumnIndex = new SimpleStringProperty();
+    private SimpleStringProperty precinctColumnIndex = new SimpleStringProperty();
+    private SimpleStringProperty overvoteDelimiter = new SimpleStringProperty();
+    private SimpleStringProperty provider = new SimpleStringProperty();
+    private SimpleStringProperty overvoteLabel = new SimpleStringProperty();
+    private SimpleStringProperty skippedRankLabel = new SimpleStringProperty();
+    private SimpleStringProperty undeclaredWriteInLabel = new SimpleStringProperty();
+    private SimpleBooleanProperty treatBlankAsUndeclaredWriteIn = new SimpleBooleanProperty();
 
     // Deprecated fields
     private String undervoteLabel;
@@ -99,114 +103,172 @@ public class RawContestConfig {
         String skippedRankLabel,
         String undeclaredWriteInLabel,
         boolean treatBlankAsUndeclaredWriteIn) {
-      this.filePath = filePath;
-      this.firstVoteColumnIndex = firstVoteColumnIndex;
-      this.firstVoteRowIndex = firstVoteRowIndex;
-      this.idColumnIndex = idColumnIndex;
-      this.precinctColumnIndex = precinctColumnIndex;
-      this.overvoteDelimiter = overvoteDelimiter;
-      this.provider = provider;
-      this.contestId = contestId;
-      this.overvoteLabel = overvoteLabel;
-      this.skippedRankLabel = skippedRankLabel;
-      this.undeclaredWriteInLabel = undeclaredWriteInLabel;
-      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
+      this.filePath.set(filePath);
+      this.firstVoteColumnIndex.set(firstVoteColumnIndex);
+      this.firstVoteRowIndex.set(firstVoteRowIndex);
+      this.idColumnIndex.set(idColumnIndex);
+      this.precinctColumnIndex.set(precinctColumnIndex);
+      this.overvoteDelimiter.set(overvoteDelimiter);
+      this.provider.set(provider);
+      this.contestId.set(contestId);
+      this.overvoteLabel.set(overvoteLabel);
+      this.skippedRankLabel.set(skippedRankLabel);
+      this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
+      this.treatBlankAsUndeclaredWriteIn.set(treatBlankAsUndeclaredWriteIn);
     }
 
     public String getFilePath() {
-      return filePath;
+      return filePath.get();
     }
 
     public void setFilePath(String filePath) {
-      this.filePath = filePath;
+      this.filePath.set(filePath);
     }
 
     public String getContestId() {
-      return contestId;
+      return contestId.get();
     }
 
     public void setContestId(String contestId) {
-      this.contestId = contestId;
+      this.contestId.set(contestId);
     }
 
     public String getFirstVoteColumnIndex() {
-      return firstVoteColumnIndex;
+      return firstVoteColumnIndex.get();
     }
 
     public void setFirstVoteColumnIndex(String firstVoteColumnIndex) {
-      this.firstVoteColumnIndex = firstVoteColumnIndex;
+      this.firstVoteColumnIndex.set(firstVoteColumnIndex);
     }
 
     public String getFirstVoteRowIndex() {
-      return firstVoteRowIndex;
+      return firstVoteRowIndex.get();
     }
 
     public void setFirstVoteRowIndex(String firstVoteRowIndex) {
-      this.firstVoteRowIndex = firstVoteRowIndex;
+      this.firstVoteRowIndex.set(firstVoteRowIndex);
     }
 
     public String getIdColumnIndex() {
-      return idColumnIndex;
+      return idColumnIndex.get();
     }
 
     public void setIdColumnIndex(String idColumnIndex) {
-      this.idColumnIndex = idColumnIndex;
+      this.idColumnIndex.set(idColumnIndex);
     }
 
     public String getPrecinctColumnIndex() {
-      return precinctColumnIndex;
+      return precinctColumnIndex.get();
     }
 
     public void setPrecinctColumnIndex(String precinctColumnIndex) {
-      this.precinctColumnIndex = precinctColumnIndex;
+      this.precinctColumnIndex.set(precinctColumnIndex);
     }
 
     public String getOvervoteDelimiter() {
-      return overvoteDelimiter;
+      return overvoteDelimiter.get();
     }
 
     public void setOvervoteDelimiter(String overvoteDelimiter) {
-      this.overvoteDelimiter = overvoteDelimiter;
+      this.overvoteDelimiter.set(overvoteDelimiter);
     }
 
     public String getProvider() {
-      return provider;
+      return provider.get();
     }
 
-    public void setProvider(String provider) {
-      this.provider = provider;
+    /**
+     * Set the provider by its GUI label.
+     */
+    public void setProvider(String providerString) {
+      // First, try to get the provider by its public name
+      ContestConfig.Provider provider = ContestConfig.Provider.getByInternalLabel(providerString);
+
+      this.provider.set(provider.getInternalLabel());
     }
 
     public String getOvervoteLabel() {
-      return overvoteLabel;
+      return overvoteLabel.get();
     }
 
     public void setOvervoteLabel(String overvoteLabel) {
-      this.overvoteLabel = overvoteLabel;
+      this.overvoteLabel.set(overvoteLabel);
     }
 
     public String getSkippedRankLabel() {
-      return skippedRankLabel;
+      return skippedRankLabel.get();
     }
 
     public void setSkippedRankLabel(String skippedRankLabel) {
-      this.skippedRankLabel = skippedRankLabel;
+      this.skippedRankLabel.set(skippedRankLabel);
     }
 
     public String getUndeclaredWriteInLabel() {
-      return undeclaredWriteInLabel;
+      return undeclaredWriteInLabel.get();
     }
 
     public void setUndeclaredWriteInLabel(String undeclaredWriteInLabel) {
-      this.undeclaredWriteInLabel = undeclaredWriteInLabel;
+      this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
     }
 
-    public boolean isTreatBlankAsUndeclaredWriteIn() {
+    public boolean getTreatBlankAsUndeclaredWriteIn() {
+      return treatBlankAsUndeclaredWriteIn.get();
+    }
+
+    public void setTreatBlankAsUndeclaredWriteIn(Boolean treatBlankAsUndeclaredWriteIn) {
+      this.treatBlankAsUndeclaredWriteIn.set(treatBlankAsUndeclaredWriteIn);
+    }
+
+    /**
+     * The following properties might be marked as unused by an IDE, but
+     * are necessary to save edits to a cell. See PropertyValueFactory.
+     */
+    public SimpleStringProperty filePathProperty() {
+      return filePath;
+    }
+
+    public SimpleStringProperty contestIdProperty() {
+      return contestId;
+    }
+
+    public SimpleStringProperty firstVoteColumnIndexProperty() {
+      return firstVoteColumnIndex;
+    }
+
+    public SimpleStringProperty firstVoteRowIndexProperty() {
+      return firstVoteRowIndex;
+    }
+
+    public SimpleStringProperty idColumnIndexProperty() {
+      return idColumnIndex;
+    }
+
+    public SimpleStringProperty precinctColumnIndexProperty() {
+      return precinctColumnIndex;
+    }
+
+    public SimpleStringProperty overvoteDelimiterProperty() {
+      return overvoteDelimiter;
+    }
+
+    public SimpleStringProperty providerProperty() {
+      return provider;
+    }
+
+    public SimpleStringProperty overvoteLabelProperty() {
+      return overvoteLabel;
+    }
+
+    public SimpleStringProperty skippedRankLabelProperty() {
+      return skippedRankLabel;
+    }
+
+    public SimpleStringProperty undeclaredWriteInLabelProperty() {
+      return undeclaredWriteInLabel;
+    }
+
+    public SimpleBooleanProperty treatBlankAsUndeclaredWriteInProperty() {
       return treatBlankAsUndeclaredWriteIn;
-    }
-
-    public void setTreatBlankAsUndeclaredWriteIn(boolean treatBlankAsUndeclaredWriteIn) {
-      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
 
     // Deprecated fields
@@ -218,31 +280,35 @@ public class RawContestConfig {
   /**
    * Contest candidate data that can be serialized and deserialized.
    */
+  @JsonIgnoreProperties(ignoreUnknown = true, value = {"observableAliases"})
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
-    private String name;
-    private boolean excluded;
-    private List<String> aliases = new ArrayList<>();
+    private SimpleStringProperty name = new SimpleStringProperty();
+    private SimpleBooleanProperty excluded = new SimpleBooleanProperty();
+    // The actual list of aliases, observable by the UI
+    private ObservableList<String> observableAliases = FXCollections.observableArrayList();
+    // A property that wraps the observable list, so that it can be serialized
+    private SimpleListProperty<String> aliases = new SimpleListProperty<>(observableAliases);
 
     Candidate() {
     }
 
     Candidate(String name, String newlineSeparatedAliases, boolean excluded) {
-      this.name = name;
-      this.excluded = excluded;
+      this.name.setValue(name);
+      this.excluded.setValue(excluded);
 
       if (newlineSeparatedAliases != null) {
         // Split by newline, and also trim whitespace
-        this.aliases = Arrays.asList(newlineSeparatedAliases.split("\\W*\\r?\\n\\W*"));
+        this.aliases.setAll(Utils.splitByNewline(newlineSeparatedAliases));
       }
     }
 
     public String getName() {
-      return name;
+      return name.getValue();
     }
 
     public void setName(String name) {
-      this.name = name;
+      this.name.setValue(name);
     }
 
     public List<String> getAliases() {
@@ -250,15 +316,16 @@ public class RawContestConfig {
     }
 
     public void setAliases(List<String> aliases) {
-      this.aliases = new ArrayList<>(aliases);
+      this.aliases.setAll(aliases);
     }
 
-    public boolean isExcluded() {
-      return excluded;
+
+    public boolean getExcluded() {
+      return excluded.getValue();
     }
 
-    public void setExcluded(boolean excluded) {
-      this.excluded = excluded;
+    public void setExcluded(Boolean excluded) {
+      this.excluded.setValue(excluded);
     }
 
 
@@ -278,25 +345,11 @@ public class RawContestConfig {
      */
     public Stream<String> createStreamOfNameAndAllAliases() {
       List<String> otherNames = new ArrayList<>();
-      if (!isNullOrBlank(this.name)) {
-        otherNames.add(this.name);
+      if (!isNullOrBlank(getName())) {
+        otherNames.add(getName());
       }
 
       return Stream.concat(this.aliases.stream(), otherNames.stream());
-    }
-
-    /**
-     * For display purposes, get a semicolon-separated list of aliases.
-     *
-     * @return a potentially-empty string
-     */
-    public String getSemicolonSeparatedAliases() {
-      Stream<String> s = this.aliases.stream();
-      return String.join("; ", s.toList());
-    }
-
-    public void setSemicolonSeparatedAliases(String semicolonSeparatedAliases) {
-      this.aliases = Arrays.asList(semicolonSeparatedAliases.split("\\W*;\\W*"));
     }
 
     /**
@@ -304,12 +357,29 @@ public class RawContestConfig {
      */
     public void trimNameAndAllAliases() {
       if (name != null) {
-        name = name.trim();
+        name.setValue(getName().trim());
       }
       if (aliases != null) {
         aliases.replaceAll(s -> s.trim());
       }
     }
+
+    /**
+     * The following properties might be marked as unused by an IDE, but
+     * are necessary to save edits to a cell. See PropertyValueFactory.
+     */
+    public SimpleStringProperty nameProperty() {
+      return name;
+    }
+
+    public SimpleListProperty<String> aliasesProperty() {
+      return aliases;
+    }
+
+    public SimpleBooleanProperty excludedProperty() {
+      return excluded;
+    }
+
   }
 
   /**

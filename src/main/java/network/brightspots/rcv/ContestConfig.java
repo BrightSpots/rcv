@@ -294,7 +294,7 @@ class ContestConfig {
           validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED);
         }
 
-        if (source.isTreatBlankAsUndeclaredWriteIn()) {
+        if (source.getTreatBlankAsUndeclaredWriteIn()) {
           logErrorWithLocation(
               String.format(
                   "treatBlankAsUndeclaredWriteIn should not be true for CVR source with "
@@ -1089,7 +1089,7 @@ class ContestConfig {
         String name = candidate.getName();
         candidateNames.add(name);
         candidatePermutation.add(name);
-        if (candidate.isExcluded()) {
+        if (candidate.getExcluded()) {
           excludedCandidates.add(name);
         }
 
@@ -1114,7 +1114,7 @@ class ContestConfig {
     boolean includeUwi = false;
     for (CvrSource source : rawConfig.cvrFileSources) {
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-          || source.isTreatBlankAsUndeclaredWriteIn()) {
+          || source.getTreatBlankAsUndeclaredWriteIn()) {
         includeUwi = true;
         break;
       }

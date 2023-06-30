@@ -48,7 +48,7 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "stopCountingAndAsk",
+    "tiebreakMode": "useCandidateOrder",
     "overvoteRule": "alwaysSkipToNextRank",
     "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
     "randomSeed": "",
