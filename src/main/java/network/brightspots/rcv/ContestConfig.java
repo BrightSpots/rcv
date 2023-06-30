@@ -54,6 +54,7 @@ class ContestConfig {
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_FIRST_ROUND_DETERMINES_THRESHOLD = false;
+  static final boolean SUGGESTED_PREVENT_ONE_CANDIDATE_FINAL_ROUND = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
@@ -866,6 +867,10 @@ class ContestConfig {
 
   boolean isFirstRoundDeterminesThresholdEnabled() {
     return rawConfig.rules.doesFirstRoundDetermineThreshold;
+  }
+
+  boolean doPreventOneCandidateInFinalRound() {
+    return rawConfig.rules.preventOneCandidateInFinalRound;
   }
 
   boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {

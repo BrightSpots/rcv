@@ -520,9 +520,15 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("test tiebreak seed")
-  void testTiebreakSeed() {
-    runTabulationTest("tiebreak_seed_test");
+  @DisplayName("test tiebreak seed: final round eliminates")
+  void testTiebreakSeedEliminate() {
+    runTabulationTest("tiebreak_seed_test_eliminate");
+  }
+
+  @Test
+  @DisplayName("test tiebreak seed: final round elects")
+  void testTiebreakSeedElect() {
+    runTabulationTest("tiebreak_seed_test_elect");
   }
 
   @Test
@@ -646,9 +652,15 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("first round determine threshold test")
-  void firstRoundDeterminesThresholdTest() {
-    runTabulationTest("first_round_determines_threshold_test");
+  @DisplayName("first round determine threshold test: elect on final round")
+  void firstRoundDeterminesThresholdElectTest() {
+    runTabulationTest("first_round_determines_threshold_elect_test");
+  }
+
+  @Test
+  @DisplayName("first round determine threshold test: eliminate on final round")
+  void firstRoundDeterminesThresholdEliminateTest() {
+    runTabulationTest("first_round_determines_threshold_eliminate_test");
   }
 
   @Test

@@ -1,6 +1,6 @@
 {
   "config" : {
-    "contest" : "Portland 2015 Mayoral Race",
+    "contest" : "First Round Determines Threshold: Final round eliminates",
     "date" : "2015-11-03",
     "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Portland, ME",
@@ -37,6 +37,24 @@
     "round" : 2,
     "tally" : {
       "Carmona, Ralph C." : "5",
+      "Vail, Christopher L." : "6"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Carmona, Ralph C.",
+      "transfers" : {
+        "exhausted" : "5"
+      }
+    } ],
+    "threshold" : "9"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
       "Vail, Christopher L." : "6"
     },
     "tallyResults" : [ {
