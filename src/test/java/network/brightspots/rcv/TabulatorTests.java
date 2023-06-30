@@ -106,7 +106,7 @@ class TabulatorTests {
 
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
-    List<String> exceptionsEncountered = session.tabulate();
+    List<String> exceptionsEncountered = session.tabulate("TEST");
     if (expectedException != null) {
       assertTrue(exceptionsEncountered.contains(expectedException));
       return;

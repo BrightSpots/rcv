@@ -70,6 +70,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -463,9 +464,10 @@ public class GuiConfigController implements Initializable {
     Pair<String, Boolean> filePathAndTempStatus = commitConfigToFileAndGetFilePath();
     if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
+        String operatorName = askUserForName();
         setGuiIsBusy(true);
         TabulatorService service = new TabulatorService(
-            filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
+            filePathAndTempStatus.getKey(), operatorName, filePathAndTempStatus.getValue());
         setUpAndStartService(service);
       } else {
         Logger.warning("Please load a contest config file before attempting to tabulate!");
@@ -951,6 +953,20 @@ public class GuiConfigController implements Initializable {
           exception);
     }
     return comparisonResult;
+  }
+
+  /**
+   * Returns whether user entered a name.
+   */
+  private String askUserForName() {
+    TextInputDialog dialog = new TextInputDialog();
+    dialog.setTitle("Enter your name");
+    dialog.setHeaderText("For auditing purposes, enter the name(s) of everyone currently "
+        + "operating this machine.");
+    dialog.setContentText("Name:");
+    Optional<String> result = dialog.showAndWait();
+
+    return result.isPresent() ? result.get() : null;
   }
 
   private boolean checkForSaveAndContinue() {
@@ -1637,9 +1653,11 @@ public class GuiConfigController implements Initializable {
 
   // TabulatorService runs a tabulation in the background
   private static class TabulatorService extends ConfigReaderService {
+    private String operatorName;
 
-    TabulatorService(String configPath, boolean deleteConfigOnCompletion) {
+    TabulatorService(String configPath, String operatorName, boolean deleteConfigOnCompletion) {
       super(configPath, deleteConfigOnCompletion);
+      this.operatorName = operatorName;
     }
 
     @Override
@@ -1649,7 +1667,7 @@ public class GuiConfigController implements Initializable {
             @Override
             protected Void call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              session.tabulate();
+              session.tabulate(operatorName);
               return null;
             }
           };
