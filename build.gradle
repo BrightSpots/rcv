@@ -185,14 +185,39 @@ def docsToCopy = copySpec {
 def sampleInputToCopy = copySpec {
     includeEmptyDirs = false
     from("$projectDir/src/test/resources/network/brightspots/rcv/test_data") {
-        include "2015_portland_mayor/2015_portland_mayor_config.json"
-        include "2015_portland_mayor/2015_portland_mayor_cvr.xlsx"
+        // Config example: interactive tiebreaking
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_config.json"
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_sequential_config.json"
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_cvr.xlsx"
+
+        // Config example: by-precinct
         include "precinct_example/precinct_example_config.json"
         include "precinct_example/precinct_example_cvr.xlsx"
-        include "dominion_cvr_conversion_alaska/*.json"
+
+        // CVR example: CDF
+        include "aliases_cdf_json/aliases_cdf_json_config.json"
+        include "aliases_cdf_json/aliases_cdf_json_expected_summary.csv"
+
+        // CVR example: Clear Ballot
+        include "clear_ballot_kansas_primary/clear_ballot_kansas_primary_config.json"
+        include "clear_ballot_kansas_primary/clear_ballot_kansas_primary.cvr.csv"
+
+        // CVR example: Dominion
+        include "dominion_kansas/dominion_kansas_config.json"
+        include "dominion_kansas/dominion_kansas/kansas_input_data/*.json"
+
+        // CVR example: ES&S
+        include "2015_portland_mayor/2015_portland_mayor_config.json"
+        include "2015_portland_mayor/2015_portland_mayor_cvr.xlsx"
+
+        // CVR example: Hart
+        include "hart_cedar_park_school_board/hart_cedar_park_school_board_config.json"
+        include "_shared/hart_cvr_archive/*.xml"
+
+        // CSV example: Hart
+        include "generic_csv_test/generic_csv_test_config.json"
+        include "generic_csv_test/generic_csv_test_cvr.json"
+
         exclude "output"
         exclude "**/*expected*"
     }
