@@ -255,7 +255,7 @@ class TabulatorTests {
   private static void runConvertToCsvTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
     TabulatorSession session = new TabulatorSession(configPath);
-    session.tabulate();
+    session.tabulate("TEST");
 
     String expectedPath = getTestFilePath(stem, "_expected.csv");
     assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));

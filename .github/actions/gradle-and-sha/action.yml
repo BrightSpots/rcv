@@ -22,7 +22,9 @@ runs:
 
     - name: "Rename output file"
       shell: bash
-      run: mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
+      run: |
+        if [ -e build/jpackage/ ]; then ls build/jpackage; fi
+        mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
 
     - name: "Generate SHA512 for Linux"
       shell: bash

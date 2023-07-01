@@ -3,11 +3,11 @@ name: "Generate Releases"
 on:
   release:
     types: [ published ]
-## To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
-##  is at the same indent level as "release":
-#  push:
-#    branches:
-#      - 'branch-name'
+# To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
+#  is at the same indent level as "release":
+  push:
+    branches:
+      - 'megabranch-1-4'
 
 jobs:
   release:
@@ -50,7 +50,7 @@ jobs:
           if [ ${{ runner.os }} == 'Windows' ]; then
             echo "FILEPATH=build/jpackage/RCTab-1.4.0.exe" >> $GITHUB_OUTPUT
           elif [ ${{ runner.os }} == 'Linux' ]; then
-            echo "FILEPATH=build/jpackage/rctab_1.4.0-1_amd64.deb" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/rctab_1.4.0_amd64.deb" >> $GITHUB_OUTPUT
           else
             echo "FILEPATH=build/jpackage/RCTab-1.4.0.dmg" >> $GITHUB_OUTPUT
           fi
