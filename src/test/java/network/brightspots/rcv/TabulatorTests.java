@@ -18,12 +18,13 @@
 
 package network.brightspots.rcv;
 
-import static org.apache.commons.io.FileUtils.copyFile;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,7 +33,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 import org.junit.jupiter.api.BeforeAll;
@@ -49,6 +52,100 @@ class TabulatorTests {
 
   // compare file contents line by line to identify differences
   private static boolean fileCompare(String path1, String path2) {
+    return path1.endsWith(".json") && path2.endsWith(".json")
+        ? fileCompareJson(path1, path2)
+        : fileCompareLineByLine(path1, path2);
+  }
+
+  private static boolean fileCompareJson(String path1, String path2) {
+    ObjectMapper mapper = new ObjectMapper();
+    boolean succeeded;
+    List<String> keysToIgnore = List.of("GeneratedDate");
+    try {
+      TypeReference<HashMap<String, Object>> type = new TypeReference<>() {};
+      HashMap<String, Object> map1 = mapper.readValue(new File(path1), type);
+      HashMap<String, Object> map2 = mapper.readValue(new File(path2), type);
+
+      succeeded = compareMaps(map1, map2, keysToIgnore);
+    } catch (IOException e) {
+      Logger.severe("Error parsing JSON file: " + e.getMessage());
+      succeeded = false;
+    }
+
+    return succeeded;
+  }
+
+  private static boolean compareMaps(Map<String, Object> map1, Map<String, Object> map2,
+      List<String> keysToIgnore) {
+    boolean areEqual = true;
+    if (map1.size() != map2.size()) {
+      areEqual = false;
+    } else {
+      for (Map.Entry<String, Object> entry : map1.entrySet()) {
+        String key = entry.getKey();
+        Object value1 = entry.getValue();
+        Object value2 = map2.get(key);
+
+        if (keysToIgnore.contains(key)) {
+          continue;
+        }
+
+        if (value1 instanceof Map && value2 instanceof Map) {
+          if (!compareMaps((Map<String, Object>) value1, (Map<String, Object>) value2,
+              keysToIgnore)) {
+            Logger.severe("Maps at key %s are not equal (%s != %s)", key, value1, value2);
+            areEqual = false;
+            break;
+          }
+        } else if (value1 instanceof List && value2 instanceof List) {
+          if (!compareLists((List<Object>) value1, (List<Object>) value2, keysToIgnore)) {
+            Logger.severe("Lists at key %s are not equal (%s != %s)", key, value1, value2);
+            areEqual = false;
+            break;
+          }
+        } else if (!value1.equals(value2)) {
+          Logger.severe("Values at key %s are not equal (%s != %s)", key, value1, value2);
+          areEqual = false;
+          break;
+        }
+      }
+    }
+
+    return areEqual;
+  }
+
+  private static boolean compareLists(List<Object> value1, List<Object> value2,
+      List<String> keysToIgnoreForMaps) {
+    boolean areEqual = true;
+    if (value1.size() != value2.size()) {
+      areEqual = false;
+    } else {
+      for (int i = 0; i < value1.size(); i++) {
+        Object item1 = value1.get(i);
+        Object item2 = value2.get(i);
+
+        if (item1 instanceof Map && item2 instanceof Map) {
+          if (!compareMaps((Map<String, Object>) item1, (Map<String, Object>) item2,
+              keysToIgnoreForMaps)) {
+            areEqual = false;
+            break;
+          }
+        } else if (item1 instanceof List && item2 instanceof List) {
+          if (!compareLists((List<Object>) item1, (List<Object>) item2, keysToIgnoreForMaps)) {
+            areEqual = false;
+            break;
+          }
+        } else if (!item1.equals(item2)) {
+          areEqual = false;
+          break;
+        }
+      }
+    }
+
+    return areEqual;
+  }
+
+  private static boolean fileCompareLineByLine(String path1, String path2) {
     boolean result = true;
     try (BufferedReader br1 = new BufferedReader(new FileReader(path1, StandardCharsets.UTF_8));
         BufferedReader br2 = new BufferedReader(new FileReader(path2, StandardCharsets.UTF_8))) {
@@ -109,36 +206,22 @@ class TabulatorTests {
     List<String> exceptionsEncountered = session.tabulate();
     if (expectedException != null) {
       assertTrue(exceptionsEncountered.contains(expectedException));
-      return;
-    }
-    Logger.info("Examining tabulation test results...");
-    String timestampString = session.getTimestampString();
-    ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    assertNotNull(config);
-
-    if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
-      for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-        compareFiles(config, stem, timestampString, Integer.toString(i));
-      }
     } else {
-      compareFiles(config, stem, timestampString, null);
-    }
+      Logger.info("Examining tabulation test results...");
+      String timestampString = session.getTimestampString();
+      ContestConfig config = ContestConfig.loadContestConfig(configPath);
+      assertNotNull(config);
 
-    // If this is a Dominion tabulation test, also check the converted output file.
-    boolean isDominion =
-        config.rawConfig.cvrFileSources.stream()
-            .anyMatch(source -> ContestConfig.getProvider(source) == Provider.DOMINION);
-    if (isDominion) {
-      String expectedPath =
-          getTestFilePath(
-              stem,
-              "_contest_"
-                  + config.rawConfig.cvrFileSources.get(0).getContestId()
-                  + "_expected.csv");
-      assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
-    }
+      if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
+        for (int i = 1; i <= config.getNumberOfWinners(); i++) {
+          compareFiles(config, stem, timestampString, Integer.toString(i));
+        }
+      } else {
+        compareFiles(config, stem, timestampString, null);
+      }
 
-    cleanOutputFolder(session);
+      cleanOutputFolder(session);
+    }
   }
 
   // helper function to support running convert-to-cdf function
@@ -153,6 +236,19 @@ class TabulatorTests {
 
     cleanOutputFolder(session);
   }
+
+  // Validate convert-to-CSV action, run before every tabulation
+  private static void runConvertToCsvTest(String stem) {
+    String configPath = getTestFilePath(stem, "_config.json");
+    TabulatorSession session = new TabulatorSession(configPath);
+    session.tabulate();
+
+    String expectedPath = getTestFilePath(stem, "_expected.csv");
+    assertTrue(fileCompare(session.getConvertedFilePath(), expectedPath));
+
+    cleanOutputFolder(session);
+  }
+
 
   private static void cleanOutputFolder(TabulatorSession session) {
     // Test passed so clean up test output folder
@@ -239,6 +335,24 @@ class TabulatorTests {
   @DisplayName("Test Convert to CDF works for ES&S")
   void convertToCdfFromEss() {
     runConvertToCdfTest("convert_to_cdf_from_ess");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CSV works for CDF")
+  void convertToCsvFromCdf() {
+    runConvertToCsvTest("convert_to_cdf_from_cdf");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CSV works for Dominion")
+  void convertToCsvFromDominion() {
+    runConvertToCsvTest("convert_to_cdf_from_dominion");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CSV works for ES&S")
+  void convertToCsvFromEss() {
+    runConvertToCsvTest("convert_to_cdf_from_ess");
   }
 
   @Test
