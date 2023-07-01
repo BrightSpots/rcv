@@ -124,20 +124,6 @@ class TabulatorTests {
       compareFiles(config, stem, timestampString, null);
     }
 
-    // If this is a Dominion tabulation test, also check the converted output file.
-    boolean isDominion =
-        config.rawConfig.cvrFileSources.stream()
-            .anyMatch(source -> ContestConfig.getProvider(source) == Provider.DOMINION);
-    if (isDominion) {
-      String expectedPath =
-          getTestFilePath(
-              stem,
-              "_contest_"
-                  + config.rawConfig.cvrFileSources.get(0).getContestId()
-                  + "_expected.csv");
-      assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
-    }
-
     cleanOutputFolder(session);
   }
 
@@ -153,6 +139,19 @@ class TabulatorTests {
 
     cleanOutputFolder(session);
   }
+
+  // Validate convert-to-CSV action, run before every tabulation
+  private static void runConvertToCsvTest(String stem) {
+    String configPath = getTestFilePath(stem, "_config.json");
+    TabulatorSession session = new TabulatorSession(configPath);
+    session.tabulate();
+
+    String expectedPath = getTestFilePath(stem, "_expected.csv");
+    assertTrue(fileCompare(session.getConvertedFilePath(), expectedPath));
+
+    cleanOutputFolder(session);
+  }
+
 
   private static void cleanOutputFolder(TabulatorSession session) {
     // Test passed so clean up test output folder
@@ -239,6 +238,24 @@ class TabulatorTests {
   @DisplayName("Test Convert to CDF works for ES&S")
   void convertToCdfFromEss() {
     runConvertToCdfTest("convert_to_cdf_from_ess");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CSV works for CDF")
+  void convertToCsvFromCdf() {
+    runConvertToCsvTest("convert_to_cdf_from_cdf");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CSV works for Dominion")
+  void convertToCsvFromDominion() {
+    runConvertToCsvTest("convert_to_cdf_from_dominion");
+  }
+
+  @Test
+  @DisplayName("Test Convert to CSV works for ES&S")
+  void convertToCsvFromEss() {
+    runConvertToCsvTest("convert_to_cdf_from_ess");
   }
 
   @Test

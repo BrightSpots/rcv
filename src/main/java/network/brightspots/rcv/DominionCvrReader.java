@@ -179,6 +179,11 @@ class DominionCvrReader extends BaseCvrReader {
     validateNamesAreInContest(castVoteRecords);
   }
 
+  @Override
+  public Integer getMaxRankingsAllowed(String contestId) {
+    return contests.get(contestId).getMaxRanks();
+  }
+
   private void validateNamesAreInContest(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {
     // build a lookup map to optimize CVR parsing

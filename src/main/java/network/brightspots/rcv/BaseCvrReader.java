@@ -39,6 +39,11 @@ abstract class BaseCvrReader {
   abstract void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException, IOException;
 
+  // Individual contests may have a different value than what the config allows.
+  public Integer getMaxRankingsAllowed(String contestId) {
+    return config.getMaxRankingsAllowed();
+  }
+
   // Any reader-specific validations can override this function.
   public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {}
