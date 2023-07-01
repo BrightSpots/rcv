@@ -553,15 +553,15 @@ class ResultsWriter {
   }
 
   // write CastVoteRecords for the specified contest to the provided folder
-  // returns a list of files written
-  List<String> writeGenericCvrCsv(
+  // returns the filepath written
+  String writeGenericCvrCsv(
       List<CastVoteRecord> castVoteRecords,
       Integer numRanks,
       String csvOutputFolder,
       String contestId,
       String undeclaredWriteInLabel)
       throws IOException {
-    List<String> filesWritten = new ArrayList<>();
+    String fileWritten = null;
     try {
       Path outputPath =
           Paths.get(
@@ -611,7 +611,7 @@ class ResultsWriter {
       // finalize the file
       csvPrinter.flush();
       csvPrinter.close();
-      filesWritten.add(outputPath.toString());
+      fileWritten = outputPath.toString();
       Logger.info("Successfully wrote: %s", outputPath.toString());
 
       File file = new File(outputPath.toString());
@@ -625,7 +625,7 @@ class ResultsWriter {
           csvOutputFolder, exception);
       throw exception;
     }
-    return filesWritten;
+    return fileWritten;
   }
 
   private void printRankings(String undeclaredWriteInLabel, Integer maxRanks, CSVPrinter csvPrinter,

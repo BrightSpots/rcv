@@ -147,7 +147,7 @@ class TabulatorTests {
     session.tabulate();
 
     String expectedPath = getTestFilePath(stem, "_expected.csv");
-    assertTrue(fileCompare(session.getConvertedFilesWritten().get(0), expectedPath));
+    assertTrue(fileCompare(session.getConvertedFilePath(), expectedPath));
 
     cleanOutputFolder(session);
   }
