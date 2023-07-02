@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'commons-cli:commons-cli:1.5.0'
     implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
@@ -32,11 +33,12 @@ application {
     mainClass = "${moduleName}.Main"
 }
 
-// Uncomment below to simulate running from the CLI
-//run {
-//    standardInput = System.in
-//    args = ["-cli", "path/to/config"]
-//}
+// Required to accept a name and tiebreak interactively via CLI
+run {
+    standardInput = System.in
+    // Uncomment below line to quickly switch into CLI mode for development
+//    args = ["--cli", "path/to/config"]
+}
 
 // ### Checkstyle plugin settings
 checkstyle {
@@ -162,15 +164,15 @@ jlink {
 
             // DMG is signed with the Installer certificate
             installerOptions += [
-              '--type', 'dmg', 
-              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
-              '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
-              '--mac-sign',
-              '--mac-signing-key-user-name', 'Developer ID Installer: Election Administration Resource Center (A257HB4NS4)',
-              '--mac-signing-keychain', 'build.keychain',
-              '--mac-package-name', 'RCTab',
-              '--mac-package-identifier', 'network.brightspots.rcv',
-              '--mac-package-signing-prefix', 'network.brightspots.rcv'
+                    '--type', 'dmg',
+                    '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
+                    '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
+                    '--mac-sign',
+                    '--mac-signing-key-user-name', 'Developer ID Installer: Election Administration Resource Center (A257HB4NS4)',
+                    '--mac-signing-keychain', 'build.keychain',
+                    '--mac-package-name', 'RCTab',
+                    '--mac-package-identifier', 'network.brightspots.rcv',
+                    '--mac-package-signing-prefix', 'network.brightspots.rcv'
             ]
         }
     }
