@@ -463,10 +463,13 @@ public class GuiConfigController implements Initializable {
     if (filePathAndTempStatus != null) {
       if (GuiContext.getInstance().getConfig() != null) {
         String operatorName = askUserForName();
-        setGuiIsBusy(true);
-        TabulatorService service = new TabulatorService(
-            filePathAndTempStatus.getKey(), operatorName, filePathAndTempStatus.getValue());
-        setUpAndStartService(service);
+        if (operatorName != null) {
+          setGuiIsBusy(true);
+          TabulatorService service =
+              new TabulatorService(
+                  filePathAndTempStatus.getKey(), operatorName, filePathAndTempStatus.getValue());
+          setUpAndStartService(service);
+        }
       } else {
         Logger.warning("Please load a contest config file before attempting to tabulate!");
       }
@@ -960,7 +963,7 @@ public class GuiConfigController implements Initializable {
     dialog.setContentText("Name:");
     Optional<String> result = dialog.showAndWait();
 
-    return result.isPresent() ? result.get() : null;
+    return result.map(String::trim).orElse(null);
   }
 
   private boolean checkForSaveAndContinue() {
@@ -1644,7 +1647,7 @@ public class GuiConfigController implements Initializable {
 
   // TabulatorService runs a tabulation in the background
   private static class TabulatorService extends ConfigReaderService {
-    private String operatorName;
+    private final String operatorName;
 
     TabulatorService(String configPath, String operatorName, boolean deleteConfigOnCompletion) {
       super(configPath, deleteConfigOnCompletion);
