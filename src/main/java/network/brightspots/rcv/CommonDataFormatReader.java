@@ -12,7 +12,7 @@
  * contest metadata (notably candidate names).  CDF uses internal ids to map candidate names (i.e.
  * contest "options") and geographical units to CVR options and precinct names respectively.
  * Building this mapping happens before records can be parsed.
- * Design: This class uses Jackson xmlmapper to read each CDF file into memory at once.  This
+ * Design: This class uses Jackson XmlMapper to read each CDF file into memory at once.  This
  * simplifies parsing code a bit, but also means that (for now) larger CDF files will result in
  * larger memory consumption during parsing.
  * Conditions: Used when reading and tabulating CDF election data.
@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 
@@ -97,8 +96,7 @@ class CommonDataFormatReader extends BaseCvrReader {
   }
 
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException {
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
     try {
       if (cvrPath.endsWith(".xml")) {
         parseXml(castVoteRecords);
@@ -179,8 +177,7 @@ class CommonDataFormatReader extends BaseCvrReader {
     }
   }
 
-  void parseXml(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException, IOException {
+  void parseXml(List<CastVoteRecord> castVoteRecords) throws CvrParseException, IOException {
     // load XML
     XmlMapper xmlMapper = new XmlMapper();
     xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -367,8 +364,7 @@ class CommonDataFormatReader extends BaseCvrReader {
   }
 
   // parse cdf json CastVoteRecordReport into CastVoteRecords and append them to input list
-  void parseJson(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException {
+  void parseJson(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
 
     // static election data
     HashMap<Object, Object> candidates = new HashMap<>();

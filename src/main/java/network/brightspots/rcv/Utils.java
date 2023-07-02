@@ -24,8 +24,7 @@ final class Utils {
 
   private static final Map<String, String> envMap = System.getenv();
 
-  private Utils() {
-  }
+  private Utils() {}
 
   static boolean isNullOrBlank(String s) {
     return s == null || s.isBlank();

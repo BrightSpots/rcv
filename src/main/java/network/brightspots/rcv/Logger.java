@@ -98,15 +98,14 @@ class Logger {
     // log file name is: outputFolder + timestamp + log index
     // FileHandler requires % to be encoded as %%.  %g is the log index
     tabulationLogPattern =
-            Paths.get(outputFolder.replace("%", "%%"),
-                    String.format("%s_audit_%%g.log", timestampString))
-                    .toAbsolutePath()
-                    .toString();
+        Paths.get(
+                outputFolder.replace("%", "%%"), String.format("%s_audit_%%g.log", timestampString))
+            .toAbsolutePath()
+            .toString();
 
-    tabulationHandler = new FileHandler(tabulationLogPattern,
-            LOG_FILE_MAX_SIZE_BYTES,
-            TABULATION_LOG_FILE_COUNT,
-            true);
+    tabulationHandler =
+        new FileHandler(
+            tabulationLogPattern, LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
     tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
     logger.addHandler(tabulationHandler);
@@ -173,12 +172,10 @@ class Logger {
           }
 
           @Override
-          public void flush() {
-          }
+          public void flush() {}
 
           @Override
-          public void close() {
-          }
+          public void close() {}
         };
     guiHandler.setLevel(Level.INFO);
     guiHandler.setFormatter(formatter);

@@ -30,9 +30,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * Contest configuration that can be serialized and deserialized.
- */
+/** Contest configuration that can be serialized and deserialized. */
 @SuppressWarnings("WeakerAccess")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RawContestConfig {
@@ -43,12 +41,9 @@ public class RawContestConfig {
   public List<Candidate> candidates;
   public ContestRules rules;
 
-  RawContestConfig() {
-  }
+  RawContestConfig() {}
 
-  /**
-   * Output settings that can be serialized and deserialized.
-   */
+  /** Output settings that can be serialized and deserialized. */
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class OutputSettings {
@@ -65,27 +60,26 @@ public class RawContestConfig {
   /**
    * Source cast vote record file that can be serialized and deserialized.
    *
-   * <p>All indexes are 1-based. </p>
+   * <p>All indexes are 1-based.
    */
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class CvrSource {
 
-    private SimpleStringProperty filePath = new SimpleStringProperty();
-    private SimpleStringProperty contestId = new SimpleStringProperty();
-    private SimpleStringProperty firstVoteColumnIndex = new SimpleStringProperty();
-    private SimpleStringProperty firstVoteRowIndex = new SimpleStringProperty();
-    private SimpleStringProperty idColumnIndex = new SimpleStringProperty();
-    private SimpleStringProperty precinctColumnIndex = new SimpleStringProperty();
-    private SimpleStringProperty overvoteDelimiter = new SimpleStringProperty();
-    private SimpleStringProperty provider = new SimpleStringProperty();
-    private SimpleStringProperty overvoteLabel = new SimpleStringProperty();
-    private SimpleStringProperty undervoteLabel = new SimpleStringProperty();
-    private SimpleStringProperty undeclaredWriteInLabel = new SimpleStringProperty();
-    private SimpleBooleanProperty treatBlankAsUndeclaredWriteIn = new SimpleBooleanProperty();
+    private final SimpleStringProperty filePath = new SimpleStringProperty();
+    private final SimpleStringProperty contestId = new SimpleStringProperty();
+    private final SimpleStringProperty firstVoteColumnIndex = new SimpleStringProperty();
+    private final SimpleStringProperty firstVoteRowIndex = new SimpleStringProperty();
+    private final SimpleStringProperty idColumnIndex = new SimpleStringProperty();
+    private final SimpleStringProperty precinctColumnIndex = new SimpleStringProperty();
+    private final SimpleStringProperty overvoteDelimiter = new SimpleStringProperty();
+    private final SimpleStringProperty provider = new SimpleStringProperty();
+    private final SimpleStringProperty overvoteLabel = new SimpleStringProperty();
+    private final SimpleStringProperty undervoteLabel = new SimpleStringProperty();
+    private final SimpleStringProperty undeclaredWriteInLabel = new SimpleStringProperty();
+    private final SimpleBooleanProperty treatBlankAsUndeclaredWriteIn = new SimpleBooleanProperty();
 
-    CvrSource() {
-    }
+    CvrSource() {}
 
     CvrSource(
         String filePath,
@@ -174,9 +168,7 @@ public class RawContestConfig {
       return provider.get();
     }
 
-    /**
-     * Set the provider by its GUI label.
-     */
+    /** Set the provider by its GUI label. */
     public void setProvider(String providerString) {
       // First, try to get the provider by its public name
       ContestConfig.Provider provider = ContestConfig.Provider.getByInternalLabel(providerString);
@@ -217,8 +209,8 @@ public class RawContestConfig {
     }
 
     /**
-     * The following properties might be marked as unused by an IDE, but
-     * are necessary to save edits to a cell. See PropertyValueFactory.
+     * The following properties might be marked as unused by an IDE, but are necessary to save edits
+     * to a cell. See PropertyValueFactory.
      */
     public SimpleStringProperty filePathProperty() {
       return filePath;
@@ -269,21 +261,20 @@ public class RawContestConfig {
     }
   }
 
-  /**
-   * Contest candidate data that can be serialized and deserialized.
-   */
-  @JsonIgnoreProperties(ignoreUnknown = true, value = {"observableAliases"})
+  /** Contest candidate data that can be serialized and deserialized. */
+  @JsonIgnoreProperties(
+      ignoreUnknown = true,
+      value = {"observableAliases"})
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Candidate {
-    private SimpleStringProperty name = new SimpleStringProperty();
-    private SimpleBooleanProperty excluded = new SimpleBooleanProperty();
+    private final SimpleStringProperty name = new SimpleStringProperty();
+    private final SimpleBooleanProperty excluded = new SimpleBooleanProperty();
     // The actual list of aliases, observable by the UI
-    private ObservableList<String> observableAliases = FXCollections.observableArrayList();
+    private final ObservableList<String> observableAliases = FXCollections.observableArrayList();
     // A property that wraps the observable list, so that it can be serialized
-    private SimpleListProperty<String> aliases = new SimpleListProperty<>(observableAliases);
+    private final SimpleListProperty<String> aliases = new SimpleListProperty<>(observableAliases);
 
-    Candidate() {
-    }
+    Candidate() {}
 
     Candidate(String name, String newlineSeparatedAliases, boolean excluded) {
       this.name.setValue(name);
@@ -311,7 +302,6 @@ public class RawContestConfig {
       this.aliases.setAll(aliases);
     }
 
-
     public boolean getExcluded() {
       return excluded.getValue();
     }
@@ -319,7 +309,6 @@ public class RawContestConfig {
     public void setExcluded(Boolean excluded) {
       this.excluded.setValue(excluded);
     }
-
 
     // This is deprecated and replaced by aliases, but we need to leave it in place
     // here for the purpose of supporting automatic migration from older config versions.
@@ -330,8 +319,8 @@ public class RawContestConfig {
     }
 
     /**
-     * A stream of all aliases (which is guaranteed to be unique) and the candidate name
-     * (which is not guaranteed to be unique, i.e. it may exist in the list twice)
+     * A stream of all aliases (which is guaranteed to be unique) and the candidate name (which is
+     * not guaranteed to be unique, i.e. it may exist in the list twice)
      *
      * @return a stream containing the candidate name and all aliases, with no null elements
      */
@@ -344,21 +333,19 @@ public class RawContestConfig {
       return Stream.concat(this.aliases.stream(), otherNames.stream());
     }
 
-    /**
-     * Removes whitespace around all name and alias strings.
-     */
+    /** Removes whitespace around all name and alias strings. */
     public void trimNameAndAllAliases() {
       if (name != null) {
         name.setValue(getName().trim());
       }
       if (aliases != null) {
-        aliases.replaceAll(s -> s.trim());
+        aliases.replaceAll(String::trim);
       }
     }
 
     /**
-     * The following properties might be marked as unused by an IDE, but
-     * are necessary to save edits to a cell. See PropertyValueFactory.
+     * The following properties might be marked as unused by an IDE, but are necessary to save edits
+     * to a cell. See PropertyValueFactory.
      */
     public SimpleStringProperty nameProperty() {
       return name;
@@ -371,12 +358,9 @@ public class RawContestConfig {
     public SimpleBooleanProperty excludedProperty() {
       return excluded;
     }
-
   }
 
-  /**
-   * Contest rules necessary for tabulation that can be serialized and deserialized.
-   */
+  /** Contest rules necessary for tabulation that can be serialized and deserialized. */
   @SuppressWarnings({"unused", "RedundantSuppression"})
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonInclude(JsonInclude.Include.NON_NULL)

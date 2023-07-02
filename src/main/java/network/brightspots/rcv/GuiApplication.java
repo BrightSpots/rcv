@@ -19,6 +19,7 @@ package network.brightspots.rcv;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Objects;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -41,11 +42,11 @@ class GuiApplication extends Application {
     String resourcePath = "/network/brightspots/rcv/GuiConfigLayout.fxml";
     String iconPath = "/network/brightspots/rcv/launcher.png";
     try {
-      Parent root = FXMLLoader.load(getClass().getResource(resourcePath));
+      Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(resourcePath)));
       window.setTitle(Main.APP_NAME);
       window.setScene(new Scene(root));
 
-      Image icon = new Image(getClass().getResourceAsStream(iconPath));
+      Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconPath)));
       window.getIcons().add(icon);
     } catch (IOException exception) {
       StringWriter sw = new StringWriter();
