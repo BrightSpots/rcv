@@ -46,7 +46,7 @@ class TabulatorSession {
   private final String configPath;
   private final String timestampString;
   private String outputPath;
-  private List<String> convertedFilesWritten;
+  private String convertedFilePath;
 
   TabulatorSession(String configPath) {
     this.configPath = configPath;
@@ -89,8 +89,8 @@ class TabulatorSession {
 
   // Visible for testing
   @SuppressWarnings("unused")
-  List<String> getConvertedFilesWritten() {
-    return convertedFilesWritten;
+  String getConvertedFilePath() {
+    return convertedFilePath;
   }
 
   // special mode to just export the CVR as CDF JSON instead of tabulating
@@ -299,22 +299,19 @@ class TabulatorSession {
         // Check for any other reader-specific validations
         reader.runAdditionalValidations(castVoteRecords);
 
-        if (reader.getClass() == DominionCvrReader.class) {
-          // Before we tabulate, we output a converted generic CSV for the CVRs.
-          try {
-            DominionCvrReader dominionReader = (DominionCvrReader) reader;
-            ResultsWriter writer =
-                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-            this.convertedFilesWritten =
-                writer.writeGenericCvrCsv(
-                    castVoteRecords,
-                    dominionReader.getContests().values(),
-                    config.getOutputDirectory(),
-                    source.getContestId(),
-                    source.getUndeclaredWriteInLabel());
-          } catch (IOException exception) {
-            // error already logged in ResultsWriter
-          }
+        // Before we tabulate, we output a converted generic CSV for the CVRs.
+        try {
+          ResultsWriter writer =
+              new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+          this.convertedFilePath =
+              writer.writeGenericCvrCsv(
+                  castVoteRecords,
+                  reader.getMaxRankingsAllowed(source.getContestId()),
+                  config.getOutputDirectory(),
+                  source.getContestId(),
+                  source.getUndeclaredWriteInLabel());
+        } catch (IOException exception) {
+          // error already logged in ResultsWriter
         }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
