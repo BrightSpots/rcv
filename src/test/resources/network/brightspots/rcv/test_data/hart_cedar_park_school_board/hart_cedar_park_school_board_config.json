@@ -19,7 +19,7 @@
     "contestId": "b651b997-417a-46d9-a676-a43d4df94ddc",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
-    "undervoteLabel": "",
+    "skippedRankLabel": "",
     "undeclaredWriteInLabel": "99cefa84-bad0-4d6b-a916-e606bd43f9cd"
   } ],
 

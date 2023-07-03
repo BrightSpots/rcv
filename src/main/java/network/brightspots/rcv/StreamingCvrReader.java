@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
@@ -60,7 +59,7 @@ class StreamingCvrReader extends BaseCvrReader {
   // optional delimiter for cells that contain multiple candidates
   private final String overvoteDelimiter;
   private final String overvoteLabel;
-  private final String undervoteLabel;
+  private final String skippedRankLabel;
   private final String undeclaredWriteInLabel;
   private final boolean treatBlankAsUndeclaredWriteIn;
   // used for generating CVR IDs
@@ -97,9 +96,9 @@ class StreamingCvrReader extends BaseCvrReader {
             : null;
     this.overvoteDelimiter = source.getOvervoteDelimiter();
     this.overvoteLabel = source.getOvervoteLabel();
-    this.undervoteLabel = source.getUndervoteLabel();
+    this.skippedRankLabel = source.getSkippedRankLabel();
     this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
-    this.treatBlankAsUndeclaredWriteIn = source.isTreatBlankAsUndeclaredWriteIn();
+    this.treatBlankAsUndeclaredWriteIn = source.getTreatBlankAsUndeclaredWriteIn();
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -232,12 +231,12 @@ class StreamingCvrReader extends BaseCvrReader {
 
       for (String candidate : candidates) {
         candidate = candidate.trim();
-        if (candidates.length > 1 && (candidate.equals("") || candidate.equals(undervoteLabel))) {
+        if (candidates.length > 1 && (candidate.equals("") || candidate.equals(skippedRankLabel))) {
           Logger.severe(
               "If a cell contains multiple candidates split by the overvote delimiter, it's not "
-                  + "valid for any of them to be blank or an explicit undervote.");
+                  + "valid for any of them to be blank or an explicit skipped ranking.");
           encounteredDataErrors = true;
-        } else if (!candidate.equals(undervoteLabel)) {
+        } else if (!candidate.equals(skippedRankLabel)) {
           // map overvotes to our internal overvote string
           if (candidate.equals(overvoteLabel)) {
             candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;

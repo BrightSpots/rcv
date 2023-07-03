@@ -18,7 +18,7 @@
     "contestId": "test set 5",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
-    "undervoteLabel": "",
+    "skippedRankLabel": "",
     "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {

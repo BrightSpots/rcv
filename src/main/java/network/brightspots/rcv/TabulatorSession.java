@@ -46,7 +46,7 @@ class TabulatorSession {
   private final String configPath;
   private final String timestampString;
   private String outputPath;
-  private List<String> convertedFilesWritten;
+  private String convertedFilePath;
 
   TabulatorSession(String configPath) {
     this.configPath = configPath;
@@ -67,7 +67,7 @@ class TabulatorSession {
         Logger.severe(
             "Can't use a config with older version %s in newer version %s of the app! To "
                 + "automatically migrate the config to the newer version, load it in the graphical "
-                + "version of the app (i.e. don't use the -cli flag when starting the tabulator).",
+                + "version of the app (i.e. don't use the --cli flag when starting the tabulator).",
             version, Main.APP_VERSION);
       }
       // No need to throw errors for these, because they'll be caught by validateTabulatorVersion()
@@ -89,8 +89,8 @@ class TabulatorSession {
 
   // Visible for testing
   @SuppressWarnings("unused")
-  List<String> getConvertedFilesWritten() {
-    return convertedFilesWritten;
+  String getConvertedFilePath() {
+    return convertedFilePath;
   }
 
   // special mode to just export the CVR as CDF JSON instead of tabulating
@@ -137,17 +137,24 @@ class TabulatorSession {
   }
 
   // Returns a List of exception class names that were thrown while tabulating.
-  List<String> tabulate() {
+  // Operator name is required for the audit logs.
+  List<String> tabulate(String operatorName) {
     Logger.info("Starting tabulation session...");
     List<String> exceptionsEncountered = new LinkedList<>();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
+    boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory());
 
-    if (setUpLogging(config.getOutputDirectory()) && config.validate().isEmpty()) {
-      Logger.info("Computer name: %s", Utils.getComputerName());
-      Logger.info("User name: %s", Utils.getUserName());
+    if (operatorName == null || operatorName.isEmpty()) {
+      Logger.severe("Operator name is required for the audit logs.");
+      exceptionsEncountered.add(TabulationAbortedException.class.toString());
+    } else if (setUpLoggingSuccess && config.validate().isEmpty()) {
+      Logger.info("Computer machine name: %s", Utils.getComputerName());
+      Logger.info("Computer user name: %s", Utils.getUserName());
+      Logger.info("Operator name: %s", operatorName);
       Logger.info("Config file: %s", configPath);
+
       try {
         Logger.fine("Begin config file contents:");
         BufferedReader reader =
@@ -292,22 +299,19 @@ class TabulatorSession {
         // Check for any other reader-specific validations
         reader.runAdditionalValidations(castVoteRecords);
 
-        if (reader.getClass() == DominionCvrReader.class) {
-          // Before we tabulate, we output a converted generic CSV for the CVRs.
-          try {
-            DominionCvrReader dominionReader = (DominionCvrReader) reader;
-            ResultsWriter writer =
-                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-            this.convertedFilesWritten =
-                writer.writeGenericCvrCsv(
-                    castVoteRecords,
-                    dominionReader.getContests().values(),
-                    config.getOutputDirectory(),
-                    source.getContestId(),
-                    source.getUndeclaredWriteInLabel());
-          } catch (IOException exception) {
-            // error already logged in ResultsWriter
-          }
+        // Before we tabulate, we output a converted generic CSV for the CVRs.
+        try {
+          ResultsWriter writer =
+              new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+          this.convertedFilePath =
+              writer.writeGenericCvrCsv(
+                  castVoteRecords,
+                  reader.getMaxRankingsAllowed(source.getContestId()),
+                  config.getOutputDirectory(),
+                  source.getContestId(),
+                  source.getUndeclaredWriteInLabel());
+        } catch (IOException exception) {
+          // error already logged in ResultsWriter
         }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);

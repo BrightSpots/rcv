@@ -16,4 +16,13 @@
     <Method name="readCastVoteRecord"/>
     <Bug code="NP"/>
   </Match>
+  <Match>
+    <Class name="network.brightspots.rcv.RawContestConfig$CvrSource"/>
+    <Bug code="UwF"/>
+  </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.RawContestConfig\$(CvrSource|Candidate)"/>
+    <Method name="~.*Property"/>
+    <Bug code="EI"/>
+  </Match>
 </FindBugsFilter>

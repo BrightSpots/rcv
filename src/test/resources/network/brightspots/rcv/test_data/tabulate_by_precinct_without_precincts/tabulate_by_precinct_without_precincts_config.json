@@ -17,7 +17,7 @@
     "overvoteDelimiter" : "",
     "provider" : "dominion",
     "overvoteLabel" : "",
-    "undervoteLabel" : "",
+    "skippedRankLabel" : "",
     "undeclaredWriteInLabel" : "12",
     "treatBlankAsUndeclaredWriteIn" : false
   } ],

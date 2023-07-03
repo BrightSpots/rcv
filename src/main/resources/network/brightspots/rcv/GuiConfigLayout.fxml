@@ -13,7 +13,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.*?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="955.0" prefWidth="1165.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
             xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
@@ -108,7 +108,7 @@
           </Tab>
           <Tab text="CVR Files" fx:id="tabCvrFiles">
             <VBox>
-              <VBox styleClass="bordered-box" maxWidth="700.0">
+              <VBox styleClass="bordered-box, disableWhileEditingTable" maxWidth="700.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <Label text="Add CVR File" style="-fx-font-weight: bold"/>
                   <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
@@ -201,9 +201,9 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="174.0" text="Undervote Label"/>
+                      <Label prefWidth="174.0" text="Skipped-Rank Label"/>
                       <TextField prefHeight="25.0" prefWidth="200.0"
-                        fx:id="textFieldCvrUndervoteLabel"/>
+                        fx:id="textFieldCvrSkippedRankLabel"/>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
@@ -238,8 +238,10 @@
               </VBox>
               <VBox styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <Text text="Double-click to edit. Pressing Enter accepts changes; pressing Escape cancels. NOTE: Provider can't be edited."/>
                   <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
                   <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
+                    styleClass="disableWhileEditingTable"
                     text="Delete Selected"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
@@ -270,8 +272,8 @@
                       prefWidth="80.0" text="Overvote&#10;Label"
                       fx:id="tableColumnCvrOvervoteLabel"/>
                     <TableColumn minWidth="20.0"
-                      prefWidth="90.0" text="Undervote&#10;Label"
-                      fx:id="tableColumnCvrUndervoteLabel"/>
+                      prefWidth="90.0" text="Skipped Rank&#10;Label"
+                      fx:id="tableColumnCvrSkippedRankLabel"/>
                     <TableColumn minWidth="20.0"
                       prefWidth="90.0" text="Undeclared&#10;Write-In&#10;Label"
                       fx:id="tableColumnCvrUndeclaredWriteInLabel"/>
@@ -293,7 +295,7 @@
           </Tab>
           <Tab text="Candidates" fx:id="tabCandidates">
             <VBox spacing="20.0">
-              <HBox alignment="CENTER" spacing="75.0">
+              <HBox styleClass="disableWhileEditingTable" alignment="CENTER" spacing="75.0">
                 <VBox styleClass="bordered-box" maxWidth="300.0">
                   <VBox alignment="TOP_CENTER">
                     <padding>
@@ -385,8 +387,10 @@
               </HBox>
               <VBox styleClass="bordered-box" maxWidth="800.0">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <Text text="Double-click to edit. Pressing Enter accepts changes; pressing Escape cancels."/>
                   <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
                   <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
+                    styleClass="disableWhileEditingTable"
                     text="Delete Selected"/>
                   <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>

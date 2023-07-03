@@ -18,7 +18,7 @@
       "contestId": "aliases file 1",
       "treatBlankAsUndeclaredWriteIn": false,
       "overvoteLabel": "",
-      "undervoteLabel": "",
+      "skippedRankLabel": "",
       "undeclaredWriteInLabel": ""
     },
     {
@@ -29,7 +29,7 @@
       "contestId": "aliases file 2",
       "treatBlankAsUndeclaredWriteIn": false,
       "overvoteLabel": "",
-      "undervoteLabel": "",
+      "skippedRankLabel": "",
       "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {

@@ -2,11 +2,13 @@ plugins {
     id "application"
     id "checkstyle"
     // Latest version at: https://github.com/spotbugs/spotbugs-gradle-plugin/tags
-    id "com.github.spotbugs" version "5.0.9"
+    id "com.github.spotbugs" version "5.0.14"
     id "idea"
     id "java-library"
-    id "org.beryx.jlink" version "2.25.0"
-    id "org.openjfx.javafxplugin" version "0.0.11"
+    // Latest version at: https://github.com/beryx/badass-jlink-plugin/tags
+    id "org.beryx.jlink" version "2.26.0"
+    // Latest version at: https://github.com/openjfx/javafx-gradle-plugin/tags
+    id "org.openjfx.javafxplugin" version "0.0.14"
 }
 
 repositories {
@@ -14,31 +16,34 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.apache.commons:commons-csv:1.9.0'
-    implementation 'org.apache.poi:poi-ooxml:5.2.2'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    implementation 'commons-cli:commons-cli:1.5.0'
+    implementation 'org.apache.commons:commons-csv:1.10.0'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
 }
 
 // ### Application plugin settings
 application {
+    mainModule = "${moduleName}"
     mainClass = "${moduleName}.Main"
 }
 
-// Uncomment below to simulate running from the CLI
-//run {
-//    standardInput = System.in
-//    args = ["-cli", "path/to/config"]
-//}
+// Required to accept a name and tiebreak interactively via CLI
+run {
+    standardInput = System.in
+    // Uncomment below line to quickly switch into CLI mode for development
+//    args = ["--cli", "path/to/config"]
+}
 
 // ### Checkstyle plugin settings
 checkstyle {
     // Latest version at https://github.com/checkstyle/checkstyle/tags
-    toolVersion = '10.3.2'
+    toolVersion = '10.12.1'
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.3.2/src/main/resources/google_checks.xml
@@ -58,7 +63,7 @@ System.setProperty("org.checkstyle.google.suppressionfilter.config",
 
 spotbugs {
     // Latest version at: https://github.com/spotbugs/spotbugs/tags
-    toolVersion = '4.7.1'
+    toolVersion = '4.7.3'
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
 
@@ -72,7 +77,7 @@ idea {
 // ### Java plugin settings
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(20))
     }
 }
 
@@ -92,7 +97,8 @@ test {
 
 // ### JavaFX plugin settings
 javafx {
-    version = "18"
+    // Latest version here: https://gluonhq.com/products/javafx/
+    version = "20.0.1"
     modules = ["javafx.base", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
@@ -158,15 +164,15 @@ jlink {
 
             // DMG is signed with the Installer certificate
             installerOptions += [
-              '--type', 'dmg', 
-              '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
-              '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
-              '--mac-sign',
-              '--mac-signing-key-user-name', 'Developer ID Installer: Election Administration Resource Center (A257HB4NS4)',
-              '--mac-signing-keychain', 'build.keychain',
-              '--mac-package-name', 'RCTab',
-              '--mac-package-identifier', 'network.brightspots.rcv',
-              '--mac-package-signing-prefix', 'network.brightspots.rcv'
+                    '--type', 'dmg',
+                    '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
+                    '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
+                    '--mac-sign',
+                    '--mac-signing-key-user-name', 'Developer ID Installer: Election Administration Resource Center (A257HB4NS4)',
+                    '--mac-signing-keychain', 'build.keychain',
+                    '--mac-package-name', 'RCTab',
+                    '--mac-package-identifier', 'network.brightspots.rcv',
+                    '--mac-package-signing-prefix', 'network.brightspots.rcv'
             ]
         }
     }
@@ -181,14 +187,39 @@ def docsToCopy = copySpec {
 def sampleInputToCopy = copySpec {
     includeEmptyDirs = false
     from("$projectDir/src/test/resources/network/brightspots/rcv/test_data") {
-        include "2015_portland_mayor/2015_portland_mayor_config.json"
-        include "2015_portland_mayor/2015_portland_mayor_cvr.xlsx"
+        // Config example: interactive tiebreaking
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_config.json"
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_sequential_config.json"
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_cvr.xlsx"
+
+        // Config example: by-precinct
         include "precinct_example/precinct_example_config.json"
         include "precinct_example/precinct_example_cvr.xlsx"
-        include "dominion_cvr_conversion_alaska/*.json"
+
+        // CVR example: CDF
+        include "aliases_cdf_json/aliases_cdf_json_config.json"
+        include "aliases_cdf_json/aliases_cdf_json_expected_summary.csv"
+
+        // CVR example: Clear Ballot
+        include "clear_ballot_kansas_primary/clear_ballot_kansas_primary_config.json"
+        include "clear_ballot_kansas_primary/clear_ballot_kansas_primary.cvr.csv"
+
+        // CVR example: Dominion
+        include "dominion_kansas/dominion_kansas_config.json"
+        include "dominion_kansas/dominion_kansas/kansas_input_data/*.json"
+
+        // CVR example: ES&S
+        include "2015_portland_mayor/2015_portland_mayor_config.json"
+        include "2015_portland_mayor/2015_portland_mayor_cvr.xlsx"
+
+        // CVR example: Hart
+        include "hart_cedar_park_school_board/hart_cedar_park_school_board_config.json"
+        include "_shared/hart_cvr_archive/*.xml"
+
+        // CSV example: Hart
+        include "generic_csv_test/generic_csv_test_config.json"
+        include "generic_csv_test/generic_csv_test_cvr.json"
+
         exclude "output"
         exclude "**/*expected*"
     }

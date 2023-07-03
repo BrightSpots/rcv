@@ -17,7 +17,7 @@
     "overvoteDelimiter" : "",
     "provider" : "cdf",
     "overvoteLabel" : "",
-    "undervoteLabel" : "",
+    "skippedRankLabel" : "",
     "undeclaredWriteInLabel" : "",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -28,7 +28,7 @@
     "overvoteDelimiter" : "",
     "provider" : "cdf",
     "overvoteLabel" : "",
-    "undervoteLabel" : "",
+    "skippedRankLabel" : "",
     "undeclaredWriteInLabel" : "",
     "treatBlankAsUndeclaredWriteIn" : false
   } ],

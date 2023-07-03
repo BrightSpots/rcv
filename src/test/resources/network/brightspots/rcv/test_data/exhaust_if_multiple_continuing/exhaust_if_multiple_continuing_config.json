@@ -19,7 +19,7 @@
     "overvoteDelimiter" : "|",
     "provider" : "ess",
     "overvoteLabel" : "",
-    "undervoteLabel" : "",
+    "skippedRankLabel" : "",
     "undeclaredWriteInLabel" : "",
     "treatBlankAsUndeclaredWriteIn" : false
   } ],
