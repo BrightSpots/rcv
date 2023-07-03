@@ -530,7 +530,7 @@ class Tabulator {
               && currentRoundTally.numActiveCandidates() - 1 == config.getNumberOfWinners()
               && config.doPreventOneCandidateInFinalRound()) {
           // Edge case: select the max vote getters as the winners, regardless of whether they've
-          // reached the threshold, if all of the following conditions are met:
+          // reached the threshold, if all the following conditions are met:
           //  1. nobody has met the threshold
           //  2. we're on the penultimate round
           //  3. isFirstRoundDeterminesThresholdEnabled is true
@@ -561,11 +561,13 @@ class Tabulator {
           && (currentRoundTally.numActiveCandidates() == 2
               && config.doPreventOneCandidateInFinalRound());
       if (needsTiebreakMultipleWinners || needsTiebreakNoWinners) {
-        // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
+        // Before running a tiebreaker, try to get just the top vote getter.
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
         selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
-        // But if there are multiple candidates tied for the max tally, we need to break the tie.
-        if (selectedWinners.size() > 1 || (selectedWinners.size() == 0)) {
+
+        // If there were multiple candidates, then it's a true tie, not just multiple candidates
+        // above the threshold. Now we run the actual tiebreaking logic.
+        if (selectedWinners.size() > 1) {
           Tiebreak tiebreak =
               new Tiebreak(
                   true,
@@ -703,7 +705,7 @@ class Tabulator {
     LinkedList<String> lastPlaceCandidates = currentRoundTallyToCandidates.get(minVotes);
     if (lastPlaceCandidates.size() > 1) {
       // there was a tie for last place
-      // create new Tiebreak object to pick a winner
+      // create new Tiebreak object to pick a loser
       Tiebreak tiebreak =
           new Tiebreak(
               false,
