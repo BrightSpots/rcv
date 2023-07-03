@@ -158,7 +158,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrOvervoteLabel;
   @FXML
-  private TableColumn<CvrSource, String> tableColumnCvrUndervoteLabel;
+  private TableColumn<CvrSource, String> tableColumnCvrSkippedRankLabel;
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrUndeclaredWriteInLabel;
   @FXML
@@ -186,7 +186,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCvrOvervoteLabel;
   @FXML
-  private TextField textFieldCvrUndervoteLabel;
+  private TextField textFieldCvrSkippedRankLabel;
   @FXML
   private TextField textFieldCvrUndeclaredWriteInLabel;
   @FXML
@@ -610,7 +610,7 @@ public class GuiConfigController implements Initializable {
     String provider = getProviderChoice(choiceCvrProvider).getInternalLabel();
     String contestId = getTextOrEmptyString(textFieldCvrContestId);
     String overvoteLabel = getTextOrEmptyString(textFieldCvrOvervoteLabel);
-    String undervoteLabel = getTextOrEmptyString(textFieldCvrUndervoteLabel);
+    String skippedRankLabel = getTextOrEmptyString(textFieldCvrSkippedRankLabel);
     String undeclaredWriteInLabel = getTextOrEmptyString(textFieldCvrUndeclaredWriteInLabel);
     boolean treatBlankAsUndeclaredWriteIn = checkBoxCvrTreatBlankAsUndeclaredWriteIn.isSelected();
 
@@ -626,7 +626,7 @@ public class GuiConfigController implements Initializable {
               provider,
               contestId,
               overvoteLabel,
-              undervoteLabel,
+              skippedRankLabel,
               undeclaredWriteInLabel,
               treatBlankAsUndeclaredWriteIn
           );
@@ -653,7 +653,7 @@ public class GuiConfigController implements Initializable {
         textFieldCvrPrecinctCol,
         textFieldCvrOvervoteDelimiter,
         textFieldCvrOvervoteLabel,
-        textFieldCvrUndervoteLabel,
+        textFieldCvrSkippedRankLabel,
         textFieldCvrUndeclaredWriteInLabel
     );
     controlsToClear.forEach(GuiConfigController::clearErrorStyling);
@@ -697,8 +697,8 @@ public class GuiConfigController implements Initializable {
       addErrorStyling(textFieldCvrOvervoteLabel);
     }
 
-    if (validationErrors.contains(ValidationError.CVR_UNDERVOTE_LABEL_INVALID)) {
-      addErrorStyling(textFieldCvrUndervoteLabel);
+    if (validationErrors.contains(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID)) {
+      addErrorStyling(textFieldCvrSkippedRankLabel);
     }
 
     if (validationErrors.contains(ValidationError.CVR_UWI_LABEL_INVALID)) {
@@ -739,8 +739,8 @@ public class GuiConfigController implements Initializable {
     textFieldCvrContestId.setDisable(true);
     textFieldCvrOvervoteLabel.clear();
     textFieldCvrOvervoteLabel.setDisable(true);
-    textFieldCvrUndervoteLabel.clear();
-    textFieldCvrUndervoteLabel.setDisable(true);
+    textFieldCvrSkippedRankLabel.clear();
+    textFieldCvrSkippedRankLabel.setDisable(true);
     textFieldCvrUndeclaredWriteInLabel.clear();
     textFieldCvrUndeclaredWriteInLabel.setDisable(true);
     checkBoxCvrTreatBlankAsUndeclaredWriteIn.setSelected(false);
@@ -1113,8 +1113,8 @@ public class GuiConfigController implements Initializable {
           textFieldCvrOvervoteDelimiter.setDisable(false);
           textFieldCvrOvervoteLabel.setDisable(false);
           textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
-          textFieldCvrUndervoteLabel.setDisable(false);
-          textFieldCvrUndervoteLabel.setText(ContestConfig.SUGGESTED_UNDERVOTE_LABEL);
+          textFieldCvrSkippedRankLabel.setDisable(false);
+          textFieldCvrSkippedRankLabel.setText(ContestConfig.SUGGESTED_SKIPPED_RANK_LABEL);
           checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(false);
           checkBoxCvrTreatBlankAsUndeclaredWriteIn
               .setSelected(ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
@@ -1160,7 +1160,7 @@ public class GuiConfigController implements Initializable {
         new EditableColumnString(tableColumnCvrOvervoteDelimiter, "overvoteDelimiter"),
         new EditableColumnString(tableColumnCvrContestId, "contestId"),
         new EditableColumnString(tableColumnCvrOvervoteLabel, "overvoteLabel"),
-        new EditableColumnString(tableColumnCvrUndervoteLabel, "undervoteLabel"),
+        new EditableColumnString(tableColumnCvrSkippedRankLabel, "skippedRankLabel"),
         new EditableColumnString(tableColumnCvrUndeclaredWriteInLabel,
            "undeclaredWriteInLabel"),
         new EditableColumnBoolean(tableColumnCvrTreatBlankAsUndeclaredWriteIn,
@@ -1175,7 +1175,14 @@ public class GuiConfigController implements Initializable {
         c -> new SimpleStringProperty(
             Provider.getByInternalLabel(c.getValue().getProvider()).toString())
     );
-
+    tableColumnCvrContestId.setCellValueFactory(new PropertyValueFactory<>("contestId"));
+    tableColumnCvrOvervoteLabel.setCellValueFactory(new PropertyValueFactory<>("overvoteLabel"));
+    tableColumnCvrSkippedRankLabel
+        .setCellValueFactory(new PropertyValueFactory<>("skippedRankLabel"));
+    tableColumnCvrUndeclaredWriteInLabel
+        .setCellValueFactory(new PropertyValueFactory<>("undeclaredWriteInLabel"));
+    tableColumnCvrTreatBlankAsUndeclaredWriteIn
+        .setCellValueFactory(new PropertyValueFactory<>("treatBlankAsUndeclaredWriteIn"));
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCvrFiles.setEditable(true);
 
@@ -1463,8 +1470,8 @@ public class GuiConfigController implements Initializable {
       source.setContestId(source.getContestId() != null ? source.getContestId().trim() : "");
       source.setOvervoteLabel(
           source.getOvervoteLabel() != null ? source.getOvervoteLabel().trim() : "");
-      source.setUndervoteLabel(
-          source.getUndervoteLabel() != null ? source.getUndervoteLabel().trim() : "");
+      source.setSkippedRankLabel(
+          source.getSkippedRankLabel() != null ? source.getSkippedRankLabel().trim() : "");
       source.setUndeclaredWriteInLabel(
           source.getUndeclaredWriteInLabel() != null ? source.getUndeclaredWriteInLabel().trim()
               : "");

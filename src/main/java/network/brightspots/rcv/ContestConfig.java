@@ -63,7 +63,7 @@ class ContestConfig {
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final boolean SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED = false;
   static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
-  static final String SUGGESTED_UNDERVOTE_LABEL = "undervote";
+  static final String SUGGESTED_SKIPPED_RANK_LABEL = "skipped rank";
   static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   private static final int MIN_COLUMN_INDEX = 1;
@@ -156,10 +156,10 @@ class ContestConfig {
           source.getOvervoteLabel(), source, "overvoteLabel")) {
         validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
       }
-      if (!isNullOrBlank(source.getUndervoteLabel())
+      if (!isNullOrBlank(source.getSkippedRankLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getUndervoteLabel(), source, "undervoteLabel")) {
-        validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_INVALID);
+          source.getSkippedRankLabel(), source, "skippedRankLabel")) {
+        validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID);
       }
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
           && stringAlreadyInUseElsewhereInSource(
@@ -290,8 +290,8 @@ class ContestConfig {
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getUndervoteLabel(), "undervoteLabel", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED);
+            source.getSkippedRankLabel(), "skippedRankLabel", provider, source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED);
         }
 
         if (source.getTreatBlankAsUndeclaredWriteIn()) {
@@ -447,7 +447,7 @@ class ContestConfig {
       inUse =
           stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, source.getUndervoteLabel(), "undervoteLabel")
+              string, field, source.getSkippedRankLabel(), "skippedRankLabel")
               || stringMatchesAnotherFieldValue(
               string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
     }
@@ -1130,7 +1130,7 @@ class ContestConfig {
     CVR_NO_FILES_SPECIFIED,
     CVR_FILE_PATH_MISSING,
     CVR_OVERVOTE_LABEL_INVALID,
-    CVR_UNDERVOTE_LABEL_INVALID,
+    CVR_SKIPPED_RANK_LABEL_INVALID,
     CVR_UWI_LABEL_INVALID,
     CVR_PROVIDER_INVALID,
     CVR_FIRST_VOTE_COLUMN_INVALID,
@@ -1154,7 +1154,7 @@ class ContestConfig {
     CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED,
     CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
-    CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED,
+    CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
     CANDIDATE_NAME_MISSING,
     CANDIDATE_DUPLICATE_NAME,

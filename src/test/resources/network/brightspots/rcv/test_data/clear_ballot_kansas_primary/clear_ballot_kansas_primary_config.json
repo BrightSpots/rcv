@@ -19,7 +19,7 @@
     "contestId": "Democratic Primary",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
-    "undervoteLabel": "",
+    "skippedRankLabel": "",
     "undeclaredWriteInLabel": "UWI"
   } ],
   "candidates" : [ {

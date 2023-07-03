@@ -18,7 +18,7 @@
     "provider": "ess",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
-    "undervoteLabel": "",
+    "skippedRankLabel": "",
     "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {

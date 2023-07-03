@@ -11,7 +11,7 @@
  * Purpose: Core contest tabulation logic including:
  * Rank choice flows and vote reallocation.
  * Winner selection, loser selection, and tiebreak rules.
- * Overvote / undervote rules.
+ * Overvote / Skipped Ranking rules.
  * Design: On each loop a round is tallied and tabulated according to selected rules.
  * Inputs: CastVoteRecords for the desired contest and ContestConfig with rules configuration.
  * Results are logged to console and audit file.
@@ -1014,7 +1014,7 @@ class Tabulator {
       //  if there are no more rankings, exhaust the cvr
 
       // lastRankSeen tracks the last rank in the current rankings set
-      // This is used to determine how many skipped rankings occurred for undervotes.
+      // This is used to determine how many skipped rankings occurred.
       int lastRankSeen = 0;
       // candidatesSeen is set of candidates encountered while processing this CVR in this round
       // used to detect duplicate candidates if exhaustOnDuplicateCandidate is enabled
@@ -1028,7 +1028,7 @@ class Tabulator {
         Integer rank = rankCandidatesPair.getKey();
         CandidatesAtRanking candidates = rankCandidatesPair.getValue();
 
-        // check for undervote exhaustion
+        // check for skipped ranking exhaustion
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
           recordSelectionForCastVoteRecord(cvr, roundTally, null,
@@ -1072,7 +1072,7 @@ class Tabulator {
           continue;
         }
 
-        // the current ranking is not an overvote or undervote
+        // the current ranking is not inactive by overvote or too many skipped rankings
         // see if any ranked candidates are continuing
 
         for (String candidate : candidates) {
