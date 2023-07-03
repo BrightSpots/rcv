@@ -1072,7 +1072,7 @@ class Tabulator {
           continue;
         }
 
-        // the current ranking is not inactive by overvote or skipped ranking
+        // the current ranking is not inactive by overvote or too many skipped rankings
         // see if any ranked candidates are continuing
 
         for (String candidate : candidates) {
