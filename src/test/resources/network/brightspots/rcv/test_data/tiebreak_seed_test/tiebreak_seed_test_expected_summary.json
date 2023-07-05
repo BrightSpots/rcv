@@ -40,31 +40,13 @@
       "Mookie Blaylock" : "3"
     },
     "tallyResults" : [ {
-      "eliminated" : "George Gervin",
-      "transfers" : {
-        "exhausted" : "3"
-      }
-    } ],
-    "threshold" : "4"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "0",
-      "overvotes" : "0",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 3,
-    "tally" : {
-      "Mookie Blaylock" : "3"
-    },
-    "tallyResults" : [ {
-      "elected" : "Mookie Blaylock",
+      "elected" : "George Gervin",
       "transfers" : { }
     } ],
-    "threshold" : "2"
+    "threshold" : "4"
   } ],
   "summary" : {
-    "finalThreshold" : "2",
+    "finalThreshold" : "4",
     "numCandidates" : 3,
     "numWinners" : 1,
     "totalNumBallots" : "9",

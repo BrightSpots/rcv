@@ -189,32 +189,13 @@
       "Terry Williams" : "10"
     },
     "tallyResults" : [ {
-      "eliminated" : "Terry Williams",
-      "transfers" : {
-        "Stephen Miller" : "2",
-        "exhausted" : "8"
-      }
-    } ],
-    "threshold" : "11"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "17",
-      "overvotes" : "0",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 9,
-    "tally" : {
-      "Stephen Miller" : "12"
-    },
-    "tallyResults" : [ {
-      "elected" : "Stephen Miller",
+      "elected" : "Terry Williams",
       "transfers" : { }
     } ],
-    "threshold" : "7"
+    "threshold" : "11"
   } ],
   "summary" : {
-    "finalThreshold" : "7",
+    "finalThreshold" : "11",
     "numCandidates" : 9,
     "numWinners" : 1,
     "totalNumBallots" : "35",
