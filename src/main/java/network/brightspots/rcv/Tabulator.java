@@ -520,9 +520,9 @@ class Tabulator {
       }
     } else {
       // We should only look for more winners if we haven't already filled all the seats.
-      if (winnerToRound.size() < config.getNumberOfWinners()) {
-        if (currentRoundTally.numActiveCandidates()
-            == config.getNumberOfWinners() - winnerToRound.size()) {
+      int numSeatsUnfilled = config.getNumberOfWinners() - winnerToRound.size();
+      if (numSeatsUnfilled > 0) {
+        if (currentRoundTally.numActiveCandidates() == numSeatsUnfilled) {
           // If the number of continuing candidates equals the number of seats to fill,
           // everyone wins.
           selectedWinners.addAll(currentRoundTally.getCandidates());
@@ -548,9 +548,25 @@ class Tabulator {
       // * If this is a single-winner election in which it's possible for no candidate to reach the
       //   threshold (i.e. "first round determines threshold" is set), the tiebreaker will choose
       //   the only winner.
-      boolean useTiebreakerIfNeeded = config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
-          || config.isFirstRoundDeterminesThresholdEnabled();
-      if (useTiebreakerIfNeeded && selectedWinners.size() > 1) {
+      boolean needsTiebreakMultipleWinners = selectedWinners.size() > 1
+          && (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
+          || config.isFirstRoundDeterminesThresholdEnabled());
+      // Edge case: there are two candidates remaining. To avoid having just one candidate in the
+      // final round, we break the tie here. Happens when we have unfilled seats, two candidates
+      // remaining, neither meets the threshold, and both have more than the minimum vote threshold.
+      // Conditions:
+      //  1. Single-winner election
+      //  2. There are two remaining candidates
+      //  3. There is one seat unfilled (i.e. the seat hasn't already been filled in a previous
+      //           round due to "Continue Untli Two Remain" config option)
+      //  4. All candidates are over the minimum threshold (see no_one_meets_minimum test)
+      boolean needsTiebreakNoWinners = config.getNumberOfWinners() == 1
+          && selectedWinners.size() == 0
+          && currentRoundTally.numActiveCandidates() == 2
+          && numSeatsUnfilled == 1
+          && currentRoundTallyToCandidates.keySet().stream().allMatch(
+              x -> x.compareTo(config.getMinimumVoteThreshold()) >= 0);
+      if (needsTiebreakMultipleWinners || needsTiebreakNoWinners) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
         selectedWinners = currentRoundTallyToCandidates.get(maxVotes);

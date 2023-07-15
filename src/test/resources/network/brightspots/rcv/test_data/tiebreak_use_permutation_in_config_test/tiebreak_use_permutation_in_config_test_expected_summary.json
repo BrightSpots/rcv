@@ -62,31 +62,13 @@
       "Yinka Dare" : "4"
     },
     "tallyResults" : [ {
-      "eliminated" : "Yinka Dare",
-      "transfers" : {
-        "exhausted" : "4"
-      }
-    } ],
-    "threshold" : "5"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "0",
-      "overvotes" : "0",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 4,
-    "tally" : {
-      "Mookie Blaylock" : "4"
-    },
-    "tallyResults" : [ {
       "elected" : "Mookie Blaylock",
       "transfers" : { }
     } ],
-    "threshold" : "3"
+    "threshold" : "5"
   } ],
   "summary" : {
-    "finalThreshold" : "3",
+    "finalThreshold" : "5",
     "numCandidates" : 4,
     "numWinners" : 1,
     "totalNumBallots" : "10",

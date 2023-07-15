@@ -79,31 +79,13 @@
       "C" : "2"
     },
     "tallyResults" : [ {
-      "eliminated" : "C",
-      "transfers" : {
-        "exhausted" : "2"
-      }
-    } ],
-    "threshold" : "3"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "7",
-      "overvotes" : "0",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 5,
-    "tally" : {
-      "B" : "2"
-    },
-    "tallyResults" : [ {
       "elected" : "B",
       "transfers" : { }
     } ],
-    "threshold" : "2"
+    "threshold" : "3"
   } ],
   "summary" : {
-    "finalThreshold" : "2",
+    "finalThreshold" : "3",
     "numCandidates" : 6,
     "numWinners" : 1,
     "totalNumBallots" : "9",
