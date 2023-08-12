@@ -19,7 +19,7 @@
     "provider" : "ess",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
+    "skippedRankLabel": "undervote",
     "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
@@ -50,6 +50,6 @@
     "batchElimination": true,
     "exhaustOnDuplicateCandidate": false,
     "rulesDescription": "Doyle Rules",
-    "stopTabulationEarlyAfterRound": "2"
+    "stopTabulationEarlyAfterRound": "1"
   }
 }

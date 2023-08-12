@@ -75,11 +75,15 @@ public class RawContestConfig {
     private final SimpleStringProperty overvoteDelimiter = new SimpleStringProperty();
     private final SimpleStringProperty provider = new SimpleStringProperty();
     private final SimpleStringProperty overvoteLabel = new SimpleStringProperty();
-    private final SimpleStringProperty undervoteLabel = new SimpleStringProperty();
+    private final SimpleStringProperty skippedRankLabel = new SimpleStringProperty();
     private final SimpleStringProperty undeclaredWriteInLabel = new SimpleStringProperty();
     private final SimpleBooleanProperty treatBlankAsUndeclaredWriteIn = new SimpleBooleanProperty();
 
-    CvrSource() {}
+    // Deprecated fields
+    private String undervoteLabel;
+
+    CvrSource() {
+    }
 
     CvrSource(
         String filePath,
@@ -91,7 +95,7 @@ public class RawContestConfig {
         String provider,
         String contestId,
         String overvoteLabel,
-        String undervoteLabel,
+        String skippedRankLabel,
         String undeclaredWriteInLabel,
         boolean treatBlankAsUndeclaredWriteIn) {
       this.filePath.set(filePath);
@@ -103,7 +107,7 @@ public class RawContestConfig {
       this.provider.set(provider);
       this.contestId.set(contestId);
       this.overvoteLabel.set(overvoteLabel);
-      this.undervoteLabel.set(undervoteLabel);
+      this.skippedRankLabel.set(skippedRankLabel);
       this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
       this.treatBlankAsUndeclaredWriteIn.set(treatBlankAsUndeclaredWriteIn);
     }
@@ -184,12 +188,12 @@ public class RawContestConfig {
       this.overvoteLabel.set(overvoteLabel);
     }
 
-    public String getUndervoteLabel() {
-      return undervoteLabel.get();
+    public String getSkippedRankLabel() {
+      return skippedRankLabel.get();
     }
 
-    public void setUndervoteLabel(String undervoteLabel) {
-      this.undervoteLabel.set(undervoteLabel);
+    public void setSkippedRankLabel(String skippedRankLabel) {
+      this.skippedRankLabel.set(skippedRankLabel);
     }
 
     public String getUndeclaredWriteInLabel() {
@@ -248,8 +252,8 @@ public class RawContestConfig {
       return overvoteLabel;
     }
 
-    public SimpleStringProperty undervoteLabelProperty() {
-      return undervoteLabel;
+    public SimpleStringProperty skippedRankLabelProperty() {
+      return skippedRankLabel;
     }
 
     public SimpleStringProperty undeclaredWriteInLabelProperty() {
@@ -258,6 +262,11 @@ public class RawContestConfig {
 
     public SimpleBooleanProperty treatBlankAsUndeclaredWriteInProperty() {
       return treatBlankAsUndeclaredWriteIn;
+    }
+
+    // Deprecated fields
+    public String getUndervoteLabel() {
+      return undervoteLabel;
     }
   }
 

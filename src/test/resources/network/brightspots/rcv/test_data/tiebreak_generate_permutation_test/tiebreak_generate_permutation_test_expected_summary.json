@@ -61,31 +61,13 @@
       "Sedale Threatt" : "2"
     },
     "tallyResults" : [ {
-      "eliminated" : "Sedale Threatt",
-      "transfers" : {
-        "exhausted" : "2"
-      }
-    } ],
-    "threshold" : "3"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "6",
-      "overvotes" : "0",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 4,
-    "tally" : {
-      "George Gervin" : "2"
-    },
-    "tallyResults" : [ {
       "elected" : "George Gervin",
       "transfers" : { }
     } ],
-    "threshold" : "2"
+    "threshold" : "3"
   } ],
   "summary" : {
-    "finalThreshold" : "2",
+    "finalThreshold" : "3",
     "numCandidates" : 4,
     "numWinners" : 1,
     "totalNumBallots" : "8",

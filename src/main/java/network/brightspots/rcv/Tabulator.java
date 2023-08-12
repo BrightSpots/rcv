@@ -11,7 +11,7 @@
  * Purpose: Core contest tabulation logic including:
  * Rank choice flows and vote reallocation.
  * Winner selection, loser selection, and tiebreak rules.
- * Overvote / undervote rules.
+ * Overvote / Skipped Ranking rules.
  * Design: On each loop a round is tallied and tabulated according to selected rules.
  * Inputs: CastVoteRecords for the desired contest and ContestConfig with rules configuration.
  * Results are logged to console and audit file.
@@ -521,9 +521,9 @@ class Tabulator {
       }
     } else {
       // We should only look for more winners if we haven't already filled all the seats.
-      if (winnerToRound.size() < config.getNumberOfWinners()) {
-        if (currentRoundTally.numActiveCandidates()
-            == config.getNumberOfWinners() - winnerToRound.size()) {
+      int numSeatsUnfilled = config.getNumberOfWinners() - winnerToRound.size();
+      if (numSeatsUnfilled > 0) {
+        if (currentRoundTally.numActiveCandidates() == numSeatsUnfilled) {
           // If the number of continuing candidates equals the number of seats to fill,
           // everyone wins.
           selectedWinners.addAll(currentRoundTally.getCandidates());
@@ -550,10 +550,25 @@ class Tabulator {
       // * If this is a single-winner election in which it's possible for no candidate to reach the
       //   threshold (i.e. "first round determines threshold" is set), the tiebreaker will choose
       //   the only winner.
-      boolean useTiebreakerIfNeeded =
-          config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
-              || config.isFirstRoundDeterminesThresholdEnabled();
-      if (useTiebreakerIfNeeded && selectedWinners.size() > 1) {
+      boolean needsTiebreakMultipleWinners = selectedWinners.size() > 1
+          && (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
+          || config.isFirstRoundDeterminesThresholdEnabled());
+      // Edge case: there are two candidates remaining. To avoid having just one candidate in the
+      // final round, we break the tie here. Happens when we have unfilled seats, two candidates
+      // remaining, neither meets the threshold, and both have more than the minimum vote threshold.
+      // Conditions:
+      //  1. Single-winner election
+      //  2. There are two remaining candidates
+      //  3. There is one seat unfilled (i.e. the seat hasn't already been filled in a previous
+      //           round due to "Continue Untli Two Remain" config option)
+      //  4. All candidates are over the minimum threshold (see no_one_meets_minimum test)
+      boolean needsTiebreakNoWinners = config.getNumberOfWinners() == 1
+          && selectedWinners.size() == 0
+          && currentRoundTally.numActiveCandidates() == 2
+          && numSeatsUnfilled == 1
+          && currentRoundTallyToCandidates.keySet().stream().allMatch(
+              x -> x.compareTo(config.getMinimumVoteThreshold()) >= 0);
+      if (needsTiebreakMultipleWinners || needsTiebreakNoWinners) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
         selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
@@ -1017,7 +1032,7 @@ class Tabulator {
       //  if there are no more rankings, exhaust the cvr
 
       // lastRankSeen tracks the last rank in the current rankings set
-      // This is used to determine how many skipped rankings occurred for undervotes.
+      // This is used to determine how many skipped rankings occurred.
       int lastRankSeen = 0;
       // candidatesSeen is set of candidates encountered while processing this CVR in this round
       // used to detect duplicate candidates if exhaustOnDuplicateCandidate is enabled
@@ -1031,7 +1046,7 @@ class Tabulator {
         Integer rank = rankCandidatesPair.getKey();
         CandidatesAtRanking candidates = rankCandidatesPair.getValue();
 
-        // check for undervote exhaustion
+        // check for skipped ranking exhaustion
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
           recordSelectionForCastVoteRecord(
@@ -1078,7 +1093,7 @@ class Tabulator {
           continue;
         }
 
-        // the current ranking is not an overvote or undervote
+        // the current ranking is not inactive by overvote or too many skipped rankings
         // see if any ranked candidates are continuing
 
         for (String candidate : candidates) {

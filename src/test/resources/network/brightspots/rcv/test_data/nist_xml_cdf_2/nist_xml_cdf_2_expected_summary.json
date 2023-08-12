@@ -38,23 +38,7 @@
       "Edward FitzGerald and Sharen Swartz Neuhardt" : "0"
     },
     "tallyResults" : [ {
-      "eliminated" : "Anita Rios and Bob Fitrakis",
-      "transfers" : { }
-    } ],
-    "threshold" : "1"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "0",
-      "overvotes" : "0",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 3,
-    "tally" : {
-      "Edward FitzGerald and Sharen Swartz Neuhardt" : "0"
-    },
-    "tallyResults" : [ {
-      "elected" : "Edward FitzGerald and Sharen Swartz Neuhardt",
+      "elected" : "Anita Rios and Bob Fitrakis",
       "transfers" : { }
     } ],
     "threshold" : "1"

@@ -140,7 +140,7 @@ final class ContestConfigMigration {
 
       if (!isNullOrBlank(rules.undervoteLabel)) {
         for (CvrSource source : rawConfig.cvrFileSources) {
-          source.setUndervoteLabel(rules.undervoteLabel);
+          source.setSkippedRankLabel(rules.undervoteLabel);
         }
       }
 
@@ -159,6 +159,16 @@ final class ContestConfigMigration {
       // Migrations from 1.3.0 to 1.4.0
       if (rules.stopTabulationEarlyAfterRound == null) {
         rules.stopTabulationEarlyAfterRound = "";
+      }
+      for (CvrSource source : rawConfig.cvrFileSources) {
+        if (source.getUndervoteLabel() != null) {
+          if (source.getSkippedRankLabel() != null) {
+            Logger.severe("Config contains a deprecated field \"%s\". Ignoring.",
+                source.getUndervoteLabel());
+          } else {
+            source.setSkippedRankLabel(source.getUndervoteLabel());
+          }
+        }
       }
 
       Logger.info(

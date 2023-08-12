@@ -19,7 +19,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -32,7 +32,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -45,7 +45,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -58,7 +58,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -71,7 +71,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -84,7 +84,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -97,7 +97,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -110,7 +110,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -123,7 +123,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -136,7 +136,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -149,7 +149,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -162,7 +162,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
@@ -175,7 +175,7 @@
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "UWI",
     "treatBlankAsUndeclaredWriteIn" : false
   } ],

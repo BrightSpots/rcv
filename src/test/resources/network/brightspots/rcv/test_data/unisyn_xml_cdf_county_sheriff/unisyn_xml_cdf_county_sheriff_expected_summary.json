@@ -162,32 +162,13 @@
       "Warren Norell" : "12"
     },
     "tallyResults" : [ {
-      "eliminated" : "Warren Norell",
-      "transfers" : {
-        "Terry Baker" : "5",
-        "exhausted" : "7"
-      }
-    } ],
-    "threshold" : "13"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "12",
-      "overvotes" : "0",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 8,
-    "tally" : {
-      "Terry Baker" : "17"
-    },
-    "tallyResults" : [ {
-      "elected" : "Terry Baker",
+      "elected" : "Warren Norell",
       "transfers" : { }
     } ],
-    "threshold" : "9"
+    "threshold" : "13"
   } ],
   "summary" : {
-    "finalThreshold" : "9",
+    "finalThreshold" : "13",
     "numCandidates" : 8,
     "numWinners" : 1,
     "totalNumBallots" : "35",

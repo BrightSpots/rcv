@@ -185,31 +185,13 @@
       "Willy Wonka" : "9"
     },
     "tallyResults" : [ {
-      "eliminated" : "Willy Wonka",
-      "transfers" : {
-        "exhausted" : "9"
-      }
-    } ],
-    "threshold" : "10"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "20",
-      "overvotes" : "0",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 9,
-    "tally" : {
-      "Niels Larson" : "9"
-    },
-    "tallyResults" : [ {
-      "elected" : "Niels Larson",
+      "elected" : "Willy Wonka",
       "transfers" : { }
     } ],
-    "threshold" : "5"
+    "threshold" : "10"
   } ],
   "summary" : {
-    "finalThreshold" : "5",
+    "finalThreshold" : "10",
     "numCandidates" : 9,
     "numWinners" : 1,
     "totalNumBallots" : "35",
