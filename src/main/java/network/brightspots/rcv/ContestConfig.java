@@ -158,7 +158,7 @@ class ContestConfig {
       }
       if (!isNullOrBlank(source.getSkippedRankLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getSkippedRankLabel(), source, "skippedRankLabel")) {
+              source.getSkippedRankLabel(), source, "skippedRankLabel")) {
         validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID);
       }
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
@@ -447,7 +447,7 @@ class ContestConfig {
       inUse =
           stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, source.getSkippedRankLabel(), "skippedRankLabel")
+                  string, field, source.getSkippedRankLabel(), "skippedRankLabel")
               || stringMatchesAnotherFieldValue(
                   string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
     }

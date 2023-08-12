@@ -82,8 +82,7 @@ public class RawContestConfig {
     // Deprecated fields
     private String undervoteLabel;
 
-    CvrSource() {
-    }
+    CvrSource() {}
 
     CvrSource(
         String filePath,

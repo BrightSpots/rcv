@@ -90,7 +90,7 @@ class Tabulator {
     }
 
     if (config.isTabulateByPrecinctEnabled()) {
-      if (precinctIds.size() == 0) {
+      if (precinctIds.isEmpty()) {
         Logger.severe("\"Tabulate by Precinct\" enabled, but CVRs don't list precincts.");
         throw new TabulationAbortedException(false);
       }
@@ -192,7 +192,7 @@ class Tabulator {
           buildTallyToCandidates(currentRoundTally, currentRoundTally.getCandidates(), true);
       List<String> winners = identifyWinners(currentRoundTally, currentRoundTallyToCandidates);
 
-      if (winners.size() > 0) {
+      if (!winners.isEmpty()) {
         for (String winner : winners) {
           winnerToRound.put(winner, currentRound);
         }
@@ -342,7 +342,7 @@ class Tabulator {
 
     // process all the CVRs if needed (i.e. if we have any winners from the previous round to
     // process)
-    if (winnersRequiringComputation.size() > 0) {
+    if (!winnersRequiringComputation.isEmpty()) {
       for (CastVoteRecord cvr : castVoteRecords) {
         // the record of winners who got partial votes from this CVR
         Map<String, BigDecimal> winnerToFractionalValue = cvr.getWinnerToFractionalValue();
@@ -550,9 +550,10 @@ class Tabulator {
       // * If this is a single-winner election in which it's possible for no candidate to reach the
       //   threshold (i.e. "first round determines threshold" is set), the tiebreaker will choose
       //   the only winner.
-      boolean needsTiebreakMultipleWinners = selectedWinners.size() > 1
-          && (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
-          || config.isFirstRoundDeterminesThresholdEnabled());
+      boolean needsTiebreakMultipleWinners =
+          selectedWinners.size() > 1
+              && (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
+                  || config.isFirstRoundDeterminesThresholdEnabled());
       // Edge case: there are two candidates remaining. To avoid having just one candidate in the
       // final round, we break the tie here. Happens when we have unfilled seats, two candidates
       // remaining, neither meets the threshold, and both have more than the minimum vote threshold.
@@ -560,14 +561,15 @@ class Tabulator {
       //  1. Single-winner election
       //  2. There are two remaining candidates
       //  3. There is one seat unfilled (i.e. the seat hasn't already been filled in a previous
-      //           round due to "Continue Untli Two Remain" config option)
+      //           round due to "Continue Until Two Remain" config option)
       //  4. All candidates are over the minimum threshold (see no_one_meets_minimum test)
-      boolean needsTiebreakNoWinners = config.getNumberOfWinners() == 1
-          && selectedWinners.size() == 0
-          && currentRoundTally.numActiveCandidates() == 2
-          && numSeatsUnfilled == 1
-          && currentRoundTallyToCandidates.keySet().stream().allMatch(
-              x -> x.compareTo(config.getMinimumVoteThreshold()) >= 0);
+      boolean needsTiebreakNoWinners =
+          config.getNumberOfWinners() == 1
+              && selectedWinners.isEmpty()
+              && currentRoundTally.numActiveCandidates() == 2
+              && numSeatsUnfilled == 1
+              && currentRoundTallyToCandidates.keySet().stream()
+                  .allMatch(x -> x.compareTo(config.getMinimumVoteThreshold()) >= 0);
       if (needsTiebreakMultipleWinners || needsTiebreakNoWinners) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
