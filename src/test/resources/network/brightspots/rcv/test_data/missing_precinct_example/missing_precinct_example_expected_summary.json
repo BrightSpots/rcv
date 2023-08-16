@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Missing Precinct example",
     "date" : "2017-11-07",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Minneapolis, MN",
-    "office" : "Mayor",
-    "threshold" : "2"
+    "office" : "Mayor"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Al Flowers" : "0",
@@ -74,8 +81,15 @@
     }, {
       "eliminated" : "Al Flowers",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "3"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Betsy Hodges" : "1",
@@ -88,8 +102,15 @@
       "transfers" : {
         "Betsy Hodges" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "3"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Betsy Hodges" : "2",
@@ -101,27 +122,31 @@
       "transfers" : {
         "Jacob Frey" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "3"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Betsy Hodges" : "2",
       "Jacob Frey" : "2"
     },
     "tallyResults" : [ {
-      "eliminated" : "Betsy Hodges",
-      "transfers" : {
-        "exhausted" : "2"
-      }
-    } ]
-  }, {
-    "round" : 5,
-    "tally" : {
-      "Jacob Frey" : "2"
-    },
-    "tallyResults" : [ {
       "elected" : "Jacob Frey",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "3"
+  } ],
+  "summary" : {
+    "finalThreshold" : "3",
+    "numCandidates" : 19,
+    "numWinners" : 1,
+    "totalNumBallots" : "4",
+    "undervotes" : 0
+  }
 }

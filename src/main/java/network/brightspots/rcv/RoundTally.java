@@ -44,9 +44,8 @@ class RoundTally {
   RoundTally(int roundNumber, Stream<String> candidateNames) {
     this.roundNumber = roundNumber;
     candidateTallies = new HashMap<>();
-    candidateNames.forEach((String candidateName) -> {
-      candidateTallies.put(candidateName, BigDecimal.ZERO);
-    });
+    candidateNames.forEach(
+        (String candidateName) -> candidateTallies.put(candidateName, BigDecimal.ZERO));
 
     ballotStatusTallies = new HashMap<>();
     for (StatusForRound statusForRound : StatusForRound.values()) {
@@ -85,10 +84,10 @@ class RoundTally {
   }
 
   // Adds to the votes for this candidate
-  BigDecimal addToCandidateTally(String candidateId, BigDecimal tally) {
+  void addToCandidateTally(String candidateId, BigDecimal tally) {
     ensureNotFinalized();
     addBallotWithStatus(StatusForRound.ACTIVE, tally);
-    return candidateTallies.put(candidateId, candidateTallies.get(candidateId).add(tally));
+    candidateTallies.put(candidateId, candidateTallies.get(candidateId).add(tally));
   }
 
   // Adds votes without adjusting the number of BallotStatus.ACTIVE ballots.
@@ -104,30 +103,30 @@ class RoundTally {
     candidateTallies.put(candidateId, tally);
   }
 
-  // Sets the winning threshold for this round.
-  void setWinningThreshold(BigDecimal winningThreshold) {
-    this.winningThreshold = winningThreshold;
-  }
-
   // Gets the winning threshold for this round.
   BigDecimal getWinningThreshold() {
     return winningThreshold;
   }
 
+  // Sets the winning threshold for this round.
+  void setWinningThreshold(BigDecimal winningThreshold) {
+    this.winningThreshold = winningThreshold;
+  }
+
   // Adds to the count of inactive ballots
-  BigDecimal addInactiveBallot(StatusForRound statusForRound, BigDecimal value) {
+  void addInactiveBallot(StatusForRound statusForRound, BigDecimal value) {
     ensureNotFinalized();
     if (statusForRound == StatusForRound.ACTIVE) {
       throw new RuntimeException("Cannot add an active ballot as inactive");
     }
-    return addBallotWithStatus(statusForRound, value);
+    addBallotWithStatus(statusForRound, value);
   }
 
   // Adds to the votes for this round
-  private BigDecimal addBallotWithStatus(StatusForRound statusForRound, BigDecimal value) {
+  private void addBallotWithStatus(StatusForRound statusForRound, BigDecimal value) {
     ensureNotFinalized();
     BigDecimal newVal = ballotStatusTallies.get(statusForRound).add(value);
-    return ballotStatusTallies.put(statusForRound, newVal);
+    ballotStatusTallies.put(statusForRound, newVal);
   }
 
   // Get the number of inactive ballots by type
@@ -162,8 +161,9 @@ class RoundTally {
   // Return a list of all candidates, if any, with votes greater than the given threshold
   public List<String> getCandidatesWithMoreVotesThan(BigDecimal threshold) {
     ensureFinalized();
-    return getCandidates().stream().filter(
-        candidate -> getCandidateTally(candidate).compareTo(threshold) > 0).toList();
+    return getCandidates().stream()
+        .filter(candidate -> getCandidateTally(candidate).compareTo(threshold) > 0)
+        .toList();
   }
 
   // Return a list of all input candidates sorted from the highest tally to lowest
@@ -191,11 +191,12 @@ class RoundTally {
 
   private void countBallots() {
     numInactiveBallots = BigDecimal.ZERO;
-    ballotStatusTallies.forEach((statusForRound, tally) -> {
-      if (statusForRound != StatusForRound.ACTIVE) {
-        numInactiveBallots = numInactiveBallots.add(tally);
-      }
-    });
+    ballotStatusTallies.forEach(
+        (statusForRound, tally) -> {
+          if (statusForRound != StatusForRound.ACTIVE) {
+            numInactiveBallots = numInactiveBallots.add(tally);
+          }
+        });
 
     numActiveBallots = ballotStatusTallies.get(StatusForRound.ACTIVE);
   }

@@ -23,21 +23,6 @@ import java.util.NoSuchElementException;
 import javafx.util.Pair;
 
 class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRanking>> {
-  /**
-   * Precondition: must be called with a 1-indexed ranking number. Note: just because this returns
-   * false at ranking N doesn't mean it will also return false at N+1 -- specifically, that will not
-   * be true if there are skipped rankings.
-   *
-   * @param num A value >= 1.
-   * @return Whether the candidate has a ranking at the given value.
-   */
-  boolean hasRankingAt(int num) {
-    if (num < 1) {
-      throw new IllegalArgumentException();
-    }
-    return num <= rankings.length && rankings[num - 1].count() != 0;
-  }
-
   private final CandidatesAtRanking[] rankings;
   private int numRankings;
 
@@ -51,8 +36,8 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
       // Initialize up to maxRankings, leaving empty arrays for any skipped rankings
       int minRanking = rawRankings.get(0).getKey();
       if (minRanking <= 0) {
-        throw new RuntimeException("Invalid ranking %d. All rankings must be positive integers"
-            .formatted(minRanking));
+        throw new RuntimeException(
+            "Invalid ranking %d. All rankings must be positive integers".formatted(minRanking));
       }
 
       int maxRanking = rawRankings.get(rawRankings.size() - 1).getKey();
@@ -76,8 +61,35 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
     }
   }
 
+  /**
+   * Precondition: must be called with a 1-indexed ranking number. Note: just because this returns
+   * false at ranking N doesn't mean it will also return false at N+1 -- specifically, that will not
+   * be true if there are skipped rankings.
+   *
+   * @param num A value >= 1.
+   * @return Whether the candidate has a ranking at the given value.
+   */
+  boolean hasRankingAt(int num) {
+    if (num < 1) {
+      throw new IllegalArgumentException();
+    }
+    return num <= rankings.length && rankings[num - 1].count() != 0;
+  }
+
   CandidatesAtRanking get(int i) {
     return rankings[i - 1];
+  }
+
+  int maxRankingNumber() {
+    return this.rankings.length;
+  }
+
+  int numRankings() {
+    return numRankings;
+  }
+
+  public Iterator<Pair<Integer, CandidatesAtRanking>> iterator() {
+    return new CandidateRankingsListIterator();
   }
 
   class CandidateRankingsListIterator implements Iterator<Pair<Integer, CandidatesAtRanking>> {
@@ -107,17 +119,5 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
     public void remove() {
       throw new UnsupportedOperationException();
     }
-  }
-
-  int maxRankingNumber() {
-    return this.rankings.length;
-  }
-
-  int numRankings() {
-    return numRankings;
-  }
-
-  public Iterator<Pair<Integer, CandidatesAtRanking>> iterator() {
-    return new CandidateRankingsListIterator();
   }
 }

@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "test set 1",
     "date" : "2019-03-06",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "TestSets_Single_winner",
-    "office" : "",
-    "threshold" : "7"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Candidate A Name" : "5",
@@ -19,8 +26,15 @@
       "transfers" : {
         "Candidate C Name" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "8"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Candidate A Name" : "5",
@@ -33,8 +47,15 @@
         "Candidate B Name" : "2",
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "8"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "2",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Candidate A Name" : "5",
@@ -43,6 +64,14 @@
     "tallyResults" : [ {
       "elected" : "Candidate B Name",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "7"
+  } ],
+  "summary" : {
+    "finalThreshold" : "7",
+    "numCandidates" : 4,
+    "numWinners" : 1,
+    "totalNumBallots" : "15",
+    "undervotes" : 0
+  }
 }

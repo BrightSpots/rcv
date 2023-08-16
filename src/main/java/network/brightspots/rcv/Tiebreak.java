@@ -112,8 +112,8 @@ class Tiebreak {
     switch (tiebreakMode) {
       case INTERACTIVE -> selectedCandidate = doInteractive(allTiedCandidates);
       case RANDOM -> selectedCandidate = doRandom(allTiedCandidates);
-      case GENERATE_PERMUTATION, USE_PERMUTATION_IN_CONFIG ->
-          selectedCandidate = doPermutationSelection(allTiedCandidates);
+      case GENERATE_PERMUTATION, USE_PERMUTATION_IN_CONFIG -> selectedCandidate =
+          doPermutationSelection(allTiedCandidates);
       default -> selectedCandidate = doPreviousRounds(allTiedCandidates);
     }
     return selectedCandidate;
@@ -190,12 +190,11 @@ class Tiebreak {
   private String doInteractiveGui(List<String> tiedCandidates) throws TabulationAbortedException {
     Logger.info(
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
-        round,
-        numVotes.intValue(),
-        String.join(", ", tiedCandidates));
-    Logger.info("Please use the pop-up window to select the candidate who should "
-        + (isSelectingWinner ? "win" : "lose")
-        + " this tiebreaker.");
+        round, numVotes.intValue(), String.join(", ", tiedCandidates));
+    Logger.info(
+        "Please use the pop-up window to select the candidate who should "
+            + (isSelectingWinner ? "win" : "lose")
+            + " this tiebreaker.");
 
     String selection = null;
 
@@ -292,16 +291,8 @@ class Tiebreak {
     return selection;
   }
 
-  private static class GuiTiebreakerPromptResponse {
-
-    final boolean tabulationCancelled;
-    final String selectedCandidate;
-
-    GuiTiebreakerPromptResponse(boolean tabulationCancelled, String selectedCandidate) {
-      this.tabulationCancelled = tabulationCancelled;
-      this.selectedCandidate = selectedCandidate;
-    }
-  }
+  private record GuiTiebreakerPromptResponse(
+      boolean tabulationCancelled, String selectedCandidate) {}
 
   class GuiTiebreakerPrompt implements Callable<GuiTiebreakerPromptResponse> {
 

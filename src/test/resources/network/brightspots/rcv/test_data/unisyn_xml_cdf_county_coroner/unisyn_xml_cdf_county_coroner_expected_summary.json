@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "For County Coroner (1/2)",
     "date" : "2019-03-06",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "5"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Andrea Doria" : "3",
@@ -22,8 +29,15 @@
     "tallyResults" : [ {
       "eliminated" : "Undeclared Write-ins",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Andrea Doria" : "3",
@@ -42,8 +56,15 @@
         "Walter Gerber" : "1",
         "Willy Wonka" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Andrea Doria" : "3",
@@ -60,8 +81,15 @@
         "Jimmy Hendriks" : "2",
         "Niels Larson" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Emily Steffan" : "4",
@@ -77,8 +105,15 @@
         "Jimmy Hendriks" : "1",
         "Niels Larson" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Emily Steffan" : "4",
@@ -92,8 +127,15 @@
       "transfers" : {
         "exhausted" : "4"
       }
-    } ]
+    } ],
+    "threshold" : "15"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "4",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "Emily Steffan" : "4",
@@ -107,8 +149,15 @@
         "Willy Wonka" : "3",
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "13"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "5",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "Jimmy Hendriks" : "7",
@@ -121,27 +170,31 @@
         "Niels Larson" : "1",
         "exhausted" : "6"
       }
-    } ]
+    } ],
+    "threshold" : "13"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "11",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 8,
     "tally" : {
       "Niels Larson" : "9",
       "Willy Wonka" : "9"
     },
     "tallyResults" : [ {
-      "eliminated" : "Willy Wonka",
-      "transfers" : {
-        "exhausted" : "9"
-      }
-    } ]
-  }, {
-    "round" : 9,
-    "tally" : {
-      "Niels Larson" : "9"
-    },
-    "tallyResults" : [ {
-      "elected" : "Niels Larson",
+      "elected" : "Willy Wonka",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "10"
+  } ],
+  "summary" : {
+    "finalThreshold" : "10",
+    "numCandidates" : 9,
+    "numWinners" : 1,
+    "totalNumBallots" : "35",
+    "undervotes" : 6
+  }
 }

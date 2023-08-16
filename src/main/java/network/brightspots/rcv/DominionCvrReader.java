@@ -125,15 +125,10 @@ class DominionCvrReader extends BaseCvrReader {
     return "Dominion";
   }
 
-  Map<String, Contest> getContests() {
-    return contests;
-  }
-
   // parse CVR JSON for records matching the specified contestId into CastVoteRecord objects and add
   // them to the input list
   @Override
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-      throws CvrParseException {
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
     // read metadata files for precincts, precinct portions, contest, and candidates
 
     // Precinct data does not exist for earlier versions of Dominion (only precinct portion)
@@ -177,6 +172,11 @@ class DominionCvrReader extends BaseCvrReader {
   public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {
     validateNamesAreInContest(castVoteRecords);
+  }
+
+  @Override
+  public Integer getMaxRankingsAllowed(String contestId) {
+    return contests.get(contestId).getMaxRanks();
   }
 
   private void validateNamesAreInContest(List<CastVoteRecord> castVoteRecords)
@@ -300,7 +300,6 @@ class DominionCvrReader extends BaseCvrReader {
         throw new CvrParseException();
       }
       String precinctPortion = this.precinctPortions.get(precinctPortionId);
-      String ballotTypeId = adjudicatedData.get("BallotTypeId").toString();
 
       ArrayList cardsList;
       // sometimes there is a "Cards" object at this level
@@ -350,14 +349,7 @@ class DominionCvrReader extends BaseCvrReader {
           // create the new cvr
           CastVoteRecord newCvr =
               new CastVoteRecord(
-                  contestId,
-                  tabulatorId,
-                  batchId,
-                  suppliedId,
-                  precinct,
-                  precinctPortion,
-                  ballotTypeId,
-                  rankings);
+                  contestId, tabulatorId, batchId, suppliedId, precinct, precinctPortion, rankings);
           castVoteRecords.add(newCvr);
         }
       }

@@ -24,11 +24,10 @@ class GuiContext {
   private static final GuiContext INSTANCE = new GuiContext();
   // currently-loaded tabulator config
   private ContestConfig config;
-  // cache for main window so we can parent file choosers to it
+  // cache for main window, so we can parent file choosers to it
   private Stage mainWindow;
 
-  private GuiContext() {
-  }
+  private GuiContext() {}
 
   static GuiContext getInstance() {
     return INSTANCE;

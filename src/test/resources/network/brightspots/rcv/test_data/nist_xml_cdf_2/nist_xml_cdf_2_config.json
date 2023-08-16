@@ -18,7 +18,7 @@
       "contestId": "For Governor and Lieutenant Governor",
       "treatBlankAsUndeclaredWriteIn": false,
       "overvoteLabel": "",
-      "undervoteLabel": "",
+      "skippedRankLabel": "",
       "undeclaredWriteInLabel": ""
     }
   ],

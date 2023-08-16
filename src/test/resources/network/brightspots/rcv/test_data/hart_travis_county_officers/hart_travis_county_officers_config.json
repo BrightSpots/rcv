@@ -19,7 +19,7 @@
     "contestId": "e9ca8235-893e-43df-93eb-3cc61eeb133c",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
-    "undervoteLabel": "",
+    "skippedRankLabel": "",
     "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [

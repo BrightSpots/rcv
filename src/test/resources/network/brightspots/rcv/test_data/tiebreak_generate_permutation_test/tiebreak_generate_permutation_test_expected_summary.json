@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Tiebreak test",
     "date" : "2017-12-03",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Funkytown, USA",
-    "office" : "Sergeant-at-Arms",
-    "threshold" : "2"
+    "office" : "Sergeant-at-Arms"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "George Gervin" : "2",
@@ -19,8 +26,15 @@
       "transfers" : {
         "exhausted" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "5"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "George Gervin" : "2",
@@ -32,27 +46,31 @@
       "transfers" : {
         "exhausted" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "4"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "4",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "George Gervin" : "2",
       "Sedale Threatt" : "2"
     },
     "tallyResults" : [ {
-      "eliminated" : "Sedale Threatt",
-      "transfers" : {
-        "exhausted" : "2"
-      }
-    } ]
-  }, {
-    "round" : 4,
-    "tally" : {
-      "George Gervin" : "2"
-    },
-    "tallyResults" : [ {
       "elected" : "George Gervin",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "3"
+  } ],
+  "summary" : {
+    "finalThreshold" : "3",
+    "numCandidates" : 4,
+    "numWinners" : 1,
+    "totalNumBallots" : "8",
+    "undervotes" : 0
+  }
 }

@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Aliases test (JSON CDF Format)",
     "date" : "2023-03-23",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "TestSets_Single_winner",
-    "office" : "Aliases test",
-    "threshold" : "16"
+    "office" : "Aliases test"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Candidate B Name File 1" : "10",
@@ -20,8 +27,15 @@
         "Candidate C Name File 1" : "2",
         "Unused Display Name Candidate A" : "2"
       }
-    } ]
+    } ],
+    "threshold" : "16"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Candidate B Name File 1" : "10",
@@ -34,8 +48,15 @@
         "Candidate B Name File 1" : "4",
         "Unused Display Name Candidate A" : "4"
       }
-    } ]
+    } ],
+    "threshold" : "16"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Candidate B Name File 1" : "14",
@@ -44,6 +65,14 @@
     "tallyResults" : [ {
       "elected" : "Unused Display Name Candidate A",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "16"
+  } ],
+  "summary" : {
+    "finalThreshold" : "16",
+    "numCandidates" : 4,
+    "numWinners" : 1,
+    "totalNumBallots" : "30",
+    "undervotes" : 0
+  }
 }

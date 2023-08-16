@@ -24,8 +24,7 @@ final class Utils {
 
   private static final Map<String, String> envMap = System.getenv();
 
-  private Utils() {
-  }
+  private Utils() {}
 
   static boolean isNullOrBlank(String s) {
     return s == null || s.isBlank();
@@ -82,5 +81,9 @@ final class Utils {
       user = envMap.getOrDefault("USERNAME", "[unknown]");
     }
     return user;
+  }
+
+  static String[] splitByNewline(String s) {
+    return s.trim().split("\\s*\\r?\\n\\s*");
   }
 }

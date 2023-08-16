@@ -26,8 +26,7 @@ final class FileUtils {
   // cache location for finding and creating user files and folders
   private static String userDirectory = null;
 
-  private FileUtils() {
-  }
+  private FileUtils() {}
 
   // return userDirectory if it exists
   // fallback to current working directory

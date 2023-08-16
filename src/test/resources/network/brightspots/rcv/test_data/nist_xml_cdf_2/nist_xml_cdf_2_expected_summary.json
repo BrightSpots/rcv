@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "For Governor and Lieutenant Governor",
     "date" : "2019-03-06",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "",
-    "office" : "",
-    "threshold" : "1"
+    "office" : ""
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Anita Rios and Bob Fitrakis" : "0",
@@ -16,25 +23,31 @@
     "tallyResults" : [ {
       "eliminated" : "John Kasich and Mary Taylor",
       "transfers" : { }
-    } ]
+    } ],
+    "threshold" : "1"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Anita Rios and Bob Fitrakis" : "0",
       "Edward FitzGerald and Sharen Swartz Neuhardt" : "0"
     },
     "tallyResults" : [ {
-      "eliminated" : "Anita Rios and Bob Fitrakis",
+      "elected" : "Anita Rios and Bob Fitrakis",
       "transfers" : { }
-    } ]
-  }, {
-    "round" : 3,
-    "tally" : {
-      "Edward FitzGerald and Sharen Swartz Neuhardt" : "0"
-    },
-    "tallyResults" : [ {
-      "elected" : "Edward FitzGerald and Sharen Swartz Neuhardt",
-      "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "1"
+  } ],
+  "summary" : {
+    "finalThreshold" : "1",
+    "numCandidates" : 3,
+    "numWinners" : 1,
+    "totalNumBallots" : "1",
+    "undervotes" : 1
+  }
 }

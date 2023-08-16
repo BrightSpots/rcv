@@ -19,7 +19,7 @@
     "provider" : "ess",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
+    "skippedRankLabel": "undervote",
     "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
@@ -56,7 +56,7 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "stopCountingAndAsk",
+    "tiebreakMode": "useCandidateOrder",
     "overvoteRule": "exhaustImmediately",
     "winnerElectionMode": "singleWinnerMajority",
     "randomSeed": "",

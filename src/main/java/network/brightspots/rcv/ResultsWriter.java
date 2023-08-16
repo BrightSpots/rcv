@@ -34,13 +34,11 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,7 +49,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javafx.util.Pair;
-import network.brightspots.rcv.DominionCvrReader.Contest;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -72,7 +69,6 @@ class ResultsWriter {
   private Set<String> precinctIds;
   // precinct to GpUnitId map (CDF only)
   private Map<String, String> gpUnitIds;
-  private BigDecimal winningThreshold;
   // map from round number to list of candidates eliminated in that round
   private Map<Integer, List<String>> roundToEliminatedCandidates;
   // map from round number to list of candidates winning in that round
@@ -95,6 +91,7 @@ class ResultsWriter {
       String outputType,
       String timestampString,
       String sequentialTabulationId) {
+    outputType = sanitizeStringForOutput(outputType);
     String fileName =
         String.format(
             "%s_%s%s",
@@ -103,7 +100,7 @@ class ResultsWriter {
   }
 
   static String sanitizeStringForOutput(String s) {
-    return s.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
+    return s == null ? "" : s.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
   }
 
   private static void generateJsonFile(String path, Map<String, Object> json) throws IOException {
@@ -139,14 +136,14 @@ class ResultsWriter {
 
   // generates an internal ContestSelectionId based on a candidate name
   private static String getCdfContestSelectionIdForCandidateName(String name) {
-    return cdfCandidateNameToContestSelectionId.computeIfAbsent(name,
-        c -> String.format("cs-%s", sanitizeStringForOutput(c).toLowerCase()));
+    return cdfCandidateNameToContestSelectionId.computeIfAbsent(
+        name, c -> String.format("cs-%s", sanitizeStringForOutput(c).toLowerCase()));
   }
 
   // generates an internal CandidateId based on a candidate name
   private static String getCdfCandidateIdForCandidateName(String name) {
-    return cdfCandidateNameToCandidateId.computeIfAbsent(name,
-        c -> String.format("c-%s", sanitizeStringForOutput(c).toLowerCase()));
+    return cdfCandidateNameToCandidateId.computeIfAbsent(
+        name, c -> String.format("c-%s", sanitizeStringForOutput(c).toLowerCase()));
   }
 
   // Instead of a list mapping ranks to list of candidates, we need a sorted list of candidates
@@ -223,11 +220,6 @@ class ResultsWriter {
     return this;
   }
 
-  ResultsWriter setWinningThreshold(BigDecimal threshold) {
-    this.winningThreshold = threshold;
-    return this;
-  }
-
   ResultsWriter setPrecinctIds(Set<String> precinctIds) {
     this.precinctIds = precinctIds;
     return this;
@@ -267,11 +259,9 @@ class ResultsWriter {
   // creates summary files for the votes in each precinct
   // param: precinctRoundTallies is map from precinct to the round-by-round vote tallies
   // param: precinctTallyTransfers is a map from precinct to tally transfers for that precinct
-  // param: numUndervotesByPrecinct is the total count of undervotes per precinct
   void generatePrecinctSummaryFiles(
       Map<String, Map<Integer, RoundTally>> precinctRoundTallies,
-      Map<String, TallyTransfers> precinctTallyTransfers,
-      Map<String, Integer> numUndervotesByPrecinct)
+      Map<String, TallyTransfers> precinctTallyTransfers)
       throws IOException {
     Set<String> filenames = new HashSet<>();
     for (var entry : precinctRoundTallies.entrySet()) {
@@ -280,10 +270,8 @@ class ResultsWriter {
       String precinctFileString = getPrecinctFileString(precinct, filenames);
       String outputPath =
           getOutputFilePathFromInstance(String.format("%s_precinct_summary", precinctFileString));
-      Integer numUndervotes = numUndervotesByPrecinct.get(precinct);
-      generateSummarySpreadsheet(roundTallies, numUndervotes, precinct, outputPath);
-      generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct),
-            precinct, outputPath);
+      generateSummarySpreadsheet(roundTallies, precinct, outputPath);
+      generateSummaryJson(roundTallies, precinctTallyTransfers.get(precinct), precinct, outputPath);
     }
   }
 
@@ -292,10 +280,7 @@ class ResultsWriter {
   // param: precinct indicates which precinct we're reporting results for (null means all)
   // param: outputPath is the path to the output file, minus its extension
   private void generateSummarySpreadsheet(
-      Map<Integer, RoundTally> roundTallies,
-      Integer numUndervotes,
-      String precinct,
-      String outputPath)
+      Map<Integer, RoundTally> roundTallies, String precinct, String outputPath)
       throws IOException {
     String csvPath = outputPath + ".csv";
     Logger.info("Generating summary spreadsheet: %s...", csvPath);
@@ -311,10 +296,14 @@ class ResultsWriter {
       throw exception;
     }
 
-    addContestInformationRows(csvPrinter, precinct);
+    BigDecimal winningThreshold = roundTallies.get(numRounds).getWinningThreshold();
+    addContestInformationRows(csvPrinter, winningThreshold, precinct);
+    addContestSummaryRows(csvPrinter, roundTallies.get(1));
     csvPrinter.print("Rounds");
     for (int round = 1; round <= numRounds; round++) {
-      csvPrinter.print(String.format("Round %d", round));
+      csvPrinter.print(String.format("Round %d Votes", round));
+      csvPrinter.print("% of vote");
+      csvPrinter.print("transfer");
     }
     csvPrinter.println();
 
@@ -339,23 +328,100 @@ class ResultsWriter {
 
         // Vote count
         csvPrinter.print(thisRoundTally);
+
+        // Vote %
+        BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
+        if (activeBallots != BigDecimal.ZERO) {
+          // Turn a decimal into a human-readable percentage (e.g. 0.1234 -> 12.34%)
+          BigDecimal divDecimal = thisRoundTally.divide(activeBallots, MathContext.DECIMAL32);
+          csvPrinter.print(divDecimal.scaleByPowerOfTen(4).intValue() / 100.0 + "%");
+        } else {
+          csvPrinter.print("");
+        }
+
+        // Transfer
+        if (round < numRounds) {
+          BigDecimal nextRoundTally = roundTallies.get(round + 1).getCandidateTally(candidate);
+          if (nextRoundTally == null) {
+            nextRoundTally = BigDecimal.ZERO;
+          }
+          csvPrinter.print(nextRoundTally.subtract(thisRoundTally));
+        } else {
+          csvPrinter.print(0);
+        }
       }
       csvPrinter.println();
     }
 
-    csvPrinter.print("Inactive ballots");
+    csvPrinter.print("Active Ballots");
     for (int round = 1; round <= numRounds; round++) {
-      BigDecimal inactiveBallots = roundTallies.get(round).numInactiveBallots();
+      csvPrinter.print(roundTallies.get(round).numActiveBallots());
+      csvPrinter.print("");
+      csvPrinter.print("");
+    }
+    csvPrinter.println();
 
-      // The previous method of calculating inactive ballots was to sum values that included
-      // active ballots, leading to additional but unnecessary precision.
-      // Mimic that behavior here so there is no change in the test files.
-      BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
-      if (inactiveBallots.scale() < activeBallots.scale()) {
-        inactiveBallots = inactiveBallots.setScale(activeBallots.scale(), RoundingMode.HALF_UP);
+    csvPrinter.print("Current Round Threshold");
+    for (int round = 1; round <= numRounds; round++) {
+      csvPrinter.print(roundTallies.get(round).getWinningThreshold());
+      csvPrinter.print("");
+      csvPrinter.print("");
+    }
+    csvPrinter.println();
+
+    Pair<String, StatusForRound>[] statusesToPrint =
+        new Pair[] {
+          new Pair<>("Overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
+          new Pair<>("Skipped Rankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
+          new Pair<>("Exhausted Choices", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
+          new Pair<>("Repeated Rankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING)
+        };
+
+    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
+      csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
+      for (int round = 1; round <= numRounds; round++) {
+        StatusForRound status = statusToPrint.getValue();
+        BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
+        csvPrinter.print(thisRoundInactive);
+
+        // Don't display percentage of inactive ballots
+        csvPrinter.print("");
+
+        // Do display transfer of inactive ballots
+        if (round != numRounds) {
+          BigDecimal nextRoundInactive = roundTallies.get(round + 1).getBallotStatusTally(status);
+          BigDecimal diff = nextRoundInactive.subtract(thisRoundInactive);
+          csvPrinter.print(diff);
+        } else {
+          csvPrinter.print(0);
+        }
       }
+      csvPrinter.println();
+    }
 
-      csvPrinter.print(inactiveBallots);
+    csvPrinter.print("Inactive Ballots Total");
+    // Undervotes should not be included in the Inactive Ballots count, even though we treat them
+    // as such internally. Subtract undervotes (which are static throughout a contest) from the
+    // inactive ballot totals.
+    BigDecimal numUndervotes =
+        roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
+    for (int round = 1; round <= numRounds; round++) {
+      BigDecimal thisRoundInactive = roundTallies.get(round).numInactiveBallots();
+      csvPrinter.print(thisRoundInactive.subtract(numUndervotes));
+
+      // Don't display percentage of inactive ballots
+      csvPrinter.print("");
+
+      // Do display transfer of inactive ballots
+      if (round != numRounds) {
+        // Note: we don't need to subtract num undervotes here since we'd be subtracting the
+        // same value from both sides of the equation, so it cancels out.
+        BigDecimal nextRoundInactive = roundTallies.get(round + 1).numInactiveBallots();
+        BigDecimal diff = nextRoundInactive.subtract(thisRoundInactive);
+        csvPrinter.print(diff);
+      } else {
+        csvPrinter.print(0);
+      }
     }
     csvPrinter.println();
 
@@ -368,6 +434,10 @@ class ResultsWriter {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round));
+
+        // Don't display transfer or percentage of residual surplus
+        csvPrinter.print("");
+        csvPrinter.print("");
       }
       csvPrinter.println();
     }
@@ -391,24 +461,39 @@ class ResultsWriter {
   // "action" rows describe which candidates were eliminated or elected
   private void addActionRows(CSVPrinter csvPrinter) throws IOException {
     csvPrinter.print("Eliminated");
-    for (int round = 1; round <= numRounds; round++) {
-      List<String> eliminated = roundToEliminatedCandidates.get(round);
-      if (eliminated != null && eliminated.size() > 0) {
-        addActionRowCandidates(eliminated, csvPrinter);
-      } else {
-        csvPrinter.print("");
-      }
-    }
-    csvPrinter.println();
+    printActionSummary(csvPrinter, roundToEliminatedCandidates);
 
     csvPrinter.print("Elected");
+    printActionSummary(csvPrinter, roundToWinningCandidates);
+  }
+
+  private void addContestSummaryRows(CSVPrinter csvPrinter, RoundTally round1Tally)
+      throws IOException {
+    BigDecimal numUndervotes =
+        round1Tally.getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
+    BigDecimal totalNumberBallots =
+        round1Tally.numActiveBallots().add(round1Tally.numInactiveBallots());
+    csvPrinter.printRecord("Contest Summary");
+    csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
+    csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
+    csvPrinter.printRecord("Total Number of Ballots", totalNumberBallots);
+    csvPrinter.printRecord("Number of Undervotes", numUndervotes);
+    csvPrinter.println();
+  }
+
+  private void printActionSummary(
+      CSVPrinter csvPrinter, Map<Integer, List<String>> roundToCandidates) throws IOException {
     for (int round = 1; round <= numRounds; round++) {
-      List<String> winners = roundToWinningCandidates.get(round);
+      List<String> winners = roundToCandidates.get(round);
       if (winners != null && winners.size() > 0) {
         addActionRowCandidates(winners, csvPrinter);
       } else {
         csvPrinter.print("");
       }
+
+      // Empty % of vote and transfer columns
+      csvPrinter.print("");
+      csvPrinter.print("");
     }
     csvPrinter.println();
   }
@@ -425,8 +510,13 @@ class ResultsWriter {
     csvPrinter.print(candidateCellText);
   }
 
-  private void addContestInformationRows(CSVPrinter csvPrinter, String precinct)
-        throws IOException {
+  private void addContestInformationRows(
+      CSVPrinter csvPrinter, BigDecimal winningThreshold, String precinct) throws IOException {
+    csvPrinter.printRecord("Contest Information");
+    csvPrinter.printRecord("Generated By", "RCTab " + Main.APP_VERSION);
+    csvPrinter.printRecord("CSV Format Version", "1");
+    csvPrinter.printRecord(
+        "Type of Election", config.isSingleWinnerEnabled() ? "Single-Winner" : "Multi-Winner");
     csvPrinter.printRecord("Contest", config.getContestName());
     csvPrinter.printRecord("Jurisdiction", config.getContestJurisdiction());
     csvPrinter.printRecord("Office", config.getContestOffice());
@@ -442,7 +532,7 @@ class ResultsWriter {
       }
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
-    csvPrinter.printRecord("Threshold", winningThreshold);
+    csvPrinter.printRecord("Final Threshold", winningThreshold);
     if (!isNullOrBlank(precinct)) {
       csvPrinter.printRecord("Precinct", precinct);
     }
@@ -451,89 +541,78 @@ class ResultsWriter {
 
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a precinct)
   void generateOverallSummaryFiles(
-      Map<Integer, RoundTally> roundTallies,
-      TallyTransfers tallyTransfers,
-      Integer numUndervotes)
-      throws IOException {
+      Map<Integer, RoundTally> roundTallies, TallyTransfers tallyTransfers) throws IOException {
     String outputPath = getOutputFilePathFromInstance("summary");
-    generateSummarySpreadsheet(roundTallies, numUndervotes, null, outputPath);
+    generateSummarySpreadsheet(roundTallies, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
   // write CastVoteRecords for the specified contest to the provided folder
-  // returns a list of files written
-  List<String> writeGenericCvrCsv(
+  // returns the filepath written
+  String writeGenericCvrCsv(
       List<CastVoteRecord> castVoteRecords,
-      Collection<Contest> contests,
+      Integer numRanks,
       String csvOutputFolder,
       String contestId,
       String undeclaredWriteInLabel)
       throws IOException {
-    List<String> filesWritten = new ArrayList<>();
+    String fileWritten;
     try {
-      for (Contest contest : contests) {
-        if (!contest.getId().equals(contestId)) {
-          // We already skipped loading CVRs for the other contests. This just ensures that we
-          // don't generate empty CSVs for them.
-          continue;
+      Path outputPath =
+          Paths.get(
+              getOutputFilePath(
+                      csvOutputFolder,
+                      "dominion_conversion_contest",
+                      timestampString,
+                      sanitizeStringForOutput(contestId))
+                  + ".csv");
+      Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
+      CSVPrinter csvPrinter;
+      BufferedWriter writer = Files.newBufferedWriter(outputPath);
+      csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
+      // print header:
+      // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
+      // rank 2 selection, ... rank maxRanks selection
+      csvPrinter.print("Contest Id");
+      csvPrinter.print("Tabulator Id");
+      csvPrinter.print("Batch Id");
+      csvPrinter.print("Record Id");
+      csvPrinter.print("Precinct");
+      csvPrinter.print("Precinct Portion");
+      for (int rank = 1; rank <= numRanks; rank++) {
+        String label = String.format("Rank %d", rank);
+        csvPrinter.print(label);
+      }
+      csvPrinter.println();
+      // print rows:
+      for (CastVoteRecord castVoteRecord : castVoteRecords) {
+        csvPrinter.print(castVoteRecord.getContestId());
+        csvPrinter.print(castVoteRecord.getTabulatorId());
+        csvPrinter.print(castVoteRecord.getBatchId());
+        csvPrinter.print(castVoteRecord.getId());
+        if (castVoteRecord.getPrecinct() == null) {
+          csvPrinter.print("");
+        } else {
+          csvPrinter.print(castVoteRecord.getPrecinct());
         }
-        Path outputPath =
-            Paths.get(
-                getOutputFilePath(
-                    csvOutputFolder,
-                    "dominion_conversion_contest",
-                    timestampString,
-                    contest.getId())
-                    + ".csv");
-        Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
-        CSVPrinter csvPrinter;
-        BufferedWriter writer = Files.newBufferedWriter(outputPath);
-        csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
-        // print header:
-        // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
-        // rank 2 selection, ... rank maxRanks selection
-        csvPrinter.print("Contest Id");
-        csvPrinter.print("Tabulator Id");
-        csvPrinter.print("Batch Id");
-        csvPrinter.print("Record Id");
-        csvPrinter.print("Precinct");
-        csvPrinter.print("Precinct Portion");
-        Integer numRanks = contest.getMaxRanks();
-        for (int rank = 1; rank <= numRanks; rank++) {
-          String label = String.format("Rank %d", rank);
-          csvPrinter.print(label);
+        if (castVoteRecord.getPrecinctPortion() == null) {
+          csvPrinter.print("");
+        } else {
+          csvPrinter.print(castVoteRecord.getPrecinctPortion());
         }
+        printRankings(undeclaredWriteInLabel, numRanks, csvPrinter, castVoteRecord);
         csvPrinter.println();
-        // print rows:
-        for (CastVoteRecord castVoteRecord : castVoteRecords) {
-          csvPrinter.print(castVoteRecord.getContestId());
-          csvPrinter.print(castVoteRecord.getTabulatorId());
-          csvPrinter.print(castVoteRecord.getBatchId());
-          csvPrinter.print(castVoteRecord.getId());
-          if (castVoteRecord.getPrecinct() == null) {
-            csvPrinter.print("");
-          } else {
-            csvPrinter.print(castVoteRecord.getPrecinct());
-          }
-          if (castVoteRecord.getPrecinctPortion() == null) {
-            csvPrinter.print("");
-          } else {
-            csvPrinter.print(castVoteRecord.getPrecinctPortion());
-          }
-          printRankings(undeclaredWriteInLabel, contest, csvPrinter, castVoteRecord);
-          csvPrinter.println();
-        }
-        // finalize the file
-        csvPrinter.flush();
-        csvPrinter.close();
-        filesWritten.add(outputPath.toString());
-        Logger.info("Successfully wrote: %s", outputPath.toString());
+      }
+      // finalize the file
+      csvPrinter.flush();
+      csvPrinter.close();
+      fileWritten = outputPath.toString();
+      Logger.info("Successfully wrote: %s", outputPath.toString());
 
-        File file = new File(outputPath.toString());
-        boolean readOnlySucceeded = file.setReadOnly();
-        if (!readOnlySucceeded) {
-          Logger.warning("Failed to set file to read-only: %s", file.getAbsolutePath());
-        }
+      File file = new File(outputPath.toString());
+      boolean readOnlySucceeded = file.setReadOnly();
+      if (!readOnlySucceeded) {
+        Logger.warning("Failed to set file to read-only: %s", file.getAbsolutePath());
       }
     } catch (IOException exception) {
       Logger.severe(
@@ -541,13 +620,17 @@ class ResultsWriter {
           csvOutputFolder, exception);
       throw exception;
     }
-    return filesWritten;
+    return fileWritten;
   }
 
-  private void printRankings(String undeclaredWriteInLabel, Contest contest, CSVPrinter csvPrinter,
-      CastVoteRecord castVoteRecord) throws IOException {
+  private void printRankings(
+      String undeclaredWriteInLabel,
+      Integer maxRanks,
+      CSVPrinter csvPrinter,
+      CastVoteRecord castVoteRecord)
+      throws IOException {
     // for each rank determine what candidate id, overvote, or undervote occurred and print it
-    for (Integer rank = 1; rank <= contest.getMaxRanks(); rank++) {
+    for (int rank = 1; rank <= maxRanks; rank++) {
       if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
         CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
         if (candidates.count() == 1) {
@@ -580,19 +663,19 @@ class ResultsWriter {
 
     HashMap<String, Object> outputJson = new HashMap<>();
     outputJson.put("CVR", generateCdfMapForCvrs(castVoteRecords));
-    outputJson.put("Election", new Map[]{generateCdfMapForElection()});
+    outputJson.put("Election", new Map[] {generateCdfMapForElection()});
     outputJson.put(
         "GeneratedDate", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
     outputJson.put("GpUnit", generateCdfMapForGpUnits());
-    outputJson.put("ReportGeneratingDeviceIds", new String[]{CDF_REPORTING_DEVICE_ID});
+    outputJson.put("ReportGeneratingDeviceIds", new String[] {CDF_REPORTING_DEVICE_ID});
     outputJson.put(
         "ReportingDevice",
-        new Map[]{
-            Map.ofEntries(
-                entry("@id", CDF_REPORTING_DEVICE_ID),
-                entry("@type", "CVR.ReportingDevice"),
-                entry("Application", Main.APP_NAME),
-                entry("Manufacturer", "Bright Spots"))
+        new Map[] {
+          Map.ofEntries(
+              entry("@id", CDF_REPORTING_DEVICE_ID),
+              entry("@type", "CVR.ReportingDevice"),
+              entry("Application", Main.APP_NAME),
+              entry("Manufacturer", "Bright Spots"))
         });
     outputJson.put("Version", "1.0.0");
     outputJson.put("@type", "CVR.CastVoteRecordReport");
@@ -600,7 +683,7 @@ class ResultsWriter {
     generateJsonFile(outputPath, outputJson);
   }
 
-  // build map from precinctId => GpUnitId as lookups are done by precinctId during cvr creation
+  // build map from precinctId => GpUnitId, as lookups are done by precinctId during cvr creation
   private Map<String, String> generateGpUnitIds() {
     Map<String, String> gpUnitIdToPrecinctId = new HashMap<>();
     int gpUnitIdIndex = 0;
@@ -749,7 +832,7 @@ class ResultsWriter {
 
     return Map.ofEntries(
         entry("@id", generateCvrSnapshotId(sanitizeStringForOutput(cvr.getId()), round)),
-        entry("CVRContest", new Map[]{contestMap}),
+        entry("CVRContest", new Map[] {contestMap}),
         entry("Type", round != null ? "interpreted" : "original"),
         entry("@type", "CVR.CVRSnapshot"));
   }
@@ -786,7 +869,7 @@ class ResultsWriter {
               entry("@type", "ContestSelection"),
               entry(
                   "CandidateIds",
-                  new String[]{getCdfCandidateIdForCandidateName(candidateName)})));
+                  new String[] {getCdfCandidateIdForCandidateName(candidateName)})));
     }
 
     Map<String, Object> contestJson =
@@ -799,7 +882,7 @@ class ResultsWriter {
     HashMap<String, Object> electionMap = new HashMap<>();
     electionMap.put("@id", CDF_ELECTION_ID);
     electionMap.put("Candidate", candidates);
-    electionMap.put("Contest", new Map[]{contestJson});
+    electionMap.put("Contest", new Map[] {contestJson});
     electionMap.put("ElectionScopeId", CDF_GPU_ID);
     electionMap.put("@type", "Election");
 
@@ -818,14 +901,27 @@ class ResultsWriter {
 
     // config will contain contest configuration info
     HashMap<String, Object> configData = new HashMap<>();
+    configData.put("generatedBy", "RCTab " + Main.APP_VERSION);
     configData.put("contest", config.getContestName());
     configData.put("jurisdiction", config.getContestJurisdiction());
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
-    configData.put("threshold", winningThreshold);
     if (!isNullOrBlank(precinct)) {
       configData.put("precinct", precinct);
     }
+
+    BigDecimal firstRoundUndervotes =
+        roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
+    BigDecimal totalNumberBallots =
+        roundTallies.get(1).numActiveBallots().add(roundTallies.get(1).numInactiveBallots());
+    BigDecimal lastRoundThreshold = roundTallies.get(numRounds).getWinningThreshold();
+
+    HashMap<String, Object> summaryData = new HashMap<>();
+    summaryData.put("finalThreshold", lastRoundThreshold);
+    summaryData.put("numWinners", config.getNumberOfWinners());
+    summaryData.put("numCandidates", config.getCandidateNames().size());
+    summaryData.put("totalNumBallots", totalNumberBallots);
+    summaryData.put("undervotes", firstRoundUndervotes.toBigInteger());
 
     ArrayList<Object> results = new ArrayList<>();
     for (int round = 1; round <= numRounds; round++) {
@@ -838,12 +934,16 @@ class ResultsWriter {
           "eliminated", roundToEliminatedCandidates.get(round), round, actions, tallyTransfers);
       roundData.put("tallyResults", actions);
       roundData.put("tally", updateCandidateNamesInTally(roundTallies.get(round)));
+      roundData.put("threshold", roundTallies.get(round).getWinningThreshold());
+      roundData.put("inactiveBallots", getInactiveJsonMap(roundTallies.get(round)));
       results.add(roundData);
     }
     // root outputJson dict will have two entries:
     // results - vote totals, transfers, and candidates elected / eliminated
     // config - global config into
     HashMap<String, Object> outputJson = new HashMap<>();
+    outputJson.put("jsonFormatVersion", "1");
+    outputJson.put("summary", summaryData);
     outputJson.put("config", configData);
     outputJson.put("results", results);
 
@@ -853,10 +953,26 @@ class ResultsWriter {
   private Map<String, BigDecimal> updateCandidateNamesInTally(RoundTally roundSummary) {
     Map<String, BigDecimal> newTally = new HashMap<>();
     for (String candidateName : roundSummary.getCandidates()) {
-      newTally.put(config.getNameForCandidate(candidateName),
-          roundSummary.getCandidateTally(candidateName));
+      newTally.put(
+          config.getNameForCandidate(candidateName), roundSummary.getCandidateTally(candidateName));
     }
     return newTally;
+  }
+
+  private Map<String, BigDecimal> getInactiveJsonMap(RoundTally roundTally) {
+    Map<String, BigDecimal> inactiveMap = new HashMap<>();
+    Pair<String, StatusForRound>[] statusesToPrint =
+        new Pair[] {
+          new Pair<>("overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
+          new Pair<>("skippedRankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
+          new Pair<>("exhaustedChoices", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
+          new Pair<>("repeatedRankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING)
+        };
+    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
+      inactiveMap.put(
+          statusToPrint.getKey(), roundTally.getBallotStatusTally(statusToPrint.getValue()));
+    }
+    return inactiveMap;
   }
 
   // adds action objects to input action list representing all actions applied this round
@@ -894,8 +1010,7 @@ class ResultsWriter {
               // candidateName will be null for special values like "exhausted"
               String candidateName = config.getNameForCandidate(entry.getKey());
               translatedTransfers.put(
-                  candidateName != null ? candidateName : entry.getKey(),
-                  entry.getValue());
+                  candidateName != null ? candidateName : entry.getKey(), entry.getValue());
             }
             action.put("transfers", translatedTransfers);
           }

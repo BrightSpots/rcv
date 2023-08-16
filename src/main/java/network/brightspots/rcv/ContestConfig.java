@@ -63,7 +63,7 @@ class ContestConfig {
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final boolean SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED = false;
   static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
-  static final String SUGGESTED_UNDERVOTE_LABEL = "undervote";
+  static final String SUGGESTED_SKIPPED_RANK_LABEL = "undervote";
   static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   private static final int MIN_COLUMN_INDEX = 1;
@@ -153,17 +153,17 @@ class ContestConfig {
     } else {
       if (!isNullOrBlank(source.getOvervoteLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getOvervoteLabel(), source, "overvoteLabel")) {
+              source.getOvervoteLabel(), source, "overvoteLabel")) {
         validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
       }
-      if (!isNullOrBlank(source.getUndervoteLabel())
+      if (!isNullOrBlank(source.getSkippedRankLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getUndervoteLabel(), source, "undervoteLabel")) {
-        validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_INVALID);
+              source.getSkippedRankLabel(), source, "skippedRankLabel")) {
+        validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID);
       }
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
+              source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
         validationErrors.add(ValidationError.CVR_UWI_LABEL_INVALID);
       }
 
@@ -290,11 +290,11 @@ class ContestConfig {
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getUndervoteLabel(), "undervoteLabel", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED);
+            source.getSkippedRankLabel(), "skippedRankLabel", provider, source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED);
         }
 
-        if (source.isTreatBlankAsUndeclaredWriteIn()) {
+        if (source.getTreatBlankAsUndeclaredWriteIn()) {
           logErrorWithLocation(
               String.format(
                   "treatBlankAsUndeclaredWriteIn should not be true for CVR source with "
@@ -319,7 +319,7 @@ class ContestConfig {
                 getProvider(source)));
       } else if (!providerRequiresContestId
           && fieldIsDefinedButShouldNotBeForProvider(
-          source.getContestId(), "contestId", provider, source.getFilePath())) {
+              source.getContestId(), "contestId", provider, source.getFilePath())) {
         // Helper will log error
         validationErrors.add(ValidationError.CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED);
       }
@@ -447,9 +447,9 @@ class ContestConfig {
       inUse =
           stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, source.getUndervoteLabel(), "undervoteLabel")
+                  string, field, source.getSkippedRankLabel(), "skippedRankLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
+                  string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
     }
     return inUse;
   }
@@ -658,7 +658,7 @@ class ContestConfig {
 
     if (getMaxRankingsAllowed() == null
         || (getNumDeclaredCandidates() >= 1
-        && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
+            && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
       validationErrors.add(ValidationError.RULES_MAX_RANKINGS_ALLOWED_INVALID);
       Logger.severe(
           "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
@@ -738,16 +738,14 @@ class ContestConfig {
                   ValidationError.RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT);
               Logger.severe(
                   "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest unless "
-                      + "the winner election mode is multi-pass IRV!"
-              );
+                      + "the winner election mode is multi-pass IRV!");
             }
 
             if (isBatchEliminationEnabled()) {
               validationErrors.add(ValidationError.RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT);
               Logger.severe(
                   "batchElimination can't be true in a multi-seat contest unless the "
-                      + "winner election mode is multi-pass IRV!"
-              );
+                      + "winner election mode is multi-pass IRV!");
             }
           }
 
@@ -755,8 +753,7 @@ class ContestConfig {
             validationErrors.add(
                 ValidationError.RULES_FIRST_ROUND_DETERMINES_THRESHOLD_TRUE_FOR_MULTI_SEAT);
             Logger.severe(
-                "doesFirstRoundDetermineThreshold can't be true in a multi-seat contest!"
-            );
+                "doesFirstRoundDetermineThreshold can't be true in a multi-seat contest!");
           }
         } else { // numberOfWinners == 1
           if (!isSingleWinnerEnabled()) {
@@ -776,8 +773,9 @@ class ContestConfig {
 
         if (getMultiSeatBottomsUpPercentageThreshold() == null) {
           validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
-          Logger.severe("If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
-              + "must be specified!");
+          Logger.severe(
+              "If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
+                  + "must be specified!");
         }
       }
     }
@@ -835,7 +833,7 @@ class ContestConfig {
 
   BigDecimal getMultiSeatBottomsUpPercentageThreshold() {
     return getMultiSeatBottomsUpPercentageThresholdRaw() != null
-        && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()
+            && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()
         ? divide(new BigDecimal(getMultiSeatBottomsUpPercentageThresholdRaw()), new BigDecimal(100))
         : null;
   }
@@ -985,8 +983,8 @@ class ContestConfig {
 
   Integer getStopTabulationEarlyAfterRound() {
     return isNullOrBlank(getStopTabulationEarlyAfterRoundRaw())
-            ? Integer.MAX_VALUE
-            : Integer.parseInt(getStopTabulationEarlyAfterRoundRaw());
+        ? Integer.MAX_VALUE
+        : Integer.parseInt(getStopTabulationEarlyAfterRoundRaw());
   }
 
   int getNumDeclaredCandidates() {
@@ -1089,15 +1087,16 @@ class ContestConfig {
         String name = candidate.getName();
         candidateNames.add(name);
         candidatePermutation.add(name);
-        if (candidate.isExcluded()) {
+        if (candidate.getExcluded()) {
           excludedCandidates.add(name);
         }
 
         Stream<String> aliases = candidate.createStreamOfNameAndAllAliases();
-        aliases.forEach(nameOrAlias -> {
-          // duplicate names and aliases get caught in validation
-          candidateAliasesToNameMap.put(nameOrAlias, name);
-        });
+        aliases.forEach(
+            nameOrAlias -> {
+              // duplicate names and aliases get caught in validation
+              candidateAliasesToNameMap.put(nameOrAlias, name);
+            });
       }
     }
 
@@ -1114,7 +1113,7 @@ class ContestConfig {
     boolean includeUwi = false;
     for (CvrSource source : rawConfig.cvrFileSources) {
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-          || source.isTreatBlankAsUndeclaredWriteIn()) {
+          || source.getTreatBlankAsUndeclaredWriteIn()) {
         includeUwi = true;
         break;
       }
@@ -1130,7 +1129,7 @@ class ContestConfig {
     CVR_NO_FILES_SPECIFIED,
     CVR_FILE_PATH_MISSING,
     CVR_OVERVOTE_LABEL_INVALID,
-    CVR_UNDERVOTE_LABEL_INVALID,
+    CVR_SKIPPED_RANK_LABEL_INVALID,
     CVR_UWI_LABEL_INVALID,
     CVR_PROVIDER_INVALID,
     CVR_FIRST_VOTE_COLUMN_INVALID,
@@ -1154,7 +1153,7 @@ class ContestConfig {
     CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED,
     CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
-    CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED,
+    CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
     CANDIDATE_NAME_MISSING,
     CANDIDATE_DUPLICATE_NAME,
@@ -1232,7 +1231,5 @@ class ContestConfig {
     }
   }
 
-  static class UnrecognizedProviderException extends Exception {
-
-  }
+  static class UnrecognizedProviderException extends Exception {}
 }

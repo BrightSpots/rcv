@@ -2,11 +2,18 @@
   "config" : {
     "contest" : "Kansas Dominion test",
     "date" : "2020-07-19",
+    "generatedBy" : "RCTab 1.4.0-alpha",
     "jurisdiction" : "Kansas",
-    "office" : "Democratic Primary",
-    "threshold" : "1962"
+    "office" : "Democratic Primary"
   },
+  "jsonFormatVersion" : "1",
   "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "13",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 1,
     "tally" : {
       "Amy Klobuchar" : "527",
@@ -32,8 +39,15 @@
         "Tulsi Gabbard" : "63",
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "2349"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "14",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 2,
     "tally" : {
       "Amy Klobuchar" : "602",
@@ -57,8 +71,15 @@
         "Tulsi Gabbard" : "84",
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "2349"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "15",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 3,
     "tally" : {
       "Amy Klobuchar" : "675",
@@ -80,8 +101,15 @@
         "Tulsi Gabbard" : "111",
         "exhausted" : "1"
       }
-    } ]
+    } ],
+    "threshold" : "2348"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "16",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
       "Amy Klobuchar" : "793",
@@ -101,8 +129,15 @@
         "Tulsi Gabbard" : "161",
         "exhausted" : "6"
       }
-    } ]
+    } ],
+    "threshold" : "2348"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "22",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 5,
     "tally" : {
       "Amy Klobuchar" : "943",
@@ -120,8 +155,15 @@
         "Tulsi Gabbard" : "226",
         "exhausted" : "40"
       }
-    } ]
+    } ],
+    "threshold" : "2345"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "23",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 6,
     "tally" : {
       "Amy Klobuchar" : "1161",
@@ -137,8 +179,15 @@
         "Tulsi Gabbard" : "338",
         "exhausted" : "202"
       }
-    } ]
+    } ],
+    "threshold" : "2325"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "28",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 7,
     "tally" : {
       "Amy Klobuchar" : "1463",
@@ -152,8 +201,15 @@
         "Tulsi Gabbard" : "441",
         "exhausted" : "523"
       }
-    } ]
+    } ],
+    "threshold" : "2224"
   }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "33",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 8,
     "tally" : {
       "Tom Steyer" : "1969",
@@ -162,6 +218,14 @@
     "tallyResults" : [ {
       "elected" : "Tom Steyer",
       "transfers" : { }
-    } ]
-  } ]
+    } ],
+    "threshold" : "1962"
+  } ],
+  "summary" : {
+    "finalThreshold" : "1962",
+    "numCandidates" : 9,
+    "numWinners" : 1,
+    "totalNumBallots" : "5000",
+    "undervotes" : 290
+  }
 }

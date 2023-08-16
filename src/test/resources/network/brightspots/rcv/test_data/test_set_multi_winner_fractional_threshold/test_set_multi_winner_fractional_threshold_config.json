@@ -18,7 +18,7 @@
     "contestId": "test set multi winner fractional",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "",
-    "undervoteLabel": "",
+    "skippedRankLabel": "",
     "undeclaredWriteInLabel": ""
   } ],
   "candidates" : [ {
@@ -47,7 +47,7 @@
     "excluded": false
   }],
   "rules" : {
-    "tiebreakMode": "stopCountingAndAsk",
+    "tiebreakMode": "useCandidateOrder",
     "overvoteRule": "alwaysSkipToNextRank",
     "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
     "randomSeed": "1",
