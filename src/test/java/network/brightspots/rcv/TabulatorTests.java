@@ -74,8 +74,8 @@ class TabulatorTests {
     return succeeded;
   }
 
-  private static boolean compareMaps(Map<String, Object> map1, Map<String, Object> map2,
-      List<String> keysToIgnore) {
+  private static boolean compareMaps(
+      Map<String, Object> map1, Map<String, Object> map2, List<String> keysToIgnore) {
     boolean areEqual = true;
     if (map1.size() != map2.size()) {
       areEqual = false;
@@ -90,8 +90,8 @@ class TabulatorTests {
         }
 
         if (value1 instanceof Map && value2 instanceof Map) {
-          if (!compareMaps((Map<String, Object>) value1, (Map<String, Object>) value2,
-              keysToIgnore)) {
+          if (!compareMaps(
+              (Map<String, Object>) value1, (Map<String, Object>) value2, keysToIgnore)) {
             Logger.severe("Maps at key %s are not equal (%s != %s)", key, value1, value2);
             areEqual = false;
             break;
@@ -113,8 +113,8 @@ class TabulatorTests {
     return areEqual;
   }
 
-  private static boolean compareLists(List<Object> value1, List<Object> value2,
-      List<String> keysToIgnoreForMaps) {
+  private static boolean compareLists(
+      List<Object> value1, List<Object> value2, List<String> keysToIgnoreForMaps) {
     boolean areEqual = true;
     if (value1.size() != value2.size()) {
       areEqual = false;
@@ -124,8 +124,8 @@ class TabulatorTests {
         Object item2 = value2.get(i);
 
         if (item1 instanceof Map && item2 instanceof Map) {
-          if (!compareMaps((Map<String, Object>) item1, (Map<String, Object>) item2,
-              keysToIgnoreForMaps)) {
+          if (!compareMaps(
+              (Map<String, Object>) item1, (Map<String, Object>) item2, keysToIgnoreForMaps)) {
             areEqual = false;
             break;
           }
@@ -248,7 +248,6 @@ class TabulatorTests {
     cleanOutputFolder(session);
   }
 
-
   private static void cleanOutputFolder(TabulatorSession session) {
     // Test passed so clean up test output folder
     File outputFolder = new File(session.getOutputPath());
@@ -294,7 +293,7 @@ class TabulatorTests {
       String sequentialId) {
     String actualOutputPath =
         ResultsWriter.getOutputFilePath(
-            config.getOutputDirectory(), outputType, timestampString, sequentialId)
+                config.getOutputDirectory(), outputType, timestampString, sequentialId)
             + extension;
     String expectedPath =
         getTestFilePath(

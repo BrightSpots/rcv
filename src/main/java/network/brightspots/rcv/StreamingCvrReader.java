@@ -141,7 +141,7 @@ class StreamingCvrReader extends BaseCvrReader {
 
   // purpose: Handle empty cells encountered while parsing a CVR. Unlike empty rows, empty cells
   // do not trigger parsing callbacks so their existence must be inferred and handled when they
-  // occur in a rankings cell.
+  // occur in a ranking's cell.
   // param: currentRank the rank at which we stop inferring empty cells for this invocation
   private void handleEmptyCells(int currentRank) {
     for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {

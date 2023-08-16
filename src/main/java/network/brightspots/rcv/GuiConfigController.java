@@ -1623,9 +1623,8 @@ public class GuiConfigController implements Initializable {
   }
 
   private abstract static class ConfigReaderService extends Service<Void> {
-    protected String configPath;
-
     private final boolean deleteConfigOnCompletion;
+    protected String configPath;
 
     ConfigReaderService(String configPath, boolean deleteConfigOnCompletion) {
       this.configPath = configPath;
@@ -1709,14 +1708,6 @@ public class GuiConfigController implements Initializable {
     public EditableColumn(TableColumn column, String propertyName) {
       this.column = column;
       this.propertyName = propertyName;
-    }
-
-    public TableColumn getColumn() {
-      return column;
-    }
-
-    public String getPropertyName() {
-      return propertyName;
     }
 
     public void setCellFactoryValue() {

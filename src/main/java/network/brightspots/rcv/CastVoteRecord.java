@@ -28,21 +28,6 @@ import java.util.Map.Entry;
 import javafx.util.Pair;
 
 class CastVoteRecord {
-  // StatusForRound represents the ballot's status on a given round.
-  // This CastVoteRecord will have different statuses each round,
-  // and this provides a more detailed breakdown than a simple
-  // active/inactive binary. It is only useful in results reporting;
-  // as far as tabulation is concerned, all that matters is whether
-  // it is active or not.
-  enum StatusForRound {
-    ACTIVE,
-    INACTIVE_BY_UNDERVOTE,
-    INACTIVE_BY_OVERVOTE,
-    INACTIVE_BY_SKIPPED_RANKING,
-    INACTIVE_BY_REPEATED_RANKING,
-    INACTIVE_BY_EXHAUSTED_CHOICES
-  }
-
   // computed unique ID for this CVR (source file + line number)
   private final String computedId;
   // supplied unique ID for this CVR
@@ -68,8 +53,6 @@ class CastVoteRecord {
   private String tabulatorId;
   // batchId parsed from Dominion CVR data
   private String batchId;
-  // ballotTypeId parsed from Dominion CVR data
-  private String ballotTypeId;
   // the ballot status for the current round, which will change as tabulation progresses.
   private StatusForRound currentRoundStatus = StatusForRound.ACTIVE;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
@@ -82,7 +65,6 @@ class CastVoteRecord {
       String suppliedId,
       String precinct,
       String precinctPortion,
-      String ballotTypeId,
       List<Pair<Integer, String>> rankings) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
@@ -91,15 +73,11 @@ class CastVoteRecord {
     this.suppliedId = suppliedId;
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
-    this.ballotTypeId = ballotTypeId;
     this.candidateRankings = new CandidateRankingsList(rankings);
   }
 
   CastVoteRecord(
-      String computedId,
-      String suppliedId,
-      String precinct,
-      List<Pair<Integer, String>> rankings) {
+      String computedId, String suppliedId, String precinct, List<Pair<Integer, String>> rankings) {
     this.computedId = computedId;
     this.suppliedId = suppliedId;
     this.precinct = precinct;
@@ -117,10 +95,6 @@ class CastVoteRecord {
 
   String getBatchId() {
     return batchId;
-  }
-
-  String getBallotTypeId() {
-    return ballotTypeId;
   }
 
   String getPrecinct() {
@@ -231,13 +205,26 @@ class CastVoteRecord {
     return winnerToFractionalValue;
   }
 
+  // StatusForRound represents the ballot's status on a given round.
+  // This CastVoteRecord will have different statuses each round,
+  // and this provides a more detailed breakdown than a simple
+  // active/inactive binary. It is only useful in results reporting;
+  // as far as tabulation is concerned, all that matters is whether
+  // it is active or not.
+  enum StatusForRound {
+    ACTIVE,
+    INACTIVE_BY_UNDERVOTE,
+    INACTIVE_BY_OVERVOTE,
+    INACTIVE_BY_SKIPPED_RANKING,
+    INACTIVE_BY_REPEATED_RANKING,
+    INACTIVE_BY_EXHAUSTED_CHOICES
+  }
+
   enum VoteOutcomeType {
     COUNTED,
     IGNORED,
     EXHAUSTED,
   }
 
-  static class CvrParseException extends Exception {
-
-  }
+  static class CvrParseException extends Exception {}
 }

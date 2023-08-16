@@ -28,8 +28,7 @@ import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 final class ContestConfigMigration {
-  private ContestConfigMigration() {
-  }
+  private ContestConfigMigration() {}
 
   // not intended to be used if either version is null
   public static boolean isVersionNewer(String version1, String version2) {
@@ -59,9 +58,10 @@ final class ContestConfigMigration {
   static void migrateConfigVersion(ContestConfig config)
       throws ConfigVersionIsNewerThanAppVersionException {
     String version = config.rawConfig.tabulatorVersion;
-    boolean needsMigration = version == null
-        || (!version.equals(Main.APP_VERSION) && !version
-        .equals(ContestConfig.AUTOMATED_TEST_VERSION));
+    boolean needsMigration =
+        version == null
+            || (!version.equals(Main.APP_VERSION)
+                && !version.equals(ContestConfig.AUTOMATED_TEST_VERSION));
     if (needsMigration) {
       if (isConfigVersionNewerThanAppVersion(version)) {
         throw new ConfigVersionIsNewerThanAppVersionException();
@@ -77,43 +77,47 @@ final class ContestConfigMigration {
           case "standard" -> rules.winnerElectionMode =
               config.getNumberOfWinners() > 1
                   ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND
-                  .getInternalLabel()
+                      .getInternalLabel()
                   : WinnerElectionMode.STANDARD_SINGLE_WINNER.getInternalLabel();
           case "singleSeatContinueUntilTwoCandidatesRemain" -> {
-            rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER
-                .getInternalLabel();
+            rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER.getInternalLabel();
             rules.continueUntilTwoCandidatesRemain = true;
           }
           case "multiSeatAllowOnlyOneWinnerPerRound" -> rules.winnerElectionMode =
               WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.getInternalLabel();
           case "multiSeatBottomsUp" -> rules.winnerElectionMode =
               config.getNumberOfWinners() == 0
-                  || config.getMultiSeatBottomsUpPercentageThreshold() != null
+                      || config.getMultiSeatBottomsUpPercentageThreshold() != null
                   ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD
-                  .getInternalLabel()
+                      .getInternalLabel()
                   : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.getInternalLabel();
           case "multiSeatSequentialWinnerTakesAll" -> rules.winnerElectionMode =
               WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.getInternalLabel();
           default -> {
             Logger.warning(
                 "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
-                    + "winnerElectionMode.", oldWinnerElectionMode);
+                    + "winnerElectionMode.",
+                oldWinnerElectionMode);
             rules.winnerElectionMode = null;
           }
         }
       }
 
       if (config.getTiebreakMode() == TiebreakMode.MODE_UNKNOWN) {
-        Map<String, TiebreakMode> tiebreakModeMigrationMap = Map.of(
-            "random", TiebreakMode.RANDOM,
-            "interactive", TiebreakMode.INTERACTIVE,
-            "previousRoundCountsThenRandom",
-            TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
-            "previousRoundCountsThenInteractive",
-            TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
-            "usePermutationInConfig", TiebreakMode.USE_PERMUTATION_IN_CONFIG,
-            "generatePermutation", TiebreakMode.GENERATE_PERMUTATION
-        );
+        Map<String, TiebreakMode> tiebreakModeMigrationMap =
+            Map.of(
+                "random",
+                TiebreakMode.RANDOM,
+                "interactive",
+                TiebreakMode.INTERACTIVE,
+                "previousRoundCountsThenRandom",
+                TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
+                "previousRoundCountsThenInteractive",
+                TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
+                "usePermutationInConfig",
+                TiebreakMode.USE_PERMUTATION_IN_CONFIG,
+                "generatePermutation",
+                TiebreakMode.GENERATE_PERMUTATION);
         String oldTiebreakMode = rules.tiebreakMode;
         if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
           rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode).getInternalLabel();
@@ -176,7 +180,5 @@ final class ContestConfigMigration {
     }
   }
 
-  static class ConfigVersionIsNewerThanAppVersionException extends Exception {
-
-  }
+  static class ConfigVersionIsNewerThanAppVersionException extends Exception {}
 }

@@ -153,17 +153,17 @@ class ContestConfig {
     } else {
       if (!isNullOrBlank(source.getOvervoteLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getOvervoteLabel(), source, "overvoteLabel")) {
+              source.getOvervoteLabel(), source, "overvoteLabel")) {
         validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
       }
       if (!isNullOrBlank(source.getSkippedRankLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getSkippedRankLabel(), source, "skippedRankLabel")) {
+              source.getSkippedRankLabel(), source, "skippedRankLabel")) {
         validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID);
       }
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
+              source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
         validationErrors.add(ValidationError.CVR_UWI_LABEL_INVALID);
       }
 
@@ -319,7 +319,7 @@ class ContestConfig {
                 getProvider(source)));
       } else if (!providerRequiresContestId
           && fieldIsDefinedButShouldNotBeForProvider(
-          source.getContestId(), "contestId", provider, source.getFilePath())) {
+              source.getContestId(), "contestId", provider, source.getFilePath())) {
         // Helper will log error
         validationErrors.add(ValidationError.CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED);
       }
@@ -447,9 +447,9 @@ class ContestConfig {
       inUse =
           stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, source.getSkippedRankLabel(), "skippedRankLabel")
+                  string, field, source.getSkippedRankLabel(), "skippedRankLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
+                  string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
     }
     return inUse;
   }
@@ -658,7 +658,7 @@ class ContestConfig {
 
     if (getMaxRankingsAllowed() == null
         || (getNumDeclaredCandidates() >= 1
-        && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
+            && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
       validationErrors.add(ValidationError.RULES_MAX_RANKINGS_ALLOWED_INVALID);
       Logger.severe(
           "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
@@ -738,16 +738,14 @@ class ContestConfig {
                   ValidationError.RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT);
               Logger.severe(
                   "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest unless "
-                      + "the winner election mode is multi-pass IRV!"
-              );
+                      + "the winner election mode is multi-pass IRV!");
             }
 
             if (isBatchEliminationEnabled()) {
               validationErrors.add(ValidationError.RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT);
               Logger.severe(
                   "batchElimination can't be true in a multi-seat contest unless the "
-                      + "winner election mode is multi-pass IRV!"
-              );
+                      + "winner election mode is multi-pass IRV!");
             }
           }
 
@@ -755,8 +753,7 @@ class ContestConfig {
             validationErrors.add(
                 ValidationError.RULES_FIRST_ROUND_DETERMINES_THRESHOLD_TRUE_FOR_MULTI_SEAT);
             Logger.severe(
-                "doesFirstRoundDetermineThreshold can't be true in a multi-seat contest!"
-            );
+                "doesFirstRoundDetermineThreshold can't be true in a multi-seat contest!");
           }
         } else { // numberOfWinners == 1
           if (!isSingleWinnerEnabled()) {
@@ -776,8 +773,9 @@ class ContestConfig {
 
         if (getMultiSeatBottomsUpPercentageThreshold() == null) {
           validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
-          Logger.severe("If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
-              + "must be specified!");
+          Logger.severe(
+              "If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
+                  + "must be specified!");
         }
       }
     }
@@ -835,7 +833,7 @@ class ContestConfig {
 
   BigDecimal getMultiSeatBottomsUpPercentageThreshold() {
     return getMultiSeatBottomsUpPercentageThresholdRaw() != null
-        && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()
+            && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()
         ? divide(new BigDecimal(getMultiSeatBottomsUpPercentageThresholdRaw()), new BigDecimal(100))
         : null;
   }
@@ -985,8 +983,8 @@ class ContestConfig {
 
   Integer getStopTabulationEarlyAfterRound() {
     return isNullOrBlank(getStopTabulationEarlyAfterRoundRaw())
-            ? Integer.MAX_VALUE
-            : Integer.parseInt(getStopTabulationEarlyAfterRoundRaw());
+        ? Integer.MAX_VALUE
+        : Integer.parseInt(getStopTabulationEarlyAfterRoundRaw());
   }
 
   int getNumDeclaredCandidates() {
@@ -1094,10 +1092,11 @@ class ContestConfig {
         }
 
         Stream<String> aliases = candidate.createStreamOfNameAndAllAliases();
-        aliases.forEach(nameOrAlias -> {
-          // duplicate names and aliases get caught in validation
-          candidateAliasesToNameMap.put(nameOrAlias, name);
-        });
+        aliases.forEach(
+            nameOrAlias -> {
+              // duplicate names and aliases get caught in validation
+              candidateAliasesToNameMap.put(nameOrAlias, name);
+            });
       }
     }
 
@@ -1232,7 +1231,5 @@ class ContestConfig {
     }
   }
 
-  static class UnrecognizedProviderException extends Exception {
-
-  }
+  static class UnrecognizedProviderException extends Exception {}
 }

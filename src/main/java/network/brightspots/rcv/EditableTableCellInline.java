@@ -40,25 +40,22 @@ import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 
 /**
- * A class containing a {@link TableCell} implementation that draws a
- * {@link TextField} node inside the cell. If the TextField is
- * left, the value is committed.
+ * A class containing a {@link TableCell} implementation that draws a {@link TextField} node inside
+ * the cell. If the TextField is left, the value is committed.
  */
-
 public class EditableTableCellInline<S, T> extends TableCell<S, T> {
+  private static final List<Control> controlsToDisableWhileEditing = new ArrayList<>();
+  private static final List<Tab> tabsToDisableWhileEditing = new ArrayList<>();
+  private static final List<Node> nodesToDisableWhileEditing = new ArrayList<>();
+  private final ObjectProperty<StringConverter<T>> converter =
+      new SimpleObjectProperty<>(this, "converter");
   private TextField textField;
   private boolean escapePressed = false;
   private TablePosition<S, ?> tablePos = null;
-  private static List<Control> controlsToDisableWhileEditing = new ArrayList<>();
-  private static List<Tab> tabsToDisableWhileEditing = new ArrayList<>();
-  private static List<Node> nodesToDisableWhileEditing = new ArrayList<>();
-
-  private final ObjectProperty<StringConverter<T>> converter =
-      new SimpleObjectProperty<>(this, "converter");
 
   /**
-   * Provides a TextFieldTableCell that allows editing of the cell content with any type.
-   * This method will only work on any type, but you'll need to provide a StringConverter.
+   * Provides a TextFieldTableCell that allows editing of the cell content with any type. This
+   * method will only work on any type, but you'll need to provide a StringConverter.
    */
   public EditableTableCellInline(StringConverter<T> converter) {
     this.getStyleClass().add("text-field-table-cell");
@@ -66,49 +63,40 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
   }
 
   /**
-   * Provides a TextField that allows editing of the cell content when
-   * the cell is double-clicked, or when TableView.edit is called.
-   * This method will only work on TableColumn instances which are of
-   * type String.
+   * Provides a TextField that allows editing of the cell content when the cell is double-clicked,
+   * or when TableView.edit() is called. This method will only work on TableColumn instances which
+   * are of type String.
    */
   public static <S> Callback<TableColumn<S, String>, TableCell<S, String>> forTableColumn() {
     return forTableColumn(new DefaultStringConverter());
   }
 
   /**
-   * Provides a TextField that allows editing of the cell content when
-   * the cell is double-clicked, or when TableView.edit is called.
-   * This method will only work on any type, but you'll need to provide a StringConverter.
+   * Provides a TextField that allows editing of the cell content when the cell is double-clicked,
+   * or when TableView.edit() is called. This method will only work on any type, but you'll need to
+   * provide a StringConverter.
    */
   public static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forTableColumn(
       final StringConverter<T> converter) {
     return list -> new EditableTableCellInline<>(converter);
   }
 
-  /**
-   * Prevent the user from leaving the UI without commiting.
-   */
+  /** Prevent the user from leaving the UI without committing. */
   public static void lockWhileEditing(Control control) {
     controlsToDisableWhileEditing.add(control);
   }
 
-  /**
-   * Prevent the user from leaving the UI without commiting.
-   */
+  /** Prevent the user from leaving the UI without committing. */
   public static void lockWhileEditing(Tab tab) {
     tabsToDisableWhileEditing.add(tab);
   }
 
-  /**
-   * Prevent the user from leaving the UI without commiting.
-   */
+  /** Prevent the user from leaving the UI without committing. */
   public static void lockWhileEditing(Node node) {
     nodesToDisableWhileEditing.add(node);
   }
 
-  /**
-   * Disables or enables both controls and tabs requested by lockWhileEditing.
-   */
+  /** Disables or enables both controls and tabs requested by lockWhileEditing. */
   private static void setDisabledForEditing(boolean doLock) {
     for (Control control : controlsToDisableWhileEditing) {
       control.setDisable(doLock);
@@ -137,9 +125,7 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
 
   @Override
   public void startEdit() {
-    if (isEditable()
-        && getTableView().isEditable()
-        && getTableColumn().isEditable()) {
+    if (isEditable() && getTableView().isEditable() && getTableColumn().isEditable()) {
       super.startEdit();
 
       setDisabledForEditing(true);
@@ -149,7 +135,7 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
         escapePressed = false;
         tablePos = getTableView().getEditingCell();
 
-        // Update the textfield
+        // Update the textField
         if (textField == null) {
           textField = getTextField();
         }
@@ -173,12 +159,8 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
       final TableView<S> table = getTableView();
       if (table != null) {
         // Inform the TableView of the edit being ready to be committed
-        CellEditEvent editEvent = new CellEditEvent(
-                table,
-                tablePos,
-                TableColumn.editCommitEvent(),
-                newValue
-        );
+        CellEditEvent editEvent =
+            new CellEditEvent(table, tablePos, TableColumn.editCommitEvent(), newValue);
 
         Event.fireEvent(getTableColumn(), editEvent);
       }
@@ -197,7 +179,6 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
 
     setDisabledForEditing(false);
   }
-
 
   @Override
   public void cancelEdit() {
@@ -240,16 +221,17 @@ public class EditableTableCellInline<S, T> extends TableCell<S, T> {
     final TextField textField = new TextField(getItemText());
     // Use onAction here rather than onKeyReleased (with check for Enter),
     // as otherwise we encounter RT-34685
-    textField.setOnAction(event -> {
-      if (converter == null) {
-        throw new IllegalStateException(
-            "Attempting to convert text input into Object, but provided "
-                + "StringConverter is null. Be sure to set a StringConverter "
-                + "in your cell factory.");
-      }
-      this.commitEdit(getConverter().fromString(textField.getText()));
-      event.consume();
-    });
+    textField.setOnAction(
+        event -> {
+          if (converter == null) {
+            throw new IllegalStateException(
+                "Attempting to convert text input into Object, but provided "
+                    + "StringConverter is null. Be sure to set a StringConverter "
+                    + "in your cell factory.");
+          }
+          this.commitEdit(getConverter().fromString(textField.getText()));
+          event.consume();
+        });
 
     textField.setOnKeyPressed(t -> escapePressed = t.getCode() == KeyCode.ESCAPE);
     textField.setOnKeyReleased(t -> escapePressed = t.getCode() == KeyCode.ESCAPE);

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import javafx.util.Pair;
 
 class HartCvrReader extends BaseCvrReader {
@@ -41,8 +40,7 @@ class HartCvrReader extends BaseCvrReader {
   // iterate all xml files in the source input folder
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-      throws CastVoteRecord.CvrParseException,
-          IOException {
+      throws CastVoteRecord.CvrParseException, IOException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
@@ -101,7 +99,6 @@ class HartCvrReader extends BaseCvrReader {
                 xmlCvr.CvrGuid,
                 xmlCvr.PrecinctSplit.Name,
                 xmlCvr.PrecinctSplit.Id,
-                null,
                 rankings);
         castVoteRecords.add(cvr);
 

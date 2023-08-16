@@ -40,15 +40,11 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-/**
- * A table cell that pops up a modal dialog to edit a list of strings.
- */
+/** A table cell that pops up a modal dialog to edit a list of strings. */
 public class EditableTableCellPopup<T> extends TableCell<T, List<String>> {
-  private Button cellButton;
+  private final Button cellButton;
 
-  /**
-   * Set up a cell that will pop up a modal dialog to edit a list of strings.
-   */
+  /** Set up a cell that will pop up a modal dialog to edit a list of strings. */
   public EditableTableCellPopup() {
     super();
 
@@ -68,10 +64,10 @@ public class EditableTableCellPopup<T> extends TableCell<T, List<String>> {
       TableView table = getTableView();
       if (table != null) {
         // Populate an edit event for the correct cell
-        TablePosition position = new TablePosition(getTableView(),
-            getTableRow().getIndex(), getTableColumn());
-        CellEditEvent editEvent = new CellEditEvent(table, position,
-            TableColumn.editCommitEvent(), item);
+        TablePosition position =
+            new TablePosition(getTableView(), getTableRow().getIndex(), getTableColumn());
+        CellEditEvent editEvent =
+            new CellEditEvent(table, position, TableColumn.editCommitEvent(), item);
         Event.fireEvent(getTableColumn(), editEvent);
       }
 
@@ -134,22 +130,24 @@ public class EditableTableCellPopup<T> extends TableCell<T, List<String>> {
     buttons.setAlignment(Pos.CENTER);
 
     // Hook up cancel button to close the popup without saving
-    cancelButton.setOnAction(event1 -> {
-      Stage stage = (Stage) cancelButton.getScene().getWindow();
-      stage.close();
-    });
+    cancelButton.setOnAction(
+        event1 -> {
+          Stage stage = (Stage) cancelButton.getScene().getWindow();
+          stage.close();
+        });
 
     // Hook up done button to save the edit
-    saveButton.setOnAction(event1 -> {
-      ObservableList<String> observableList =
-          FXCollections.observableArrayList(Utils.splitByNewline(textArea.getText()));
-      observableList.addListener((ListChangeListener<String>) c ->
-          cellButton.setText(safeJoin("; ", c.getList())));
-      commitEdit(observableList);
+    saveButton.setOnAction(
+        event1 -> {
+          ObservableList<String> observableList =
+              FXCollections.observableArrayList(Utils.splitByNewline(textArea.getText()));
+          observableList.addListener(
+              (ListChangeListener<String>) c -> cellButton.setText(safeJoin("; ", c.getList())));
+          commitEdit(observableList);
 
-      Stage stage = (Stage) saveButton.getScene().getWindow();
-      stage.close();
-    });
+          Stage stage = (Stage) saveButton.getScene().getWindow();
+          stage.close();
+        });
 
     // Create the stage and hook it up to the done button, and don't let user click away
     Stage stage = new Stage();

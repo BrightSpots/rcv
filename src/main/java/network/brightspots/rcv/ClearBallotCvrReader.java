@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 
@@ -115,7 +114,6 @@ class ClearBallotCvrReader extends BaseCvrReader {
                 cvrData[CvrColumnField.BallotID.ordinal()],
                 cvrData[CvrColumnField.PrecinctID.ordinal()],
                 null,
-                cvrData[CvrColumnField.BallotStyleID.ordinal()],
                 rankings);
 
         castVoteRecords.add(castVoteRecord);
