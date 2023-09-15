@@ -308,6 +308,7 @@ class TabulatorSession {
                   castVoteRecords,
                   reader.getMaxRankingsAllowed(source.getContestId()),
                   config.getOutputDirectory(),
+                  source.getFilePath(),
                   source.getContestId(),
                   source.getUndeclaredWriteInLabel());
         } catch (IOException exception) {

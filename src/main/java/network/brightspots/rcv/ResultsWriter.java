@@ -553,17 +553,28 @@ class ResultsWriter {
       List<CastVoteRecord> castVoteRecords,
       Integer numRanks,
       String csvOutputFolder,
+      String inputFilepath,
       String contestId,
       String undeclaredWriteInLabel)
       throws IOException {
     String fileWritten;
+    // Get input filename with extension
+    String inputFileBaseName = new File(inputFilepath).getName();
+    // Remove the extension if it exists
+    int lastIndex = inputFileBaseName.lastIndexOf('.');
+    if (lastIndex != -1) {
+      inputFileBaseName = inputFileBaseName.substring(0, lastIndex);
+    }
+    // Put the input filename in the output filename in case contestId isn't unique --
+    // knowing that it's possible that if both the filename AND the contestId isn't unique,
+    // this will fail.
     Path outputPath =
             Paths.get(
                     getOutputFilePath(
                             csvOutputFolder,
                             "dominion_conversion_contest",
                             timestampString,
-                            sanitizeStringForOutput(contestId))
+                            inputFileBaseName + "-" + sanitizeStringForOutput(contestId))
                             + ".csv");
     try {
       Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
