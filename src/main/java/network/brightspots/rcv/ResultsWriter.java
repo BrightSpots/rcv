@@ -557,15 +557,15 @@ class ResultsWriter {
       String undeclaredWriteInLabel)
       throws IOException {
     String fileWritten;
+    Path outputPath =
+            Paths.get(
+                    getOutputFilePath(
+                            csvOutputFolder,
+                            "dominion_conversion_contest",
+                            timestampString,
+                            sanitizeStringForOutput(contestId))
+                            + ".csv");
     try {
-      Path outputPath =
-          Paths.get(
-              getOutputFilePath(
-                      csvOutputFolder,
-                      "dominion_conversion_contest",
-                      timestampString,
-                      sanitizeStringForOutput(contestId))
-                  + ".csv");
       Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
       CSVPrinter csvPrinter;
       BufferedWriter writer = Files.newBufferedWriter(outputPath);
@@ -616,8 +616,8 @@ class ResultsWriter {
       }
     } catch (IOException exception) {
       Logger.severe(
-          "Error writing cast vote records in generic format from input file: %s\n%s",
-          csvOutputFolder, exception);
+          "Error writing cast vote records in generic format to output path: %s\n%s",
+          outputPath, exception);
       throw exception;
     }
     return fileWritten;
