@@ -61,6 +61,9 @@ class Logger {
   private static java.util.logging.Logger logger;
   private static java.util.logging.FileHandler tabulationHandler;
   private static String tabulationLogPattern;
+  // The audit logs include the hash of the file in the filename. While the file
+  // is still open, that can't happen -- so use this string in the filename in the meantime.
+  private static final String inProgressHashValue = "hash-tbd";
 
   static void setup() {
     logger = java.util.logging.Logger.getLogger("");
@@ -95,17 +98,20 @@ class Logger {
   // adds file logging for a tabulation run
   static void addTabulationFileLogging(String outputFolder, String timestampString)
       throws IOException {
-    // log file name is: outputFolder + timestamp + log index
-    // FileHandler requires % to be encoded as %%.  %g is the log index
+    // log file name is: outputFolder + timestamp + log index + hash + .log
+    // FileHandler requires % to be encoded as %%.
+    // %g is the log index, and %h is the hash
     tabulationLogPattern =
         Paths.get(
-                outputFolder.replace("%", "%%"), String.format("%s_audit_%%g.log", timestampString))
+                outputFolder.replace("%", "%%"),
+                String.format("%s_audit_%%g_%%h.log", timestampString))
             .toAbsolutePath()
             .toString();
 
     tabulationHandler =
         new FileHandler(
-            tabulationLogPattern, LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
+            tabulationLogPattern.replace("%h", inProgressHashValue),
+            LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
     tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
     logger.addHandler(tabulationHandler);
@@ -120,14 +126,28 @@ class Logger {
 
     int index = 0;
     while (true) {
-      File file = new File(tabulationLogPattern.replace("%g", String.valueOf(index)));
-      if (!file.exists()) {
+      File fileWithoutHash = new File(tabulationLogPattern
+              .replace("%g", String.valueOf(index))
+              .replace("%h", inProgressHashValue));
+      if (!fileWithoutHash.exists()) {
         break;
       }
-      boolean readOnlySucceeded = file.setReadOnly();
-      if (!readOnlySucceeded) {
-        warning("Failed to set file to read-only: %s", file.getAbsolutePath());
+
+      // Rename file to include hash
+      String hash = Utils.getHash(fileWithoutHash);
+      File fileWithHash = new File(tabulationLogPattern
+              .replace("%g", String.valueOf(index))
+              .replace("%h", hash));
+      boolean moveSucceeded = fileWithoutHash.renameTo(fileWithHash);
+      if (!moveSucceeded) {
+        severe("Failed to rename %s to %s", fileWithoutHash.getAbsolutePath(), fileWithHash);
+      } else {
+        boolean readOnlySucceeded = fileWithHash.setReadOnly();
+        if (!readOnlySucceeded) {
+          warning("Failed to set file to read-only: %s", fileWithHash.getAbsolutePath());
+        }
       }
+
       index++;
     }
   }
