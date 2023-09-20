@@ -18,8 +18,10 @@ package network.brightspots.rcv;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -113,19 +115,5 @@ final class Utils {
       hexString.append(hex);
     }
     return hexString.toString();
-  }
-
-  static String getHash(File file) {
-    MessageDigest digest;
-    try {
-      digest = MessageDigest.getInstance("SHA-256");
-    } catch (NoSuchAlgorithmException e) {
-      Logger.severe("Failed to get SHA-256 algorithm");
-      return "[hash not available]";
-    }
-
-    // Read file as byte-array for hashing
-    byte[] fileBytes = readFileToByteArray(file);
-    return bytesToHex(digest.digest(fileBytes));
   }
 }

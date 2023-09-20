@@ -134,7 +134,7 @@ class Logger {
       }
 
       // Rename file to include hash
-      String hash = Utils.getHash(fileWithoutHash);
+      String hash = FileUtils.getHash(fileWithoutHash);
       File fileWithHash = new File(tabulationLogPattern
               .replace("%g", String.valueOf(index))
               .replace("%h", hash));

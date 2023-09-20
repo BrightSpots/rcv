@@ -29,7 +29,7 @@ final class AuditableFile extends File {
       Logger.warning("Failed to set file to read-only: %s", getAbsolutePath());
     }
 
-    String hash = Utils.getHash(this);
+    String hash = FileUtils.getHash(this);
     Logger.info("File %s written with hash %s".formatted(getAbsolutePath(), hash));
   }
 }
