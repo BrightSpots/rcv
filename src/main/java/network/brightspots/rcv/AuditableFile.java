@@ -17,6 +17,8 @@
 package network.brightspots.rcv;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 final class AuditableFile extends File {
   public AuditableFile(String pathname) {
@@ -24,12 +26,32 @@ final class AuditableFile extends File {
   }
 
   public void finalizeAndHash() {
-    boolean readOnlySucceeded = setReadOnly();
+    String hash = FileUtils.getHash(this);
+
+    // Write hash to audit log
+    Logger.info("File %s written with hash %s".formatted(getAbsolutePath(), hash));
+
+    // Write hash to hash file
+    File hashFile = new File(getAbsolutePath() + ".sha");
+    writeStringToFile(hashFile, hash);
+
+    // Make both file and its hash file read-only
+    makeReadOnlyOrLogWarning(this);
+    makeReadOnlyOrLogWarning(hashFile);
+  }
+
+  private void writeStringToFile(File file, String string) {
+    try {
+      Files.writeString(file.toPath(), string);
+    } catch (IOException e) {
+      Logger.severe("Could not write to file %s: %s", file.getAbsoluteFile(), e.getMessage());
+    }
+  }
+
+  private void makeReadOnlyOrLogWarning(File file) {
+    boolean readOnlySucceeded = file.setReadOnly();
     if (!readOnlySucceeded) {
       Logger.warning("Failed to set file to read-only: %s", getAbsolutePath());
     }
-
-    String hash = FileUtils.getHash(this);
-    Logger.info("File %s written with hash %s".formatted(getAbsolutePath(), hash));
   }
 }
