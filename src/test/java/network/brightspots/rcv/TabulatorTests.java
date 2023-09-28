@@ -318,6 +318,15 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Test basic RSA signature validation")
+  void testRSAValidation() throws FileUtils.CouldNotVerifySignatureException {
+    File publicKeyTxt = new File("/Users/arminsamii/Downloads/Public Key.txt");
+    File signatureFile = new File("/Users/arminsamii/Downloads/CVRExport-7-27-2026 01-19-44 PM.zip.sig.xml");
+    File dataFile = new File("/Users/arminsamii/Downloads/CVRExport-7-27-2026 01-19-44 PM.zip");
+    assertTrue(FileUtils.verifyPublicKeySignature(publicKeyTxt, signatureFile, dataFile));
+  }
+
+  @Test
   @DisplayName("Test Convert to CDF works for CDF")
   void convertToCdfFromCdf() {
     runConvertToCdfTest("convert_to_cdf_from_cdf");

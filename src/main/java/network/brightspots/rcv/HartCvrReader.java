@@ -41,11 +41,29 @@ class HartCvrReader extends BaseCvrReader {
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException, IOException {
+    File publicKeyTxt = new File("/Users/arminsamii/Downloads/Public Key.txt");
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
       for (File child : children) {
-        if (child.getName().toLowerCase().endsWith("xml")) {
+        String childNameLower = child.getName().toLowerCase();
+        if (childNameLower.endsWith("xml") && !childNameLower.endsWith(".sig.xml")) {
+          File signatureXML = new File(child.getAbsolutePath() + ".sig.xml");
+          boolean isHashVerified;
+          try {
+            isHashVerified = FileUtils.verifyPublicKeySignature(
+                    publicKeyTxt, signatureXML, child);
+          } catch (FileUtils.CouldNotVerifySignatureException e) {
+            Logger.severe("Failure while trying to verify hash %s of %s: \n%s",
+                    signatureXML.getAbsolutePath(), child.getAbsolutePath(), e.getMessage());
+            throw new CastVoteRecord.CvrParseException();
+          }
+          if (!isHashVerified) {
+            Logger.severe("Incorrect hash %s of %s",
+                    signatureXML.getAbsolutePath(), child.getAbsolutePath());
+            throw new CastVoteRecord.CvrParseException();
+          }
+
           readCastVoteRecord(castVoteRecords, child.toPath());
         }
       }
