@@ -95,8 +95,8 @@ class Logger {
   // adds file logging for a tabulation run
   static void addTabulationFileLogging(String outputFolder, String timestampString)
       throws IOException {
-    // log file name is: outputFolder + timestamp + log index + hash + .log
-    // FileHandler requires % to be encoded as %%. %g is the log index.
+    // log file name is: outputFolder + timestamp + log index
+    // FileHandler requires % to be encoded as %%.  %g is the log index
     tabulationLogPattern =
         Paths.get(
                 outputFolder.replace("%", "%%"),

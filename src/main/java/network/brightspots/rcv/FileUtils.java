@@ -59,9 +59,9 @@ final class FileUtils {
   static String getHash(File file) {
     MessageDigest digest;
     try {
-      digest = MessageDigest.getInstance("SHA-256");
+      digest = MessageDigest.getInstance("SHA-512");
     } catch (NoSuchAlgorithmException e) {
-      Logger.severe("Failed to get SHA-256 algorithm");
+      Logger.severe("Failed to get SHA-512 algorithm");
       return "[hash not available]";
     }
 

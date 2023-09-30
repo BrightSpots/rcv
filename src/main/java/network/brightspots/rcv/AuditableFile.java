@@ -32,8 +32,8 @@ final class AuditableFile extends File {
     Logger.info("File %s written with hash %s".formatted(getAbsolutePath(), hash));
 
     // Write hash to hash file
-    File hashFile = new File(getAbsolutePath() + ".sha");
-    writeStringToFile(hashFile, hash);
+    File hashFile = new File(getAbsolutePath() + ".hash");
+    writeStringToFile(hashFile, "sha512: " + hash);
 
     // Make both file and its hash file read-only
     makeReadOnlyOrLogWarning(this);

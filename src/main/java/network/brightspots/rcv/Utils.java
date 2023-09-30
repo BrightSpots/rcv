@@ -94,17 +94,6 @@ final class Utils {
     return s.trim().split("\\s*\\r?\\n\\s*");
   }
 
-  static byte[] readFileToByteArray(File file) {
-    byte[] fileBytes = null;
-    try {
-      fileBytes = Files.readAllBytes(file.toPath());
-    } catch (IOException e) {
-      Logger.severe("Failed to read file: %s", file.getAbsolutePath());
-    }
-
-    return fileBytes;
-  }
-
   static String bytesToHex(byte[] hash) {
     StringBuilder hexString = new StringBuilder(2 * hash.length);
     for (byte b : hash) {
