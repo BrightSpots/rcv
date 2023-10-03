@@ -98,15 +98,16 @@ class Logger {
     // log file name is: outputFolder + timestamp + log index
     // FileHandler requires % to be encoded as %%.  %g is the log index
     tabulationLogPattern =
-            Paths.get(outputFolder.replace("%", "%%"),
-                    String.format("%s_audit_%%g.log", timestampString))
-                    .toAbsolutePath()
-                    .toString();
+        Paths.get(
+                outputFolder.replace("%", "%%"),
+                String.format("%s_audit_%%g.log", timestampString))
+            .toAbsolutePath()
+            .toString();
 
-    tabulationHandler = new FileHandler(tabulationLogPattern,
-            LOG_FILE_MAX_SIZE_BYTES,
-            TABULATION_LOG_FILE_COUNT,
-            true);
+    tabulationHandler =
+        new FileHandler(
+            tabulationLogPattern,
+            LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
     tabulationHandler.setFormatter(formatter);
     tabulationHandler.setLevel(Level.FINE);
     logger.addHandler(tabulationHandler);
@@ -119,16 +120,16 @@ class Logger {
     tabulationHandler.close();
     logger.removeHandler(tabulationHandler);
 
+    // Find all files we wrote to, and finalize each one
     int index = 0;
     while (true) {
-      File file = new File(tabulationLogPattern.replace("%g", String.valueOf(index)));
+      AuditableFile file = new AuditableFile(tabulationLogPattern
+              .replace("%g", String.valueOf(index)));
       if (!file.exists()) {
         break;
       }
-      boolean readOnlySucceeded = file.setReadOnly();
-      if (!readOnlySucceeded) {
-        warning("Failed to set file to read-only: %s", file.getAbsolutePath());
-      }
+
+      file.finalizeAndHash();
       index++;
     }
   }
