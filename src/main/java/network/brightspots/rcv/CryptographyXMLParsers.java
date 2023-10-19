@@ -25,7 +25,7 @@ public class CryptographyXMLParsers {
         @JacksonXmlProperty(localName = "SignedInfo")
         SignedInfo signedInfo;
 
-        @JacksonXmlProperty(localName = "SignatureValue")
+        @JacksonXmlProperty(isAttribute = true, localName = "SignatureValue")
         String signatureValue;
 
         @JacksonXmlProperty(localName = "KeyInfo")
@@ -41,15 +41,19 @@ public class CryptographyXMLParsers {
 
         @JacksonXmlProperty(localName = "Reference")
         Reference reference;
+
+        // Required to match Hart's implementation of canonicalization
+        @JacksonXmlProperty(isAttribute = true, localName = "xmlns")
+        String xmlns = "http://www.w3.org/2000/09/xmldsig#";
     }
 
     static class CanonicalizationMethod {
-        @JacksonXmlProperty(isAttribute = true)
+        @JacksonXmlProperty(isAttribute = true, localName = "Algorithm")
         String algorithm;
     }
 
     static class SignatureMethod {
-        @JacksonXmlProperty(isAttribute = true)
+        @JacksonXmlProperty(isAttribute = true, localName = "Algorithm")
         String algorithm;
     }
 
@@ -67,7 +71,7 @@ public class CryptographyXMLParsers {
     }
 
     static class DigestMethod {
-        @JacksonXmlProperty(isAttribute = true)
+        @JacksonXmlProperty(isAttribute = true, localName = "Algorithm")
         String algorithm;
     }
 
@@ -82,10 +86,10 @@ public class CryptographyXMLParsers {
     }
 
     static class RSAKeyValue {
-        @JacksonXmlProperty(localName = "Modulus")
+        @JacksonXmlProperty(isAttribute = true, localName = "Modulus")
         String modulus;
 
-        @JacksonXmlProperty(localName = "Exponent")
+        @JacksonXmlProperty(isAttribute = true, localName = "Exponent")
         String exponent;
     }
 }

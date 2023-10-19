@@ -18,20 +18,52 @@
 
 package network.brightspots.rcv;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.crypto.Data;
+import javax.xml.crypto.NodeSetData;
+import javax.xml.crypto.OctetStreamData;
+import javax.xml.crypto.XMLCryptoContext;
+import javax.xml.crypto.dom.DOMCryptoContext;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
+import javax.xml.crypto.dsig.TransformException;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import static network.brightspots.rcv.CryptographyXMLParsers.HartSignature;
 import static network.brightspots.rcv.CryptographyXMLParsers.RSAKeyValue;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.DigestInputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -80,8 +112,37 @@ final class FileUtils {
     }
   }
 
+  static String tempMergeConflictGetHash(File file, String algorithm) {
+    MessageDigest digest;
+    try {
+      digest = MessageDigest.getInstance(algorithm);
+    } catch (NoSuchAlgorithmException e) {
+      Logger.severe("Failed to get algorithm " + algorithm);
+      return "[hash not available]";
+    }
+
+    try (InputStream is = Files.newInputStream(file.toPath())) {
+      try (DigestInputStream hashingStream = new DigestInputStream(is, digest)) {
+        while (hashingStream.readNBytes(1024).length > 0) {
+          // Read in 1kb chunks -- don't need to do anything in the body here
+        }
+      }
+    } catch (IOException e) {
+      Logger.severe("Failed to read file: %s", file.getAbsolutePath());
+      return "[hash not available]";
+    }
+
+    return Base64.getEncoder().encodeToString(digest.digest());
+  }
+
+  @SuppressWarnings("checkstyle:LeftCurly")
   static boolean verifyPublicKeySignature(File publicKeyFile, File signatureKeyFile, File dataFile)
           throws CouldNotVerifySignatureException {
+    // try {
+    //   return XmlSignature.validate(signatureKeyFile);
+    // } catch (Exception e) {
+    //   return false;
+    // }
     // Load the public key and signature from their corresponding files
     HartSignature hartSignature;
     RSAKeyValue rsaKeyValue;
@@ -92,19 +153,53 @@ final class FileUtils {
       throw new CouldNotVerifySignatureException("Failed to read files: " + e.getMessage());
     }
 
+    EnsurePublicKeyMatchesExpectedValue(hartSignature, rsaKeyValue, signatureKeyFile, publicKeyFile);
+    EnsureDigestMatchesExpectedValue(dataFile, hartSignature);
+    EnsureSignatureMatchesExpectedValue(hartSignature, rsaKeyValue, dataFile);
+
+    return true;
+  }
+
+  static void EnsureDigestMatchesExpectedValue(File dataFile, HartSignature hartSignature) throws CouldNotVerifySignatureException
+  {
+    // Check if the filenames match
+    String actualFilename = dataFile.getName();
+    String expectedFilename = new File(hartSignature.signedInfo.reference.URI).getName();
+    if (!actualFilename.equals(expectedFilename))
+    {
+      throw new CouldNotVerifySignatureException(
+              "Signed file was %s but you provided %s".formatted(actualFilename, expectedFilename));
+    }
+
+    String actualDigest = FileUtils.tempMergeConflictGetHash(dataFile, "SHA-256");
+    String expectedDigest = hartSignature.signedInfo.reference.digestValue;
+
+    if (!actualDigest.equals(expectedDigest))
+    {
+      throw new CouldNotVerifySignatureException(
+              "Signed file had digest %s but the file you provided had %s".formatted(expectedDigest, actualDigest));
+    }
+  }
+
+  static void EnsurePublicKeyMatchesExpectedValue(HartSignature hartSignature, RSAKeyValue rsaKeyValue, File signatureKeyFile, File publicKeyFile) throws CouldNotVerifySignatureException {
     // Sanity check: does the signature file match the known public key file?
     // If not, the file may have been signed with a newer or older version than we support.
     RSAKeyValue rsaFromFile = hartSignature.keyInfo.keyValue.rsaKeyValue;
-    if (!rsaFromFile.exponent.equals(rsaKeyValue.exponent)
-        || !rsaFromFile.modulus.equals(rsaKeyValue.modulus)) {
+    rsaFromFile.exponent = rsaFromFile.exponent.trim();
+    rsaFromFile.modulus = rsaFromFile.modulus.trim();
+    if (!rsaFromFile.exponent.equals(rsaKeyValue.exponent) || !rsaFromFile.modulus.equals(rsaKeyValue.modulus))
+    {
       throw new CouldNotVerifySignatureException("%s was signed with a different public key than %s"
               .formatted(signatureKeyFile.getAbsolutePath(), publicKeyFile.getAbsolutePath()));
     }
+  }
 
+  static void EnsureSignatureMatchesExpectedValue(HartSignature hartSignature, RSAKeyValue rsaKeyValue, File dataFile) throws CouldNotVerifySignatureException
+  {
     // Decode Base64
     byte[] modulusBytes = Base64.getDecoder().decode(rsaKeyValue.modulus);
     byte[] exponentBytes = Base64.getDecoder().decode(rsaKeyValue.exponent);
-    byte[] signatureBytes = Base64.getDecoder().decode(hartSignature.signatureValue);
+    byte[] signatureBytes = Base64.getDecoder().decode(hartSignature.signatureValue.trim());
 
     // Convert byte arrays to BigIntegers
     // Use 1 as the signum to treat the bytes as positive
@@ -122,37 +217,78 @@ final class FileUtils {
       throw new CouldNotVerifySignatureException("Failed to load signing algorithms: " + e.getMessage());
     }
 
+    // Initialize the signature with the public key
     try {
       signature.initVerify(publicKey);
     } catch (InvalidKeyException e) {
       throw new CouldNotVerifySignatureException("Invalid Key: %s" + e.getMessage());
     }
 
+    // Canonicalize the XML
+    byte[] canonicalizedBytes = CanonicalizeXml(hartSignature.signedInfo);
+
+    // Verify the signature
     boolean verified;
-    byte[] data;
     try {
-      // TODO read 1024 bytes at a time
-      data = Files.readAllBytes(dataFile.toPath());
-      signature.update(data);
+      signature.update(canonicalizedBytes);
       verified = signature.verify(signatureBytes);
     } catch (SignatureException e) {
       throw new CouldNotVerifySignatureException("Signature failure: %s" + e.getMessage());
-    } catch (IOException e) {
-      throw new CouldNotVerifySignatureException("Failed to read data file: " + e.getMessage());
     }
 
-    return verified;
+    if (!verified) {
+      throw new CouldNotVerifySignatureException("Signature verification failed");
+    }
+  }
+
+  static byte[] CanonicalizeXml(CryptographyXMLParsers.SignedInfo signedInfo) throws CouldNotVerifySignatureException {
+    // Canonicalize -- sort of. We need one change in addition to canonicalization to mirror what
+    // .NET Framework 4.8.1 does, which is what Hart uses.
+
+    // Build the XML mapper to serialize from the SignedInfo object
+    XmlMapper xmlMapper = new XmlMapper();
+    String xmlSignedInfo = null;
+    try {
+      xmlSignedInfo = xmlMapper.writeValueAsString(signedInfo);
+    } catch (JsonProcessingException e) {
+      throw new CouldNotVerifySignatureException("Failed to parse the signature XML file");
+    }
+
+    // Set up the canonicalization transform
+    XMLSignatureFactory sigFactory = XMLSignatureFactory.getInstance("DOM");
+    CanonicalizationMethod c14n;
+    try {
+      c14n = sigFactory.newCanonicalizationMethod(signedInfo.canonicalizationMethod.algorithm,
+              (C14NMethodParameterSpec) null);
+    } catch (NoSuchAlgorithmException e) {
+      throw new CouldNotVerifySignatureException(".sig.xml file uses an unsupported canonicalization algorithm");
+    } catch (InvalidAlgorithmParameterException e) {
+      throw new CouldNotVerifySignatureException(".sig.xml file uses an invalid canonicalization algorithm parameter");
+    }
+
+    // Read the serialized data into a stream and canonicalize it
+    InputStream xmlSignedInfoStream = new ByteArrayInputStream(xmlSignedInfo.getBytes(StandardCharsets.UTF_8));
+    OctetStreamData canonicalizedData;
+    try {
+      canonicalizedData = (OctetStreamData)c14n.transform(new OctetStreamData(xmlSignedInfoStream), null);
+    } catch (TransformException e) {
+      throw new CouldNotVerifySignatureException("Canonicalization failed: " + e.getMessage());
+    }
+
+    try {
+      return canonicalizedData.getOctetStream().readAllBytes();
+    } catch (IOException e) {
+      throw new CouldNotVerifySignatureException("Canonicalization returned an invalid result");
+    }
   }
 
   static class UnableToCreateDirectoryException extends Exception {
-
     UnableToCreateDirectoryException(String message) {
       super(message);
     }
   }
 
   static class CouldNotVerifySignatureException extends Exception {
-
     CouldNotVerifySignatureException(String message) {
       super(message);
     }

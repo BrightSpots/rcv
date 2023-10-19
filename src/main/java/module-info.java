@@ -12,7 +12,8 @@ module network.brightspots.rcv {
   requires org.apache.commons.csv;
   requires org.apache.poi.ooxml;
   requires commons.cli;
-  // enable reflexive calls from network.brightspots.rcv into javafx.fxml
+    requires java.xml.crypto;
+    // enable reflexive calls from network.brightspots.rcv into javafx.fxml
   opens network.brightspots.rcv;
   // our main module
   exports network.brightspots.rcv;

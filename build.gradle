@@ -116,7 +116,8 @@ jlink {
             '--strip-debug', '--compress', '2',
             '--no-header-files', '--no-man-pages'
     mergedModule {
-        requires "java.xml"
+        //requires "java.xml"
+
     }
     launcher {
         // TODO Sync version number with release.yml and Main.java (github.com/BrightSpots/rcv/issues/662)
