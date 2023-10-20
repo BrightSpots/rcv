@@ -19,7 +19,7 @@ package network.brightspots.rcv;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
-public class CryptographyXmlParsers {
+class CryptographyXmlParsers {
   @JacksonXmlRootElement(localName = "Signature", namespace = "http://www.w3.org/2000/09/xmldsig#")
   public static class HartSignature {
     @JacksonXmlProperty(localName = "SignedInfo")
@@ -43,6 +43,7 @@ public class CryptographyXmlParsers {
     Reference reference;
 
     // Required to match Hart's implementation of canonicalization
+    @SuppressWarnings("unused")
     @JacksonXmlProperty(localName = "xmlns", isAttribute = true)
     String xmlns = "http://www.w3.org/2000/09/xmldsig#";
   }

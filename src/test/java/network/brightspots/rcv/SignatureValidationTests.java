@@ -20,13 +20,13 @@ package network.brightspots.rcv;
 
 import static network.brightspots.rcv.CryptographySignatureValidation.CouldNotVerifySignatureException;
 import static network.brightspots.rcv.CryptographySignatureValidation.verifyPublicKeySignature;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,16 +46,16 @@ class SignatureValidationTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
-    TEMP_DIRECTORY.mkdirs();
+    assertTrue(TEMP_DIRECTORY.mkdirs());
   }
 
   @AfterAll
   static void teardown() {
-    TEMP_DIRECTORY.delete();
+    assertTrue(TEMP_DIRECTORY.delete());
   }
 
   @Test
-  @DisplayName("Test RSA signature validation passes")
+  @DisplayName("Success: default files")
   void testValidationSucceeds() throws CouldNotVerifySignatureException {
     assertTrue(verifyPublicKeySignature(
             DEFAULT_PUBLIC_KEY_FILE, DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE));
@@ -74,16 +74,16 @@ class SignatureValidationTests {
   void testModifiedDataFile() throws IOException {
     File modifiedDataFile = File.createTempFile("test", ".xml");
     modifiedDataFile.deleteOnExit();
-    // Open modified file and write a byte to modify it
-    Files.write(modifiedDataFile.toPath(), "not the original data".getBytes());
+
+    Files.writeString(modifiedDataFile.toPath(), "not the original data");
 
     Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->
-      verifyPublicKeySignature(DEFAULT_PUBLIC_KEY_FILE, DEFAULT_SIGNATURE_FILE, modifiedDataFile)
+        verifyPublicKeySignature(DEFAULT_PUBLIC_KEY_FILE, DEFAULT_SIGNATURE_FILE, modifiedDataFile)
     );
   }
 
   @Test
-  @DisplayName("Different folder, same filename passes")
+  @DisplayName("Success: Different folder, same filename")
   void testSuccessIfFilenameMatches() throws CouldNotVerifySignatureException, IOException {
     File modifiedDataFile = new File(TEMP_DIRECTORY.getAbsolutePath() + "/test.xml");
     modifiedDataFile.deleteOnExit();
@@ -94,19 +94,19 @@ class SignatureValidationTests {
   }
 
   @Test
-  @DisplayName("Different filename throws an exception")
+  @DisplayName("Exception: Different filename")
   void testFailsIfFilenameDiffers() throws IOException {
     File modifiedDataFile = new File(TEMP_DIRECTORY.getAbsolutePath() + "/test2.xml");
     modifiedDataFile.deleteOnExit();
     Files.copy(DEFAULT_DATA_FILE.toPath(), modifiedDataFile.toPath());
 
     Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->
-      verifyPublicKeySignature(DEFAULT_PUBLIC_KEY_FILE, DEFAULT_SIGNATURE_FILE, modifiedDataFile)
+        verifyPublicKeySignature(DEFAULT_PUBLIC_KEY_FILE, DEFAULT_SIGNATURE_FILE, modifiedDataFile)
     );
   }
 
   @Test
-  @DisplayName("Correct signature but unexpected public key throws an exception")
+  @DisplayName("Exception: Correct signature but unexpected public key")
   void testUnexpectedPublicKey() throws IOException {
     File incorrectPublicKey = new File(TEST_FOLDER + "/incorrect_public_key.txt");
     Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->

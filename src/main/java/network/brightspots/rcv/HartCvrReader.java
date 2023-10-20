@@ -41,26 +41,26 @@ class HartCvrReader extends BaseCvrReader {
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException, IOException {
-    File publicKeyTxt = new File("/Users/arminsamii/Downloads/Public Key.txt");
+    File publicKeyTxt = new File("src/main/resources/network/brightspots/rcv/publickey.txt");
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
       for (File child : children) {
         String childNameLower = child.getName().toLowerCase();
         if (childNameLower.endsWith("xml") && !childNameLower.endsWith(".sig.xml")) {
-          File signatureXML = new File(child.getAbsolutePath() + ".sig.xml");
+          File signatureXml = new File(child.getAbsolutePath() + ".sig.xml");
           boolean isHashVerified;
           try {
             isHashVerified = CryptographySignatureValidation.verifyPublicKeySignature(
-                    publicKeyTxt, signatureXML, child);
+                    publicKeyTxt, signatureXml, child);
           } catch (CryptographySignatureValidation.CouldNotVerifySignatureException e) {
             Logger.severe("Failure while trying to verify hash %s of %s: \n%s",
-                    signatureXML.getAbsolutePath(), child.getAbsolutePath(), e.getMessage());
+                    signatureXml.getAbsolutePath(), child.getAbsolutePath(), e.getMessage());
             throw new CastVoteRecord.CvrParseException();
           }
           if (!isHashVerified) {
             Logger.severe("Incorrect hash %s of %s",
-                    signatureXML.getAbsolutePath(), child.getAbsolutePath());
+                    signatureXml.getAbsolutePath(), child.getAbsolutePath());
             throw new CastVoteRecord.CvrParseException();
           }
 

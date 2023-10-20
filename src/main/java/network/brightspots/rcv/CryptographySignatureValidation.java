@@ -49,7 +49,7 @@ import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
-public class CryptographySignatureValidation {
+class CryptographySignatureValidation {
   /**
    * This function returns whether the signature matches validation.
    * It throws an error if it is unable to perform this check, for reasons including:
@@ -133,7 +133,7 @@ public class CryptographySignatureValidation {
     rsaFromFile.exponent = rsaFromFile.exponent.trim();
     rsaFromFile.modulus = rsaFromFile.modulus.trim();
     if (!rsaFromFile.exponent.equals(rsaKeyValue.exponent)
-      || !rsaFromFile.modulus.equals(rsaKeyValue.modulus)) {
+        || !rsaFromFile.modulus.equals(rsaKeyValue.modulus)) {
       throw new CouldNotVerifySignatureException(
               "%s was signed with a different public key than %s.\nActual modulus: %s\nExpected: %s"
               .formatted(signatureKeyFile.getAbsolutePath(), publicKeyFile.getAbsolutePath(),
@@ -242,7 +242,7 @@ public class CryptographySignatureValidation {
     }
   }
 
-  public static class CouldNotVerifySignatureException extends Exception {
+  static class CouldNotVerifySignatureException extends Exception {
     CouldNotVerifySignatureException(String message) {
       super(message);
     }
