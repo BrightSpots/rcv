@@ -18,7 +18,6 @@
 
 package network.brightspots.rcv;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -316,16 +315,6 @@ class TabulatorTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
-  }
-
-  @Test
-  @DisplayName("Test basic RSA signature validation")
-  void testRSAValidation() throws FileUtils.CouldNotVerifySignatureException {
-    File publicKeyTxt = new File("/Users/arminsamii/Downloads/Public Key.txt");
-    File signatureFile = new File("/Users/arminsamii/Downloads/cvrexport/1_ddc9fb5f-2762-462b-a5da-20c083751901.xml.sig.xml");
-    File dataFile = new File("/Users/arminsamii/Downloads/cvrexport/1_ddc9fb5f-2762-462b-a5da-20c083751901.xml");
-    assertTrue(FileUtils.verifyPublicKeySignature(publicKeyTxt, signatureFile, dataFile));
-
   }
 
   @Test

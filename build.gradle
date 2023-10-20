@@ -116,7 +116,7 @@ jlink {
             '--strip-debug', '--compress', '2',
             '--no-header-files', '--no-man-pages'
     mergedModule {
-        //requires "java.xml"
+        requires "java.xml"
 
     }
     launcher {

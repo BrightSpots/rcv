@@ -51,9 +51,9 @@ class HartCvrReader extends BaseCvrReader {
           File signatureXML = new File(child.getAbsolutePath() + ".sig.xml");
           boolean isHashVerified;
           try {
-            isHashVerified = FileUtils.verifyPublicKeySignature(
+            isHashVerified = CryptographySignatureValidation.verifyPublicKeySignature(
                     publicKeyTxt, signatureXML, child);
-          } catch (FileUtils.CouldNotVerifySignatureException e) {
+          } catch (CryptographySignatureValidation.CouldNotVerifySignatureException e) {
             Logger.severe("Failure while trying to verify hash %s of %s: \n%s",
                     signatureXML.getAbsolutePath(), child.getAbsolutePath(), e.getMessage());
             throw new CastVoteRecord.CvrParseException();
