@@ -315,6 +315,7 @@ class TabulatorTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
+    CryptographyConfig.disableValidationForUnitTests();
   }
 
   @Test

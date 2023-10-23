@@ -19,7 +19,7 @@ package network.brightspots.rcv;
 import static network.brightspots.rcv.CryptographyXmlParsers.RsaKeyValue;
 
 class CryptographyConfig {
-  private static final boolean IS_HART_SIGNATURE_VALIDATION_ENABLED = true;
+  private static boolean IS_HART_SIGNATURE_VALIDATION_ENABLED = true;
 
   private static final String RSA_MODULUS = "vifu/KSlTnBHOtl0IuHEc1R3A4sH1vKCKU9G/8/LtD6Ih5aWq7Suyu"
         + "GYgIUUzErmFC92kv4chXKBFwti5wSfoHqtTpmlAvlIsLvi4zrllaoewShzUCG/sqAH3Zw4JBOb6wk20064bkiejX"
@@ -42,5 +42,18 @@ class CryptographyConfig {
     rsaKeyValue.modulus = RSA_MODULUS;
     rsaKeyValue.exponent = RSA_EXPONENT;
     return rsaKeyValue;
+  }
+
+  public static void disableValidationForUnitTests() {
+    // Do some basic sanity checking to make sure this is never accidentally called
+    // outside of the TabulatorTests.
+    StackTraceElement[] currentStack = Thread.currentThread().getStackTrace();
+    StackTraceElement lastStackFrame = currentStack[2];
+    if (!lastStackFrame.getClassName().equals("network.brightspots.rcv.TabulatorTests")) {
+      throw new RuntimeException("Only unit tests can disable validation. Expected to be "
+              + "called from TabulatorTests, but instead got " + lastStackFrame.getClassName());
+    }
+
+    IS_HART_SIGNATURE_VALIDATION_ENABLED = false;
   }
 }
