@@ -58,24 +58,21 @@ class CryptographySignatureValidation {
    * 3. The corresponding file has been edited and the hash no longer matches
    */
   public static boolean verifyPublicKeySignature(
-          File publicKeyFile,
+          RsaKeyValue publicKey,
           File signatureKeyFile,
           File dataFile) throws CouldNotVerifySignatureException {
     // Load the public key and signature from their corresponding files
     HartSignature hartSignature;
-    CryptographyXmlParsers.RsaKeyValue rsaKeyValue;
     try {
       hartSignature = readFromXml(signatureKeyFile, HartSignature.class);
-      rsaKeyValue = readFromXml(publicKeyFile, RsaKeyValue.class);
     } catch (IOException e) {
       throw new CouldNotVerifySignatureException("Failed to read files: " + e.getMessage());
     }
 
-    ensurePublicKeyMatchesExpectedValue(hartSignature, rsaKeyValue,
-            signatureKeyFile, publicKeyFile);
+    ensurePublicKeyMatchesExpectedValue(hartSignature, publicKey, signatureKeyFile);
     ensureDigestMatchesExpectedValue(dataFile, hartSignature);
 
-    return checkSignature(hartSignature, rsaKeyValue);
+    return checkSignature(hartSignature, publicKey);
   }
 
   private static void ensureDigestMatchesExpectedValue(File dataFile, HartSignature hartSignature)
@@ -124,20 +121,19 @@ class CryptographySignatureValidation {
 
   private static void ensurePublicKeyMatchesExpectedValue(
           HartSignature hartSignature,
-          RsaKeyValue rsaKeyValue,
-          File signatureKeyFile,
-          File publicKeyFile) throws CouldNotVerifySignatureException {
+          RsaKeyValue expectedPublicKey,
+          File signatureKeyFile) throws CouldNotVerifySignatureException {
     // Sanity check: does the signature file match the known public key file?
     // If not, the file may have been signed with a newer or older version than we support.
-    RsaKeyValue rsaFromFile = hartSignature.keyInfo.keyValue.rsaKeyValue;
-    rsaFromFile.exponent = rsaFromFile.exponent.trim();
-    rsaFromFile.modulus = rsaFromFile.modulus.trim();
-    if (!rsaFromFile.exponent.equals(rsaKeyValue.exponent)
-        || !rsaFromFile.modulus.equals(rsaKeyValue.modulus)) {
+    RsaKeyValue actualPublicKey = hartSignature.keyInfo.keyValue.rsaKeyValue;
+    actualPublicKey.exponent = actualPublicKey.exponent.trim();
+    actualPublicKey.modulus = actualPublicKey.modulus.trim();
+    if (!actualPublicKey.exponent.equals(expectedPublicKey.exponent)
+        || !actualPublicKey.modulus.equals(expectedPublicKey.modulus)) {
       throw new CouldNotVerifySignatureException(
-              "%s was signed with a different public key than %s.\nActual modulus: %s\nExpected: %s"
-              .formatted(signatureKeyFile.getAbsolutePath(), publicKeyFile.getAbsolutePath(),
-                      rsaFromFile.modulus, rsaKeyValue.modulus)
+              "%s was signed with unexpected public key.\nActual modulus: %s\nExpected: %s"
+              .formatted(signatureKeyFile.getAbsolutePath(),
+                      actualPublicKey.modulus, expectedPublicKey.modulus)
       );
     }
   }
@@ -231,7 +227,7 @@ class CryptographySignatureValidation {
     }
   }
 
-  private static <T> T readFromXml(File xmlFile, Class<T> classType) throws IOException {
+  public static <T> T readFromXml(File xmlFile, Class<T> classType) throws IOException {
     XmlMapper xmlMapper = new XmlMapper();
     xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 

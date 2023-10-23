@@ -20,12 +20,12 @@ package network.brightspots.rcv;
 
 import static network.brightspots.rcv.CryptographySignatureValidation.CouldNotVerifySignatureException;
 import static network.brightspots.rcv.CryptographySignatureValidation.verifyPublicKeySignature;
+import static network.brightspots.rcv.CryptographyXmlParsers.RsaKeyValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -54,11 +54,24 @@ class SignatureValidationTests {
     assertTrue(TEMP_DIRECTORY.delete());
   }
 
+  static RsaKeyValue getPublicKeyFor(File file) {
+    try {
+      return CryptographySignatureValidation.readFromXml(file, RsaKeyValue.class);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  static RsaKeyValue defaultPublicKey() {
+    return getPublicKeyFor(DEFAULT_PUBLIC_KEY_FILE);
+  }
+
+
   @Test
   @DisplayName("Success: default files")
   void testValidationSucceeds() throws CouldNotVerifySignatureException {
     assertTrue(verifyPublicKeySignature(
-            DEFAULT_PUBLIC_KEY_FILE, DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE));
+            defaultPublicKey(), DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE));
   }
 
   @Test
@@ -66,7 +79,7 @@ class SignatureValidationTests {
   void testValidationFailure() throws CouldNotVerifySignatureException {
     File incorrectSignatureFile = new File(TEST_FOLDER + "/incorrect_signature.xml.sig.xml");
     assertFalse(verifyPublicKeySignature(
-            DEFAULT_PUBLIC_KEY_FILE, incorrectSignatureFile, DEFAULT_DATA_FILE));
+            defaultPublicKey(), incorrectSignatureFile, DEFAULT_DATA_FILE));
   }
 
   @Test
@@ -78,7 +91,7 @@ class SignatureValidationTests {
     Files.writeString(modifiedDataFile.toPath(), "not the original data");
 
     Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->
-        verifyPublicKeySignature(DEFAULT_PUBLIC_KEY_FILE, DEFAULT_SIGNATURE_FILE, modifiedDataFile)
+        verifyPublicKeySignature(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
     );
   }
 
@@ -90,7 +103,7 @@ class SignatureValidationTests {
     Files.copy(DEFAULT_DATA_FILE.toPath(), modifiedDataFile.toPath());
 
     assertTrue(verifyPublicKeySignature(
-            DEFAULT_PUBLIC_KEY_FILE, DEFAULT_SIGNATURE_FILE, modifiedDataFile));
+            defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile));
   }
 
   @Test
@@ -101,16 +114,18 @@ class SignatureValidationTests {
     Files.copy(DEFAULT_DATA_FILE.toPath(), modifiedDataFile.toPath());
 
     Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->
-        verifyPublicKeySignature(DEFAULT_PUBLIC_KEY_FILE, DEFAULT_SIGNATURE_FILE, modifiedDataFile)
+        verifyPublicKeySignature(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
     );
   }
 
   @Test
   @DisplayName("Exception: Correct signature but unexpected public key")
-  void testUnexpectedPublicKey() throws IOException {
+  void testUnexpectedPublicKey() {
     File incorrectPublicKey = new File(TEST_FOLDER + "/incorrect_public_key.txt");
-    Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->
-            verifyPublicKeySignature(incorrectPublicKey, DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE)
+    Assertions.assertThrows(CouldNotVerifySignatureException.class, () -> verifyPublicKeySignature(
+            getPublicKeyFor(incorrectPublicKey),
+            DEFAULT_SIGNATURE_FILE,
+            DEFAULT_DATA_FILE)
     );
   }
 }

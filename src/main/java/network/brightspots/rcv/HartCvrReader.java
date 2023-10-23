@@ -38,10 +38,7 @@ class HartCvrReader extends BaseCvrReader {
   }
 
   boolean verifyHashIfNeeded(File cvrXml) {
-    File publicKeyTxt = new File("src/main/resources/network/brightspots/rcv/publickey.txt");
-    if (!publicKeyTxt.exists()) {
-      // TODO -- hack -- have a global trigger for whether this file should exist.
-      // For now, just get the tests passing by skipping this.
+    if (!CryptographyConfig.isIsHartSignatureValidationEnabled()) {
       return true;
     }
 
@@ -49,7 +46,7 @@ class HartCvrReader extends BaseCvrReader {
     boolean isHashVerified;
     try {
       isHashVerified = CryptographySignatureValidation.verifyPublicKeySignature(
-              publicKeyTxt, signatureXml, cvrXml);
+              CryptographyConfig.getRsaPublicKey(), signatureXml, cvrXml);
     } catch (CryptographySignatureValidation.CouldNotVerifySignatureException e) {
       Logger.severe("Failure while trying to verify hash %s of %s: \n%s",
               signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath(), e.getMessage());
@@ -61,6 +58,7 @@ class HartCvrReader extends BaseCvrReader {
       return false;
     }
 
+    Logger.info("Signature validation successful for %s", cvrXml.getName());
     return true;
   }
 
