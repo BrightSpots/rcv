@@ -34,13 +34,17 @@ class CryptographyConfig {
     return IS_HART_SIGNATURE_VALIDATION_ENABLED;
   }
 
-  public static RsaKeyValue getRsaPublicKey() {
+  public static synchronized RsaKeyValue getRsaPublicKey() {
+    // Synchronized to prevent a race condition. SpotBugs will complain otherwise, even though
+    // this is not currently called on multiple threads.
     if (rsaKeyValue != null) {
       return rsaKeyValue;
     }
+
     rsaKeyValue = new RsaKeyValue();
     rsaKeyValue.modulus = RSA_MODULUS;
     rsaKeyValue.exponent = RSA_EXPONENT;
+
     return rsaKeyValue;
   }
 

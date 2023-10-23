@@ -43,7 +43,6 @@ class CryptographyXmlParsers {
     Reference reference;
 
     // Required to match Hart's implementation of canonicalization
-    @SuppressWarnings("unused")
     @JacksonXmlProperty(localName = "xmlns", isAttribute = true)
     String xmlns = "http://www.w3.org/2000/09/xmldsig#";
   }

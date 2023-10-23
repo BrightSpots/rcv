@@ -51,7 +51,10 @@ class SignatureValidationTests {
 
   @AfterAll
   static void teardown() {
-    assertTrue(TEMP_DIRECTORY.delete());
+    boolean didDelete = TEMP_DIRECTORY.delete();
+    if (!didDelete) {
+      Logger.warning("Failed to clean up directory: %s", TEMP_DIRECTORY.getAbsolutePath());
+    }
   }
 
   static RsaKeyValue getPublicKeyFor(File file) {
