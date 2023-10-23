@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -111,14 +110,11 @@ class ResultsWriter {
     module.addSerializer(BigDecimal.class, new ToStringSerializer());
     mapper.registerModule(module);
     ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
-    File outFile = new File(path);
+    AuditableFile outFile = new AuditableFile(path);
 
     try {
       jsonWriter.writeValue(outFile, json);
-      boolean readOnlySucceeded = outFile.setReadOnly();
-      if (!readOnlySucceeded) {
-        Logger.warning("Failed to set file to read-only: %s", outFile.getAbsolutePath());
-      }
+      outFile.finalizeAndHash();
     } catch (IOException exception) {
       Logger.severe(
           "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
@@ -282,17 +278,17 @@ class ResultsWriter {
   private void generateSummarySpreadsheet(
       Map<Integer, RoundTally> roundTallies, String precinct, String outputPath)
       throws IOException {
-    String csvPath = outputPath + ".csv";
-    Logger.info("Generating summary spreadsheet: %s...", csvPath);
+    AuditableFile csvFile = new AuditableFile(outputPath + ".csv");
+    Logger.info("Generating summary spreadsheet: %s...", csvFile.getAbsolutePath());
 
     CSVPrinter csvPrinter;
     try {
-      BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvPath));
+      BufferedWriter writer = Files.newBufferedWriter(csvFile.toPath());
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException exception) {
       Logger.severe(
           "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
-          csvPath, exception);
+          csvFile.getAbsolutePath(), exception);
       throw exception;
     }
 
@@ -445,12 +441,7 @@ class ResultsWriter {
     try {
       csvPrinter.flush();
       csvPrinter.close();
-
-      File file = new File(csvPath);
-      boolean readOnlySucceeded = file.setReadOnly();
-      if (!readOnlySucceeded) {
-        Logger.warning("Failed to set file to read-only: %s", file.getAbsolutePath());
-      }
+      csvFile.finalizeAndHash();
     } catch (IOException exception) {
       Logger.severe("Error saving file: %s\n%s", outputPath, exception);
       throw exception;
@@ -553,22 +544,33 @@ class ResultsWriter {
       List<CastVoteRecord> castVoteRecords,
       Integer numRanks,
       String csvOutputFolder,
+      String inputFilepath,
       String contestId,
       String undeclaredWriteInLabel)
       throws IOException {
     String fileWritten;
-    Path outputPath =
-            Paths.get(
+    // Get input filename with extension
+    String inputFileBaseName = new File(inputFilepath).getName();
+    // Remove the extension if it exists
+    int lastIndex = inputFileBaseName.lastIndexOf('.');
+    if (lastIndex != -1) {
+      inputFileBaseName = inputFileBaseName.substring(0, lastIndex);
+    }
+    // Put the input filename in the output filename in case contestId isn't unique --
+    // knowing that it's possible that if both the filename AND the contestId isn't unique,
+    // this will fail.
+    AuditableFile outputFile = new AuditableFile(
                     getOutputFilePath(
                             csvOutputFolder,
                             "dominion_conversion_contest",
                             timestampString,
-                            sanitizeStringForOutput(contestId))
+                            inputFileBaseName + "-" + sanitizeStringForOutput(contestId))
                             + ".csv");
     try {
-      Logger.info("Writing cast vote records in generic format to file: %s...", outputPath);
+      Logger.info("Writing cast vote records in generic format to file: %s...",
+              outputFile.getAbsolutePath());
       CSVPrinter csvPrinter;
-      BufferedWriter writer = Files.newBufferedWriter(outputPath);
+      BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath());
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
       // print header:
       // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
@@ -606,18 +608,14 @@ class ResultsWriter {
       // finalize the file
       csvPrinter.flush();
       csvPrinter.close();
-      fileWritten = outputPath.toString();
-      Logger.info("Successfully wrote: %s", outputPath.toString());
+      fileWritten = outputFile.getAbsolutePath();
+      Logger.info("Successfully wrote: %s", outputFile.getAbsolutePath());
 
-      File file = new File(outputPath.toString());
-      boolean readOnlySucceeded = file.setReadOnly();
-      if (!readOnlySucceeded) {
-        Logger.warning("Failed to set file to read-only: %s", file.getAbsolutePath());
-      }
+      outputFile.finalizeAndHash();
     } catch (IOException exception) {
       Logger.severe(
           "Error writing cast vote records in generic format to output path: %s\n%s",
-          outputPath, exception);
+          outputFile.getAbsolutePath(), exception);
       throw exception;
     }
     return fileWritten;

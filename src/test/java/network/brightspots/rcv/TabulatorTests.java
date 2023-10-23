@@ -254,6 +254,9 @@ class TabulatorTests {
     File[] files = outputFolder.listFiles();
     if (files != null) {
       for (File file : files) {
+        if (file.getName().equals(".DS_Store")) {
+          continue;
+        }
         if (!file.isDirectory()) {
           try {
             // Every ephemeral file must be set to read-only on close, including audit logs
