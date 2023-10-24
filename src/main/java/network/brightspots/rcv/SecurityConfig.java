@@ -62,20 +62,20 @@ class SecurityConfig {
     return rsaKeyValue;
   }
 
-  public static void disableValidationForUnitTests() {
+  public static void setEnableValidationForUnitTests(boolean toWhat) {
     if (!isCalledByTabulatorTests()) {
-      throw new RuntimeException("Only unit tests can disable validation.");
+      throw new RuntimeException("Only unit tests can edit security configuration.");
     }
 
-    IS_HART_SIGNATURE_VALIDATION_ENABLED = false;
+    IS_HART_SIGNATURE_VALIDATION_ENABLED = toWhat;
   }
 
-  public static void enableHomeDirectorySavingForUnitTests() {
+  public static void setAllowHomeDirectorySavingForUnitTests(boolean toWhat) {
     if (!isCalledByTabulatorTests()) {
-      throw new RuntimeException("Only unit tests can disable validation.");
+      throw new RuntimeException("Only unit tests can edit security configuration.");
     }
 
-    CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY = true;
+    CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY = toWhat;
   }
 
   private static boolean isCalledByTabulatorTests() {
@@ -83,6 +83,7 @@ class SecurityConfig {
     // outside of the expected test module.
     StackTraceElement[] currentStack = Thread.currentThread().getStackTrace();
     StackTraceElement lastStackFrame = currentStack[3];
-    return lastStackFrame.getClassName().equals("network.brightspots.rcv.TabulatorTests");
+    return lastStackFrame.getClassName().equals("network.brightspots.rcv.TabulatorTests")
+        || lastStackFrame.getClassName().equals("network.brightspots.rcv.SecurityTests");
   }
 }

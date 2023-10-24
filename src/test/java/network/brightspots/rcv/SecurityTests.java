@@ -144,6 +144,8 @@ class SecurityTests {
   @Test
   @DisplayName("Users may not save output files to their User directory")
   void testFailureOnInvalidOutputDirectory() {
+    SecurityConfig.setAllowHomeDirectorySavingForUnitTests(false);
+
     String configPath = TEST_ASSET_FOLDER + "/invalid_output_directory/config.json";
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     Set<ContestConfig.ValidationError> errors = config.validate();
