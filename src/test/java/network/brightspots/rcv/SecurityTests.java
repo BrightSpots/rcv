@@ -90,8 +90,7 @@ class SecurityTests {
     File incorrectSignatureFile = new File(TEST_SIG_PREFIX
             + "/incorrect_signature.xml.sig.xml");
     Assertions.assertThrows(VerificationSignatureDidNotMatchException.class, () ->
-            ensureSignatureIsValid(
-                    defaultPublicKey(), incorrectSignatureFile, DEFAULT_DATA_FILE));
+            ensureSignatureIsValid(defaultPublicKey(), incorrectSignatureFile, DEFAULT_DATA_FILE));
   }
 
   @Test

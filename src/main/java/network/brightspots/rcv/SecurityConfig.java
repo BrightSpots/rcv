@@ -46,6 +46,10 @@ class SecurityConfig {
     return IS_HART_SIGNATURE_VALIDATION_ENABLED;
   }
 
+  public static boolean canOutputFilesSaveToUserDirectory() {
+    return CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY;
+  }
+
   // Synchronized to prevent a race condition. SpotBugs will complain otherwise, even though
   // this is not currently called on multiple threads.
   public static synchronized RsaKeyValue getRsaPublicKey() {
