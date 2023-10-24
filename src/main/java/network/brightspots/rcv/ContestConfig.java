@@ -23,6 +23,7 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -514,6 +515,24 @@ class ContestConfig {
     if (isNullOrBlank(getContestName())) {
       validationErrors.add(ValidationError.OUTPUT_CONTEST_NAME_MISSING);
       Logger.severe("contestName is required!");
+    }
+
+    if (!SecurityConfig.canOutputFilesSaveToUserDirectory()) {
+      try {
+        String homeDirectory = new File(System.getProperty("user.home")).getCanonicalPath();
+        String outputDirectory = new File(getOutputDirectory()).getCanonicalPath();
+        if (outputDirectory.startsWith(homeDirectory)) {
+          validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY);
+          Logger.severe("To ensure read-only access to RCTab output files, "
+                  + "users must not set the output path to user account folders like My Documents "
+                  + "or My Desktop - any path under {0}. Users must select a path outside these "
+                  + "folders. Please select a different path in the Output Tab of the app.",
+                  homeDirectory);
+        }
+      } catch (Exception exception) {
+        Logger.severe("Error checking if output directory was in user directory: %s", exception);
+        validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY);
+      }
     }
   }
 
@@ -1126,6 +1145,7 @@ class ContestConfig {
     TABULATOR_VERSION_MISSING,
     TABULATOR_VERSION_NOT_SUPPORTED,
     OUTPUT_CONTEST_NAME_MISSING,
+    OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY,
     CVR_NO_FILES_SPECIFIED,
     CVR_FILE_PATH_MISSING,
     CVR_OVERVOTE_LABEL_INVALID,
