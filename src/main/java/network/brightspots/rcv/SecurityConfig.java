@@ -44,13 +44,11 @@ class SecurityConfig {
   // Synchronized to prevent a race condition. SpotBugs will complain otherwise, even though
   // this is not currently called on multiple threads.
   public static synchronized RsaKeyValue getRsaPublicKey() {
-    if (rsaKeyValue != null) {
-      return rsaKeyValue;
+    if (rsaKeyValue == null) {
+      rsaKeyValue = new RsaKeyValue();
+      rsaKeyValue.modulus = RSA_MODULUS;
+      rsaKeyValue.exponent = RSA_EXPONENT;
     }
-
-    rsaKeyValue = new RsaKeyValue();
-    rsaKeyValue.modulus = RSA_MODULUS;
-    rsaKeyValue.exponent = RSA_EXPONENT;
 
     return rsaKeyValue;
   }

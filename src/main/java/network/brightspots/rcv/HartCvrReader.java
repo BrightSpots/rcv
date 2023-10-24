@@ -38,35 +38,36 @@ class HartCvrReader extends BaseCvrReader {
   }
 
   boolean verifyHashIfNeeded(File cvrXml) {
-    if (!SecurityConfig.isIsHartSignatureValidationEnabled()) {
-      return true;
+    boolean isHashNeeded = SecurityConfig.isIsHartSignatureValidationEnabled();
+    boolean isHashVerified = false;
+
+    if (SecurityConfig.isIsHartSignatureValidationEnabled()) {
+      File signatureXml = new File(cvrXml.getAbsolutePath() + ".sig.xml");
+      if (signatureXml.exists()) {
+        try {
+          isHashVerified = SecuritySignatureValidation.verifyPublicKeySignature(
+                  SecurityConfig.getRsaPublicKey(), signatureXml, cvrXml);
+
+          if (!isHashVerified) {
+            Logger.severe("Incorrect hash %s of %s",
+                    signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath());
+          }
+        } catch (SecuritySignatureValidation.CouldNotVerifySignatureException e) {
+          Logger.severe("Failure while trying to verify hash %s of %s: \n%s",
+                  signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath(), e.getMessage());
+        }
+      } else {
+        Logger.severe("A cryptographic signature is required at %s, but it was not found.",
+                signatureXml.getAbsolutePath());
+      }
     }
 
-    File signatureXml = new File(cvrXml.getAbsolutePath() + ".sig.xml");
-    if (!signatureXml.exists()) {
-      Logger.severe("A cryptographic signature is required at %s, but it was not found.",
-              signatureXml.getAbsolutePath());
-      return false;
+    if (isHashNeeded && isHashVerified) {
+      Logger.info("Signature validation successful for %s", cvrXml.getName());
     }
 
-    boolean isHashVerified;
-    try {
-      isHashVerified = SecuritySignatureValidation.verifyPublicKeySignature(
-              SecurityConfig.getRsaPublicKey(), signatureXml, cvrXml);
-    } catch (SecuritySignatureValidation.CouldNotVerifySignatureException e) {
-      Logger.severe("Failure while trying to verify hash %s of %s: \n%s",
-              signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath(), e.getMessage());
-      return false;
-    }
-
-    if (!isHashVerified) {
-      Logger.severe("Incorrect hash %s of %s",
-              signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath());
-      return false;
-    }
-
-    Logger.info("Signature validation successful for %s", cvrXml.getName());
-    return true;
+    // This function returns true if a hash isn't needed, or if verification is successful
+    return !isHashNeeded || isHashVerified;
   }
 
   // iterate all xml files in the source input folder

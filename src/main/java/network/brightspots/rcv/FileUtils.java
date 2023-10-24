@@ -58,26 +58,30 @@ final class FileUtils {
   }
 
   static byte[] getHashBytes(File file, String algorithm) {
+    byte[] bytesToReturn;
     MessageDigest digest;
     try {
       digest = MessageDigest.getInstance(algorithm);
+
+      try (InputStream is = Files.newInputStream(file.toPath())) {
+        try (DigestInputStream hashingStream = new DigestInputStream(is, digest)) {
+          while (hashingStream.readNBytes(1024).length > 0) {
+            // Read in 1kb chunks -- don't need to do anything in the body here
+          }
+        }
+      } catch (IOException e) {
+        Logger.severe("Failed to read file: %s", file.getAbsolutePath());
+        bytesToReturn = "[hash not available]".getBytes(StandardCharsets.UTF_8);
+      }
+
+      bytesToReturn = digest.digest();
     } catch (NoSuchAlgorithmException e) {
       Logger.severe("Failed to get the %s algorithm".formatted(algorithm));
-      return "[hash not available]".getBytes(StandardCharsets.UTF_8);
+      bytesToReturn = "[hash not available]".getBytes(StandardCharsets.UTF_8);
     }
 
-    try (InputStream is = Files.newInputStream(file.toPath())) {
-      try (DigestInputStream hashingStream = new DigestInputStream(is, digest)) {
-        while (hashingStream.readNBytes(1024).length > 0) {
-          // Read in 1kb chunks -- don't need to do anything in the body here
-        }
-      }
-    } catch (IOException e) {
-      Logger.severe("Failed to read file: %s", file.getAbsolutePath());
-      return "[hash not available]".getBytes(StandardCharsets.UTF_8);
-    }
 
-    return digest.digest();
+    return bytesToReturn;
   }
 
   static class UnableToCreateDirectoryException extends Exception {
