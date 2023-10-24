@@ -26,7 +26,7 @@
     <Bug code="EI"/>
   </Match>
   <Match>
-    <Class name="~network\.brightspots\.rcv\.CryptographyXmlParsers\$SignedInfo"/>
+    <Class name="~network\.brightspots\.rcv\.SecurityXmlParsers\$SignedInfo"/>
     <Field name="xmlns"/>
     <Bug code="UrF"/>
   </Match>

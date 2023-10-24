@@ -16,9 +16,9 @@
 
 package network.brightspots.rcv;
 
-import static network.brightspots.rcv.CryptographyXmlParsers.RsaKeyValue;
+import static network.brightspots.rcv.SecurityXmlParsers.RsaKeyValue;
 
-class CryptographyConfig {
+class SecurityConfig {
   // Only the unit test modules should ever set this to false, if it is initially set as true.
   // Note: On some builds, this will be configured to false by default. We will need some
   // formalized method of toggling this for two versions of builds, which has yet to be determined.

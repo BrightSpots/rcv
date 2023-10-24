@@ -17,9 +17,9 @@
 
 package network.brightspots.rcv;
 
-import static network.brightspots.rcv.CryptographyXmlParsers.HartSignature;
-import static network.brightspots.rcv.CryptographyXmlParsers.RsaKeyValue;
-import static network.brightspots.rcv.CryptographyXmlParsers.SignedInfo;
+import static network.brightspots.rcv.SecurityXmlParsers.HartSignature;
+import static network.brightspots.rcv.SecurityXmlParsers.RsaKeyValue;
+import static network.brightspots.rcv.SecurityXmlParsers.SignedInfo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -47,7 +47,7 @@ import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
-class CryptographySignatureValidation {
+class SecuritySignatureValidation {
   /**
    * This function returns whether the signature matches validation.
    * It throws an error if it is unable to perform this check, for reasons including:
@@ -91,7 +91,8 @@ class CryptographySignatureValidation {
               "Signed file was %s but you provided %s".formatted(actualFilename, expectedFilename));
     }
 
-    String actualDigest = FileUtils.getHash(dataFile, "SHA-256");
+    byte[] actualDigestBytes = FileUtils.getHashBytes(dataFile, "SHA-256");
+    String actualDigest = Base64.getEncoder().encodeToString(actualDigestBytes);
     String expectedDigest = hartSignature.signedInfo.reference.digestValue;
 
     if (!actualDigest.equals(expectedDigest)) {
@@ -112,6 +113,8 @@ class CryptographySignatureValidation {
           RsaKeyValue expectedPublicKey,
           File signatureKeyFile) throws CouldNotVerifySignatureException {
     RsaKeyValue actualPublicKey = hartSignature.keyInfo.keyValue.rsaKeyValue;
+    actualPublicKey.exponent = actualPublicKey.exponent.trim();
+    actualPublicKey.modulus = actualPublicKey.modulus.trim();
     if (!actualPublicKey.exponent.equals(expectedPublicKey.exponent)
         || !actualPublicKey.modulus.equals(expectedPublicKey.modulus)) {
       throw new CouldNotVerifySignatureException(

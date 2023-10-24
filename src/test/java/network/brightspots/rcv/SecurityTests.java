@@ -17,26 +17,25 @@
 
 package network.brightspots.rcv;
 
-import static network.brightspots.rcv.CryptographySignatureValidation.CouldNotVerifySignatureException;
-import static network.brightspots.rcv.CryptographySignatureValidation.verifyPublicKeySignature;
-import static network.brightspots.rcv.CryptographyXmlParsers.RsaKeyValue;
+import static network.brightspots.rcv.SecuritySignatureValidation.CouldNotVerifySignatureException;
+import static network.brightspots.rcv.SecuritySignatureValidation.verifyPublicKeySignature;
+import static network.brightspots.rcv.SecurityXmlParsers.RsaKeyValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class SignatureValidationTests {
+class SecurityTests {
   private static final String TEST_FOLDER =
       "src/test/resources/network/brightspots/rcv/test_data/signature_validation";
   private static final File DEFAULT_PUBLIC_KEY_FILE = new File(TEST_FOLDER + "/public_key.txt");
@@ -47,7 +46,11 @@ class SignatureValidationTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
-    assertTrue(TEMP_DIRECTORY.mkdirs());
+    boolean didCreate = TEMP_DIRECTORY.mkdirs();
+    if (!didCreate) {
+      // Maybe it already existed, maybe it couldn't be created
+      Logger.warning("Failed to create directory: %s", TEMP_DIRECTORY.getAbsolutePath());
+    }
   }
 
   @AfterAll
@@ -59,10 +62,10 @@ class SignatureValidationTests {
   }
 
   static RsaKeyValue getPublicKeyFor(File file) {
-    try {
-      XmlMapper xmlMapper = new XmlMapper();
-      xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      return xmlMapper.readValue(new FileInputStream(file), RsaKeyValue.class);
+    XmlMapper xmlMapper = new XmlMapper();
+    xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    try (FileInputStream inputStream = new FileInputStream(file)) {
+      return xmlMapper.readValue(inputStream, RsaKeyValue.class);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

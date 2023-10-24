@@ -38,7 +38,7 @@ class HartCvrReader extends BaseCvrReader {
   }
 
   boolean verifyHashIfNeeded(File cvrXml) {
-    if (!CryptographyConfig.isIsHartSignatureValidationEnabled()) {
+    if (!SecurityConfig.isIsHartSignatureValidationEnabled()) {
       return true;
     }
 
@@ -51,9 +51,9 @@ class HartCvrReader extends BaseCvrReader {
 
     boolean isHashVerified;
     try {
-      isHashVerified = CryptographySignatureValidation.verifyPublicKeySignature(
-              CryptographyConfig.getRsaPublicKey(), signatureXml, cvrXml);
-    } catch (CryptographySignatureValidation.CouldNotVerifySignatureException e) {
+      isHashVerified = SecuritySignatureValidation.verifyPublicKeySignature(
+              SecurityConfig.getRsaPublicKey(), signatureXml, cvrXml);
+    } catch (SecuritySignatureValidation.CouldNotVerifySignatureException e) {
       Logger.severe("Failure while trying to verify hash %s of %s: \n%s",
               signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath(), e.getMessage());
       return false;

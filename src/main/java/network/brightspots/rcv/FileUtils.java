@@ -22,6 +22,7 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -56,13 +57,13 @@ final class FileUtils {
     }
   }
 
-  static String getHash(File file, String algorithm) {
+  static byte[] getHashBytes(File file, String algorithm) {
     MessageDigest digest;
     try {
       digest = MessageDigest.getInstance(algorithm);
     } catch (NoSuchAlgorithmException e) {
-      Logger.severe("Failed to get SHA-512 algorithm");
-      return "[hash not available]";
+      Logger.severe("Failed to get the %s algorithm".formatted(algorithm));
+      return "[hash not available]".getBytes(StandardCharsets.UTF_8);
     }
 
     try (InputStream is = Files.newInputStream(file.toPath())) {
@@ -73,10 +74,10 @@ final class FileUtils {
       }
     } catch (IOException e) {
       Logger.severe("Failed to read file: %s", file.getAbsolutePath());
-      return "[hash not available]";
+      return "[hash not available]".getBytes(StandardCharsets.UTF_8);
     }
 
-    return Utils.bytesToHex(digest.digest());
+    return digest.digest();
   }
 
   static class UnableToCreateDirectoryException extends Exception {

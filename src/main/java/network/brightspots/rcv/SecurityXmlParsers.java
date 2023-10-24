@@ -19,7 +19,7 @@ package network.brightspots.rcv;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
-class CryptographyXmlParsers {
+class SecurityXmlParsers {
   @JacksonXmlRootElement(localName = "Signature", namespace = "http://www.w3.org/2000/09/xmldsig#")
   public static class HartSignature {
     @JacksonXmlProperty(localName = "SignedInfo")
