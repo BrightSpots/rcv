@@ -48,11 +48,11 @@ jobs:
           # and while we could use some regex to figure out the version number automatically, it seems cleaner
           # to know the expected version number upfront.
           if [ ${{ runner.os }} == 'Windows' ]; then
-            echo "FILEPATH=build/jpackage/RCTab-1.4.0-alpha.exe" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/RCTab-1.3.999.exe" >> $GITHUB_OUTPUT
           elif [ ${{ runner.os }} == 'Linux' ]; then
-            echo "FILEPATH=build/jpackage/rctab_1.4.0-alpha-1_amd64.deb" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/rctab_1.3.999-1_amd64.deb" >> $GITHUB_OUTPUT
           else
-            echo "FILEPATH=build/jpackage/RCTab-1.4.0-alpha.dmg" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/RCTab-1.3.999.dmg" >> $GITHUB_OUTPUT
           fi
       - name: "Create executable filename"
         id: exefn
