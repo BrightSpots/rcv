@@ -24,6 +24,11 @@ class SecurityConfig {
   // formalized method of toggling this for two versions of builds, which has yet to be determined.
   private static boolean IS_HART_SIGNATURE_VALIDATION_ENABLED = true;
 
+  // Is the user allowed to save output files to their User directory?
+  // Since user accounts retain delete and create permissions to their user account folders,
+  // this should be disallowed to truly ensure output files are read-only.
+  private static boolean CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY = true;
+
   // The base64-encoded RSA public key modulus
   private static final String RSA_MODULUS = "vifu/KSlTnBHOtl0IuHEc1R3A4sH1vKCKU9G/8/LtD6Ih5aWq7Suyu"
         + "GYgIUUzErmFC92kv4chXKBFwti5wSfoHqtTpmlAvlIsLvi4zrllaoewShzUCG/sqAH3Zw4JBOb6wk20064bkiejX"
@@ -39,6 +44,10 @@ class SecurityConfig {
 
   public static boolean isIsHartSignatureValidationEnabled() {
     return IS_HART_SIGNATURE_VALIDATION_ENABLED;
+  }
+
+  public static boolean canOutputFilesSaveToUserDirectory() {
+    return CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY;
   }
 
   // Synchronized to prevent a race condition. SpotBugs will complain otherwise, even though
