@@ -2,12 +2,12 @@ name: "Generate Releases"
 
 on:
   release:
-    types: [ published ]
+    types: [ release ]
 ## To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
 ##  is at the same indent level as "release":
-#  push:
-#    branches:
-#      - 'branch-name'
+  push:
+    branches:
+      - 'feature/issue-759_idempotent-sha'
 
 jobs:
   release:
@@ -122,6 +122,11 @@ jobs:
           xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait
           echo "Attach staple"
           xcrun stapler staple ${{ steps.exefn.outputs.FILEPATH }}
+
+          #- name: "Create idempotent hash on Windows"
+          #  if: matrix.os == 'Windows'
+          #  run: |
+          #    ./idempotent_hash.bat
 
       - uses: actions/upload-artifact@v3
         with:

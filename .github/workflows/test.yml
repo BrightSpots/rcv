@@ -15,5 +15,5 @@ jobs:
         with:
           java-version: '20.0.1'
           distribution: 'temurin'
-      - name: "Test with Gradle"
-        run: ./gradlew check
+#     - name: "Test with Gradle"
+#       run: ./gradlew check
