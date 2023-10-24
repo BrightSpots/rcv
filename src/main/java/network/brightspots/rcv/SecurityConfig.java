@@ -27,7 +27,7 @@ class SecurityConfig {
   // Is the user allowed to save output files to their User directory?
   // Since user accounts retain delete and create permissions to their user account folders,
   // this should be disallowed to truly ensure output files are read-only.
-  private static boolean CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY = true;
+  private static boolean CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY = false;
 
   // The base64-encoded RSA public key modulus
   private static final String RSA_MODULUS = "vifu/KSlTnBHOtl0IuHEc1R3A4sH1vKCKU9G/8/LtD6Ih5aWq7Suyu"
@@ -63,15 +63,26 @@ class SecurityConfig {
   }
 
   public static void disableValidationForUnitTests() {
-    // Do some basic sanity checking to make sure this is never accidentally called
-    // outside of the TabulatorTests.
-    StackTraceElement[] currentStack = Thread.currentThread().getStackTrace();
-    StackTraceElement lastStackFrame = currentStack[2];
-    if (!lastStackFrame.getClassName().equals("network.brightspots.rcv.TabulatorTests")) {
-      throw new RuntimeException("Only unit tests can disable validation. Expected to be "
-              + "called from TabulatorTests, but instead got " + lastStackFrame.getClassName());
+    if (!isCalledByTabulatorTests()) {
+      throw new RuntimeException("Only unit tests can disable validation.");
     }
 
     IS_HART_SIGNATURE_VALIDATION_ENABLED = false;
+  }
+
+  public static void enableHomeDirectorySavingForUnitTests() {
+    if (!isCalledByTabulatorTests()) {
+      throw new RuntimeException("Only unit tests can disable validation.");
+    }
+
+    CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY = true;
+  }
+
+  private static boolean isCalledByTabulatorTests() {
+    // Do some basic sanity checking to make sure this is never accidentally called
+    // outside of the expected test module.
+    StackTraceElement[] currentStack = Thread.currentThread().getStackTrace();
+    StackTraceElement lastStackFrame = currentStack[3];
+    return lastStackFrame.getClassName().equals("network.brightspots.rcv.TabulatorTests");
   }
 }

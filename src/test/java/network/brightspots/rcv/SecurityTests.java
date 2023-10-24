@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Set;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,12 +37,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class SecurityTests {
-  private static final String TEST_FOLDER =
-      "src/test/resources/network/brightspots/rcv/test_data/signature_validation";
-  private static final File DEFAULT_PUBLIC_KEY_FILE = new File(TEST_FOLDER + "/public_key.txt");
-  private static final File DEFAULT_SIGNATURE_FILE = new File(TEST_FOLDER + "/test.xml.sig.xml");
-  private static final File DEFAULT_DATA_FILE = new File(TEST_FOLDER + "/test.xml");
-  private static final File TEMP_DIRECTORY = new File(TEST_FOLDER + "/tmp/");
+  private static final String TEST_ASSET_FOLDER =
+          "src/test/resources/network/brightspots/rcv/test_data";
+  private static final String TEST_SIG_PREFIX = TEST_ASSET_FOLDER + "/signature_validation/";
+  private static final File DEFAULT_PUBLIC_KEY_FILE = new File(TEST_SIG_PREFIX + "public_key.txt");
+  private static final File DEFAULT_SIGNATURE_FILE = new File(TEST_SIG_PREFIX + "test.xml.sig.xml");
+  private static final File DEFAULT_DATA_FILE = new File(TEST_SIG_PREFIX + "test.xml");
+  private static final File TEMP_DIRECTORY = new File(TEST_SIG_PREFIX + "tmp/");
 
   @BeforeAll
   static void setup() {
@@ -86,7 +88,8 @@ class SecurityTests {
   @Test
   @DisplayName("Verification fails when the signature is incorrect")
   void testValidationFailure() throws CouldNotVerifySignatureException {
-    File incorrectSignatureFile = new File(TEST_FOLDER + "/incorrect_signature.xml.sig.xml");
+    File incorrectSignatureFile = new File(TEST_SIG_PREFIX
+            + "/incorrect_signature.xml.sig.xml");
     assertFalse(verifyPublicKeySignature(
             defaultPublicKey(), incorrectSignatureFile, DEFAULT_DATA_FILE));
   }
@@ -130,11 +133,22 @@ class SecurityTests {
   @Test
   @DisplayName("Exception is thrown when the file is signed with an unsupported key")
   void testUnexpectedPublicKey() {
-    File incorrectPublicKey = new File(TEST_FOLDER + "/incorrect_public_key.txt");
+    File incorrectPublicKey = new File(TEST_SIG_PREFIX + "/incorrect_public_key.txt");
     Assertions.assertThrows(CouldNotVerifySignatureException.class, () -> verifyPublicKeySignature(
             getPublicKeyFor(incorrectPublicKey),
             DEFAULT_SIGNATURE_FILE,
             DEFAULT_DATA_FILE)
     );
+  }
+
+  @Test
+  @DisplayName("Users may not save output files to their User directory")
+  void testFailureOnInvalidOutputDirectory() {
+    String configPath = TEST_ASSET_FOLDER + "/invalid_output_directory/config.json";
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    Set<ContestConfig.ValidationError> errors = config.validate();
+    Assertions.assertArrayEquals(new ContestConfig.ValidationError[]{
+        ContestConfig.ValidationError.OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY
+    }, errors.toArray());
   }
 }
