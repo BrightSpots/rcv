@@ -43,6 +43,12 @@ class HartCvrReader extends BaseCvrReader {
     }
 
     File signatureXml = new File(cvrXml.getAbsolutePath() + ".sig.xml");
+    if (!signatureXml.exists()) {
+      Logger.severe("A cryptographic signature is required at %s, but it was not found.",
+              signatureXml.getAbsolutePath());
+      return false;
+    }
+
     boolean isHashVerified;
     try {
       isHashVerified = CryptographySignatureValidation.verifyPublicKeySignature(
@@ -52,6 +58,7 @@ class HartCvrReader extends BaseCvrReader {
               signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath(), e.getMessage());
       return false;
     }
+
     if (!isHashVerified) {
       Logger.severe("Incorrect hash %s of %s",
               signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath());

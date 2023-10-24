@@ -56,10 +56,10 @@ final class FileUtils {
     }
   }
 
-  static String getHash(File file) {
+  static String getHash(File file, String algorithm) {
     MessageDigest digest;
     try {
-      digest = MessageDigest.getInstance("SHA-512");
+      digest = MessageDigest.getInstance(algorithm);
     } catch (NoSuchAlgorithmException e) {
       Logger.severe("Failed to get SHA-512 algorithm");
       return "[hash not available]";

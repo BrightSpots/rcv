@@ -8,8 +8,9 @@
  */
 
 /*
- * Purpose: Java static class representing the crpytographic signing of a Hart file.
- * Design: a Jackson XML object that can be serialized to and from XML.
+ * Purpose: A set of tools to verify signatures of Hart CVRs.
+ * Design: Reproduces the signature verification algorithm used by Hart, which
+ * is the .NET Framework 4.8.1 implementation of a detached XML Digital Signature.
  * Conditions: When verifying the signature of a Hart file.
  * Version history: see https://github.com/BrightSpots/rcv.
  */
@@ -30,12 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.security.DigestInputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -55,13 +53,14 @@ class CryptographySignatureValidation {
    * It throws an error if it is unable to perform this check, for reasons including:
    * 1. The public key in the signed file does not match the expected key
    * 2. The canonicalization or hashing algorithm is not supported
-   * 3. The corresponding file has been edited and the hash no longer matches
+   * 3. The corresponding file has been edited and its hash no longer
+   * matches what's found in signatureKeyFile
    */
   public static boolean verifyPublicKeySignature(
           RsaKeyValue publicKey,
           File signatureKeyFile,
           File dataFile) throws CouldNotVerifySignatureException {
-    // Load the public key and signature from their corresponding files
+    // Load the .sig.xml file into a HartSignature object
     HartSignature hartSignature;
     try {
       hartSignature = readFromXml(signatureKeyFile, HartSignature.class);
@@ -69,12 +68,19 @@ class CryptographySignatureValidation {
       throw new CouldNotVerifySignatureException("Failed to read files: " + e.getMessage());
     }
 
+    // Checks that will throw exceptions if they don't pass
     ensurePublicKeyMatchesExpectedValue(hartSignature, publicKey, signatureKeyFile);
     ensureDigestMatchesExpectedValue(dataFile, hartSignature);
 
+    // Check that might throw an exception if its unable to perform the signature validation.
     return checkSignature(hartSignature, publicKey);
   }
 
+  /**
+   * It is possible for the signature to be valid, but for the underlying file to have been changed,
+   * meaning the hash no longer matches what was signed. This function mandates that the data file
+   * was not modified. If it was, it is evidence of tampering and we throw an error.
+   */
   private static void ensureDigestMatchesExpectedValue(File dataFile, HartSignature hartSignature)
           throws CouldNotVerifySignatureException {
     // Check if the filenames match
@@ -85,7 +91,7 @@ class CryptographySignatureValidation {
               "Signed file was %s but you provided %s".formatted(actualFilename, expectedFilename));
     }
 
-    String actualDigest = tempMergeConflictGetHash(dataFile, "SHA-256");
+    String actualDigest = FileUtils.getHash(dataFile, "SHA-256");
     String expectedDigest = hartSignature.signedInfo.reference.digestValue;
 
     if (!actualDigest.equals(expectedDigest)) {
@@ -95,39 +101,17 @@ class CryptographySignatureValidation {
     }
   }
 
-  private static String tempMergeConflictGetHash(File file, String algorithm) {
-    // TODO delete this function once develop is merged in
-    MessageDigest digest;
-    try {
-      digest = MessageDigest.getInstance(algorithm);
-    } catch (NoSuchAlgorithmException e) {
-      Logger.severe("Failed to get algorithm " + algorithm);
-      return "[hash not available]";
-    }
 
-    try (InputStream is = Files.newInputStream(file.toPath())) {
-      try (DigestInputStream hashingStream = new DigestInputStream(is, digest)) {
-        while (hashingStream.readNBytes(1024).length > 0) {
-          // Read in 1kb chunks -- don't need to do anything in the body here
-        }
-      }
-    } catch (IOException e) {
-      Logger.severe("Failed to read file: %s", file.getAbsolutePath());
-      return "[hash not available]";
-    }
-
-    return Base64.getEncoder().encodeToString(digest.digest());
-  }
-
+  /**
+   * Does the signature file match the expected public key, which is encoded in the
+   * source of the Java application? If not, the file was signed with a different public
+   * key, and we cannot trust it.
+   */
   private static void ensurePublicKeyMatchesExpectedValue(
           HartSignature hartSignature,
           RsaKeyValue expectedPublicKey,
           File signatureKeyFile) throws CouldNotVerifySignatureException {
-    // Sanity check: does the signature file match the known public key file?
-    // If not, the file may have been signed with a newer or older version than we support.
     RsaKeyValue actualPublicKey = hartSignature.keyInfo.keyValue.rsaKeyValue;
-    actualPublicKey.exponent = actualPublicKey.exponent.trim();
-    actualPublicKey.modulus = actualPublicKey.modulus.trim();
     if (!actualPublicKey.exponent.equals(expectedPublicKey.exponent)
         || !actualPublicKey.modulus.equals(expectedPublicKey.modulus)) {
       throw new CouldNotVerifySignatureException(
@@ -138,6 +122,10 @@ class CryptographySignatureValidation {
     }
   }
 
+  /**
+   * Once all checks of tampering have been performed, we can check the signature itself.
+   * If this returns false, it is still a severe, blocking error.
+   */
   private static boolean checkSignature(HartSignature hartSignature, RsaKeyValue rsaKeyValue)
           throws CouldNotVerifySignatureException {
     // Decode Base64
@@ -181,14 +169,21 @@ class CryptographySignatureValidation {
     }
   }
 
+  /**
+   * The XML namespace is propagated in .NET Framework 4.8.1's library, but not in Java's security
+   * libraries. Since Hart uses an outdated canonicalization algorithm (1.0) that leaves
+   * ambiguity about namespace propagation, this function resolves that ambiguity by replicating
+   * what .NET Framework 4.8.1 does.
+   * Note that more modern canonicalization algorithms do not have this ambiguity.
+   * See also:
+   * Canonical XML Version 1.0: https://www.w3.org/TR/2001/REC-xml-c14n-20010315
+   * Canonical XML Version 1.1: https://www.w3.org/TR/xml-c14n11/
+   */
   private static byte[] canonicalizeXml(SignedInfo signedInfo)
           throws CouldNotVerifySignatureException {
-    // Canonicalize -- sort of. We need one change in addition to canonicalization to mirror what
-    // .NET Framework 4.8.1 does, which is what Hart uses.
-
-    // Build the XML mapper to serialize from the SignedInfo object
+    // Convert the SignedInfo object to XML
     XmlMapper xmlMapper = new XmlMapper();
-    String xmlSignedInfo = null;
+    String xmlSignedInfo;
     try {
       xmlSignedInfo = xmlMapper.writeValueAsString(signedInfo);
     } catch (JsonProcessingException e) {
@@ -227,7 +222,10 @@ class CryptographySignatureValidation {
     }
   }
 
-  public static <T> T readFromXml(File xmlFile, Class<T> classType) throws IOException {
+  /**
+   * Reads an XML file into a Java object.
+   */
+  private static <T> T readFromXml(File xmlFile, Class<T> classType) throws IOException {
     XmlMapper xmlMapper = new XmlMapper();
     xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 

@@ -26,7 +26,7 @@ final class AuditableFile extends File {
   }
 
   public void finalizeAndHash() {
-    String hash = FileUtils.getHash(this);
+    String hash = FileUtils.getHash(this, "SHA-512");
 
     // Write hash to audit log
     Logger.info("File %s written with hash %s".formatted(getAbsolutePath(), hash));

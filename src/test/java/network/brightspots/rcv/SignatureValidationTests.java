@@ -8,10 +8,9 @@
  */
 
 /*
- * Purpose: These regression tests run various tabulations and compare the generated results to
- * expected results.
- * Design: Passing these tests ensures that changes to code have not altered the results of the
- * tabulation.
+ * Purpose: Test the cryptographic signature validation functionality.
+ * Design: Passing these tests ensures that cryptographic signature validation checks all
+ * the required conditions.
  * Conditions: During automated testing.
  * Version history: see https://github.com/BrightSpots/rcv.
  */
@@ -25,8 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,8 +37,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class SignatureValidationTests {
-
-  // folder where we store test inputs
   private static final String TEST_FOLDER =
       "src/test/resources/network/brightspots/rcv/test_data/signature_validation";
   private static final File DEFAULT_PUBLIC_KEY_FILE = new File(TEST_FOLDER + "/public_key.txt");
@@ -59,7 +60,9 @@ class SignatureValidationTests {
 
   static RsaKeyValue getPublicKeyFor(File file) {
     try {
-      return CryptographySignatureValidation.readFromXml(file, RsaKeyValue.class);
+      XmlMapper xmlMapper = new XmlMapper();
+      xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      return xmlMapper.readValue(new FileInputStream(file), RsaKeyValue.class);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -71,14 +74,14 @@ class SignatureValidationTests {
 
 
   @Test
-  @DisplayName("Success: default files")
+  @DisplayName("Succeeds using the default, valid files")
   void testValidationSucceeds() throws CouldNotVerifySignatureException {
     assertTrue(verifyPublicKeySignature(
             defaultPublicKey(), DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE));
   }
 
   @Test
-  @DisplayName("Failure: incorrect signature")
+  @DisplayName("Verification fails when the signature is incorrect")
   void testValidationFailure() throws CouldNotVerifySignatureException {
     File incorrectSignatureFile = new File(TEST_FOLDER + "/incorrect_signature.xml.sig.xml");
     assertFalse(verifyPublicKeySignature(
@@ -86,7 +89,7 @@ class SignatureValidationTests {
   }
 
   @Test
-  @DisplayName("Exception: modified file")
+  @DisplayName("Exception is thrown when the data file is modified")
   void testModifiedDataFile() throws IOException {
     File modifiedDataFile = File.createTempFile("test", ".xml");
     modifiedDataFile.deleteOnExit();
@@ -99,7 +102,7 @@ class SignatureValidationTests {
   }
 
   @Test
-  @DisplayName("Success: Different folder, same filename")
+  @DisplayName("Succeeds when data file is in a different folder (but has the right filename)")
   void testSuccessIfFilenameMatches() throws CouldNotVerifySignatureException, IOException {
     File modifiedDataFile = new File(TEMP_DIRECTORY.getAbsolutePath() + "/test.xml");
     modifiedDataFile.deleteOnExit();
@@ -110,7 +113,7 @@ class SignatureValidationTests {
   }
 
   @Test
-  @DisplayName("Exception: Different filename")
+  @DisplayName("Exception is thrown when the filenames differ")
   void testFailsIfFilenameDiffers() throws IOException {
     File modifiedDataFile = new File(TEMP_DIRECTORY.getAbsolutePath() + "/test2.xml");
     modifiedDataFile.deleteOnExit();
@@ -122,7 +125,7 @@ class SignatureValidationTests {
   }
 
   @Test
-  @DisplayName("Exception: Correct signature but unexpected public key")
+  @DisplayName("Exception is thrown when the file is signed with an unsupported key")
   void testUnexpectedPublicKey() {
     File incorrectPublicKey = new File(TEST_FOLDER + "/incorrect_public_key.txt");
     Assertions.assertThrows(CouldNotVerifySignatureException.class, () -> verifyPublicKeySignature(

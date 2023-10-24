@@ -8,8 +8,8 @@
  */
 
 /*
- * Purpose: Java static class representing the crpytographic signing of a Hart file.
- * Design: a Jackson XML object that can be serialized to and from XML.
+ * Purpose: In-memory representation of .sig.xml signature files.
+ * Design: A series of Java objects that can be serialized to and from XML.
  * Conditions: When verifying the signature of a Hart file.
  * Version history: see https://github.com/BrightSpots/rcv.
  */
