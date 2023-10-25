@@ -235,3 +235,7 @@ tasks.jlink.doLast {
         into JLINK_DIR + "/sample_input"
     }
 }
+tasks.withType(AbstractArchiveTask) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
