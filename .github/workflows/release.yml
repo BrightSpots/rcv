@@ -128,6 +128,13 @@ jobs:
           #  run: |
           #    ./idempotent_hash.bat
 
+      - name: "Generate Idempotent SHA512 for Windows"
+        if: runner.os == 'Windows'
+        run: |
+          move .github/workflows/hash.bat build
+          cd build
+          hash.bat >> idempotent-hash.sha512
+
       - uses: actions/upload-artifact@v3
         with:
           name: Package
@@ -137,6 +144,7 @@ jobs:
             ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}.sha512
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}.sha512
+            build/idempotent-hash.sha512
           retention-days: 90
 
       - name: "Upload binaries to release"
