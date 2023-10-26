@@ -123,6 +123,14 @@ jobs:
           echo "Attach staple"
           xcrun stapler staple ${{ steps.exefn.outputs.FILEPATH }}
 
+      - name: "Generate Idempotent SHA512 for Windows"
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        if: runner.os == 'Windows'
+        run: |
+          cd ${{ github.workspace }}
+          move build\rcv .
+          .\hash.bat >> idempotent-hash.sha512
+
       - uses: actions/upload-artifact@v3
         with:
           name: Package
@@ -132,6 +140,7 @@ jobs:
             ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}.sha512
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}.sha512
+            idempotent-hash.sha512
           retention-days: 90
 
       - name: "Upload binaries to release"
