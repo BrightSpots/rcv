@@ -17,8 +17,8 @@
 
 package network.brightspots.rcv;
 
-import static network.brightspots.rcv.SecuritySignatureValidation.CouldNotVerifySignatureException;
-import static network.brightspots.rcv.SecuritySignatureValidation.VerificationFailedException;
+import static network.brightspots.rcv.SecuritySignatureValidation.VerificationDidNotRunException;
+import static network.brightspots.rcv.SecuritySignatureValidation.VerificationSignatureDidNotMatchException;
 import static network.brightspots.rcv.SecuritySignatureValidation.ensureSignatureIsValid;
 import static network.brightspots.rcv.SecurityXmlParsers.RsaKeyValue;
 
@@ -78,7 +78,7 @@ class SecurityTests {
   @Test
   @DisplayName("Succeeds using the default, valid files")
   void testValidationSucceeds() throws
-          CouldNotVerifySignatureException, VerificationFailedException {
+          VerificationDidNotRunException, VerificationSignatureDidNotMatchException {
     ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE);
   }
 
@@ -86,7 +86,7 @@ class SecurityTests {
   @DisplayName("Verification fails when the signature is incorrect")
   void testValidationFailure() {
     File incorrectSignatureFile = new File(TEST_FOLDER + "/incorrect_signature.xml.sig.xml");
-    Assertions.assertThrows(VerificationFailedException.class, () ->
+    Assertions.assertThrows(VerificationSignatureDidNotMatchException.class, () ->
             ensureSignatureIsValid(
             defaultPublicKey(), incorrectSignatureFile, DEFAULT_DATA_FILE));
   }
@@ -99,15 +99,15 @@ class SecurityTests {
 
     Files.writeString(modifiedDataFile.toPath(), "not the original data");
 
-    Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->
+    Assertions.assertThrows(VerificationDidNotRunException.class, () ->
         ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
     );
   }
 
   @Test
   @DisplayName("Succeeds when data file is in a different folder (but has the right filename)")
-  void testSuccessIfFilenameMatches()
-          throws CouldNotVerifySignatureException, VerificationFailedException, IOException {
+  void testSuccessIfFilenameMatches() throws
+          VerificationDidNotRunException, VerificationSignatureDidNotMatchException, IOException {
     File modifiedDataFile = new File(TEMP_DIRECTORY.getAbsolutePath() + "/test.xml");
     modifiedDataFile.deleteOnExit();
     Files.copy(DEFAULT_DATA_FILE.toPath(), modifiedDataFile.toPath());
@@ -122,7 +122,7 @@ class SecurityTests {
     modifiedDataFile.deleteOnExit();
     Files.copy(DEFAULT_DATA_FILE.toPath(), modifiedDataFile.toPath());
 
-    Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->
+    Assertions.assertThrows(VerificationDidNotRunException.class, () ->
         ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
     );
   }
@@ -131,7 +131,7 @@ class SecurityTests {
   @DisplayName("Exception is thrown when the file is signed with an unsupported key")
   void testUnexpectedPublicKey() {
     File incorrectPublicKey = new File(TEST_FOLDER + "/incorrect_public_key.txt");
-    Assertions.assertThrows(CouldNotVerifySignatureException.class, () -> ensureSignatureIsValid(
+    Assertions.assertThrows(VerificationDidNotRunException.class, () -> ensureSignatureIsValid(
             getPublicKeyFor(incorrectPublicKey),
             DEFAULT_SIGNATURE_FILE,
             DEFAULT_DATA_FILE)

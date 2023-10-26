@@ -48,10 +48,10 @@ class HartCvrReader extends BaseCvrReader {
           SecuritySignatureValidation.ensureSignatureIsValid(
                   SecurityConfig.getRsaPublicKey(), signatureXml, cvrXml);
           isHashVerified = true;
-        } catch (SecuritySignatureValidation.CouldNotVerifySignatureException e) {
+        } catch (SecuritySignatureValidation.VerificationDidNotRunException e) {
           Logger.severe("Failure while trying to verify hash %s of %s: \n%s",
                   signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath(), e.getMessage());
-        } catch (SecuritySignatureValidation.VerificationFailedException e) {
+        } catch (SecuritySignatureValidation.VerificationSignatureDidNotMatchException e) {
           Logger.severe("Incorrect hash %s of %s",
                   signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath());
         }

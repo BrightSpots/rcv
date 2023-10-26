@@ -54,19 +54,18 @@ class SecuritySignatureValidation {
    * 1. The public key in the signed file does not match the expected key
    * 2. The canonicalization or hashing algorithm is not supported
    * 3. The data file has been edited and its hash does not match what's found in signatureKeyFile
-   * Throws VerificationFailedException if the signature verification successfully ran, but
-   * the corresponding signature was invalid.
+   * Throws VerificationSignatureDidNotMatchException if the signature verification successfully
+   * ran, but the corresponding signature was invalid.
    */
   public static void ensureSignatureIsValid(
-          RsaKeyValue publicKey,
-          File signatureKeyFile,
-          File dataFile) throws CouldNotVerifySignatureException, VerificationFailedException {
+          RsaKeyValue publicKey, File signatureKeyFile, File dataFile)
+          throws VerificationDidNotRunException, VerificationSignatureDidNotMatchException {
     // Load the .sig.xml file into a HartSignature object
     HartSignature hartSignature;
     try {
       hartSignature = readFromXml(signatureKeyFile, HartSignature.class);
     } catch (IOException e) {
-      throw new CouldNotVerifySignatureException("Failed to read files: " + e.getMessage());
+      throw new VerificationDidNotRunException("Failed to read files: " + e.getMessage());
     }
 
     ensurePublicKeyMatchesExpectedValue(hartSignature, publicKey, signatureKeyFile);
@@ -80,12 +79,12 @@ class SecuritySignatureValidation {
    * was not modified. If it was, it is evidence of tampering and we throw an error.
    */
   private static void ensureDigestMatchesExpectedValue(File dataFile, HartSignature hartSignature)
-          throws CouldNotVerifySignatureException {
+          throws VerificationDidNotRunException {
     // Check if the filenames match
     String actualFilename = dataFile.getName();
     String expectedFilename = new File(hartSignature.signedInfo.reference.uri).getName();
     if (!actualFilename.equals(expectedFilename)) {
-      throw new CouldNotVerifySignatureException(
+      throw new VerificationDidNotRunException(
               "Signed file was %s but you provided %s".formatted(actualFilename, expectedFilename));
     }
 
@@ -96,7 +95,7 @@ class SecuritySignatureValidation {
     String expectedDigest = hartSignature.signedInfo.reference.digestValue;
 
     if (!actualDigest.equals(expectedDigest)) {
-      throw new CouldNotVerifySignatureException(
+      throw new VerificationDidNotRunException(
               "Signed file had digest %s but the file you provided had %s"
               .formatted(expectedDigest, actualDigest));
     }
@@ -107,12 +106,12 @@ class SecuritySignatureValidation {
    * uses just SHA-X. Convert the w3.org URL to the Java algorithm name .
    */
   private static String javaAlgorithmForW3AlgorithmUrl(String w3AlgorithmUrl)
-          throws CouldNotVerifySignatureException {
+          throws VerificationDidNotRunException {
     return switch (w3AlgorithmUrl) {
       case "http://www.w3.org/2001/04/xmlenc#sha512" -> "SHA-512";
       case "http://www.w3.org/2001/04/xmlenc#sha256" -> "SHA-256";
       case "http://www.w3.org/2000/09/xmldsig#sha1" -> "SHA-1";
-      default -> throw new CouldNotVerifySignatureException(
+      default -> throw new VerificationDidNotRunException(
               "Unsupported digest algorithm: %s".formatted(w3AlgorithmUrl));
     };
   }
@@ -126,13 +125,13 @@ class SecuritySignatureValidation {
   private static void ensurePublicKeyMatchesExpectedValue(
           HartSignature hartSignature,
           RsaKeyValue expectedPublicKey,
-          File signatureKeyFile) throws CouldNotVerifySignatureException {
+          File signatureKeyFile) throws VerificationDidNotRunException {
     RsaKeyValue actualPublicKey = hartSignature.keyInfo.keyValue.rsaKeyValue;
     actualPublicKey.exponent = actualPublicKey.exponent.trim();
     actualPublicKey.modulus = actualPublicKey.modulus.trim();
     if (!actualPublicKey.exponent.equals(expectedPublicKey.exponent)
         || !actualPublicKey.modulus.equals(expectedPublicKey.modulus)) {
-      throw new CouldNotVerifySignatureException(
+      throw new VerificationDidNotRunException(
               "%s was signed with unexpected public key.\nActual modulus: %s\nExpected: %s"
               .formatted(signatureKeyFile.getAbsolutePath(),
                       actualPublicKey.modulus, expectedPublicKey.modulus)
@@ -145,7 +144,7 @@ class SecuritySignatureValidation {
    * If this returns false, it is still a severe, blocking error.
    */
   private static void ensureSignatureMatches(HartSignature hartSignature, RsaKeyValue rsaKeyValue)
-          throws CouldNotVerifySignatureException, VerificationFailedException {
+          throws VerificationDidNotRunException, VerificationSignatureDidNotMatchException {
     // Decode Base64
     byte[] modulusBytes = Base64.getDecoder().decode(rsaKeyValue.modulus);
     byte[] exponentBytes = Base64.getDecoder().decode(rsaKeyValue.exponent);
@@ -164,7 +163,7 @@ class SecuritySignatureValidation {
       publicKey = KeyFactory.getInstance("RSA").generatePublic(spec);
       signature = Signature.getInstance("SHA256withRSA");
     } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-      throw new CouldNotVerifySignatureException("Failed to load signing algorithms: "
+      throw new VerificationDidNotRunException("Failed to load signing algorithms: "
               + e.getMessage());
     }
 
@@ -172,7 +171,7 @@ class SecuritySignatureValidation {
     try {
       signature.initVerify(publicKey);
     } catch (InvalidKeyException e) {
-      throw new CouldNotVerifySignatureException("Invalid Key: " + e.getMessage());
+      throw new VerificationDidNotRunException("Invalid Key: " + e.getMessage());
     }
 
     // Canonicalize the XML
@@ -182,10 +181,10 @@ class SecuritySignatureValidation {
     try {
       signature.update(canonicalizedBytes);
       if (!signature.verify(signatureBytes)) {
-        throw new VerificationFailedException("Signature did not match.");
+        throw new VerificationSignatureDidNotMatchException("Signature did not match.");
       }
     } catch (SignatureException e) {
-      throw new CouldNotVerifySignatureException("Signature failure: %s" + e.getMessage());
+      throw new VerificationDidNotRunException("Signature failure: %s" + e.getMessage());
     }
   }
 
@@ -200,14 +199,14 @@ class SecuritySignatureValidation {
    * Canonical XML Version 1.1: https://www.w3.org/TR/xml-c14n11/
    */
   private static byte[] canonicalizeXml(SignedInfo signedInfo)
-          throws CouldNotVerifySignatureException {
+          throws VerificationDidNotRunException {
     // Convert the SignedInfo object to XML
     XmlMapper xmlMapper = new XmlMapper();
     String xmlSignedInfo;
     try {
       xmlSignedInfo = xmlMapper.writeValueAsString(signedInfo);
     } catch (JsonProcessingException e) {
-      throw new CouldNotVerifySignatureException("Failed to parse the signature XML file");
+      throw new VerificationDidNotRunException("Failed to parse the signature XML file");
     }
 
     // Set up the canonicalization transform
@@ -217,10 +216,10 @@ class SecuritySignatureValidation {
       c14n = sigFactory.newCanonicalizationMethod(signedInfo.canonicalizationMethod.algorithm,
               (C14NMethodParameterSpec) null);
     } catch (NoSuchAlgorithmException e) {
-      throw new CouldNotVerifySignatureException(
+      throw new VerificationDidNotRunException(
               ".sig.xml file uses an unsupported canonicalization algorithm");
     } catch (InvalidAlgorithmParameterException e) {
-      throw new CouldNotVerifySignatureException(
+      throw new VerificationDidNotRunException(
               ".sig.xml file uses an invalid canonicalization algorithm parameter");
     }
 
@@ -232,13 +231,13 @@ class SecuritySignatureValidation {
     try {
       canonicalizedData = (OctetStreamData) c14n.transform(uncanonicalizedData, null);
     } catch (TransformException e) {
-      throw new CouldNotVerifySignatureException("Canonicalization failed: " + e.getMessage());
+      throw new VerificationDidNotRunException("Canonicalization failed: " + e.getMessage());
     }
 
     try {
       return canonicalizedData.getOctetStream().readAllBytes();
     } catch (IOException e) {
-      throw new CouldNotVerifySignatureException("Canonicalization returned an invalid result");
+      throw new VerificationDidNotRunException("Canonicalization returned an invalid result");
     }
   }
 
@@ -259,15 +258,15 @@ class SecuritySignatureValidation {
   // Used when something prevents the signature verification from running,
   // either because of an error or because the verification result would be invalid even if
   // it succeeded (e.g. the signature was valid, but the hash did not match).
-  static class CouldNotVerifySignatureException extends Exception {
-    CouldNotVerifySignatureException(String message) {
+  static class VerificationDidNotRunException extends Exception {
+    VerificationDidNotRunException(String message) {
       super(message);
     }
   }
 
   // Used when the signature verification successfully ran, but the signatures did not match.
-  static class VerificationFailedException extends Exception {
-    VerificationFailedException(String message) {
+  static class VerificationSignatureDidNotMatchException extends Exception {
+    VerificationSignatureDidNotMatchException(String message) {
       super(message);
     }
   }
