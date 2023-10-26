@@ -49,17 +49,18 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
 class SecuritySignatureValidation {
   /**
-   * This function returns whether the signature matches validation.
-   * It throws an error if it is unable to perform this check, for reasons including:
+   * Throws an exception if the signature is invalid.
+   * Throws CouldNotVerifySignature if it is unable to run the validation, for reasons including:
    * 1. The public key in the signed file does not match the expected key
    * 2. The canonicalization or hashing algorithm is not supported
-   * 3. The corresponding file has been edited and its hash no longer
-   * matches what's found in signatureKeyFile
+   * 3. The data file has been edited and its hash does not match what's found in signatureKeyFile
+   * Throws VerificationFailedException if the signature verification successfully ran, but
+   * the corresponding signature was invalid.
    */
-  public static boolean verifyPublicKeySignature(
+  public static void ensureSignatureIsValid(
           RsaKeyValue publicKey,
           File signatureKeyFile,
-          File dataFile) throws CouldNotVerifySignatureException {
+          File dataFile) throws CouldNotVerifySignatureException, VerificationFailedException {
     // Load the .sig.xml file into a HartSignature object
     HartSignature hartSignature;
     try {
@@ -68,12 +69,9 @@ class SecuritySignatureValidation {
       throw new CouldNotVerifySignatureException("Failed to read files: " + e.getMessage());
     }
 
-    // Checks that will throw exceptions if they don't pass
     ensurePublicKeyMatchesExpectedValue(hartSignature, publicKey, signatureKeyFile);
     ensureDigestMatchesExpectedValue(dataFile, hartSignature);
-
-    // Check that might throw an exception if its unable to perform the signature validation.
-    return checkSignature(hartSignature, publicKey);
+    ensureSignatureMatches(hartSignature, publicKey);
   }
 
   /**
@@ -91,7 +89,9 @@ class SecuritySignatureValidation {
               "Signed file was %s but you provided %s".formatted(actualFilename, expectedFilename));
     }
 
-    byte[] actualDigestBytes = FileUtils.getHashBytes(dataFile, "SHA-256");
+    String algorithm = javaAlgorithmForW3AlgorithmUrl(
+            hartSignature.signedInfo.reference.digestMethod.algorithm);
+    byte[] actualDigestBytes = FileUtils.getHashBytes(dataFile, algorithm);
     String actualDigest = Base64.getEncoder().encodeToString(actualDigestBytes);
     String expectedDigest = hartSignature.signedInfo.reference.digestValue;
 
@@ -100,6 +100,21 @@ class SecuritySignatureValidation {
               "Signed file had digest %s but the file you provided had %s"
               .formatted(expectedDigest, actualDigest));
     }
+  }
+
+  /**
+   * The .sig.xml files use a w3.org URL to reference an algorithm, whereas Java
+   * uses just SHA-X. Convert the w3.org URL to the Java algorithm name .
+   */
+  private static String javaAlgorithmForW3AlgorithmUrl(String w3AlgorithmUrl)
+          throws CouldNotVerifySignatureException {
+    return switch (w3AlgorithmUrl) {
+      case "http://www.w3.org/2001/04/xmlenc#sha512" -> "SHA-512";
+      case "http://www.w3.org/2001/04/xmlenc#sha256" -> "SHA-256";
+      case "http://www.w3.org/2000/09/xmldsig#sha1" -> "SHA-1";
+      default -> throw new CouldNotVerifySignatureException(
+              "Unsupported digest algorithm: %s".formatted(w3AlgorithmUrl));
+    };
   }
 
 
@@ -129,8 +144,8 @@ class SecuritySignatureValidation {
    * Once all checks of tampering have been performed, we can check the signature itself.
    * If this returns false, it is still a severe, blocking error.
    */
-  private static boolean checkSignature(HartSignature hartSignature, RsaKeyValue rsaKeyValue)
-          throws CouldNotVerifySignatureException {
+  private static void ensureSignatureMatches(HartSignature hartSignature, RsaKeyValue rsaKeyValue)
+          throws CouldNotVerifySignatureException, VerificationFailedException {
     // Decode Base64
     byte[] modulusBytes = Base64.getDecoder().decode(rsaKeyValue.modulus);
     byte[] exponentBytes = Base64.getDecoder().decode(rsaKeyValue.exponent);
@@ -166,7 +181,9 @@ class SecuritySignatureValidation {
     // Verify the signature
     try {
       signature.update(canonicalizedBytes);
-      return signature.verify(signatureBytes);
+      if (!signature.verify(signatureBytes)) {
+        throw new VerificationFailedException("Signature did not match.");
+      }
     } catch (SignatureException e) {
       throw new CouldNotVerifySignatureException("Signature failure: %s" + e.getMessage());
     }
@@ -239,8 +256,18 @@ class SecuritySignatureValidation {
     }
   }
 
+  // Used when something prevents the signature verification from running,
+  // either because of an error or because the verification result would be invalid even if
+  // it succeeded (e.g. the signature was valid, but the hash did not match).
   static class CouldNotVerifySignatureException extends Exception {
     CouldNotVerifySignatureException(String message) {
+      super(message);
+    }
+  }
+
+  // Used when the signature verification successfully ran, but the signatures did not match.
+  static class VerificationFailedException extends Exception {
+    VerificationFailedException(String message) {
       super(message);
     }
   }

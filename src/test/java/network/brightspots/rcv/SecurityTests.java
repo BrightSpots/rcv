@@ -18,10 +18,9 @@
 package network.brightspots.rcv;
 
 import static network.brightspots.rcv.SecuritySignatureValidation.CouldNotVerifySignatureException;
-import static network.brightspots.rcv.SecuritySignatureValidation.verifyPublicKeySignature;
+import static network.brightspots.rcv.SecuritySignatureValidation.VerificationFailedException;
+import static network.brightspots.rcv.SecuritySignatureValidation.ensureSignatureIsValid;
 import static network.brightspots.rcv.SecurityXmlParsers.RsaKeyValue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -78,16 +77,17 @@ class SecurityTests {
 
   @Test
   @DisplayName("Succeeds using the default, valid files")
-  void testValidationSucceeds() throws CouldNotVerifySignatureException {
-    assertTrue(verifyPublicKeySignature(
-            defaultPublicKey(), DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE));
+  void testValidationSucceeds() throws
+          CouldNotVerifySignatureException, VerificationFailedException {
+    ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE);
   }
 
   @Test
   @DisplayName("Verification fails when the signature is incorrect")
-  void testValidationFailure() throws CouldNotVerifySignatureException {
+  void testValidationFailure() {
     File incorrectSignatureFile = new File(TEST_FOLDER + "/incorrect_signature.xml.sig.xml");
-    assertFalse(verifyPublicKeySignature(
+    Assertions.assertThrows(VerificationFailedException.class, () ->
+            ensureSignatureIsValid(
             defaultPublicKey(), incorrectSignatureFile, DEFAULT_DATA_FILE));
   }
 
@@ -100,19 +100,19 @@ class SecurityTests {
     Files.writeString(modifiedDataFile.toPath(), "not the original data");
 
     Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->
-        verifyPublicKeySignature(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
+        ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
     );
   }
 
   @Test
   @DisplayName("Succeeds when data file is in a different folder (but has the right filename)")
-  void testSuccessIfFilenameMatches() throws CouldNotVerifySignatureException, IOException {
+  void testSuccessIfFilenameMatches()
+          throws CouldNotVerifySignatureException, VerificationFailedException, IOException {
     File modifiedDataFile = new File(TEMP_DIRECTORY.getAbsolutePath() + "/test.xml");
     modifiedDataFile.deleteOnExit();
     Files.copy(DEFAULT_DATA_FILE.toPath(), modifiedDataFile.toPath());
 
-    assertTrue(verifyPublicKeySignature(
-            defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile));
+    ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile);
   }
 
   @Test
@@ -123,7 +123,7 @@ class SecurityTests {
     Files.copy(DEFAULT_DATA_FILE.toPath(), modifiedDataFile.toPath());
 
     Assertions.assertThrows(CouldNotVerifySignatureException.class, () ->
-        verifyPublicKeySignature(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
+        ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
     );
   }
 
@@ -131,7 +131,7 @@ class SecurityTests {
   @DisplayName("Exception is thrown when the file is signed with an unsupported key")
   void testUnexpectedPublicKey() {
     File incorrectPublicKey = new File(TEST_FOLDER + "/incorrect_public_key.txt");
-    Assertions.assertThrows(CouldNotVerifySignatureException.class, () -> verifyPublicKeySignature(
+    Assertions.assertThrows(CouldNotVerifySignatureException.class, () -> ensureSignatureIsValid(
             getPublicKeyFor(incorrectPublicKey),
             DEFAULT_SIGNATURE_FILE,
             DEFAULT_DATA_FILE)
