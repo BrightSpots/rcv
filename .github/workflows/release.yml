@@ -77,25 +77,6 @@ jobs:
           intermediate-filepath: build/rcv.zip
           final-filepath: ${{ steps.zipfn.outputs.FILEPATH }}
 
-      - name: "Prepare keychain"
-        if: matrix.os == 'macOS-latest'
-        env:
-          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
-          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
-        run: |
-          export TEMP_PWD=temporary-password-to-avoid-GUI-prompt
-          echo "Decode Base64 certificates"
-          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
-          echo "Create and unlock keychain"
-          security create-keychain -p $TEMP_PWD build.keychain
-          security unlock-keychain -p $TEMP_PWD build.keychain
-          echo "Import certificates into keychain"
-          # Note: in the next command, the -A should not be used outside of github actions.
-          # It allows any application to read the keychain, which is fine in an ephemeral environment,
-          # but not fine if you run this on your own machine.
-          security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -A -T /usr/bin/codesign -T /usr/bin/productbuild -T /usr/bin/security
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $TEMP_PWD build.keychain
-
       - name: "Create executable with jpackage (and sign, on MacOS)"
         uses: ./.github/actions/gradle-and-sha
         with:
@@ -103,37 +84,13 @@ jobs:
           intermediate-filepath: ${{ steps.jpackagefn.outputs.FILEPATH }}
           final-filepath: ${{ steps.exefn.outputs.FILEPATH }}
 
-      - name: "Notarize app bundle"
-        if: matrix.os == 'macOS-latest'
-        env:
-          MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.MACOS_NOTARIZATION_APPLE_ID }}
-          MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.MACOS_NOTARIZATION_TEAM_ID }}
-          MACOS_NOTARIZATION_PWD: ${{ secrets.MACOS_NOTARIZATION_PWD }}
-          IDENTITY_PUBLIC_KEY: A257HB4NS4
-        run: |
-          echo "Unlock keychain"
-          security unlock-keychain -p temporary-password-to-avoid-GUI-prompt build.keychain
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temporary-password-to-avoid-GUI-prompt build.keychain
-          echo "Create keychain profile"
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_PWD"
-          echo "Creating temp notarization archive"
-          ditto -c -k --sequesterRsrc --keepParent ${{ steps.exefn.outputs.FILEPATH }} "notarization.zip"
-          echo "Notarize app -- this may take a few minutes"
-          xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait
-          echo "Attach staple"
-          xcrun stapler staple ${{ steps.exefn.outputs.FILEPATH }}
-
-          #- name: "Create idempotent hash on Windows"
-          #  if: matrix.os == 'Windows'
-          #  run: |
-          #    ./idempotent_hash.bat
-
       - name: "Generate Idempotent SHA512 for Windows"
+        working-directory: ${{env.GITHUB_WORKSPACE}}
         if: runner.os == 'Windows'
         run: |
-          move .github/workflows/hash.bat build
-          cd build
-          hash.bat >> idempotent-hash.sha512
+          echo "cd into workspace"
+          cd ${{ github.workspace }}
+          .\hash.bat >> idempotent-hash.sha512
 
       - uses: actions/upload-artifact@v3
         with:
@@ -144,7 +101,7 @@ jobs:
             ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}.sha512
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}.sha512
-            build/idempotent-hash.sha512
+            idempotent-hash.sha512
           retention-days: 90
 
       - name: "Upload binaries to release"

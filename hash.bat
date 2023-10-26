@@ -10,8 +10,8 @@ setlocal EnableExtensions EnableDelayedExpansion
 
 set "HASHFILE=all_hashes.txt"
 set "TEMPHASHFILE=all_hashes_temp.txt"
-set "EXTRACTIONDIR=.\rcv\modules_extracted"
-set "MODULESFILE=.\rcv\lib\modules"
+set "EXTRACTIONDIR=.\build\rcv\modules_extracted"
+set "MODULESFILE=.\build\rcv\lib\modules"
 
 if exist %HASHFILE% (
 	echo Deleting existing hash file, %HASHFILE% ...
@@ -35,7 +35,7 @@ del %MODULESFILE%
 
 :: Calculate the hash for every file here and in all subdirectories, appending to the file (format "(filename) = (hash)")
 echo Calculating hashes...
-for /r .\rcv %%f in (*) do (
+for /r .\build\rcv %%f in (*) do (
     <NUL set /p ="%%f = " >> %HASHFILE%
     C:\Windows\System32\certutil.exe -hashfile "%%f" SHA512 | findstr /v ":" >> %HASHFILE%
 )
