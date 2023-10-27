@@ -37,6 +37,38 @@ class HartCvrReader extends BaseCvrReader {
     return "Hart";
   }
 
+  boolean verifyHashIfNeeded(File cvrXml) {
+    boolean isHashNeeded = SecurityConfig.isIsHartSignatureValidationEnabled();
+    boolean isHashVerified = false;
+
+    if (SecurityConfig.isIsHartSignatureValidationEnabled()) {
+      File signatureXml = new File(cvrXml.getAbsolutePath() + ".sig.xml");
+      if (signatureXml.exists()) {
+        try {
+          SecuritySignatureValidation.ensureSignatureIsValid(
+                  SecurityConfig.getRsaPublicKey(), signatureXml, cvrXml);
+          isHashVerified = true;
+        } catch (SecuritySignatureValidation.VerificationDidNotRunException e) {
+          Logger.severe("Failure while trying to verify hash %s of %s: \n%s",
+                  signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath(), e.getMessage());
+        } catch (SecuritySignatureValidation.VerificationSignatureDidNotMatchException e) {
+          Logger.severe("Incorrect hash %s of %s",
+                  signatureXml.getAbsolutePath(), cvrXml.getAbsolutePath());
+        }
+      } else {
+        Logger.severe("A cryptographic signature is required at %s, but it was not found.",
+                signatureXml.getAbsolutePath());
+      }
+    }
+
+    if (isHashNeeded && isHashVerified) {
+      Logger.info("Signature validation successful for %s", cvrXml.getName());
+    }
+
+    // This function returns true if a hash isn't needed, or if verification is successful
+    return !isHashNeeded || isHashVerified;
+  }
+
   // iterate all xml files in the source input folder
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
@@ -45,7 +77,11 @@ class HartCvrReader extends BaseCvrReader {
     File[] children = cvrRoot.listFiles();
     if (children != null) {
       for (File child : children) {
-        if (child.getName().toLowerCase().endsWith("xml")) {
+        String childNameLower = child.getName().toLowerCase();
+        if (childNameLower.endsWith("xml") && !childNameLower.endsWith(".sig.xml")) {
+          if (!verifyHashIfNeeded(child)) {
+            throw new CastVoteRecord.CvrParseException();
+          }
           readCastVoteRecord(castVoteRecords, child.toPath());
         }
       }

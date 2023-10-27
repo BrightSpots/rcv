@@ -22,6 +22,7 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -56,27 +57,31 @@ final class FileUtils {
     }
   }
 
-  static String getHash(File file) {
+  static byte[] getHashBytes(File file, String algorithm) {
+    byte[] bytesToReturn;
     MessageDigest digest;
     try {
-      digest = MessageDigest.getInstance("SHA-512");
-    } catch (NoSuchAlgorithmException e) {
-      Logger.severe("Failed to get SHA-512 algorithm");
-      return "[hash not available]";
-    }
+      digest = MessageDigest.getInstance(algorithm);
 
-    try (InputStream is = Files.newInputStream(file.toPath())) {
-      try (DigestInputStream hashingStream = new DigestInputStream(is, digest)) {
-        while (hashingStream.readNBytes(1024).length > 0) {
-          // Read in 1kb chunks -- don't need to do anything in the body here
+      try (InputStream is = Files.newInputStream(file.toPath())) {
+        try (DigestInputStream hashingStream = new DigestInputStream(is, digest)) {
+          while (hashingStream.readNBytes(1024).length > 0) {
+            // Read in 1kb chunks -- don't need to do anything in the body here
+          }
         }
+      } catch (IOException e) {
+        Logger.severe("Failed to read file: %s", file.getAbsolutePath());
+        bytesToReturn = "[hash not available]".getBytes(StandardCharsets.UTF_8);
       }
-    } catch (IOException e) {
-      Logger.severe("Failed to read file: %s", file.getAbsolutePath());
-      return "[hash not available]";
+
+      bytesToReturn = digest.digest();
+    } catch (NoSuchAlgorithmException e) {
+      Logger.severe("Failed to get the %s algorithm".formatted(algorithm));
+      bytesToReturn = "[hash not available]".getBytes(StandardCharsets.UTF_8);
     }
 
-    return Utils.bytesToHex(digest.digest());
+
+    return bytesToReturn;
   }
 
   static class UnableToCreateDirectoryException extends Exception {

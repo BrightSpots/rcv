@@ -25,4 +25,9 @@
     <Method name="~.*Property"/>
     <Bug code="EI"/>
   </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.SecurityXmlParsers\$SignedInfo"/>
+    <Field name="xmlns"/>
+    <Bug code="UrF"/>
+  </Match>
 </FindBugsFilter>
