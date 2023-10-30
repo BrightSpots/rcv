@@ -204,6 +204,7 @@ class TabulatorTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
+    SecurityConfig.disableValidationForUnitTests();
   }
 
   @Test
