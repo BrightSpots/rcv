@@ -18,6 +18,9 @@ package network.brightspots.rcv;
 
 import static network.brightspots.rcv.SecurityXmlParsers.RsaKeyValue;
 
+import java.security.NoSuchAlgorithmException;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+
 class SecurityConfig {
   // Only the unit test modules should ever set this to false, if it is initially set as true.
   // Note: On some builds, this will be configured to false by default. We will need some
@@ -36,6 +39,18 @@ class SecurityConfig {
 
   // The RsaKeyValue is lazily-initialized. It is set on the first call to getRsaPublicKey().
   private static RsaKeyValue rsaKeyValue = null;
+
+  private static final String expectedSecureRandomProvider = "SUN";
+
+  private static final String expectedXmlCanonicalizationProvider = "XMLDSig";
+
+  static {
+    try {
+      setupAndVerifyFipsCompliance();
+    } catch (SecurityConfigurationException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   public static boolean isIsHartSignatureValidationEnabled() {
     return IS_HART_SIGNATURE_VALIDATION_ENABLED;
@@ -64,5 +79,68 @@ class SecurityConfig {
     }
 
     IS_HART_SIGNATURE_VALIDATION_ENABLED = false;
+  }
+
+  private static void setupAndVerifyFipsCompliance() throws SecurityConfigurationException {
+    // First, verify that the SecureRandom provider is what we expect.
+    try {
+      String randomProviderName =
+            java.security.SecureRandom.getInstanceStrong().getProvider().getName();
+      if (!randomProviderName.equals(expectedSecureRandomProvider)) {
+        throw new SecurityConfigurationException("Unexpected SecureRandom provider"
+              + randomProviderName);
+      }
+    } catch (NoSuchAlgorithmException e) {
+      throw new SecurityConfigurationException("No SecureRandom algorithm found.");
+    }
+
+    java.security.Security.insertProviderAt(new BouncyCastleFipsProvider(), 1);
+    // Remove all providers except for the SecureRandom provider and the XMLDSig provider.
+    // XMLDsig is only used for canonicalizaton, not for anything related to cryptography.
+    java.security.Provider[] providers = java.security.Security.getProviders();
+    int numSecureRandomProviders = 0;
+    int numXmlCanonicalizationProviders = 0;
+    for (java.security.Provider provider : providers) {
+      String name = provider.getName();
+      if (name.equals(expectedSecureRandomProvider)) {
+        numSecureRandomProviders++;
+      } else if (name.equals(expectedXmlCanonicalizationProvider)) {
+        numXmlCanonicalizationProviders++;
+      } else {
+        java.security.Security.removeProvider(name);
+      }
+    }
+
+    if (numSecureRandomProviders != 1) {
+      throw new SecurityConfigurationException(
+          "Must have exactly one SecureRandom provider, but found "
+          + numSecureRandomProviders);
+    }
+    if (numXmlCanonicalizationProviders != 1) {
+      throw new SecurityConfigurationException(
+          "Must have exactly one XML Canonicalization provider, but found "
+          + numXmlCanonicalizationProviders);
+    }
+
+    // Note: position 1 is "most preferred", not 0
+    java.security.Security.insertProviderAt(new BouncyCastleFipsProvider(), 1);
+
+    Logger.info("Security Providers: ");
+    for (java.security.Provider provider : java.security.Security.getProviders()) {
+      Logger.info(provider.getName() + "\n\t" + provider.getInfo());
+    }
+  }
+
+  /*
+   * Sanity check to ensure setupAndVerifyFipsCompliance has been run.
+   */
+  public static boolean haveProvidersBeenCulled() {
+    return java.security.Security.getProviders().length == 3;
+  }
+
+  static class SecurityConfigurationException extends Exception {
+    SecurityConfigurationException(String message) {
+      super(message);
+    }
   }
 }
