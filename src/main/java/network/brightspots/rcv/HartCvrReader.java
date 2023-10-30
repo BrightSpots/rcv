@@ -84,7 +84,7 @@ class HartCvrReader {
 
   // iterate all xml files in the source input folder
   void readCastVoteRecordsFromFolder(List<CastVoteRecord> castVoteRecords)
-      throws IOException, UnrecognizedCandidatesException {
+          throws IOException, UnrecognizedCandidatesException, CastVoteRecord.CvrParseException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
