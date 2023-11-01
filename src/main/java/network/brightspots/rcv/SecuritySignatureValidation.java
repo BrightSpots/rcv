@@ -174,17 +174,43 @@ class SecuritySignatureValidation {
       throw new VerificationDidNotRunException("Invalid Key: " + e.getMessage());
     }
 
-    // Canonicalize the XML
+    // Canonicalize the XML before removing providers,
+    // since this uses the XMLDSig provider.
     byte[] canonicalizedBytes = canonicalizeXml(hartSignature.signedInfo);
 
-    // Verify the signature
+    // Verify the signature, ensuring FIPS compliance
+    removeNonFipsProvidersAndRunRsa(signature, canonicalizedBytes, signatureBytes);
+  }
+
+  private static void removeNonFipsProvidersAndRunRsa(
+          Signature signature,
+          byte[] canonicalizedBytes,
+          byte[] signatureBytes)
+          throws VerificationDidNotRunException, VerificationSignatureDidNotMatchException {
+    java.security.Provider[] providers = java.security.Security.getProviders();
+
     try {
+      // Step 1: Remove all non-FIPS providers
+      for (java.security.Provider provider : providers) {
+        if (!provider.getName().equals("BCFIPS")) {
+          java.security.Security.removeProvider(provider.getName());
+        }
+      }
+
+      // Step 2: Run the core RSA algorithm
       signature.update(canonicalizedBytes);
       if (!signature.verify(signatureBytes)) {
         throw new VerificationSignatureDidNotMatchException("Signature did not match.");
       }
     } catch (SignatureException e) {
       throw new VerificationDidNotRunException("Signature failure: %s" + e.getMessage());
+    } finally {
+      // Step 3: Replace the non-FIPS providers
+      for (java.security.Provider provider : providers) {
+        if (!provider.getName().equals("BCFIPS")) {
+          java.security.Security.addProvider(provider);
+        }
+      }
     }
   }
 
