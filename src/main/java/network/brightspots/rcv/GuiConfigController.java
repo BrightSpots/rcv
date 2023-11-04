@@ -865,9 +865,9 @@ public class GuiConfigController implements Initializable {
   }
 
   private void setDefaultValues() {
-    String versionText = "Running %s version %s".formatted(Main.APP_NAME, Main.APP_VERSION);
+    String versionText = "%s version %s".formatted(Main.APP_NAME, Main.APP_VERSION);
     if (Main.APP_VERSION.endsWith("999")) {
-      versionText += " -- this is a development version";
+      versionText += " -- this is a development version, do not distribute!";
       labelVersion.setBackground(new Background(new BackgroundFill(
           Color.DARKRED, CornerRadii.EMPTY, Insets.EMPTY)));
       labelVersion.setTextFill(Color.WHITE);
