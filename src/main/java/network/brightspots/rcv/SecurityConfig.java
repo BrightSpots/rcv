@@ -42,7 +42,7 @@ class SecurityConfig {
   // The RsaKeyValue is lazily-initialized. It is set on the first call to getRsaPublicKey().
   private static RsaKeyValue rsaKeyValue = null;
 
-  public static boolean isIsHartSignatureValidationEnabled() {
+  public static boolean isHartSignatureValidationEnabled() {
     return IS_HART_SIGNATURE_VALIDATION_ENABLED;
   }
 
