@@ -141,15 +141,15 @@ class SecurityTests {
   }
 
   @Test
-  @DisplayName("Users may not save output files to their User directory")
+  @DisplayName("Users may not save output files to their Users directory")
   void testFailureOnInvalidOutputDirectory() {
-    SecurityConfig.setAllowHomeDirectorySavingForUnitTests(false);
+    SecurityConfig.setAllowUsersDirectorySavingForUnitTests(false);
 
     String configPath = TEST_ASSET_FOLDER + "/invalid_output_directory/config.json";
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     Set<ContestConfig.ValidationError> errors = config.validate();
     Assertions.assertArrayEquals(new ContestConfig.ValidationError[]{
-        ContestConfig.ValidationError.OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY
+            ContestConfig.ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY
     }, errors.toArray());
   }
 }

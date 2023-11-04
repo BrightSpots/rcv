@@ -23,7 +23,6 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -517,21 +516,23 @@ class ContestConfig {
       Logger.severe("contestName is required!");
     }
 
-    if (!SecurityConfig.canOutputFilesSaveToUserDirectory()) {
+    if (!SecurityConfig.canOutputFilesSaveToUsersDirectory()) {
       try {
         String homeDirectory = new File(System.getProperty("user.home")).getCanonicalPath();
+        // Strip the username off the file path to get the root Users directory path
+        String rootUsersDirectory = homeDirectory.substring(0, homeDirectory.lastIndexOf('\\'));
         String outputDirectory = new File(getOutputDirectory()).getCanonicalPath();
-        if (outputDirectory.startsWith(homeDirectory)) {
-          validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY);
-          Logger.severe("To ensure read-only access to RCTab output files, "
-                  + "users must not set the output path to user account folders like My Documents "
-                  + "or My Desktop - any path under {0}. Users must select a path outside these "
-                  + "folders. Please select a different path in the Output Tab of the app.",
-                  homeDirectory);
+        if (outputDirectory.startsWith(rootUsersDirectory)) {
+          validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY);
+          Logger.severe("To ensure read-only access to RCTab output files, users must not"
+                          + " set the output path to user account folders like Documents, Desktop, etc."
+                          + " -- any path under \"%s\" is prohibited. Please specify a new path outside"
+                          + " this folder in the Output tab of the app (e.g. C:\\RCTab\\output).",
+                  rootUsersDirectory);
         }
       } catch (Exception exception) {
-        Logger.severe("Error checking if output directory was in user directory: %s", exception);
-        validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY);
+        Logger.severe("Error checking if output directory was in Users directory: %s", exception);
+        validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY);
       }
     }
   }
@@ -1145,7 +1146,7 @@ class ContestConfig {
     TABULATOR_VERSION_MISSING,
     TABULATOR_VERSION_NOT_SUPPORTED,
     OUTPUT_CONTEST_NAME_MISSING,
-    OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY,
+    OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY,
     CVR_NO_FILES_SPECIFIED,
     CVR_FILE_PATH_MISSING,
     CVR_OVERVOTE_LABEL_INVALID,

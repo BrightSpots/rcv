@@ -24,10 +24,10 @@ class SecurityConfig {
   // formalized method of toggling this for two versions of builds, which has yet to be determined.
   private static boolean IS_HART_SIGNATURE_VALIDATION_ENABLED = false;
 
-  // Is the user allowed to save output files to their User directory?
+  // Is the user allowed to save output files to their Users directory?
   // Since user accounts retain delete and create permissions to their user account folders,
   // this should be disallowed to truly ensure output files are read-only.
-  private static boolean CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY = true;
+  private static boolean CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY = true;
 
   // The base64-encoded RSA public key modulus
   private static final String RSA_MODULUS = "vifu/KSlTnBHOtl0IuHEc1R3A4sH1vKCKU9G/8/LtD6Ih5aWq7Suyu"
@@ -46,8 +46,8 @@ class SecurityConfig {
     return IS_HART_SIGNATURE_VALIDATION_ENABLED;
   }
 
-  public static boolean canOutputFilesSaveToUserDirectory() {
-    return CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY;
+  public static boolean canOutputFilesSaveToUsersDirectory() {
+    return CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY;
   }
 
   // Synchronized to prevent a race condition. SpotBugs will complain otherwise, even though
@@ -62,28 +62,28 @@ class SecurityConfig {
     return rsaKeyValue;
   }
 
-  public static void setEnableValidationForUnitTests(boolean toWhat) {
-    if (!isCalledByTabulatorTests()) {
-      throw new RuntimeException("Only unit tests can edit security configuration.");
+  public static void setEnableValidationForUnitTests(boolean isEnabled) {
+    if (isNotCalledByTabulatorTests()) {
+      throw new RuntimeException("Only unit tests can edit the security configuration!");
     }
 
-    IS_HART_SIGNATURE_VALIDATION_ENABLED = toWhat;
+    IS_HART_SIGNATURE_VALIDATION_ENABLED = isEnabled;
   }
 
-  public static void setAllowHomeDirectorySavingForUnitTests(boolean toWhat) {
-    if (!isCalledByTabulatorTests()) {
-      throw new RuntimeException("Only unit tests can edit security configuration.");
+  public static void setAllowUsersDirectorySavingForUnitTests(boolean isAllowed) {
+    if (isNotCalledByTabulatorTests()) {
+      throw new RuntimeException("Only unit tests can edit the security configuration!");
     }
 
-    CAN_OUTPUT_FILES_SAVE_TO_USER_DIRECTORY = toWhat;
+    CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY = isAllowed;
   }
 
-  private static boolean isCalledByTabulatorTests() {
+  private static boolean isNotCalledByTabulatorTests() {
     // Do some basic sanity checking to make sure this is never accidentally called
-    // outside of the expected test module.
+    // from outside the expected test module.
     StackTraceElement[] currentStack = Thread.currentThread().getStackTrace();
     StackTraceElement lastStackFrame = currentStack[3];
-    return lastStackFrame.getClassName().equals("network.brightspots.rcv.TabulatorTests")
-        || lastStackFrame.getClassName().equals("network.brightspots.rcv.SecurityTests");
+    return !lastStackFrame.getClassName().equals("network.brightspots.rcv.TabulatorTests")
+            && !lastStackFrame.getClassName().equals("network.brightspots.rcv.SecurityTests");
   }
 }
