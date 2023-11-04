@@ -524,12 +524,13 @@ class ContestConfig {
         String outputDirectory = new File(getOutputDirectory()).getCanonicalPath();
         if (outputDirectory.startsWith(rootUsersDirectory)) {
           validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY);
-          Logger.severe("To ensure read-only access to RCTab output files, users must not"
-                          + " set the output path to user account folders like Documents,"
-                          + " Desktop, etc. -- any path under \"%s\" is prohibited. Please"
-                          + " specify a new path outside this folder in the Output tab of the"
-                          + " app (e.g. C:\\RCTab\\output).",
-                  rootUsersDirectory);
+          Logger.severe(
+              "To ensure read-only access to RCTab output files, users must not"
+                  + " set the output path to user account folders like Documents,"
+                  + " Desktop, etc. -- any path under \"%s\" is prohibited. Please"
+                  + " specify a new path outside this folder in the Output tab of the"
+                  + " app (e.g. C:\\RCTab\\output).",
+              rootUsersDirectory);
         }
       } catch (Exception exception) {
         Logger.severe("Error checking if output directory was in Users directory: %s", exception);

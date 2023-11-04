@@ -30,11 +30,11 @@ class SecurityConfig {
   private static boolean CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY = true;
 
   // The base64-encoded RSA public key modulus
-  private static final String RSA_MODULUS = "vifu/KSlTnBHOtl0IuHEc1R3A4sH1vKCKU9G/8/LtD6Ih5aWq7Suyu"
-        + "GYgIUUzErmFC92kv4chXKBFwti5wSfoHqtTpmlAvlIsLvi4zrllaoewShzUCG/sqAH3Zw4JBOb6wk20064bkiejX"
-        + "baxEZticxgs08ZU9bHmpWrlldbIJmgt3gOjhG68+ATfShREpuLeAV9lGU2+Y6OdKtUHVewSeyIfz3+Rpajc/f2UP"
-        + "tO6uA09FzmzryWhhtZHiXpev2oVWCpT1MH5JVgrWykX9fWcxJMTHdvZnMxYzJF6ox3vGtx6x8Eib8H4RT4KutWph"
-        + "PPT3vLDkhYXP9TAP+B1edxwQ==";
+  private static final String RSA_MODULUS =
+      "vifu/KSlTnBHOtl0IuHEc1R3A4sH1vKCKU9G/8/LtD6Ih5aWq7SuyuGYgIUUzErmFC92kv4chXKBFwti5wSfoHqt"
+          + "TpmlAvlIsLvi4zrllaoewShzUCG/sqAH3Zw4JBOb6wk20064bkiejXbaxEZticxgs08ZU9bHmpWrlldbIJmgt3"
+          + "gOjhG68+ATfShREpuLeAV9lGU2+Y6OdKtUHVewSeyIfz3+Rpajc/f2UPtO6uA09FzmzryWhhtZHiXpev2oVWCp"
+          + "T1MH5JVgrWykX9fWcxJMTHdvZnMxYzJF6ox3vGtx6x8Eib8H4RT4KutWphPPT3vLDkhYXP9TAP+B1edxwQ==";
 
   // The base64-encoded RSA public key exponent
   private static final String RSA_EXPONENT = "AQAB";
@@ -84,6 +84,6 @@ class SecurityConfig {
     StackTraceElement[] currentStack = Thread.currentThread().getStackTrace();
     StackTraceElement lastStackFrame = currentStack[3];
     return !lastStackFrame.getClassName().equals("network.brightspots.rcv.TabulatorTests")
-            && !lastStackFrame.getClassName().equals("network.brightspots.rcv.SecurityTests");
+        && !lastStackFrame.getClassName().equals("network.brightspots.rcv.SecurityTests");
   }
 }

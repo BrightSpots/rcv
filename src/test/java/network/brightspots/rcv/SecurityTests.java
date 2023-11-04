@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 
 class SecurityTests {
   private static final String TEST_ASSET_FOLDER =
-          "src/test/resources/network/brightspots/rcv/test_data";
+      "src/test/resources/network/brightspots/rcv/test_data";
   private static final String TEST_SIG_PREFIX = TEST_ASSET_FOLDER + "/signature_validation/";
   private static final File DEFAULT_PUBLIC_KEY_FILE = new File(TEST_SIG_PREFIX + "public_key.txt");
   private static final File DEFAULT_SIGNATURE_FILE = new File(TEST_SIG_PREFIX + "test.xml.sig.xml");
@@ -76,20 +76,20 @@ class SecurityTests {
     return getPublicKeyFor(DEFAULT_PUBLIC_KEY_FILE);
   }
 
-
   @Test
   @DisplayName("Succeeds using the default, valid files")
-  void testValidationSucceeds() throws
-          VerificationDidNotRunException, VerificationSignatureDidNotMatchException {
+  void testValidationSucceeds()
+      throws VerificationDidNotRunException, VerificationSignatureDidNotMatchException {
     ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE);
   }
 
   @Test
   @DisplayName("Verification fails when the signature is incorrect")
   void testValidationFailure() {
-    File incorrectSignatureFile = new File(TEST_SIG_PREFIX
-            + "/incorrect_signature.xml.sig.xml");
-    Assertions.assertThrows(VerificationSignatureDidNotMatchException.class, () ->
+    File incorrectSignatureFile = new File(TEST_SIG_PREFIX + "/incorrect_signature.xml.sig.xml");
+    Assertions.assertThrows(
+        VerificationSignatureDidNotMatchException.class,
+        () ->
             ensureSignatureIsValid(defaultPublicKey(), incorrectSignatureFile, DEFAULT_DATA_FILE));
   }
 
@@ -101,15 +101,17 @@ class SecurityTests {
 
     Files.writeString(modifiedDataFile.toPath(), "not the original data");
 
-    Assertions.assertThrows(VerificationDidNotRunException.class, () ->
-        ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
-    );
+    Assertions.assertThrows(
+        VerificationDidNotRunException.class,
+        () -> ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile));
   }
 
   @Test
   @DisplayName("Succeeds when data file is in a different folder (but has the right filename)")
-  void testSuccessIfFilenameMatches() throws
-          VerificationDidNotRunException, VerificationSignatureDidNotMatchException, IOException {
+  void testSuccessIfFilenameMatches()
+      throws VerificationDidNotRunException,
+          VerificationSignatureDidNotMatchException,
+          IOException {
     File modifiedDataFile = new File(TEMP_DIRECTORY.getAbsolutePath() + "/test.xml");
     modifiedDataFile.deleteOnExit();
     Files.copy(DEFAULT_DATA_FILE.toPath(), modifiedDataFile.toPath());
@@ -124,20 +126,20 @@ class SecurityTests {
     modifiedDataFile.deleteOnExit();
     Files.copy(DEFAULT_DATA_FILE.toPath(), modifiedDataFile.toPath());
 
-    Assertions.assertThrows(VerificationDidNotRunException.class, () ->
-        ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile)
-    );
+    Assertions.assertThrows(
+        VerificationDidNotRunException.class,
+        () -> ensureSignatureIsValid(defaultPublicKey(), DEFAULT_SIGNATURE_FILE, modifiedDataFile));
   }
 
   @Test
   @DisplayName("Exception is thrown when the file is signed with an unsupported key")
   void testUnexpectedPublicKey() {
     File incorrectPublicKey = new File(TEST_SIG_PREFIX + "/incorrect_public_key.txt");
-    Assertions.assertThrows(VerificationDidNotRunException.class, () -> ensureSignatureIsValid(
-            getPublicKeyFor(incorrectPublicKey),
-            DEFAULT_SIGNATURE_FILE,
-            DEFAULT_DATA_FILE)
-    );
+    Assertions.assertThrows(
+        VerificationDidNotRunException.class,
+        () ->
+            ensureSignatureIsValid(
+                getPublicKeyFor(incorrectPublicKey), DEFAULT_SIGNATURE_FILE, DEFAULT_DATA_FILE));
   }
 
   @Test
@@ -148,8 +150,10 @@ class SecurityTests {
     String configPath = TEST_ASSET_FOLDER + "/invalid_output_directory/config.json";
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     Set<ContestConfig.ValidationError> errors = config.validate();
-    Assertions.assertArrayEquals(new ContestConfig.ValidationError[]{
-            ContestConfig.ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY
-    }, errors.toArray());
+    Assertions.assertArrayEquals(
+        new ContestConfig.ValidationError[] {
+          ContestConfig.ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY
+        },
+        errors.toArray());
   }
 }
