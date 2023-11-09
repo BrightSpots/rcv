@@ -22,12 +22,12 @@ class SecurityConfig {
   // Only the unit test modules should ever set this to false, if it is initially set as true.
   // Note: On some builds, this will be configured to false by default. We will need some
   // formalized method of toggling this for two versions of builds, which has yet to be determined.
-  private static boolean IS_HART_SIGNATURE_VALIDATION_ENABLED = false;
+  private static boolean IS_HART_SIGNATURE_VALIDATION_ENABLED = true;
 
   // Is the user allowed to save output files to their Users directory?
   // Since user accounts retain delete and create permissions to their user account folders,
   // this should be disallowed to truly ensure output files are read-only.
-  private static boolean CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY = true;
+  private static boolean CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY = false;
 
   // The base64-encoded RSA public key modulus
   private static final String RSA_MODULUS =
