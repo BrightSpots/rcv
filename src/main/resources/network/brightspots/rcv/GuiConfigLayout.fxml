@@ -43,11 +43,19 @@
               text="Open Help Manual"/>
           </Menu>
         </MenuBar>
-        <Label fx:id="labelCurrentlyLoaded">
-          <padding>
-            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
-          </padding>
-        </Label>
+        <HBox alignment="CENTER_LEFT">
+            <Label fx:id="labelCurrentlyLoaded">
+              <padding>
+                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
+              </padding>
+            </Label>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="labelVersion" alignment="CENTER_RIGHT" minWidth="200.0">
+              <padding>
+                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
+              </padding>
+            </Label>
+        </HBox>
       </VBox>
     </top>
     <center>

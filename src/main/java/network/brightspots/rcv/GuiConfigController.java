@@ -49,6 +49,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -72,6 +73,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -123,6 +128,8 @@ public class GuiConfigController implements Initializable {
   private TextArea textAreaHelp;
   @FXML
   private Label labelCurrentlyLoaded;
+  @FXML
+  private Label labelVersion;
   @FXML
   private TextField textFieldContestName;
   @FXML
@@ -858,6 +865,14 @@ public class GuiConfigController implements Initializable {
   }
 
   private void setDefaultValues() {
+    String versionText = "%s version %s".formatted(Main.APP_NAME, Main.APP_VERSION);
+    if (Main.APP_VERSION.endsWith("999")) {
+      versionText += " -- this is a development version, do not distribute!";
+      labelVersion.setBackground(new Background(new BackgroundFill(
+          Color.DARKRED, CornerRadii.EMPTY, Insets.EMPTY)));
+      labelVersion.setTextFill(Color.WHITE);
+    }
+    labelVersion.setText(versionText);
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
 
     checkBoxCandidateExcluded.setSelected(ContestConfig.SUGGESTED_CANDIDATE_EXCLUDED);
