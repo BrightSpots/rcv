@@ -204,7 +204,8 @@ class TabulatorTests {
   @BeforeAll
   static void setup() {
     Logger.setup();
-    SecurityConfig.disableValidationForUnitTests();
+    SecurityConfig.setEnableValidationForUnitTests(false);
+    SecurityConfig.setAllowUsersDirectorySavingForUnitTests(true);
   }
 
   @Test
