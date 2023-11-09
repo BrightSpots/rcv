@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-      "filePath": "../_shared/dominion_alaska/alaska_input_data",
+      "filePath": "../dominion_alaska/alaska_input_data",
       "provider": "dominion",
       "contestId": "1",
       "treatBlankAsUndeclaredWriteIn": false,
