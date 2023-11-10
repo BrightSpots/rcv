@@ -156,4 +156,16 @@ class SecurityTests {
         },
         errors.toArray());
   }
+
+  @Test
+  @DisplayName("Ensure FIPS Compliance check is run")
+  void testFipsComplianceWasCorrectlySetUp() {
+    Assertions.assertTrue(SecurityConfig.haveProvidersBeenCulled());
+
+    java.security.Provider[] providers = java.security.Security.getProviders();
+    Assertions.assertEquals(3, providers.length);
+    Assertions.assertEquals("BCFIPS", providers[0].getName());
+    Assertions.assertEquals("SUN", providers[1].getName());
+    Assertions.assertEquals("XMLDSig", providers[2].getName());
+  }
 }

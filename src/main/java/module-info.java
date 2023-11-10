@@ -12,6 +12,7 @@ module network.brightspots.rcv {
   requires java.xml;
   requires org.apache.poi.ooxml;
   requires java.xml.crypto;
+  requires org.bouncycastle.fips.core;
   // enable reflexive calls from network.brightspots.rcv into javafx.fxml
   opens network.brightspots.rcv;
   // our main module

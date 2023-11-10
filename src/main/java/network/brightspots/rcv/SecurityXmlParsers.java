@@ -66,8 +66,6 @@ class SecurityXmlParsers {
 
     @JacksonXmlProperty(localName = "DigestValue")
     String digestValue;
-
-    // Getters and setters
   }
 
   static class DigestMethod {
