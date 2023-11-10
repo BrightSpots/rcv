@@ -114,7 +114,8 @@ jlink {
     imageZip = file(JLINK_DIR + ".zip")
     addOptions '--add-modules', MODULES_TO_ADD,
             '--strip-debug', '--compress', '2',
-            '--no-header-files', '--no-man-pages'
+            '--no-header-files', '--no-man-pages',
+            '--ignore-signing-information'
     mergedModule {
         requires "java.xml"
     }
