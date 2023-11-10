@@ -51,10 +51,10 @@ class HartCvrReader {
   }
 
   boolean verifyHashIfNeeded(File cvrXml) {
-    boolean isHashNeeded = SecurityConfig.isIsHartSignatureValidationEnabled();
+    boolean isHashNeeded = SecurityConfig.isHartSignatureValidationEnabled();
     boolean isHashVerified = false;
 
-    if (SecurityConfig.isIsHartSignatureValidationEnabled()) {
+    if (SecurityConfig.isHartSignatureValidationEnabled()) {
       if (!SecurityConfig.haveProvidersBeenCulled()) {
         Logger.severe("RCTab security error. Could not meet FIPS compliance.");
       }
