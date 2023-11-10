@@ -495,6 +495,28 @@ class ContestConfig {
       validationErrors.add(ValidationError.OUTPUT_CONTEST_NAME_MISSING);
       Logger.severe("contestName is required!");
     }
+
+    if (!SecurityConfig.canOutputFilesSaveToUsersDirectory()) {
+      try {
+        String homeDirectory = new File(System.getProperty("user.home")).getCanonicalPath();
+        // Strip the username off the file path to get the root Users directory path
+        String rootUsersDirectory = homeDirectory.substring(0, homeDirectory.lastIndexOf('\\'));
+        String outputDirectory = new File(getOutputDirectory()).getCanonicalPath();
+        if (outputDirectory.startsWith(rootUsersDirectory)) {
+          validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY);
+          Logger.severe(
+              "To ensure read-only access to RCTab output files, users must not"
+                  + " set the output path to user account folders like Documents,"
+                  + " Desktop, etc. -- any path under \"%s\" is prohibited. Please"
+                  + " specify a new path outside this folder in the Output tab of the"
+                  + " app (e.g. C:\\RCTab\\output).",
+              rootUsersDirectory);
+        }
+      } catch (Exception exception) {
+        Logger.severe("Error checking if output directory was in Users directory: %s", exception);
+        validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY);
+      }
+    }
   }
 
   // checks for conflicts between a candidate name and other name/codes or other reserved strings
@@ -1079,6 +1101,7 @@ class ContestConfig {
     TABULATOR_VERSION_MISSING,
     TABULATOR_VERSION_NOT_SUPPORTED,
     OUTPUT_CONTEST_NAME_MISSING,
+    OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY,
     CVR_NO_FILES_SPECIFIED,
     CVR_FILE_PATH_MISSING,
     CVR_OVERVOTE_LABEL_INVALID,
@@ -1108,6 +1131,7 @@ class ContestConfig {
     CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
+    CVR_OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY,
     CANDIDATE_NAME_MISSING,
     CANDIDATE_NAME_INVALID,
     CANDIDATE_CODE_INVALID,

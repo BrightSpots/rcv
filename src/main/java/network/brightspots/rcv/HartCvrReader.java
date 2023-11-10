@@ -51,10 +51,10 @@ class HartCvrReader {
   }
 
   boolean verifyHashIfNeeded(File cvrXml) {
-    boolean isHashNeeded = SecurityConfig.isIsHartSignatureValidationEnabled();
+    boolean isHashNeeded = SecurityConfig.isHartSignatureValidationEnabled();
     boolean isHashVerified = false;
 
-    if (SecurityConfig.isIsHartSignatureValidationEnabled()) {
+    if (SecurityConfig.isHartSignatureValidationEnabled()) {
       File signatureXml = new File(cvrXml.getAbsolutePath() + ".sig.xml");
       if (signatureXml.exists()) {
         try {
