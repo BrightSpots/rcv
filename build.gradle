@@ -22,7 +22,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
-    implementation 'org.bouncycastle:bc-fips:1.0.2.4'
+    implementation 'org.bouncycastle:bc-fips:1.0.2.3'
 }
 
 // ### Application plugin settings
