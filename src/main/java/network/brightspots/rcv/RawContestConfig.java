@@ -288,7 +288,7 @@ public class RawContestConfig {
       this.name.setValue(name);
       this.excluded.setValue(excluded);
 
-      if (newlineSeparatedAliases != null) {
+      if (newlineSeparatedAliases != null && !newlineSeparatedAliases.isEmpty()) {
         // Split by newline, and also trim whitespace
         this.aliases.setAll(Utils.splitByNewline(newlineSeparatedAliases));
       }
