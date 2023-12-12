@@ -82,11 +82,14 @@ class ClearBallotCvrReader extends BaseCvrReader {
           choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
-        if (rank > this.config.getMaxRankingsAllowed()) {
-          Logger.severe(
-              "Rank: %d exceeds max rankings allowed in config: %d",
-              rank, this.config.getMaxRankingsAllowed());
-          throw new CvrParseException();
+        if (!this.config.getRawConfig().rules.maxRankingsAllowed.equals("max")) {
+          if (this.config.getMaxRankingsAllowed() != null
+                  && rank > this.config.getMaxRankingsAllowed()) {
+            Logger.severe(
+                    "Rank: %d exceeds max rankings allowed in config: %d",
+                    rank, this.config.getMaxRankingsAllowed());
+            throw new CvrParseException();
+          }
         }
         columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
       }
