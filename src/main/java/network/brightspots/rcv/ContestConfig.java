@@ -1129,6 +1129,11 @@ class ContestConfig {
       candidateAliasesToNameMap.put(
           Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
     }
+
+    if (isOverVoteLabelEnabled()) {
+      candidateAliasesToNameMap.put(
+              Tabulator.EXPLICIT_OVERVOTE_LABEL, Tabulator.EXPLICIT_OVERVOTE_LABEL);
+    }
   }
 
   private boolean undeclaredWriteInsEnabled() {
@@ -1141,6 +1146,17 @@ class ContestConfig {
       }
     }
     return includeUwi;
+  }
+
+  private boolean isOverVoteLabelEnabled() {
+    boolean overVote = false;
+    for (CvrSource source : rawConfig.cvrFileSources) {
+      if (!isNullOrBlank(source.getOvervoteLabel())) {
+        overVote = true;
+        break;
+      }
+    }
+    return overVote;
   }
 
   // Possible validation errors
