@@ -100,7 +100,14 @@ class RoundTally {
   // Sets vote totals without adjusting the number of BallotStatus.ACTIVE ballots.
   void setCandidateTallyViaSurplusAdjustment(String candidateId, BigDecimal tally) {
     ensureIsMakingSurplusAdjustment();
+    BigDecimal diff = tally.subtract(candidateTallies.getOrDefault(candidateId, BigDecimal.ZERO));
     candidateTallies.put(candidateId, tally);
+
+    // We don't add to BallotStatus.ACTIVE, but we still need to track this to get
+    // the correct percentages when reporting results externally.
+    BigDecimal newTally = ballotStatusTallies.getOrDefault(
+            StatusForRound.LOCKED_IN, BigDecimal.ZERO).add(diff);
+    ballotStatusTallies.put(StatusForRound.LOCKED_IN, newTally);
   }
 
   // Gets the winning threshold for this round.
@@ -135,13 +142,19 @@ class RoundTally {
     return ballotStatusTallies.get(statusForRound);
   }
 
-  // Get the number af active ballots in this round
+  // Get the number of active ballots in this round
   BigDecimal numActiveBallots() {
     ensureFinalized();
     return numActiveBallots;
   }
 
-  // Get the number af active ballots in this round
+  // Get the number of "locked-in" ballots in this round
+  BigDecimal numActiveOrLockedInBallots() {
+    ensureFinalized();
+    return numActiveBallots.add(ballotStatusTallies.get(StatusForRound.LOCKED_IN));
+  }
+
+  // Get the number of inactive ballots in this round
   BigDecimal numInactiveBallots() {
     ensureFinalized();
     return numInactiveBallots;

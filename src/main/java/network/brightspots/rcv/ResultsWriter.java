@@ -326,10 +326,10 @@ class ResultsWriter {
         csvPrinter.print(thisRoundTally);
 
         // Vote %
-        BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
-        if (activeBallots != BigDecimal.ZERO) {
+        BigDecimal votePctDivisor = roundTallies.get(round).numActiveOrLockedInBallots();
+        if (votePctDivisor != BigDecimal.ZERO) {
           // Turn a decimal into a human-readable percentage (e.g. 0.1234 -> 12.34%)
-          BigDecimal divDecimal = thisRoundTally.divide(activeBallots, MathContext.DECIMAL32);
+          BigDecimal divDecimal = thisRoundTally.divide(votePctDivisor, MathContext.DECIMAL32);
           csvPrinter.print(divDecimal.scaleByPowerOfTen(4).intValue() / 100.0 + "%");
         } else {
           csvPrinter.print("");
@@ -351,7 +351,9 @@ class ResultsWriter {
 
     csvPrinter.print("Active Ballots");
     for (int round = 1; round <= numRounds; round++) {
-      csvPrinter.print(roundTallies.get(round).numActiveBallots());
+      // While internally we separate out an "active" and a "locked in" ballot,
+      // externally, the difference is not important.
+      csvPrinter.print(roundTallies.get(round).numActiveOrLockedInBallots());
       csvPrinter.print("");
       csvPrinter.print("");
     }
