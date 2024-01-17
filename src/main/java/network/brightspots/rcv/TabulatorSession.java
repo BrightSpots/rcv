@@ -33,6 +33,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
@@ -279,6 +281,9 @@ class TabulatorSession {
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     boolean encounteredSourceProblem = false;
 
+    // Per-source data for writing generic CSV
+    List<ResultsWriter.PerSourceDataForCsv> perSourceDataForCsv = new ArrayList<>();
+
     // At each iteration of the following loop, we add records from another source file.
     for (RawContestConfig.CvrSource source : config.rawConfig.cvrFileSources) {
       String cvrPath = config.resolveConfigPath(source.getFilePath());
@@ -288,32 +293,22 @@ class TabulatorSession {
         Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
         reader.readCastVoteRecords(castVoteRecords);
 
+        // Update the per-source data for the results writer
+        perSourceDataForCsv.add(new ResultsWriter.PerSourceDataForCsv(
+                source,
+                castVoteRecords.size() - 1,
+                reader.getMaxRankingsAllowed(source.getContestId())));
+
         // Check for unrecognized candidates
         Map<String, Integer> unrecognizedCandidateCounts =
             reader.gatherUnknownCandidates(castVoteRecords);
 
-        if (unrecognizedCandidateCounts.size() > 0) {
+        if (!unrecognizedCandidateCounts.isEmpty()) {
           throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
         }
 
         // Check for any other reader-specific validations
         reader.runAdditionalValidations(castVoteRecords);
-
-        // Before we tabulate, we output a converted generic CSV for the CVRs.
-        try {
-          ResultsWriter writer =
-              new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-          this.convertedFilePath =
-              writer.writeGenericCvrCsv(
-                  castVoteRecords,
-                  reader.getMaxRankingsAllowed(source.getContestId()),
-                  config.getOutputDirectory(),
-                  source.getFilePath(),
-                  source.getContestId(),
-                  source.getUndeclaredWriteInLabel());
-        } catch (IOException exception) {
-          // error already logged in ResultsWriter
-        }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
@@ -345,6 +340,19 @@ class TabulatorSession {
       } catch (Exception exception) {
         Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath, exception);
         encounteredSourceProblem = true;
+      }
+
+      // Output the Generic CSV CVR
+      try {
+        ResultsWriter writer =
+                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+        this.convertedFilePath =
+                writer.writeGenericCvrCsv(
+                        castVoteRecords,
+                        perSourceDataForCsv,
+                        config.getOutputDirectory());
+      } catch (IOException exception) {
+        // error already logged in ResultsWriter
       }
     }
 

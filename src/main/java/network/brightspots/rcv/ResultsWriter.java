@@ -91,10 +91,11 @@ class ResultsWriter {
       String timestampString,
       String sequentialTabulationId) {
     outputType = sanitizeStringForOutput(outputType);
+    String sequence = sequentialTabulationId == null ? "" : sequentialSuffixForOutputPath(sequentialTabulationId);
     String fileName =
         String.format(
             "%s_%s%s",
-            timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationId));
+            timestampString, outputType, sequence);
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
   }
 
@@ -542,29 +543,19 @@ class ResultsWriter {
   // returns the filepath written
   String writeGenericCvrCsv(
       List<CastVoteRecord> castVoteRecords,
-      Integer numRanks,
-      String csvOutputFolder,
-      String inputFilepath,
-      String contestId,
-      String undeclaredWriteInLabel)
+      List<PerSourceDataForCsv> perSourceDataForCsv,
+      String csvOutputFolder)
       throws IOException {
     String fileWritten;
-    // Get input filename with extension
-    String inputFileBaseName = new File(inputFilepath).getName();
-    // Remove the extension if it exists
-    int lastIndex = inputFileBaseName.lastIndexOf('.');
-    if (lastIndex != -1) {
-      inputFileBaseName = inputFileBaseName.substring(0, lastIndex);
-    }
     // Put the input filename in the output filename in case contestId isn't unique --
     // knowing that it's possible that if both the filename AND the contestId isn't unique,
     // this will fail.
     AuditableFile outputFile = new AuditableFile(
                     getOutputFilePath(
                             csvOutputFolder,
-                            "dominion_conversion_contest",
+                            "essential_cvr",
                             timestampString,
-                            inputFileBaseName + "-" + sanitizeStringForOutput(contestId))
+                            null)
                             + ".csv");
     try {
       Logger.info("Writing cast vote records in generic format to file: %s...",
@@ -575,19 +566,42 @@ class ResultsWriter {
       // print header:
       // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
       // rank 2 selection, ... rank maxRanks selection
+      csvPrinter.print("Source filepath");
       csvPrinter.print("Contest Id");
       csvPrinter.print("Tabulator Id");
       csvPrinter.print("Batch Id");
       csvPrinter.print("Record Id");
       csvPrinter.print("Precinct");
-      csvPrinter.print("Precinct Portion");
-      for (int rank = 1; rank <= numRanks; rank++) {
+      csvPrinter.print("Precinct portion");
+
+      // Get the max maxRankingsAllowed across all perSourceDataForCsv
+      int maxRankingAcrossSources = 0;
+      for (PerSourceDataForCsv sourceData : perSourceDataForCsv) {
+          maxRankingAcrossSources = Math.max(sourceData.maxRankingsAllowed, maxRankingAcrossSources);
+      }
+
+      for (int rank = 1; rank <= maxRankingAcrossSources; rank++) {
         String label = String.format("Rank %d", rank);
         csvPrinter.print(label);
       }
       csvPrinter.println();
+
+      // While the cast vote records are in a flattened list,
+      // we can use the PerSourceDataForCsv to determine which source each record came from.
+      int currentSourceIndex = 0;
+      PerSourceDataForCsv currentSourceData = perSourceDataForCsv.get(currentSourceIndex);
+
       // print rows:
-      for (CastVoteRecord castVoteRecord : castVoteRecords) {
+      for (int i = 0; i < castVoteRecords.size(); i++)
+      {
+        if (i > currentSourceData.lastIndexInCvrList) {
+          // we've moved on to a new contest, so we need to switch to the next source
+          currentSourceIndex++;
+          currentSourceData = perSourceDataForCsv.get(currentSourceIndex);
+        }
+
+        CastVoteRecord castVoteRecord = castVoteRecords.get(i);
+        csvPrinter.print(currentSourceData.source.getFilePath());
         csvPrinter.print(castVoteRecord.getContestId());
         csvPrinter.print(castVoteRecord.getTabulatorId());
         csvPrinter.print(castVoteRecord.getBatchId());
@@ -602,7 +616,7 @@ class ResultsWriter {
         } else {
           csvPrinter.print(castVoteRecord.getPrecinctPortion());
         }
-        printRankings(undeclaredWriteInLabel, numRanks, csvPrinter, castVoteRecord);
+        printRankings(currentSourceData.source.getUndeclaredWriteInLabel(), currentSourceData.maxRankingsAllowed, csvPrinter, castVoteRecord);
         csvPrinter.println();
       }
       // finalize the file
@@ -631,18 +645,23 @@ class ResultsWriter {
     for (int rank = 1; rank <= maxRanks; rank++) {
       if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
         CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
-        if (candidates.count() == 1) {
-          String selection = candidates.get(0);
-          // We map all undeclared write-ins to our constant string when we read them in,
-          // so we need to translate it back to the original candidate ID here.
-          if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-            selection = undeclaredWriteInLabel;
-          } else {
-            selection = config.getNameForCandidate(selection);
+        if (candidates.count() >= 1)
+        {
+          // We list all candidates at a given ranking on separate lines
+          // This allows algorithms which accept overvotes.
+          List<String> allCandidatesAtRanking = new ArrayList<>(candidates.count());
+          for (String candidate : candidates) {
+            String selection = candidate;
+            // We map all undeclared write-ins to our constant string when we read them in,
+            // so we need to translate it back to the original candidate ID here.
+            if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
+              selection = undeclaredWriteInLabel;
+            } else {
+              selection = config.getNameForCandidate(selection);
+            }
+            allCandidatesAtRanking.add(selection);
           }
-          csvPrinter.print(selection);
-        } else {
-          csvPrinter.print("overvote");
+          csvPrinter.print(String.join("\n", allCandidatesAtRanking));
         }
       } else {
         csvPrinter.print("undervote");
@@ -1018,6 +1037,19 @@ class ResultsWriter {
         }
         actions.add(action);
       }
+    }
+  }
+
+  // Per-source data to be used in the CSV CVR export
+  static class PerSourceDataForCsv {
+    public final CvrSource source;
+    public final int lastIndexInCvrList;
+    public final int maxRankingsAllowed;
+
+    PerSourceDataForCsv(CvrSource source, int lastIndexInCvrList, int maxRankingsAllowed) {
+      this.source = source;
+      this.lastIndexInCvrList = lastIndexInCvrList;
+      this.maxRankingsAllowed = maxRankingsAllowed;
     }
   }
 
