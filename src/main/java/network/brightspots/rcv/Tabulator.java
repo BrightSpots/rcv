@@ -1132,8 +1132,14 @@ class Tabulator {
         // if this is the last ranking we are out of rankings and must exhaust this cvr
         // determine if the reason is skipping too many ranks, or no continuing candidates
         if (rank == cvr.candidateRankings.maxRankingNumber()) {
-          if (!config.isMaxRankingsSetToMaximum()
-              && config.getMaxRankingsAllowedWhenNotSetToMaximum() - rank > config.getMaxSkippedRanksAllowed()) {
+          // When determining if this is an undervote or exhausted choice, look at either
+          // the max ranking allowed by the config, or if the config does not impose a limit,
+          // look at the number of declared candidates.
+          int maxAllowedRanking = config.isMaxRankingsSetToMaximum()
+                  ? config.getNumDeclaredCandidates()
+                  : config.getMaxRankingsAllowedWhenNotSetToMaximum();
+          if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
+              && maxAllowedRanking - rank > config.getMaxSkippedRanksAllowed()) {
             recordSelectionForCastVoteRecord(
                 cvr, roundTally, null, StatusForRound.INACTIVE_BY_UNDERVOTE, "");
           } else {

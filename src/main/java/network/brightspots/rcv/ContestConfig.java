@@ -988,9 +988,13 @@ class ContestConfig {
     return rawConfig.rules.maxRankingsAllowed;
   }
 
-  // Because the max rank can be set to "max", there's no reasonable value we can
-  // return outward. Returning MAX_VALUE could cause integer overflows if
-  // the caller tries to do arithmetic with the result (e.g. convert to a max column)
+  // Because the max rank can be set to "max", there's no single value that makes sense
+  // to all callers of this function.
+  // Returning MAX_VALUE could cause integer overflows if
+  // the caller tries to do arithmetic with the result (e.g. convert to a max column),
+  // or if the caller is iterating for all values up until the max rank.
+  // Returning NumDeclaredCandidates is not valid in cases where this is used before
+  // candidates are declared.
   // Instead of returning the max rank, only allow checking via this function,
   // or returning the value as a string for audit logging.
   boolean isRankingAllowed(int rank) {
@@ -1005,10 +1009,11 @@ class ContestConfig {
     return rank <= Integer.parseInt(getMaxRankingsAllowedRaw());
   }
 
-  // There are times when it is necessary to grab the max ranking, though:
-  // notably, when writing outputs up until the max ranking, or when
-  // reading inputs where a "blank" indicates an undeclared write-in.
-  // Handle that, but ensure the caller has checked if it's set to "max"
+  // There are times when it is necessary to grab the max ranking, for example,
+  // when iterating up until the max ranking, or when reading inputs where a
+  // "blank" indicates an undeclared write-in.
+  // Force the caller of this function to check isMaxRankingsSetToMaximum first,
+  // so we know they've handled that special case.
   Integer getMaxRankingsAllowedWhenNotSetToMaximum() {
     if (isMaxRankingsSetToMaximum()) {
       throw new RuntimeException(

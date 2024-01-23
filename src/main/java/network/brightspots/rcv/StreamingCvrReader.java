@@ -216,9 +216,8 @@ class StreamingCvrReader extends BaseCvrReader {
     }
 
     // see if this column is in the ranking range
-    if (col >= firstVoteColumnIndex
-        && config.isRankingAllowed(col - firstVoteColumnIndex)) {
-      int currentRank = col - firstVoteColumnIndex + 1;
+    int currentRank = col - firstVoteColumnIndex + 1;
+    if (config.isRankingAllowed(currentRank)) {
       // handle any empty cells which may exist between this cell and any previous one
       handleEmptyCells(currentRank);
       String cellString = cellData.trim();

@@ -582,9 +582,11 @@ class ResultsWriter {
       csvPrinter.print("Record Id");
       csvPrinter.print("Precinct");
       csvPrinter.print("Precinct Portion");
-      int maxRank = 0;
-      for (CastVoteRecord castVoteRecord : castVoteRecords) {
-        maxRank = Math.max(maxRank, castVoteRecord.candidateRankings.maxRankingNumber());
+      int maxRank;
+      if (config.isMaxRankingsSetToMaximum()) {
+        maxRank = config.getNumDeclaredCandidates();
+      } else {
+        maxRank = config.getMaxRankingsAllowedWhenNotSetToMaximum();
       }
       for (int rank = 1; rank <= maxRank; rank++) {
         String label = String.format("Rank %d", rank);
@@ -636,10 +638,10 @@ class ResultsWriter {
       throws IOException {
     // for each rank determine what candidate id, overvote, or undervote occurred and print it
     for (int rank = 1; rank <= maxRanks; rank++) {
+      if (!reader.isRankingAllowed(rank, source.getContestId())) {
+        break;
+      }
       if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
-        if (reader.isRankingAllowed(rank, source.getContestId())) {
-          break;
-        }
         CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
         if (candidates.count() == 1) {
           String selection = candidates.get(0);
