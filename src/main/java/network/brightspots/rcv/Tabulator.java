@@ -509,6 +509,11 @@ class Tabulator {
       throws TabulationAbortedException {
     List<String> selectedWinners = new LinkedList<>();
 
+    if (getCandidateSignum(UNDECLARED_WRITE_IN_OUTPUT_LABEL, currentRoundTally) != 0) {
+      // No winners can be selected while undeclared candidates are live
+      return selectedWinners;
+    }
+
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       // if everyone meets the threshold, select them all as winners
       boolean allMeet =
@@ -636,8 +641,7 @@ class Tabulator {
   private List<String> dropUndeclaredWriteIns(RoundTally currentRoundTally) {
     List<String> eliminated = new LinkedList<>();
     String label = UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-    if (currentRoundTally.getCandidateTally(label) != null
-        && currentRoundTally.getCandidateTally(label).signum() == 1) {
+    if (getCandidateSignum(label, currentRoundTally) == 1) {
       eliminated.add(label);
       Logger.info(
           "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It "
@@ -645,6 +649,19 @@ class Tabulator {
           label, currentRound, currentRoundTally.getCandidateTally(label));
     }
     return eliminated;
+  }
+
+  // Returns the signum of the tally for a given label, or 0 if the label is not
+  // in the current round
+  // param: label candidate ID
+  // param: currentRoundTally map of candidate IDs to their tally for a given round
+  // returns: signum of the candidate tally
+  private int getCandidateSignum(String label, RoundTally currentRoundTally) {
+    BigDecimal tally = currentRoundTally.getCandidateTally(label);
+    if (tally == null) {
+      return 0;
+    }
+    return tally.signum();
   }
 
   // eliminate all candidates below a certain tally threshold
