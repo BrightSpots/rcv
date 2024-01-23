@@ -33,8 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
@@ -341,19 +339,19 @@ class TabulatorSession {
         Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath, exception);
         encounteredSourceProblem = true;
       }
+    }
 
-      // Output the Generic CSV CVR
-      try {
-        ResultsWriter writer =
-                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-        this.convertedFilePath =
-                writer.writeGenericCvrCsv(
-                        castVoteRecords,
-                        perSourceDataForCsv,
-                        config.getOutputDirectory());
-      } catch (IOException exception) {
-        // error already logged in ResultsWriter
-      }
+    // Output the Generic CSV CVR
+    try {
+      ResultsWriter writer =
+              new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+      this.convertedFilePath =
+              writer.writeGenericCvrCsv(
+                      castVoteRecords,
+                      perSourceDataForCsv,
+                      config.getOutputDirectory());
+    } catch (IOException exception) {
+      // error already logged in ResultsWriter
     }
 
     if (encounteredSourceProblem) {

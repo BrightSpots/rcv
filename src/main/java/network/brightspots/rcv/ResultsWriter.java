@@ -91,7 +91,9 @@ class ResultsWriter {
       String timestampString,
       String sequentialTabulationId) {
     outputType = sanitizeStringForOutput(outputType);
-    String sequence = sequentialTabulationId == null ? "" : sequentialSuffixForOutputPath(sequentialTabulationId);
+    String sequence = sequentialTabulationId == null
+            ? ""
+            : sequentialSuffixForOutputPath(sequentialTabulationId);
     String fileName =
         String.format(
             "%s_%s%s",
@@ -566,18 +568,18 @@ class ResultsWriter {
       // print header:
       // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
       // rank 2 selection, ... rank maxRanks selection
-      csvPrinter.print("Source filepath");
+      csvPrinter.print("Source Filepath");
       csvPrinter.print("Contest Id");
       csvPrinter.print("Tabulator Id");
       csvPrinter.print("Batch Id");
       csvPrinter.print("Record Id");
       csvPrinter.print("Precinct");
-      csvPrinter.print("Precinct portion");
+      csvPrinter.print("Precinct Portion");
 
       // Get the max maxRankingsAllowed across all perSourceDataForCsv
       int maxRankingAcrossSources = 0;
       for (PerSourceDataForCsv sourceData : perSourceDataForCsv) {
-          maxRankingAcrossSources = Math.max(sourceData.maxRankingsAllowed, maxRankingAcrossSources);
+        maxRankingAcrossSources = Math.max(sourceData.maxRankingsAllowed, maxRankingAcrossSources);
       }
 
       for (int rank = 1; rank <= maxRankingAcrossSources; rank++) {
@@ -592,8 +594,7 @@ class ResultsWriter {
       PerSourceDataForCsv currentSourceData = perSourceDataForCsv.get(currentSourceIndex);
 
       // print rows:
-      for (int i = 0; i < castVoteRecords.size(); i++)
-      {
+      for (int i = 0; i < castVoteRecords.size(); i++) {
         if (i > currentSourceData.lastIndexInCvrList) {
           // we've moved on to a new contest, so we need to switch to the next source
           currentSourceIndex++;
@@ -616,7 +617,8 @@ class ResultsWriter {
         } else {
           csvPrinter.print(castVoteRecord.getPrecinctPortion());
         }
-        printRankings(currentSourceData.source.getUndeclaredWriteInLabel(), currentSourceData.maxRankingsAllowed, csvPrinter, castVoteRecord);
+        printRankings(currentSourceData.source.getUndeclaredWriteInLabel(),
+            currentSourceData.maxRankingsAllowed, csvPrinter, castVoteRecord);
         csvPrinter.println();
       }
       // finalize the file
@@ -645,8 +647,7 @@ class ResultsWriter {
     for (int rank = 1; rank <= maxRanks; rank++) {
       if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
         CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
-        if (candidates.count() >= 1)
-        {
+        if (candidates.count() >= 1) {
           // We list all candidates at a given ranking on separate lines
           // This allows algorithms which accept overvotes.
           List<String> allCandidatesAtRanking = new ArrayList<>(candidates.count());
