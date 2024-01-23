@@ -166,7 +166,9 @@ class StreamingCvrReader extends BaseCvrReader {
   // complete construction of new CVR object
   private void endCvr() {
     // handle any empty cells which may appear at the end of this row
-    handleEmptyCells(config.getMaxRankingsAllowed() + 1);
+    if (!config.isMaxRankingsSetToMaximum()) {
+      handleEmptyCells(config.getMaxRankingsAllowedWhenNotSetToMaximum() + 1);
+    }
     String computedCastVoteRecordId =
         String.format("%s-%d", ResultsWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
 
@@ -215,7 +217,7 @@ class StreamingCvrReader extends BaseCvrReader {
 
     // see if this column is in the ranking range
     if (col >= firstVoteColumnIndex
-        && col < firstVoteColumnIndex + config.getMaxRankingsAllowed()) {
+        && config.isRankingAllowed(col - firstVoteColumnIndex)) {
       int currentRank = col - firstVoteColumnIndex + 1;
       // handle any empty cells which may exist between this cell and any previous one
       handleEmptyCells(currentRank);
