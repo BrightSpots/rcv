@@ -994,6 +994,10 @@ class ContestConfig {
   // Instead of returning the max rank, only allow checking via this function,
   // or returning the value as a string for audit logging.
   boolean isRankingAllowed(int rank) {
+    if (rank <= 0) {
+      return false;
+    }
+
     if (isMaxRankingsSetToMaximum()) {
       return true;
     }

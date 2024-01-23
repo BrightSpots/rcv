@@ -176,7 +176,7 @@ class DominionCvrReader extends BaseCvrReader {
 
   @Override
   public boolean isRankingAllowed(int rank, String contestId) {
-    return rank <= contests.get(contestId).getMaxRanks();
+    return rank > 0 && rank <= contests.get(contestId).getMaxRanks();
   }
 
   private void validateNamesAreInContest(List<CastVoteRecord> castVoteRecords)
