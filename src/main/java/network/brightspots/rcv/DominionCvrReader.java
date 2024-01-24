@@ -171,6 +171,7 @@ class DominionCvrReader extends BaseCvrReader {
   @Override
   public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {
+    super.runAdditionalValidations(castVoteRecords);
     validateNamesAreInContest(castVoteRecords);
   }
 

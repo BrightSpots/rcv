@@ -82,7 +82,9 @@ class ClearBallotCvrReader extends BaseCvrReader {
           choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
-        columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
+        if (this.config.isRankingAllowed(rank)) {
+          columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
+        }
       }
       // read all remaining rows and create CastVoteRecords for each one
       while (true) {
