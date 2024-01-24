@@ -22,17 +22,11 @@ runs:
 
     - name: "Rename output file"
       shell: bash
-      run: mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
+      run: |
+        ls build/*/*
+        mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
 
-    - name: "Generate SHA512 for Linux"
-      shell: bash
-      if: runner.os == 'Linux'
-      run: sha512sum ${{ inputs.final-filepath }} > ${{ inputs.final-filepath }}.sha512
-    - name: "Generate SHA512 for Windows"
-      shell: bash
-      if: runner.os == 'Windows'
-      run: certutil -hashfile ${{ inputs.final-filepath }} SHA512 >> ${{ inputs.final-filepath }}.sha512
-    - name: "Generate SHA512 for OSX"
-      shell: bash
-      if: runner.os == 'macOS'
-      run: openssl dgst -sha512 > ${{ inputs.final-filepath }}.sha512
+    - name: "Generate SHA512"
+      uses: ./.github/actions/sha
+      with:
+        filepath: ${{ inputs.final-filepath }}

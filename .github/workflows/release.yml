@@ -3,11 +3,11 @@ name: "Generate Releases"
 on:
   release:
     types: [ published ]
-## To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
-##  is at the same indent level as "release":
-#  push:
-#    branches:
-#      - 'branch-name'
+# To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
+#  is at the same indent level as "release":
+  push:
+    branches:
+      - 'feature/issue-756_airgap'
 
 jobs:
   release:
@@ -50,7 +50,7 @@ jobs:
           if [ ${{ runner.os }} == 'Windows' ]; then
             echo "FILEPATH=build/jpackage/RCTab-1.3.999.exe" >> $GITHUB_OUTPUT
           elif [ ${{ runner.os }} == 'Linux' ]; then
-            echo "FILEPATH=build/jpackage/rctab_1.3.999-1_amd64.deb" >> $GITHUB_OUTPUT
+            echo "FILEPATH=build/jpackage/rctab_1.3.999_amd64.deb" >> $GITHUB_OUTPUT
           else
             echo "FILEPATH=build/jpackage/RCTab-1.3.999.dmg" >> $GITHUB_OUTPUT
           fi
@@ -76,6 +76,38 @@ jobs:
           gradle-command: jlinkZip
           intermediate-filepath: build/rcv.zip
           final-filepath: ${{ steps.zipfn.outputs.FILEPATH }}
+
+      - name: "Create caches filename"
+        id: cachefn
+        shell: bash
+        run: |
+          echo "DEPENDENCY_FILEPATH=dependencycache.${{ runner.os }}.zip" >> $GITHUB_OUTPUT
+          echo "PLUGIN_FILEPATH=plugincache.${{ runner.os }}.zip" >> $GITHUB_OUTPUT
+
+      - name: "Create dependency zip"
+        uses: ./.github/actions/zip
+        with:
+          command: ./gradlew copyLibs
+          input: ".dependencycache"
+          zipFilename: ${{steps.cachefn.outputs.DEPENDENCY_FILEPATH}}
+
+      - name: "Create plugins zip"
+        uses: ./.github/actions/zip
+        with:
+          type: "zip"
+          command: ./gradlew assemble && ./gradlew --stop
+          input: "~/.gradle/caches"
+          zipFilename: ${{steps.cachefn.outputs.PLUGIN_FILEPATH}}
+
+      - name: "Generate SHA512 for dependency cache"
+        uses: ./.github/actions/sha
+        with:
+          filepath: ${{steps.cachefn.outputs.DEPENDENCY_FILEPATH}}
+
+      - name: "Generate SHA512 for plugins cache"
+        uses: ./.github/actions/sha
+        with:
+          filepath: ${{steps.cachefn.outputs.PLUGIN_FILEPATH}}
 
       - name: "Prepare keychain"
         if: matrix.os == 'macOS-latest'
@@ -132,6 +164,10 @@ jobs:
             ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}.sha512
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}.sha512
+            ${{ github.workspace }}/${{steps.cachefn.outputs.DEPENDENCY_FILEPATH}}
+            ${{ github.workspace }}/${{steps.cachefn.outputs.DEPENDENCY_FILEPATH}}.sha512
+            ${{ github.workspace }}/${{steps.cachefn.outputs.PLUGIN_FILEPATH}}
+            ${{ github.workspace }}/${{steps.cachefn.outputs.PLUGIN_FILEPATH}}.sha512
           retention-days: 90
 
       - name: "Upload binaries to release"

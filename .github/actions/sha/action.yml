@@ -1,0 +1,24 @@
+name: "Create SHA512 for a file"
+description: "Cross-platform helper: creates SHA512"
+
+inputs:
+  filepath:
+    description: "The input file path"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Generate SHA512 for Linux"
+      shell: bash
+      if: runner.os == 'Linux'
+      run: sha512sum ${{ inputs.filepath }} > ${{ inputs.filepath }}.sha512
+    - name: "Generate SHA512 for Windows"
+      shell: bash
+      if: runner.os == 'Windows'
+      run: certutil -hashfile ${{ inputs.filepath }} SHA512 >> ${{ inputs.filepath }}.sha512
+    - name: "Generate SHA512 for macOS"
+      shell: bash
+      if: runner.os == 'macOS'
+      run: openssl dgst -sha512 > ${{ inputs.filepath }}.sha512
+
