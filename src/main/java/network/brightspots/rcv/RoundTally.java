@@ -206,8 +206,9 @@ class RoundTally {
     numInactiveBallots = BigDecimal.ZERO;
     ballotStatusTallies.forEach(
         (statusForRound, tally) -> {
-          if (statusForRound != StatusForRound.ACTIVE) {
-            numInactiveBallots = numInactiveBallots.add(tally);
+            if (statusForRound != StatusForRound.ACTIVE
+                && statusForRound != StatusForRound.LOCKED_IN) {
+              numInactiveBallots = numInactiveBallots.add(tally);
           }
         });
 
