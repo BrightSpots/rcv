@@ -59,7 +59,7 @@ On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch
 1. Download gradle from https://gradle.org/releases/ and place it in your path
 2. Download and extract the source code from [releases page](https://github.com/BrightSpots/rcv/releases)
 3. Download the appropriate cache files for your OS: cache.[OS].zip
-4. Stop the gradle daemon with `./gradlew --stop`
+4. Stop the gradle daemon with `gradle --stop`
 5. Delete the directory ~/.gradle/caches if it exists
 6. Extract cache.[OS].zip to ~/.gradle/caches so that the "caches" directory is in ~/.gradle
 7. In the extracted directory, you may manually verify each dependency using checksums.csv in accordance with your own policies

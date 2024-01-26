@@ -1,7 +1,12 @@
 #!/bin/bash
 # Generates a CSV of checksums for all maven dependencies in the global cache
 # Including their actual SHA 256, and where to verify that online
+# Usage: ./generate-dependency-hashes.sh <OS: Windows, MacOS, or Linux>
 set -e
+
+os=$1
+
+parentPath=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 
 echo "Filename, SHA-1 Checksum, SHA-256 Checksum, Maven Dependency URL, Direct URL to SHA-1, Direct URL to SHA-256"
 cd ~/.gradle/caches/modules-2/files-2.1
@@ -21,7 +26,7 @@ for filename in $(find  * -type f); do
     directUrl="https://repo1.maven.org/maven2/$slashSeparatedOrg/$dependencyName/$version/$dependencyName-$version.$ext"
     directUrlToSha1="$directUrl.sha1"
     directUrlToSha256="$directUrl.sha256"
-    sha1=$(shasum -a 1 $filename | cut -f1 -d" ")
-    sha256=$(shasum -a 256 $filename | cut -f1 -d" ")
+    sha1=$($parentPath/sha.sh $filename $os 1)
+    sha256=$($parentPath/sha.sh $filename $os 256)
     echo "$filename,$sha1,$sha256,$friendlyurl,$directUrlToSha1,$directUrlToSha256"
 done

@@ -27,6 +27,5 @@ runs:
         mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
 
     - name: "Generate SHA512"
-      uses: ./.github/actions/sha
-      with:
-        filepath: ${{ inputs.final-filepath }}
+      shell: bash
+      run: ./.github/workflows/sha.sh ${{ runner.os }} ${{ inputs.final-filepath }} 512

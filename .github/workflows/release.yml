@@ -85,7 +85,7 @@ jobs:
 
       - name: "Generate SHA1 and SHA256 for each maven dependency"
         shell: bash
-        run: ./.github/workflows/generate-dependency-hashes.sh >> ~/.gradle/caches/checksums.csv
+        run: ./.github/workflows/generate-dependency-hashes.sh ${{ runner.os }} >> ~/.gradle/caches/checksums.csv
 
       - name: "Create dependency zip"
         uses: ./.github/actions/zip
@@ -96,9 +96,8 @@ jobs:
           zipFilename: ${{steps.cachefn.outputs.FILEPATH}}
 
       - name: "Generate SHA512 for plugins cache"
-        uses: ./.github/actions/sha
-        with:
-          filepath: ${{steps.cachefn.outputs.FILEPATH}}
+        shell: bash
+        run: ./.github/workflows/sha.sh ${{steps.cachefn.outputs.FILEPATH}} ${{ runner.os }} 512
 
       - name: "Prepare keychain"
         if: matrix.os == 'macOS-latest'
