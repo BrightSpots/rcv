@@ -83,6 +83,10 @@ jobs:
         run: |
           echo "FILEPATH=${{ steps.basefn.outputs.FILEPATH }}.cache.zip" >> $GITHUB_OUTPUT
 
+      - name: "Generate SHA1 and SHA256 for each maven dependency"
+        shell: bash
+        run: ./.github/workflows/generate-dependency-hashes.sh >> ~/.gradle/caches/checksums.csv
+
       - name: "Create dependency zip"
         uses: ./.github/actions/zip
         with:
@@ -90,10 +94,6 @@ jobs:
           command: ./gradlew assemble && ./gradlew --stop
           input: "~/.gradle/caches"
           zipFilename: ${{steps.cachefn.outputs.FILEPATH}}
-
-      - name: "Generate SHA1 and SHA256 for each maven dependency"
-        shell: bash
-        run: ./.github/workflows/generate-dependency-hashes.sh >> ~/.gradle/caches/checksums.csv
 
       - name: "Generate SHA512 for plugins cache"
         uses: ./.github/actions/sha

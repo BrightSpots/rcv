@@ -56,20 +56,18 @@ On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch
 #### Method 3 (Least Easy): Building on an airgapped Machine
 
 
-1. Download and extract the source code from [releases page](https://github.com/BrightSpots/rcv/releases)
-2. Download the appropriate cache files for your OS: dependencycache.[OS].zip and plugincache.[OS].zip
-3. Stop the gradle daemon with `./gradlew --stop`
-4. Delete the directory ~/.gradle/caches if it exists
-5. Extract plugincache.[OS].zip to ~/.gradle/caches so that the "caches" directory is in ~/.gradle
-6. Delete the directory .dependencycache in the `rcv` source code root directory
-7. Extract dependencycache.[OS].zip to .dependencycache in the `rcv` source code root directory
-8. Run `./gradlew assemble --offline` and ensure you get no errors
-9. Run `./gradlew run --offline` to launch RCTab
-10. Run `./gradlew jpackage --offline` to generate a jpackage package
+1. Download gradle from https://gradle.org/releases/ and place it in your path
+2. Download and extract the source code from [releases page](https://github.com/BrightSpots/rcv/releases)
+3. Download the appropriate cache files for your OS: cache.[OS].zip
+4. Stop the gradle daemon with `./gradlew --stop`
+5. Delete the directory ~/.gradle/caches if it exists
+6. Extract cache.[OS].zip to ~/.gradle/caches so that the "caches" directory is in ~/.gradle
+7. In the extracted directory, you may manually verify each dependency using checksums.csv in accordance with your own policies
+8. Run `gradle assemble --offline` and ensure you get no errors
+9. Run `gradle run --offline` to launch RCTab
+10. Run `gradle jpackage --offline` to generate a jpackage package
 
 Note: this is not currently available on Silicon-chip Apple Devices. Only Intel Mac is supported.
-
-TODO: You may need to download gradle separately if the airgapped machine does not have gradle.
 
 #### Encrypting the Tabulator Directory
 For security purposes, we **strongly recommend** applying password encryption (e.g. 256-bit SHA) to the directory containing the Tabulator, config files, CVR files, and any other related files.
