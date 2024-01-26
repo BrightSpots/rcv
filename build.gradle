@@ -15,24 +15,15 @@ repositories {
     mavenCentral()
 }
 
-// Caching dependencies for a fully-offline build
-def DEPENDENCY_CACHE_DIR = "$projectDir/.dependencycache/"
-
 dependencies {
-    if (gradle.startParameter.isOffline()) {
-        implementation fileTree(dir: DEPENDENCY_CACHE_DIR)
-    } else {
-        implementation 'commons-cli:commons-cli:1.5.0'
-        implementation 'org.apache.commons:commons-csv:1.10.0'
-        implementation 'org.apache.poi:poi-ooxml:5.2.3'
-        implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
-        implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
-        implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-        implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
-        implementation "com.github.spotbugs:spotbugs:4.8.3"
-
-    }
-
+    implementation 'commons-cli:commons-cli:1.5.0'
+    implementation 'org.apache.commons:commons-csv:1.10.0'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
+    implementation "com.github.spotbugs:spotbugs:4.8.3"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
 }
@@ -244,26 +235,4 @@ tasks.jlink.doLast {
         with sampleInputToCopy
         into JLINK_DIR + "/sample_input"
     }
-}
-
-// Tooling to copy dependencies for a fully-offline build
-configurations {
-  cacheableImplementation.extendsFrom implementation
-}
-
-task deleteLibraryCache(type: Delete) {
-    delete DEPENDENCY_CACHE_DIR
-}
-
-task copyLibs(type: Copy, dependsOn: 'deleteLibraryCache') {
-    from configurations.cacheableImplementation
-    into DEPENDENCY_CACHE_DIR
-}
-
-// Necessary for offline builds to succeed
-tasks.withType(Tar) {
-   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-tasks.withType(Zip) {
-   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

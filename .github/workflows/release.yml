@@ -81,33 +81,24 @@ jobs:
         id: cachefn
         shell: bash
         run: |
-          echo "DEPENDENCY_FILEPATH=${{ steps.basefn.outputs.FILEPATH }}.dependencycache.zip" >> $GITHUB_OUTPUT
-          echo "PLUGIN_FILEPATH=${{ steps.basefn.outputs.FILEPATH }}.plugincache.zip" >> $GITHUB_OUTPUT
+          echo "FILEPATH=${{ steps.basefn.outputs.FILEPATH }}.cache.zip" >> $GITHUB_OUTPUT
 
       - name: "Create dependency zip"
         uses: ./.github/actions/zip
         with:
-          command: ./gradlew copyLibs
-          input: ".dependencycache"
-          zipFilename: ${{steps.cachefn.outputs.DEPENDENCY_FILEPATH}}
-
-      - name: "Create plugins zip"
-        uses: ./.github/actions/zip
-        with:
-          type: "zip"
+          # Build, then remove all non-essential files
           command: ./gradlew assemble && ./gradlew --stop
           input: "~/.gradle/caches"
-          zipFilename: ${{steps.cachefn.outputs.PLUGIN_FILEPATH}}
+          zipFilename: ${{steps.cachefn.outputs.FILEPATH}}
 
-      - name: "Generate SHA512 for dependency cache"
-        uses: ./.github/actions/sha
-        with:
-          filepath: ${{steps.cachefn.outputs.DEPENDENCY_FILEPATH}}
+      - name: "Generate SHA1 and SHA256 for each maven dependency"
+        shell: bash
+        run: ./.github/workflows/generate-dependency-hashes.sh >> ~/.gradle/caches/checksums.csv
 
       - name: "Generate SHA512 for plugins cache"
         uses: ./.github/actions/sha
         with:
-          filepath: ${{steps.cachefn.outputs.PLUGIN_FILEPATH}}
+          filepath: ${{steps.cachefn.outputs.FILEPATH}}
 
       - name: "Prepare keychain"
         if: matrix.os == 'macOS-latest'
@@ -164,10 +155,8 @@ jobs:
             ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}.sha512
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}.sha512
-            ${{ github.workspace }}/${{steps.cachefn.outputs.DEPENDENCY_FILEPATH}}
-            ${{ github.workspace }}/${{steps.cachefn.outputs.DEPENDENCY_FILEPATH}}.sha512
-            ${{ github.workspace }}/${{steps.cachefn.outputs.PLUGIN_FILEPATH}}
-            ${{ github.workspace }}/${{steps.cachefn.outputs.PLUGIN_FILEPATH}}.sha512
+            ${{ github.workspace }}/${{steps.cachefn.outputs.FILEPATH}}
+            ${{ github.workspace }}/${{steps.cachefn.outputs.FILEPATH}}.sha512
           retention-days: 1
 
       - name: "Upload binaries to release"
