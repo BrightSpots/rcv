@@ -11,10 +11,16 @@ jobs:
         matrix:
             os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
+      - name: "Create base filename for all artifacts"
+        id: basefn
+        shell: bash
+        run: |
+          FILENAME=$(echo rctab_${{ github.ref_name }}_${{ runner.os }}_${{ runner.arch }} | sed -e 's/\//_/g')
+          echo "FILENAME=$FILENAME" >> $GITHUB_OUTPUT
       - name: "Create filename"
         id: fn
         shell: bash
-        run: echo "FILENAME=build/rctab_${{ github.ref_name }}_${{ runner.os }}.zip" >> $GITHUB_OUTPUT
+        run: echo "FILENAME=build/${{ steps.basefn.outputs.FILENAME }}.zip" >> $GITHUB_OUTPUT
           
       - uses: actions/checkout@v3
 
@@ -46,6 +52,27 @@ jobs:
         if: runner.os == 'macOS'
         run: openssl dgst -sha512 > ${{ steps.fn.outputs.FILENAME }}.sha512
 
+      - name: "Create caches filename"
+        id: cachefn
+        shell: bash
+        run: |
+          echo "FILENAME=${{ steps.basefn.outputs.FILENAME }}.cache.zip" >> $GITHUB_OUTPUT
+      - name: "Generate SHA1 and SHA256 for each maven dependency"
+        shell: bash
+        run: ./.github/workflows/generate-dependency-hashes.sh ${{ runner.os }} >> ~/.gradle/caches/checksums.csv
+
+      - name: "Create dependency zip"
+        uses: ./.github/actions/zip
+        with:
+          # Build, then remove all non-essential files
+          command: ./gradlew assemble && ./gradlew --stop
+          input: "~/.gradle/caches"
+          zipFilename: ${{steps.cachefn.outputs.FILENAME}}
+
+      - name: "Generate SHA512 for plugins cache"
+        shell: bash
+        run: ./.github/workflows/sha.sh ${{steps.cachefn.outputs.FILENAME}} ${{ runner.os }} 512
+
       - uses: actions/upload-artifact@v3
         with:
           name: Package
@@ -53,6 +80,8 @@ jobs:
           path: |
             ${{ github.workspace }}/${{ steps.fn.outputs.FILENAME }}
             ${{ github.workspace }}/${{ steps.fn.outputs.FILENAME }}.sha512
+            ${{ github.workspace }}/${{steps.cachefn.outputs.FILENAME}}
+            ${{ github.workspace }}/${{steps.cachefn.outputs.FILENAME}}.sha512
           retention-days: 90
 
       - name: "Upload binaries to release"

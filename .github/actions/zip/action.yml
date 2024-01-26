@@ -1,0 +1,30 @@
+name: "Create zip of a directory"
+description: "Cross-platform helper: creates SHA512"
+
+inputs:
+  input:
+    description: "The input file path"
+    required: true
+  command:
+    description: "The command to run first"
+    required: true
+  zipFilename:
+    description: "The output file name"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Run pre-command"
+      shell: bash
+      run: ${{ inputs.command }}
+
+    - name: "Generate zip for Linux"
+      if: runner.os == 'Linux' || runner.os == 'MacOS'
+      shell: bash
+      run: zip -r ${{inputs.zipFilename}} ${{inputs.input}}
+
+    - name: "Generate zip for Windows"
+      if: runner.os == 'Windows'
+      shell: powershell
+      run: Compress-Archive -Path ${{inputs.input}} -Destination ${{inputs.zipFilename}}
