@@ -3,6 +3,9 @@ name: Build Releases
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - 'feature/airgap-on-1.3.2'
 
 jobs:
   release:

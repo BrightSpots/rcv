@@ -2,7 +2,7 @@ plugins {
     id "application"
     id "checkstyle"
     // Latest version at: https://github.com/spotbugs/spotbugs-gradle-plugin/tags
-    id "com.github.spotbugs" version "5.0.9"
+    id "com.github.spotbugs" version "6.0.3"
     id "idea"
     id "java-library"
     id "org.beryx.jlink" version "2.25.0"
@@ -23,6 +23,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
     implementation 'org.bouncycastle:bc-fips:1.0.2.3'
+    implementation "com.github.spotbugs:spotbugs:4.8.3"
 }
 
 // ### Application plugin settings
@@ -59,7 +60,7 @@ System.setProperty("org.checkstyle.google.suppressionfilter.config",
 
 spotbugs {
     // Latest version at: https://github.com/spotbugs/spotbugs/tags
-    toolVersion = '4.7.1'
+    toolVersion = '4.8.3'
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
 
