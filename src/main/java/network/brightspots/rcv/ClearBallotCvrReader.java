@@ -54,7 +54,7 @@ class ClearBallotCvrReader extends BaseCvrReader {
         Logger.severe("No header row found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
       }
-      String[] headerData = firstRow.split(",");
+      String[] headerData = firstRow.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
       if (headerData.length < CvrColumnField.ChoicesBegin.ordinal()) {
         Logger.severe("No choice columns found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
