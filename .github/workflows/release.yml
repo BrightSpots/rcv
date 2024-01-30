@@ -68,7 +68,7 @@ jobs:
         uses: ./.github/actions/zip
         with:
           # Build, then remove all non-essential files
-          command: ./gradlew assemble && ./gradlew --stop
+          command: ./gradlew build -xtest && ./gradlew --stop && ls ~/.gradle/caches/* && for i in $(find ~/.gradle/caches -name gc.properties); do rm $i; done
           input: "~/.gradle/caches"
           zipFilename: ${{steps.cachefn.outputs.FILENAME}}
 
