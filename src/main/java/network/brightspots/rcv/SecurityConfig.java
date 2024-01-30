@@ -108,8 +108,7 @@ class SecurityConfig {
       String randomProviderName =
             java.security.SecureRandom.getInstanceStrong().getProvider().getName();
       if (!randomProviderName.equals(expectedSecureRandomProvider)) {
-        throw new SecurityConfigurationException("Unexpected SecureRandom provider"
-              + randomProviderName);
+        Logger.warning("The SecureRandom provider is " + randomProviderName);
       }
     } catch (NoSuchAlgorithmException e) {
       throw new SecurityConfigurationException("No SecureRandom algorithm found.");
