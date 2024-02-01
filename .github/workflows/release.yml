@@ -62,14 +62,14 @@ jobs:
           echo "FILENAME=${{ steps.basefn.outputs.FILENAME }}.cache.zip" >> $GITHUB_OUTPUT
       - name: "Generate SHA1 and SHA256 for each maven dependency"
         shell: bash
-        run: ./.github/workflows/generate-dependency-hashes.sh ${{ runner.os }} >> ~/.gradle/caches/checksums.csv
+        run: ./.github/workflows/generate-dependency-hashes.sh ${{ runner.os }} >> ~/.gradle/caches/modules-2/checksums.csv
 
       - name: "Create dependency zip"
         uses: ./.github/actions/zip
         with:
           # Build, then remove all non-essential files
-          command: ./gradlew build -xtest && ./gradlew --stop && ls ~/.gradle/caches/* && for i in $(find ~/.gradle/caches -name gc.properties); do rm $i; done
-          input: "~/.gradle/caches"
+          command: ./gradlew build -xtest && ./gradlew --stop && for i in $(find ~/.gradle/caches -name gc.properties); do rm $i; done
+          input: "~/.gradle/caches/modules-2"
           zipFilename: ${{steps.cachefn.outputs.FILENAME}}
 
       - name: "Generate SHA512 for plugins cache"

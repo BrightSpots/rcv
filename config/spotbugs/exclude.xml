@@ -30,12 +30,4 @@
     <Field name="xmlns"/>
     <Bug code="UrF"/>
   </Match>
-  <Match>
-    <Class name="network.brightspots.rcv.StreamingCvrReader"/>
-    <Bug code="CT"/>
-  </Match>
-  <Match>
-    <Class name="network.brightspots.rcv.Tabulator"/>
-    <Bug code="CT"/>
-  </Match>
 </FindBugsFilter>

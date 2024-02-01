@@ -107,8 +107,10 @@ class SecurityConfig {
     try {
       String randomProviderName =
             java.security.SecureRandom.getInstanceStrong().getProvider().getName();
-      if (!randomProviderName.equals(expectedSecureRandomProvider)) {
-        Logger.warning("The SecureRandom provider is " + randomProviderName);
+      if (!randomProviderName.equals(expectedSecureRandomProvider)
+            && !randomProviderName.equals(new BouncyCastleFipsProvider().getName())) {
+        throw new SecurityConfigurationException("Unexpected SecureRandom provider"
+              + randomProviderName);
       }
     } catch (NoSuchAlgorithmException e) {
       throw new SecurityConfigurationException("No SecureRandom algorithm found.");
