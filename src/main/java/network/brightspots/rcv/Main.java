@@ -27,7 +27,7 @@ import java.util.List;
 public class Main extends GuiApplication {
 
   public static final String APP_NAME = "RCTab";
-  public static final String APP_VERSION = "1.3.1";
+  public static final String APP_VERSION = "1.3.1 RC2";
 
   /**
    * Main entry point to RCTab.
