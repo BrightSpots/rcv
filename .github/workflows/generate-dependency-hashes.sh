@@ -10,7 +10,7 @@ parentPath=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 
 echo "Filename, SHA-1 Checksum, SHA-256 Checksum, Maven Dependency URL, Direct URL to SHA-1, Direct URL to SHA-256"
 cd ~/.gradle/caches/modules-2/files-2.1
-for filename in $(find  * -type f); do
+for filename in $(find * -type f); do
     # filename is of format, with dot-separated org:
     # <org>/<dependency-name>/<version>/<sha-1>/<dependency-name>-<version>.<ext>
     # friendly URL is of format, with dot-separated org:

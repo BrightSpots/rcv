@@ -97,7 +97,9 @@ jobs:
 
       - name: "Generate SHA512 for plugins cache"
         shell: bash
-        run: ./.github/workflows/sha.sh ${{steps.cachefn.outputs.FILEPATH}} ${{ runner.os }} 512
+        run: |
+          ./.github/workflows/sha.sh ${{steps.cachefn.outputs.FILEPATH}} ${{ runner.os }} 512 > ${{steps.cachefn.outputs.FILEPATH}}.sha512
+          # ./.github/workflows/sha-of-zip.sh ${{steps.cachefn.outputs.FILEPATH}} ${{ runner.os }} 512 > ${{steps.cachefn.outputs.FILEPATH}}.golden.sha512
 
       - name: "Prepare keychain"
         if: matrix.os == 'macOS-latest'
@@ -152,10 +154,12 @@ jobs:
           path: |
             ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}.sha512
+            ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}.golden.sha512
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}.sha512
             ${{ github.workspace }}/${{steps.cachefn.outputs.FILEPATH}}
             ${{ github.workspace }}/${{steps.cachefn.outputs.FILEPATH}}.sha512
+            ${{ github.workspace }}/${{steps.cachefn.outputs.FILEPATH}}.golden.sha512
           retention-days: 1
 
       - name: "Upload binaries to release"

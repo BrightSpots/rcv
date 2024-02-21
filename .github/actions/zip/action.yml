@@ -1,5 +1,5 @@
 name: "Create zip of a directory"
-description: "Cross-platform helper: creates SHA512"
+description: "Cross-platform helper: creates a zip archive"
 
 inputs:
   input:

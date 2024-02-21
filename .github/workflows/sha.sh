@@ -8,7 +8,6 @@ filename=$1
 os=$2
 a=$3
 
-
 if [ $os == 'Windows' ]; then
     echo $(certutil -hashfile $filename SHA$a | sed -n 2p)
 elif [ $os == 'Linux' ]; then
@@ -16,3 +15,4 @@ elif [ $os == 'Linux' ]; then
 else
     echo $(shasum -a $a $filename | cut -f1 -d" ")
 fi
+
