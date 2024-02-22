@@ -11,6 +11,7 @@ os=$2
 sha_a=$3
 
 parentPath=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+modulesPath="./rcv/lib/modules"
 
 # Make a temporary directory to extract zip, and a temporary file to hold SHAs
 tempDirectory=$(mktemp -d)
@@ -20,8 +21,12 @@ touch $tempAllChecksumsFile
 # Extract the zip
 unzip -q $zipFilepath -d $tempDirectory 2>/dev/null
 
-# Get a checksum for each file in the zip
+# Go into the extracted directory and delete the modules file
+# That file is consistent on a single machine, but differs across machines
 cd $tempDirectory
+rm $modulesPath
+
+# Get a checksum for each file in the zip
 for filename in $(find * -type f | sort); do
   checksum=$($parentPath/../workflows/sha.sh $filename $os $sha_a)
   echo $checksum >> $tempAllChecksumsFile

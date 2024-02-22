@@ -84,9 +84,15 @@ jobs:
           mkdir cache
           echo "FILEPATH=cache/${{ steps.basefn.outputs.FILEPATH }}.cache.zip" >> $GITHUB_OUTPUT
 
+      - name: "Create checksum filename"
+        id: checksumsfn
+        shell: bash
+        run: |
+          echo "FILEPATH=cache/checksums.csv" >> $GITHUB_OUTPUT
+
       - name: "Generate SHA1 and SHA256 for each maven dependency"
         shell: bash
-        run: ./.github/workflows/generate-dependency-hashes.sh ${{ runner.os }} >> ~/.gradle/caches/checksums.csv
+        run: ./.github/workflows/generate-dependency-hashes.sh ${{ runner.os }} >> ${{steps.checksumsfn.outputs.FILEPATH}}
 
       - name: "Create dependency zip"
         uses: ./.github/actions/zip
@@ -100,6 +106,11 @@ jobs:
         shell: bash
         run: |
           ./.github/workflows/sha.sh ${{steps.cachefn.outputs.FILEPATH}} ${{ runner.os }} 512 > ${{steps.cachefn.outputs.FILEPATH}}.sha512
+
+      - name: "Generate SHA512 for plugins' checksums"
+        shell: bash
+        run: |
+          ./.github/workflows/sha.sh ${{steps.checksumsfn.outputs.FILEPATH}} ${{ runner.os }} 512 > ${{steps.checksumsfn.outputs.FILEPATH}}.sha512
 
       - name: "Generate Golden SHA512 for jlinkZip"
         uses: ./.github/actions/sha-of-zip
@@ -158,14 +169,16 @@ jobs:
           name: Package
           if-no-files-found: error
           path: |
-            ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}
-            ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}.sha512
-            ${{ github.workspace }}/${{ steps.zipfn.outputs.FILEPATH }}.golden.sha512
-            ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}
-            ${{ github.workspace }}/${{ steps.exefn.outputs.FILEPATH }}.sha512
-            ${{ github.workspace }}/${{steps.cachefn.outputs.FILEPATH}}
-            ${{ github.workspace }}/${{steps.cachefn.outputs.FILEPATH}}.sha512
-            ${{ github.workspace }}/${{steps.cachefn.outputs.FILEPATH}}.golden.sha512
+            ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}
+            ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}.sha512
+            ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}.golden.sha512
+            ${{ github.workspace }}/${{    steps.exefn.outputs.FILEPATH    }}
+            ${{ github.workspace }}/${{    steps.exefn.outputs.FILEPATH    }}.sha512
+            ${{ github.workspace }}/${{   steps.cachefn.outputs.FILEPATH   }}
+            ${{ github.workspace }}/${{   steps.cachefn.outputs.FILEPATH   }}.sha512
+            ${{ github.workspace }}/${{   steps.cachefn.outputs.FILEPATH   }}.golden.sha512
+            ${{ github.workspace }}/${{ steps.checksumsfn.outputs.FILEPATH }}
+            ${{ github.workspace }}/${{ steps.checksumsfn.outputs.FILEPATH }}.sha512
           retention-days: 1
 
       - name: "Upload binaries to release"

@@ -13,6 +13,7 @@ set "HASHFILE_UNSORTED=all_hashes_unsorted.txt"
 set "HASHFILE_PATH_STRIPPED=all_hashes_path_stripped.txt"
 set "HASHFILE_SORTED=all_hashes_sorted.txt"
 set "EXTRACTIONDIR=.\rcv\zip_extracted"
+set "MODULESFILE=.\rcv\lib\modules"
 
 if exist %HASHFILE_UNSORTED% (
   del %HASHFILE_UNSORTED%
@@ -25,12 +26,17 @@ if exist %EXTRACTIONDIR% (
 mkdir %EXTRACTIONDIR%
 powershell -command Expand-Archive -Path %ZIP_FILEPATH% -Destination %EXTRACTIONDIR%
 cd %EXTRACTIONDIR%
+ 
+:: Remove modules file, which doesn't vary on the same machine but does vary across machines
+del %MODULESFILE%
 
 :: Calculate the hash for every file here and in all subdirectories, appending to the file (format "(filename) = (hash)")
-for /r . %%f in (*) do (
-    <NUL set /p ="%%f = " >> %HASHFILE_UNSORTED%
-    C:\Windows\System32\certutil.exe -hashfile "%%f" SHA%SHA_A% | findstr /v ":" >> %HASHFILE_UNSORTED%
-)
+(
+  for /r . %%f in (*) do (
+      <NUL set /p ="%%f = "
+      C:\Windows\System32\certutil.exe -hashfile "%%f" SHA%SHA_A% | findstr /v ":"
+  )
+) > %HASHFILE_UNSORTED%
 
 :: Replace the absolute paths to each file with relative paths (e.g. C:\temp\rcv => .\rcv)
 set "SEARCHTEXT=%cd%"
@@ -45,7 +51,8 @@ sort "%HASHFILE_PATH_STRIPPED%" > "%HASHFILE_SORTED%"
 
 C:\Windows\System32\certutil.exe -hashfile %HASHFILE_SORTED% SHA%SHA_A% | findstr /v ":"
 
-:: after printing the golden hash, print the details: hash of each file
-type "%HASHFILE_SORTED%"
+:: For debugging, enable printing the file-by-file hash
+:: echo "File-by-file hash"
+:: type "%HASHFILE_SORTED%"
 
 endlocal
