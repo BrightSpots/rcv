@@ -45,4 +45,7 @@ sort "%HASHFILE_PATH_STRIPPED%" > "%HASHFILE_SORTED%"
 
 C:\Windows\System32\certutil.exe -hashfile %HASHFILE_SORTED% SHA%SHA_A% | findstr /v ":"
 
+:: after printing the golden hash, print the details: hash of each file
+type "%HASHFILE_SORTED%"
+
 endlocal
