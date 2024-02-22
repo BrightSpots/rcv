@@ -28,4 +28,4 @@ for filename in $(find * -type f | sort); do
 done
 
 # Echo the checksum of the checksums
-echo $($parentPath/sha.sh $tempAllChecksumsFile $os $a)
+echo $($parentPath/../workflows/sha.sh $tempAllChecksumsFile $os $a)

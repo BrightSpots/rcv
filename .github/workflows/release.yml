@@ -81,7 +81,8 @@ jobs:
         id: cachefn
         shell: bash
         run: |
-          echo "FILEPATH=${{ steps.basefn.outputs.FILEPATH }}.cache.zip" >> $GITHUB_OUTPUT
+          mkdir cache
+          echo "FILEPATH=cache/${{ steps.basefn.outputs.FILEPATH }}.cache.zip" >> $GITHUB_OUTPUT
 
       - name: "Generate SHA1 and SHA256 for each maven dependency"
         shell: bash
