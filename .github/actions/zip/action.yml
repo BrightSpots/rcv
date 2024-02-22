@@ -19,7 +19,7 @@ runs:
       shell: bash
       run: ${{ inputs.command }}
 
-    - name: "Generate zip for Linux"
+    - name: "Generate zip for Linux/Mac"
       if: runner.os == 'Linux' || runner.os == 'MacOS'
       shell: bash
       run: zip -r ${{inputs.zipFilename}} ${{inputs.input}}

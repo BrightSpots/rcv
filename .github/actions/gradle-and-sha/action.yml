@@ -25,10 +25,7 @@ runs:
       run: |
         mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
 
-    - name: "Generate SHA512. If ZIP, it will also extract to avoid timestamp-mingling."
+    - name: "Generate SHA512"
       shell: bash
       run: |
         ./.github/workflows/sha.sh ${{ inputs.final-filepath }} ${{ runner.os }} 512 > ${{ inputs.final-finalpath }}.sha512
-        if [ "${{ inputs.intermediate-filepath }}" == "*zip" ]; then
-          ./.github/workflows/sha-of-zip.sh ${{ inputs.final-filepath }} ${{ runner.os }} 512 > ${{ inputs.final-finalpath }}.golden.sha512
-        fi

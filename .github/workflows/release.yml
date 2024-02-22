@@ -99,7 +99,18 @@ jobs:
         shell: bash
         run: |
           ./.github/workflows/sha.sh ${{steps.cachefn.outputs.FILEPATH}} ${{ runner.os }} 512 > ${{steps.cachefn.outputs.FILEPATH}}.sha512
-          # ./.github/workflows/sha-of-zip.sh ${{steps.cachefn.outputs.FILEPATH}} ${{ runner.os }} 512 > ${{steps.cachefn.outputs.FILEPATH}}.golden.sha512
+
+      - name: "Generate Golden SHA512 for jlinkZip"
+        uses: ./.github/actions/sha-of-zip
+        with:
+          zipFilename: ${{ steps.zipfn.outputs.FILEPATH }}
+          shaA: 512
+
+      - name: "Generate Golden SHA512 for plugins cache"
+        uses: ./.github/actions/sha-of-zip
+        with:
+          zipFilename: ${{steps.cachefn.outputs.FILEPATH}} 
+          shaA: 512
 
       - name: "Prepare keychain"
         if: matrix.os == 'macOS-latest'
