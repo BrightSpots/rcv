@@ -8,7 +8,7 @@ set -e
 
 zipFilepath=$1
 os=$2
-a=$3
+sha_a=$3
 
 parentPath=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 
@@ -23,9 +23,9 @@ unzip -q $zipFilepath -d $tempDirectory 2>/dev/null
 # Get a checksum for each file in the zip
 cd $tempDirectory
 for filename in $(find * -type f | sort); do
-  checksum=$($parentPath/../workflows/sha.sh $filename $os $a)
+  checksum=$($parentPath/../workflows/sha.sh $filename $os $sha_a)
   echo $checksum >> $tempAllChecksumsFile
 done
 
 # Echo the checksum of the checksums
-echo $($parentPath/../workflows/sha.sh $tempAllChecksumsFile $os $a)
+echo $($parentPath/../workflows/sha.sh $tempAllChecksumsFile $os $sha_a)

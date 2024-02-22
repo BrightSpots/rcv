@@ -22,10 +22,8 @@ runs:
 
     - name: "Rename output file"
       shell: bash
-      run: |
-        mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
+      run: mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
 
     - name: "Generate SHA512"
       shell: bash
-      run: |
-        ./.github/workflows/sha.sh ${{ inputs.final-filepath }} ${{ runner.os }} 512 > ${{ inputs.final-finalpath }}.sha512
+      run: ./.github/workflows/sha.sh ${{ inputs.final-filepath }} ${{ runner.os }} 512 > ${{ inputs.final-finalpath }}.sha512

@@ -6,13 +6,13 @@ set -e
 
 filename=$1
 os=$2
-a=$3
+sha_a=$3
 
 if [ $os == 'Windows' ]; then
-    echo $(certutil -hashfile $filename SHA$a | sed -n 2p)
+    echo $(certutil -hashfile $filename SHA$sha_a | sed -n 2p)
 elif [ $os == 'Linux' ]; then
-    echo $(sha${a}sum $filename | cut -f1 -d" ")
+    echo $(sha${sha_a}sum $filename | cut -f1 -d" ")
 else
-    echo $(shasum -a $a $filename | cut -f1 -d" ")
+    echo $(shasum -a $sha_a $filename | cut -f1 -d" ")
 fi
 

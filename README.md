@@ -61,7 +61,7 @@ On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch
 3. Download the appropriate cache files for your OS: cache.[OS].zip
 4. Stop the gradle daemon with `gradle --stop`
 5. Delete the directory ~/.gradle/caches if it exists
-6. Extract cache.[OS].zip to ~/.gradle/caches so that the "caches" directory is in ~/.gradle
+6. Extract the appropriate caches/[filename].zip to ~/.gradle/caches so that the "caches" directory is in ~/.gradle
 7. In the extracted directory, you may manually verify each dependency using checksums.csv in accordance with your own policies
 8. Run `gradle assemble --offline` and ensure you get no errors
 9. Run `gradle run --offline` to launch RCTab

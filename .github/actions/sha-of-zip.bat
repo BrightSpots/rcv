@@ -7,8 +7,6 @@
 set ZIP_FILEPATH=%1
 set SHA_A=%2
 
-:: NOTE: This script must be placed one level up from the rcv directory
-
 setlocal EnableExtensions EnableDelayedExpansion
 
 set "HASHFILE_UNSORTED=all_hashes_unsorted.txt"
@@ -45,6 +43,6 @@ for /f "delims=" %%A in ('type "%HASHFILE_UNSORTED%"') do (
 
 sort "%HASHFILE_PATH_STRIPPED%" > "%HASHFILE_SORTED%"
 
-C:\Windows\System32\certutil.exe -hashfile %HASHFILE_SORTED% SHA%SHA_A%
+C:\Windows\System32\certutil.exe -hashfile %HASHFILE_SORTED% SHA%SHA_A% | findstr /v ":"
 
 endlocal
