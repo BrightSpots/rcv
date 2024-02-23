@@ -11,8 +11,6 @@ setlocal EnableExtensions EnableDelayedExpansion
 
 :: All paths relative to pwd -- where this script is called from
 set "EXTRACTIONDIR=.\rcv\zip_extracted"
-set "MODULESFILE=.\rcv\zip_extracted\rcv\lib\modules"
-set "MODULESDIR=.\rcv\zip_extracted\rcv\lib\modules_extracted"
 set "HASHFILE_UNSORTED=all_hashes_unsorted.txt"
 set "HASHFILE_PATH_STRIPPED=all_hashes_path_stripped.txt"
 set "HASHFILE_SORTED=all_hashes_sorted.txt"
@@ -21,24 +19,19 @@ if exist %HASHFILE_UNSORTED% (
   del %HASHFILE_UNSORTED%
 )
 
+if exist %HASHFILE_PATH_STRIPPED% (
+  del %HASHFILE_PATH_STRIPPED%
+)
+
+if exist %HASHFILE_SORTED% (
+  del %HASHFILE_SORTED%
+)
+
 if exist %EXTRACTIONDIR% (
   rmdir /s /q %EXTRACTIONDIR%
 )
 
-if exist %MODULESDIR% (
-  rmdir /s /q %EXTRACTIONDIR%
-)
- 
 powershell -command Expand-Archive -Path %ZIP_FILEPATH% -Destination %EXTRACTIONDIR%
-
-:: Extract modules, get the SHA-512 of it, and add it to the top of the hashfile
-jimage extract --dir %MODULESDIR% %MODULESFILE%
-
-powershell .github\actions\Sha-Of-Directory.ps1 %MODULESDIR% 512 > %HASHFILE_UNSORTED%
-
-:: Delete both modules and the extracted dir
-del %MODULESFILE%
-rmdir /s /q %MODULESDIR%
 
 :: Calculate the hash for every file here and in all subdirectories, appending to the file (format "(filename) = (hash)")
 (
@@ -59,6 +52,10 @@ for /f "delims=" %%A in ('type "%HASHFILE_UNSORTED%"') do (
 
 sort "%HASHFILE_PATH_STRIPPED%" > "%HASHFILE_SORTED%"
 
+:: dos2unix on the file to ensure consistent SHAs
+powershell -Command "& {[IO.File]::WriteAllText(\"%HASHFILE_SORTED%\", $([IO.File]::ReadAllText(\"%HASHFILE_SORTED%\") -replace \"`r`n", "`n\"))}"
+
+:: echo the final hash
 C:\Windows\System32\certutil.exe -hashfile %HASHFILE_SORTED% SHA%SHA_A% | findstr /v ":"
 
 :: For debugging, enable printing the file-by-file hash
