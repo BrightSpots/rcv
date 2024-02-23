@@ -169,6 +169,7 @@ jobs:
           name: Package
           if-no-files-found: error
           path: |
+            ${{ github.workspace }}/all_hashes_sorted.txt
             ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}
             ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}.sha512
             ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}.golden.sha512
