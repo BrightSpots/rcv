@@ -60,7 +60,9 @@ class CsvCvrReader extends BaseCvrReader {
 
       parser.stream().skip(firstVoteRowIndex);
 
+      int index = 0;
       for (CSVRecord csvRecord : parser) {
+        index++;
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         for (int col = firstVoteColumnIndex; col < csvRecord.size(); col++) {
           String rankAsString = csvRecord.get(col);
@@ -86,7 +88,7 @@ class CsvCvrReader extends BaseCvrReader {
 
         // create the new CastVoteRecord
         CastVoteRecord newCvr =
-            new CastVoteRecord(source.getContestId(), "no supplied ID", "no precinct", rankings);
+            new CastVoteRecord(Integer.toString(index), "no supplied ID", "no precinct", rankings);
         castVoteRecords.add(newCvr);
       }
     } catch (IOException exception) {
