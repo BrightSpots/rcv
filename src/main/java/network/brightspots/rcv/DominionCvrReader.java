@@ -354,8 +354,8 @@ class DominionCvrReader extends BaseCvrReader {
           }
           // create the new cvr
           CastVoteRecord newCvr =
-              new CastVoteRecord(
-                  contestId, tabulatorId, batchId, suppliedId, computedId, precinct, precinctPortion, rankings);
+              new CastVoteRecord(contestId, tabulatorId, batchId, suppliedId,
+                      computedId, precinct, precinctPortion, rankings);
           castVoteRecords.add(newCvr);
         }
       }
