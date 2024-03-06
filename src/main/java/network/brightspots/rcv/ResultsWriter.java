@@ -541,9 +541,10 @@ class ResultsWriter {
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
-  // write CastVoteRecords for the specified contest to the provided folder
+  // write CastVoteRecords for the specified contest to the provided folder,
+  // using the simplified RCTab format.
   // returns the filepath written
-  String writeGenericCvrCsv(
+  String writeRctabCvrCsv(
       List<CastVoteRecord> castVoteRecords,
       List<PerSourceDataForCsv> perSourceDataForCsv,
       String csvOutputFolder)
@@ -555,7 +556,7 @@ class ResultsWriter {
     AuditableFile outputFile = new AuditableFile(
                     getOutputFilePath(
                             csvOutputFolder,
-                            "essential_cvr",
+                            "rctab_cvr",
                             timestampString,
                             null)
                             + ".csv");

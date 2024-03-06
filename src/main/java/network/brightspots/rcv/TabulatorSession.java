@@ -341,12 +341,12 @@ class TabulatorSession {
       }
     }
 
-    // Output the Generic CSV CVR
+    // Output the RCTab-CSV CVR
     try {
       ResultsWriter writer =
               new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
       this.convertedFilePath =
-              writer.writeGenericCvrCsv(
+              writer.writeRctabCvrCsv(
                       castVoteRecords,
                       perSourceDataForCsv,
                       config.getOutputDirectory());
