@@ -17,6 +17,7 @@
 package network.brightspots.rcv;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +49,19 @@ abstract class BaseCvrReader {
   public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {}
 
+  // Some CVRs have a list of candidates in the file. Read that list and return it.
+  // This will be used in tandem with gatherUnknownCandidates, which only looks for candidates
+  // that has at least one vote.
+  public List<String> readCandidateListFromCvr(List<CastVoteRecord> castVoteRecords)
+      throws IOException {
+    return new ArrayList<>();
+  }
+
   // Gather candidate names from the CVR that are not in the config.
-  Map<String, Integer> gatherUnknownCandidates(List<CastVoteRecord> castVoteRecords) {
+  Map<String, Integer> gatherUnknownCandidates(
+      List<CastVoteRecord> castVoteRecords, boolean includeCandidatesWithZeroVotes) {
+    // First pass: gather all unrecognized candidates and their counts
+    // All CVR Readers have this implemented
     Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
     for (CastVoteRecord cvr : castVoteRecords) {
       for (Pair<Integer, CandidatesAtRanking> ranking : cvr.candidateRankings) {
@@ -61,6 +73,30 @@ abstract class BaseCvrReader {
           }
 
           unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
+        }
+      }
+    }
+
+    if (includeCandidatesWithZeroVotes) {
+      // Second pass: read all candidates
+      // Not all CVR Readers have this implemented, so it's just a catch to
+      // find any candidate with zero votes.
+      List<String> allCandidates = new ArrayList<>();
+      try {
+        allCandidates = readCandidateListFromCvr(castVoteRecords);
+      } catch (IOException e) {
+        // If we can't read the candidate list, we can't check for unrecognized candidates.
+        Logger.warning("IOException reading candidate list from CVR: %s", e.getMessage());
+      }
+
+      // Remove overvote and write-in label from candidate list, if they exist
+      allCandidates.remove(source.getOvervoteLabel());
+      allCandidates.remove(source.getUndeclaredWriteInLabel());
+
+      // Combine the lists
+      for (String candidate : allCandidates) {
+        if (!unrecognizedCandidateCounts.containsKey(candidate)) {
+          unrecognizedCandidateCounts.put(candidate, 0);
         }
       }
     }
