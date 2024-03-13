@@ -658,6 +658,8 @@ class ResultsWriter {
             // so we need to translate it back to the original candidate ID here.
             if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
               selection = undeclaredWriteInLabel;
+            } else if (selection.equals(Tabulator.EXPLICIT_OVERVOTE_LABEL)) {
+              selection = Tabulator.EXPLICIT_OVERVOTE_LABEL;
             } else {
               selection = config.getNameForCandidate(selection);
             }
