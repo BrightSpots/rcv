@@ -306,7 +306,8 @@ class TabulatorSession {
           this.convertedFilePath =
               writer.writeGenericCvrCsv(
                   castVoteRecords,
-                  reader.getMaxRankingsAllowed(source.getContestId()),
+                  source,
+                  reader,
                   config.getOutputDirectory(),
                   source.getFilePath(),
                   source.getContestId(),

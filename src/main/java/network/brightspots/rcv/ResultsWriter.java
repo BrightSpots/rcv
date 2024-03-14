@@ -542,7 +542,8 @@ class ResultsWriter {
   // returns the filepath written
   String writeGenericCvrCsv(
       List<CastVoteRecord> castVoteRecords,
-      Integer numRanks,
+      CvrSource source,
+      BaseCvrReader reader,
       String csvOutputFolder,
       String inputFilepath,
       String contestId,
@@ -581,7 +582,13 @@ class ResultsWriter {
       csvPrinter.print("Record Id");
       csvPrinter.print("Precinct");
       csvPrinter.print("Precinct Portion");
-      for (int rank = 1; rank <= numRanks; rank++) {
+      int maxRank;
+      if (config.isMaxRankingsSetToMaximum()) {
+        maxRank = config.getNumDeclaredCandidates();
+      } else {
+        maxRank = config.getMaxRankingsAllowedWhenNotSetToMaximum();
+      }
+      for (int rank = 1; rank <= maxRank; rank++) {
         String label = String.format("Rank %d", rank);
         csvPrinter.print(label);
       }
@@ -602,7 +609,7 @@ class ResultsWriter {
         } else {
           csvPrinter.print(castVoteRecord.getPrecinctPortion());
         }
-        printRankings(undeclaredWriteInLabel, numRanks, csvPrinter, castVoteRecord);
+        printRankings(undeclaredWriteInLabel, maxRank, reader, source, csvPrinter, castVoteRecord);
         csvPrinter.println();
       }
       // finalize the file
@@ -624,11 +631,18 @@ class ResultsWriter {
   private void printRankings(
       String undeclaredWriteInLabel,
       Integer maxRanks,
+      BaseCvrReader reader,
+      CvrSource source,
       CSVPrinter csvPrinter,
       CastVoteRecord castVoteRecord)
       throws IOException {
     // for each rank determine what candidate id, overvote, or undervote occurred and print it
     for (int rank = 1; rank <= maxRanks; rank++) {
+      // If the configuration did not allow this ranking, we want to exclude it
+      // from the RCTab CVR -- even if it was present in the source CVRs.
+      if (!reader.isRankingAllowed(rank, source.getContestId())) {
+        break;
+      }
       if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
         CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
         if (candidates.count() == 1) {
