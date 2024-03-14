@@ -91,13 +91,10 @@ class ResultsWriter {
       String timestampString,
       String sequentialTabulationId) {
     outputType = sanitizeStringForOutput(outputType);
-    String sequence = sequentialTabulationId == null
-            ? ""
-            : sequentialSuffixForOutputPath(sequentialTabulationId);
     String fileName =
         String.format(
             "%s_%s%s",
-            timestampString, outputType, sequence);
+            timestampString, outputType, sequentialSuffixForOutputPath(sequentialTabulationId));
     return Paths.get(outputDirectory, fileName).toAbsolutePath().toString();
   }
 
@@ -600,6 +597,10 @@ class ResultsWriter {
           // we've moved on to a new contest, so we need to switch to the next source
           currentSourceIndex++;
           currentSourceData = perSourceDataForCsv.get(currentSourceIndex);
+
+          if (currentSourceData.sourceIndex != currentSourceIndex) {
+            throw new RuntimeException("Source list must be sorted by sourceIndex!");
+          }
         }
 
         CastVoteRecord castVoteRecord = castVoteRecords.get(i);
@@ -648,25 +649,23 @@ class ResultsWriter {
     for (int rank = 1; rank <= maxRanks; rank++) {
       if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
         CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
-        if (candidates.count() >= 1) {
-          // We list all candidates at a given ranking on separate lines
-          // This allows algorithms which accept overvotes.
-          List<String> allCandidatesAtRanking = new ArrayList<>(candidates.count());
-          for (String candidate : candidates) {
-            String selection = candidate;
-            // We map all undeclared write-ins to our constant string when we read them in,
-            // so we need to translate it back to the original candidate ID here.
-            if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-              selection = undeclaredWriteInLabel;
-            } else if (selection.equals(Tabulator.EXPLICIT_OVERVOTE_LABEL)) {
-              selection = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-            } else {
-              selection = config.getNameForCandidate(selection);
-            }
-            allCandidatesAtRanking.add(selection);
+        // We list all candidates at a given ranking on separate lines
+        // This allows algorithms which accept overvotes.
+        List<String> allCandidatesAtRanking = new ArrayList<>(candidates.count());
+        for (String candidate : candidates) {
+          String selection = candidate;
+          // We map all undeclared write-ins to our constant string when we read them in,
+          // so we need to translate it back to the original candidate ID here.
+          if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
+            selection = undeclaredWriteInLabel;
+          } else if (selection.equals(Tabulator.EXPLICIT_OVERVOTE_LABEL)) {
+            selection = Tabulator.EXPLICIT_OVERVOTE_LABEL;
+          } else {
+            selection = config.getNameForCandidate(selection);
           }
-          csvPrinter.print(String.join("\n", allCandidatesAtRanking));
+          allCandidatesAtRanking.add(selection);
         }
+        csvPrinter.print(String.join("\n", allCandidatesAtRanking));
       } else {
         csvPrinter.print("undervote");
       }
@@ -1047,11 +1046,14 @@ class ResultsWriter {
   // Per-source data to be used in the CSV CVR export
   static class PerSourceDataForCsv {
     public final CvrSource source;
+    public final int sourceIndex;
     public final int lastIndexInCvrList;
     public final int maxRankingsAllowed;
 
-    PerSourceDataForCsv(CvrSource source, int lastIndexInCvrList, int maxRankingsAllowed) {
+    PerSourceDataForCsv(
+        CvrSource source, int sourceIndex, int lastIndexInCvrList, int maxRankingsAllowed) {
       this.source = source;
+      this.sourceIndex = sourceIndex;
       this.lastIndexInCvrList = lastIndexInCvrList;
       this.maxRankingsAllowed = maxRankingsAllowed;
     }

@@ -283,7 +283,8 @@ class TabulatorSession {
     List<ResultsWriter.PerSourceDataForCsv> perSourceDataForCsv = new ArrayList<>();
 
     // At each iteration of the following loop, we add records from another source file.
-    for (RawContestConfig.CvrSource source : config.rawConfig.cvrFileSources) {
+    for (int sourceIndex = 0; sourceIndex < config.rawConfig.cvrFileSources.size(); ++sourceIndex) {
+      RawContestConfig.CvrSource source  = config.rawConfig.cvrFileSources.get(sourceIndex);
       String cvrPath = config.resolveConfigPath(source.getFilePath());
       Provider provider = ContestConfig.getProvider(source);
       try {
@@ -294,6 +295,7 @@ class TabulatorSession {
         // Update the per-source data for the results writer
         perSourceDataForCsv.add(new ResultsWriter.PerSourceDataForCsv(
                 source,
+                sourceIndex,
                 castVoteRecords.size() - 1,
                 reader.getMaxRankingsAllowed(source.getContestId())));
 
