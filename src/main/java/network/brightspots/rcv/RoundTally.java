@@ -37,6 +37,7 @@ class RoundTally {
   private BigDecimal winningThreshold;
   private BigDecimal numActiveBallots;
   private BigDecimal numInactiveBallots;
+  private BigDecimal numLockedInBallots;
 
   private boolean isFinalized = false;
   private boolean unlockedForSurplusCalculation = false;
@@ -48,6 +49,7 @@ class RoundTally {
         (String candidateName) -> candidateTallies.put(candidateName, BigDecimal.ZERO));
 
     ballotStatusTallies = new HashMap<>();
+    numLockedInBallots = BigDecimal.ZERO;
     for (StatusForRound statusForRound : StatusForRound.values()) {
       ballotStatusTallies.put(statusForRound, BigDecimal.ZERO);
     }
@@ -105,9 +107,7 @@ class RoundTally {
 
     // We don't add to BallotStatus.ACTIVE, but we still need to track this to get
     // the correct percentages when reporting results externally.
-    BigDecimal newTally = ballotStatusTallies.getOrDefault(
-            StatusForRound.LOCKED_IN, BigDecimal.ZERO).add(diff);
-    ballotStatusTallies.put(StatusForRound.LOCKED_IN, newTally);
+    numLockedInBallots = numLockedInBallots.add(diff);
   }
 
   // Gets the winning threshold for this round.
@@ -148,10 +148,10 @@ class RoundTally {
     return numActiveBallots;
   }
 
-  // Get the number of "locked-in" ballots in this round
+  // Get the number of active ballots plus the fractional amount of "locked in" ballots.
   BigDecimal numActiveOrLockedInBallots() {
     ensureFinalized();
-    return numActiveBallots.add(ballotStatusTallies.get(StatusForRound.LOCKED_IN));
+    return numActiveBallots.add(numLockedInBallots);
   }
 
   // Get the number of inactive ballots in this round
@@ -206,9 +206,8 @@ class RoundTally {
     numInactiveBallots = BigDecimal.ZERO;
     ballotStatusTallies.forEach(
         (statusForRound, tally) -> {
-            if (statusForRound != StatusForRound.ACTIVE
-                && statusForRound != StatusForRound.LOCKED_IN) {
-              numInactiveBallots = numInactiveBallots.add(tally);
+          if (statusForRound != StatusForRound.ACTIVE) {
+            numInactiveBallots = numInactiveBallots.add(tally);
           }
         });
 

@@ -213,7 +213,6 @@ class CastVoteRecord {
   // it is active or not.
   enum StatusForRound {
     ACTIVE,
-    LOCKED_IN,
     INACTIVE_BY_UNDERVOTE,
     INACTIVE_BY_OVERVOTE,
     INACTIVE_BY_SKIPPED_RANKING,
