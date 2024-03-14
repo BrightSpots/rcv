@@ -1,4 +1,4 @@
-Source Filepath,Contest Id,Tabulator Id,Batch Id,Record Id,Precinct,Precinct Portion,Rank 1,Rank 2,Rank 3,Rank 4,Rank 5
+Source Filepath,Contest Id,Tabulator Id,Batch Id,Record Id,Precinct,Precinct Portion,Rank 1,Rank 2,Rank 3,Rank 4,Rank 5,Rank 6,Rank 7,Rank 8
 ../_shared/dominion_alaska/alaska_input_data,1,42,1,1,,Precinct 1,Michael R. Bloomberg,Joseph R. Biden,12,Elizabeth Warren,Tulsi Gabbard
 ../_shared/dominion_alaska/alaska_input_data,1,42,1,2,,Precinct 1,Joseph R. Biden,12,Bernie Sanders,Pete Buttigieg,Tulsi Gabbard
 ../_shared/dominion_alaska/alaska_input_data,1,42,1,3,,Precinct 1,12,Amy Klobuchar,Tulsi Gabbard,Joseph R. Biden,Michael R. Bloomberg

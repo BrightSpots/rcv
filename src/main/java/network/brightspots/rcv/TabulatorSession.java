@@ -295,9 +295,9 @@ class TabulatorSession {
         // Update the per-source data for the results writer
         perSourceDataForCsv.add(new ResultsWriter.PerSourceDataForCsv(
                 source,
+                reader,
                 sourceIndex,
-                castVoteRecords.size() - 1,
-                reader.getMaxRankingsAllowed(source.getContestId())));
+                castVoteRecords.size() - 1));
 
         // Check for unrecognized candidates
         Map<String, Integer> unrecognizedCandidateCounts =

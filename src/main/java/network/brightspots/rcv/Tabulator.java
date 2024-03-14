@@ -509,6 +509,11 @@ class Tabulator {
       throws TabulationAbortedException {
     List<String> selectedWinners = new LinkedList<>();
 
+    if (getCandidateSignum(UNDECLARED_WRITE_IN_OUTPUT_LABEL, currentRoundTally) != 0) {
+      // No winners can be selected while undeclared candidates are live
+      return selectedWinners;
+    }
+
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       // if everyone meets the threshold, select them all as winners
       boolean allMeet =
@@ -636,8 +641,7 @@ class Tabulator {
   private List<String> dropUndeclaredWriteIns(RoundTally currentRoundTally) {
     List<String> eliminated = new LinkedList<>();
     String label = UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-    if (currentRoundTally.getCandidateTally(label) != null
-        && currentRoundTally.getCandidateTally(label).signum() == 1) {
+    if (getCandidateSignum(label, currentRoundTally) == 1) {
       eliminated.add(label);
       Logger.info(
           "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It "
@@ -645,6 +649,19 @@ class Tabulator {
           label, currentRound, currentRoundTally.getCandidateTally(label));
     }
     return eliminated;
+  }
+
+  // Returns the signum of the tally for a given label, or 0 if the label is not
+  // in the current round
+  // param: label candidate ID
+  // param: currentRoundTally map of candidate IDs to their tally for a given round
+  // returns: signum of the candidate tally
+  private int getCandidateSignum(String label, RoundTally currentRoundTally) {
+    BigDecimal tally = currentRoundTally.getCandidateTally(label);
+    if (tally == null) {
+      return 0;
+    }
+    return tally.signum();
   }
 
   // eliminate all candidates below a certain tally threshold
@@ -1132,8 +1149,14 @@ class Tabulator {
         // if this is the last ranking we are out of rankings and must exhaust this cvr
         // determine if the reason is skipping too many ranks, or no continuing candidates
         if (rank == cvr.candidateRankings.maxRankingNumber()) {
+          // When determining if this is an undervote or exhausted choice, look at either
+          // the max ranking allowed by the config, or if the config does not impose a limit,
+          // look at the number of declared candidates.
+          int maxAllowedRanking = config.isMaxRankingsSetToMaximum()
+                  ? config.getNumDeclaredCandidates()
+                  : config.getMaxRankingsAllowedWhenNotSetToMaximum();
           if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
-              && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
+              && maxAllowedRanking - rank > config.getMaxSkippedRanksAllowed()) {
             recordSelectionForCastVoteRecord(
                 cvr, roundTally, null, StatusForRound.INACTIVE_BY_UNDERVOTE, "");
           } else {

@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -576,13 +575,13 @@ class ResultsWriter {
       csvPrinter.print("Precinct");
       csvPrinter.print("Precinct Portion");
 
-      // Get the max maxRankingsAllowed across all perSourceDataForCsv
-      int maxRankingAcrossSources = 0;
-      for (PerSourceDataForCsv sourceData : perSourceDataForCsv) {
-        maxRankingAcrossSources = Math.max(sourceData.maxRankingsAllowed, maxRankingAcrossSources);
+      int maxRank;
+      if (config.isMaxRankingsSetToMaximum()) {
+        maxRank = config.getNumDeclaredCandidates();
+      } else {
+        maxRank = config.getMaxRankingsAllowedWhenNotSetToMaximum();
       }
-
-      for (int rank = 1; rank <= maxRankingAcrossSources; rank++) {
+      for (int rank = 1; rank <= maxRank; rank++) {
         String label = String.format("Rank %d", rank);
         csvPrinter.print(label);
       }
@@ -621,8 +620,8 @@ class ResultsWriter {
         } else {
           csvPrinter.print(castVoteRecord.getPrecinctPortion());
         }
-        printRankings(currentSourceData.source.getUndeclaredWriteInLabel(),
-            currentSourceData.maxRankingsAllowed, csvPrinter, castVoteRecord);
+        printRankings(currentSourceData.source.getUndeclaredWriteInLabel(), maxRank,
+            currentSourceData.reader, currentSourceData.source, csvPrinter, castVoteRecord);
         csvPrinter.println();
       }
       // finalize the file
@@ -644,11 +643,18 @@ class ResultsWriter {
   private void printRankings(
       String undeclaredWriteInLabel,
       Integer maxRanks,
+      BaseCvrReader reader,
+      CvrSource source,
       CSVPrinter csvPrinter,
       CastVoteRecord castVoteRecord)
       throws IOException {
     // for each rank determine what candidate id, overvote, or undervote occurred and print it
     for (int rank = 1; rank <= maxRanks; rank++) {
+      // If the configuration did not allow this ranking, we want to exclude it
+      // from the RCTab CVR -- even if it was present in the source CVRs.
+      if (!reader.isRankingAllowed(rank, source.getContestId())) {
+        break;
+      }
       if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
         CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
         // We list all candidates at a given ranking on separate lines
@@ -1048,16 +1054,16 @@ class ResultsWriter {
   // Per-source data to be used in the CSV CVR export
   static class PerSourceDataForCsv {
     public final CvrSource source;
+    public final BaseCvrReader reader;
     public final int sourceIndex;
     public final int lastIndexInCvrList;
-    public final int maxRankingsAllowed;
 
     PerSourceDataForCsv(
-        CvrSource source, int sourceIndex, int lastIndexInCvrList, int maxRankingsAllowed) {
+        CvrSource source, BaseCvrReader reader, int sourceIndex, int lastIndexInCvrList) {
       this.source = source;
+      this.reader = reader;
       this.sourceIndex = sourceIndex;
       this.lastIndexInCvrList = lastIndexInCvrList;
-      this.maxRankingsAllowed = maxRankingsAllowed;
     }
   }
 

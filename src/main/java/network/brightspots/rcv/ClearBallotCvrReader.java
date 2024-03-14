@@ -54,7 +54,7 @@ class ClearBallotCvrReader extends BaseCvrReader {
         Logger.severe("No header row found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
       }
-      String[] headerData = firstRow.split(",");
+      String[] headerData = firstRow.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
       if (headerData.length < CvrColumnField.ChoicesBegin.ordinal()) {
         Logger.severe("No choice columns found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
@@ -82,13 +82,9 @@ class ClearBallotCvrReader extends BaseCvrReader {
           choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
-        if (rank > this.config.getMaxRankingsAllowed()) {
-          Logger.severe(
-              "Rank: %d exceeds max rankings allowed in config: %d",
-              rank, this.config.getMaxRankingsAllowed());
-          throw new CvrParseException();
+        if (this.config.isRankingAllowed(rank)) {
+          columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
         }
-        columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
       }
       // read all remaining rows and create CastVoteRecords for each one
       while (true) {
