@@ -638,6 +638,8 @@ class ResultsWriter {
       throws IOException {
     // for each rank determine what candidate id, overvote, or undervote occurred and print it
     for (int rank = 1; rank <= maxRanks; rank++) {
+      // If the configuration did not allow this ranking, we want to exclude it
+      // from the RCTab CVR -- even if it was present in the source CVRs.
       if (!reader.isRankingAllowed(rank, source.getContestId())) {
         break;
       }
