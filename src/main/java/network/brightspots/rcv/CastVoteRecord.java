@@ -66,14 +66,7 @@ class CastVoteRecord {
       String precinct,
       String precinctPortion,
       List<Pair<Integer, String>> rankings) {
-    this.contestId = contestId;
-    this.tabulatorId = tabulatorId;
-    this.batchId = batchId;
-    this.computedId = null;
-    this.suppliedId = suppliedId;
-    this.precinct = precinct;
-    this.precinctPortion = precinctPortion;
-    this.candidateRankings = new CandidateRankingsList(rankings);
+    this(contestId, tabulatorId, batchId, suppliedId, null, precinct, precinctPortion, rankings);
   }
 
   CastVoteRecord(
@@ -88,8 +81,8 @@ class CastVoteRecord {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
     this.batchId = batchId;
-    this.computedId = computedId;
     this.suppliedId = suppliedId;
+    this.computedId = computedId;
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
     this.candidateRankings = new CandidateRankingsList(rankings);
@@ -97,11 +90,7 @@ class CastVoteRecord {
 
   CastVoteRecord(
       String computedId, String suppliedId, String precinct, List<Pair<Integer, String>> rankings) {
-    this.computedId = computedId;
-    this.suppliedId = suppliedId;
-    this.precinct = precinct;
-    this.precinctPortion = null;
-    this.candidateRankings = new CandidateRankingsList(rankings);
+    this(null, null, null, suppliedId, computedId, precinct, null, rankings);
   }
 
   String getContestId() {
