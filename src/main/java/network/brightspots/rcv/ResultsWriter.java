@@ -538,9 +538,11 @@ class ResultsWriter {
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
-  // write CastVoteRecords for the specified contest to the provided folder,
+  // Write CastVoteRecords for the specified contest to the provided folder,
   // using the simplified RCTab format.
-  // returns the filepath written
+  // Note that the castVoteRecords list MUST be stable, as perSourceDataForCsv
+  // relies on its exact ordering to determine which source each record came from.
+  // Returns the filepath written
   String writeRctabCvrCsv(
       List<CastVoteRecord> castVoteRecords,
       List<PerSourceDataForCsv> perSourceDataForCsv,
