@@ -51,7 +51,7 @@ abstract class BaseCvrReader {
 
   // Some CVRs have a list of candidates in the file. Read that list and return it.
   // This will be used in tandem with gatherUnknownCandidates, which only looks for candidates
-  // that has at least one vote.
+  // that have at least one vote.
   public List<String> readCandidateListFromCvr(List<CastVoteRecord> castVoteRecords)
       throws IOException {
     return new ArrayList<>();
@@ -78,9 +78,10 @@ abstract class BaseCvrReader {
     }
 
     if (includeCandidatesWithZeroVotes) {
-      // Second pass: read all candidates
-      // Not all CVR Readers have this implemented, so it's just a catch to
-      // find any candidate with zero votes.
+      // Second pass: read the entire candidate list from the CVR,
+      // regardless of whether they have any votes.
+      // TODO -- once all readers have this implemented, we can skip the first pass entirely
+      // during auto-load candidates and just use readCandidateListFromCvr.
       List<String> allCandidates = new ArrayList<>();
       try {
         allCandidates = readCandidateListFromCvr(castVoteRecords);
@@ -94,9 +95,10 @@ abstract class BaseCvrReader {
       allCandidates.remove(source.getUndeclaredWriteInLabel());
 
       // Combine the lists
-      for (String candidate : allCandidates) {
-        if (!unrecognizedCandidateCounts.containsKey(candidate)) {
-          unrecognizedCandidateCounts.put(candidate, 0);
+      for (String candidateName : allCandidates) {
+        if (!unrecognizedCandidateCounts.containsKey(candidateName)
+            && config.getNameForCandidate(candidateName) == null) {
+          unrecognizedCandidateCounts.put(candidateName, 0);
         }
       }
     }
