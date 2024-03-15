@@ -325,10 +325,10 @@ class ResultsWriter {
         csvPrinter.print(thisRoundTally);
 
         // Vote %
-        BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
-        if (activeBallots != BigDecimal.ZERO) {
+        BigDecimal votePctDivisor = roundTallies.get(round).activeAndLockedInBallotSum();
+        if (votePctDivisor != BigDecimal.ZERO) {
           // Turn a decimal into a human-readable percentage (e.g. 0.1234 -> 12.34%)
-          BigDecimal divDecimal = thisRoundTally.divide(activeBallots, MathContext.DECIMAL32);
+          BigDecimal divDecimal = thisRoundTally.divide(votePctDivisor, MathContext.DECIMAL32);
           csvPrinter.print(divDecimal.scaleByPowerOfTen(4).intValue() / 100.0 + "%");
         } else {
           csvPrinter.print("");
@@ -350,7 +350,9 @@ class ResultsWriter {
 
     csvPrinter.print("Active Ballots");
     for (int round = 1; round <= numRounds; round++) {
-      csvPrinter.print(roundTallies.get(round).numActiveBallots());
+      // While internally we separate out an "active" and a "locked in" ballot,
+      // externally, the difference is not important.
+      csvPrinter.print(roundTallies.get(round).activeAndLockedInBallotSum());
       csvPrinter.print("");
       csvPrinter.print("");
     }
@@ -401,7 +403,7 @@ class ResultsWriter {
     BigDecimal numUndervotes =
         roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
     for (int round = 1; round <= numRounds; round++) {
-      BigDecimal thisRoundInactive = roundTallies.get(round).numInactiveBallots();
+      BigDecimal thisRoundInactive = roundTallies.get(round).inactiveBallotSum();
       csvPrinter.print(thisRoundInactive.subtract(numUndervotes));
 
       // Don't display percentage of inactive ballots
@@ -411,7 +413,7 @@ class ResultsWriter {
       if (round != numRounds) {
         // Note: we don't need to subtract num undervotes here since we'd be subtracting the
         // same value from both sides of the equation, so it cancels out.
-        BigDecimal nextRoundInactive = roundTallies.get(round + 1).numInactiveBallots();
+        BigDecimal nextRoundInactive = roundTallies.get(round + 1).inactiveBallotSum();
         BigDecimal diff = nextRoundInactive.subtract(thisRoundInactive);
         csvPrinter.print(diff);
       } else {
@@ -462,7 +464,7 @@ class ResultsWriter {
     BigDecimal numUndervotes =
         round1Tally.getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
     BigDecimal totalNumberBallots =
-        round1Tally.numActiveBallots().add(round1Tally.numInactiveBallots());
+        round1Tally.activeBallotSum().add(round1Tally.inactiveBallotSum());
     csvPrinter.printRecord("Contest Summary");
     csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
     csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
@@ -941,7 +943,7 @@ class ResultsWriter {
     BigDecimal firstRoundUndervotes =
         roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
     BigDecimal totalNumberBallots =
-        roundTallies.get(1).numActiveBallots().add(roundTallies.get(1).numInactiveBallots());
+        roundTallies.get(1).activeBallotSum().add(roundTallies.get(1).inactiveBallotSum());
     BigDecimal lastRoundThreshold = roundTallies.get(numRounds).getWinningThreshold();
 
     HashMap<String, Object> summaryData = new HashMap<>();
