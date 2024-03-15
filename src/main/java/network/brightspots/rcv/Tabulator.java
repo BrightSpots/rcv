@@ -395,7 +395,7 @@ class Tabulator {
 
   // determine and store the threshold to win
   private void setWinningThreshold(RoundTally currentRoundTally, BigDecimal minimumVoteThreshold) {
-    BigDecimal currentRoundTotalVotes = currentRoundTally.numActiveBallots();
+    BigDecimal currentRoundTotalVotes = currentRoundTally.activeBallotSum();
 
     BigDecimal winningThreshold;
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
@@ -515,7 +515,7 @@ class Tabulator {
           currentRoundTally
                   .getCandidatesWithMoreVotesThan(currentRoundTally.getWinningThreshold())
                   .size()
-              == currentRoundTally.numActiveCandidates();
+              == currentRoundTally.activeCandidateSum();
       if (allMeet) {
         selectedWinners.addAll(currentRoundTally.getCandidates());
       }
@@ -523,12 +523,12 @@ class Tabulator {
       // We should only look for more winners if we haven't already filled all the seats.
       int numSeatsUnfilled = config.getNumberOfWinners() - winnerToRound.size();
       if (numSeatsUnfilled > 0) {
-        if (currentRoundTally.numActiveCandidates() == numSeatsUnfilled) {
+        if (currentRoundTally.activeCandidateSum() == numSeatsUnfilled) {
           // If the number of continuing candidates equals the number of seats to fill,
           // everyone wins.
           selectedWinners.addAll(currentRoundTally.getCandidates());
         } else if (config.isFirstRoundDeterminesThresholdEnabled()
-            && currentRoundTally.numActiveCandidates() - 1 == config.getNumberOfWinners()) {
+            && currentRoundTally.activeCandidateSum() - 1 == config.getNumberOfWinners()) {
           // Edge case: if nobody meets the threshold, but we're on the penultimate round when
           // isFirstRoundDeterminesThresholdEnabled is true, select the max vote getters as
           // the winners. If isFirstRoundDeterminesThresholdEnabled isn't enabled, it should be
@@ -566,7 +566,7 @@ class Tabulator {
       boolean needsTiebreakNoWinners =
           config.getNumberOfWinners() == 1
               && selectedWinners.isEmpty()
-              && currentRoundTally.numActiveCandidates() == 2
+              && currentRoundTally.activeCandidateSum() == 2
               && numSeatsUnfilled == 1
               && currentRoundTallyToCandidates.keySet().stream()
                   .allMatch(x -> x.compareTo(config.getMinimumVoteThreshold()) >= 0);

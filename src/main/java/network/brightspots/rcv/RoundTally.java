@@ -35,9 +35,9 @@ class RoundTally {
   private final Map<String, BigDecimal> candidateTallies;
   private final Map<StatusForRound, BigDecimal> ballotStatusTallies;
   private BigDecimal winningThreshold;
-  private BigDecimal numActiveBallots;
-  private BigDecimal numInactiveBallots;
-  private BigDecimal numLockedInBallots;
+  private BigDecimal activeBallotSum;
+  private BigDecimal inactiveBallotSum;
+  private BigDecimal lockedInBallotSum;
 
   private boolean isFinalized = false;
   private boolean unlockedForSurplusCalculation = false;
@@ -49,7 +49,7 @@ class RoundTally {
         (String candidateName) -> candidateTallies.put(candidateName, BigDecimal.ZERO));
 
     ballotStatusTallies = new HashMap<>();
-    numLockedInBallots = BigDecimal.ZERO;
+    lockedInBallotSum = BigDecimal.ZERO;
     for (StatusForRound statusForRound : StatusForRound.values()) {
       ballotStatusTallies.put(statusForRound, BigDecimal.ZERO);
     }
@@ -68,7 +68,7 @@ class RoundTally {
   }
 
   // Surplus computation allows writing to the tally after the round is locked in, and
-  // it does not affect the number of ACTIVE ballots when adjusted.
+  // it does not affect the sum of ACTIVE ballots when adjusted.
   void unlockForSurplusCalculation() {
     unlockedForSurplusCalculation = true;
   }
@@ -79,7 +79,7 @@ class RoundTally {
     countBallots();
   }
 
-  // Get the number of votes this candidate has this round
+  // Get the sum of votes this candidate has this round
   BigDecimal getCandidateTally(String candidateId) {
     ensureFinalized();
     return candidateTallies.get(candidateId);
@@ -92,14 +92,14 @@ class RoundTally {
     candidateTallies.put(candidateId, candidateTallies.get(candidateId).add(tally));
   }
 
-  // Adds votes without adjusting the number of BallotStatus.ACTIVE ballots.
+  // Adds votes without adjusting the sum of BallotStatus.ACTIVE ballots.
   void addToCandidateTallyViaSurplusAdjustment(String candidateId, BigDecimal tally) {
     ensureIsMakingSurplusAdjustment();
     BigDecimal prevTally = candidateTallies.get(candidateId);
     setCandidateTallyViaSurplusAdjustment(candidateId, prevTally.add(tally));
   }
 
-  // Sets vote totals without adjusting the number of BallotStatus.ACTIVE ballots.
+  // Sets vote totals without adjusting the sum of BallotStatus.ACTIVE ballots.
   void setCandidateTallyViaSurplusAdjustment(String candidateId, BigDecimal tally) {
     ensureIsMakingSurplusAdjustment();
     BigDecimal diff = tally.subtract(candidateTallies.getOrDefault(candidateId, BigDecimal.ZERO));
@@ -107,7 +107,7 @@ class RoundTally {
 
     // We don't add to BallotStatus.ACTIVE, but we still need to track this to get
     // the correct percentages when reporting results externally.
-    numLockedInBallots = numLockedInBallots.add(diff);
+    lockedInBallotSum = lockedInBallotSum.add(diff);
   }
 
   // Gets the winning threshold for this round.
@@ -136,28 +136,28 @@ class RoundTally {
     ballotStatusTallies.put(statusForRound, newVal);
   }
 
-  // Get the number of inactive ballots by type
+  // Get the sum of inactive ballots by type
   BigDecimal getBallotStatusTally(StatusForRound statusForRound) {
     ensureFinalized();
     return ballotStatusTallies.get(statusForRound);
   }
 
-  // Get the number of active ballots in this round
-  BigDecimal numActiveBallots() {
+  // Get the sum of active ballots in this round
+  BigDecimal activeBallotSum() {
     ensureFinalized();
-    return numActiveBallots;
+    return activeBallotSum;
   }
 
-  // Get the number of active ballots plus the fractional amount of "locked in" ballots.
-  BigDecimal numActiveOrLockedInBallots() {
+  // Get the sum of active ballots plus the fractional amount of "locked in" ballots.
+  BigDecimal activeAndLockedInBallotSum() {
     ensureFinalized();
-    return numActiveBallots.add(numLockedInBallots);
+    return activeBallotSum.add(lockedInBallotSum);
   }
 
-  // Get the number of inactive ballots in this round
-  BigDecimal numInactiveBallots() {
+  // Get the sum of inactive ballots in this round
+  BigDecimal inactiveBallotSum() {
     ensureFinalized();
-    return numInactiveBallots;
+    return inactiveBallotSum;
   }
 
   // Get all candidate names
@@ -166,7 +166,7 @@ class RoundTally {
   }
 
   // Get all candidate names
-  public int numActiveCandidates() {
+  public int activeCandidateSum() {
     ensureFinalized();
     return candidateTallies.size();
   }
@@ -203,15 +203,15 @@ class RoundTally {
   }
 
   private void countBallots() {
-    numInactiveBallots = BigDecimal.ZERO;
+    inactiveBallotSum = BigDecimal.ZERO;
     ballotStatusTallies.forEach(
         (statusForRound, tally) -> {
           if (statusForRound != StatusForRound.ACTIVE) {
-            numInactiveBallots = numInactiveBallots.add(tally);
+            inactiveBallotSum = inactiveBallotSum.add(tally);
           }
         });
 
-    numActiveBallots = ballotStatusTallies.get(StatusForRound.ACTIVE);
+    activeBallotSum = ballotStatusTallies.get(StatusForRound.ACTIVE);
   }
 
   private void ensureFinalized() {
