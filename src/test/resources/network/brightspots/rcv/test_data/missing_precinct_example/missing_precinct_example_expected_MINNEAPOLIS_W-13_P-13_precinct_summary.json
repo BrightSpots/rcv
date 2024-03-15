@@ -1,0 +1,151 @@
+{
+  "config" : {
+    "contest" : "Missing Precinct example",
+    "date" : "2017-11-07",
+    "generatedBy" : "RCTab 1.3.999",
+    "jurisdiction" : "Minneapolis, MN",
+    "office" : "Mayor",
+    "precinct" : "MINNEAPOLIS W-13 P-13"
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "Al Flowers" : "0",
+      "Aswar Rahman" : "0",
+      "Betsy Hodges" : "0",
+      "Captain Jack Sparrow" : "0",
+      "Charlie Gers" : "0",
+      "Christopher Zimmerman" : "0",
+      "David John Wilson" : "0",
+      "David Rosenfeld" : "0",
+      "Gregg A. Iverson" : "0",
+      "Ian Simpson" : "0",
+      "Jacob Frey" : "0",
+      "L.A. Nik" : "0",
+      "Nekima Levy-Pounds" : "0",
+      "Raymond Dehn" : "0",
+      "Ronald Lischeid" : "0",
+      "Theron Preston Washington" : "0",
+      "Tom Hoch" : "1",
+      "Troy Benjegerdes" : "0",
+      "Undeclared Write-ins" : "0"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Aswar Rahman",
+      "transfers" : { }
+    }, {
+      "eliminated" : "David Rosenfeld",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Raymond Dehn",
+      "transfers" : { }
+    }, {
+      "eliminated" : "L.A. Nik",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Undeclared Write-ins",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Christopher Zimmerman",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Ronald Lischeid",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Ian Simpson",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Charlie Gers",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Captain Jack Sparrow",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Theron Preston Washington",
+      "transfers" : { }
+    }, {
+      "eliminated" : "David John Wilson",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Gregg A. Iverson",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Troy Benjegerdes",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Al Flowers",
+      "transfers" : { }
+    } ],
+    "threshold" : "3"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "Betsy Hodges" : "0",
+      "Jacob Frey" : "0",
+      "Nekima Levy-Pounds" : "0",
+      "Tom Hoch" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Nekima Levy-Pounds",
+      "transfers" : { }
+    } ],
+    "threshold" : "3"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "Betsy Hodges" : "0",
+      "Jacob Frey" : "0",
+      "Tom Hoch" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Tom Hoch",
+      "transfers" : {
+        "Jacob Frey" : "1"
+      }
+    } ],
+    "threshold" : "3"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "Betsy Hodges" : "0",
+      "Jacob Frey" : "1"
+    },
+    "tallyResults" : [ {
+      "elected" : "Jacob Frey",
+      "transfers" : { }
+    } ],
+    "threshold" : "3"
+  } ],
+  "summary" : {
+    "finalThreshold" : "3",
+    "numCandidates" : 19,
+    "numWinners" : 1,
+    "totalNumBallots" : "1",
+    "undervotes" : 0
+  }
+}

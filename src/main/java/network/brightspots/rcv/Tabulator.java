@@ -181,10 +181,10 @@ class Tabulator {
             !config.isFirstRoundDeterminesThresholdEnabled() || currentRound == 1;
       }
       if (shouldRecomputeThreshold) {
-        setWinningThreshold(currentRoundTally, config.getMinimumVoteThreshold());
+        calculateAndSetWinningThreshold(currentRoundTally, config.getMinimumVoteThreshold());
       } else {
         BigDecimal lastRoundThreshold = roundTallies.get(currentRound - 1).getWinningThreshold();
-        currentRoundTally.setWinningThreshold(lastRoundThreshold);
+        setWinningThreshold(currentRound, lastRoundThreshold);
       }
 
       // "invert" map and look for winners
@@ -394,7 +394,8 @@ class Tabulator {
   }
 
   // determine and store the threshold to win
-  private void setWinningThreshold(RoundTally currentRoundTally, BigDecimal minimumVoteThreshold) {
+  private void calculateAndSetWinningThreshold(
+        RoundTally currentRoundTally, BigDecimal minimumVoteThreshold) {
     BigDecimal currentRoundTotalVotes = currentRoundTally.activeBallotSum();
 
     BigDecimal winningThreshold;
@@ -441,7 +442,21 @@ class Tabulator {
       winningThreshold = minimumVoteThreshold;
     }
 
+    if (currentRoundTally != roundTallies.get(currentRoundTally.getRoundNumber())) {
+      throw new RuntimeException("RoundTally object is not the same as the one in the map.");
+    }
+    setWinningThreshold(currentRoundTally.getRoundNumber(), winningThreshold);
+  }
+
+  private void setWinningThreshold(int roundNumber, BigDecimal winningThreshold) {
+    RoundTally currentRoundTally = roundTallies.get(roundNumber);
     currentRoundTally.setWinningThreshold(winningThreshold);
+    // Do the same for each precinct
+    if (config.isTabulateByPrecinctEnabled()) {
+      for (var roundTalliesForPrecinct : precinctRoundTallies.values()) {
+        roundTalliesForPrecinct.get(roundNumber).setWinningThreshold(winningThreshold);
+      }
+    }
     Logger.info("Winning threshold set to %s.", winningThreshold);
   }
 
