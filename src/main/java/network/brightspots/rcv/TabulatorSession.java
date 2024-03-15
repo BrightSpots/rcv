@@ -301,7 +301,7 @@ class TabulatorSession {
 
         // Check for unrecognized candidates
         Map<String, Integer> unrecognizedCandidateCounts =
-            reader.gatherUnknownCandidates(castVoteRecords);
+            reader.gatherUnknownCandidates(castVoteRecords, false);
 
         if (!unrecognizedCandidateCounts.isEmpty()) {
           throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);

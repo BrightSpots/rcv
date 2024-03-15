@@ -1571,7 +1571,9 @@ public class GuiConfigController implements Initializable {
                     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
                     BaseCvrReader reader = provider.constructReader(config, source);
                     reader.readCastVoteRecords(castVoteRecords);
-                    unloadedNames.addAll(reader.gatherUnknownCandidates(castVoteRecords).keySet());
+                    Set<String> unknownCandidates = reader.gatherUnknownCandidates(
+                        castVoteRecords, true).keySet();
+                    unloadedNames.addAll(unknownCandidates);
                   } catch (ContestConfig.UnrecognizedProviderException e) {
                     Logger.severe(
                         "Unrecognized provider \"%s\" in source file \"%s\": %s",

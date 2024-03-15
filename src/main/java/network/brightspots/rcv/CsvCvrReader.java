@@ -45,6 +45,25 @@ class CsvCvrReader extends BaseCvrReader {
     return "generic CSV";
   }
 
+  @Override
+  public List<String> readCandidateListFromCvr(List<CastVoteRecord> castVoteRecords)
+      throws IOException {
+    try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
+      CSVParser parser =
+              CSVParser.parse(
+                      inputStream,
+                      Charset.defaultCharset(),
+                      CSVFormat.Builder.create().setHeader().build());
+      List<String> rawCandidateNames = parser.getHeaderNames();
+      // Split rawCandidateNames from firstVoteColumnIndex to the end
+      return new ArrayList<>(rawCandidateNames.subList(
+            firstVoteColumnIndex, rawCandidateNames.size()));
+    } catch (IOException exception) {
+      Logger.severe("Error parsing cast vote record:\n%s", exception);
+      throw exception;
+    }
+  }
+
   // parse CVR CSV file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
