@@ -257,6 +257,9 @@ class TabulatorTests {
         if (file.getName().equals(".DS_Store")) {
           continue;
         }
+        if (file.getName().endsWith(".lck")) {
+          continue;
+        }
         if (!file.isDirectory()) {
           try {
             // Every ephemeral file must be set to read-only on close, including audit logs

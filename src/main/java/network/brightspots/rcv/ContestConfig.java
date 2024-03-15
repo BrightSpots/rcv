@@ -678,9 +678,9 @@ class ContestConfig {
       Logger.severe("Invalid winnerElectionMode!");
     }
 
-    if (getMaxRankingsAllowed() == null
+    if (getMaxRankingsAllowedAsString() == null
         || (getNumDeclaredCandidates() >= 1
-            && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
+            && !isRankingAllowed(MIN_MAX_RANKINGS_ALLOWED))) {
       validationErrors.add(ValidationError.RULES_MAX_RANKINGS_ALLOWED_INVALID);
       Logger.severe(
           "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
@@ -988,11 +988,47 @@ class ContestConfig {
     return rawConfig.rules.maxRankingsAllowed;
   }
 
-  Integer getMaxRankingsAllowed() {
-    return stringToIntWithOption(
-        getMaxRankingsAllowedRaw(),
-        MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION,
-        getNumDeclaredCandidates());
+  // Because the max rank can be set to "max", there's no single value that makes sense
+  // to all callers of this function.
+  // Returning MAX_VALUE could cause integer overflows if
+  // the caller tries to do arithmetic with the result (e.g. convert to a max column),
+  // or if the caller is iterating for all values up until the max rank.
+  // Returning NumDeclaredCandidates is not valid in cases where this is used before
+  // candidates are declared.
+  // Instead of returning the max rank, only allow checking via this function,
+  // or returning the value as a string for audit logging.
+  boolean isRankingAllowed(int rank) {
+    if (rank <= 0) {
+      return false;
+    }
+
+    if (isMaxRankingsSetToMaximum()) {
+      return true;
+    }
+
+    return rank <= Integer.parseInt(getMaxRankingsAllowedRaw());
+  }
+
+  // There are times when it is necessary to grab the max ranking, for example,
+  // when iterating up until the max ranking, or when reading inputs where a
+  // "blank" indicates an undeclared write-in.
+  // Force the caller of this function to check isMaxRankingsSetToMaximum first,
+  // so we know they've handled that special case.
+  Integer getMaxRankingsAllowedWhenNotSetToMaximum() {
+    if (isMaxRankingsSetToMaximum()) {
+      throw new RuntimeException(
+              "Do not call this function without first checking isMaxRankingsSetToMaximum!");
+    }
+
+    return Integer.parseInt(getMaxRankingsAllowedRaw());
+  }
+
+  boolean isMaxRankingsSetToMaximum() {
+    return getMaxRankingsAllowedRaw().equals(MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION);
+  }
+
+  String getMaxRankingsAllowedAsString() {
+    return getMaxRankingsAllowedRaw();
   }
 
   boolean isBatchEliminationEnabled() {

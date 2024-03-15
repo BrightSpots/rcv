@@ -40,13 +40,21 @@ abstract class BaseCvrReader {
       throws CastVoteRecord.CvrParseException, IOException;
 
   // Individual contests may have a different value than what the config allows.
-  public Integer getMaxRankingsAllowed(String contestId) {
-    return config.getMaxRankingsAllowed();
+  public boolean isRankingAllowed(int rank, String contestId) {
+    return config.isRankingAllowed(rank);
   }
 
   // Any reader-specific validations can override this function.
   public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
-      throws CastVoteRecord.CvrParseException {}
+      throws CastVoteRecord.CvrParseException {
+    for (CastVoteRecord cvr : castVoteRecords) {
+      for (Pair<Integer, CandidatesAtRanking> ranking : cvr.candidateRankings) {
+        if (!this.config.isRankingAllowed(ranking.getKey())) {
+          throw new CastVoteRecord.CvrParseException();
+        }
+      }
+    }
+  }
 
   // Gather candidate names from the CVR that are not in the config.
   Map<String, Integer> gatherUnknownCandidates(List<CastVoteRecord> castVoteRecords) {

@@ -171,12 +171,13 @@ class DominionCvrReader extends BaseCvrReader {
   @Override
   public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {
+    super.runAdditionalValidations(castVoteRecords);
     validateNamesAreInContest(castVoteRecords);
   }
 
   @Override
-  public Integer getMaxRankingsAllowed(String contestId) {
-    return contests.get(contestId).getMaxRanks();
+  public boolean isRankingAllowed(int rank, String contestId) {
+    return rank > 0 && rank <= contests.get(contestId).getMaxRanks();
   }
 
   private void validateNamesAreInContest(List<CastVoteRecord> castVoteRecords)
