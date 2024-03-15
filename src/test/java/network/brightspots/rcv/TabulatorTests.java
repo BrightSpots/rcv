@@ -219,6 +219,14 @@ class TabulatorTests {
         compareFiles(config, stem, timestampString, null);
       }
 
+      if (config.isTabulateByPrecinctEnabled()) {
+        for (String precinct : session.loadPrecinctNamesFromCvrs(config)) {
+          String outputType = ResultsWriter.sanitizeStringForOutput(precinct + "_precinct_summary");
+          compareFiles(config, stem, outputType, ".json", timestampString, null, true);
+          compareFiles(config, stem, outputType, ".csv", timestampString, null, true);
+        }
+      }
+
       cleanOutputFolder(session);
     }
   }
@@ -231,7 +239,7 @@ class TabulatorTests {
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null);
+    compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null, false);
 
     cleanOutputFolder(session);
   }
@@ -283,10 +291,10 @@ class TabulatorTests {
 
   private static void compareFiles(
       ContestConfig config, String stem, String timestampString, String sequentialId) {
-    compareFiles(config, stem, "summary", ".json", timestampString, sequentialId);
-    compareFiles(config, stem, "summary", ".csv", timestampString, sequentialId);
+    compareFiles(config, stem, "summary", ".json", timestampString, sequentialId, false);
+    compareFiles(config, stem, "summary", ".csv", timestampString, sequentialId, false);
     if (config.isGenerateCdfJsonEnabled()) {
-      compareFiles(config, stem, "cvr_cdf", ".json", timestampString, sequentialId);
+      compareFiles(config, stem, "cvr_cdf", ".json", timestampString, sequentialId, false);
     }
   }
 
@@ -296,7 +304,8 @@ class TabulatorTests {
       String outputType,
       String extension,
       String timestampString,
-      String sequentialId) {
+      String sequentialId,
+      boolean onlyCheckIfExpectedFileExists) {
     String actualOutputPath =
         ResultsWriter.getOutputFilePath(
                 config.getOutputDirectory(), outputType, timestampString, sequentialId)
@@ -310,7 +319,9 @@ class TabulatorTests {
                 + extension);
 
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
-    if (fileCompare(expectedPath, actualOutputPath)) {
+    if (onlyCheckIfExpectedFileExists && !new File(expectedPath).exists()) {
+      Logger.info("Skipping comparison: expected file does not exist.");
+    } else if (fileCompare(expectedPath, actualOutputPath)) {
       Logger.info("Files are equal.");
     } else {
       Logger.info("Files are different.");

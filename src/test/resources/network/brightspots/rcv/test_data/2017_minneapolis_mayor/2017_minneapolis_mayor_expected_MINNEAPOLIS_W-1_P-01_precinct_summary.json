@@ -1,0 +1,252 @@
+{
+  "config" : {
+    "contest" : "2017 Minneapolis mayoral race",
+    "date" : "2017-11-07",
+    "generatedBy" : "RCTab 1.3.999",
+    "jurisdiction" : "Minneapolis, MN",
+    "office" : "Mayor",
+    "precinct" : "MINNEAPOLIS W-1 P-01"
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "Al Flowers" : "5",
+      "Aswar Rahman" : "9",
+      "Betsy Hodges" : "64",
+      "Captain Jack Sparrow" : "4",
+      "Charlie Gers" : "5",
+      "Christopher Zimmerman" : "0",
+      "David John Wilson" : "1",
+      "David Rosenfeld" : "3",
+      "Gregg A. Iverson" : "3",
+      "Ian Simpson" : "3",
+      "Jacob Frey" : "95",
+      "L.A. Nik" : "7",
+      "Nekima Levy-Pounds" : "69",
+      "Raymond Dehn" : "56",
+      "Ronald Lischeid" : "3",
+      "Theron Preston Washington" : "0",
+      "Tom Hoch" : "77",
+      "Troy Benjegerdes" : "3",
+      "Undeclared Write-ins" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Undeclared Write-ins",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ],
+    "threshold" : "52243"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "Al Flowers" : "5",
+      "Aswar Rahman" : "9",
+      "Betsy Hodges" : "64",
+      "Captain Jack Sparrow" : "4",
+      "Charlie Gers" : "5",
+      "Christopher Zimmerman" : "0",
+      "David John Wilson" : "1",
+      "David Rosenfeld" : "3",
+      "Gregg A. Iverson" : "3",
+      "Ian Simpson" : "3",
+      "Jacob Frey" : "95",
+      "L.A. Nik" : "7",
+      "Nekima Levy-Pounds" : "69",
+      "Raymond Dehn" : "56",
+      "Ronald Lischeid" : "3",
+      "Theron Preston Washington" : "0",
+      "Tom Hoch" : "77",
+      "Troy Benjegerdes" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Aswar Rahman",
+      "transfers" : {
+        "Betsy Hodges" : "2",
+        "Jacob Frey" : "3",
+        "Nekima Levy-Pounds" : "1",
+        "Tom Hoch" : "2",
+        "exhausted" : "1"
+      }
+    }, {
+      "eliminated" : "David Rosenfeld",
+      "transfers" : {
+        "Betsy Hodges" : "1",
+        "Jacob Frey" : "1",
+        "exhausted" : "1"
+      }
+    }, {
+      "eliminated" : "L.A. Nik",
+      "transfers" : {
+        "exhausted" : "7"
+      }
+    }, {
+      "eliminated" : "Christopher Zimmerman",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Ronald Lischeid",
+      "transfers" : {
+        "Tom Hoch" : "2",
+        "exhausted" : "1"
+      }
+    }, {
+      "eliminated" : "Ian Simpson",
+      "transfers" : {
+        "Raymond Dehn" : "1",
+        "Tom Hoch" : "1",
+        "exhausted" : "1"
+      }
+    }, {
+      "eliminated" : "Charlie Gers",
+      "transfers" : {
+        "Nekima Levy-Pounds" : "1",
+        "Tom Hoch" : "1",
+        "exhausted" : "3"
+      }
+    }, {
+      "eliminated" : "Captain Jack Sparrow",
+      "transfers" : {
+        "Jacob Frey" : "2",
+        "exhausted" : "2"
+      }
+    }, {
+      "eliminated" : "Theron Preston Washington",
+      "transfers" : { }
+    }, {
+      "eliminated" : "David John Wilson",
+      "transfers" : {
+        "Nekima Levy-Pounds" : "1"
+      }
+    }, {
+      "eliminated" : "Gregg A. Iverson",
+      "transfers" : {
+        "Jacob Frey" : "2",
+        "exhausted" : "1"
+      }
+    }, {
+      "eliminated" : "Troy Benjegerdes",
+      "transfers" : {
+        "Jacob Frey" : "2",
+        "Raymond Dehn" : "1"
+      }
+    }, {
+      "eliminated" : "Al Flowers",
+      "transfers" : {
+        "Nekima Levy-Pounds" : "2",
+        "Raymond Dehn" : "1",
+        "Tom Hoch" : "1",
+        "exhausted" : "1"
+      }
+    } ],
+    "threshold" : "52200"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "Betsy Hodges" : "67",
+      "Jacob Frey" : "105",
+      "Nekima Levy-Pounds" : "74",
+      "Raymond Dehn" : "59",
+      "Tom Hoch" : "84"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Nekima Levy-Pounds",
+      "transfers" : {
+        "Betsy Hodges" : "17",
+        "Jacob Frey" : "24",
+        "Raymond Dehn" : "18",
+        "Tom Hoch" : "5",
+        "exhausted" : "10"
+      }
+    } ],
+    "threshold" : "50933"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "Betsy Hodges" : "84",
+      "Jacob Frey" : "129",
+      "Raymond Dehn" : "77",
+      "Tom Hoch" : "89"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Tom Hoch",
+      "transfers" : {
+        "Betsy Hodges" : "11",
+        "Jacob Frey" : "28",
+        "Raymond Dehn" : "19",
+        "exhausted" : "31"
+      }
+    } ],
+    "threshold" : "49874"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 5,
+    "tally" : {
+      "Betsy Hodges" : "95",
+      "Jacob Frey" : "157",
+      "Raymond Dehn" : "96"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Betsy Hodges",
+      "transfers" : {
+        "Jacob Frey" : "36",
+        "Raymond Dehn" : "15",
+        "exhausted" : "44"
+      }
+    } ],
+    "threshold" : "46790"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 6,
+    "tally" : {
+      "Jacob Frey" : "193",
+      "Raymond Dehn" : "111"
+    },
+    "tallyResults" : [ {
+      "elected" : "Jacob Frey",
+      "transfers" : { }
+    } ],
+    "threshold" : "40838"
+  } ],
+  "summary" : {
+    "finalThreshold" : "40838",
+    "numCandidates" : 19,
+    "numWinners" : 1,
+    "totalNumBallots" : "408",
+    "undervotes" : 0
+  }
+}
