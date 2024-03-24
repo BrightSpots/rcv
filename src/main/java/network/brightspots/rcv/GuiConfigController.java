@@ -29,6 +29,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -42,15 +44,19 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -80,6 +86,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
@@ -407,6 +415,30 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  public String getSelectedFilePath() {
+    return selectedFile != null ? selectedFile.getAbsolutePath() : "No File Saved Yet";
+  }
+
+  /**
+   * Action when user hits a save button from the Tabulate GUI
+   * @param useTemporaryFile whether they hit the Temporary save button
+   * @return The saved file's absolute path, or null if canceled
+   */
+  public String saveFile(boolean useTemporaryFile) {
+    File outputFile = null;
+    if (useTemporaryFile) {
+      outputFile = new File(selectedFile.getAbsolutePath() + ".temp");
+      saveFile(outputFile);
+    } else {
+      outputFile = getSaveFile();
+      if (outputFile != null) {
+        saveFile(outputFile);
+      }
+    }
+
+    return outputFile != null ? outputFile.getAbsolutePath() : null;
+  }
+
   private File getSaveFile() {
     FileChooser fc = new FileChooser();
     if (selectedFile == null) {
@@ -462,25 +494,19 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Tabulate whatever is currently entered into the GUI. Requires user to save if there are unsaved
-   * changes, and creates and launches TabulatorService from the saved config path.
+   * Pops up the Tabulation Confirmation Window
    */
   public void menuItemTabulateClicked() {
-    Pair<String, Boolean> filePathAndTempStatus = commitConfigToFileAndGetFilePath();
-    if (filePathAndTempStatus != null) {
-      if (GuiContext.getInstance().getConfig() != null) {
-        String operatorName = askUserForName();
-        if (operatorName != null) {
-          setGuiIsBusy(true);
-          TabulatorService service =
-              new TabulatorService(
-                  filePathAndTempStatus.getKey(), operatorName, filePathAndTempStatus.getValue());
-          setUpAndStartService(service);
-        }
-      } else {
-        Logger.warning("Please load a contest config file before attempting to tabulate!");
-      }
-    }
+    openTabulateWindow();
+  }
+
+  /**
+   * Tabulate whatever is currently entered into the GUI. Assumes GuiTabulateController checked all prerequisites.
+   */
+  public void startTabulation(String configPath, String operatorName, boolean deleteConfigOnCompletion) {
+    setGuiIsBusy(true);
+    TabulatorService service = new TabulatorService(configPath, operatorName, deleteConfigOnCompletion);
+    setUpAndStartService(service);
   }
 
   /**
@@ -506,6 +532,28 @@ public class GuiConfigController implements Initializable {
     service.setOnCancelled(event -> setGuiIsBusy(false));
     service.setOnFailed(event -> setGuiIsBusy(false));
     service.start();
+  }
+
+  private void openTabulateWindow() {
+    RawContestConfig config = createRawContestConfig();
+    final Stage window = new Stage();
+    window.initModality(Modality.APPLICATION_MODAL);
+    window.setTitle("Tabulate");
+
+    String resourcePath = "/network/brightspots/rcv/TabulationPopup.fxml";
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
+      Parent root = loader.load();
+      GuiTabulateController controller = loader.getController();
+      controller.initialize(this, config.candidates.size(), config.cvrFileSources.size());
+      window.setScene(new Scene(root));
+      window.showAndWait();
+    } catch (IOException exception) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      exception.printStackTrace(pw);
+      Logger.severe("Failed to open: %s:\n%s. ", resourcePath, sw);
+    }
   }
 
   private void exitGui() {
@@ -930,7 +978,7 @@ public class GuiConfigController implements Initializable {
    * If they differ, also tells you if the on-disk version is "TEST" --
    * in which case, you may be okay with a difference for ease of development.
    */
-  private ConfigComparisonResult compareConfigs() {
+  public ConfigComparisonResult compareConfigs() {
     ConfigComparisonResult comparisonResult = ConfigComparisonResult.DIFFERENT;
     try {
       String currentConfigString =
@@ -1531,7 +1579,7 @@ public class GuiConfigController implements Initializable {
     return config;
   }
 
-  private enum ConfigComparisonResult {
+  public enum ConfigComparisonResult {
     SAME,
     DIFFERENT,
     DIFFERENT_BUT_VERSION_IS_TEST,
