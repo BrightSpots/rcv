@@ -415,16 +415,16 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  public File getSelectedFile() {
-    return selectedFile;
+  public String getSelectedFilePath() {
+    return selectedFile != null ? selectedFile.getAbsolutePath() : "No File Saved Yet";
   }
 
   /**
    * Action when user hits a save button from the Tabulate GUI
    * @param useTemporaryFile whether they hit the Temporary save button
-   * @return The saved file, or null if canceled
+   * @return The saved file's absolute path, or null if canceled
    */
-  public File saveFile(boolean useTemporaryFile) {
+  public String saveFile(boolean useTemporaryFile) {
     File outputFile = null;
     if (useTemporaryFile) {
       outputFile = new File(selectedFile.getAbsolutePath() + ".temp");
@@ -435,7 +435,8 @@ public class GuiConfigController implements Initializable {
         saveFile(outputFile);
       }
     }
-    return outputFile;
+
+    return outputFile != null ? outputFile.getAbsolutePath() : null;
   }
 
   private File getSaveFile() {
@@ -534,28 +535,24 @@ public class GuiConfigController implements Initializable {
   }
 
   private void openTabulateWindow() {
-    ContestConfig config = GuiContext.getInstance().getConfig();
-    if (config == null) {
-      Logger.warning("Please load a contest config file before attempting to tabulate!");
-    } else {
-      final Stage window = new Stage();
-      window.initModality(Modality.APPLICATION_MODAL);
-      window.setTitle("Tabulate");
+    RawContestConfig config = createRawContestConfig();
+    final Stage window = new Stage();
+    window.initModality(Modality.APPLICATION_MODAL);
+    window.setTitle("Tabulate");
 
-      String resourcePath = "/network/brightspots/rcv/TabulationPopup.fxml";
-      try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
-        Parent root = loader.load();
-        GuiTabulateController controller = loader.getController();
-        controller.initialize(this, config.getNumCandidates(), -1);
-        window.setScene(new Scene(root));
-        window.showAndWait();
-      } catch (IOException exception) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        exception.printStackTrace(pw);
-        Logger.severe("Failed to open: %s:\n%s. ", resourcePath, sw);
-      }
+    String resourcePath = "/network/brightspots/rcv/TabulationPopup.fxml";
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
+      Parent root = loader.load();
+      GuiTabulateController controller = loader.getController();
+      controller.initialize(this, config.candidates.size(), config.cvrFileSources.size());
+      window.setScene(new Scene(root));
+      window.showAndWait();
+    } catch (IOException exception) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      exception.printStackTrace(pw);
+      Logger.severe("Failed to open: %s:\n%s. ", resourcePath, sw);
     }
   }
 

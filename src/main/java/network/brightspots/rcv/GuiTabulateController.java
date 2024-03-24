@@ -17,6 +17,7 @@
 package network.brightspots.rcv;
 
 import java.io.File;
+import java.io.IOException;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -34,7 +35,7 @@ public class GuiTabulateController {
   /**
    * Once the file is saved, cache it here. It cannot be changed while this modal is open.
    */
-  private File savedConfigFile = null;
+  private String savedConfigFilePath = null;
 
   /**
    * Cache whether the user is using a temporary config.
@@ -101,8 +102,17 @@ public class GuiTabulateController {
    * @param actionEvent ignored
    */
   public void buttonTabulateClicked(ActionEvent actionEvent) {
-    guiConfigController.startTabulation(
-        savedConfigFile.getAbsolutePath(), userNameField.getText(), isSavedConfigFileTemporary);
+    if (tabulateButton.getText().equals("Tabulate")) {
+      guiConfigController.startTabulation(
+              savedConfigFilePath, userNameField.getText(), isSavedConfigFileTemporary);
+      tabulateButton.setText("Open Results Folder");
+    } else {
+      if (!tabulateButton.getText().equals("Open Results Folder")) {
+        throw new RuntimeException("Unexpected button text: " + tabulateButton.getText());
+      }
+
+      openOutputDirectoryInFileExplorer();
+    }
   }
 
   /**
@@ -111,10 +121,11 @@ public class GuiTabulateController {
    * @param actionEvent ignored
    */
   public void buttonSaveClicked(ActionEvent actionEvent) {
-    savedConfigFile = guiConfigController.saveFile(false);
-    if (savedConfigFile != null) {
+    savedConfigFilePath = guiConfigController.saveFile(false);
+    if (savedConfigFilePath != null) {
       saveButton.setText("Save");
       tempSaveButton.setText("Temp File Saved!");
+      filepath.setText(savedConfigFilePath);
     }
     updateGuiNotifyConfigSaved();
     setTabulationButtonStatus();
@@ -126,7 +137,7 @@ public class GuiTabulateController {
    * @param actionEvent ignored
    */
   public void buttonTempSaveClicked(ActionEvent actionEvent) {
-    savedConfigFile = guiConfigController.saveFile(true);
+    savedConfigFilePath = guiConfigController.saveFile(true);
     isSavedConfigFileTemporary = true;
     tempSaveButton.setText("Saved!");
     updateGuiNotifyConfigSaved();
@@ -134,12 +145,12 @@ public class GuiTabulateController {
   }
 
   private void setTabulationButtonStatus() {
-    if (savedConfigFile != null) {
+    if (savedConfigFilePath != null) {
       // Don't override the progress text unless we're past the Save stage
       updateGuiWithNameEnteredStatus();
     }
 
-    if (savedConfigFile != null && !userNameField.getText().isEmpty()) {
+    if (savedConfigFilePath != null && !userNameField.getText().isEmpty()) {
       tabulateButton.setDisable(false);
     } else {
       tabulateButton.setDisable(true);
@@ -147,7 +158,7 @@ public class GuiTabulateController {
   }
 
   private void updateGuiNotifyConfigSaved() {
-    if (savedConfigFile == null) {
+    if (savedConfigFilePath == null) {
       throw new RuntimeException("There must be a saved file before calling this function.");
     }
 
@@ -168,7 +179,7 @@ public class GuiTabulateController {
   }
 
   private void initializeSaveButtonStatuses() {
-    filepath.setText(guiConfigController.getSelectedFile().getAbsolutePath());
+    filepath.setText(guiConfigController.getSelectedFilePath());
     filepath.setScrollLeft(1);
     filepath.setStyle(unfilledFieldStyle);
     saveButton.setStyle(unfilledFieldStyle);
@@ -184,19 +195,33 @@ public class GuiTabulateController {
         break;
       case SAME:
         saveButton.setText("Saved!");
-        savedConfigFile = guiConfigController.getSelectedFile();
+        savedConfigFilePath = guiConfigController.getSelectedFilePath();
         tempSaveButton.setVisible(false);
         updateGuiNotifyConfigSaved();
     }
   }
 
   private void updateProgressText() {
-    if (savedConfigFile == null) {
+    if (savedConfigFilePath == null) {
       progressText.setText("Save the config file to continue.");
     } else if (userNameField.getText().isEmpty()) {
       progressText.setText("Please enter your name to continue.");
     } else {
       progressText.setText("");
+    }
+  }
+
+  private void openOutputDirectoryInFileExplorer() {
+    String outputDir = ContestConfig.loadContestConfig(savedConfigFilePath).getOutputDirectory();
+    if (!outputDir.endsWith("/")) {
+      outputDir += "/";
+    }
+    String[] cmd = new String[]{"open", "-R", outputDir};
+
+    try {
+      Runtime.getRuntime().exec(cmd, null);
+    } catch (IOException e) {
+      Logger.warning("Failed to open file explorer: " + e.getMessage());
     }
   }
 }
