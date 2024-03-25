@@ -1789,6 +1789,9 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Adapted from https://stackoverflow.com/a/41282740/1057105
+   */
   private static class NumberTableCellFactory<S, T>
         implements Callback<TableColumn<S, T>, TableCell<S, T>> {
     private final int startNumber;
