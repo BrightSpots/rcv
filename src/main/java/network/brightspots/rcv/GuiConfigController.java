@@ -994,17 +994,21 @@ public class GuiConfigController implements Initializable {
         RawContestConfig configFromFile =
             JsonParser.readFromFileWithoutLogging(
                 selectedFile.getAbsolutePath(), RawContestConfig.class);
-        String savedConfigString =
-            new ObjectMapper()
-                .writer()
-                .withDefaultPrettyPrinter()
-                .writeValueAsString(configFromFile);
-        if (currentConfigString.equals(savedConfigString)) {
-          comparisonResult = ConfigComparisonResult.SAME;
-        } else if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
-          comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
+        if (configFromFile == null) {
+          Logger.severe("Config file could not be read from disk -- did you move it?");
+        } else {
+          String savedConfigString =
+                  new ObjectMapper()
+                          .writer()
+                          .withDefaultPrettyPrinter()
+                          .writeValueAsString(configFromFile);
+          if (currentConfigString.equals(savedConfigString)) {
+            comparisonResult = ConfigComparisonResult.SAME;
+          } else if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
+            comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
+          }
+          // Otherwise, comparisonResult should remain ConfigComparisonResult.DIFFERENT
         }
-        // Otherwise, comparisonResult should remain ConfigComparisonResult.DIFFERENT
       }
     } catch (JsonProcessingException exception) {
       Logger.warning(

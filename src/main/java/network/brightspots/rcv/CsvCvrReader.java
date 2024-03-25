@@ -88,6 +88,7 @@ class CsvCvrReader extends BaseCvrReader {
           }
           int rankAsInt;
           try {
+            rankAsString = rankAsString.trim();
             rankAsInt = Integer.parseInt(rankAsString);
           } catch (NumberFormatException e) {
             Logger.severe(
