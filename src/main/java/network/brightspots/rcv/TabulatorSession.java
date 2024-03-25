@@ -94,7 +94,8 @@ class TabulatorSession {
   }
 
   // special mode to just export the CVR as CDF JSON instead of tabulating
-  void convertToCdf() {
+  // returns whether it succeeded
+  boolean convertToCdf() {
     Logger.info("Starting CDF conversion session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
@@ -134,10 +135,15 @@ class TabulatorSession {
 
     Logger.info("CDF conversion session completed.");
     Logger.removeTabulationFileLogging();
+
+    return conversionSuccess;
   }
 
   // Returns a List of exception class names that were thrown while tabulating.
   // Operator name is required for the audit logs.
+  // Note: An exception MUST be returned any time tabulation does not run.
+  // In general, that means any Logger.severe in this function should be accompanied
+  // by an exceptionsEncountered.add(...) call.
   List<String> tabulate(String operatorName) {
     Logger.info("Starting tabulation session...");
     List<String> exceptionsEncountered = new LinkedList<>();
@@ -182,7 +188,9 @@ class TabulatorSession {
           // Read cast vote records and precinct IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
           if (castVoteRecords == null) {
-            Logger.severe("Aborting tabulation due to cast vote record errors!");
+            String errorMessage = "Aborting tabulation due to cast vote record errors!";
+            exceptionsEncountered.add(errorMessage);
+            Logger.severe(errorMessage);
             break;
           }
           Set<String> newWinnerSet;
@@ -218,7 +226,9 @@ class TabulatorSession {
         // Read cast vote records and precinct IDs from CVR files
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
         if (castVoteRecords == null) {
-          Logger.severe("Aborting tabulation due to cast vote record errors!");
+          String errorMessage = "Aborting tabulation due to cast vote record errors!";
+          exceptionsEncountered.add(errorMessage);
+          Logger.severe(errorMessage);
         } else {
           try {
             runTabulationForConfig(config, castVoteRecords);

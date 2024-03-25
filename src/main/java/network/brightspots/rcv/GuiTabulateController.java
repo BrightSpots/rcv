@@ -19,7 +19,10 @@ package network.brightspots.rcv;
 import java.io.File;
 import java.io.IOException;
 
+import javafx.concurrent.Service;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -28,10 +31,32 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /** View controller for tabulator layout. */
 @SuppressWarnings("WeakerAccess")
 public class GuiTabulateController {
+  /**
+   * The button text to display before tabulation begins
+   */
+  private static final String buttonTabulateText = "Tabulate";
+
+  /**
+   * The button text to display while tabulation is in progress
+   */
+  private static final String buttonTabulateInProgressText = "Tabulating...";
+
+  /**
+   * The button text to display after tabulation successfully completes
+   */
+  private static final String buttonOpenResultsText = "Open Results Folder";
+
+  /**
+   * The button text to display after tabulation fails
+   */
+  private static final String buttonViewErrorLogsText = "View Error Logs";
+
   /**
    * Once the file is saved, cache it here. It cannot be changed while this modal is open.
    */
@@ -41,6 +66,13 @@ public class GuiTabulateController {
    * Cache whether the user is using a temporary config.
    */
   private boolean isSavedConfigFileTemporary = false;
+
+  /**
+   * The output folder of the tabulated config.
+   * It's important to cache this, since Temp Configs will be deleted after tabulation
+   * and we won't know this value without re-reading the GUI state.
+   */
+  private String configOutputPath;
 
   /**
    * This modal builds upon the GuiConfigController, and therefore only interacts with it.
@@ -102,17 +134,59 @@ public class GuiTabulateController {
    * @param actionEvent ignored
    */
   public void buttonTabulateClicked(ActionEvent actionEvent) {
-    if (tabulateButton.getText().equals("Tabulate")) {
-      guiConfigController.startTabulation(
-              savedConfigFilePath, userNameField.getText(), isSavedConfigFileTemporary);
-      tabulateButton.setText("Open Results Folder");
-    } else {
-      if (!tabulateButton.getText().equals("Open Results Folder")) {
-        throw new RuntimeException("Unexpected button text: " + tabulateButton.getText());
-      }
+    switch (tabulateButton.getText()) {
+      case buttonTabulateText:
+        ContestConfig config = ContestConfig.loadContestConfig(savedConfigFilePath);
+        configOutputPath = config.getOutputDirectory();
+        if (!configOutputPath.endsWith("/")) {
+          configOutputPath += "/";
+        }
 
-      openOutputDirectoryInFileExplorer();
+        Service<Boolean> service = guiConfigController.startTabulation(
+                savedConfigFilePath, userNameField.getText(), isSavedConfigFileTemporary);
+        // Dispatch a function that watches the service and updates the progress bar
+        watchServiceProgress(service);
+        break;
+      case buttonOpenResultsText:
+        openOutputDirectoryInFileExplorer();
+        break;
+      case buttonViewErrorLogsText:
+        // Close the window
+        Window window = tabulateButton.getScene().getWindow();
+        ((Stage) window).close();
+        break;
+      default:
+        throw new IllegalStateException("Unexpected value: " + tabulateButton.getText());
     }
+  }
+
+  private void watchServiceProgress(Service<Boolean> service) {
+    progressBar.progressProperty().bind(service.progressProperty());
+    tabulateButton.setText(buttonTabulateInProgressText);
+    tabulateButton.setDisable(true);
+    userNameField.setDisable(true);
+
+    // This is a litle hacky -- we want two listeners on setOnSucceded,
+    // so we enforce that this callback is added second.
+    EventHandler<WorkerStateEvent> originalCallback = service.getOnSucceeded();
+    if (originalCallback == null) {
+      throw new RuntimeException("Programming Error: Java does not allow multiple listeners, "
+              + "so this listener must be called after the other listener is added.");
+    }
+
+    service.setOnSucceeded(workerStateEvent -> {
+      originalCallback.handle(workerStateEvent);
+      progressBar.progressProperty().unbind();
+      tabulateButton.setDisable(false);
+
+      boolean succeeded = service.getValue();
+      if (succeeded) {
+        progressBar.setProgress(1);
+        tabulateButton.setText(buttonOpenResultsText);
+      } else {
+        tabulateButton.setText(buttonViewErrorLogsText);
+      }
+    });
   }
 
   /**
@@ -180,7 +254,7 @@ public class GuiTabulateController {
 
   private void initializeSaveButtonStatuses() {
     filepath.setText(guiConfigController.getSelectedFilePath());
-    filepath.setScrollLeft(1);
+    filepath.positionCaret(filepath.getLength() - 1); // scroll to end
     filepath.setStyle(unfilledFieldStyle);
     saveButton.setStyle(unfilledFieldStyle);
     tempSaveButton.setStyle(unfilledFieldStyle);
@@ -212,11 +286,7 @@ public class GuiTabulateController {
   }
 
   private void openOutputDirectoryInFileExplorer() {
-    String outputDir = ContestConfig.loadContestConfig(savedConfigFilePath).getOutputDirectory();
-    if (!outputDir.endsWith("/")) {
-      outputDir += "/";
-    }
-    String[] cmd = new String[]{"open", "-R", outputDir};
+    String[] cmd = new String[]{"open", "-R", configOutputPath};
 
     try {
       Runtime.getRuntime().exec(cmd, null);

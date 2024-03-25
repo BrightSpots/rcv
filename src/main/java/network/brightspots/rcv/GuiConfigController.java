@@ -44,7 +44,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -503,10 +502,12 @@ public class GuiConfigController implements Initializable {
   /**
    * Tabulate whatever is currently entered into the GUI. Assumes GuiTabulateController checked all prerequisites.
    */
-  public void startTabulation(String configPath, String operatorName, boolean deleteConfigOnCompletion) {
+  public Service<Boolean> startTabulation(
+        String configPath, String operatorName, boolean deleteConfigOnCompletion) {
     setGuiIsBusy(true);
     TabulatorService service = new TabulatorService(configPath, operatorName, deleteConfigOnCompletion);
     setUpAndStartService(service);
+    return service;
   }
 
   /**
@@ -527,7 +528,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private void setUpAndStartService(Service<Void> service) {
+  private void setUpAndStartService(Service<Boolean> service) {
     service.setOnSucceeded(event -> setGuiIsBusy(false));
     service.setOnCancelled(event -> setGuiIsBusy(false));
     service.setOnFailed(event -> setGuiIsBusy(false));
@@ -540,7 +541,7 @@ public class GuiConfigController implements Initializable {
     window.initModality(Modality.APPLICATION_MODAL);
     window.setTitle("Tabulate");
 
-    String resourcePath = "/network/brightspots/rcv/TabulationPopup.fxml";
+    String resourcePath = "/network/brightspots/rcv/GuiTabulationPopup.fxml";
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
       Parent root = loader.load();
@@ -1589,7 +1590,7 @@ public class GuiConfigController implements Initializable {
     DIFFERENT_BUT_VERSION_IS_TEST,
   }
 
-  private static class AutoLoadCandidatesService extends Service<Void> {
+  private static class AutoLoadCandidatesService extends Service<Boolean> {
 
     private final ContestConfig config;
     private final List<CvrSource> sources;
@@ -1603,12 +1604,13 @@ public class GuiConfigController implements Initializable {
     }
 
     @Override
-    protected Task<Void> createTask() {
-      Task<Void> task =
+    protected Task<Boolean> createTask() {
+      Task<Boolean> task =
           new Task<>() {
             @Override
-            protected Void call() {
+            protected Boolean call() {
               Logger.info("Auto-loading candidates from CVR files...");
+              boolean hasAnyFailures = false;
               boolean cvrsSpecified = true;
               if (sources.isEmpty()) {
                 Logger.warning("No CVR files specified!");
@@ -1627,10 +1629,12 @@ public class GuiConfigController implements Initializable {
                         castVoteRecords, true).keySet();
                     unloadedNames.addAll(unknownCandidates);
                   } catch (ContestConfig.UnrecognizedProviderException e) {
+                    hasAnyFailures = true;
                     Logger.severe(
                         "Unrecognized provider \"%s\" in source file \"%s\": %s",
                         source.getProvider(), source.getFilePath(), e.getMessage());
                   } catch (CastVoteRecord.CvrParseException | IOException e) {
+                    hasAnyFailures = true;
                     Logger.severe(
                         "Failed to read source file \"%s\": ",
                         source.getFilePath(), e.getMessage());
@@ -1647,13 +1651,14 @@ public class GuiConfigController implements Initializable {
                     tableViewCandidates.getItems().add(candidate);
                     successCount++;
                   } else {
+                    hasAnyFailures = true;
                     Logger.severe("Failed to load candidate \"%s\"!", name);
                   }
                 }
 
                 Logger.info("Auto-loaded %d candidates.", successCount);
               }
-              return null;
+              return hasAnyFailures;
             }
           };
       task.setOnFailed(
@@ -1664,7 +1669,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private static class ValidatorService extends Service<Void> {
+  private static class ValidatorService extends Service<Boolean> {
 
     private final ContestConfig contestConfig;
 
@@ -1673,13 +1678,13 @@ public class GuiConfigController implements Initializable {
     }
 
     @Override
-    protected Task<Void> createTask() {
-      Task<Void> task =
+    protected Task<Boolean> createTask() {
+      Task<Boolean> task =
           new Task<>() {
             @Override
-            protected Void call() {
-              contestConfig.validate();
-              return null;
+            protected Boolean call() {
+              Set<ValidationError> errors = contestConfig.validate();
+              return errors.isEmpty();
             }
           };
       task.setOnFailed(
@@ -1691,7 +1696,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private abstract static class ConfigReaderService extends Service<Void> {
+  private abstract static class ConfigReaderService extends Service<Boolean> {
     private final boolean deleteConfigOnCompletion;
     protected String configPath;
 
@@ -1709,7 +1714,7 @@ public class GuiConfigController implements Initializable {
       }
     }
 
-    protected void setUpTaskCompletionTriggers(Task<Void> task, String failureMessage) {
+    protected void setUpTaskCompletionTriggers(Task<Boolean> task, String failureMessage) {
       task.setOnFailed(
           arg0 -> {
             Logger.severe(failureMessage, task.getException());
@@ -1730,14 +1735,20 @@ public class GuiConfigController implements Initializable {
     }
 
     @Override
-    protected Task<Void> createTask() {
-      Task<Void> task =
+    protected Task<Boolean> createTask() {
+      Task<Boolean> task =
           new Task<>() {
             @Override
-            protected Void call() {
+            protected Boolean call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              session.tabulate(operatorName);
-              return null;
+              List<String> errors = session.tabulate(operatorName);
+              if (errors.isEmpty()) {
+                succeeded();
+              } else {
+                Logger.warning("There were errors");
+                failed();
+              }
+              return errors.isEmpty();
             }
           };
 
@@ -1753,15 +1764,13 @@ public class GuiConfigController implements Initializable {
     }
 
     @Override
-    protected Task<Void> createTask() {
-      Task<Void> task =
+    protected Task<Boolean> createTask() {
+      Task<Boolean> task =
           new Task<>() {
             @Override
-            protected Void call() {
+            protected Boolean call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              session.convertToCdf();
-
-              return null;
+              return session.convertToCdf();
             }
           };
       setUpTaskCompletionTriggers(task,
