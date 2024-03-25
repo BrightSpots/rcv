@@ -44,6 +44,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.NamedArg;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -66,6 +67,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -80,6 +82,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import network.brightspots.rcv.ContestConfig.Provider;
@@ -1200,6 +1203,7 @@ public class GuiConfigController implements Initializable {
         .setCellValueFactory(new PropertyValueFactory<>("treatBlankAsUndeclaredWriteIn"));
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCvrFiles.setEditable(true);
+    tableViewCvrFiles.getColumns().add(0, NumberTableCellFactory.createNumberColumn("#", 1));
 
     EditableColumn[] candidateStringColumnsAndProperties = new EditableColumn[]{
         new EditableColumnString(tableColumnCandidateName, "name"),
@@ -1223,6 +1227,7 @@ public class GuiConfigController implements Initializable {
 
     tableViewCandidates.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCandidates.setEditable(true);
+    tableViewCandidates.getColumns().add(0, NumberTableCellFactory.createNumberColumn("#", 1));
 
     // Let's also catch programming errors -- all of these properties must have corresponding
     // functions in order to have the PropertyValueFactory work correctly.
@@ -1781,6 +1786,47 @@ public class GuiConfigController implements Initializable {
     @Override
     public void setCellFactory() {
       column.setCellFactory(tc -> new EditableTableCellPopup<Candidate>());
+    }
+  }
+
+  /**
+   * Adapted from https://stackoverflow.com/a/41282740/1057105
+   */
+  private static class NumberTableCellFactory<S, T>
+        implements Callback<TableColumn<S, T>, TableCell<S, T>> {
+    private final int startNumber;
+
+    public NumberTableCellFactory(@NamedArg("startNumber") int startNumber) {
+      this.startNumber = startNumber;
+    }
+
+    public static class NumberTableCell<S, T> extends TableCell<S, T> {
+      private final int startNumber;
+
+      public NumberTableCell(int startNumber) {
+        this.startNumber = startNumber;
+      }
+
+      @Override
+      public void updateItem(T item, boolean empty) {
+        super.updateItem(item, empty);
+
+        setText(empty ? "" : Integer.toString(startNumber + getIndex()));
+      }
+    }
+
+    @Override
+    public TableCell<S, T> call(TableColumn<S, T> param) {
+      return new NumberTableCell<>(startNumber);
+    }
+
+    public static <T> TableColumn<T, Void> createNumberColumn(String text, int startNumber) {
+      TableColumn<T, Void> column = new TableColumn<>(text);
+      column.setSortable(false);
+      column.setEditable(false);
+      column.setPrefWidth(25);
+      column.setCellFactory(new NumberTableCellFactory<>(startNumber));
+      return column;
     }
   }
 }
