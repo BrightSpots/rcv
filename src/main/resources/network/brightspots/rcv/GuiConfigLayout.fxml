@@ -665,6 +665,17 @@
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <CheckBox fx:id="checkBoxTabulateByBatch" mnemonicParsing="false"
+                            text="Tabulate by Batch">
+                    <VBox.margin>
+                      <Insets top="8.0" bottom="8.0"/>
+                    </VBox.margin>
+                  </CheckBox>
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <CheckBox fx:id="checkBoxGenerateCdfJson" mnemonicParsing="false"
                     text="Generate CDF JSON">
                     <VBox.margin>

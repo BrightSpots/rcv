@@ -53,6 +53,7 @@ public class RawContestConfig {
     public String contestDate;
     public String contestJurisdiction;
     public String contestOffice;
+    public boolean tabulateByBatch;
     public boolean tabulateByPrecinct;
     public boolean generateCdfJson;
   }

@@ -144,6 +144,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldContestOffice;
   @FXML
+  private CheckBox checkBoxTabulateByBatch;
+  @FXML
   private CheckBox checkBoxTabulateByPrecinct;
   @FXML
   private CheckBox checkBoxGenerateCdfJson;
@@ -890,6 +892,7 @@ public class GuiConfigController implements Initializable {
         ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
 
     textFieldOutputDirectory.setText(ContestConfig.SUGGESTED_OUTPUT_DIRECTORY);
+    checkBoxTabulateByBatch.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_BATCH);
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
     checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
   }
@@ -922,6 +925,7 @@ public class GuiConfigController implements Initializable {
     checkBoxExhaustOnDuplicateCandidate.setSelected(false);
 
     textFieldOutputDirectory.clear();
+    checkBoxTabulateByBatch.setSelected(false);
     checkBoxTabulateByPrecinct.setSelected(false);
     checkBoxGenerateCdfJson.setSelected(false);
 
@@ -1384,6 +1388,7 @@ public class GuiConfigController implements Initializable {
     }
     textFieldContestJurisdiction.setText(outputSettings.contestJurisdiction);
     textFieldContestOffice.setText(outputSettings.contestOffice);
+    checkBoxTabulateByBatch.setSelected(outputSettings.tabulateByBatch);
     checkBoxTabulateByPrecinct.setSelected(outputSettings.tabulateByPrecinct);
     checkBoxGenerateCdfJson.setSelected(outputSettings.generateCdfJson);
 
@@ -1473,6 +1478,7 @@ public class GuiConfigController implements Initializable {
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
     outputSettings.contestJurisdiction = getTextOrEmptyString(textFieldContestJurisdiction);
     outputSettings.contestOffice = getTextOrEmptyString(textFieldContestOffice);
+    outputSettings.tabulateByBatch = checkBoxTabulateByBatch.isSelected();
     outputSettings.tabulateByPrecinct = checkBoxTabulateByPrecinct.isSelected();
     outputSettings.generateCdfJson = checkBoxGenerateCdfJson.isSelected();
     config.outputSettings = outputSettings;

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -39,6 +40,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
+import network.brightspots.rcv.ContestConfig.TabulateByField;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 
 class Tabulator {
@@ -61,18 +63,18 @@ class Tabulator {
   // this structure is computed over the course of tabulation
   private final Map<Integer, RoundTally> roundTallies = new HashMap<>();
   // precinctRoundTallies is a map from precinct to roundTallies for that precinct
-  private final Map<String, Map<Integer, RoundTally>> precinctRoundTallies = new HashMap<>();
+  private final Map<TabulateByField, Map<String, Map<Integer, RoundTally>>> fieldRoundTallies = new HashMap<>(); // TODO need a better structure!
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
   // map from candidate ID to the round in which they won
   private final Map<String, Integer> winnerToRound = new HashMap<>();
   // tracks vote transfer summaries (usable by external visualizer software)
   private final TallyTransfers tallyTransfers = new TallyTransfers();
-  private final Map<String, TallyTransfers> precinctTallyTransfers = new HashMap<>();
+  private final Map<TabulateByField, Map<String, TallyTransfers>> fieldTallyTransfers = new HashMap<>(); // TODO simplify
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
-  // precincts which may appear in the cast vote records
-  private final Set<String> precinctIds = new HashSet<>();
+  // cast vote record metadata on which tabulation can be "split", such as precinct or batch
+  private final HashMap<TabulateByField, Set<String>> fieldIds = new HashMap<>();
   // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
 
@@ -82,20 +84,29 @@ class Tabulator {
     this.candidateNames = config.getCandidateNames();
     this.config = config;
 
+    fieldIds.put(TabulateByField.BATCH, new HashSet<>());
+    fieldIds.put(TabulateByField.PRECINCT, new HashSet<>());
     for (CastVoteRecord cvr : castVoteRecords) {
+      String batchId = cvr.getBatchId();
+      if (batchId != null) {
+        fieldIds.get(TabulateByField.BATCH).add(batchId);
+      }
+
       String precinctId = cvr.getPrecinct();
       if (precinctId != null) {
-        precinctIds.add(precinctId);
+        fieldIds.get(TabulateByField.PRECINCT).add(precinctId);
       }
     }
 
-    if (config.isTabulateByPrecinctEnabled()) {
-      if (precinctIds.isEmpty()) {
-        Logger.severe("\"Tabulate by Precinct\" enabled, but CVRs don't list precincts.");
+    for (TabulateByField field : TabulateByField.values()) {
+      if (config.isTabulateByEnabled(field) && fieldIds.get(field).isEmpty()) {
+        Logger.severe(
+            "\"Tabulate by %s\" enabled, but CVRs don't list %ss.",
+            field, field.toString().toLowerCase());
         throw new TabulationAbortedException(false);
       }
 
-      initPrecinctRoundTallies();
+      initTabulateByFieldRoundTallies(field);
     }
   }
 
@@ -1004,10 +1015,12 @@ class Tabulator {
   // returns a map of candidate ID to vote tallies for this round
   private RoundTally computeTalliesForRound(int currentRound) throws TabulationAbortedException {
     RoundTally roundTally = getNewTally(currentRound);
-    Map<String, RoundTally> roundTallyByPrecinct = new HashMap<>();
-    if (config.isTabulateByPrecinctEnabled()) {
-      for (String precinct : precinctRoundTallies.keySet()) {
-        roundTallyByPrecinct.put(precinct, getNewTally(currentRound));
+    Map<TabulateByField, Map<String, RoundTally>> roundTallyByField = new HashMap<>();
+    for (TabulateByField field : TabulateByField.values()) {
+      if (config.isTabulateByEnabled(field)) {
+        for (String fieldId : fieldRoundTallies.get(field).keySet()) {
+          roundTallyByField.get(field).put(fieldId, getNewTally(currentRound));
+        }
       }
     }
 
@@ -1168,12 +1181,14 @@ class Tabulator {
     } // end looping over all ballots
 
     // Take the tallies for this round for each precinct and merge them into the main map tracking
-    // the tallies by precinct.
-    if (config.isTabulateByPrecinctEnabled()) {
-      for (var entry : roundTallyByPrecinct.entrySet()) {
-        Map<Integer, RoundTally> roundTalliesForPrecinct = precinctRoundTallies.get(entry.getKey());
-        roundTalliesForPrecinct.put(currentRound, entry.getValue());
-        roundTalliesForPrecinct.get(currentRound).lockInRound();
+    // the tallies by each enabled field.
+    for (TabulateByField field : TabulateByField.values()) {
+      if (config.isTabulateByEnabled(field)) {
+        for (var entry : roundTallyByPrecinct.entrySet()) {
+          Map<Integer, RoundTally> roundTalliesForField = fieldRoundTallies.get(field).get(entry.getKey());
+          roundTalliesForField.put(currentRound, entry.getValue());
+          roundTalliesForField.get(currentRound).lockInRound();
+        }
       }
     }
     roundTally.lockInRound();
@@ -1191,24 +1206,28 @@ class Tabulator {
       RoundTally roundTally,
       BigDecimal fractionalTransferValue,
       String selectedCandidate,
-      Map<String, RoundTally> roundTallyByPrecinct,
-      String precinct) {
+      Map<TabulateByField, Map<String, RoundTally>> roundTallyByField,
+      String fieldId) {
     roundTally.addToCandidateTally(selectedCandidate, fractionalTransferValue);
-    if (config.isTabulateByPrecinctEnabled() && !isNullOrBlank(precinct)) {
-      roundTallyByPrecinct
-          .get(precinct)
-          .addToCandidateTally(selectedCandidate, fractionalTransferValue);
+    for (TabulateByField field : TabulateByField.values()) {
+      if (config.isTabulateByEnabled(field) && !isNullOrBlank(fieldId)) {
+        roundTallyByField
+                .get(field)
+                .get(fieldId)
+                .addToCandidateTally(selectedCandidate, fractionalTransferValue);
+      }
     }
   }
 
-  private void initPrecinctRoundTallies() throws TabulationAbortedException {
-    for (String precinctId : precinctIds) {
-      if (isNullOrBlank(precinctId)) {
-        Logger.severe("Null precinct found in precinct list: %s", precinctIds);
+  private void initTabulateByFieldRoundTallies(TabulateByField field)
+        throws TabulationAbortedException {
+    for (String fieldId : fieldIds.get(field)) {
+      if (isNullOrBlank(fieldId)) {
+        Logger.severe("Null %s found in %s list: %s", field, field, fieldId);
         throw new TabulationAbortedException(false);
       }
-      precinctRoundTallies.put(precinctId, new HashMap<>());
-      precinctTallyTransfers.put(precinctId, new TallyTransfers());
+      fieldRoundTallies.get(field).put(fieldId, new HashMap<>());
+      fieldTallyTransfers.get(field).put(fieldId, new TallyTransfers());
     }
   }
 

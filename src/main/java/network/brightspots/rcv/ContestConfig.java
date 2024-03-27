@@ -44,6 +44,7 @@ class ContestConfig {
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final String AUTOMATED_TEST_VERSION = "TEST";
   static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
+  static final boolean SUGGESTED_TABULATE_BY_BATCH = false;
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
@@ -959,8 +960,12 @@ class ContestConfig {
     return rawConfig.outputSettings.contestDate;
   }
 
-  boolean isTabulateByPrecinctEnabled() {
-    return rawConfig.outputSettings.tabulateByPrecinct;
+  boolean isTabulateByEnabled(TabulateByField field) {
+      return switch (field) {
+          case PRECINCT -> rawConfig.outputSettings.tabulateByPrecinct;
+          case BATCH -> rawConfig.outputSettings.tabulateByBatch;
+          default -> false;
+      };
   }
 
   boolean isGenerateCdfJsonEnabled() {
@@ -1288,6 +1293,22 @@ class ContestConfig {
 
     public String getInternalLabel() {
       return internalLabel;
+    }
+  }
+
+  enum TabulateByField {
+    PRECINCT("Precinct"),
+    BATCH("Batch");
+
+    private final String label;
+
+    TabulateByField(String label) {
+      this.label = label;
+    }
+
+    @Override
+    public String toString() {
+      return label;
     }
   }
 
