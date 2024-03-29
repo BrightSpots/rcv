@@ -72,6 +72,7 @@ public class RawContestConfig {
     private final SimpleStringProperty firstVoteColumnIndex = new SimpleStringProperty();
     private final SimpleStringProperty firstVoteRowIndex = new SimpleStringProperty();
     private final SimpleStringProperty idColumnIndex = new SimpleStringProperty();
+    private final SimpleStringProperty batchColumnIndex = new SimpleStringProperty();
     private final SimpleStringProperty precinctColumnIndex = new SimpleStringProperty();
     private final SimpleStringProperty overvoteDelimiter = new SimpleStringProperty();
     private final SimpleStringProperty provider = new SimpleStringProperty();
@@ -90,6 +91,7 @@ public class RawContestConfig {
         String firstVoteColumnIndex,
         String firstVoteRowIndex,
         String idColumnIndex,
+        String batchColumnIndex,
         String precinctColumnIndex,
         String overvoteDelimiter,
         String provider,
@@ -102,6 +104,7 @@ public class RawContestConfig {
       this.firstVoteColumnIndex.set(firstVoteColumnIndex);
       this.firstVoteRowIndex.set(firstVoteRowIndex);
       this.idColumnIndex.set(idColumnIndex);
+      this.batchColumnIndex.set(batchColumnIndex);
       this.precinctColumnIndex.set(precinctColumnIndex);
       this.overvoteDelimiter.set(overvoteDelimiter);
       this.provider.set(provider);
@@ -150,6 +153,14 @@ public class RawContestConfig {
 
     public void setIdColumnIndex(String idColumnIndex) {
       this.idColumnIndex.set(idColumnIndex);
+    }
+
+    public String getBatchColumnIndex() {
+      return batchColumnIndex.get();
+    }
+
+    public void setBatchColumnIndex(String batchColumnIndex) {
+      this.batchColumnIndex.set(batchColumnIndex);
     }
 
     public String getPrecinctColumnIndex() {
@@ -236,6 +247,9 @@ public class RawContestConfig {
       return idColumnIndex;
     }
 
+    public SimpleStringProperty batchColumnIndexProperty() {
+      return batchColumnIndex;
+    }
     public SimpleStringProperty precinctColumnIndexProperty() {
       return precinctColumnIndex;
     }

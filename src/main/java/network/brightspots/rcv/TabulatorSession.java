@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
+import network.brightspots.rcv.ContestConfig.TabulateByField;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
@@ -108,11 +109,12 @@ class TabulatorSession {
         if (castVoteRecords == null) {
           Logger.severe("Aborting conversion due to cast vote record errors!");
         } else {
-          Set<String> precinctIds = new Tabulator(castVoteRecords, config).getPrecinctIds();
+          Tabulator.FieldIdSet fieldIds =
+              new Tabulator(castVoteRecords, config).getFieldIds();
           ResultsWriter writer =
               new ResultsWriter()
                   .setNumRounds(0)
-                  .setPrecinctIds(precinctIds)
+                  .setFieldIds(fieldIds)
                   .setContestConfig(config)
                   .setTimestampString(timestampString);
           writer.generateCdfJson(castVoteRecords);
@@ -179,7 +181,7 @@ class TabulatorSession {
         while (config.getSequentialWinners().size() < numWinners) {
           Logger.info(
               "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
-          // Read cast vote records and precinct IDs from CVR files
+          // Read cast vote records and field IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
           if (castVoteRecords == null) {
             Logger.severe("Aborting tabulation due to cast vote record errors!");
@@ -215,7 +217,7 @@ class TabulatorSession {
         tabulationSuccess = true;
       } else {
         // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
-        // Read cast vote records and precinct IDs from CVR files
+        // Read cast vote records and field IDs from CVR files
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
         if (castVoteRecords == null) {
           Logger.severe("Aborting tabulation due to cast vote record errors!");

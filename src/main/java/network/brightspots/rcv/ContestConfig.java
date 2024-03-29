@@ -26,12 +26,15 @@ import java.math.RoundingMode;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -59,6 +62,7 @@ class ContestConfig {
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
   static final int SUGGESTED_CVR_ID_COLUMN = 1;
+  static final int SUGGESTED_CVR_BATCH_COLUMN = 3;
   static final int SUGGESTED_CVR_PRECINCT_COLUMN = 2;
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
@@ -600,16 +604,21 @@ class ContestConfig {
 
         if (getProvider(source) == Provider.CDF) {
           // Perform CDF checks
-          if (isTabulateByPrecinctEnabled()) {
+          if (isTabulateByEnabled(TabulateByField.PRECINCT)) {
             validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT);
             Logger.severe("tabulateByPrecinct may not be used with CDF files.");
           }
         } else if (getProvider(source) == Provider.ESS) {
           // Perform ES&S checks
-          if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
+          if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByEnabled(TabulateByField.PRECINCT)) {
             validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN);
             Logger.severe(
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s", cvrPath);
+          }
+          if (isNullOrBlank(source.getBatchColumnIndex()) && isTabulateByEnabled(TabulateByField.BATCH)) {
+            validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_BATCH_COLUMN);
+            Logger.severe(
+                    "batchColumnIndex is required when tabulateByBatch is enabled: %s", cvrPath);
           }
           if (isNullOrBlank(source.getOvervoteDelimiter())
               && getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
@@ -968,6 +977,10 @@ class ContestConfig {
       };
   }
 
+  List<TabulateByField> enabledFields() {
+    return Arrays.stream(TabulateByField.values()).filter(this::isTabulateByEnabled).collect(Collectors.toList());
+  }
+
   boolean isGenerateCdfJsonEnabled() {
     return rawConfig.outputSettings.generateCdfJson;
   }
@@ -1199,6 +1212,7 @@ class ContestConfig {
     CVR_FIRST_VOTE_COLUMN_INVALID,
     CVR_FIRST_VOTE_ROW_INVALID,
     CVR_ID_COLUMN_INVALID,
+    CVR_BATCH_COLUMN_INVALID,
     CVR_PRECINCT_COLUMN_INVALID,
     CVR_OVERVOTE_DELIMITER_INVALID,
     CVR_CDF_FILE_PATH_INVALID,
@@ -1208,6 +1222,7 @@ class ContestConfig {
     CVR_FILE_PATH_INVALID,
     CVR_OVERVOTE_LABEL_OVERVOTE_RULE_MISMATCH,
     CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT,
+    CVR_TABULATE_BY_PRECINCT_REQUIRES_BATCH_COLUMN,
     CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN,
     CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED,
     CVR_OVERVOTE_DELIMITER_MISSING,

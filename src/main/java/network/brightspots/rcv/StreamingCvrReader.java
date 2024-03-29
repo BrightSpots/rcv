@@ -46,6 +46,8 @@ class StreamingCvrReader extends BaseCvrReader {
 
   // this indicates a missing precinct ID in output files
   private static final String MISSING_PRECINCT_ID = "missing_precinct_id";
+  // this indicates a missing batch ID in output files
+  private static final String MISSING_BATCH_ID = "missing_batch_id";
   // name of the source file
   private final String excelFileName;
   // 0-based column index of first ranking
@@ -54,6 +56,8 @@ class StreamingCvrReader extends BaseCvrReader {
   private final int firstVoteRowIndex;
   // 0-based column index of CVR ID (if present)
   private final Integer idColumnIndex;
+  // 0-based column index of currentBatch name (if present)
+  private final Integer batchColumnIndex;
   // 0-based column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
   // optional delimiter for cells that contain multiple candidates
@@ -70,6 +74,8 @@ class StreamingCvrReader extends BaseCvrReader {
   private LinkedList<String> currentCvrData;
   // supplied CVR ID for CVR in progress
   private String currentSuppliedCvrId;
+  // batch ID for CVR in progress
+  private String currentBatch;
   // precinct ID for CVR in progress
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
@@ -90,6 +96,10 @@ class StreamingCvrReader extends BaseCvrReader {
         isNullOrBlank(source.getIdColumnIndex())
             ? null
             : Integer.parseInt(source.getIdColumnIndex()) - 1;
+    this.batchColumnIndex =
+            !isNullOrBlank(source.getBatchColumnIndex())
+                    ? Integer.parseInt(source.getBatchColumnIndex()) - 1
+                    : null;
     this.precinctColumnIndex =
         !isNullOrBlank(source.getPrecinctColumnIndex())
             ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
@@ -159,6 +169,7 @@ class StreamingCvrReader extends BaseCvrReader {
     currentRankings = new LinkedList<>();
     currentCvrData = new LinkedList<>();
     currentSuppliedCvrId = null;
+    currentBatch = null;
     currentPrecinct = null;
     lastRankSeen = 0;
   }
@@ -182,6 +193,17 @@ class StreamingCvrReader extends BaseCvrReader {
       }
     }
 
+
+    // add batch ID if needed
+    if (batchColumnIndex != null) {
+      if (currentBatch == null) {
+        // group batch with missing Ids here
+        Logger.warning(
+                "Batch identifier not found for cast vote record: %s", computedCastVoteRecordId);
+        currentBatch = MISSING_BATCH_ID;
+      }
+    }
+
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
       Logger.severe(
           "Cast vote record identifier missing on row %d in file %s. This may be due to an "
@@ -195,6 +217,7 @@ class StreamingCvrReader extends BaseCvrReader {
     Logger.fine("[Raw Data]: " + currentCvrData.toString());
 
     // create new cast vote record
+    // TODO -- shall we pass Batch ID to the constructor, or remove ES&S CVR ability?
     CastVoteRecord newRecord =
         new CastVoteRecord(
             computedCastVoteRecordId, currentSuppliedCvrId, currentPrecinct, currentRankings);

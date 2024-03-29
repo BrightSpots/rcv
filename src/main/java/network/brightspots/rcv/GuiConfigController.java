@@ -160,6 +160,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrIdCol;
   @FXML
+  private TableColumn<CvrSource, String> tableColumnCvrBatchCol;
+  @FXML
   private TableColumn<CvrSource, String> tableColumnCvrPrecinctCol;
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrOvervoteDelimiter;
@@ -191,6 +193,8 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldCvrFirstVoteRow;
   @FXML
   private TextField textFieldCvrIdCol;
+  @FXML
+  private TextField textFieldCvrBatchCol;
   @FXML
   private TextField textFieldCvrPrecinctCol;
   @FXML
@@ -617,6 +621,7 @@ public class GuiConfigController implements Initializable {
     String firstVoteColumnIndex = getTextOrEmptyString(textFieldCvrFirstVoteCol);
     String firstVoteRowIndex = getTextOrEmptyString(textFieldCvrFirstVoteRow);
     String idColumnIndex = getTextOrEmptyString(textFieldCvrIdCol);
+    String batchColumnIndex = getTextOrEmptyString(textFieldCvrBatchCol);
     String precinctColumnIndex = getTextOrEmptyString(textFieldCvrPrecinctCol);
     String overvoteDelimiter = getTextOrEmptyString(textFieldCvrOvervoteDelimiter);
     String provider = getProviderChoice(choiceCvrProvider).getInternalLabel();
@@ -633,6 +638,7 @@ public class GuiConfigController implements Initializable {
               firstVoteColumnIndex,
               firstVoteRowIndex,
               idColumnIndex,
+              batchColumnIndex,
               precinctColumnIndex,
               overvoteDelimiter,
               provider,
@@ -662,6 +668,7 @@ public class GuiConfigController implements Initializable {
         textFieldCvrFirstVoteCol,
         textFieldCvrFirstVoteRow,
         textFieldCvrIdCol,
+        textFieldCvrBatchCol,
         textFieldCvrPrecinctCol,
         textFieldCvrOvervoteDelimiter,
         textFieldCvrOvervoteLabel,
@@ -695,6 +702,10 @@ public class GuiConfigController implements Initializable {
 
     if (validationErrors.contains(ValidationError.CVR_ID_COLUMN_INVALID)) {
       addErrorStyling(textFieldCvrIdCol);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_BATCH_COLUMN_INVALID)) {
+      addErrorStyling(textFieldCvrBatchCol);
     }
 
     if (validationErrors.contains(ValidationError.CVR_PRECINCT_COLUMN_INVALID)) {
@@ -743,6 +754,8 @@ public class GuiConfigController implements Initializable {
     textFieldCvrFirstVoteRow.setDisable(true);
     textFieldCvrIdCol.clear();
     textFieldCvrIdCol.setDisable(true);
+    textFieldCvrBatchCol.clear();
+    textFieldCvrBatchCol.setDisable(true);
     textFieldCvrPrecinctCol.clear();
     textFieldCvrPrecinctCol.setDisable(true);
     textFieldCvrOvervoteDelimiter.clear();
@@ -1129,6 +1142,9 @@ public class GuiConfigController implements Initializable {
               .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
           textFieldCvrIdCol.setDisable(false);
           textFieldCvrIdCol.setText(String.valueOf(ContestConfig.SUGGESTED_CVR_ID_COLUMN));
+          textFieldCvrBatchCol.setDisable(false);
+          textFieldCvrBatchCol
+                  .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_BATCH_COLUMN));
           textFieldCvrPrecinctCol.setDisable(false);
           textFieldCvrPrecinctCol
               .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_PRECINCT_COLUMN));
@@ -1178,6 +1194,7 @@ public class GuiConfigController implements Initializable {
         new EditableColumnString(tableColumnCvrFirstVoteCol, "firstVoteColumnIndex"),
         new EditableColumnString(tableColumnCvrFirstVoteRow, "firstVoteRowIndex"),
         new EditableColumnString(tableColumnCvrIdCol, "idColumnIndex"),
+        new EditableColumnString(tableColumnCvrBatchCol, "batchColumnIndex"),
         new EditableColumnString(tableColumnCvrPrecinctCol, "precinctColumnIndex"),
         new EditableColumnString(tableColumnCvrOvervoteDelimiter, "overvoteDelimiter"),
         new EditableColumnString(tableColumnCvrContestId, "contestId"),
@@ -1488,6 +1505,8 @@ public class GuiConfigController implements Initializable {
       source.setFilePath(source.getFilePath() != null ? source.getFilePath().trim() : "");
       source.setIdColumnIndex(
           source.getIdColumnIndex() != null ? source.getIdColumnIndex().trim() : "");
+      source.setBatchColumnIndex(
+              source.getBatchColumnIndex() != null ? source.getBatchColumnIndex().trim() : "");
       source.setPrecinctColumnIndex(
           source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex().trim() : "");
       source.setOvervoteDelimiter(
@@ -1671,6 +1690,7 @@ public class GuiConfigController implements Initializable {
     protected void setUpTaskCompletionTriggers(Task<Void> task, String failureMessage) {
       task.setOnFailed(
           arg0 -> {
+            task.getException().printStackTrace();
             Logger.severe(failureMessage, task.getException());
             cleanUp();
           });

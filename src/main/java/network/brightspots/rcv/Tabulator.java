@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,6 +37,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
 import network.brightspots.rcv.ContestConfig.TabulateByField;
@@ -61,20 +61,20 @@ class Tabulator {
   // roundTallies is a map from round number to a map from candidate ID to vote total for the round
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes for each candidate in round 1
   // this structure is computed over the course of tabulation
-  private final Map<Integer, RoundTally> roundTallies = new HashMap<>();
-  // precinctRoundTallies is a map from precinct to roundTallies for that precinct
-  private final Map<TabulateByField, Map<String, Map<Integer, RoundTally>>> fieldRoundTallies = new HashMap<>(); // TODO need a better structure!
+  private final RoundTallies roundTallies = new RoundTallies();
+  // roundTalliesByField is a map from a tabulate-by field to roundTallies for that field
+  private final BreakdownByField<RoundTallies> roundTalliesByField = new BreakdownByField<>();
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
   // map from candidate ID to the round in which they won
   private final Map<String, Integer> winnerToRound = new HashMap<>();
   // tracks vote transfer summaries (usable by external visualizer software)
   private final TallyTransfers tallyTransfers = new TallyTransfers();
-  private final Map<TabulateByField, Map<String, TallyTransfers>> fieldTallyTransfers = new HashMap<>(); // TODO simplify
+  private final BreakdownByField<TallyTransfers> tallyTransfersByField = new BreakdownByField<>();
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // cast vote record metadata on which tabulation can be "split", such as precinct or batch
-  private final HashMap<TabulateByField, Set<String>> fieldIds = new HashMap<>();
+  private final FieldIdSet fieldIds = new FieldIdSet();
   // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
 
@@ -84,22 +84,20 @@ class Tabulator {
     this.candidateNames = config.getCandidateNames();
     this.config = config;
 
-    fieldIds.put(TabulateByField.BATCH, new HashSet<>());
-    fieldIds.put(TabulateByField.PRECINCT, new HashSet<>());
-    for (CastVoteRecord cvr : castVoteRecords) {
-      String batchId = cvr.getBatchId();
-      if (batchId != null) {
-        fieldIds.get(TabulateByField.BATCH).add(batchId);
-      }
+    fieldIds.initialize(TabulateByField.BATCH);
+    fieldIds.initialize(TabulateByField.PRECINCT);
 
-      String precinctId = cvr.getPrecinct();
-      if (precinctId != null) {
-        fieldIds.get(TabulateByField.PRECINCT).add(precinctId);
+    for (CastVoteRecord cvr : castVoteRecords) {
+      for (TabulateByField field : config.enabledFields()) {
+        String fieldId = cvr.getField(field);
+        if (fieldId != null) {
+          fieldIds.add(field, fieldId);
+        }
       }
     }
 
-    for (TabulateByField field : TabulateByField.values()) {
-      if (config.isTabulateByEnabled(field) && fieldIds.get(field).isEmpty()) {
+    for (TabulateByField field : config.enabledFields()) {
+      if (fieldIds.isEmpty(field)) {
         Logger.severe(
             "\"Tabulate by %s\" enabled, but CVRs don't list %ss.",
             field, field.toString().toLowerCase());
@@ -334,19 +332,19 @@ class Tabulator {
               : previousRoundTally.getCandidateTally(winner));
     }
 
-    // initialize or populate precinct tallies
-    if (config.isTabulateByPrecinctEnabled()) {
-      // this is all the tallies for the given precinct
-      for (var roundTalliesForPrecinct : precinctRoundTallies.values()) {
-        // and this is the tally for the current round for the precinct
-        RoundTally roundTallyForPrecinct = roundTalliesForPrecinct.get(currentRound);
-        roundTallyForPrecinct.unlockForSurplusCalculation();
+    // initialize or populate tabulate-by field tallies
+    for (TabulateByField field : config.enabledFields()) {
+      // this is all the tallies for the given field
+      for (var roundTalliesForField : roundTalliesByField.get(field).values()) {
+        // and this is the tally for the current round for the field
+        RoundTally roundTallyForField = roundTalliesForField.get(currentRound);
+        roundTallyForField.unlockForSurplusCalculation();
         for (String winner : winnersToProcess) {
-          roundTallyForPrecinct.setCandidateTallyViaSurplusAdjustment(
+          roundTallyForField.setCandidateTallyViaSurplusAdjustment(
               winner,
               winnersRequiringComputation.contains(winner)
                   ? BigDecimal.ZERO
-                  : roundTalliesForPrecinct.get(currentRound - 1).getCandidateTally(winner));
+                  : roundTalliesForField.get(currentRound - 1).getCandidateTally(winner));
         }
       }
     }
@@ -365,20 +363,24 @@ class Tabulator {
           BigDecimal fractionalTransferValue = entry.getValue();
 
           roundTally.addToCandidateTallyViaSurplusAdjustment(winner, fractionalTransferValue);
-          if (config.isTabulateByPrecinctEnabled() && cvr.getPrecinct() != null) {
-            Map<Integer, RoundTally> precinctTally = precinctRoundTallies.get(cvr.getPrecinct());
-            RoundTally precinctRoundTally = precinctTally.get(currentRound);
-            precinctRoundTally.addToCandidateTallyViaSurplusAdjustment(
-                winner, fractionalTransferValue);
+          for (TabulateByField field : config.enabledFields()) {
+            String fieldId = cvr.getField(field);
+            if (fieldId != null) {
+              var roundTalliesForField = roundTalliesByField.get(field);
+              RoundTallies fieldTallies = roundTalliesForField.get(fieldId);
+              RoundTally fieldRoundTally = fieldTallies.get(currentRound);
+              fieldRoundTally.addToCandidateTallyViaSurplusAdjustment(
+                  winner, fractionalTransferValue);
+            }
           }
         }
       }
 
-      // Re-lock all precinct tabulations
-      if (config.isTabulateByPrecinctEnabled()) {
-        for (var roundTalliesForPrecinct : precinctRoundTallies.values()) {
-          RoundTally roundTallyForPrecinct = roundTalliesForPrecinct.get(currentRound);
-          roundTallyForPrecinct.relockAfterSurplusCalculation();
+      // Re-lock all by-field tabulations
+      for (TabulateByField field : config.enabledFields()) {
+        for (var roundTalliesForField : roundTalliesByField.get(field).values()) {
+          RoundTally roundTallyForField = roundTalliesForField.get(currentRound);
+          roundTallyForField.relockAfterSurplusCalculation();
         }
       }
 
@@ -781,14 +783,11 @@ class Tabulator {
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
             .setTimestampString(timestamp)
-            .setPrecinctIds(precinctIds)
+            .setFieldIds(fieldIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
     writer.generateOverallSummaryFiles(roundTallies, tallyTransfers);
-
-    if (config.isTabulateByPrecinctEnabled()) {
-      writer.generatePrecinctSummaryFiles(precinctRoundTallies, precinctTallyTransfers);
-    }
+    writer.generateByFieldSummaryFiles(roundTalliesByField, tallyTransfersByField);
 
     if (config.isGenerateCdfJsonEnabled()) {
       try {
@@ -800,8 +799,8 @@ class Tabulator {
     }
   }
 
-  Set<String> getPrecinctIds() throws IOException {
-    return precinctIds;
+  FieldIdSet getFieldIds() {
+    return fieldIds;
   }
 
   // Function: runBatchElimination
@@ -955,16 +954,16 @@ class Tabulator {
           cvr.getCurrentRecipientOfVote(),
           selectedCandidate,
           cvr.getFractionalTransferValue());
-      if (config.isTabulateByPrecinctEnabled()) {
-        String precinctId = cvr.getPrecinct();
-        TallyTransfers precinctTallyTransfer = precinctTallyTransfers.get(precinctId);
-        if (precinctTallyTransfer == null) {
+      for (TabulateByField field : config.enabledFields()) {
+        String fieldId = cvr.getField(field);
+        TallyTransfers tallyTransferForField = tallyTransfersByField.get(field, fieldId);
+        if (tallyTransferForField == null) {
           Logger.severe(
-              "Precinct \"%s\" is not among the %d known precincts.",
-              precinctId, precinctIds.size());
+              "%s \"%s\" is not among the %d known %s.",
+              field, fieldId, fieldIds.size(field), field);
           throw new TabulationAbortedException(false);
         }
-        precinctTallyTransfer.addTransfer(
+        tallyTransferForField.addTransfer(
             currentRoundTally.getRoundNumber(),
             cvr.getCurrentRecipientOfVote(),
             selectedCandidate,
@@ -1015,12 +1014,10 @@ class Tabulator {
   // returns a map of candidate ID to vote tallies for this round
   private RoundTally computeTalliesForRound(int currentRound) throws TabulationAbortedException {
     RoundTally roundTally = getNewTally(currentRound);
-    Map<TabulateByField, Map<String, RoundTally>> roundTallyByField = new HashMap<>();
-    for (TabulateByField field : TabulateByField.values()) {
-      if (config.isTabulateByEnabled(field)) {
-        for (String fieldId : fieldRoundTallies.get(field).keySet()) {
-          roundTallyByField.get(field).put(fieldId, getNewTally(currentRound));
-        }
+    BreakdownByField<RoundTally> roundTallyByField = new BreakdownByField();
+    for (TabulateByField field : config.enabledFields()) {
+      for (String fieldId : roundTalliesByField.get(field).keySet()) {
+        roundTallyByField.initialize(field, fieldId, getNewTally(currentRound));
       }
     }
 
@@ -1043,10 +1040,9 @@ class Tabulator {
         // current candidate is continuing so rollover their vote into the current round
         incrementTallies(
             roundTally,
-            cvr.getFractionalTransferValue(),
+            cvr,
             cvr.getCurrentRecipientOfVote(),
-            roundTallyByPrecinct,
-            cvr.getPrecinct());
+            roundTallyByField);
         continue;
       }
 
@@ -1141,13 +1137,8 @@ class Tabulator {
           recordSelectionForCastVoteRecord(
               cvr, roundTally, selectedCandidate, StatusForRound.ACTIVE, "");
 
-          // If enabled, this will also update the roundTallyByPrecinct
-          incrementTallies(
-              roundTally,
-              cvr.getFractionalTransferValue(),
-              selectedCandidate,
-              roundTallyByPrecinct,
-              cvr.getPrecinct());
+          // This will also update the roundTallyByField for each enabled field
+          incrementTallies(roundTally, cvr, selectedCandidate, roundTallyByField);
 
           // There can be at most one continuing candidate in candidates; if there were more than
           // one, we would have already flagged this as an overvote.
@@ -1180,15 +1171,13 @@ class Tabulator {
       } // end looping over the rankings within one ballot
     } // end looping over all ballots
 
-    // Take the tallies for this round for each precinct and merge them into the main map tracking
+    // Take the tallies for this round for each field and merge them into the main map tracking
     // the tallies by each enabled field.
-    for (TabulateByField field : TabulateByField.values()) {
-      if (config.isTabulateByEnabled(field)) {
-        for (var entry : roundTallyByPrecinct.entrySet()) {
-          Map<Integer, RoundTally> roundTalliesForField = fieldRoundTallies.get(field).get(entry.getKey());
-          roundTalliesForField.put(currentRound, entry.getValue());
-          roundTalliesForField.get(currentRound).lockInRound();
-        }
+    for (TabulateByField field : config.enabledFields()) {
+      for (var entry : roundTallyByField.get(field).entrySet()) {
+        RoundTallies roundTalliesForField = roundTalliesByField.get(field).get(entry.getKey());
+        roundTalliesForField.put(currentRound, entry.getValue());
+        roundTalliesForField.get(currentRound).lockInRound();
       }
     }
     roundTally.lockInRound();
@@ -1201,19 +1190,15 @@ class Tabulator {
     return new RoundTally(roundNumber, candidateNames.stream().filter(this::isCandidateContinuing));
   }
 
-  // transfer vote to round tally and (if valid) the precinct round tally
-  private void incrementTallies(
-      RoundTally roundTally,
-      BigDecimal fractionalTransferValue,
-      String selectedCandidate,
-      Map<TabulateByField, Map<String, RoundTally>> roundTallyByField,
-      String fieldId) {
+  // transfer vote to round tally and (if valid) the by-field round tally
+  private void incrementTallies(RoundTally roundTally,
+        CastVoteRecord cvr, String selectedCandidate, BreakdownByField<RoundTally> roundTalliesByField) {
+    BigDecimal fractionalTransferValue = cvr.getFractionalTransferValue();
     roundTally.addToCandidateTally(selectedCandidate, fractionalTransferValue);
-    for (TabulateByField field : TabulateByField.values()) {
-      if (config.isTabulateByEnabled(field) && !isNullOrBlank(fieldId)) {
-        roundTallyByField
-                .get(field)
-                .get(fieldId)
+    for (TabulateByField field : config.enabledFields()) {
+      String fieldId = cvr.getField(field);
+      if (!isNullOrBlank(fieldId)) {
+        roundTalliesByField.get(field, fieldId)
                 .addToCandidateTally(selectedCandidate, fractionalTransferValue);
       }
     }
@@ -1226,8 +1211,9 @@ class Tabulator {
         Logger.severe("Null %s found in %s list: %s", field, field, fieldId);
         throw new TabulationAbortedException(false);
       }
-      fieldRoundTallies.get(field).put(fieldId, new HashMap<>());
-      fieldTallyTransfers.get(field).put(fieldId, new TallyTransfers());
+      roundTalliesByField.initialize(field, fieldId, new RoundTallies());
+      tallyTransfersByField.initialize(field, fieldId, new TallyTransfers());
+
     }
   }
 
@@ -1351,6 +1337,72 @@ class Tabulator {
     ELIMINATED,
     INVALID,
     EXCLUDED,
+  }
+
+  /**
+   * A wrapper around Map<Integer, RoundTally>
+   * A mapping between a round number and that round's corresponding RoundTally.
+   */
+  static class RoundTallies {
+    private final Map<Integer, RoundTally> roundTallies = new HashMap<>();
+
+    public void put(Integer roundNumber, RoundTally roundTally) {
+      roundTallies.put(roundNumber, roundTally);
+    }
+
+    public RoundTally get(Integer roundNumber) {
+      return roundTallies.get(roundNumber);
+    }
+  }
+
+  /**
+   * A wrapper around Map<TabulateByField, Map<String, T>
+   * Breaks down the templated type T by a specific field. The field type the outer map (TabulateByField),
+   * and the field ID is the inner map (String).
+   */
+  static class BreakdownByField<T> {
+    private final Map<TabulateByField, Map<String, T>> breakdownByField = new HashMap<>();
+
+    public T initialize(TabulateByField field, String fieldId, T t) {
+      return breakdownByField.computeIfAbsent(field, k -> new HashMap<>()).put(fieldId, t);
+    }
+
+    public Map<String, T> get(TabulateByField field) {
+      return breakdownByField.get(field);
+    }
+
+    public T get(TabulateByField field, String fieldId) {
+      return get(field).get(fieldId);
+    }
+  }
+
+  /**
+   * A wrapper around Map<TabulateByField, Set<String>>
+   * Maps a TabulateByField to the set of corresponding field IDs.
+   */
+  static class FieldIdSet {
+    private final Map<TabulateByField, Set<String>> fieldIds = new HashMap<>();
+
+    public void initialize(TabulateByField field) {
+      fieldIds.put(field, new HashSet<>());
+    }
+
+    public void add(TabulateByField field, String fieldId) {
+      fieldIds.get(field).add(fieldId);
+    }
+
+    public boolean isEmpty(TabulateByField field) {
+      return fieldIds.get(field).isEmpty();
+    }
+
+    // Add an enumerator for each Set<String> of a given field
+    public Set<String> get(TabulateByField field) {
+      return fieldIds.get(field);
+    }
+
+    public int size(TabulateByField field) {
+      return fieldIds.get(field).size();
+    }
   }
 
   /**
