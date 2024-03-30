@@ -250,6 +250,7 @@ public class RawContestConfig {
     public SimpleStringProperty batchColumnIndexProperty() {
       return batchColumnIndex;
     }
+
     public SimpleStringProperty precinctColumnIndexProperty() {
       return precinctColumnIndex;
     }

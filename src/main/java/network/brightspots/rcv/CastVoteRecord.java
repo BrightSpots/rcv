@@ -94,11 +94,10 @@ class CastVoteRecord {
   }
 
   String getField(ContestConfig.TabulateByField field) {
-      return switch (field) {
-        case BATCH -> batchId;
-        case PRECINCT -> precinct;
-        default -> throw new RuntimeException("Unexpected field: " + field);
-      };
+    return switch (field) {
+      case BATCH -> batchId;
+      case PRECINCT -> precinct;
+    };
   }
 
   String getPrecinctPortion() {

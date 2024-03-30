@@ -610,15 +610,19 @@ class ContestConfig {
           }
         } else if (getProvider(source) == Provider.ESS) {
           // Perform ES&S checks
-          if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByEnabled(TabulateByField.PRECINCT)) {
+          if (isNullOrBlank(source.getPrecinctColumnIndex())
+              && isTabulateByEnabled(TabulateByField.PRECINCT)) {
             validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN);
             Logger.severe(
-                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s", cvrPath);
+                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
+                cvrPath);
           }
-          if (isNullOrBlank(source.getBatchColumnIndex()) && isTabulateByEnabled(TabulateByField.BATCH)) {
+          if (isNullOrBlank(source.getBatchColumnIndex())
+              && isTabulateByEnabled(TabulateByField.BATCH)) {
             validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_BATCH_COLUMN);
             Logger.severe(
-                    "batchColumnIndex is required when tabulateByBatch is enabled: %s", cvrPath);
+                    "batchColumnIndex is required when tabulateByBatch is enabled: %s",
+                    cvrPath);
           }
           if (isNullOrBlank(source.getOvervoteDelimiter())
               && getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
@@ -970,15 +974,16 @@ class ContestConfig {
   }
 
   boolean isTabulateByEnabled(TabulateByField field) {
-      return switch (field) {
-          case PRECINCT -> rawConfig.outputSettings.tabulateByPrecinct;
-          case BATCH -> rawConfig.outputSettings.tabulateByBatch;
-          default -> false;
-      };
+    return switch (field) {
+      case PRECINCT -> rawConfig.outputSettings.tabulateByPrecinct;
+      case BATCH -> rawConfig.outputSettings.tabulateByBatch;
+    };
   }
 
   List<TabulateByField> enabledFields() {
-    return Arrays.stream(TabulateByField.values()).filter(this::isTabulateByEnabled).collect(Collectors.toList());
+    return Arrays.stream(TabulateByField.values())
+            .filter(this::isTabulateByEnabled)
+            .collect(Collectors.toList());
   }
 
   boolean isGenerateCdfJsonEnabled() {

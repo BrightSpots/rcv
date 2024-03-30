@@ -37,7 +37,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
 import network.brightspots.rcv.ContestConfig.TabulateByField;
@@ -1191,8 +1190,8 @@ class Tabulator {
   }
 
   // transfer vote to round tally and (if valid) the by-field round tally
-  private void incrementTallies(RoundTally roundTally,
-        CastVoteRecord cvr, String selectedCandidate, BreakdownByField<RoundTally> roundTalliesByField) {
+  private void incrementTallies(RoundTally roundTally, CastVoteRecord cvr,
+        String selectedCandidate, BreakdownByField<RoundTally> roundTalliesByField) {
     BigDecimal fractionalTransferValue = cvr.getFractionalTransferValue();
     roundTally.addToCandidateTally(selectedCandidate, fractionalTransferValue);
     for (TabulateByField field : config.enabledFields()) {
@@ -1340,7 +1339,7 @@ class Tabulator {
   }
 
   /**
-   * A wrapper around Map<Integer, RoundTally>
+   * A wrapper around Map&lt;Integer, RoundTally&gt;
    * A mapping between a round number and that round's corresponding RoundTally.
    */
   static class RoundTallies {
@@ -1356,9 +1355,9 @@ class Tabulator {
   }
 
   /**
-   * A wrapper around Map<TabulateByField, Map<String, T>
-   * Breaks down the templated type T by a specific field. The field type the outer map (TabulateByField),
-   * and the field ID is the inner map (String).
+   * A wrapper around Map&lt;TabulateByField, Map&lt;String, T&gt;&gt;
+   * Breaks down the templated type T by a specific field.
+   * The field type is the outer map (TabulateByField), and the field ID is the inner map (String).
    */
   static class BreakdownByField<T> {
     private final Map<TabulateByField, Map<String, T>> breakdownByField = new HashMap<>();
@@ -1377,7 +1376,7 @@ class Tabulator {
   }
 
   /**
-   * A wrapper around Map<TabulateByField, Set<String>>
+   * A wrapper around Map&lt;TabulateByField, Set&lt;String&gt;&gt;
    * Maps a TabulateByField to the set of corresponding field IDs.
    */
   static class FieldIdSet {
