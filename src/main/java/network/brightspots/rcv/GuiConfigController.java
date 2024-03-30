@@ -418,8 +418,26 @@ public class GuiConfigController implements Initializable {
     return selectedFile != null ? selectedFile.getAbsolutePath() : "No File Saved Yet";
   }
 
+  private File getSaveFile() {
+    FileChooser fc = new FileChooser();
+    if (selectedFile == null) {
+      fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+    } else {
+      fc.setInitialDirectory(new File(selectedFile.getParent()));
+      fc.setInitialFileName(selectedFile.getName());
+    }
+    fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
+    fc.setTitle("Save Config");
+    File fileToSave = fc.showSaveDialog(GuiContext.getInstance().getMainWindow());
+    if (fileToSave != null) {
+      selectedFile = fileToSave;
+    }
+    return fileToSave;
+  }
+
   /**
-   * Action when user hits a save button from the Tabulate GUI
+   * Action when user hits a save button from the Tabulate GUI.
+   *
    * @param useTemporaryFile whether they hit the Temporary save button
    * @return The saved file's absolute path, or null if canceled
    */
@@ -436,23 +454,6 @@ public class GuiConfigController implements Initializable {
     }
 
     return outputFile != null ? outputFile.getAbsolutePath() : null;
-  }
-
-  private File getSaveFile() {
-    FileChooser fc = new FileChooser();
-    if (selectedFile == null) {
-      fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
-    } else {
-      fc.setInitialDirectory(new File(selectedFile.getParent()));
-      fc.setInitialFileName(selectedFile.getName());
-    }
-    fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
-    fc.setTitle("Save Config");
-    File fileToSave = fc.showSaveDialog(GuiContext.getInstance().getMainWindow());
-    if (fileToSave != null) {
-      selectedFile = fileToSave;
-    }
-    return fileToSave;
   }
 
   private void saveFile(File fileToSave) {
@@ -493,19 +494,21 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Pops up the Tabulation Confirmation Window
+   * Pops up the Tabulation Confirmation Window.
    */
   public void menuItemTabulateClicked() {
     openTabulateWindow();
   }
 
   /**
-   * Tabulate whatever is currently entered into the GUI. Assumes GuiTabulateController checked all prerequisites.
+   * Tabulate whatever is currently entered into the GUI.
+   * Assumes GuiTabulateController checked all prerequisites.
    */
   public Service<Boolean> startTabulation(
         String configPath, String operatorName, boolean deleteConfigOnCompletion) {
     setGuiIsBusy(true);
-    TabulatorService service = new TabulatorService(configPath, operatorName, deleteConfigOnCompletion);
+    TabulatorService service = new TabulatorService(
+        configPath, operatorName, deleteConfigOnCompletion);
     setUpAndStartService(service);
     return service;
   }
@@ -974,7 +977,7 @@ public class GuiConfigController implements Initializable {
     setDefaultValues();
   }
 
-  /*
+  /**
    * Compares the GUI configuration with the on-disk configuration.
    * If they differ, also tells you if the on-disk version is "TEST" --
    * in which case, you may be okay with a difference for ease of development.
@@ -1584,6 +1587,9 @@ public class GuiConfigController implements Initializable {
     return config;
   }
 
+  /**
+   * The result of comparing the GUI config to the on-disk config.
+   */
   public enum ConfigComparisonResult {
     SAME,
     DIFFERENT,

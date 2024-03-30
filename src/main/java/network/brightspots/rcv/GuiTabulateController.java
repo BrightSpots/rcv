@@ -16,9 +16,7 @@
 
 package network.brightspots.rcv;
 
-import java.io.File;
 import java.io.IOException;
-
 import javafx.concurrent.Service;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -38,22 +36,22 @@ import javafx.stage.Window;
 @SuppressWarnings("WeakerAccess")
 public class GuiTabulateController {
   /**
-   * The button text to display before tabulation begins
+   * The button text to display before tabulation begins.
    */
   private static final String buttonTabulateText = "Tabulate";
 
   /**
-   * The button text to display while tabulation is in progress
+   * The button text to display while tabulation is in progress.
    */
   private static final String buttonTabulateInProgressText = "Tabulating...";
 
   /**
-   * The button text to display after tabulation successfully completes
+   * The button text to display after tabulation successfully completes.
    */
   private static final String buttonOpenResultsText = "Open Results Folder";
 
   /**
-   * The button text to display after tabulation fails
+   * The button text to display after tabulation fails.
    */
   private static final String buttonViewErrorLogsText = "View Error Logs";
 
@@ -118,7 +116,7 @@ public class GuiTabulateController {
   }
 
   /**
-   * Action when a letter is typed in the name field
+   * Action when a letter is typed in the name field.
    *
    * @param keyEvent ignored
    */
@@ -272,6 +270,9 @@ public class GuiTabulateController {
         savedConfigFilePath = guiConfigController.getSelectedFilePath();
         tempSaveButton.setVisible(false);
         updateGuiNotifyConfigSaved();
+        break;
+      default:
+        throw new IllegalStateException("Unexpected value: " + result);
     }
   }
 
