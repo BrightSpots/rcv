@@ -8,51 +8,46 @@
   ~ License, v. 2.0. If a copy of the MPL was not distributed with this
   ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
   -->
-
 <!--suppress JavaFxRedundantPropertyValue -->
+
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="955.0" prefWidth="1165.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
-            xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="network.brightspots.rcv.GuiConfigController">
-  <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    prefHeight="955.0" prefWidth="1165.0">
+
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="955.0" prefWidth="1165.0" stylesheets="/network/brightspots/rcv/GuiStyles.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="network.brightspots.rcv.GuiConfigController">
+  <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="955.0" prefWidth="1165.0">
     <top>
       <VBox BorderPane.alignment="TOP_LEFT">
         <MenuBar fx:id="menuBar">
           <Menu mnemonicParsing="false" text="File">
-            <MenuItem mnemonicParsing="false" onAction="#menuItemNewConfigClicked" text="New"/>
-            <MenuItem mnemonicParsing="false" onAction="#menuItemLoadConfigClicked" text="Load..."/>
-            <MenuItem mnemonicParsing="false" onAction="#menuItemSaveClicked" text="Save..."/>
-            <SeparatorMenuItem mnemonicParsing="false"/>
-            <MenuItem mnemonicParsing="false" onAction="#menuItemExitClicked" text="Exit"/>
+            <MenuItem mnemonicParsing="false" onAction="#menuItemNewConfigClicked" text="New" />
+            <MenuItem mnemonicParsing="false" onAction="#menuItemLoadConfigClicked" text="Load..." />
+            <MenuItem mnemonicParsing="false" onAction="#menuItemSaveClicked" text="Save..." />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#menuItemExitClicked" text="Exit" />
           </Menu>
           <Menu mnemonicParsing="false" text="Tabulation">
-            <MenuItem mnemonicParsing="false" onAction="#menuItemValidateClicked" text="Validate"/>
-            <MenuItem mnemonicParsing="false" onAction="#menuItemTabulateClicked" text="Tabulate"/>
+            <MenuItem mnemonicParsing="false" onAction="#menuItemValidateClicked" text="Validate" />
+            <MenuItem mnemonicParsing="false" onAction="#menuItemTabulateClicked" text="Tabulate" />
           </Menu>
           <Menu mnemonicParsing="false" text="Conversion">
-            <MenuItem mnemonicParsing="false" onAction="#menuItemConvertToCdfClicked"
-              text="Convert CVRs in Current Config to CDF"/>
+            <MenuItem mnemonicParsing="false" onAction="#menuItemConvertToCdfClicked" text="Convert CVRs in Current Config to CDF" />
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
-            <MenuItem mnemonicParsing="false" onAction="#menuItemOpenHelpClicked"
-              text="Open Help Manual"/>
+            <MenuItem mnemonicParsing="false" onAction="#menuItemOpenHelpClicked" text="Open Help Manual" />
           </Menu>
         </MenuBar>
         <HBox alignment="CENTER_LEFT">
             <Label fx:id="labelCurrentlyLoaded">
               <padding>
-                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
+                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
               </padding>
             </Label>
-            <Region HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS" />
             <Label fx:id="labelVersion" alignment="CENTER_RIGHT" minWidth="200.0">
               <padding>
-                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
+                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
               </padding>
             </Label>
         </HBox>
@@ -61,646 +56,569 @@
     <center>
       <VBox BorderPane.alignment="CENTER">
         <TabPane fx:id="tabPane" minHeight="450.0" tabClosingPolicy="UNAVAILABLE">
-          <Tab text="Contest Info" fx:id="tabContestInfo">
+          <Tab fx:id="tabContestInfo" text="Contest Info">
             <VBox>
-              <VBox styleClass="bordered-box" maxWidth="450.0">
+              <VBox maxWidth="450.0" styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label prefWidth="130" text="Contest Name *"/>
-                  <TextField fx:id="textFieldContestName" prefWidth="300.0"/>
+                  <Label prefWidth="130" text="Contest Name *" />
+                  <TextField fx:id="textFieldContestName" prefWidth="300.0" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label prefWidth="130" text="Contest Date"/>
-                  <DatePicker fx:id="datePickerContestDate" editable="false" prefWidth="150.0"/>
-                  <Button mnemonicParsing="false"
-                    onAction="#buttonClearDatePickerContestDateClicked"
-                    text="Clear"/>
+                  <Label prefWidth="130" text="Contest Date" />
+                  <DatePicker fx:id="datePickerContestDate" editable="false" prefWidth="150.0" />
+                  <Button mnemonicParsing="false" onAction="#buttonClearDatePickerContestDateClicked" text="Clear" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label prefWidth="130" text="Contest Jurisdiction"/>
-                  <TextField fx:id="textFieldContestJurisdiction" prefWidth="300.0"/>
+                  <Label prefWidth="130" text="Contest Jurisdiction" />
+                  <TextField fx:id="textFieldContestJurisdiction" prefWidth="300.0" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label prefWidth="130" text="Contest Office"/>
-                  <TextField fx:id="textFieldContestOffice" prefWidth="300.0"/>
+                  <Label prefWidth="130" text="Contest Office" />
+                  <TextField fx:id="textFieldContestOffice" prefWidth="300.0" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label prefWidth="130.0" text="Rules Description"/>
-                  <TextField fx:id="textFieldRulesDescription" prefWidth="300.0"/>
+                  <Label prefWidth="130.0" text="Rules Description" />
+                  <TextField fx:id="textFieldRulesDescription" prefWidth="300.0" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                 </padding>
                 <VBox.margin>
-                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                  <Insets bottom="8.0" left="8.0" right="4.0" />
                 </VBox.margin>
               </VBox>
               <padding>
-                <Insets top="12.0"/>
+                <Insets top="12.0" />
               </padding>
             </VBox>
           </Tab>
-          <Tab text="CVR Files" fx:id="tabCvrFiles">
+          <Tab fx:id="tabCvrFiles" text="CVR Files">
             <VBox>
-              <VBox styleClass="bordered-box, disableWhileEditingTable" maxWidth="700.0">
+              <VBox maxWidth="700.0" styleClass="bordered-box, disableWhileEditingTable">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Add CVR File" style="-fx-font-weight: bold"/>
-                  <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
-                  <Button mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add"
-                    fx:id="buttonAddCvrFile"/>
-                  <Button mnemonicParsing="false" onAction="#buttonClearCvrFieldsClicked"
-                    text="Clear"/>
+                  <Label style="-fx-font-weight: bold" text="Add CVR File" />
+                  <Region prefHeight="25.0" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="buttonAddCvrFile" mnemonicParsing="false" onAction="#buttonAddCvrFileClicked" text="Add" />
+                  <Button mnemonicParsing="false" onAction="#buttonClearCvrFieldsClicked" text="Clear" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <Separator>
                   <padding>
-                    <Insets bottom="8.0" top="8.0"/>
+                    <Insets bottom="8.0" top="8.0" />
                   </padding>
                 </Separator>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Provider *" prefWidth="110.0"/>
-                      <ChoiceBox prefWidth="160.0" fx:id="choiceCvrProvider"/>
+                      <Label prefWidth="110.0" text="Provider *" />
+                      <ChoiceBox fx:id="choiceCvrProvider" prefWidth="160.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Contest ID *" prefWidth="110.0"/>
-                      <TextField prefHeight="25.0" prefWidth="160.0"
-                        fx:id="textFieldCvrContestId"/>
+                      <Label prefWidth="110.0" text="Contest ID *" />
+                      <TextField fx:id="textFieldCvrContestId" prefHeight="25.0" prefWidth="160.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="130.0" text="First Vote Column *"/>
-                      <TextField prefHeight="25.0" prefWidth="40.0"
-                        fx:id="textFieldCvrFirstVoteCol"/>
+                      <Label prefWidth="130.0" text="First Vote Column *" />
+                      <TextField fx:id="textFieldCvrFirstVoteCol" prefHeight="25.0" prefWidth="40.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="130.0" text="First Vote Row *"/>
-                      <TextField prefHeight="25.0" prefWidth="40.0"
-                        fx:id="textFieldCvrFirstVoteRow"/>
+                      <Label prefWidth="130.0" text="First Vote Row *" />
+                      <TextField fx:id="textFieldCvrFirstVoteRow" prefHeight="25.0" prefWidth="40.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="130.0" text="ID Column"/>
-                      <TextField prefHeight="25.0" prefWidth="40.0" fx:id="textFieldCvrIdCol"/>
+                      <Label prefWidth="130.0" text="ID Column" />
+                      <TextField fx:id="textFieldCvrIdCol" prefHeight="25.0" prefWidth="40.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="130.0" text="Precinct Column"/>
-                      <TextField prefHeight="25.0" prefWidth="40.0"
-                        fx:id="textFieldCvrPrecinctCol"/>
+                      <Label prefWidth="130.0" text="Precinct Column" />
+                      <TextField fx:id="textFieldCvrPrecinctCol" prefHeight="25.0" prefWidth="40.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                   </VBox>
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Path *"/>
-                      <TextField prefHeight="25.0" prefWidth="290.0" fx:id="textFieldCvrFilePath"/>
-                      <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
-                        text="Select" fx:id="buttonCvrFilePath"/>
+                      <Label text="Path *" />
+                      <TextField fx:id="textFieldCvrFilePath" prefHeight="26.0" prefWidth="179.0" />
+                      <Button fx:id="buttonCvrFilePath" mnemonicParsing="false" onAction="#buttonCvrFilePathClicked" prefHeight="26.0" prefWidth="157.0" text="Select" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="174.0" text="Overvote Delimiter"/>
-                      <TextField prefHeight="25.0" prefWidth="40.0"
-                        fx:id="textFieldCvrOvervoteDelimiter"/>
+                      <Label prefWidth="174.0" text="Overvote Delimiter" />
+                      <TextField fx:id="textFieldCvrOvervoteDelimiter" prefHeight="25.0" prefWidth="40.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="174.0" text="Overvote Label"/>
-                      <TextField prefHeight="25.0" prefWidth="200.0"
-                        fx:id="textFieldCvrOvervoteLabel"/>
+                      <Label prefWidth="174.0" text="Overvote Label" />
+                      <TextField fx:id="textFieldCvrOvervoteLabel" prefHeight="25.0" prefWidth="200.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="174.0" text="Skipped-Rank Label"/>
-                      <TextField prefHeight="25.0" prefWidth="200.0"
-                        fx:id="textFieldCvrSkippedRankLabel"/>
+                      <Label prefWidth="174.0" text="Skipped-Rank Label" />
+                      <TextField fx:id="textFieldCvrSkippedRankLabel" prefHeight="25.0" prefWidth="200.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="174.0" text="Undeclared Write-In Label"/>
-                      <TextField prefHeight="25.0" prefWidth="200.0"
-                        fx:id="textFieldCvrUndeclaredWriteInLabel"/>
+                      <Label prefWidth="174.0" text="Undeclared Write-In Label" />
+                      <TextField fx:id="textFieldCvrUndeclaredWriteInLabel" prefHeight="25.0" prefWidth="200.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <CheckBox fx:id="checkBoxCvrTreatBlankAsUndeclaredWriteIn"
-                        mnemonicParsing="false" text="Treat Blank as Undeclared Write-in">
+                      <CheckBox fx:id="checkBoxCvrTreatBlankAsUndeclaredWriteIn" mnemonicParsing="false" text="Treat Blank as Undeclared Write-in">
                         <VBox.margin>
-                          <Insets top="8.0" bottom="8.0"/>
+                          <Insets bottom="8.0" top="8.0" />
                         </VBox.margin>
                       </CheckBox>
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                   </VBox>
                 </HBox>
                 <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                 </padding>
                 <VBox.margin>
-                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                  <Insets bottom="8.0" left="8.0" right="4.0" />
                 </VBox.margin>
               </VBox>
               <VBox styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Text text="Double-click to edit. Pressing Enter accepts changes; pressing Escape cancels. NOTE: Provider can't be edited."/>
-                  <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
-                  <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked"
-                    styleClass="disableWhileEditingTable"
-                    text="Delete Selected"/>
+                  <Text text="Double-click to edit. Pressing Enter accepts changes; pressing Escape cancels. NOTE: Provider can't be edited." />
+                  <Region prefHeight="25.0" HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" onAction="#buttonDeleteCvrFileClicked" styleClass="disableWhileEditingTable" text="Delete Selected" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <TableView fx:id="tableViewCvrFiles">
                   <columns>
-                    <TableColumn fx:id="tableColumnCvrFilePath" minWidth="20.0"
-                      prefWidth="300.0" text="Path"/>
-                    <TableColumn fx:id="tableColumnCvrProvider" minWidth="20.0"
-                      prefWidth="110.0" text="Provider"/>
-                    <TableColumn fx:id="tableColumnCvrContestId" minWidth="20.0"
-                      prefWidth="110.0" text="Contest ID"/>
-                    <TableColumn fx:id="tableColumnCvrFirstVoteCol" minWidth="20.0" prefWidth="50.0"
-                      text="First&#10;Vote&#10;Col"/>
-                    <TableColumn fx:id="tableColumnCvrFirstVoteRow" minWidth="20.0" prefWidth="50.0"
-                      text="First&#10;Vote&#10;Row"/>
-                    <TableColumn fx:id="tableColumnCvrIdCol" minWidth="20.0"
-                      prefWidth="50.0"
-                      text="ID&#10;Col"/>
-                    <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0"
-                      prefWidth="70.0"
-                      text="Precinct&#10;Column"/>
-                    <TableColumn minWidth="20.0"
-                      prefWidth="80.0" text="Overvote&#10;Delimiter"
-                      fx:id="tableColumnCvrOvervoteDelimiter"/>
-                    <TableColumn minWidth="20.0"
-                      prefWidth="80.0" text="Overvote&#10;Label"
-                      fx:id="tableColumnCvrOvervoteLabel"/>
-                    <TableColumn minWidth="20.0"
-                      prefWidth="90.0" text="Skipped Rank&#10;Label"
-                      fx:id="tableColumnCvrSkippedRankLabel"/>
-                    <TableColumn minWidth="20.0"
-                      prefWidth="90.0" text="Undeclared&#10;Write-In&#10;Label"
-                      fx:id="tableColumnCvrUndeclaredWriteInLabel"/>
-                    <TableColumn fx:id="tableColumnCvrTreatBlankAsUndeclaredWriteIn" minWidth="20.0"
-                      prefWidth="120.0" text="Treat Blank&#10;As Undeclared&#10;Write-In"/>
+                    <TableColumn fx:id="tableColumnCvrFilePath" minWidth="20.0" prefWidth="300.0" text="Path" />
+                    <TableColumn fx:id="tableColumnCvrProvider" minWidth="20.0" prefWidth="110.0" text="Provider" />
+                    <TableColumn fx:id="tableColumnCvrContestId" minWidth="20.0" prefWidth="110.0" text="Contest ID" />
+                    <TableColumn fx:id="tableColumnCvrFirstVoteCol" minWidth="20.0" prefWidth="50.0" text="First&#10;Vote&#10;Col" />
+                    <TableColumn fx:id="tableColumnCvrFirstVoteRow" minWidth="20.0" prefWidth="50.0" text="First&#10;Vote&#10;Row" />
+                    <TableColumn fx:id="tableColumnCvrIdCol" minWidth="20.0" prefWidth="50.0" text="ID&#10;Col" />
+                    <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0" prefWidth="70.0" text="Precinct&#10;Column" />
+                    <TableColumn fx:id="tableColumnCvrOvervoteDelimiter" minWidth="20.0" prefWidth="80.0" text="Overvote&#10;Delimiter" />
+                    <TableColumn fx:id="tableColumnCvrOvervoteLabel" minWidth="20.0" prefWidth="80.0" text="Overvote&#10;Label" />
+                    <TableColumn fx:id="tableColumnCvrSkippedRankLabel" minWidth="20.0" prefWidth="90.0" text="Skipped Rank&#10;Label" />
+                    <TableColumn fx:id="tableColumnCvrUndeclaredWriteInLabel" minWidth="20.0" prefWidth="90.0" text="Undeclared&#10;Write-In&#10;Label" />
+                    <TableColumn fx:id="tableColumnCvrTreatBlankAsUndeclaredWriteIn" minWidth="20.0" prefWidth="120.0" text="Treat Blank&#10;As Undeclared&#10;Write-In" />
                   </columns>
                 </TableView>
                 <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                 </padding>
                 <VBox.margin>
-                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                  <Insets bottom="8.0" left="8.0" right="4.0" />
                 </VBox.margin>
               </VBox>
               <padding>
-                <Insets top="12.0"/>
+                <Insets top="12.0" />
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Candidates" fx:id="tabCandidates">
+          <Tab fx:id="tabCandidates" text="Candidates">
             <VBox spacing="20.0">
-              <HBox styleClass="disableWhileEditingTable" alignment="CENTER" spacing="75.0">
-                <VBox styleClass="bordered-box" maxWidth="300.0">
+              <HBox alignment="CENTER" spacing="75.0" styleClass="disableWhileEditingTable">
+                <VBox maxWidth="300.0" styleClass="bordered-box">
                   <VBox alignment="TOP_CENTER" spacing="10">
                     <padding>
-                      <Insets left="8.0" right="8.0" bottom="8.0" top="8.0"/>
+                      <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                     </padding>
-                    <Label text="Auto-Load Candidates from CVRs" style="-fx-font-weight: bold"/>
-                    <Text
-                        text="Search through all CVRs and load each unique candidate name found."
-                        wrappingWidth="250"
-                    />
-                    <Text
-                        text="NOTE: The auto-load feature relies on candidates appearing in vote data to populate the list of candidates. Users should confirm the list of candidates populated against the list of candidates in their election to confirm that all candidates were properly loaded."
-                        style="-fx-font-weight: bold; -fx-font-style: italic; -fx-font-size: 11"
-                        wrappingWidth="250"
-                    />
+                    <Label style="-fx-font-weight: bold" text="Auto-Load Candidates from CVRs" />
+                    <Text text="Search through all CVRs and load each unique candidate name found." wrappingWidth="250" />
+                    <Text style="-fx-font-weight: bold; -fx-font-style: italic; -fx-font-size: 11" text="NOTE: The auto-load feature relies on candidates appearing in vote data to populate the list of candidates. Users should confirm the list of candidates populated against the list of candidates in their election to confirm that all candidates were properly loaded." wrappingWidth="250" />
                     <Separator>
                     </Separator>
-                    <Region prefHeight="25.0" VBox.vgrow="ALWAYS"/>
+                    <Region prefHeight="25.0" VBox.vgrow="ALWAYS" />
                     <HBox alignment="CENTER" spacing="4.0">
-                      <Button mnemonicParsing="false" onAction="#buttonAutoLoadCandidatesClicked" text="Auto-Load"/>
+                      <Button mnemonicParsing="false" onAction="#buttonAutoLoadCandidatesClicked" text="Auto-Load" />
                     </HBox>
-                    <Region prefHeight="25.0" VBox.vgrow="ALWAYS"/>
+                    <Region prefHeight="25.0" VBox.vgrow="ALWAYS" />
                   </VBox>
                 </VBox>
-                <VBox styleClass="bordered-box" maxWidth="400.0">
+                <VBox maxWidth="400.0" styleClass="bordered-box">
                   <VBox alignment="TOP_CENTER" spacing="10">
                     <padding>
-                      <Insets left="8.0" right="8.0" bottom="8.0" top="8.0"/>
+                      <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                     </padding>
-                    <Label text="Manually Add Candidate" style="-fx-font-weight: bold"/>
-                    <Text
-                            text="You can manually add candidates if auto-loading fails to produce acceptable results."
-                            wrappingWidth="350"
-                    />
+                    <Label style="-fx-font-weight: bold" text="Manually Add Candidate" />
+                    <Text text="You can manually add candidates if auto-loading fails to produce acceptable results." wrappingWidth="350" />
                     <VBox>
-                      <Text text="NOTE: Candidate names are case-sensitive and must match the CVR exactly, including any HTML tags or other special characters!"
-                            wrappingWidth="350"
-                            style="-fx-font-weight: bold; -fx-font-style: italic; -fx-font-size: 11">
+                      <Text style="-fx-font-weight: bold; -fx-font-style: italic; -fx-font-size: 11" text="NOTE: Candidate names are case-sensitive and must match the CVR exactly, including any HTML tags or other special characters!" wrappingWidth="350">
                       </Text>
                       <padding>
-                        <Insets left="8.0" right="8.0" top="8.0"/>
+                        <Insets left="8.0" right="8.0" top="8.0" />
                       </padding>
                     </VBox>
                   </VBox>
                   <Separator>
                     <padding>
-                      <Insets bottom="8.0" top="8.0"/>
+                      <Insets bottom="8.0" top="8.0" />
                     </padding>
                   </Separator>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <Label text="Name *" prefWidth="50.0"/>
-                    <TextField prefHeight="25.0" prefWidth="300.0" fx:id="textFieldCandidateName"/>
+                    <Label prefWidth="50.0" text="Name *" />
+                    <TextField fx:id="textFieldCandidateName" prefHeight="25.0" prefWidth="300.0" />
                     <padding>
-                      <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                     </padding>
                   </HBox>
                   <Label text="Aliases, codes, and other spellings (one per line):">
                   </Label>
                   <TextArea fx:id="textAreaCandidateAliases" prefHeight="200.0" prefWidth="200.0" />
-                  <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                  </padding>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <CheckBox fx:id="checkBoxCandidateExcluded" mnemonicParsing="false"
-                      text="Excluded">
+                    <CheckBox fx:id="checkBoxCandidateExcluded" mnemonicParsing="false" text="Excluded">
                       <VBox.margin>
-                        <Insets top="10.0"/>
+                        <Insets top="10.0" />
                       </VBox.margin>
                     </CheckBox>
                     <padding>
-                      <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                     </padding>
                   </HBox>
-                  <Region prefHeight="25.0" VBox.vgrow="ALWAYS"/>
+                  <Region prefHeight="25.0" VBox.vgrow="ALWAYS" />
                   <HBox alignment="CENTER" spacing="4.0">
-                    <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add"/>
-                    <Button mnemonicParsing="false" onAction="#buttonClearCandidateClicked"
-                            text="Clear"/>
+                    <Button mnemonicParsing="false" onAction="#buttonAddCandidateClicked" text="Add" />
+                    <Button mnemonicParsing="false" onAction="#buttonClearCandidateClicked" text="Clear" />
                   </HBox>
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                  </padding>
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </VBox>
                 <Separator>
                   <padding>
-                    <Insets bottom="8.0" top="8.0"/>
+                    <Insets bottom="8.0" top="8.0" />
                   </padding>
                 </Separator>
                 <VBox.margin>
-                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                  <Insets bottom="8.0" left="8.0" right="4.0" />
                 </VBox.margin>
               </HBox>
-              <VBox styleClass="bordered-box" maxWidth="800.0">
+              <VBox maxWidth="800.0" styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Text text="Double-click to edit. Pressing Enter accepts changes; pressing Escape cancels."/>
-                  <Region prefHeight="25.0" HBox.hgrow="ALWAYS"/>
-                  <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked"
-                    styleClass="disableWhileEditingTable"
-                    text="Delete Selected"/>
+                  <Text text="Double-click to edit. Pressing Enter accepts changes; pressing Escape cancels." />
+                  <Region prefHeight="25.0" HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" onAction="#buttonDeleteCandidateClicked" styleClass="disableWhileEditingTable" text="Delete Selected" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <TableView fx:id="tableViewCandidates" prefHeight="414.0" prefWidth="600.0">
                   <columns>
-                    <TableColumn fx:id="tableColumnCandidateName" minWidth="20.0"
-                      prefWidth="230.0" text="Name"/>
-                    <TableColumn fx:id="tableColumnCandidateAliases" minWidth="20.0"
-                      prefWidth="200.0" text="Aliases / Codes" />
-                    <TableColumn fx:id="tableColumnCandidateExcluded" minWidth="20.0"
-                      prefWidth="100.0" text="Excluded"/>
+                    <TableColumn fx:id="tableColumnCandidateName" minWidth="20.0" prefWidth="230.0" text="Name" />
+                    <TableColumn fx:id="tableColumnCandidateAliases" minWidth="20.0" prefWidth="200.0" text="Aliases / Codes" />
+                    <TableColumn fx:id="tableColumnCandidateExcluded" minWidth="20.0" prefWidth="100.0" text="Excluded" />
                   </columns>
                 </TableView>
                 <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                 </padding>
                 <VBox.margin>
-                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                  <Insets bottom="8.0" left="8.0" right="4.0" />
                 </VBox.margin>
               </VBox>
               <padding>
-                <Insets top="12.0"/>
+                <Insets top="12.0" />
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Winning Rules" fx:id="tabWinningRules">
+          <Tab fx:id="tabWinningRules" text="Winning Rules">
             <VBox>
               <VBox styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label text="Winner Election Mode *" prefWidth="180.0"/>
-                  <ChoiceBox prefWidth="330.0" fx:id="choiceWinnerElectionMode"/>
+                  <Label prefWidth="180.0" text="Winner Election Mode *" />
+                  <ChoiceBox fx:id="choiceWinnerElectionMode" prefWidth="330.0" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <Separator>
                   <padding>
-                    <Insets bottom="8.0" top="8.0"/>
+                    <Insets bottom="8.0" top="8.0" />
                   </padding>
                 </Separator>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="220.0"
-                        text="Maximum Number of Candidates&#xD;  That Can Be Ranked *"/>
-                      <TextField fx:id="textFieldMaxRankingsAllowed" maxWidth="80.0"/>
-                      <CheckBox mnemonicParsing="false" text="Maximum"
-                        fx:id="checkBoxMaxRankingsAllowedMax">
+                      <Label prefWidth="220.0" text="Maximum Number of Candidates&#13;  That Can Be Ranked *" />
+                      <TextField fx:id="textFieldMaxRankingsAllowed" maxWidth="80.0" />
+                      <CheckBox fx:id="checkBoxMaxRankingsAllowedMax" mnemonicParsing="false" text="Maximum">
                         <VBox.margin>
-                          <Insets bottom="8.0" top="8.0"/>
+                          <Insets bottom="8.0" top="8.0" />
                         </VBox.margin>
                       </CheckBox>
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="220.0" text="Minimum Vote Threshold"/>
-                      <TextField fx:id="textFieldMinimumVoteThreshold" maxWidth="80.0"/>
+                      <Label prefWidth="220.0" text="Minimum Vote Threshold" />
+                      <TextField fx:id="textFieldMinimumVoteThreshold" maxWidth="80.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="220.0" text="Stop Tabulation Early after Round"/>
+                      <Label prefWidth="220.0" text="Stop Tabulation Early after Round" />
                       <TextField fx:id="textFieldStopTabulationEarlyAfterRound" maxWidth="80.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <CheckBox fx:id="checkBoxBatchElimination" mnemonicParsing="false"
-                        text="Use Batch Elimination">
+                      <CheckBox fx:id="checkBoxBatchElimination" mnemonicParsing="false" text="Use Batch Elimination">
                         <VBox.margin>
-                          <Insets top="8.0" bottom="8.0"/>
+                          <Insets bottom="8.0" top="8.0" />
                         </VBox.margin>
                       </CheckBox>
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <CheckBox fx:id="checkBoxContinueUntilTwoCandidatesRemain"
-                        mnemonicParsing="false"
-                        text="Continue until Two Candidates Remain">
+                      <CheckBox fx:id="checkBoxContinueUntilTwoCandidatesRemain" mnemonicParsing="false" text="Continue until Two Candidates Remain">
                         <VBox.margin>
-                          <Insets top="8.0" bottom="8.0"/>
+                          <Insets bottom="8.0" top="8.0" />
                         </VBox.margin>
                       </CheckBox>
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <CheckBox fx:id="checkBoxFirstRoundDeterminesThreshold"
-                                mnemonicParsing="false"
-                                text="First Round Determines Threshold">
+                      <CheckBox fx:id="checkBoxFirstRoundDeterminesThreshold" mnemonicParsing="false" text="First Round Determines Threshold">
                         <VBox.margin>
-                          <Insets top="8.0" bottom="8.0"/>
+                          <Insets bottom="8.0" top="8.0" />
                         </VBox.margin>
                       </CheckBox>
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="110.0" text="Tiebreak Mode *"/>
-                      <ChoiceBox fx:id="choiceTiebreakMode" prefWidth="320.0"/>
+                      <Label prefWidth="110.0" text="Tiebreak Mode *" />
+                      <ChoiceBox fx:id="choiceTiebreakMode" prefWidth="320.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="220.0" text="Random Seed *"/>
-                      <TextField maxWidth="160.0" fx:id="textFieldRandomSeed"/>
+                      <Label prefWidth="220.0" text="Random Seed *" />
+                      <TextField fx:id="textFieldRandomSeed" maxWidth="160.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                   </VBox>
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="240.0" text="Number of Winners *"/>
-                      <TextField maxWidth="80.0" fx:id="textFieldNumberOfWinners"/>
+                      <Label prefWidth="240.0" text="Number of Winners *" />
+                      <TextField fx:id="textFieldNumberOfWinners" maxWidth="80.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="240.0" text="Percentage Threshold *"/>
-                      <TextField fx:id="textFieldMultiSeatBottomsUpPercentageThreshold"
-                        maxWidth="80.0"/>
-                      <Label text=" &#37;" prefWidth="18.0"/>
+                      <Label prefWidth="240.0" text="Percentage Threshold *" />
+                      <TextField fx:id="textFieldMultiSeatBottomsUpPercentageThreshold" maxWidth="80.0" />
+                      <Label prefWidth="18.0" text=" %" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                     <VBox spacing="4.0">
                       <fx:define>
-                        <ToggleGroup fx:id="thresholdCalculationMethodToggleGroup"/>
+                        <ToggleGroup fx:id="thresholdCalculationMethodToggleGroup" />
                       </fx:define>
-                      <Label text="Threshold Calculation Method *"/>
-                      <RadioButton alignment="TOP_LEFT" mnemonicParsing="false"
-                        toggleGroup="$thresholdCalculationMethodToggleGroup"
-                        fx:id="radioThresholdMostCommon"
-                        text="Compute using most common threshold formula&#xD;  = ((Votes / (Seats + 1)) + 1, disregarding fractions"/>
-                      <RadioButton alignment="TOP_LEFT" mnemonicParsing="false"
-                        toggleGroup="$thresholdCalculationMethodToggleGroup"
-                        fx:id="radioThresholdHbQuota"
-                        text="Compute using HB Quota&#xD;  > (Votes / (Seats + 1))"/>
-                      <RadioButton alignment="TOP_LEFT" mnemonicParsing="false"
-                        toggleGroup="$thresholdCalculationMethodToggleGroup"
-                        fx:id="radioThresholdHareQuota"
-                        text="Compute using Hare Quota&#xD;  = (Votes / Seats)"/>
+                      <Label text="Threshold Calculation Method *" />
+                      <RadioButton fx:id="radioThresholdMostCommon" alignment="TOP_LEFT" mnemonicParsing="false" text="Compute using most common threshold formula&#13;  = ((Votes / (Seats + 1)) + 1, disregarding fractions">
+                                    <toggleGroup>
+                                       <ToggleGroup fx:id="thresholdCalculationMethodToggleGroup" />
+                                    </toggleGroup></RadioButton>
+                      <RadioButton fx:id="radioThresholdHbQuota" alignment="TOP_LEFT" mnemonicParsing="false" text="Compute using HB Quota&#13;  &gt; (Votes / (Seats + 1))" toggleGroup="$thresholdCalculationMethodToggleGroup" />
+                      <RadioButton fx:id="radioThresholdHareQuota" alignment="TOP_LEFT" mnemonicParsing="false" text="Compute using Hare Quota&#13;  = (Votes / Seats)" toggleGroup="$thresholdCalculationMethodToggleGroup" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </VBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="240.0"
-                        text="Decimal Places for Vote Arithmetic&#xD;  (Multi-Winner Only) *"/>
-                      <TextField maxWidth="80.0" fx:id="textFieldDecimalPlacesForVoteArithmetic"/>
+                      <Label prefWidth="240.0" text="Decimal Places for Vote Arithmetic&#13;  (Multi-Winner Only) *" />
+                      <TextField fx:id="textFieldDecimalPlacesForVoteArithmetic" maxWidth="80.0" />
                       <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                       </padding>
                     </HBox>
                   </VBox>
                 </HBox>
                 <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                 </padding>
                 <VBox.margin>
-                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                  <Insets bottom="8.0" left="8.0" right="4.0" />
                 </VBox.margin>
               </VBox>
               <padding>
-                <Insets top="12.0"/>
+                <Insets top="12.0" />
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Voter Error Rules" fx:id="tabVoterErrorRules">
+          <Tab fx:id="tabVoterErrorRules" text="Voter Error Rules">
             <VBox>
               <VBox maxWidth="460.0" styleClass="bordered-box">
                 <HBox spacing="4.0">
-                  <Label prefWidth="120.0" text="Overvote Rule *"/>
+                  <Label prefWidth="120.0" text="Overvote Rule *" />
                   <VBox spacing="4.0">
                     <fx:define>
-                      <ToggleGroup fx:id="overvoteRuleToggleGroup"/>
+                      <ToggleGroup fx:id="overvoteRuleToggleGroup" />
                     </fx:define>
-                    <RadioButton mnemonicParsing="false" toggleGroup="$overvoteRuleToggleGroup"
-                      fx:id="radioOvervoteAlwaysSkip"/>
-                    <RadioButton mnemonicParsing="false" toggleGroup="$overvoteRuleToggleGroup"
-                      fx:id="radioOvervoteExhaustImmediately"/>
-                    <RadioButton mnemonicParsing="false" toggleGroup="$overvoteRuleToggleGroup"
-                      fx:id="radioOvervoteExhaustIfMultiple"/>
+                    <RadioButton fx:id="radioOvervoteAlwaysSkip" mnemonicParsing="false">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="overvoteRuleToggleGroup" />
+                                 </toggleGroup></RadioButton>
+                    <RadioButton fx:id="radioOvervoteExhaustImmediately" mnemonicParsing="false" toggleGroup="$overvoteRuleToggleGroup" />
+                    <RadioButton fx:id="radioOvervoteExhaustIfMultiple" mnemonicParsing="false" toggleGroup="$overvoteRuleToggleGroup" />
                   </VBox>
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label prefWidth="280.0"
-                    text="How Many Consecutive Skipped&#xD;  Ranks Are Allowed *"/>
-                  <TextField fx:id="textFieldMaxSkippedRanksAllowed" maxWidth="220.0"/>
-                  <CheckBox mnemonicParsing="false" text="Unlimited" prefWidth="180.0"
-                    fx:id="checkBoxMaxSkippedRanksAllowedUnlimited">
+                  <Label prefWidth="280.0" text="How Many Consecutive Skipped&#13;  Ranks Are Allowed *" />
+                  <TextField fx:id="textFieldMaxSkippedRanksAllowed" maxWidth="220.0" />
+                  <CheckBox fx:id="checkBoxMaxSkippedRanksAllowedUnlimited" mnemonicParsing="false" prefWidth="180.0" text="Unlimited">
                     <VBox.margin>
-                      <Insets bottom="8.0" top="8.0"/>
+                      <Insets bottom="8.0" top="8.0" />
                     </VBox.margin>
                   </CheckBox>
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <CheckBox fx:id="checkBoxExhaustOnDuplicateCandidate" mnemonicParsing="false"
-                    text="Exhaust on Multiple Ranks for the Same Candidate">
+                  <CheckBox fx:id="checkBoxExhaustOnDuplicateCandidate" mnemonicParsing="false" text="Exhaust on Multiple Ranks for the Same Candidate">
                     <VBox.margin>
-                      <Insets top="8.0" bottom="8.0"/>
+                      <Insets bottom="8.0" top="8.0" />
                     </VBox.margin>
                   </CheckBox>
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                 </padding>
                 <VBox.margin>
-                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                  <Insets bottom="8.0" left="8.0" right="4.0" />
                 </VBox.margin>
               </VBox>
               <padding>
-                <Insets top="12.0"/>
+                <Insets top="12.0" />
               </padding>
             </VBox>
           </Tab>
-          <Tab text="Output" fx:id="tabOutput">
+          <Tab fx:id="tabOutput" text="Output">
             <VBox>
               <VBox maxWidth="610.0" styleClass="bordered-box">
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <Label prefWidth="120.0" text="Output Directory"/>
-                  <TextField fx:id="textFieldOutputDirectory" prefWidth="400.0"/>
-                  <Button mnemonicParsing="false" onAction="#buttonOutputDirectoryClicked"
-                    text="Select"/>
+                  <Label prefWidth="120.0" text="Output Directory" />
+                  <TextField fx:id="textFieldOutputDirectory" prefWidth="400.0" />
+                  <Button mnemonicParsing="false" onAction="#buttonOutputDirectoryClicked" text="Select" />
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <CheckBox fx:id="checkBoxTabulateByPrecinct" mnemonicParsing="false"
-                    text="Tabulate by Precinct">
+                  <CheckBox fx:id="checkBoxTabulateByPrecinct" mnemonicParsing="false" text="Tabulate by Precinct">
                     <VBox.margin>
-                      <Insets top="8.0" bottom="8.0"/>
+                      <Insets bottom="8.0" top="8.0" />
                     </VBox.margin>
                   </CheckBox>
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
-                  <CheckBox fx:id="checkBoxGenerateCdfJson" mnemonicParsing="false"
-                    text="Generate CDF JSON">
+                  <CheckBox fx:id="checkBoxGenerateCdfJson" mnemonicParsing="false" text="Generate CDF JSON">
                     <VBox.margin>
-                      <Insets top="8.0" bottom="8.0"/>
+                      <Insets bottom="8.0" top="8.0" />
                     </VBox.margin>
                   </CheckBox>
                   <padding>
-                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                   </padding>
                 </HBox>
                 <padding>
-                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                 </padding>
                 <VBox.margin>
-                  <Insets bottom="8.0" left="8.0" right="4.0"/>
+                  <Insets bottom="8.0" left="8.0" right="4.0" />
                 </VBox.margin>
               </VBox>
               <padding>
-                <Insets top="12.0"/>
+                <Insets top="12.0" />
               </padding>
             </VBox>
           </Tab>
         </TabPane>
-        <Region/>
+        <Region />
       </VBox>
     </center>
     <right>
-      <TextArea fx:id="textAreaHelp" editable="false" minWidth="300.0" prefWidth="300.0"
-        styleClass="help-text-area" wrapText="true" BorderPane.alignment="TOP_LEFT"/>
+      <TextArea fx:id="textAreaHelp" editable="false" minWidth="300.0" prefWidth="300.0" styleClass="help-text-area" wrapText="true" BorderPane.alignment="TOP_LEFT" />
     </right>
     <bottom>
-      <TextArea id="textStatus" fx:id="textAreaStatus" editable="false" prefHeight="200.0"
-        prefWidth="200.0" styleClass="console-text-area" wrapText="true"
-        BorderPane.alignment="TOP_LEFT">
+      <TextArea id="textStatus" fx:id="textAreaStatus" editable="false" prefHeight="200.0" prefWidth="200.0" styleClass="console-text-area" wrapText="true" BorderPane.alignment="TOP_LEFT">
         <BorderPane.margin>
-          <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+          <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
         </BorderPane.margin>
       </TextArea>
     </bottom>
