@@ -105,23 +105,20 @@ class TabulatorSession {
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
-        if (castVoteRecords == null) {
-          Logger.severe("Aborting conversion due to cast vote record errors!");
-        } else {
-          Set<String> precinctIds = new Tabulator(castVoteRecords, config).getPrecinctIds();
-          ResultsWriter writer =
-              new ResultsWriter()
-                  .setNumRounds(0)
-                  .setPrecinctIds(precinctIds)
-                  .setContestConfig(config)
-                  .setTimestampString(timestampString);
-          writer.generateCdfJson(castVoteRecords);
-          conversionSuccess = true;
-        }
+        Set<String> precinctIds = new Tabulator(castVoteRecords, config).getPrecinctIds();
+        ResultsWriter writer =
+            new ResultsWriter()
+                .setNumRounds(0)
+                .setPrecinctIds(precinctIds)
+                .setContestConfig(config)
+                .setTimestampString(timestampString);
+        writer.generateCdfJson(castVoteRecords);
+        conversionSuccess = true;
       } catch (IOException
           | UnableToCreateDirectoryException
           | TabulationAbortedException
-          | RoundSnapshotDataMissingException exception) {
+          | RoundSnapshotDataMissingException
+          | CastVoteRecordGenericParseException exception) {
         Logger.severe("Failed to convert CVR(s) to CDF: %s", exception.getMessage());
       }
     }
@@ -180,15 +177,11 @@ class TabulatorSession {
           Logger.info(
               "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
           // Read cast vote records and precinct IDs from CVR files
-          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
-          if (castVoteRecords == null) {
-            Logger.severe("Aborting tabulation due to cast vote record errors!");
-            break;
-          }
           Set<String> newWinnerSet;
           try {
+            List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
             newWinnerSet = runTabulationForConfig(config, castVoteRecords);
-          } catch (TabulationAbortedException exception) {
+          } catch (TabulationAbortedException | CastVoteRecordGenericParseException exception) {
             exceptionsEncountered.add(exception.getClass().toString());
             Logger.severe(exception.getMessage());
             break;
@@ -216,17 +209,16 @@ class TabulatorSession {
       } else {
         // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
         // Read cast vote records and precinct IDs from CVR files
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
-        if (castVoteRecords == null) {
+        try {
+          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
+          runTabulationForConfig(config, castVoteRecords);
+          tabulationSuccess = true;
+        } catch (CastVoteRecordGenericParseException exception) {
+          exceptionsEncountered.add(exception.getClass().toString());
           Logger.severe("Aborting tabulation due to cast vote record errors!");
-        } else {
-          try {
-            runTabulationForConfig(config, castVoteRecords);
-            tabulationSuccess = true;
-          } catch (TabulationAbortedException exception) {
-            exceptionsEncountered.add(exception.getClass().toString());
-            Logger.severe(exception.getMessage());
-          }
+        } catch (TabulationAbortedException exception) {
+          exceptionsEncountered.add(exception.getClass().toString());
+          Logger.severe(exception.getMessage());
         }
       }
       Logger.info("Tabulation session completed.");
@@ -274,7 +266,8 @@ class TabulatorSession {
   // parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
   // returns: list of parsed CVRs or null if an error was encountered
-  private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config) {
+  private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config)
+        throws CastVoteRecordGenericParseException {
     Logger.info("Parsing cast vote records...");
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     boolean encounteredSourceProblem = false;
@@ -365,6 +358,11 @@ class TabulatorSession {
     } else {
       Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
     }
+
+    if (castVoteRecords == null) {
+      throw new CastVoteRecordGenericParseException();
+    }
+
     return castVoteRecords;
   }
 
@@ -376,5 +374,8 @@ class TabulatorSession {
     UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
       this.candidateCounts = candidateCounts;
     }
+  }
+
+  static class CastVoteRecordGenericParseException extends Exception {
   }
 }

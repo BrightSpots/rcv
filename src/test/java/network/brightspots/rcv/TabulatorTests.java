@@ -784,4 +784,11 @@ class TabulatorTests {
     runTabulationTest(
         "tabulate_by_precinct_without_precincts", TabulationAbortedException.class.toString());
   }
+
+  @Test
+  @DisplayName("halting error when CVRs have a ranking larger than the max-configured value")
+  void maxRankingValidationFails() {
+    runTabulationTest("max_ranking_enforcement",
+        TabulatorSession.CastVoteRecordGenericParseException.class.toString());
+  }
 }

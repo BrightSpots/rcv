@@ -81,6 +81,9 @@ class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRankin
   }
 
   int maxRankingNumber() {
+    if (numRankings == 0) {
+      throw new IllegalArgumentException("Max ranking may only be called on non-empty rankings");
+    }
     return this.rankings.length;
   }
 
