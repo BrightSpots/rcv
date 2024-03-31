@@ -49,11 +49,7 @@ class CsvCvrReader extends BaseCvrReader {
   public List<String> readCandidateListFromCvr(List<CastVoteRecord> castVoteRecords)
       throws IOException {
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
-      CSVParser parser =
-              CSVParser.parse(
-                      inputStream,
-                      Charset.defaultCharset(),
-                      CSVFormat.Builder.create().setHeader().build());
+      CSVParser parser = getCsvParser(inputStream);
       List<String> rawCandidateNames = parser.getHeaderNames();
       // Split rawCandidateNames from firstVoteColumnIndex to the end
       return new ArrayList<>(rawCandidateNames.subList(
@@ -69,11 +65,7 @@ class CsvCvrReader extends BaseCvrReader {
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException, IOException {
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
-      CSVParser parser =
-          CSVParser.parse(
-              inputStream,
-              Charset.defaultCharset(),
-              CSVFormat.Builder.create().setHeader().build());
+      CSVParser parser = getCsvParser(inputStream);
       List<String> candidateIds = parser.getHeaderNames();
       int undeclaredWriteInColumn = candidateIds.indexOf(source.getUndeclaredWriteInLabel());
 
@@ -112,5 +104,16 @@ class CsvCvrReader extends BaseCvrReader {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
       throw exception;
     }
+  }
+
+  private CSVParser getCsvParser(FileInputStream inputStream) throws IOException {
+    CSVFormat format = CSVFormat.Builder.create()
+        .setHeader()
+        .setAllowMissingColumnNames(true)
+        .build();
+    return CSVParser.parse(
+      inputStream,
+      Charset.defaultCharset(),
+      format);
   }
 }
