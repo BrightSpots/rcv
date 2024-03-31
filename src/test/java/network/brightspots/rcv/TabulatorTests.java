@@ -263,22 +263,10 @@ class TabulatorTests {
         if (!file.isDirectory()) {
           try {
             // Every ephemeral file must be set to read-only on close, including audit logs
-            if (file.canWrite()) {
-              // If a previous test was exited early by a developer, the file may still be
-              // writeable. That makes it pretty annoying for developers to see these spurious
-              // failures. As a safeguard, we'll only check for writeability for files
-              // created in the last five minutes -- well over the duration of any test we
-              // have today.
-              if (file.lastModified() > System.currentTimeMillis() - 1000 * 60 * 5) {
-                fail("File must not be writeable: %s".formatted(file.getAbsolutePath()));
-              } else {
-                Logger.warning(
-                        "File was writeable, but it was created more than five minutes ago"
-                                + " so we assume a previous test failed to clean it up: %s",
-                        file.getAbsolutePath());
-              }
-            }
-            // Ensure it can be deleted -- make it writeable now.
+            assertFalse(
+                file.canWrite(),
+                "File must not be writeable: %s".formatted(file.getAbsolutePath()));
+            // Then set it writeable so it can be deleted
             boolean writeableSucceeded = file.setWritable(true);
             if (!writeableSucceeded) {
               Logger.warning("Failed to set file to writeable: %s", file.getAbsolutePath());
