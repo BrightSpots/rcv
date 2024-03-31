@@ -30,4 +30,9 @@
     <Field name="xmlns"/>
     <Bug code="UrF"/>
   </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.GuiTabulateController"/>
+    <Method name="initialize"/>
+    <Bug code="EI2"/>
+  </Match>
 </FindBugsFilter>
