@@ -453,6 +453,10 @@ class Tabulator {
     int numWinnersDeclared = winnerToRound.size();
     if (currentRound >= config.getStopTabulationEarlyAfterRound()) {
       keepTabulating = false;
+    } else if (winnerToRound.size() == config.getNumDeclaredCandidates()
+            && config.getNumberOfWinners() > config.getNumCandidates()) {
+      Logger.warning("Config specifies more winners than candidates. Everyone is now elected.");
+      keepTabulating = false;
     } else if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
@@ -528,7 +532,7 @@ class Tabulator {
       // We should only look for more winners if we haven't already filled all the seats.
       int numSeatsUnfilled = config.getNumberOfWinners() - winnerToRound.size();
       if (numSeatsUnfilled > 0) {
-        if (currentRoundTally.activeCandidateSum() == numSeatsUnfilled) {
+        if (currentRoundTally.activeCandidateSum() <= numSeatsUnfilled) {
           // If the number of continuing candidates equals the number of seats to fill,
           // everyone wins.
           selectedWinners.addAll(currentRoundTally.getCandidates());

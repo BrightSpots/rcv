@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -461,6 +462,12 @@ class TabulatorTests {
   @DisplayName("Dominion - No Precinct Data")
   void testDominionNoPrecinctData() {
     runTabulationTest("dominion_no_precinct_data");
+  }
+
+  @Test
+  @DisplayName("More # winners than # candidates is okay")
+  void testMoreWinnersThanCandidates() {
+    runTabulationTest("more_winners_than_candidates");
   }
 
   @Test
