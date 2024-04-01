@@ -290,6 +290,7 @@ class TabulatorSession {
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
         Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
+        int startIndex = castVoteRecords.size();
         reader.readCastVoteRecords(castVoteRecords);
 
         // Update the per-source data for the results writer
@@ -297,6 +298,7 @@ class TabulatorSession {
                 source,
                 reader,
                 sourceIndex,
+                startIndex,
                 castVoteRecords.size() - 1));
 
         // Check for unrecognized candidates
@@ -356,6 +358,9 @@ class TabulatorSession {
       // error already logged in ResultsWriter
     }
 
+    // Print contest summary to the audit log
+    writeContestSummary(perSourceDataForCsv);
+
     if (encounteredSourceProblem) {
       Logger.severe("Parsing cast vote records failed!");
       castVoteRecords = null;
@@ -366,6 +371,16 @@ class TabulatorSession {
       Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
     }
     return castVoteRecords;
+  }
+
+  private void writeContestSummary(List<ResultsWriter.PerSourceDataForCsv> perSourceDataForCsv) {
+    Logger.info("Contest summary:");
+    for (ResultsWriter.PerSourceDataForCsv sourceData : perSourceDataForCsv) {
+      Logger.info("Source %d: %s",
+          sourceData.sourceIndex + 1, sourceData.source.getFilePath());
+      Logger.info("  uses provider: %s", sourceData.source.getProvider());
+      Logger.info("  read %d cast vote records", sourceData.getNumCvrs());
+    }
   }
 
   static class UnrecognizedCandidatesException extends Exception {

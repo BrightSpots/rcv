@@ -1058,14 +1058,21 @@ class ResultsWriter {
     public final CvrSource source;
     public final BaseCvrReader reader;
     public final int sourceIndex;
+    public final int firstIndexInCvrList;
     public final int lastIndexInCvrList;
 
     PerSourceDataForCsv(
-        CvrSource source, BaseCvrReader reader, int sourceIndex, int lastIndexInCvrList) {
+        CvrSource source, BaseCvrReader reader,
+        int sourceIndex, int firstIndexInCvrList, int lastIndexInCvrList) {
       this.source = source;
       this.reader = reader;
       this.sourceIndex = sourceIndex;
+      this.firstIndexInCvrList = firstIndexInCvrList;
       this.lastIndexInCvrList = lastIndexInCvrList;
+    }
+
+    public int getNumCvrs() {
+      return lastIndexInCvrList - firstIndexInCvrList + 1;
     }
   }
 
