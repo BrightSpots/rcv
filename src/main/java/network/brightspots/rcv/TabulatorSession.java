@@ -344,16 +344,18 @@ class TabulatorSession {
     }
 
     // Output the RCTab-CSV CVR
-    try {
-      ResultsWriter writer =
-              new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-      this.convertedFilePath =
-              writer.writeRctabCvrCsv(
-                      castVoteRecords,
-                      perSourceDataForCsv,
-                      config.getOutputDirectory());
-    } catch (IOException exception) {
-      // error already logged in ResultsWriter
+    if (!encounteredSourceProblem) {
+      try {
+        ResultsWriter writer =
+                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+        this.convertedFilePath =
+                writer.writeRctabCvrCsv(
+                        castVoteRecords,
+                        perSourceDataForCsv,
+                        config.getOutputDirectory());
+      } catch (IOException exception) {
+        // error already logged in ResultsWriter
+      }
     }
 
     if (encounteredSourceProblem) {
