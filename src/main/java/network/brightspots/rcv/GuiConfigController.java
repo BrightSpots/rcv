@@ -418,7 +418,7 @@ public class GuiConfigController implements Initializable {
     return selectedFile != null ? selectedFile.getAbsolutePath() : "No File Saved Yet";
   }
 
-  private File getSaveFile() {
+  private File getSaveFile(Stage stage) {
     FileChooser fc = new FileChooser();
     if (selectedFile == null) {
       fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -428,7 +428,7 @@ public class GuiConfigController implements Initializable {
     }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
-    File fileToSave = fc.showSaveDialog(GuiContext.getInstance().getMainWindow());
+    File fileToSave = fc.showSaveDialog(stage);
     if (fileToSave != null) {
       selectedFile = fileToSave;
     }
@@ -441,13 +441,14 @@ public class GuiConfigController implements Initializable {
    * @param useTemporaryFile whether they hit the Temporary save button
    * @return The saved file's absolute path, or null if canceled
    */
-  public String saveFile(boolean useTemporaryFile) {
+  public String saveFile(Button fromButton, boolean useTemporaryFile) {
+    Stage stage = (Stage) fromButton.getScene().getWindow();
     File outputFile = null;
     if (useTemporaryFile) {
       outputFile = new File(selectedFile.getAbsolutePath() + ".temp");
       saveFile(outputFile);
     } else {
-      outputFile = getSaveFile();
+      outputFile = getSaveFile(stage);
       if (outputFile != null) {
         saveFile(outputFile);
       }
@@ -469,7 +470,7 @@ public class GuiConfigController implements Initializable {
    * Action when save menu item is clicked.
    */
   public void menuItemSaveClicked() {
-    File fileToSave = getSaveFile();
+    File fileToSave = getSaveFile(GuiContext.getInstance().getMainWindow());
     if (fileToSave != null) {
       saveFile(fileToSave);
     }
@@ -543,6 +544,7 @@ public class GuiConfigController implements Initializable {
     final Stage window = new Stage();
     window.initModality(Modality.APPLICATION_MODAL);
     window.setTitle("Tabulate");
+    window.initOwner(GuiContext.getInstance().getMainWindow());
 
     String resourcePath = "/network/brightspots/rcv/GuiTabulationPopup.fxml";
     try {
@@ -551,6 +553,8 @@ public class GuiConfigController implements Initializable {
       GuiTabulateController controller = loader.getController();
       controller.initialize(this, config.candidates.size(), config.cvrFileSources.size());
       window.setScene(new Scene(root));
+      window.setX(GuiContext.getInstance().getMainWindow().getX() + 50);
+      window.setY(GuiContext.getInstance().getMainWindow().getY() + 50);
       window.showAndWait();
     } catch (IOException exception) {
       StringWriter sw = new StringWriter();
@@ -1053,7 +1057,7 @@ public class GuiConfigController implements Initializable {
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
       if (result.isPresent() && result.get() == saveButton) {
-        File fileToSave = getSaveFile();
+        File fileToSave = getSaveFile(GuiContext.getInstance().getMainWindow());
         if (fileToSave != null) {
           saveFile(fileToSave);
           willContinue = true;
@@ -1106,7 +1110,7 @@ public class GuiConfigController implements Initializable {
 
       // Process the result, handling all three buttons and the "X"
       if (result.isPresent() && result.get() == saveButton) {
-        File fileToSave = getSaveFile();
+        File fileToSave = getSaveFile(GuiContext.getInstance().getMainWindow());
         if (fileToSave != null) {
           saveFile(fileToSave);
           filePathAndTempStatus = new Pair<>(fileToSave.getAbsolutePath(), false);

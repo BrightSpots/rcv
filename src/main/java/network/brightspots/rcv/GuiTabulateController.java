@@ -182,6 +182,7 @@ public class GuiTabulateController {
         progressBar.setProgress(1);
         tabulateButton.setText(buttonOpenResultsText);
       } else {
+        progressBar.setProgress(0);
         tabulateButton.setText(buttonViewErrorLogsText);
       }
     });
@@ -193,7 +194,7 @@ public class GuiTabulateController {
    * @param actionEvent ignored
    */
   public void buttonSaveClicked(ActionEvent actionEvent) {
-    savedConfigFilePath = guiConfigController.saveFile(false);
+    savedConfigFilePath = guiConfigController.saveFile(saveButton, false);
     if (savedConfigFilePath != null) {
       saveButton.setText("Save");
       tempSaveButton.setText("Temp File Saved!");
@@ -209,7 +210,7 @@ public class GuiTabulateController {
    * @param actionEvent ignored
    */
   public void buttonTempSaveClicked(ActionEvent actionEvent) {
-    savedConfigFilePath = guiConfigController.saveFile(true);
+    savedConfigFilePath = guiConfigController.saveFile(tempSaveButton, true);
     isSavedConfigFileTemporary = true;
     tempSaveButton.setText("Saved!");
     updateGuiNotifyConfigSaved();
