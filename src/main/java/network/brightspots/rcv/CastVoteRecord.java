@@ -77,8 +77,13 @@ class CastVoteRecord {
   }
 
   CastVoteRecord(
-      String computedId, String suppliedId, String precinct, List<Pair<Integer, String>> rankings) {
+      String computedId,
+      String batchId,
+      String suppliedId,
+      String precinct,
+      List<Pair<Integer, String>> rankings) {
     this.computedId = computedId;
+    this.batchId = batchId;
     this.suppliedId = suppliedId;
     this.precinct = precinct;
     this.precinctPortion = null;

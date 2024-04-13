@@ -62,7 +62,6 @@ class ContestConfig {
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
   static final int SUGGESTED_CVR_ID_COLUMN = 1;
-  static final int SUGGESTED_CVR_BATCH_COLUMN = 3;
   static final int SUGGESTED_CVR_PRECINCT_COLUMN = 2;
   static final int SUGGESTED_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 4;
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;

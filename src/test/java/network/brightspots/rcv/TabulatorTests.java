@@ -611,9 +611,15 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("precinct example")
+  @DisplayName("tabulate by precinct")
   void precinctExample() {
     runTabulationTest("precinct_example");
+  }
+
+  @Test
+  @DisplayName("tabulate by batch")
+  void batchExample() {
+    runTabulationTest("batch_example");
   }
 
   @Test

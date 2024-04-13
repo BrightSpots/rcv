@@ -193,7 +193,6 @@ class StreamingCvrReader extends BaseCvrReader {
       }
     }
 
-
     // add batch ID if needed
     if (batchColumnIndex != null) {
       if (currentBatch == null) {
@@ -217,10 +216,12 @@ class StreamingCvrReader extends BaseCvrReader {
     Logger.fine("[Raw Data]: " + currentCvrData.toString());
 
     // create new cast vote record
-    // TODO -- shall we pass Batch ID to the constructor, or remove ES&S CVR ability?
-    CastVoteRecord newRecord =
-        new CastVoteRecord(
-            computedCastVoteRecordId, currentSuppliedCvrId, currentPrecinct, currentRankings);
+    CastVoteRecord newRecord = new CastVoteRecord(
+        computedCastVoteRecordId,
+        currentBatch,
+        currentSuppliedCvrId,
+        currentPrecinct,
+        currentRankings);
     cvrList.add(newRecord);
 
     // provide some user feedback on the CVR count
@@ -234,6 +235,8 @@ class StreamingCvrReader extends BaseCvrReader {
     currentCvrData.add(cellData);
     if (precinctColumnIndex != null && col == precinctColumnIndex) {
       currentPrecinct = cellData;
+    } else if (batchColumnIndex != null && col == batchColumnIndex) {
+      currentBatch = cellData;
     } else if (idColumnIndex != null && col == idColumnIndex) {
       currentSuppliedCvrId = cellData;
     }

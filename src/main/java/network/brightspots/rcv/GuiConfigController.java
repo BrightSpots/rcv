@@ -1143,8 +1143,6 @@ public class GuiConfigController implements Initializable {
           textFieldCvrIdCol.setDisable(false);
           textFieldCvrIdCol.setText(String.valueOf(ContestConfig.SUGGESTED_CVR_ID_COLUMN));
           textFieldCvrBatchCol.setDisable(false);
-          textFieldCvrBatchCol
-                  .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_BATCH_COLUMN));
           textFieldCvrPrecinctCol.setDisable(false);
           textFieldCvrPrecinctCol
               .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_PRECINCT_COLUMN));
