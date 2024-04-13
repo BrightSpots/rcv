@@ -232,6 +232,14 @@ class ContestConfig {
               source.getFilePath())) {
             validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
           }
+
+          if (fieldIsDefinedButShouldNotBeForProvider(
+                  source.getBatchColumnIndex(),
+                  "batchColumnIndex",
+                  provider,
+                  source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED);
+          }
         }
 
         // See the config file documentation for an explanation of this regex
@@ -286,6 +294,14 @@ class ContestConfig {
             provider,
             source.getFilePath())) {
           validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
+        }
+
+        if (fieldIsDefinedButShouldNotBeForProvider(
+                source.getBatchColumnIndex(),
+                "batchColumnIndex",
+                provider,
+                source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
@@ -603,9 +619,9 @@ class ContestConfig {
 
         if (getProvider(source) == Provider.CDF) {
           // Perform CDF checks
-          if (isTabulateByEnabled(TabulateByField.PRECINCT)) {
-            validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT);
-            Logger.severe("tabulateByPrecinct may not be used with CDF files.");
+          for (TabulateByField tabulateByField : enabledFields()) {
+            validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_DISAGREEMENT);
+            Logger.severe("%s may not be used with CDF files.",  tabulateByField);
           }
         } else if (getProvider(source) == Provider.ESS) {
           // Perform ES&S checks
@@ -1225,7 +1241,7 @@ class ContestConfig {
     CVR_DUPLICATE_FILE_PATHS,
     CVR_FILE_PATH_INVALID,
     CVR_OVERVOTE_LABEL_OVERVOTE_RULE_MISMATCH,
-    CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT,
+    CVR_CDF_TABULATE_BY_DISAGREEMENT,
     CVR_TABULATE_BY_PRECINCT_REQUIRES_BATCH_COLUMN,
     CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN,
     CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED,
@@ -1235,6 +1251,7 @@ class ContestConfig {
     CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED,
     CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED,
     CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED,
+    CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
