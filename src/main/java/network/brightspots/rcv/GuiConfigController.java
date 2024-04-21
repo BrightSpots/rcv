@@ -508,6 +508,17 @@ public class GuiConfigController implements Initializable {
    * Tabulate whatever is currently entered into the GUI.
    * Assumes GuiTabulateController checked all prerequisites.
    */
+  public Service<Integer> parseAndCountCastVoteRecords(String configPath) {
+    setGuiIsBusy(true);
+    Service<Integer> service = new ReadCastVoteRecordsService(configPath);
+    setUpAndStartService(service);
+    return service;
+  }
+
+  /**
+   * Tabulate whatever is currently entered into the GUI.
+   * Assumes GuiTabulateController checked all prerequisites.
+   */
   public Service<Boolean> startTabulation(
         String configPath, String operatorName, boolean deleteConfigOnCompletion) {
     setGuiIsBusy(true);
@@ -535,7 +546,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private void setUpAndStartService(Service<Boolean> service) {
+  private <T> void setUpAndStartService(Service<T> service) {
     service.setOnSucceeded(event -> setGuiIsBusy(false));
     service.setOnCancelled(event -> setGuiIsBusy(false));
     service.setOnFailed(event -> setGuiIsBusy(false));
@@ -1791,6 +1802,33 @@ public class GuiConfigController implements Initializable {
       setUpTaskCompletionTriggers(task,
           "Error when attempting to convert to CDF:\n%s\nConversion failed!");
       return task;
+    }
+  }
+
+  // ReadCastVoteRecordsService reads CVRs
+  private static class ReadCastVoteRecordsService extends Service<Integer> {
+    private final String configPath;
+
+    ReadCastVoteRecordsService(String configPath) {
+      this.configPath = configPath;
+    }
+
+    @Override
+    protected Task<Integer> createTask() {
+      return new Task<>() {
+          @Override
+          protected Integer call() {
+            TabulatorSession session = new TabulatorSession(configPath);
+            int count = session.parseAndCountCastVoteRecords();
+            if (count >= 0) {
+              succeeded();
+            } else {
+              Logger.warning("There were errors");
+              failed();
+            }
+            return count;
+          }
+        };
     }
   }
 

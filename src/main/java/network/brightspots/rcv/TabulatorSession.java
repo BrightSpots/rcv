@@ -139,6 +139,12 @@ class TabulatorSession {
     return conversionSuccess;
   }
 
+  int parseAndCountCastVoteRecords() {
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    List<CastVoteRecord> cvrs = parseCastVoteRecords(config);
+    return cvrs == null ? -1 : cvrs.size();
+  }
+
   // Returns a List of exception class names that were thrown while tabulating.
   // Operator name is required for the audit logs.
   // Note: An exception MUST be returned any time tabulation does not run.
