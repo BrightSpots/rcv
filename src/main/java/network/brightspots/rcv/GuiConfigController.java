@@ -102,6 +102,7 @@ import network.brightspots.rcv.RawContestConfig.OutputSettings;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
+import network.brightspots.rcv.TabulatorSession.LoadedCvrData;
 
 /**
  * View controller for config layout.
@@ -508,9 +509,9 @@ public class GuiConfigController implements Initializable {
    * Tabulate whatever is currently entered into the GUI.
    * Assumes GuiTabulateController checked all prerequisites.
    */
-  public Service<Integer> parseAndCountCastVoteRecords(String configPath) {
+  public Service<LoadedCvrData> parseAndCountCastVoteRecords(String configPath) {
     setGuiIsBusy(true);
-    Service<Integer> service = new ReadCastVoteRecordsService(configPath);
+    Service<LoadedCvrData> service = new ReadCastVoteRecordsService(configPath);
     setUpAndStartService(service);
     return service;
   }
@@ -520,10 +521,13 @@ public class GuiConfigController implements Initializable {
    * Assumes GuiTabulateController checked all prerequisites.
    */
   public Service<Boolean> startTabulation(
-        String configPath, String operatorName, boolean deleteConfigOnCompletion) {
+        String configPath,
+        String operatorName,
+        boolean deleteConfigOnCompletion,
+        LoadedCvrData expectedCvrData) {
     setGuiIsBusy(true);
     TabulatorService service = new TabulatorService(
-        configPath, operatorName, deleteConfigOnCompletion);
+        configPath, operatorName, deleteConfigOnCompletion, expectedCvrData);
     setUpAndStartService(service);
     return service;
   }
@@ -1754,10 +1758,16 @@ public class GuiConfigController implements Initializable {
   // TabulatorService runs a tabulation in the background
   private static class TabulatorService extends ConfigReaderService {
     private final String operatorName;
+    private LoadedCvrData expectedCvrStatistics;
 
-    TabulatorService(String configPath, String operatorName, boolean deleteConfigOnCompletion) {
+    TabulatorService(
+          String configPath,
+          String operatorName,
+          boolean deleteConfigOnCompletion,
+          LoadedCvrData expectedCvrStatistics) {
       super(configPath, deleteConfigOnCompletion);
       this.operatorName = operatorName;
+      this.expectedCvrStatistics = expectedCvrStatistics;
     }
 
     @Override
@@ -1767,7 +1777,7 @@ public class GuiConfigController implements Initializable {
             @Override
             protected Boolean call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              List<String> errors = session.tabulate(operatorName);
+              List<String> errors = session.tabulate(operatorName, expectedCvrStatistics);
               if (errors.isEmpty()) {
                 succeeded();
               } else {
@@ -1806,7 +1816,7 @@ public class GuiConfigController implements Initializable {
   }
 
   // ReadCastVoteRecordsService reads CVRs
-  private static class ReadCastVoteRecordsService extends Service<Integer> {
+  private static class ReadCastVoteRecordsService extends Service<LoadedCvrData> {
     private final String configPath;
 
     ReadCastVoteRecordsService(String configPath) {
@@ -1814,19 +1824,19 @@ public class GuiConfigController implements Initializable {
     }
 
     @Override
-    protected Task<Integer> createTask() {
+    protected Task<LoadedCvrData> createTask() {
       return new Task<>() {
           @Override
-          protected Integer call() {
+          protected LoadedCvrData call() {
             TabulatorSession session = new TabulatorSession(configPath);
-            int count = session.parseAndCountCastVoteRecords();
-            if (count >= 0) {
+            LoadedCvrData cvrStatics = session.parseAndCountCastVoteRecords();
+            if (cvrStatics.successfullyReadAll) {
               succeeded();
             } else {
               Logger.warning("There were errors");
               failed();
             }
-            return count;
+            return cvrStatics;
           }
         };
     }

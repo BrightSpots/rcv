@@ -105,18 +105,19 @@ class TabulatorSession {
       Logger.info("Converting CVR(s) to CDF...");
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
-        if (castVoteRecords == null) {
+        LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
+        if (!castVoteRecords.successfullyReadAll) {
           Logger.severe("Aborting conversion due to cast vote record errors!");
         } else {
-          Set<String> precinctIds = new Tabulator(castVoteRecords, config).getPrecinctIds();
+          Set<String> precinctIds = new Tabulator(
+              castVoteRecords.getCvrs(), config).getPrecinctIds();
           ResultsWriter writer =
               new ResultsWriter()
                   .setNumRounds(0)
                   .setPrecinctIds(precinctIds)
                   .setContestConfig(config)
                   .setTimestampString(timestampString);
-          writer.generateCdfJson(castVoteRecords);
+          writer.generateCdfJson(castVoteRecords.getCvrs());
           conversionSuccess = true;
         }
       } catch (IOException
@@ -139,10 +140,9 @@ class TabulatorSession {
     return conversionSuccess;
   }
 
-  int parseAndCountCastVoteRecords() {
+  LoadedCvrData parseAndCountCastVoteRecords() {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    List<CastVoteRecord> cvrs = parseCastVoteRecords(config);
-    return cvrs == null ? -1 : cvrs.size();
+    return parseCastVoteRecords(config);
   }
 
   // Returns a List of exception class names that were thrown while tabulating.
@@ -150,7 +150,7 @@ class TabulatorSession {
   // Note: An exception MUST be returned any time tabulation does not run.
   // In general, that means any Logger.severe in this function should be accompanied
   // by an exceptionsEncountered.add(...) call.
-  List<String> tabulate(String operatorName) {
+  List<String> tabulate(String operatorName, LoadedCvrData expectedCvrData) {
     Logger.info("Starting tabulation session...");
     List<String> exceptionsEncountered = new LinkedList<>();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
@@ -192,8 +192,14 @@ class TabulatorSession {
           Logger.info(
               "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
           // Read cast vote records and precinct IDs from CVR files
-          List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
-          if (castVoteRecords == null) {
+          LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
+          if (config.getSequentialWinners().isEmpty()
+                && !castVoteRecords.metadataMatches(expectedCvrData)) {
+            Logger.severe("CVR Data has changed between loading the CVRs and reading them!");
+            exceptionsEncountered.add(TabulationAbortedException.class.toString());
+            break;
+          }
+          if (!castVoteRecords.successfullyReadAll) {
             String errorMessage = "Aborting tabulation due to cast vote record errors!";
             exceptionsEncountered.add(errorMessage);
             Logger.severe(errorMessage);
@@ -201,7 +207,7 @@ class TabulatorSession {
           }
           Set<String> newWinnerSet;
           try {
-            newWinnerSet = runTabulationForConfig(config, castVoteRecords);
+            newWinnerSet = runTabulationForConfig(config, castVoteRecords.getCvrs());
           } catch (TabulationAbortedException exception) {
             exceptionsEncountered.add(exception.getClass().toString());
             Logger.severe(exception.getMessage());
@@ -230,14 +236,17 @@ class TabulatorSession {
       } else {
         // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
         // Read cast vote records and precinct IDs from CVR files
-        List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
-        if (castVoteRecords == null) {
+        LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
+        if (!castVoteRecords.metadataMatches(expectedCvrData)) {
+          Logger.severe("CVR Data has changed between loading the CVRs and reading them!");
+          exceptionsEncountered.add(TabulationAbortedException.class.toString());
+        } else if (!castVoteRecords.successfullyReadAll) {
           String errorMessage = "Aborting tabulation due to cast vote record errors!";
           exceptionsEncountered.add(errorMessage);
           Logger.severe(errorMessage);
         } else {
           try {
-            runTabulationForConfig(config, castVoteRecords);
+            runTabulationForConfig(config, castVoteRecords.getCvrs());
             tabulationSuccess = true;
           } catch (TabulationAbortedException exception) {
             exceptionsEncountered.add(exception.getClass().toString());
@@ -290,7 +299,7 @@ class TabulatorSession {
   // parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
   // returns: list of parsed CVRs or null if an error was encountered
-  private List<CastVoteRecord> parseCastVoteRecords(ContestConfig config) {
+  private LoadedCvrData parseCastVoteRecords(ContestConfig config) {
     Logger.info("Parsing cast vote records...");
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     boolean encounteredSourceProblem = false;
@@ -381,7 +390,7 @@ class TabulatorSession {
     } else {
       Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
     }
-    return castVoteRecords;
+    return new LoadedCvrData(castVoteRecords);
   }
 
   static class UnrecognizedCandidatesException extends Exception {
@@ -391,6 +400,70 @@ class TabulatorSession {
 
     UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
       this.candidateCounts = candidateCounts;
+    }
+  }
+
+  /**
+   * A summary of the cast vote records that have been read.
+   * Manages CVR in memory, so you can retain metadata about the loaded CVRs without
+   * keeping them all in memory. Use .discard() to free up memory. After memory is freed,
+   * all other operations except for getCvrs() are still valid.
+   */
+  public static class LoadedCvrData {
+    public static final LoadedCvrData matchesAll = new LoadedCvrData(true);
+    public final boolean successfullyReadAll;
+
+    private List<CastVoteRecord> cvrs;
+    private int numCvrs;
+    private boolean isDiscarded;
+    private boolean doesMatchAllMetadata;
+
+    public LoadedCvrData(List<CastVoteRecord> cvrs) {
+      this.cvrs = cvrs;
+      this.successfullyReadAll = cvrs != null;
+      this.numCvrs = cvrs != null ? cvrs.size() : 0;
+      this.isDiscarded = false;
+      this.doesMatchAllMetadata = false;
+    }
+
+    /**
+     * This constructor will cause metadataMatches to always return true.
+     */
+    private LoadedCvrData(boolean doesMatchAllMetadata) {
+      this.cvrs = null;
+      this.successfullyReadAll = false;
+      this.numCvrs = 0;
+      this.isDiscarded = false;
+      this.doesMatchAllMetadata = true;
+    }
+
+    /**
+     * Currently only checks if the number of CVRs matches, but can be extended to ensure
+     * exact matches or meet other needs.
+     *
+     * @param other The loaded CVRs to compare against
+     * @return whether the metadata matches
+     */
+    public boolean metadataMatches(LoadedCvrData other) {
+      return other.doesMatchAllMetadata
+          || this.doesMatchAllMetadata
+          || other.numCvrs() == this.numCvrs();
+    }
+
+    public int numCvrs() {
+      return numCvrs;
+    }
+
+    public void discard() {
+      cvrs = null;
+      isDiscarded = true;
+    }
+
+    public List<CastVoteRecord> getCvrs() {
+      if (isDiscarded) {
+        throw new IllegalStateException("CVRs have been discarded from memory.");
+      }
+      return cvrs;
     }
   }
 }

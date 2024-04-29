@@ -35,4 +35,12 @@
     <Method name="initialize"/>
     <Bug code="EI2"/>
   </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.TabulatorSession\$LoadedCvrData"/>
+    <Bug code="EI2"/>
+  </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.TabulatorSession\$LoadedCvrData"/>
+    <Bug code="EI"/>
+  </Match>
 </FindBugsFilter>

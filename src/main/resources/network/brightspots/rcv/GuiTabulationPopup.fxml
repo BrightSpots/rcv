@@ -101,7 +101,7 @@
       <ProgressBar fx:id="progressBar" layoutX="19.0" layoutY="429.0" prefHeight="20.0" prefWidth="563.0" progress="0.0" />
       <HBox layoutX="21.0" layoutY="367.0" prefHeight="42.0" prefWidth="556.0" spacing="20.0">
          <children>
-            <Button fx:id="loadCvrButton" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#buttonloadCvrsClicked" prefHeight="42.0" prefWidth="200.0" text="Load CVRs" />
+            <Button fx:id="loadCvrButton" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#buttonloadCvrsClicked" prefHeight="42.0" prefWidth="200.0" text="Check Ballot Counts" />
             <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="&gt;" textAlignment="CENTER" translateY="11.0" />
             <Button fx:id="tabulateButton" defaultButton="true" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#buttonTabulateClicked" prefHeight="42.0" prefWidth="200.0" text="Tabulate" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="&gt;" textAlignment="CENTER" translateY="11.0" />

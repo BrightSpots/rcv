@@ -83,7 +83,7 @@ public class Main extends GuiApplication {
         session.convertToCdf();
       } else {
         operatorName = operatorName.trim();
-        session.tabulate(operatorName);
+        session.tabulate(operatorName, TabulatorSession.LoadedCvrData.matchesAll);
       }
     }
 

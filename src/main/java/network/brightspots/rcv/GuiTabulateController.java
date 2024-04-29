@@ -32,6 +32,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import network.brightspots.rcv.TabulatorSession.LoadedCvrData;
 
 /** View controller for tabulator layout. */
 @SuppressWarnings("WeakerAccess")
@@ -85,6 +86,11 @@ public class GuiTabulateController {
    * If the last task failed.
    */
   private boolean lastTaskFailed = false;
+
+  /**
+   * Last-loaded CVR metadata, with the CVRs themselves discarded from memory.
+   */
+  private LoadedCvrData lastLoadedCvrData;
 
   @FXML private TextArea filepath;
   @FXML private Button saveButton;
@@ -144,7 +150,7 @@ public class GuiTabulateController {
     }
 
     enableButtonsUpTo(null);
-    Service<Integer> service = guiConfigController.parseAndCountCastVoteRecords(configPath);
+    Service<LoadedCvrData> service = guiConfigController.parseAndCountCastVoteRecords(configPath);
     // Dispatch a function that watches the service and updates the progress bar
     watchParseCvrServiceProgress(service);
   }
@@ -163,7 +169,7 @@ public class GuiTabulateController {
     }
 
     Service<Boolean> service = guiConfigController.startTabulation(
-        configPath, userNameField.getText(), useTemporaryConfigBeforeTabulation);
+        configPath, userNameField.getText(), useTemporaryConfigBeforeTabulation, lastLoadedCvrData);
     // Dispatch a function that watches the service and updates the progress bar
     watchTabulatorServiceProgress(service);
   }
@@ -196,11 +202,14 @@ public class GuiTabulateController {
     watchGenericService(service, onSuceededEvent);
   }
 
-  private void watchParseCvrServiceProgress(Service<Integer> service) {
+  private void watchParseCvrServiceProgress(Service<LoadedCvrData> service) {
     EventHandler<WorkerStateEvent> onSuceededEvent = workerStateEvent -> {
       enableButtonsUpTo(tabulateButton);
-      numberOfBallots.setText("Number of Ballots: " + service.getValue());
+      LoadedCvrData data = service.getValue();
+      numberOfBallots.setText("Number of Ballots: " + data.numCvrs());
       numberOfBallots.setOpacity(1);
+      data.discard();
+      lastLoadedCvrData = data;
     };
 
     watchGenericService(service, onSuceededEvent);
