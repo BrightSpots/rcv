@@ -66,11 +66,23 @@ class CastVoteRecord {
       String precinct,
       String precinctPortion,
       List<Pair<Integer, String>> rankings) {
+    this(contestId, tabulatorId, batchId, suppliedId, null, precinct, precinctPortion, rankings);
+  }
+
+  CastVoteRecord(
+          String contestId,
+          String tabulatorId,
+          String batchId,
+          String suppliedId,
+          String computedId,
+          String precinct,
+          String precinctPortion,
+          List<Pair<Integer, String>> rankings) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
     this.batchId = batchId;
-    this.computedId = null;
     this.suppliedId = suppliedId;
+    this.computedId = computedId;
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
     this.candidateRankings = new CandidateRankingsList(rankings);
@@ -78,16 +90,11 @@ class CastVoteRecord {
 
   CastVoteRecord(
       String computedId,
-      String batchId,
       String suppliedId,
       String precinct,
+      String batchId,
       List<Pair<Integer, String>> rankings) {
-    this.computedId = computedId;
-    this.batchId = batchId;
-    this.suppliedId = suppliedId;
-    this.precinct = precinct;
-    this.precinctPortion = null;
-    this.candidateRankings = new CandidateRankingsList(rankings);
+    this(null, null, batchId, suppliedId, computedId, precinct, null, rankings);
   }
 
   String getContestId() {
@@ -119,10 +126,10 @@ class CastVoteRecord {
 
     StringBuilder logStringBuilder = new StringBuilder();
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (!isNullOrBlank(suppliedId)) {
-      logStringBuilder.append(suppliedId);
-    } else {
+    if (!isNullOrBlank(computedId)) {
       logStringBuilder.append(computedId);
+    } else {
+      logStringBuilder.append(suppliedId);
     }
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
