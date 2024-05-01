@@ -170,7 +170,6 @@ class TabulatorSession {
         exceptionsEncountered.add(exception.getClass().toString());
         Logger.severe("Error logging config file: %s\n%s", configPath, exception);
       }
-
       Logger.info("Tabulating '%s'...", config.getContestName());
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         Logger.info("This is a multi-pass IRV contest.");
