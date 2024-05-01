@@ -218,9 +218,9 @@ class StreamingCvrReader extends BaseCvrReader {
     // create new cast vote record
     CastVoteRecord newRecord = new CastVoteRecord(
         computedCastVoteRecordId,
-        currentBatch,
         currentSuppliedCvrId,
         currentPrecinct,
+        currentBatch,
         currentRankings);
     cvrList.add(newRecord);
 
