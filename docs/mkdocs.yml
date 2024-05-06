@@ -1,0 +1,46 @@
+site_name: RCTab TDP
+docs_dir: tdp
+plugins:
+  - awesome-pages
+  - search
+  - with-pdf
+nav:  
+  - Home: index.md
+  - Overview:
+    - System Overview: System-Overview.md
+    - System Functionality Description: System-Functionality-Description.md
+    - Acceptance Test Procedures: Acceptance-Test-Procedures.md
+    - System Security Specification Requirements: System-Security-Specification-Requirements.md
+    - Design and Interface Specification: Design-and-Interface-Specification.md
+  - Security:
+    - Security Architecture: Security-Architecture.md
+    - Development Environment Specification: Development-Environment-Specification.md
+    - Security Threat Analysis: Security-Threat-Analysis.md
+    - Security Testing and Vulnerability Analysis: Security-Testing-and-Vulnerability-Analysis.md
+  - System:
+    - System Operations Procedures: System-Operations-Procedures.md
+    - System Maintenance Manual: System-Maintenance-Manual.md
+  - Testing and Training:
+    - Personnel Deployment and Training: Personnel-Deployment-and-Training.md
+    - L&A Testing: L&A-Testing.md
+    - Configuration Management Plan: Configuration-Management-Plan.md
+    - Quality Assurance Plan: Quality-Assurance-Plan.md
+    - Tabulator Trusted Build Instructions: Tabulator-Trusted-Build-Instructions.md
+    - System Change Notes: System-Change-Notes.md
+    - System Hardening Procedures - Windows OS: System-Hardening-Procedures---Windows-OS.md
+    - System Test and Verification Specification: System-Test-and-Verification-Specification.md
+    - User Guide: User-Guide.md
+    - Tabulation Options for RCV Tabulation: Tabulation-Options-for-RCV-Tabulation.md
+    - Process Ranked Choice Voting Contest: Process-Ranked-Choice-Voting-Contest.md
+    - Ballot Limitations & Maximum Testing Range: Ballot-Limitations-&-Maximum-Testing-Range.md
+    - Installation Instructions for Windows OS: Installation-Instructions-for-Windows-OS.md
+    - Tabulator Command Line Instructions: Tabulator-Command-Line-Instructions.md
+  - Another example:
+    - Configuration File Parameters: Configuration-File-Parameters.md
+    - RCTab CVR Files: RCTab-CVR-Files.md
+    - RCTab Config Files: RCTab-Config-Files.md
+    - Post-Election Audit & Clearing RCTab from System: Post-Election-Audit-&-Clearing-RCTab-from-System.md
+    - RCTab Operator Log Messages: RCTab-Operator-Log-Messages.md
+    - RCTab System Tab Hints: RCTab-System-Tab-Hints.md
+    - Coding and Header Comment Standards for RCTab: Coding-and-Header-Comment-Standards-for-RCTab.md
+    - Secure USB Process: Secure-USB-Process.md
