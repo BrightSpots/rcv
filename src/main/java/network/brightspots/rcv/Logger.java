@@ -21,7 +21,7 @@
  *  Captures all INFO level logging for the execution of a session.
  *  "session" could span multiple tabulations in GUI mode.
  *
- * GUI handler (INFO) -> textArea
+ * GUI handler (INFO) -> listView
  *  Displays INFO level logging in GUI for user feedback in GUI mode.
  *
  * Default handler -> console
@@ -44,7 +44,12 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javafx.application.Platform;
-import javafx.scene.control.TextArea;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.Background;
+import javafx.scene.paint.Color;
 
 class Logger {
 
@@ -156,21 +161,40 @@ class Logger {
   }
 
   // add logging to the provided text area for display to user in the GUI
-  static void addGuiLogging(TextArea textArea) {
+  static void addGuiLogging(ListView<Label> listView) {
+    ObservableList<Label> logMessages = FXCollections.observableArrayList();
+    listView.setItems(logMessages);
+
     java.util.logging.Handler guiHandler =
         new Handler() {
           @Override
           public void publish(LogRecord record) {
             if (isLoggable(record)) {
               String msg = getFormatter().format(record);
+              Label logLabel = new Label(msg);
+
+              // Set background color based on log level
+              if (record.getLevel() == Level.SEVERE) {
+                logLabel.setBackground(Background.fill(Color.DARKRED));
+              } else if (record.getLevel() == Level.WARNING) {
+                logLabel.setBackground(Background.fill(Color.DARKORANGE));
+              }
+
               // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
               // otherwise schedule the text update to run on the GUI thread
               if (Platform.isFxApplicationThread()) {
-                textArea.appendText(msg);
+                addFromMainThread(logLabel);
               } else {
-                Platform.runLater(() -> textArea.appendText(msg));
+                Platform.runLater(() -> addFromMainThread(logLabel));
               }
             }
+          }
+
+          private void addFromMainThread(Label logLabel) {
+            logMessages.add(logLabel);
+
+            // Scroll to the bottom of the listview
+            listView.scrollTo(logMessages.size() - 1);
           }
 
           @Override
