@@ -112,7 +112,7 @@ public class GuiTabulateController {
     guiConfigController = controller;
     numberOfCandidates.setText("Number of candidates: " + numCandidates);
     numberOfCvrFiles.setText("Number of CVR Files: " + numCvrs);
-    numberOfBallots.setText("Number of Ballots: <load CVRs to count>");
+    numberOfBallots.setText("Number of Ballots: <Check Ballot Counts to load>");
     numberOfBallots.setOpacity(0.5);
     filledFieldStyle = "";
     unfilledFieldStyle = "-fx-border-color: red;";
@@ -190,6 +190,8 @@ public class GuiTabulateController {
   }
 
   private void watchTabulatorServiceProgress(Service<Boolean> service) {
+    // Measure time it takes for the function to complete
+    long startTime = System.currentTimeMillis();
     EventHandler<WorkerStateEvent> onSuceededEvent = workerStateEvent -> {
       lastTaskFailed = service.getValue();
       if (lastTaskFailed) {
@@ -198,6 +200,8 @@ public class GuiTabulateController {
         openResultsButton.setText(buttonViewErrorLogsText);
       }
       enableButtonsUpTo(openResultsButton);
+      long endTime = System.currentTimeMillis();
+      Logger.info("Tabulation took " + (endTime - startTime) / 1000 + " seconds.");
     };
     watchGenericService(service, onSuceededEvent);
   }
