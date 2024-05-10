@@ -32,12 +32,12 @@
 
 package network.brightspots.rcv;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -46,10 +46,19 @@ import java.util.logging.LogRecord;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 class Logger {
 
@@ -165,6 +174,49 @@ class Logger {
     ObservableList<Label> logMessages = FXCollections.observableArrayList();
     listView.setItems(logMessages);
 
+    // Set cell factory to reduce vertical gap
+    listView.setCellFactory(param -> new ListCell<Label>() {
+      @Override
+      protected void updateItem(Label item, boolean empty) {
+        // Sets zero padding and updates the cell colors
+        super.updateItem(item, empty);
+        if (empty || item == null) {
+          setGraphic(null);
+          setText(null);
+          setStyle(null);
+        } else {
+          setGraphic(item);
+
+          // Remove the label padding
+          setPadding(new Insets(0, 0, 0, 0));
+
+          // First remove any existing style, which can either be overridden
+          // (if it needs a custom background) or can remain as the default.
+          setStyle(null);
+
+          // Set the entire background color to the label's background
+          // This changes the background from being a text highlight to taking up the whole row
+          Background bg = item.getBackground();
+          if (bg != null) {
+            List<BackgroundFill> fills = item.getBackground().getFills();
+            if (!fills.isEmpty()) {
+              Paint bgColor = fills.get(0).getFill();
+              String hexColor = bgColor.toString().replace("0x", "#");
+              setStyle("-fx-background-color: " + hexColor);
+            }
+          }
+
+          // Change the look when selected -- lighten it up a bit
+          // while maintaining the warning/severe color
+          if (isSelected()) {
+            setBlendMode(BlendMode.SCREEN);
+          } else {
+            setBlendMode(BlendMode.SRC_OVER);
+          }
+        }
+      }
+    });
+
     java.util.logging.Handler guiHandler =
         new Handler() {
           @Override
@@ -172,6 +224,8 @@ class Logger {
             if (isLoggable(record)) {
               String msg = getFormatter().format(record);
               Label logLabel = new Label(msg);
+              logLabel.setPadding(new Insets(0, 0, 0, 0));
+              logLabel.setWrapText(true);
 
               // Set background color based on log level
               if (record.getLevel() == Level.SEVERE) {
@@ -179,6 +233,13 @@ class Logger {
               } else if (record.getLevel() == Level.WARNING) {
                 logLabel.setBackground(Background.fill(Color.DARKORANGE));
               }
+
+              // On Right Click, user can copy text
+              ContextMenu contextMenu = new ContextMenu();
+              MenuItem copyMenuItem = new MenuItem("Copy");
+              copyMenuItem.setOnAction(event -> copyToClipboard(logLabel));
+              contextMenu.getItems().add(copyMenuItem);
+              logLabel.setContextMenu(contextMenu);
 
               // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
               // otherwise schedule the text update to run on the GUI thread
@@ -195,6 +256,13 @@ class Logger {
 
             // Scroll to the bottom of the listview
             listView.scrollTo(logMessages.size() - 1);
+          }
+
+          private void copyToClipboard(Label logLabel) {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putString(logLabel.getText());
+            clipboard.setContent(content);
           }
 
           @Override
