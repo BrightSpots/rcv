@@ -18,6 +18,7 @@
 
 package network.brightspots.rcv;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -193,11 +194,20 @@ class TabulatorTests {
   }
 
   private static void runTabulationTest(String testStem) {
-    runTabulationTest(testStem, null);
+    runTabulationTest(testStem, null, 0);
+  }
+
+  private static void runTabulationTest(String testStem, int expectedNumPrecinctFileToCheck) {
+    runTabulationTest(testStem, null, expectedNumPrecinctFileToCheck);
+  }
+
+  private static void runTabulationTest(String testStem, String expectedException) {
+    runTabulationTest(testStem, expectedException, 0);
   }
 
   // helper function to support running various tabulation tests
-  private static void runTabulationTest(String stem, String expectedException) {
+  private static void runTabulationTest(String stem, String expectedException,
+                                        int expectedNumPrecinctFileToCheck) {
     String configPath = getTestFilePath(stem, "_config.json");
 
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
@@ -219,13 +229,19 @@ class TabulatorTests {
         compareFiles(config, stem, timestampString, null);
       }
 
+      int numPrecinctFilesChecked = 0;
       if (config.isTabulateByPrecinctEnabled()) {
         for (String precinct : session.loadPrecinctNamesFromCvrs(config)) {
           String outputType = ResultsWriter.sanitizeStringForOutput(precinct + "_precinct_summary");
-          compareFiles(config, stem, outputType, ".json", timestampString, null, true);
-          compareFiles(config, stem, outputType, ".csv", timestampString, null, true);
+          if (compareFiles(config, stem, outputType, ".json", timestampString, null, true)) {
+            numPrecinctFilesChecked++;
+          }
+          if (compareFiles(config, stem, outputType, ".csv", timestampString, null, true)) {
+            numPrecinctFilesChecked++;
+          }
         }
       }
+      assertEquals(numPrecinctFilesChecked, expectedNumPrecinctFileToCheck);
 
       cleanOutputFolder(session);
     }
@@ -298,7 +314,11 @@ class TabulatorTests {
     }
   }
 
-  private static void compareFiles(
+  /**
+   * Returns whether the files were compared at all.
+   * If they were compared and not equal, the test will fail.
+   */
+  private static boolean compareFiles(
       ContestConfig config,
       String stem,
       String outputType,
@@ -319,7 +339,9 @@ class TabulatorTests {
                 + extension);
 
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
+    boolean didCompare = true;
     if (onlyCheckIfExpectedFileExists && !new File(expectedPath).exists()) {
+      didCompare = false;
       Logger.info("Skipping comparison: expected file does not exist.");
     } else if (fileCompare(expectedPath, actualOutputPath)) {
       Logger.info("Files are equal.");
@@ -327,6 +349,7 @@ class TabulatorTests {
       Logger.info("Files are different.");
       fail();
     }
+    return didCompare;
   }
 
   @BeforeAll
@@ -534,13 +557,13 @@ class TabulatorTests {
   @Test
   @DisplayName("2017 Minneapolis Mayor")
   void test2017MinneapolisMayor() {
-    runTabulationTest("2017_minneapolis_mayor");
+    runTabulationTest("2017_minneapolis_mayor", 4);
   }
 
   @Test
   @DisplayName("2013 Minneapolis Mayor")
   void test2013MinneapolisMayor() {
-    runTabulationTest("2013_minneapolis_mayor");
+    runTabulationTest("2013_minneapolis_mayor", 4);
   }
 
   @Test
@@ -624,13 +647,13 @@ class TabulatorTests {
   @Test
   @DisplayName("precinct example")
   void precinctExample() {
-    runTabulationTest("precinct_example");
+    runTabulationTest("precinct_example", 2);
   }
 
   @Test
   @DisplayName("missing precinct example")
   void missingPrecinctExample() {
-    runTabulationTest("missing_precinct_example");
+    runTabulationTest("missing_precinct_example", 4);
   }
 
   @Test
