@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -326,10 +325,10 @@ class ResultsWriter {
         csvPrinter.print(thisRoundTally);
 
         // Vote %
-        BigDecimal activeBallots = roundTallies.get(round).numActiveBallots();
-        if (activeBallots != BigDecimal.ZERO) {
+        BigDecimal votePctDivisor = roundTallies.get(round).activeAndLockedInBallotSum();
+        if (votePctDivisor != BigDecimal.ZERO) {
           // Turn a decimal into a human-readable percentage (e.g. 0.1234 -> 12.34%)
-          BigDecimal divDecimal = thisRoundTally.divide(activeBallots, MathContext.DECIMAL32);
+          BigDecimal divDecimal = thisRoundTally.divide(votePctDivisor, MathContext.DECIMAL32);
           csvPrinter.print(divDecimal.scaleByPowerOfTen(4).intValue() / 100.0 + "%");
         } else {
           csvPrinter.print("");
@@ -351,7 +350,9 @@ class ResultsWriter {
 
     csvPrinter.print("Active Ballots");
     for (int round = 1; round <= numRounds; round++) {
-      csvPrinter.print(roundTallies.get(round).numActiveBallots());
+      // While internally we separate out an "active" and a "locked in" ballot,
+      // externally, the difference is not important.
+      csvPrinter.print(roundTallies.get(round).activeAndLockedInBallotSum());
       csvPrinter.print("");
       csvPrinter.print("");
     }
@@ -402,7 +403,7 @@ class ResultsWriter {
     BigDecimal numUndervotes =
         roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
     for (int round = 1; round <= numRounds; round++) {
-      BigDecimal thisRoundInactive = roundTallies.get(round).numInactiveBallots();
+      BigDecimal thisRoundInactive = roundTallies.get(round).inactiveBallotSum();
       csvPrinter.print(thisRoundInactive.subtract(numUndervotes));
 
       // Don't display percentage of inactive ballots
@@ -412,7 +413,7 @@ class ResultsWriter {
       if (round != numRounds) {
         // Note: we don't need to subtract num undervotes here since we'd be subtracting the
         // same value from both sides of the equation, so it cancels out.
-        BigDecimal nextRoundInactive = roundTallies.get(round + 1).numInactiveBallots();
+        BigDecimal nextRoundInactive = roundTallies.get(round + 1).inactiveBallotSum();
         BigDecimal diff = nextRoundInactive.subtract(thisRoundInactive);
         csvPrinter.print(diff);
       } else {
@@ -463,7 +464,7 @@ class ResultsWriter {
     BigDecimal numUndervotes =
         round1Tally.getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
     BigDecimal totalNumberBallots =
-        round1Tally.numActiveBallots().add(round1Tally.numInactiveBallots());
+        round1Tally.activeBallotSum().add(round1Tally.inactiveBallotSum());
     csvPrinter.printRecord("Contest Summary");
     csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
     csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
@@ -538,33 +539,26 @@ class ResultsWriter {
     generateSummaryJson(roundTallies, tallyTransfers, null, outputPath);
   }
 
-  // write CastVoteRecords for the specified contest to the provided folder
-  // returns the filepath written
-  String writeGenericCvrCsv(
+  // Write CastVoteRecords for the specified contest to the provided folder,
+  // using the simplified RCTab format.
+  // Note that the castVoteRecords list MUST be stable, as perSourceDataForCsv
+  // relies on its exact ordering to determine which source each record came from.
+  // Returns the filepath written
+  String writeRctabCvrCsv(
       List<CastVoteRecord> castVoteRecords,
-      Integer numRanks,
-      String csvOutputFolder,
-      String inputFilepath,
-      String contestId,
-      String undeclaredWriteInLabel)
+      List<PerSourceDataForCsv> perSourceDataForCsv,
+      String csvOutputFolder)
       throws IOException {
     String fileWritten;
-    // Get input filename with extension
-    String inputFileBaseName = new File(inputFilepath).getName();
-    // Remove the extension if it exists
-    int lastIndex = inputFileBaseName.lastIndexOf('.');
-    if (lastIndex != -1) {
-      inputFileBaseName = inputFileBaseName.substring(0, lastIndex);
-    }
     // Put the input filename in the output filename in case contestId isn't unique --
     // knowing that it's possible that if both the filename AND the contestId isn't unique,
     // this will fail.
     AuditableFile outputFile = new AuditableFile(
                     getOutputFilePath(
                             csvOutputFolder,
-                            "dominion_conversion_contest",
+                            "rctab_cvr",
                             timestampString,
-                            inputFileBaseName + "-" + sanitizeStringForOutput(contestId))
+                            null)
                             + ".csv");
     try {
       Logger.info("Writing cast vote records in generic format to file: %s...",
@@ -575,19 +569,45 @@ class ResultsWriter {
       // print header:
       // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
       // rank 2 selection, ... rank maxRanks selection
+      csvPrinter.print("Source Filepath");
       csvPrinter.print("Contest Id");
       csvPrinter.print("Tabulator Id");
       csvPrinter.print("Batch Id");
       csvPrinter.print("Record Id");
       csvPrinter.print("Precinct");
       csvPrinter.print("Precinct Portion");
-      for (int rank = 1; rank <= numRanks; rank++) {
+
+      int maxRank;
+      if (config.isMaxRankingsSetToMaximum()) {
+        maxRank = config.getNumDeclaredCandidates();
+      } else {
+        maxRank = config.getMaxRankingsAllowedWhenNotSetToMaximum();
+      }
+      for (int rank = 1; rank <= maxRank; rank++) {
         String label = String.format("Rank %d", rank);
         csvPrinter.print(label);
       }
       csvPrinter.println();
+
+      // While the cast vote records are in a flattened list,
+      // we can use the PerSourceDataForCsv to determine which source each record came from.
+      int currentSourceIndex = 0;
+      PerSourceDataForCsv currentSourceData = perSourceDataForCsv.get(currentSourceIndex);
+
       // print rows:
-      for (CastVoteRecord castVoteRecord : castVoteRecords) {
+      for (int i = 0; i < castVoteRecords.size(); i++) {
+        if (i > currentSourceData.lastIndexInCvrList) {
+          // we've moved on to a new contest, so we need to switch to the next source
+          currentSourceIndex++;
+          currentSourceData = perSourceDataForCsv.get(currentSourceIndex);
+
+          if (currentSourceData.sourceIndex != currentSourceIndex) {
+            throw new RuntimeException("Source list must be sorted by sourceIndex!");
+          }
+        }
+
+        CastVoteRecord castVoteRecord = castVoteRecords.get(i);
+        csvPrinter.print(currentSourceData.source.getFilePath());
         csvPrinter.print(castVoteRecord.getContestId());
         csvPrinter.print(castVoteRecord.getTabulatorId());
         csvPrinter.print(castVoteRecord.getBatchId());
@@ -602,7 +622,8 @@ class ResultsWriter {
         } else {
           csvPrinter.print(castVoteRecord.getPrecinctPortion());
         }
-        printRankings(undeclaredWriteInLabel, numRanks, csvPrinter, castVoteRecord);
+        printRankings(currentSourceData.source.getUndeclaredWriteInLabel(), maxRank,
+            currentSourceData.reader, currentSourceData.source, csvPrinter, castVoteRecord);
         csvPrinter.println();
       }
       // finalize the file
@@ -624,26 +645,37 @@ class ResultsWriter {
   private void printRankings(
       String undeclaredWriteInLabel,
       Integer maxRanks,
+      BaseCvrReader reader,
+      CvrSource source,
       CSVPrinter csvPrinter,
       CastVoteRecord castVoteRecord)
       throws IOException {
     // for each rank determine what candidate id, overvote, or undervote occurred and print it
     for (int rank = 1; rank <= maxRanks; rank++) {
+      // If the configuration did not allow this ranking, we want to exclude it
+      // from the RCTab CVR -- even if it was present in the source CVRs.
+      if (!reader.isRankingAllowed(rank, source.getContestId())) {
+        break;
+      }
       if (castVoteRecord.candidateRankings.hasRankingAt(rank)) {
         CandidatesAtRanking candidates = castVoteRecord.candidateRankings.get(rank);
-        if (candidates.count() == 1) {
-          String selection = candidates.get(0);
+        // We list all candidates at a given ranking on separate lines
+        // This allows algorithms which accept overvotes.
+        List<String> allCandidatesAtRanking = new ArrayList<>(candidates.count());
+        for (String candidate : candidates) {
+          String selection = candidate;
           // We map all undeclared write-ins to our constant string when we read them in,
           // so we need to translate it back to the original candidate ID here.
           if (selection.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             selection = undeclaredWriteInLabel;
+          } else if (selection.equals(Tabulator.EXPLICIT_OVERVOTE_LABEL)) {
+            selection = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           } else {
             selection = config.getNameForCandidate(selection);
           }
-          csvPrinter.print(selection);
-        } else {
-          csvPrinter.print("overvote");
+          allCandidatesAtRanking.add(selection);
         }
+        csvPrinter.print(String.join("\n", allCandidatesAtRanking));
       } else {
         csvPrinter.print("undervote");
       }
@@ -911,7 +943,7 @@ class ResultsWriter {
     BigDecimal firstRoundUndervotes =
         roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
     BigDecimal totalNumberBallots =
-        roundTallies.get(1).numActiveBallots().add(roundTallies.get(1).numInactiveBallots());
+        roundTallies.get(1).activeBallotSum().add(roundTallies.get(1).inactiveBallotSum());
     BigDecimal lastRoundThreshold = roundTallies.get(numRounds).getWinningThreshold();
 
     HashMap<String, Object> summaryData = new HashMap<>();
@@ -1018,6 +1050,22 @@ class ResultsWriter {
         }
         actions.add(action);
       }
+    }
+  }
+
+  // Per-source data to be used in the CSV CVR export
+  static class PerSourceDataForCsv {
+    public final CvrSource source;
+    public final BaseCvrReader reader;
+    public final int sourceIndex;
+    public final int lastIndexInCvrList;
+
+    PerSourceDataForCsv(
+        CvrSource source, BaseCvrReader reader, int sourceIndex, int lastIndexInCvrList) {
+      this.source = source;
+      this.reader = reader;
+      this.sourceIndex = sourceIndex;
+      this.lastIndexInCvrList = lastIndexInCvrList;
     }
   }
 

@@ -181,10 +181,10 @@ class Tabulator {
             !config.isFirstRoundDeterminesThresholdEnabled() || currentRound == 1;
       }
       if (shouldRecomputeThreshold) {
-        setWinningThreshold(currentRoundTally, config.getMinimumVoteThreshold());
+        calculateAndSetWinningThreshold(currentRoundTally, config.getMinimumVoteThreshold());
       } else {
         BigDecimal lastRoundThreshold = roundTallies.get(currentRound - 1).getWinningThreshold();
-        currentRoundTally.setWinningThreshold(lastRoundThreshold);
+        setWinningThreshold(currentRound, lastRoundThreshold);
       }
 
       // "invert" map and look for winners
@@ -394,8 +394,9 @@ class Tabulator {
   }
 
   // determine and store the threshold to win
-  private void setWinningThreshold(RoundTally currentRoundTally, BigDecimal minimumVoteThreshold) {
-    BigDecimal currentRoundTotalVotes = currentRoundTally.numActiveBallots();
+  private void calculateAndSetWinningThreshold(
+        RoundTally currentRoundTally, BigDecimal minimumVoteThreshold) {
+    BigDecimal currentRoundTotalVotes = currentRoundTally.activeBallotSum();
 
     BigDecimal winningThreshold;
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
@@ -441,7 +442,21 @@ class Tabulator {
       winningThreshold = minimumVoteThreshold;
     }
 
+    if (currentRoundTally != roundTallies.get(currentRoundTally.getRoundNumber())) {
+      throw new RuntimeException("RoundTally object is not the same as the one in the map.");
+    }
+    setWinningThreshold(currentRoundTally.getRoundNumber(), winningThreshold);
+  }
+
+  private void setWinningThreshold(int roundNumber, BigDecimal winningThreshold) {
+    RoundTally currentRoundTally = roundTallies.get(roundNumber);
     currentRoundTally.setWinningThreshold(winningThreshold);
+    // Do the same for each precinct
+    if (config.isTabulateByPrecinctEnabled()) {
+      for (var roundTalliesForPrecinct : precinctRoundTallies.values()) {
+        roundTalliesForPrecinct.get(roundNumber).setWinningThreshold(winningThreshold);
+      }
+    }
     Logger.info("Winning threshold set to %s.", winningThreshold);
   }
 
@@ -509,13 +524,18 @@ class Tabulator {
       throws TabulationAbortedException {
     List<String> selectedWinners = new LinkedList<>();
 
+    if (getCandidateSignum(UNDECLARED_WRITE_IN_OUTPUT_LABEL, currentRoundTally) != 0) {
+      // No winners can be selected while undeclared candidates are live
+      return selectedWinners;
+    }
+
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       // if everyone meets the threshold, select them all as winners
       boolean allMeet =
           currentRoundTally
                   .getCandidatesWithMoreVotesThan(currentRoundTally.getWinningThreshold())
                   .size()
-              == currentRoundTally.numActiveCandidates();
+              == currentRoundTally.activeCandidateSum();
       if (allMeet) {
         selectedWinners.addAll(currentRoundTally.getCandidates());
       }
@@ -523,12 +543,12 @@ class Tabulator {
       // We should only look for more winners if we haven't already filled all the seats.
       int numSeatsUnfilled = config.getNumberOfWinners() - winnerToRound.size();
       if (numSeatsUnfilled > 0) {
-        if (currentRoundTally.numActiveCandidates() == numSeatsUnfilled) {
+        if (currentRoundTally.activeCandidateSum() == numSeatsUnfilled) {
           // If the number of continuing candidates equals the number of seats to fill,
           // everyone wins.
           selectedWinners.addAll(currentRoundTally.getCandidates());
         } else if (config.isFirstRoundDeterminesThresholdEnabled()
-            && currentRoundTally.numActiveCandidates() - 1 == config.getNumberOfWinners()) {
+            && currentRoundTally.activeCandidateSum() - 1 == config.getNumberOfWinners()) {
           // Edge case: if nobody meets the threshold, but we're on the penultimate round when
           // isFirstRoundDeterminesThresholdEnabled is true, select the max vote getters as
           // the winners. If isFirstRoundDeterminesThresholdEnabled isn't enabled, it should be
@@ -566,7 +586,7 @@ class Tabulator {
       boolean needsTiebreakNoWinners =
           config.getNumberOfWinners() == 1
               && selectedWinners.isEmpty()
-              && currentRoundTally.numActiveCandidates() == 2
+              && currentRoundTally.activeCandidateSum() == 2
               && numSeatsUnfilled == 1
               && currentRoundTallyToCandidates.keySet().stream()
                   .allMatch(x -> x.compareTo(config.getMinimumVoteThreshold()) >= 0);
@@ -636,8 +656,7 @@ class Tabulator {
   private List<String> dropUndeclaredWriteIns(RoundTally currentRoundTally) {
     List<String> eliminated = new LinkedList<>();
     String label = UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-    if (currentRoundTally.getCandidateTally(label) != null
-        && currentRoundTally.getCandidateTally(label).signum() == 1) {
+    if (getCandidateSignum(label, currentRoundTally) == 1) {
       eliminated.add(label);
       Logger.info(
           "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It "
@@ -645,6 +664,19 @@ class Tabulator {
           label, currentRound, currentRoundTally.getCandidateTally(label));
     }
     return eliminated;
+  }
+
+  // Returns the signum of the tally for a given label, or 0 if the label is not
+  // in the current round
+  // param: label candidate ID
+  // param: currentRoundTally map of candidate IDs to their tally for a given round
+  // returns: signum of the candidate tally
+  private int getCandidateSignum(String label, RoundTally currentRoundTally) {
+    BigDecimal tally = currentRoundTally.getCandidateTally(label);
+    if (tally == null) {
+      return 0;
+    }
+    return tally.signum();
   }
 
   // eliminate all candidates below a certain tally threshold
@@ -1132,8 +1164,14 @@ class Tabulator {
         // if this is the last ranking we are out of rankings and must exhaust this cvr
         // determine if the reason is skipping too many ranks, or no continuing candidates
         if (rank == cvr.candidateRankings.maxRankingNumber()) {
+          // When determining if this is an undervote or exhausted choice, look at either
+          // the max ranking allowed by the config, or if the config does not impose a limit,
+          // look at the number of declared candidates.
+          int maxAllowedRanking = config.isMaxRankingsSetToMaximum()
+                  ? config.getNumDeclaredCandidates()
+                  : config.getMaxRankingsAllowedWhenNotSetToMaximum();
           if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
-              && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
+              && maxAllowedRanking - rank > config.getMaxSkippedRanksAllowed()) {
             recordSelectionForCastVoteRecord(
                 cvr, roundTally, null, StatusForRound.INACTIVE_BY_UNDERVOTE, "");
           } else {

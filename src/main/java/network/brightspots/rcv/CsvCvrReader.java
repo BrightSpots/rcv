@@ -45,6 +45,25 @@ class CsvCvrReader extends BaseCvrReader {
     return "generic CSV";
   }
 
+  @Override
+  public List<String> readCandidateListFromCvr(List<CastVoteRecord> castVoteRecords)
+      throws IOException {
+    try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
+      CSVParser parser =
+              CSVParser.parse(
+                      inputStream,
+                      Charset.defaultCharset(),
+                      CSVFormat.Builder.create().setHeader().build());
+      List<String> rawCandidateNames = parser.getHeaderNames();
+      // Split rawCandidateNames from firstVoteColumnIndex to the end
+      return new ArrayList<>(rawCandidateNames.subList(
+            firstVoteColumnIndex, rawCandidateNames.size()));
+    } catch (IOException exception) {
+      Logger.severe("Error parsing cast vote record:\n%s", exception);
+      throw exception;
+    }
+  }
+
   // parse CVR CSV file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
@@ -60,7 +79,9 @@ class CsvCvrReader extends BaseCvrReader {
 
       parser.stream().skip(firstVoteRowIndex);
 
+      int index = 0;
       for (CSVRecord csvRecord : parser) {
+        index++;
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         for (int col = firstVoteColumnIndex; col < csvRecord.size(); col++) {
           String rankAsString = csvRecord.get(col);
@@ -86,7 +107,7 @@ class CsvCvrReader extends BaseCvrReader {
 
         // create the new CastVoteRecord
         CastVoteRecord newCvr =
-            new CastVoteRecord(source.getContestId(), "no supplied ID", "no precinct", rankings);
+            new CastVoteRecord(Integer.toString(index), "no supplied ID", "no precinct", rankings);
         castVoteRecords.add(newCvr);
       }
     } catch (IOException exception) {

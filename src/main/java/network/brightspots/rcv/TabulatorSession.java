@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -238,6 +239,15 @@ class TabulatorSession {
     return exceptionsEncountered;
   }
 
+  Set<String> loadPrecinctNamesFromCvrs(ContestConfig config) {
+    List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
+    try {
+      return new Tabulator(castVoteRecords, config).getPrecinctIds();
+    } catch (IOException | TabulationAbortedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private boolean setUpLogging(String outputDirectory) {
     boolean success = false;
     // cache outputPath for testing
@@ -279,8 +289,12 @@ class TabulatorSession {
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     boolean encounteredSourceProblem = false;
 
+    // Per-source data for writing generic CSV
+    List<ResultsWriter.PerSourceDataForCsv> perSourceDataForCsv = new ArrayList<>();
+
     // At each iteration of the following loop, we add records from another source file.
-    for (RawContestConfig.CvrSource source : config.rawConfig.cvrFileSources) {
+    for (int sourceIndex = 0; sourceIndex < config.rawConfig.cvrFileSources.size(); ++sourceIndex) {
+      RawContestConfig.CvrSource source  = config.rawConfig.cvrFileSources.get(sourceIndex);
       String cvrPath = config.resolveConfigPath(source.getFilePath());
       Provider provider = ContestConfig.getProvider(source);
       try {
@@ -288,32 +302,23 @@ class TabulatorSession {
         Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
         reader.readCastVoteRecords(castVoteRecords);
 
+        // Update the per-source data for the results writer
+        perSourceDataForCsv.add(new ResultsWriter.PerSourceDataForCsv(
+                source,
+                reader,
+                sourceIndex,
+                castVoteRecords.size() - 1));
+
         // Check for unrecognized candidates
         Map<String, Integer> unrecognizedCandidateCounts =
-            reader.gatherUnknownCandidates(castVoteRecords);
+            reader.gatherUnknownCandidates(castVoteRecords, false);
 
-        if (unrecognizedCandidateCounts.size() > 0) {
+        if (!unrecognizedCandidateCounts.isEmpty()) {
           throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
         }
 
         // Check for any other reader-specific validations
         reader.runAdditionalValidations(castVoteRecords);
-
-        // Before we tabulate, we output a converted generic CSV for the CVRs.
-        try {
-          ResultsWriter writer =
-              new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-          this.convertedFilePath =
-              writer.writeGenericCvrCsv(
-                  castVoteRecords,
-                  reader.getMaxRankingsAllowed(source.getContestId()),
-                  config.getOutputDirectory(),
-                  source.getFilePath(),
-                  source.getContestId(),
-                  source.getUndeclaredWriteInLabel());
-        } catch (IOException exception) {
-          // error already logged in ResultsWriter
-        }
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
@@ -346,6 +351,19 @@ class TabulatorSession {
         Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath, exception);
         encounteredSourceProblem = true;
       }
+    }
+
+    // Output the RCTab-CSV CVR
+    try {
+      ResultsWriter writer =
+              new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+      this.convertedFilePath =
+              writer.writeRctabCvrCsv(
+                      castVoteRecords,
+                      perSourceDataForCsv,
+                      config.getOutputDirectory());
+    } catch (IOException exception) {
+      // error already logged in ResultsWriter
     }
 
     if (encounteredSourceProblem) {
