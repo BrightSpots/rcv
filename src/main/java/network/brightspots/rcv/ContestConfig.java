@@ -26,10 +26,8 @@ import java.math.RoundingMode;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -619,21 +617,21 @@ class ContestConfig {
 
         if (getProvider(source) == Provider.CDF) {
           // Perform CDF checks
-          for (TabulateByField tabulateByField : enabledFields()) {
+          for (TabulateBySlice tabulateBySlice : enabledSlices()) {
             validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_DISAGREEMENT);
-            Logger.severe("%s may not be used with CDF files.",  tabulateByField);
+            Logger.severe("%s may not be used with CDF files.", tabulateBySlice);
           }
         } else if (getProvider(source) == Provider.ESS) {
           // Perform ES&S checks
           if (isNullOrBlank(source.getPrecinctColumnIndex())
-              && isTabulateByEnabled(TabulateByField.PRECINCT)) {
+              && isTabulateByEnabled(TabulateBySlice.PRECINCT)) {
             validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN);
             Logger.severe(
                 "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
                 cvrPath);
           }
           if (isNullOrBlank(source.getBatchColumnIndex())
-              && isTabulateByEnabled(TabulateByField.BATCH)) {
+              && isTabulateByEnabled(TabulateBySlice.BATCH)) {
             validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_BATCH_COLUMN);
             Logger.severe(
                     "batchColumnIndex is required when tabulateByBatch is enabled: %s",
@@ -988,15 +986,15 @@ class ContestConfig {
     return rawConfig.outputSettings.contestDate;
   }
 
-  boolean isTabulateByEnabled(TabulateByField field) {
-    return switch (field) {
+  boolean isTabulateByEnabled(TabulateBySlice slice) {
+    return switch (slice) {
       case PRECINCT -> rawConfig.outputSettings.tabulateByPrecinct;
       case BATCH -> rawConfig.outputSettings.tabulateByBatch;
     };
   }
 
-  List<TabulateByField> enabledFields() {
-    return Arrays.stream(TabulateByField.values())
+  List<TabulateBySlice> enabledSlices() {
+    return Arrays.stream(TabulateBySlice.values())
             .filter(this::isTabulateByEnabled)
             .collect(Collectors.toList());
   }
@@ -1332,13 +1330,13 @@ class ContestConfig {
     }
   }
 
-  enum TabulateByField {
+  enum TabulateBySlice {
     PRECINCT("Precinct"),
     BATCH("Batch");
 
     private final String label;
 
-    TabulateByField(String label) {
+    TabulateBySlice(String label) {
       this.label = label;
     }
 

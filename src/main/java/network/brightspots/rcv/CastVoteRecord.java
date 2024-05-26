@@ -105,8 +105,8 @@ class CastVoteRecord {
     return tabulatorId;
   }
 
-  String getField(ContestConfig.TabulateByField field) {
-    return switch (field) {
+  String getSlice(ContestConfig.TabulateBySlice slice) {
+    return switch (slice) {
       case BATCH -> batchId;
       case PRECINCT -> precinct;
     };

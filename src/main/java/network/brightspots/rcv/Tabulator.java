@@ -39,7 +39,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
-import network.brightspots.rcv.ContestConfig.TabulateByField;
+import network.brightspots.rcv.ContestConfig.TabulateBySlice;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 
 class Tabulator {
@@ -61,19 +61,19 @@ class Tabulator {
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes for each candidate in round 1
   // this structure is computed over the course of tabulation
   private final RoundTallies roundTallies = new RoundTallies();
-  // roundTalliesByField is a map from a tabulate-by field to roundTallies for that field
-  private final BreakdownByField<RoundTallies> roundTalliesByField = new BreakdownByField<>();
+  // roundTalliesBySlice is a map from a tabulate-by slice to roundTallies for that slice
+  private final BreakdownBySlice<RoundTallies> roundTalliesBySlice = new BreakdownBySlice<>();
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
   // map from candidate ID to the round in which they won
   private final Map<String, Integer> winnerToRound = new HashMap<>();
   // tracks vote transfer summaries (usable by external visualizer software)
   private final TallyTransfers tallyTransfers = new TallyTransfers();
-  private final BreakdownByField<TallyTransfers> tallyTransfersByField = new BreakdownByField<>();
+  private final BreakdownBySlice<TallyTransfers> tallyTransfersBySlice = new BreakdownBySlice<>();
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
   // cast vote record metadata on which tabulation can be "split", such as precinct or batch
-  private final FieldIdSet fieldIds = new FieldIdSet();
+  private final SliceIdSet sliceIds = new SliceIdSet();
   // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
 
@@ -83,27 +83,27 @@ class Tabulator {
     this.candidateNames = config.getCandidateNames();
     this.config = config;
 
-    fieldIds.initialize(TabulateByField.BATCH);
-    fieldIds.initialize(TabulateByField.PRECINCT);
+    sliceIds.initialize(ContestConfig.TabulateBySlice.BATCH);
+    sliceIds.initialize(ContestConfig.TabulateBySlice.PRECINCT);
 
     for (CastVoteRecord cvr : castVoteRecords) {
-      for (TabulateByField field : config.enabledFields()) {
-        String fieldId = cvr.getField(field);
-        if (fieldId != null) {
-          fieldIds.add(field, fieldId);
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        String sliceId = cvr.getSlice(slice);
+        if (sliceId != null) {
+          sliceIds.add(slice, sliceId);
         }
       }
     }
 
-    for (TabulateByField field : config.enabledFields()) {
-      if (fieldIds.isEmpty(field)) {
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      if (sliceIds.isEmpty(slice)) {
         Logger.severe(
             "\"Tabulate by %s\" enabled, but CVRs don't list %ss.",
-            field, field.toString().toLowerCase());
+            slice, slice.toString().toLowerCase());
         throw new TabulationAbortedException(false);
       }
 
-      initTabulateByFieldRoundTallies(field);
+      initTabulateBySliceRoundTallies(slice);
     }
   }
 
@@ -331,19 +331,19 @@ class Tabulator {
               : previousRoundTally.getCandidateTally(winner));
     }
 
-    // initialize or populate tabulate-by field tallies
-    for (TabulateByField field : config.enabledFields()) {
-      // this is all the tallies for the given field
-      for (var roundTalliesForField : roundTalliesByField.get(field).values()) {
-        // and this is the tally for the current round for the field
-        RoundTally roundTallyForField = roundTalliesForField.get(currentRound);
-        roundTallyForField.unlockForSurplusCalculation();
+    // initialize or populate tabulate-by slice tallies
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      // this is all the tallies for the given slice
+      for (var roundTalliesForSlice : roundTalliesBySlice.get(slice).values()) {
+        // and this is the tally for the current round for the slice
+        RoundTally roundTallyForSlice = roundTalliesForSlice.get(currentRound);
+        roundTallyForSlice.unlockForSurplusCalculation();
         for (String winner : winnersToProcess) {
-          roundTallyForField.setCandidateTallyViaSurplusAdjustment(
+          roundTallyForSlice.setCandidateTallyViaSurplusAdjustment(
               winner,
               winnersRequiringComputation.contains(winner)
                   ? BigDecimal.ZERO
-                  : roundTalliesForField.get(currentRound - 1).getCandidateTally(winner));
+                  : roundTalliesForSlice.get(currentRound - 1).getCandidateTally(winner));
         }
       }
     }
@@ -362,24 +362,24 @@ class Tabulator {
           BigDecimal fractionalTransferValue = entry.getValue();
 
           roundTally.addToCandidateTallyViaSurplusAdjustment(winner, fractionalTransferValue);
-          for (TabulateByField field : config.enabledFields()) {
-            String fieldId = cvr.getField(field);
-            if (fieldId != null) {
-              var roundTalliesForField = roundTalliesByField.get(field);
-              RoundTallies fieldTallies = roundTalliesForField.get(fieldId);
-              RoundTally fieldRoundTally = fieldTallies.get(currentRound);
-              fieldRoundTally.addToCandidateTallyViaSurplusAdjustment(
+          for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+            String sliceId = cvr.getSlice(slice);
+            if (sliceId != null) {
+              var roundTalliesForSlice = roundTalliesBySlice.get(slice);
+              RoundTallies sliceTallies = roundTalliesForSlice.get(sliceId);
+              RoundTally sliceRoundTally = sliceTallies.get(currentRound);
+              sliceRoundTally.addToCandidateTallyViaSurplusAdjustment(
                   winner, fractionalTransferValue);
             }
           }
         }
       }
 
-      // Re-lock all by-field tabulations
-      for (TabulateByField field : config.enabledFields()) {
-        for (var roundTalliesForField : roundTalliesByField.get(field).values()) {
-          RoundTally roundTallyForField = roundTalliesForField.get(currentRound);
-          roundTallyForField.relockAfterSurplusCalculation();
+      // Re-lock all by-slice tabulations
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        for (var roundTalliesForSlice : roundTalliesBySlice.get(slice).values()) {
+          RoundTally roundTallyForSlice = roundTalliesForSlice.get(currentRound);
+          roundTallyForSlice.relockAfterSurplusCalculation();
         }
       }
 
@@ -782,11 +782,11 @@ class Tabulator {
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
             .setTimestampString(timestamp)
-            .setFieldIds(fieldIds)
+            .setSliceIds(sliceIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
     writer.generateOverallSummaryFiles(roundTallies, tallyTransfers);
-    writer.generateByFieldSummaryFiles(roundTalliesByField, tallyTransfersByField);
+    writer.generateBySliceSummaryFiles(roundTalliesBySlice, tallyTransfersBySlice);
 
     if (config.isGenerateCdfJsonEnabled()) {
       try {
@@ -798,8 +798,8 @@ class Tabulator {
     }
   }
 
-  FieldIdSet getFieldIds() {
-    return fieldIds;
+  SliceIdSet getSliceIds() {
+    return sliceIds;
   }
 
   // Function: runBatchElimination
@@ -953,16 +953,16 @@ class Tabulator {
           cvr.getCurrentRecipientOfVote(),
           selectedCandidate,
           cvr.getFractionalTransferValue());
-      for (TabulateByField field : config.enabledFields()) {
-        String fieldId = cvr.getField(field);
-        TallyTransfers tallyTransferForField = tallyTransfersByField.get(field, fieldId);
-        if (tallyTransferForField == null) {
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        String sliceId = cvr.getSlice(slice);
+        TallyTransfers tallyTransferForSlice = tallyTransfersBySlice.get(slice, sliceId);
+        if (tallyTransferForSlice == null) {
           Logger.severe(
               "%s \"%s\" is not among the %d known %s.",
-              field, fieldId, fieldIds.size(field), field);
+              slice, sliceId, sliceIds.size(slice), slice);
           throw new TabulationAbortedException(false);
         }
-        tallyTransferForField.addTransfer(
+        tallyTransferForSlice.addTransfer(
             currentRoundTally.getRoundNumber(),
             cvr.getCurrentRecipientOfVote(),
             selectedCandidate,
@@ -1013,10 +1013,10 @@ class Tabulator {
   // returns a map of candidate ID to vote tallies for this round
   private RoundTally computeTalliesForRound(int currentRound) throws TabulationAbortedException {
     RoundTally roundTally = getNewTally(currentRound);
-    BreakdownByField<RoundTally> roundTallyByField = new BreakdownByField();
-    for (TabulateByField field : config.enabledFields()) {
-      for (String fieldId : roundTalliesByField.get(field).keySet()) {
-        roundTallyByField.initialize(field, fieldId, getNewTally(currentRound));
+    BreakdownBySlice<RoundTally> roundTallyBySlice = new BreakdownBySlice();
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      for (String sliceId : roundTalliesBySlice.get(slice).keySet()) {
+        roundTallyBySlice.initialize(slice, sliceId, getNewTally(currentRound));
       }
     }
 
@@ -1041,7 +1041,7 @@ class Tabulator {
             roundTally,
             cvr,
             cvr.getCurrentRecipientOfVote(),
-            roundTallyByField);
+            roundTallyBySlice);
         continue;
       }
 
@@ -1136,8 +1136,8 @@ class Tabulator {
           recordSelectionForCastVoteRecord(
               cvr, roundTally, selectedCandidate, StatusForRound.ACTIVE, "");
 
-          // This will also update the roundTallyByField for each enabled field
-          incrementTallies(roundTally, cvr, selectedCandidate, roundTallyByField);
+          // This will also update the roundTallyBySlice for each enabled slice
+          incrementTallies(roundTally, cvr, selectedCandidate, roundTallyBySlice);
 
           // There can be at most one continuing candidate in candidates; if there were more than
           // one, we would have already flagged this as an overvote.
@@ -1170,13 +1170,13 @@ class Tabulator {
       } // end looping over the rankings within one ballot
     } // end looping over all ballots
 
-    // Take the tallies for this round for each field and merge them into the main map tracking
-    // the tallies by each enabled field.
-    for (TabulateByField field : config.enabledFields()) {
-      for (var entry : roundTallyByField.get(field).entrySet()) {
-        RoundTallies roundTalliesForField = roundTalliesByField.get(field).get(entry.getKey());
-        roundTalliesForField.put(currentRound, entry.getValue());
-        roundTalliesForField.get(currentRound).lockInRound();
+    // Take the tallies for this round for each slice and merge them into the main map tracking
+    // the tallies by each enabled slice.
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      for (var entry : roundTallyBySlice.get(slice).entrySet()) {
+        RoundTallies roundTalliesForSlice = roundTalliesBySlice.get(slice).get(entry.getKey());
+        roundTalliesForSlice.put(currentRound, entry.getValue());
+        roundTalliesForSlice.get(currentRound).lockInRound();
       }
     }
     roundTally.lockInRound();
@@ -1189,29 +1189,29 @@ class Tabulator {
     return new RoundTally(roundNumber, candidateNames.stream().filter(this::isCandidateContinuing));
   }
 
-  // transfer vote to round tally and (if valid) the by-field round tally
+  // transfer vote to round tally and (if valid) the by-slice round tally
   private void incrementTallies(RoundTally roundTally, CastVoteRecord cvr,
-        String selectedCandidate, BreakdownByField<RoundTally> roundTalliesByField) {
+        String selectedCandidate, BreakdownBySlice<RoundTally> roundTalliesBySlice) {
     BigDecimal fractionalTransferValue = cvr.getFractionalTransferValue();
     roundTally.addToCandidateTally(selectedCandidate, fractionalTransferValue);
-    for (TabulateByField field : config.enabledFields()) {
-      String fieldId = cvr.getField(field);
-      if (!isNullOrBlank(fieldId)) {
-        roundTalliesByField.get(field, fieldId)
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      String sliceId = cvr.getSlice(slice);
+      if (!isNullOrBlank(sliceId)) {
+        roundTalliesBySlice.get(slice, sliceId)
                 .addToCandidateTally(selectedCandidate, fractionalTransferValue);
       }
     }
   }
 
-  private void initTabulateByFieldRoundTallies(TabulateByField field)
+  private void initTabulateBySliceRoundTallies(ContestConfig.TabulateBySlice slice)
         throws TabulationAbortedException {
-    for (String fieldId : fieldIds.get(field)) {
-      if (isNullOrBlank(fieldId)) {
-        Logger.severe("Null %s found in %s list: %s", field, field, fieldId);
+    for (String sliceId : sliceIds.get(slice)) {
+      if (isNullOrBlank(sliceId)) {
+        Logger.severe("Null %s found in %s list: %s", slice, slice, sliceId);
         throw new TabulationAbortedException(false);
       }
-      roundTalliesByField.initialize(field, fieldId, new RoundTallies());
-      tallyTransfersByField.initialize(field, fieldId, new TallyTransfers());
+      roundTalliesBySlice.initialize(slice, sliceId, new RoundTallies());
+      tallyTransfersBySlice.initialize(slice, sliceId, new TallyTransfers());
 
     }
   }
@@ -1355,52 +1355,53 @@ class Tabulator {
   }
 
   /**
-   * A wrapper around Map&lt;TabulateByField, Map&lt;String, T&gt;&gt;
-   * Breaks down the templated type T by a specific field.
-   * The field type is the outer map (TabulateByField), and the field ID is the inner map (String).
+   * A wrapper around Map&lt;TabulateBySlice, Map&lt;String, T&gt;&gt;
+   * Breaks down the templated type T by a specific slice.
+   * The slice type is the outer map (TabulateBySlice), and the slice ID is the inner map (String).
    */
-  static class BreakdownByField<T> {
-    private final Map<TabulateByField, Map<String, T>> breakdownByField = new HashMap<>();
+  static class BreakdownBySlice<T> {
+    private final Map<ContestConfig.TabulateBySlice, Map<String, T>> breakdownBySlice
+            = new HashMap<>();
 
-    public T initialize(TabulateByField field, String fieldId, T t) {
-      return breakdownByField.computeIfAbsent(field, k -> new HashMap<>()).put(fieldId, t);
+    public T initialize(ContestConfig.TabulateBySlice slice, String sliceId, T t) {
+      return breakdownBySlice.computeIfAbsent(slice, k -> new HashMap<>()).put(sliceId, t);
     }
 
-    public Map<String, T> get(TabulateByField field) {
-      return breakdownByField.get(field);
+    public Map<String, T> get(ContestConfig.TabulateBySlice slice) {
+      return breakdownBySlice.get(slice);
     }
 
-    public T get(TabulateByField field, String fieldId) {
-      return get(field).get(fieldId);
+    public T get(ContestConfig.TabulateBySlice slice, String sliceId) {
+      return get(slice).get(sliceId);
     }
   }
 
   /**
-   * A wrapper around Map&lt;TabulateByField, Set&lt;String&gt;&gt;
-   * Maps a TabulateByField to the set of corresponding field IDs.
+   * A wrapper around Map&lt;TabulateBySlice, Set&lt;String&gt;&gt;
+   * Maps a TabulateBySlice to the set of corresponding slice IDs.
    */
-  static class FieldIdSet {
-    private final Map<TabulateByField, Set<String>> fieldIds = new HashMap<>();
+  static class SliceIdSet {
+    private final Map<ContestConfig.TabulateBySlice, Set<String>> sliceIds = new HashMap<>();
 
-    public void initialize(TabulateByField field) {
-      fieldIds.put(field, new HashSet<>());
+    public void initialize(ContestConfig.TabulateBySlice slice) {
+      sliceIds.put(slice, new HashSet<>());
     }
 
-    public void add(TabulateByField field, String fieldId) {
-      fieldIds.get(field).add(fieldId);
+    public void add(TabulateBySlice slice, String sliceId) {
+      sliceIds.get(slice).add(sliceId);
     }
 
-    public boolean isEmpty(TabulateByField field) {
-      return fieldIds.get(field).isEmpty();
+    public boolean isEmpty(ContestConfig.TabulateBySlice slice) {
+      return sliceIds.get(slice).isEmpty();
     }
 
-    // Add an enumerator for each Set<String> of a given field
-    public Set<String> get(TabulateByField field) {
-      return fieldIds.get(field);
+    // Add an enumerator for each Set<String> of a given slice
+    public Set<String> get(ContestConfig.TabulateBySlice slice) {
+      return sliceIds.get(slice);
     }
 
-    public int size(TabulateByField field) {
-      return fieldIds.get(field).size();
+    public int size(ContestConfig.TabulateBySlice slice) {
+      return sliceIds.get(slice).size();
     }
   }
 

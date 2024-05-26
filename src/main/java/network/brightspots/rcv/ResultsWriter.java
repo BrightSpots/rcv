@@ -9,7 +9,7 @@
 
 /*
  * Purpose: Ingests tabulation results and generates various summary report files.
- * Design: Generates per-field files if specified.
+ * Design: Generates per-slice files if specified.
  * CSV summary file(s) with round by round counts.
  * JSON summary file(s) with additional data on transfer counts.
  * Also converts CVR sources into CDF format and writes them to disk.
@@ -47,10 +47,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javafx.util.Pair;
-import network.brightspots.rcv.ContestConfig.TabulateByField;
+import network.brightspots.rcv.ContestConfig.TabulateBySlice;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
-import network.brightspots.rcv.Tabulator.FieldIdSet;
 import network.brightspots.rcv.Tabulator.RoundTallies;
+import network.brightspots.rcv.Tabulator.SliceIdSet;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -66,8 +66,8 @@ class ResultsWriter {
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
-  // all Field Ids which may appear in the output cvrs
-  private FieldIdSet fieldIds;
+  // all Slice Ids which may appear in the output cvrs
+  private SliceIdSet sliceIds;
   // precinct to GpUnitId map (CDF only)
   private Map<String, String> gpUnitIds;
   // map from round number to list of candidates eliminated in that round
@@ -183,13 +183,13 @@ class ResultsWriter {
     return sortedCandidatesWithRanks;
   }
 
-  // return a unique, valid string for this field's output spreadsheet filename
-  private static String getFileStringForField(
-        TabulateByField field, String fieldId, Set<String> filenames) {
-    String sanitized = "%s_%s".formatted(field, sanitizeStringForOutput(fieldId));
+  // return a unique, valid string for this slice's output spreadsheet filename
+  private static String getFileStringForSlice(
+          ContestConfig.TabulateBySlice slice, String sliceId, Set<String> filenames) {
+    String sanitized = "%s_%s".formatted(slice, sanitizeStringForOutput(sliceId));
     String filename = sanitized;
     // appendNumber is used to find a unique filename (in practice this really shouldn't be
-    // necessary because different field IDs shouldn't have the same sanitized name, but we're
+    // necessary because different slice IDs shouldn't have the same sanitized name, but we're
     // doing it here to be safe)
     int appendNumber = 2;
     while (filenames.contains(filename)) {
@@ -219,8 +219,8 @@ class ResultsWriter {
     return this;
   }
 
-  ResultsWriter setFieldIds(FieldIdSet fieldIds) {
-    this.fieldIds = fieldIds;
+  ResultsWriter setSliceIds(SliceIdSet sliceIds) {
+    this.sliceIds = sliceIds;
     return this;
   }
 
@@ -255,35 +255,35 @@ class ResultsWriter {
     return this;
   }
 
-  // creates summary files for the votes split by a TabulateByField
-  // param: roundTalliesByField is map from a field type to the round-by-round vote tallies
-  // param: tallyTransfersByField is a map from a field type to tally transfers for that field
-  void generateByFieldSummaryFiles(
-        Tabulator.BreakdownByField<RoundTallies> roundTalliesByField,
-        Tabulator.BreakdownByField<TallyTransfers> tallyTransfersByField)
+  // creates summary files for the votes split by a TabulateBySlice
+  // param: roundTalliesBySlice is map from a slice type to the round-by-round vote tallies
+  // param: tallyTransfersBySlice is a map from a slice type to tally transfers for that slice
+  void generateBySliceSummaryFiles(
+        Tabulator.BreakdownBySlice<RoundTallies> roundTalliesBySlice,
+        Tabulator.BreakdownBySlice<TallyTransfers> tallyTransfersBySlice)
       throws IOException {
-    for (TabulateByField field : config.enabledFields()) {
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
       Set<String> filenames = new HashSet<>();
-      for (var entry : roundTalliesByField.get(field).entrySet()) {
-        String fieldId = entry.getKey();
+      for (var entry : roundTalliesBySlice.get(slice).entrySet()) {
+        String sliceId = entry.getKey();
         RoundTallies roundTallies = entry.getValue();
-        TallyTransfers tallyTransfers = tallyTransfersByField.get(field, fieldId);
-        String fieldFileString = getFileStringForField(field, fieldId, filenames);
+        TallyTransfers tallyTransfers = tallyTransfersBySlice.get(slice, sliceId);
+        String sliceFileString = getFileStringForSlice(slice, sliceId, filenames);
         String outputPath = getOutputFilePathFromInstance(
-            String.format("%s_summary", fieldFileString));
-        generateSummarySpreadsheet(roundTallies, field, fieldId, outputPath);
-        generateSummaryJson(roundTallies, tallyTransfers, field, fieldId, outputPath);
+            String.format("%s_summary", sliceFileString));
+        generateSummarySpreadsheet(roundTallies, slice, sliceId, outputPath);
+        generateSummaryJson(roundTallies, tallyTransfers, slice, sliceId, outputPath);
       }
     }
   }
 
   // create a summary spreadsheet .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
-  // param: field indicates which type of field we're reporting results for (null means all)
-  // param: fieldId indicates the specific field ID we're reporting results for (null means all)
+  // param: slice indicates which type of slice we're reporting results for (null means all)
+  // param: sliceId indicates the specific slice ID we're reporting results for (null means all)
   // param: outputPath is the path to the output file, minus its extension
   private void generateSummarySpreadsheet(
-        RoundTallies roundTallies, TabulateByField field, String fieldId, String outputPath)
+          RoundTallies roundTallies, TabulateBySlice slice, String sliceId, String outputPath)
       throws IOException {
     AuditableFile csvFile = new AuditableFile(outputPath + ".csv");
     Logger.info("Generating summary spreadsheet: %s...", csvFile.getAbsolutePath());
@@ -300,7 +300,7 @@ class ResultsWriter {
     }
 
     BigDecimal winningThreshold = roundTallies.get(numRounds).getWinningThreshold();
-    addContestInformationRows(csvPrinter, winningThreshold, field, fieldId);
+    addContestInformationRows(csvPrinter, winningThreshold, slice, sliceId);
     addContestSummaryRows(csvPrinter, roundTallies.get(1));
     csvPrinter.print("Rounds");
     for (int round = 1; round <= numRounds; round++) {
@@ -310,8 +310,8 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    // actions don't make sense in individual by-field results
-    if (isNullOrBlank(fieldId)) {
+    // actions don't make sense in individual by-slice results
+    if (isNullOrBlank(sliceId)) {
       addActionRows(csvPrinter);
     }
 
@@ -434,8 +434,8 @@ class ResultsWriter {
     // We check if we accumulated any residual surplus over the course of the tabulation by testing
     // whether the value in the final round is positive.
     // Note that this concept only makes sense when we're reporting the overall tabulation, so we
-    // omit it when generating results at the individual by-field level.
-    if (fieldId == null && roundToResidualSurplus.get(numRounds).signum() == 1) {
+    // omit it when generating results at the individual by-slice level.
+    if (sliceId == null && roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round));
@@ -510,8 +510,10 @@ class ResultsWriter {
     csvPrinter.print(candidateCellText);
   }
 
-  private void addContestInformationRows(CSVPrinter csvPrinter, BigDecimal winningThreshold,
-        TabulateByField field, String fieldId) throws IOException {
+  private void addContestInformationRows(CSVPrinter csvPrinter,
+                                         BigDecimal winningThreshold,
+                                         ContestConfig.TabulateBySlice slice,
+                                         String sliceId) throws IOException {
     csvPrinter.printRecord("Contest Information");
     csvPrinter.printRecord("Generated By", "RCTab " + Main.APP_VERSION);
     csvPrinter.printRecord("CSV Format Version", "1");
@@ -533,13 +535,13 @@ class ResultsWriter {
     }
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
     csvPrinter.printRecord("Final Threshold", winningThreshold);
-    if (!isNullOrBlank(fieldId)) {
-      csvPrinter.printRecord(field, fieldId);
+    if (!isNullOrBlank(sliceId)) {
+      csvPrinter.printRecord(slice, sliceId);
     }
     csvPrinter.println();
   }
 
-  // creates a summary spreadsheet and JSON for the full contest (as opposed to a specific field)
+  // creates a summary spreadsheet and JSON for the full contest (as opposed to a specific slice)
   void generateOverallSummaryFiles(
       RoundTallies roundTallies, TallyTransfers tallyTransfers) throws IOException {
     String outputPath = getOutputFilePathFromInstance("summary");
@@ -619,9 +621,9 @@ class ResultsWriter {
         csvPrinter.print(currentSourceData.source.getFilePath());
         csvPrinter.print(castVoteRecord.getContestId());
         csvPrinter.print(castVoteRecord.getTabulatorId());
-        csvPrinter.print(castVoteRecord.getField(TabulateByField.BATCH));
+        csvPrinter.print(castVoteRecord.getSlice(TabulateBySlice.BATCH));
         csvPrinter.print(castVoteRecord.getId());
-        csvPrinter.print(castVoteRecord.getField(TabulateByField.PRECINCT));
+        csvPrinter.print(castVoteRecord.getSlice(ContestConfig.TabulateBySlice.PRECINCT));
         csvPrinter.print(castVoteRecord.getPrecinctPortion());
         printRankings(currentSourceData.source.getUndeclaredWriteInLabel(), maxRank,
             currentSourceData.reader, currentSourceData.source, csvPrinter, castVoteRecord);
@@ -718,7 +720,7 @@ class ResultsWriter {
   private Map<String, String> generateGpUnitIds() {
     Map<String, String> gpUnitIdToPrecinctId = new HashMap<>();
     int gpUnitIdIndex = 0;
-    for (String precinctId : fieldIds.get(TabulateByField.PRECINCT)) {
+    for (String precinctId : sliceIds.get(ContestConfig.TabulateBySlice.PRECINCT)) {
       gpUnitIdToPrecinctId.put(precinctId, String.format(CDF_GPU_ID_FORMAT, ++gpUnitIdIndex));
     }
     return gpUnitIdToPrecinctId;
@@ -782,8 +784,8 @@ class ResultsWriter {
       cvrMap.put("ElectionId", CDF_ELECTION_ID);
       cvrMap.put("@type", "CVR");
       // if using precincts add GpUnitId for cvr precinct
-      if (config.isTabulateByEnabled(TabulateByField.PRECINCT)) {
-        String gpUnitId = gpUnitIds.get(cvr.getField(TabulateByField.PRECINCT));
+      if (config.isTabulateByEnabled(TabulateBySlice.PRECINCT)) {
+        String gpUnitId = gpUnitIds.get(cvr.getSlice(TabulateBySlice.PRECINCT));
         cvrMap.put("BallotStyleUnitId", gpUnitId);
       }
       cvrMaps.add(cvrMap);
@@ -924,8 +926,8 @@ class ResultsWriter {
   private void generateSummaryJson(
       RoundTallies roundTallies,
       TallyTransfers tallyTransfers,
-      TabulateByField field,
-      String fieldId,
+      TabulateBySlice slice,
+      String sliceId,
       String outputPath)
       throws IOException {
     String jsonPath = outputPath + ".json";
@@ -938,8 +940,8 @@ class ResultsWriter {
     configData.put("jurisdiction", config.getContestJurisdiction());
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
-    if (!isNullOrBlank(fieldId)) {
-      configData.put(field.toString(), fieldId);
+    if (!isNullOrBlank(sliceId)) {
+      configData.put(slice.toString(), sliceId);
     }
 
     BigDecimal firstRoundUndervotes =
