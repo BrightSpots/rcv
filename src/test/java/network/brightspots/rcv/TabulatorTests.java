@@ -197,8 +197,8 @@ class TabulatorTests {
     runTabulationTest(testStem, null, 0);
   }
 
-  private static void runTabulationTest(String testStem, int expectedNumPrecinctFileToCheck) {
-    runTabulationTest(testStem, null, expectedNumPrecinctFileToCheck);
+  private static void runTabulationTest(String testStem, int expectedNumPrecinctFilesToCheck) {
+    runTabulationTest(testStem, null, expectedNumPrecinctFilesToCheck);
   }
 
   private static void runTabulationTest(String testStem, String expectedException) {
@@ -207,7 +207,7 @@ class TabulatorTests {
 
   // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem, String expectedException,
-                                        int expectedNumPrecinctFileToCheck) {
+                                        int expectedNumPrecinctFilesToCheck) {
     String configPath = getTestFilePath(stem, "_config.json");
 
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
@@ -241,7 +241,7 @@ class TabulatorTests {
           }
         }
       }
-      assertEquals(numPrecinctFilesChecked, expectedNumPrecinctFileToCheck);
+      assertEquals(numPrecinctFilesChecked, expectedNumPrecinctFilesToCheck);
 
       cleanOutputFolder(session);
     }
