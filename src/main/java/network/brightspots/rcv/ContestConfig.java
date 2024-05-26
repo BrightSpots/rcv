@@ -619,7 +619,8 @@ class ContestConfig {
           // Perform CDF checks
           for (TabulateBySlice tabulateBySlice : enabledSlices()) {
             validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_DISAGREEMENT);
-            Logger.severe("%s may not be used with CDF files.", tabulateBySlice);
+            Logger.severe("Tabulate-by-%s has not yet been implemented for CDF files.",
+                    tabulateBySlice);
           }
         } else if (getProvider(source) == Provider.ESS) {
           // Perform ES&S checks

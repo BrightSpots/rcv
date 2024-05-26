@@ -109,7 +109,7 @@ class TabulatorSession {
           Logger.severe("Aborting conversion due to cast vote record errors!");
         } else {
           Tabulator.SliceIdSet sliceIds =
-              new Tabulator(castVoteRecords, config).getSliceIds();
+              new Tabulator(castVoteRecords, config).getEnabledSliceIds();
           ResultsWriter writer =
               new ResultsWriter()
                   .setNumRounds(0)

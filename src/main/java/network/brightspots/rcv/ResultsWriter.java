@@ -66,7 +66,7 @@ class ResultsWriter {
 
   // number of rounds needed to elect winner(s)
   private int numRounds;
-  // all Slice Ids which may appear in the output cvrs
+  // all Slice Ids that may appear in the output cvrs
   private SliceIdSet sliceIds;
   // precinct to GpUnitId map (CDF only)
   private Map<String, String> gpUnitIds;
