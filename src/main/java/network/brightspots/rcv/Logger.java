@@ -36,8 +36,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.BlockingDeque;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -75,6 +77,7 @@ class Logger {
   private static java.util.logging.Logger logger;
   private static java.util.logging.FileHandler tabulationHandler;
   private static String tabulationLogPattern;
+  private static final List<Label> labelsQueue = new ArrayList<>();
 
   static void setup() {
     logger = java.util.logging.Logger.getLogger("");
@@ -225,7 +228,7 @@ class Logger {
               String msg = getFormatter().format(record);
               Label logLabel = new Label(msg);
               logLabel.setPadding(new Insets(0, 0, 0, 0));
-              logLabel.setWrapText(true);
+              logLabel.setWrapText(false);
 
               // Set background color based on log level
               if (record.getLevel() == Level.SEVERE) {
@@ -241,20 +244,25 @@ class Logger {
               contextMenu.getItems().add(copyMenuItem);
               logLabel.setContextMenu(contextMenu);
 
-              // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
-              // otherwise schedule the text update to run on the GUI thread
-              if (Platform.isFxApplicationThread()) {
-                addFromMainThread(logLabel);
-              } else {
-                Platform.runLater(() -> addFromMainThread(logLabel));
+              // Rather than adding to the list too many times in a row,
+              // we add to a queue and schedule an occasional update to the UI.
+              // This prevents the UI from lagging when there are many log messages.
+              synchronized (labelsQueue) {
+                labelsQueue.add(logLabel);
+
+                // The first item in the queue is the only one that needs to trigger the update.
+                if (labelsQueue.size() == 1) {
+                  Platform.runLater(this::addFromMainThread);
+                }
               }
             }
           }
 
-          private void addFromMainThread(Label logLabel) {
-            logMessages.add(logLabel);
-
-            // Scroll to the bottom of the listview
+          private void addFromMainThread() {
+            synchronized (labelsQueue) {
+              logMessages.addAll(labelsQueue);
+              labelsQueue.clear();
+            }
             listView.scrollTo(logMessages.size() - 1);
           }
 
