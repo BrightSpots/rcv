@@ -186,7 +186,7 @@ class ResultsWriter {
   // return a unique, valid string for this slice's output spreadsheet filename
   private static String getFileStringForSlice(
           ContestConfig.TabulateBySlice slice, String sliceId, Set<String> filenames) {
-    String sanitized = "%s_%s".formatted(slice, sanitizeStringForOutput(sliceId));
+    String sanitized = "%s_%s".formatted(sanitizeStringForOutput(sliceId), slice.toLowerString());
     String filename = sanitized;
     // appendNumber is used to find a unique filename (in practice this really shouldn't be
     // necessary because different slice IDs shouldn't have the same sanitized name, but we're
@@ -941,7 +941,7 @@ class ResultsWriter {
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
     if (!isNullOrBlank(sliceId)) {
-      configData.put(slice.toString(), sliceId);
+      configData.put(slice.toLowerString(), sliceId);
     }
 
     BigDecimal firstRoundUndervotes =

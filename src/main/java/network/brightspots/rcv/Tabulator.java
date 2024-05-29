@@ -463,10 +463,11 @@ class Tabulator {
   private void setWinningThreshold(int roundNumber, BigDecimal winningThreshold) {
     RoundTally currentRoundTally = roundTallies.get(roundNumber);
     currentRoundTally.setWinningThreshold(winningThreshold);
-    // Do the same for each precinct
-    if (config.isTabulateByPrecinctEnabled()) {
-      for (var roundTalliesForPrecinct : precinctRoundTallies.values()) {
-        roundTalliesForPrecinct.get(roundNumber).setWinningThreshold(winningThreshold);
+
+    // Do the same for each slice
+    for (TabulateBySlice slice : config.enabledSlices()) {
+      for (var roundTalliesForSlice : roundTalliesBySlices.get(slice).values()) {
+        roundTalliesForSlice.get(roundNumber).setWinningThreshold(winningThreshold);
       }
     }
     Logger.info("Winning threshold set to %s.", winningThreshold);
