@@ -144,6 +144,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldContestOffice;
   @FXML
+  private CheckBox checkBoxTabulateByBatch;
+  @FXML
   private CheckBox checkBoxTabulateByPrecinct;
   @FXML
   private CheckBox checkBoxGenerateCdfJson;
@@ -157,6 +159,8 @@ public class GuiConfigController implements Initializable {
   private TableColumn<CvrSource, String> tableColumnCvrFirstVoteRow;
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrIdCol;
+  @FXML
+  private TableColumn<CvrSource, String> tableColumnCvrBatchCol;
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrPrecinctCol;
   @FXML
@@ -189,6 +193,8 @@ public class GuiConfigController implements Initializable {
   private TextField textFieldCvrFirstVoteRow;
   @FXML
   private TextField textFieldCvrIdCol;
+  @FXML
+  private TextField textFieldCvrBatchCol;
   @FXML
   private TextField textFieldCvrPrecinctCol;
   @FXML
@@ -615,6 +621,7 @@ public class GuiConfigController implements Initializable {
     String firstVoteColumnIndex = getTextOrEmptyString(textFieldCvrFirstVoteCol);
     String firstVoteRowIndex = getTextOrEmptyString(textFieldCvrFirstVoteRow);
     String idColumnIndex = getTextOrEmptyString(textFieldCvrIdCol);
+    String batchColumnIndex = getTextOrEmptyString(textFieldCvrBatchCol);
     String precinctColumnIndex = getTextOrEmptyString(textFieldCvrPrecinctCol);
     String overvoteDelimiter = getTextOrEmptyString(textFieldCvrOvervoteDelimiter);
     String provider = getProviderChoice(choiceCvrProvider).getInternalLabel();
@@ -631,6 +638,7 @@ public class GuiConfigController implements Initializable {
               firstVoteColumnIndex,
               firstVoteRowIndex,
               idColumnIndex,
+              batchColumnIndex,
               precinctColumnIndex,
               overvoteDelimiter,
               provider,
@@ -660,6 +668,7 @@ public class GuiConfigController implements Initializable {
         textFieldCvrFirstVoteCol,
         textFieldCvrFirstVoteRow,
         textFieldCvrIdCol,
+        textFieldCvrBatchCol,
         textFieldCvrPrecinctCol,
         textFieldCvrOvervoteDelimiter,
         textFieldCvrOvervoteLabel,
@@ -693,6 +702,10 @@ public class GuiConfigController implements Initializable {
 
     if (validationErrors.contains(ValidationError.CVR_ID_COLUMN_INVALID)) {
       addErrorStyling(textFieldCvrIdCol);
+    }
+
+    if (validationErrors.contains(ValidationError.CVR_BATCH_COLUMN_INVALID)) {
+      addErrorStyling(textFieldCvrBatchCol);
     }
 
     if (validationErrors.contains(ValidationError.CVR_PRECINCT_COLUMN_INVALID)) {
@@ -741,6 +754,8 @@ public class GuiConfigController implements Initializable {
     textFieldCvrFirstVoteRow.setDisable(true);
     textFieldCvrIdCol.clear();
     textFieldCvrIdCol.setDisable(true);
+    textFieldCvrBatchCol.clear();
+    textFieldCvrBatchCol.setDisable(true);
     textFieldCvrPrecinctCol.clear();
     textFieldCvrPrecinctCol.setDisable(true);
     textFieldCvrOvervoteDelimiter.clear();
@@ -890,6 +905,7 @@ public class GuiConfigController implements Initializable {
         ContestConfig.SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES);
 
     textFieldOutputDirectory.setText(ContestConfig.SUGGESTED_OUTPUT_DIRECTORY);
+    checkBoxTabulateByBatch.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_BATCH);
     checkBoxTabulateByPrecinct.setSelected(ContestConfig.SUGGESTED_TABULATE_BY_PRECINCT);
     checkBoxGenerateCdfJson.setSelected(ContestConfig.SUGGESTED_GENERATE_CDF_JSON);
   }
@@ -922,6 +938,7 @@ public class GuiConfigController implements Initializable {
     checkBoxExhaustOnDuplicateCandidate.setSelected(false);
 
     textFieldOutputDirectory.clear();
+    checkBoxTabulateByBatch.setSelected(false);
     checkBoxTabulateByPrecinct.setSelected(false);
     checkBoxGenerateCdfJson.setSelected(false);
 
@@ -1125,6 +1142,7 @@ public class GuiConfigController implements Initializable {
               .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
           textFieldCvrIdCol.setDisable(false);
           textFieldCvrIdCol.setText(String.valueOf(ContestConfig.SUGGESTED_CVR_ID_COLUMN));
+          textFieldCvrBatchCol.setDisable(false);
           textFieldCvrPrecinctCol.setDisable(false);
           textFieldCvrPrecinctCol
               .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_PRECINCT_COLUMN));
@@ -1174,6 +1192,7 @@ public class GuiConfigController implements Initializable {
         new EditableColumnString(tableColumnCvrFirstVoteCol, "firstVoteColumnIndex"),
         new EditableColumnString(tableColumnCvrFirstVoteRow, "firstVoteRowIndex"),
         new EditableColumnString(tableColumnCvrIdCol, "idColumnIndex"),
+        new EditableColumnString(tableColumnCvrBatchCol, "batchColumnIndex"),
         new EditableColumnString(tableColumnCvrPrecinctCol, "precinctColumnIndex"),
         new EditableColumnString(tableColumnCvrOvervoteDelimiter, "overvoteDelimiter"),
         new EditableColumnString(tableColumnCvrContestId, "contestId"),
@@ -1384,6 +1403,7 @@ public class GuiConfigController implements Initializable {
     }
     textFieldContestJurisdiction.setText(outputSettings.contestJurisdiction);
     textFieldContestOffice.setText(outputSettings.contestOffice);
+    checkBoxTabulateByBatch.setSelected(outputSettings.tabulateByBatch);
     checkBoxTabulateByPrecinct.setSelected(outputSettings.tabulateByPrecinct);
     checkBoxGenerateCdfJson.setSelected(outputSettings.generateCdfJson);
 
@@ -1473,6 +1493,7 @@ public class GuiConfigController implements Initializable {
         datePickerContestDate.getValue() != null ? datePickerContestDate.getValue().toString() : "";
     outputSettings.contestJurisdiction = getTextOrEmptyString(textFieldContestJurisdiction);
     outputSettings.contestOffice = getTextOrEmptyString(textFieldContestOffice);
+    outputSettings.tabulateByBatch = checkBoxTabulateByBatch.isSelected();
     outputSettings.tabulateByPrecinct = checkBoxTabulateByPrecinct.isSelected();
     outputSettings.generateCdfJson = checkBoxGenerateCdfJson.isSelected();
     config.outputSettings = outputSettings;
@@ -1482,6 +1503,8 @@ public class GuiConfigController implements Initializable {
       source.setFilePath(source.getFilePath() != null ? source.getFilePath().trim() : "");
       source.setIdColumnIndex(
           source.getIdColumnIndex() != null ? source.getIdColumnIndex().trim() : "");
+      source.setBatchColumnIndex(
+              source.getBatchColumnIndex() != null ? source.getBatchColumnIndex().trim() : "");
       source.setPrecinctColumnIndex(
           source.getPrecinctColumnIndex() != null ? source.getPrecinctColumnIndex().trim() : "");
       source.setOvervoteDelimiter(
@@ -1665,6 +1688,7 @@ public class GuiConfigController implements Initializable {
     protected void setUpTaskCompletionTriggers(Task<Void> task, String failureMessage) {
       task.setOnFailed(
           arg0 -> {
+            task.getException().printStackTrace();
             Logger.severe(failureMessage, task.getException());
             cleanUp();
           });

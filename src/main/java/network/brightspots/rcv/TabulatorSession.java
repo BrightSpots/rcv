@@ -109,11 +109,12 @@ class TabulatorSession {
         if (castVoteRecords == null) {
           Logger.severe("Aborting conversion due to cast vote record errors!");
         } else {
-          Set<String> precinctIds = new Tabulator(castVoteRecords, config).getPrecinctIds();
+          Tabulator.SliceIdSet sliceIds =
+              new Tabulator(castVoteRecords, config).getEnabledSliceIds();
           ResultsWriter writer =
               new ResultsWriter()
                   .setNumRounds(0)
-                  .setPrecinctIds(precinctIds)
+                  .setSliceIds(sliceIds)
                   .setContestConfig(config)
                   .setTimestampString(timestampString);
           writer.generateCdfJson(castVoteRecords);
@@ -180,7 +181,7 @@ class TabulatorSession {
         while (config.getSequentialWinners().size() < numWinners) {
           Logger.info(
               "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
-          // Read cast vote records and precinct IDs from CVR files
+          // Read cast vote records and slice IDs from CVR files
           List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
           if (castVoteRecords == null) {
             Logger.severe("Aborting tabulation due to cast vote record errors!");
@@ -216,7 +217,7 @@ class TabulatorSession {
         tabulationSuccess = true;
       } else {
         // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
-        // Read cast vote records and precinct IDs from CVR files
+        // Read cast vote records and slice IDs from CVR files
         List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
         if (castVoteRecords == null) {
           Logger.severe("Aborting tabulation due to cast vote record errors!");

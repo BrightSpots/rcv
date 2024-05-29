@@ -89,8 +89,12 @@ class CastVoteRecord {
   }
 
   CastVoteRecord(
-      String computedId, String suppliedId, String precinct, List<Pair<Integer, String>> rankings) {
-    this(null, null, null, suppliedId, computedId, precinct, null, rankings);
+      String computedId,
+      String suppliedId,
+      String precinct,
+      String batchId,
+      List<Pair<Integer, String>> rankings) {
+    this(null, null, batchId, suppliedId, computedId, precinct, null, rankings);
   }
 
   String getContestId() {
@@ -101,12 +105,11 @@ class CastVoteRecord {
     return tabulatorId;
   }
 
-  String getBatchId() {
-    return batchId;
-  }
-
-  String getPrecinct() {
-    return precinct;
+  String getSlice(ContestConfig.TabulateBySlice slice) {
+    return switch (slice) {
+      case BATCH -> batchId;
+      case PRECINCT -> precinct;
+    };
   }
 
   String getPrecinctPortion() {

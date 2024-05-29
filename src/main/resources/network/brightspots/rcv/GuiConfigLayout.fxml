@@ -181,6 +181,14 @@
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
                     </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label prefWidth="130.0" text="Batch Column"/>
+                      <TextField prefHeight="25.0" prefWidth="40.0"
+                                 fx:id="textFieldCvrBatchCol"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
                   </VBox>
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
@@ -273,6 +281,9 @@
                     <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0"
                       prefWidth="70.0"
                       text="Precinct&#10;Column"/>
+                    <TableColumn fx:id="tableColumnCvrBatchCol" minWidth="20.0"
+                                 prefWidth="70.0"
+                                 text="Batch&#10;Column"/>
                     <TableColumn minWidth="20.0"
                       prefWidth="80.0" text="Overvote&#10;Delimiter"
                       fx:id="tableColumnCvrOvervoteDelimiter"/>
@@ -656,6 +667,17 @@
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <CheckBox fx:id="checkBoxTabulateByPrecinct" mnemonicParsing="false"
                     text="Tabulate by Precinct">
+                    <VBox.margin>
+                      <Insets top="8.0" bottom="8.0"/>
+                    </VBox.margin>
+                  </CheckBox>
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <CheckBox fx:id="checkBoxTabulateByBatch" mnemonicParsing="false"
+                            text="Tabulate by Batch">
                     <VBox.margin>
                       <Insets top="8.0" bottom="8.0"/>
                     </VBox.margin>
