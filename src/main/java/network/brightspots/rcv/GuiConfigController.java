@@ -1805,7 +1805,7 @@ public class GuiConfigController implements Initializable {
               if (errors.isEmpty()) {
                 succeeded();
               } else {
-                Logger.warning("There were errors");
+                Logger.warning("Encountered %d errors during tabulation.", errors.size());
                 failed();
               }
               return errors.isEmpty();
@@ -1857,7 +1857,7 @@ public class GuiConfigController implements Initializable {
             if (cvrStatics.successfullyReadAll) {
               succeeded();
             } else {
-              Logger.warning("There were errors");
+              Logger.warning("Failed to read all CVRs.");
               failed();
             }
             return cvrStatics;

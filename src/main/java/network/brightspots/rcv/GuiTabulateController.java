@@ -68,17 +68,18 @@ public class GuiTabulateController {
   private String configOutputPath;
 
   /**
-   * This modal builds upon the GuiConfigController, and therefore only interacts with it.
+   * This modal builds upon the GuiConfigController, and the two share some functionality
+   * (e.g. saving a config file). The shared functionality lives in GuiConfigController.
    */
   private GuiConfigController guiConfigController;
 
   /**
-   * The style applied when a field is filled.
+   * The style applied when a required field is correctly filled.
    */
   private String filledFieldStyle;
 
   /**
-   * The style applied when a field is unfilled.
+   * The style applied when a required field is unfilled and requires user input.
    */
   private String unfilledFieldStyle;
 
@@ -143,15 +144,10 @@ public class GuiTabulateController {
    */
   public void buttonloadCvrsClicked(ActionEvent actionEvent) {
     String configPath = getConfigPathOrCreateTempFile();
-    ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    configOutputPath = config.getOutputDirectory();
-    if (!configOutputPath.endsWith("/")) {
-      configOutputPath += "/";
-    }
 
     enableButtonsUpTo(null);
     Service<LoadedCvrData> service = guiConfigController.parseAndCountCastVoteRecords(configPath);
-    // Dispatch a function that watches the service and updates the progress bar
+
     watchParseCvrServiceProgress(service);
   }
 
@@ -162,15 +158,10 @@ public class GuiTabulateController {
    */
   public void buttonTabulateClicked(ActionEvent actionEvent) {
     String configPath = getConfigPathOrCreateTempFile();
-    ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    configOutputPath = config.getOutputDirectory();
-    if (!configOutputPath.endsWith("/")) {
-      configOutputPath += "/";
-    }
 
     Service<Boolean> service = guiConfigController.startTabulation(
         configPath, userNameField.getText(), useTemporaryConfigBeforeTabulation, lastLoadedCvrData);
-    // Dispatch a function that watches the service and updates the progress bar
+
     watchTabulatorServiceProgress(service);
   }
 
@@ -295,9 +286,17 @@ public class GuiTabulateController {
   }
 
   private String getConfigPathOrCreateTempFile() {
-    return useTemporaryConfigBeforeTabulation
+    String path = useTemporaryConfigBeforeTabulation
         ? guiConfigController.saveFile(tempSaveButton, true)
         : savedConfigFilePath;
+
+    ContestConfig config = ContestConfig.loadContestConfig(path);
+    configOutputPath = config.getOutputDirectory();
+    if (!configOutputPath.endsWith("/")) {
+      configOutputPath += "/";
+    }
+
+    return path;
   }
 
   private boolean isConfigSavedOrTempFileReady() {
