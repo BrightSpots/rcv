@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -109,12 +110,12 @@ class TabulatorSession {
         if (!castVoteRecords.successfullyReadAll) {
           Logger.severe("Aborting conversion due to cast vote record errors!");
         } else {
-          Set<String> precinctIds = new Tabulator(
-              castVoteRecords.getCvrs(), config).getPrecinctIds();
+          Tabulator.SliceIdSet sliceIds =
+              new Tabulator(castVoteRecords.getCvrs(), config).getEnabledSliceIds();
           ResultsWriter writer =
               new ResultsWriter()
                   .setNumRounds(0)
-                  .setPrecinctIds(precinctIds)
+                  .setSliceIds(sliceIds)
                   .setContestConfig(config)
                   .setTimestampString(timestampString);
           writer.generateCdfJson(castVoteRecords.getCvrs());
@@ -191,7 +192,7 @@ class TabulatorSession {
         while (config.getSequentialWinners().size() < numWinners) {
           Logger.info(
               "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
-          // Read cast vote records and precinct IDs from CVR files
+          // Read cast vote records and slice IDs from CVR files
           LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
           if (config.getSequentialWinners().isEmpty()
                 && !castVoteRecords.metadataMatches(expectedCvrData)) {
@@ -235,7 +236,7 @@ class TabulatorSession {
         tabulationSuccess = true;
       } else {
         // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
-        // Read cast vote records and precinct IDs from CVR files
+        // Read cast vote records and slice IDs from CVR files
         LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
         if (!castVoteRecords.metadataMatches(expectedCvrData)) {
           Logger.severe("CVR Data has changed between loading the CVRs and reading them!");
@@ -261,6 +262,15 @@ class TabulatorSession {
     }
     Logger.removeTabulationFileLogging();
     return exceptionsEncountered;
+  }
+
+  Set<String> loadSliceNamesFromCvrs(ContestConfig.TabulateBySlice slice, ContestConfig config) {
+    List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config).getCvrs();
+    try {
+      return new Tabulator(castVoteRecords, config).getEnabledSliceIds().get(slice);
+    } catch (TabulationAbortedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private boolean setUpLogging(String outputDirectory) {
