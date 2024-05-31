@@ -67,6 +67,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
@@ -134,7 +135,7 @@ public class GuiConfigController implements Initializable {
   private boolean guiIsBusy;
 
   @FXML
-  private TextArea textAreaStatus;
+  private ListView<Label> textAreaStatus;
   @FXML
   private TextArea textAreaHelp;
   @FXML
