@@ -187,10 +187,13 @@ class Logger {
           setText(null);
           setStyle(null);
         } else {
-          setGraphic(item);
+          // Reset the widths to allow word wrap
+          item.setMinWidth(listView.getWidth() - 50);
+          item.setMaxWidth(listView.getWidth() - 50);
+          item.setPrefWidth(listView.getWidth() - 50);
 
-          // Remove the label padding
-          setPadding(new Insets(0, 0, 0, 0));
+          // Fix the label padding
+          setPadding(new Insets(0, 0, 0, 3));
 
           // First remove any existing style, which can either be overridden
           // (if it needs a custom background) or can remain as the default.
@@ -215,6 +218,8 @@ class Logger {
           } else {
             setBlendMode(BlendMode.SRC_OVER);
           }
+
+          setGraphic(item);
         }
       }
     });
@@ -226,8 +231,8 @@ class Logger {
             if (isLoggable(record)) {
               String msg = getFormatter().format(record);
               Label logLabel = new Label(msg);
-              logLabel.setPadding(new Insets(0, 0, 0, 0));
-              logLabel.setWrapText(false);
+              logLabel.setPadding(new Insets(0, 0, 0, 3));
+              logLabel.setWrapText(true);
 
               // Set background color based on log level
               if (record.getLevel() == Level.SEVERE) {
