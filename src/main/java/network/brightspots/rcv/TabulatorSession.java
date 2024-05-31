@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+
+import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
@@ -323,6 +325,7 @@ class TabulatorSession {
         throws CastVoteRecordGenericParseException {
     Logger.info("Parsing cast vote records...");
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+    List<Pair<String, Integer>> perSourceCvrCounts = new ArrayList<>();
     boolean encounteredSourceProblem = false;
 
     // Per-source data for writing generic CSV
@@ -336,7 +339,9 @@ class TabulatorSession {
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
         Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
+        int origNumCvrs = castVoteRecords.size();
         reader.readCastVoteRecords(castVoteRecords);
+        int numCvrsRead = castVoteRecords.size() - origNumCvrs;
 
         // Update the per-source data for the results writer
         perSourceDataForCsv.add(new ResultsWriter.PerSourceDataForCsv(
@@ -355,6 +360,9 @@ class TabulatorSession {
 
         // Check for any other reader-specific validations
         reader.runAdditionalValidations(castVoteRecords);
+
+        // Update the per-file CVR counts
+        perSourceCvrCounts.add(new Pair<>(cvrPath, numCvrsRead));
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
@@ -419,7 +427,7 @@ class TabulatorSession {
       throw new CastVoteRecordGenericParseException();
     }
 
-    return new LoadedCvrData(castVoteRecords);
+    return new LoadedCvrData(castVoteRecords, perSourceCvrCounts);
   }
 
   static class UnrecognizedCandidatesException extends Exception {
@@ -447,19 +455,22 @@ class TabulatorSession {
 
     private List<CastVoteRecord> cvrs;
     private final int numCvrs;
+    private List<Pair<String, Integer>> perSourceCvrCounts;
     private boolean isDiscarded;
     private final boolean doesMatchAllMetadata;
 
-    public LoadedCvrData(List<CastVoteRecord> cvrs) {
+    public LoadedCvrData(List<CastVoteRecord> cvrs, List<Pair<String, Integer>> perSourceCvrCounts) {
       this.cvrs = cvrs;
       this.successfullyReadAll = cvrs != null;
       this.numCvrs = cvrs != null ? cvrs.size() : 0;
       this.isDiscarded = false;
       this.doesMatchAllMetadata = false;
+      this.perSourceCvrCounts = perSourceCvrCounts;
     }
 
     /**
-     * This constructor will cause metadataMatches to always return true.
+     * This constructor will cause metadataMatches to always return true,
+     * and contains no true statistics.
      */
     private LoadedCvrData() {
       this.cvrs = null;
@@ -467,6 +478,7 @@ class TabulatorSession {
       this.numCvrs = 0;
       this.isDiscarded = false;
       this.doesMatchAllMetadata = true;
+      this.perSourceCvrCounts = new ArrayList<>();
     }
 
     /**
@@ -484,6 +496,10 @@ class TabulatorSession {
 
     public int numCvrs() {
       return numCvrs;
+    }
+
+    public List<Pair<String, Integer>> getPerSourceCvrCounts() {
+      return perSourceCvrCounts;
     }
 
     public void discard() {

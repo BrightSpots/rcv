@@ -42,22 +42,34 @@
                   <Insets top="10.0" />
                </VBox.margin>
             </Text>
-            <Label fx:id="numberOfCandidates" prefHeight="24.0" prefWidth="349.0" text="Number of Candidates: X" wrapText="true">
-               <font>
-                  <Font size="16.0" />
-               </font>
-               <VBox.margin>
-                  <Insets left="15.0" />
-               </VBox.margin>
-            </Label>
-            <Label fx:id="numberOfCvrFiles" prefHeight="24.0" prefWidth="349.0" text="Number of CVR Files: Y" wrapText="true">
-               <font>
-                  <Font size="16.0" />
-               </font>
-               <VBox.margin>
-                  <Insets left="15.0" />
-               </VBox.margin>
-            </Label>
+            <HBox prefWidth="567.0" spacing="30.0">
+               <VBox prefWidth="350.0" spacing="5.0">
+                  <Label fx:id="numberOfCandidates" prefHeight="24.0" prefWidth="349.0" text="Number of Candidates: X" wrapText="true">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="15.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="numberOfCvrFiles" prefHeight="24.0" prefWidth="349.0" text="Number of CVR Files: Y" wrapText="true">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="15.0" />
+                     </VBox.margin>
+                  </Label>
+               </VBox>
+               <VBox prefWidth="500.0" spacing="30.0">
+                  <TableView fx:id="perSourceCvrCountTable" prefWidth="330.0">
+                     <columns>
+                        <TableColumn fx:id="perSourceCvrColumnCount" minWidth="20.0" prefWidth="70.0" text="Num Ballots" />
+                        <TableColumn fx:id="perSourceCvrColumnFilepath" minWidth="20.0" prefWidth="230.0" text="Filepath" />
+                     </columns>
+                  </TableView>
+               </VBox>
+            </HBox>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Auditing Information" wrappingWidth="225.1533203125">
                <font>
                   <Font name="System Bold" size="19.0" />
