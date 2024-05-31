@@ -238,7 +238,7 @@ class Logger {
               if (record.getLevel() == Level.SEVERE) {
                 logLabel.setBackground(Background.fill(Color.DARKRED));
               } else if (record.getLevel() == Level.WARNING) {
-                logLabel.setBackground(Background.fill(Color.DARKORANGE));
+                logLabel.setBackground(Background.fill(Color.SIENNA));
               }
 
               // On Right Click, user can copy text
