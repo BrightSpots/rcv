@@ -1847,7 +1847,8 @@ public class GuiConfigController implements Initializable {
             @Override
             protected Boolean call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              List<String> errors = session.tabulate(operatorName, expectedCvrStatistics);
+              List<String> errors = session.tabulate(
+                      operatorName, expectedCvrStatistics, this::updateProgress);
               if (errors.isEmpty()) {
                 succeeded();
               } else {
@@ -1876,7 +1877,7 @@ public class GuiConfigController implements Initializable {
             @Override
             protected Boolean call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              return session.convertToCdf();
+              return session.convertToCdf(this::updateProgress);
             }
           };
       setUpTaskCompletionTriggers(task,
@@ -1901,7 +1902,7 @@ public class GuiConfigController implements Initializable {
             TabulatorSession session = new TabulatorSession(configPath);
             LoadedCvrData cvrStatics = null;
             try {
-              cvrStatics = session.parseAndCountCastVoteRecords();
+              cvrStatics = session.parseAndCountCastVoteRecords(this::updateProgress);
               succeeded();
             } catch (TabulatorSession.CastVoteRecordGenericParseException e) {
               Logger.severe("Failed to read CVRs: %s", e.getMessage());
