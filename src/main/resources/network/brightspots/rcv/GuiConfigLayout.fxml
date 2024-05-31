@@ -718,13 +718,12 @@
         styleClass="help-text-area" wrapText="true" BorderPane.alignment="TOP_LEFT"/>
     </right>
     <bottom>
-      <TextArea id="textStatus" fx:id="textAreaStatus" editable="false" prefHeight="200.0"
-        prefWidth="200.0" styleClass="console-text-area" wrapText="true"
-        BorderPane.alignment="TOP_LEFT">
+      <ListView id="textStatus" fx:id="textAreaStatus" editable="false" prefHeight="200.0"
+        prefWidth="200.0" styleClass="console-text-area" BorderPane.alignment="TOP_LEFT">
         <BorderPane.margin>
           <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
         </BorderPane.margin>
-      </TextArea>
+      </ListView>
     </bottom>
   </BorderPane>
 </ScrollPane>
