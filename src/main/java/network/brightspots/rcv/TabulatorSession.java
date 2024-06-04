@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -159,7 +158,7 @@ class TabulatorSession {
     boolean tabulationSuccess = false;
     boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory());
 
-    if (operatorName == null || operatorName.isEmpty()) {
+    if (operatorName == null || operatorName.isBlank()) {
       Logger.severe("Operator name is required for the audit logs.");
       exceptionsEncountered.add(TabulationAbortedException.class.toString());
     } else if (setUpLoggingSuccess && config.validate().isEmpty()) {
@@ -196,7 +195,7 @@ class TabulatorSession {
           LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
           if (config.getSequentialWinners().isEmpty()
                 && !castVoteRecords.metadataMatches(expectedCvrData)) {
-            Logger.severe("CVR Data has changed between loading the CVRs and reading them!");
+            Logger.severe("CVR data has changed between loading the CVRs and reading them!");
             exceptionsEncountered.add(TabulationAbortedException.class.toString());
             break;
           }
@@ -239,7 +238,7 @@ class TabulatorSession {
         // Read cast vote records and slice IDs from CVR files
         LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
         if (!castVoteRecords.metadataMatches(expectedCvrData)) {
-          Logger.severe("CVR Data has changed between loading the CVRs and reading them!");
+          Logger.severe("CVR data has changed between loading the CVRs and reading them!");
           exceptionsEncountered.add(TabulationAbortedException.class.toString());
         } else if (!castVoteRecords.successfullyReadAll) {
           String errorMessage = "Aborting tabulation due to cast vote record errors!";
@@ -262,6 +261,10 @@ class TabulatorSession {
     }
     Logger.removeTabulationFileLogging();
     return exceptionsEncountered;
+  }
+
+  List<String> tabulate(String operatorName) {
+    return tabulate(operatorName, TabulatorSession.LoadedCvrData.MATCHES_ALL);
   }
 
   Set<String> loadSliceNamesFromCvrs(ContestConfig.TabulateBySlice slice, ContestConfig config) {
@@ -420,13 +423,13 @@ class TabulatorSession {
    * all other operations except for getCvrs() are still valid.
    */
   public static class LoadedCvrData {
-    public static final LoadedCvrData matchesAll = new LoadedCvrData(true);
+    public static final LoadedCvrData MATCHES_ALL = new LoadedCvrData();
     public final boolean successfullyReadAll;
 
     private List<CastVoteRecord> cvrs;
-    private int numCvrs;
+    private final int numCvrs;
     private boolean isDiscarded;
-    private boolean doesMatchAllMetadata;
+    private final boolean doesMatchAllMetadata;
 
     public LoadedCvrData(List<CastVoteRecord> cvrs) {
       this.cvrs = cvrs;
@@ -436,10 +439,8 @@ class TabulatorSession {
       this.doesMatchAllMetadata = false;
     }
 
-    /**
-     * This constructor will cause metadataMatches to always return true.
-     */
-    private LoadedCvrData(boolean doesMatchAllMetadata) {
+    /** This constructor will cause metadataMatches to always return true. */
+    private LoadedCvrData() {
       this.cvrs = null;
       this.successfullyReadAll = false;
       this.numCvrs = 0;

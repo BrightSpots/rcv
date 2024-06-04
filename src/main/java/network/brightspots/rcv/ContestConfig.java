@@ -501,7 +501,7 @@ class ContestConfig {
       Logger.info("Contest config validation successful.");
     } else {
       Logger.severe(
-          "Contest config validation failed! Please modify the contest config file and try again.\n"
+          "Contest config validation failed! Modify the contest config file and try again.\n"
               + "See config_file_documentation.txt for more details.");
     }
     return validationErrors;
@@ -545,8 +545,8 @@ class ContestConfig {
           Logger.severe(
               "To ensure read-only access to RCTab output files, users must not"
                   + " set the output path to user account folders like Documents,"
-                  + " Desktop, etc. -- any path under \"%s\" is prohibited. Please"
-                  + " specify a new path outside this folder in the Output tab of the"
+                  + " Desktop, etc. -- any path under \"%s\" is prohibited."
+                  + " Specify a new path outside this folder in the Output tab of the"
                   + " app (e.g. C:\\RCTab\\output).",
               rootUsersDirectory);
         }

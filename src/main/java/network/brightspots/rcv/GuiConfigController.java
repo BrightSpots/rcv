@@ -426,7 +426,7 @@ public class GuiConfigController implements Initializable {
   }
 
   public String getSelectedFilePath() {
-    return selectedFile != null ? selectedFile.getAbsolutePath() : "No File Saved Yet";
+    return selectedFile != null ? selectedFile.getAbsolutePath() : "No file saved yet!";
   }
 
   private File getSaveFile(Stage stage) {
@@ -454,7 +454,7 @@ public class GuiConfigController implements Initializable {
    */
   public String saveFile(Button fromButton, boolean useTemporaryFile) {
     Stage stage = (Stage) fromButton.getScene().getWindow();
-    File outputFile = null;
+    File outputFile;
     if (useTemporaryFile) {
       outputFile = new File(selectedFile.getAbsolutePath() + ".temp");
       saveFile(outputFile);
@@ -552,7 +552,7 @@ public class GuiConfigController implements Initializable {
             filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
         setUpAndStartService(service);
       } else {
-        Logger.warning("Please load a contest config file before attempting to convert to CDF!");
+        Logger.warning("Load a contest config file before attempting to convert to CDF!");
       }
     }
   }
@@ -1018,11 +1018,11 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Compares the GUI configuration with the on-disk configuration.
-   * If they differ, also tells you if the on-disk version is "TEST" --
-   * in which case, you may be okay with a difference for ease of development.
+   * Compares the GUI configuration with the on-disk configuration. If they differ, also tells you
+   * if the on-disk version is "TEST" -- in which case, you may be okay with a difference for ease
+   * of development.
    */
-  public ConfigComparisonResult compareConfigs() {
+  ConfigComparisonResult compareConfigs() {
     ConfigComparisonResult comparisonResult = ConfigComparisonResult.DIFFERENT;
     try {
       String currentConfigString =
@@ -1039,7 +1039,7 @@ public class GuiConfigController implements Initializable {
             JsonParser.readFromFileWithoutLogging(
                 selectedFile.getAbsolutePath(), RawContestConfig.class);
         if (configFromFile == null) {
-          Logger.severe("Config file could not be read from disk -- did you move it?");
+          Logger.severe("Config file could not be read from disk! Did you move it?");
         } else {
           String savedConfigString =
                   new ObjectMapper()
@@ -1783,7 +1783,7 @@ public class GuiConfigController implements Initializable {
   // TabulatorService runs a tabulation in the background
   private static class TabulatorService extends ConfigReaderService {
     private final String operatorName;
-    private LoadedCvrData expectedCvrStatistics;
+    private final LoadedCvrData expectedCvrStatistics;
 
     TabulatorService(
           String configPath,

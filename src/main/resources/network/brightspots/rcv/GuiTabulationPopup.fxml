@@ -2,7 +2,7 @@
 
 <!--
   ~ RCTab
-  ~ Copyright (c) 2017-2024 Bright Spots Developers.
+  ~ Copyright (c) 2017-2023 Bright Spots Developers.
   ~
   ~ This Source Code Form is subject to the terms of the Mozilla Public
   ~ License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,7 +13,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
 <Pane prefHeight="513.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="network.brightspots.rcv.GuiTabulateController">
    <children>
       <VBox layoutX="14.0" layoutY="10.0" prefHeight="343.0" prefWidth="573.0" spacing="10.0">
@@ -30,7 +29,8 @@
                         <Insets left="15.0" />
                      </HBox.margin>
                   </TextArea>
-                  <Button fx:id="saveButton" minWidth="70.0" mnemonicParsing="false" onAction="#buttonSaveClicked" prefHeight="42.0" text="Save*" />
+                  <Button fx:id="saveButton" minWidth="70.0" mnemonicParsing="false"
+                          onAction="#buttonSaveClicked" prefHeight="42.0" text="Save"/>
                   <Button fx:id="tempSaveButton" minWidth="155.0" mnemonicParsing="false" onAction="#buttonTempSaveClicked" prefHeight="42.0" text="Save Temporary Config" />
                </children>
             </HBox>

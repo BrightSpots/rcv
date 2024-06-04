@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
@@ -179,7 +178,7 @@ class Tiebreak {
         // if parseInt failed selection will be null and we will retry
       }
       if (selection == null) {
-        System.out.println("Invalid selection. Please try again.");
+        System.out.println("Invalid selection. Try again.");
         System.out.println(prompt);
       }
     }
@@ -193,7 +192,7 @@ class Tiebreak {
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
         round, numVotes.intValue(), String.join(", ", tiedCandidates));
     Logger.info(
-        "Please use the pop-up window to select the candidate who should "
+        "Use the pop-up window to select the candidate who should "
             + (isSelectingWinner ? "win" : "lose")
             + " this tiebreaker.");
 
@@ -215,7 +214,7 @@ class Tiebreak {
         Logger.severe("Failed to get tiebreaker!\n%s", exception);
       }
       if (selection == null) {
-        Logger.warning("Invalid selection! Please try again.");
+        Logger.warning("Invalid selection! Try again.");
       }
     }
 

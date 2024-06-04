@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2024 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -16,7 +16,6 @@
 
 package network.brightspots.rcv;
 
-import java.io.File;
 import java.io.IOException;
 import javafx.concurrent.Service;
 import javafx.concurrent.WorkerStateEvent;
@@ -38,59 +37,40 @@ import network.brightspots.rcv.TabulatorSession.LoadedCvrData;
 @SuppressWarnings("WeakerAccess")
 public class GuiTabulateController {
   /**
-   * The button text to display after tabulation successfully completes.
-   */
-  private static final String buttonOpenResultsText = "Open Results Folder";
-
-  /**
-   * The button text to display after tabulation fails.
-   */
-  private static final String buttonViewErrorLogsText = "View Error Logs";
-
-  /**
-   * Once the file is saved, cache it here. It cannot be changed while this modal is open.
-   * Do not rely on this variable alone -- it should be used in conjunction with
+   * Once the file is saved, cache it here. It cannot be changed while this modal is open. Do not
+   * rely on this variable alone -- it should be used in conjunction with
    * useTemporaryConfigBeforeTabulation. It will be null if the Save Temp File button was used.
    */
   private String savedConfigFilePath = null;
 
   /**
-   * If true, savedConfigFilePath will be null and we will load and save a temporary config file
-   * on each tabulation.
+   * If true, savedConfigFilePath will be null and we will load and save a temporary config file on
+   * each tabulation.
    */
   private boolean useTemporaryConfigBeforeTabulation = false;
 
   /**
-   * The output folder of the tabulated config.
-   * It's important to cache this, since Temp Configs will be deleted after tabulation
-   * and we won't know this value without re-reading the GUI state.
+   * The output folder of the tabulated config. It's important to cache this, since Temp Configs
+   * will be deleted after tabulation and we won't know this value without re-reading the GUI state.
    */
   private String configOutputPath;
 
   /**
-   * This modal builds upon the GuiConfigController, and the two share some functionality
-   * (e.g. saving a config file). The shared functionality lives in GuiConfigController.
+   * This modal builds upon the GuiConfigController, and the two share some functionality (e.g.
+   * saving a config file). The shared functionality lives in GuiConfigController.
    */
   private GuiConfigController guiConfigController;
 
-  /**
-   * The style applied when a required field is correctly filled.
-   */
+  /** The style applied when a required field is correctly filled. */
   private String filledFieldStyle;
 
-  /**
-   * The style applied when a required field is unfilled and requires user input.
-   */
+  /** The style applied when a required field is unfilled and requires user input. */
   private String unfilledFieldStyle;
 
-  /**
-   * If the last task failed.
-   */
+  /** If the last task failed. */
   private boolean lastTaskFailed = false;
 
-  /**
-   * Last-loaded CVR metadata, with the CVRs themselves discarded from memory.
-   */
+  /** Last-loaded CVR metadata, with the CVRs themselves discarded from memory. */
   private LoadedCvrData lastLoadedCvrData;
 
   @FXML private TextArea filepath;
@@ -106,14 +86,12 @@ public class GuiTabulateController {
   @FXML private Button openResultsButton;
   @FXML private Text progressText;
 
-  /**
-   * Initialize the GUI with all information required for tabulation.
-   */
+  /** Initialize the GUI with all information required for tabulation. */
   public void initialize(GuiConfigController controller, int numCandidates, int numCvrs) {
     guiConfigController = controller;
     numberOfCandidates.setText("Number of candidates: " + numCandidates);
-    numberOfCvrFiles.setText("Number of CVR Files: " + numCvrs);
-    numberOfBallots.setText("Number of Ballots: <Check Ballot Counts to load>");
+    numberOfCvrFiles.setText("Number of CVR files: " + numCvrs);
+    numberOfBallots.setText("Number of ballots: <Check ballot counts to load>");
     numberOfBallots.setOpacity(0.5);
     filledFieldStyle = "";
     unfilledFieldStyle = "-fx-border-color: red;";
@@ -159,8 +137,12 @@ public class GuiTabulateController {
   public void buttonTabulateClicked(ActionEvent actionEvent) {
     String configPath = getConfigPathOrCreateTempFile();
 
-    Service<Boolean> service = guiConfigController.startTabulation(
-        configPath, userNameField.getText(), useTemporaryConfigBeforeTabulation, lastLoadedCvrData);
+    Service<Boolean> service =
+        guiConfigController.startTabulation(
+            configPath,
+            userNameField.getText(),
+            useTemporaryConfigBeforeTabulation,
+            lastLoadedCvrData);
 
     watchTabulatorServiceProgress(service);
   }
@@ -183,35 +165,37 @@ public class GuiTabulateController {
   private void watchTabulatorServiceProgress(Service<Boolean> service) {
     // Measure time it takes for the function to complete
     long startTime = System.currentTimeMillis();
-    EventHandler<WorkerStateEvent> onSuceededEvent = workerStateEvent -> {
-      lastTaskFailed = service.getValue();
-      if (lastTaskFailed) {
-        openResultsButton.setText(buttonOpenResultsText);
-      } else {
-        openResultsButton.setText(buttonViewErrorLogsText);
-      }
-      enableButtonsUpTo(openResultsButton);
-      long endTime = System.currentTimeMillis();
-      Logger.info("Tabulation took " + (endTime - startTime) / 1000 + " seconds.");
-    };
-    watchGenericService(service, onSuceededEvent);
+    EventHandler<WorkerStateEvent> onSucceededEvent =
+        workerStateEvent -> {
+          lastTaskFailed = service.getValue();
+          if (lastTaskFailed) {
+            openResultsButton.setText("Open Results Folder");
+          } else {
+            openResultsButton.setText("View Error Logs");
+          }
+          enableButtonsUpTo(openResultsButton);
+          long endTime = System.currentTimeMillis();
+          Logger.info("Tabulation took " + (endTime - startTime) / 1000.0 + " seconds.");
+        };
+    watchGenericService(service, onSucceededEvent);
   }
 
   private void watchParseCvrServiceProgress(Service<LoadedCvrData> service) {
-    EventHandler<WorkerStateEvent> onSuceededEvent = workerStateEvent -> {
-      enableButtonsUpTo(tabulateButton);
-      LoadedCvrData data = service.getValue();
-      numberOfBallots.setText("Number of Ballots: " + String.format("%,d", data.numCvrs()));
-      numberOfBallots.setOpacity(1);
-      data.discard();
-      lastLoadedCvrData = data;
-    };
+    EventHandler<WorkerStateEvent> onSucceededEvent =
+        workerStateEvent -> {
+          enableButtonsUpTo(tabulateButton);
+          LoadedCvrData data = service.getValue();
+          numberOfBallots.setText("Number of Ballots: " + String.format("%,d", data.numCvrs()));
+          numberOfBallots.setOpacity(1);
+          data.discard();
+          lastLoadedCvrData = data;
+        };
 
-    watchGenericService(service, onSuceededEvent);
+    watchGenericService(service, onSucceededEvent);
   }
 
-  private <T> void watchGenericService(Service<T> service,
-        EventHandler<WorkerStateEvent> onSuccessCallback) {
+  private <T> void watchGenericService(
+      Service<T> service, EventHandler<WorkerStateEvent> onSuccessCallback) {
     progressBar.progressProperty().bind(service.progressProperty());
     enableButtonsUpTo(null);
 
@@ -219,21 +203,23 @@ public class GuiTabulateController {
     // so we enforce that this callback is added second.
     EventHandler<WorkerStateEvent> originalCallback = service.getOnSucceeded();
     if (originalCallback == null) {
-      throw new RuntimeException("Programming Error: Java does not allow multiple listeners, "
+      throw new RuntimeException(
+          "Programming Error: Java does not allow multiple listeners, "
               + "so this listener must be called after the other listener is added.");
     }
 
-    service.setOnSucceeded(workerStateEvent -> {
-      progressBar.progressProperty().unbind();
-      progressBar.setProgress(1);
-      originalCallback.handle(workerStateEvent);
-      onSuccessCallback.handle(workerStateEvent);
-    });
+    service.setOnSucceeded(
+        workerStateEvent -> {
+          progressBar.progressProperty().unbind();
+          progressBar.setProgress(1);
+          originalCallback.handle(workerStateEvent);
+          onSuccessCallback.handle(workerStateEvent);
+        });
   }
 
   /**
-   * In the list of three buttons, Read > Tabulate > Open, sets the buttons up
-   * until this button as enabled.
+   * In the list of three buttons, Read > Tabulate > Open, sets the buttons up until this button as
+   * enabled.
    *
    * @param button Last button to be enabled, or null to disable all buttons
    */
@@ -264,8 +250,8 @@ public class GuiTabulateController {
   public void buttonSaveClicked(ActionEvent actionEvent) {
     savedConfigFilePath = guiConfigController.saveFile(saveButton, false);
     if (isConfigSavedOrTempFileReady()) {
-      saveButton.setText("Save");
-      tempSaveButton.setText("Temp File Saved!");
+      saveButton.setText("Saved!");
+      tempSaveButton.setVisible(false);
       filepath.setText(savedConfigFilePath);
     }
     updateGuiNotifyConfigSaved();
@@ -279,16 +265,17 @@ public class GuiTabulateController {
    */
   public void buttonTempSaveClicked(ActionEvent actionEvent) {
     useTemporaryConfigBeforeTabulation = true;
-    saveButton.setText("Save");
-    tempSaveButton.setText("Saved!");
+    saveButton.setText("Saved!");
+    tempSaveButton.setVisible(false);
     updateGuiNotifyConfigSaved();
     setTabulationButtonStatus();
   }
 
   private String getConfigPathOrCreateTempFile() {
-    String path = useTemporaryConfigBeforeTabulation
-        ? guiConfigController.saveFile(tempSaveButton, true)
-        : savedConfigFilePath;
+    String path =
+        useTemporaryConfigBeforeTabulation
+            ? guiConfigController.saveFile(tempSaveButton, true)
+            : savedConfigFilePath;
 
     ContestConfig config = ContestConfig.loadContestConfig(path);
     configOutputPath = config.getOutputDirectory();
@@ -309,7 +296,7 @@ public class GuiTabulateController {
       updateGuiWithNameEnteredStatus();
     }
 
-    if (isConfigSavedOrTempFileReady() && !userNameField.getText().isEmpty()) {
+    if (isConfigSavedOrTempFileReady() && !userNameField.getText().isBlank()) {
       enableButtonsUpTo(loadCvrButton);
     } else {
       enableButtonsUpTo(null);
@@ -326,7 +313,7 @@ public class GuiTabulateController {
   }
 
   private void updateGuiWithNameEnteredStatus() {
-    if (userNameField.getText().isEmpty()) {
+    if (userNameField.getText().isBlank()) {
       userNameField.setStyle(unfilledFieldStyle);
     } else {
       userNameField.setStyle(filledFieldStyle);
@@ -362,8 +349,8 @@ public class GuiTabulateController {
   private void updateProgressText() {
     if (!isConfigSavedOrTempFileReady()) {
       progressText.setText("Save the config file to continue.");
-    } else if (userNameField.getText().isEmpty()) {
-      progressText.setText("Please enter your name to continue.");
+    } else if (userNameField.getText().isBlank()) {
+      progressText.setText("Enter your name to continue.");
     } else {
       progressText.setText("");
     }
