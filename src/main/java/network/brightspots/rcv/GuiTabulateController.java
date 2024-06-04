@@ -201,7 +201,7 @@ public class GuiTabulateController {
     EventHandler<WorkerStateEvent> onSuceededEvent = workerStateEvent -> {
       enableButtonsUpTo(tabulateButton);
       LoadedCvrData data = service.getValue();
-      numberOfBallots.setText("Number of Ballots: " + data.numCvrs());
+      numberOfBallots.setText("Number of Ballots: " + String.format("%,d", data.numCvrs()));
       numberOfBallots.setOpacity(1);
       data.discard();
       lastLoadedCvrData = data;
