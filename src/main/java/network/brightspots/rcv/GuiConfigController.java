@@ -1736,7 +1736,7 @@ public class GuiConfigController implements Initializable {
 
                 Logger.info("Auto-loaded %d candidates.", successCount);
               }
-              return hasAnyFailures;
+              return !hasAnyFailures;
             }
           };
       task.setOnFailed(
@@ -1882,7 +1882,7 @@ public class GuiConfigController implements Initializable {
             if (cvrStatics.successfullyReadAll) {
               succeeded();
             } else {
-              Logger.warning("Failed to read all CVRs.");
+              Logger.severe("Failed to read all CVRs!");
               failed();
             }
             return cvrStatics;
