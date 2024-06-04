@@ -165,6 +165,12 @@ public class GuiTabulateController {
   private void watchTabulatorServiceProgress(Service<Boolean> service) {
     // Measure time it takes for the function to complete
     long startTime = System.currentTimeMillis();
+
+    // Prevent the user from closing the window while tabulation is in progress
+    Window window = tabulateButton.getScene().getWindow();
+    Stage stage = ((Stage) window);
+    stage.setOnCloseRequest(event -> event.consume());
+
     EventHandler<WorkerStateEvent> onSucceededEvent =
         workerStateEvent -> {
           lastTaskFailed = service.getValue();
@@ -174,6 +180,7 @@ public class GuiTabulateController {
             openResultsButton.setText("View Error Logs");
           }
           enableButtonsUpTo(openResultsButton);
+          stage.setOnCloseRequest(null);
           long endTime = System.currentTimeMillis();
           Logger.info("Tabulation took " + (endTime - startTime) / 1000.0 + " seconds.");
         };
@@ -199,6 +206,11 @@ public class GuiTabulateController {
     progressBar.progressProperty().bind(service.progressProperty());
     enableButtonsUpTo(null);
 
+    // Don't let user close the modal while the service is running
+    Window window = tabulateButton.getScene().getWindow();
+    Stage stage = ((Stage) window);
+    stage.setOnCloseRequest(event -> event.consume());
+
     // This is a litle hacky -- we want two listeners on setOnSucceded,
     // so we enforce that this callback is added second.
     EventHandler<WorkerStateEvent> originalCallback = service.getOnSucceeded();
@@ -212,6 +224,7 @@ public class GuiTabulateController {
         workerStateEvent -> {
           progressBar.progressProperty().unbind();
           progressBar.setProgress(1);
+          stage.setOnCloseRequest(null);
           originalCallback.handle(workerStateEvent);
           onSuccessCallback.handle(workerStateEvent);
         });
@@ -253,8 +266,8 @@ public class GuiTabulateController {
       saveButton.setText("Saved!");
       tempSaveButton.setVisible(false);
       filepath.setText(savedConfigFilePath);
+      updateGuiNotifyConfigSaved();
     }
-    updateGuiNotifyConfigSaved();
     setTabulationButtonStatus();
   }
 
@@ -330,9 +343,12 @@ public class GuiTabulateController {
     GuiConfigController.ConfigComparisonResult result = guiConfigController.compareConfigs();
     switch (result) {
       case DIFFERENT:
+      case GUI_IS_EMPTY:
+        saveButton.setText("Save*");
         tempSaveButton.setVisible(false);
         break;
       case DIFFERENT_BUT_VERSION_IS_TEST:
+        saveButton.setText("Save*");
         tempSaveButton.setVisible(true);
         break;
       case SAME:
@@ -357,10 +373,21 @@ public class GuiTabulateController {
   }
 
   private void openOutputDirectoryInFileExplorer() {
-    String[] cmd = new String[]{"open", "-R", configOutputPath};
-
     try {
-      Runtime.getRuntime().exec(cmd, null);
+      String os = System.getProperty("os.name").toLowerCase();
+      if (os.contains("win")) {
+        // Windows
+        Runtime.getRuntime().exec(new String[]{"explorer.exe", "/select,", configOutputPath});
+      } else if (os.contains("mac")) {
+        // MacOS
+        Runtime.getRuntime().exec(new String[]{"open", "-R", configOutputPath});
+      } else if (os.contains("nix") || os.contains("nux")) {
+        // Linux
+        Runtime.getRuntime().exec(new String[]{"xdg-open", configOutputPath});
+      } else {
+        // Fallback to console output
+        System.out.println("Unsupported operating system for this operation: " + os);
+      }
     } catch (IOException e) {
       Logger.warning("Failed to open file explorer: " + e.getMessage());
     }

@@ -1032,7 +1032,7 @@ public class GuiConfigController implements Initializable {
               .writeValueAsString(createRawContestConfig());
       if (selectedFile == null && currentConfigString.equals(emptyConfigString)) {
         // All fields are currently empty / default values so no point in asking to save
-        comparisonResult = ConfigComparisonResult.SAME;
+        comparisonResult = ConfigComparisonResult.GUI_IS_EMPTY;
       } else if (GuiContext.getInstance().getConfig() != null) {
         // Compare to version currently saved on the hard drive
         RawContestConfig configFromFile =
@@ -1080,7 +1080,8 @@ public class GuiConfigController implements Initializable {
   private boolean checkForSaveAndContinue() {
     boolean willContinue = false;
     ConfigComparisonResult comparisonResult = compareConfigs();
-    if (comparisonResult != ConfigComparisonResult.SAME) {
+    if (comparisonResult != ConfigComparisonResult.SAME
+          && comparisonResult != ConfigComparisonResult.GUI_IS_EMPTY) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
       ButtonType doNotSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
       Alert alert =
@@ -1119,7 +1120,9 @@ public class GuiConfigController implements Initializable {
   private Pair<String, Boolean> commitConfigToFileAndGetFilePath() {
     Pair<String, Boolean> filePathAndTempStatus = null;
     ConfigComparisonResult comparisonResult = compareConfigs();
-    if (comparisonResult != ConfigComparisonResult.SAME) {
+    if (comparisonResult == ConfigComparisonResult.GUI_IS_EMPTY) {
+      Logger.severe("Cannot convert an empty contest config!");
+    } else if (comparisonResult != ConfigComparisonResult.SAME) {
       // Three possible buttons, but only Save/Cancel shown unless version is TEST
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
       ButtonType useTempButton = new ButtonType("Use Temporary Config", ButtonBar.ButtonData.NO);
@@ -1639,6 +1642,7 @@ public class GuiConfigController implements Initializable {
    * The result of comparing the GUI config to the on-disk config.
    */
   public enum ConfigComparisonResult {
+    GUI_IS_EMPTY,
     SAME,
     DIFFERENT,
     DIFFERENT_BUT_VERSION_IS_TEST,
