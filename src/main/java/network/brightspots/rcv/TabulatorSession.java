@@ -240,11 +240,11 @@ class TabulatorSession {
     return exceptionsEncountered;
   }
 
-  Set<String> loadPrecinctNamesFromCvrs(ContestConfig config) {
+  Set<String> loadSliceNamesFromCvrs(ContestConfig.TabulateBySlice slice, ContestConfig config) {
     List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config);
     try {
-      return new Tabulator(castVoteRecords, config).getPrecinctIds();
-    } catch (IOException | TabulationAbortedException e) {
+      return new Tabulator(castVoteRecords, config).getEnabledSliceIds().get(slice);
+    } catch (TabulationAbortedException e) {
       throw new RuntimeException(e);
     }
   }

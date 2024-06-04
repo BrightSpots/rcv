@@ -21,7 +21,7 @@
  *  Captures all INFO level logging for the execution of a session.
  *  "session" could span multiple tabulations in GUI mode.
  *
- * GUI handler (INFO) -> textArea
+ * GUI handler (INFO) -> listView
  *  Displays INFO level logging in GUI for user feedback in GUI mode.
  *
  * Default handler -> console
@@ -32,19 +32,34 @@
 
 package network.brightspots.rcv;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javafx.application.Platform;
-import javafx.scene.control.TextArea;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 class Logger {
 
@@ -61,6 +76,7 @@ class Logger {
   private static java.util.logging.Logger logger;
   private static java.util.logging.FileHandler tabulationHandler;
   private static String tabulationLogPattern;
+  private static final List<Label> labelsQueue = new ArrayList<>();
 
   static void setup() {
     logger = java.util.logging.Logger.getLogger("");
@@ -156,21 +172,109 @@ class Logger {
   }
 
   // add logging to the provided text area for display to user in the GUI
-  static void addGuiLogging(TextArea textArea) {
+  static void addGuiLogging(ListView<Label> listView) {
+    ObservableList<Label> logMessages = FXCollections.observableArrayList();
+    listView.setItems(logMessages);
+
+    // Set cell factory to reduce vertical gap
+    listView.setCellFactory(param -> new ListCell<Label>() {
+      @Override
+      protected void updateItem(Label item, boolean empty) {
+        // Sets zero padding and updates the cell colors
+        super.updateItem(item, empty);
+        if (empty || item == null) {
+          setGraphic(null);
+          setText(null);
+          setStyle(null);
+        } else {
+          // Reset the widths to allow word wrap
+          item.setMinWidth(listView.getWidth() - 50);
+          item.setMaxWidth(listView.getWidth() - 50);
+          item.setPrefWidth(listView.getWidth() - 50);
+
+          // Fix the label padding
+          setPadding(new Insets(0, 0, 0, 3));
+
+          // First remove any existing style, which can either be overridden
+          // (if it needs a custom background) or can remain as the default.
+          setStyle(null);
+
+          // Set the entire background color to the label's background
+          // This changes the background from being a text highlight to taking up the whole row
+          Background bg = item.getBackground();
+          if (bg != null) {
+            List<BackgroundFill> fills = item.getBackground().getFills();
+            if (!fills.isEmpty()) {
+              Paint bgColor = fills.get(0).getFill();
+              String hexColor = bgColor.toString().replace("0x", "#");
+              setStyle("-fx-background-color: " + hexColor);
+            }
+          }
+
+          // Change the look when selected -- lighten it up a bit
+          // while maintaining the warning/severe color
+          if (isSelected()) {
+            setBlendMode(BlendMode.SCREEN);
+          } else {
+            setBlendMode(BlendMode.SRC_OVER);
+          }
+
+          setGraphic(item);
+        }
+      }
+    });
+
     java.util.logging.Handler guiHandler =
         new Handler() {
           @Override
           public void publish(LogRecord record) {
             if (isLoggable(record)) {
               String msg = getFormatter().format(record);
-              // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
-              // otherwise schedule the text update to run on the GUI thread
-              if (Platform.isFxApplicationThread()) {
-                textArea.appendText(msg);
-              } else {
-                Platform.runLater(() -> textArea.appendText(msg));
+              Label logLabel = new Label(msg);
+              logLabel.setPadding(new Insets(0, 0, 0, 3));
+              logLabel.setWrapText(true);
+
+              // Set background color based on log level
+              if (record.getLevel() == Level.SEVERE) {
+                logLabel.setBackground(Background.fill(Color.DARKRED));
+              } else if (record.getLevel() == Level.WARNING) {
+                logLabel.setBackground(Background.fill(Color.SIENNA));
+              }
+
+              // On Right Click, user can copy text
+              ContextMenu contextMenu = new ContextMenu();
+              MenuItem copyMenuItem = new MenuItem("Copy");
+              copyMenuItem.setOnAction(event -> copyToClipboard(logLabel));
+              contextMenu.getItems().add(copyMenuItem);
+              logLabel.setContextMenu(contextMenu);
+
+              // Rather than adding to the list too many times in a row,
+              // we add to a queue and schedule an occasional update to the UI.
+              // This prevents the UI from lagging when there are many log messages.
+              synchronized (labelsQueue) {
+                labelsQueue.add(logLabel);
+
+                // The first item in the queue is the only one that needs to trigger the update.
+                if (labelsQueue.size() == 1) {
+                  Platform.runLater(this::addFromMainThread);
+                }
               }
             }
+          }
+
+          private void addFromMainThread() {
+            synchronized (labelsQueue) {
+              logMessages.addAll(labelsQueue);
+              labelsQueue.clear();
+            }
+            listView.scrollTo(logMessages.size() - 1);
+          }
+
+          private void copyToClipboard(Label logLabel) {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putString(logLabel.getText());
+            clipboard.setContent(content);
           }
 
           @Override

@@ -1345,6 +1345,10 @@ class ContestConfig {
     public String toString() {
       return label;
     }
+
+    public String toLowerString() {
+      return label.toLowerCase();
+    }
   }
 
   static class UnrecognizedProviderException extends Exception {}
