@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -44,6 +45,7 @@ class ContestConfig {
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final String AUTOMATED_TEST_VERSION = "TEST";
   static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
+  static final boolean SUGGESTED_TABULATE_BY_BATCH = false;
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
@@ -228,6 +230,14 @@ class ContestConfig {
               source.getFilePath())) {
             validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
           }
+
+          if (fieldIsDefinedButShouldNotBeForProvider(
+                  source.getBatchColumnIndex(),
+                  "batchColumnIndex",
+                  provider,
+                  source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED);
+          }
         }
 
         // See the config file documentation for an explanation of this regex
@@ -282,6 +292,14 @@ class ContestConfig {
             provider,
             source.getFilePath())) {
           validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
+        }
+
+        if (fieldIsDefinedButShouldNotBeForProvider(
+                source.getBatchColumnIndex(),
+                "batchColumnIndex",
+                provider,
+                source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
@@ -599,16 +617,26 @@ class ContestConfig {
 
         if (getProvider(source) == Provider.CDF) {
           // Perform CDF checks
-          if (isTabulateByPrecinctEnabled()) {
-            validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT);
-            Logger.severe("tabulateByPrecinct may not be used with CDF files.");
+          for (TabulateBySlice tabulateBySlice : enabledSlices()) {
+            validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_DISAGREEMENT);
+            Logger.severe("Tabulate-by-%s has not yet been implemented for CDF files.",
+                    tabulateBySlice);
           }
         } else if (getProvider(source) == Provider.ESS) {
           // Perform ES&S checks
-          if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
+          if (isNullOrBlank(source.getPrecinctColumnIndex())
+              && isTabulateByEnabled(TabulateBySlice.PRECINCT)) {
             validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN);
             Logger.severe(
-                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s", cvrPath);
+                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
+                cvrPath);
+          }
+          if (isNullOrBlank(source.getBatchColumnIndex())
+              && isTabulateByEnabled(TabulateBySlice.BATCH)) {
+            validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_BATCH_COLUMN);
+            Logger.severe(
+                    "batchColumnIndex is required when tabulateByBatch is enabled: %s",
+                    cvrPath);
           }
           if (isNullOrBlank(source.getOvervoteDelimiter())
               && getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
@@ -959,8 +987,17 @@ class ContestConfig {
     return rawConfig.outputSettings.contestDate;
   }
 
-  boolean isTabulateByPrecinctEnabled() {
-    return rawConfig.outputSettings.tabulateByPrecinct;
+  boolean isTabulateByEnabled(TabulateBySlice slice) {
+    return switch (slice) {
+      case PRECINCT -> rawConfig.outputSettings.tabulateByPrecinct;
+      case BATCH -> rawConfig.outputSettings.tabulateByBatch;
+    };
+  }
+
+  List<TabulateBySlice> enabledSlices() {
+    return Arrays.stream(TabulateBySlice.values())
+            .filter(this::isTabulateByEnabled)
+            .collect(Collectors.toList());
   }
 
   boolean isGenerateCdfJsonEnabled() {
@@ -1194,6 +1231,7 @@ class ContestConfig {
     CVR_FIRST_VOTE_COLUMN_INVALID,
     CVR_FIRST_VOTE_ROW_INVALID,
     CVR_ID_COLUMN_INVALID,
+    CVR_BATCH_COLUMN_INVALID,
     CVR_PRECINCT_COLUMN_INVALID,
     CVR_OVERVOTE_DELIMITER_INVALID,
     CVR_CDF_FILE_PATH_INVALID,
@@ -1202,7 +1240,8 @@ class ContestConfig {
     CVR_DUPLICATE_FILE_PATHS,
     CVR_FILE_PATH_INVALID,
     CVR_OVERVOTE_LABEL_OVERVOTE_RULE_MISMATCH,
-    CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT,
+    CVR_CDF_TABULATE_BY_DISAGREEMENT,
+    CVR_TABULATE_BY_PRECINCT_REQUIRES_BATCH_COLUMN,
     CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN,
     CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED,
     CVR_OVERVOTE_DELIMITER_MISSING,
@@ -1211,6 +1250,7 @@ class ContestConfig {
     CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED,
     CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED,
     CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED,
+    CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
@@ -1288,6 +1328,22 @@ class ContestConfig {
 
     public String getInternalLabel() {
       return internalLabel;
+    }
+  }
+
+  enum TabulateBySlice {
+    PRECINCT("Precinct"),
+    BATCH("Batch");
+
+    private final String label;
+
+    TabulateBySlice(String label) {
+      this.label = label;
+    }
+
+    @Override
+    public String toString() {
+      return label;
     }
   }
 

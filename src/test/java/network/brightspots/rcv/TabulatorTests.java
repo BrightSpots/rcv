@@ -18,6 +18,7 @@
 
 package network.brightspots.rcv;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -193,11 +194,20 @@ class TabulatorTests {
   }
 
   private static void runTabulationTest(String testStem) {
-    runTabulationTest(testStem, null);
+    runTabulationTest(testStem, null, 0);
+  }
+
+  private static void runTabulationTest(String testStem, int expectedNumPrecinctFilesToCheck) {
+    runTabulationTest(testStem, null, expectedNumPrecinctFilesToCheck);
+  }
+
+  private static void runTabulationTest(String testStem, String expectedException) {
+    runTabulationTest(testStem, expectedException, 0);
   }
 
   // helper function to support running various tabulation tests
-  private static void runTabulationTest(String stem, String expectedException) {
+  private static void runTabulationTest(String stem, String expectedException,
+                                        int expectedNumPrecinctFilesToCheck) {
     String configPath = getTestFilePath(stem, "_config.json");
 
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
@@ -219,6 +229,20 @@ class TabulatorTests {
         compareFiles(config, stem, timestampString, null);
       }
 
+      int numPrecinctFilesChecked = 0;
+      if (config.isTabulateByPrecinctEnabled()) {
+        for (String precinct : session.loadPrecinctNamesFromCvrs(config)) {
+          String outputType = ResultsWriter.sanitizeStringForOutput(precinct + "_precinct_summary");
+          if (compareFiles(config, stem, outputType, ".json", timestampString, null, true)) {
+            numPrecinctFilesChecked++;
+          }
+          if (compareFiles(config, stem, outputType, ".csv", timestampString, null, true)) {
+            numPrecinctFilesChecked++;
+          }
+        }
+      }
+      assertEquals(numPrecinctFilesChecked, expectedNumPrecinctFilesToCheck);
+
       cleanOutputFolder(session);
     }
   }
@@ -231,7 +255,7 @@ class TabulatorTests {
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null);
+    compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null, false);
 
     cleanOutputFolder(session);
   }
@@ -263,10 +287,22 @@ class TabulatorTests {
         if (!file.isDirectory()) {
           try {
             // Every ephemeral file must be set to read-only on close, including audit logs
-            assertFalse(
-                file.canWrite(),
-                "File must not be writeable: %s".formatted(file.getAbsolutePath()));
-            // Then set it writeable so it can be deleted
+            if (file.canWrite()) {
+              // If a previous test was exited early by a developer, the file may still be
+              // writeable. That makes it pretty annoying for developers to see these spurious
+              // failures. As a safeguard, we'll only check for writeability for files
+              // created in the last five minutes -- well over the duration of any test we
+              // have today.
+              if (file.lastModified() > System.currentTimeMillis() - 1000 * 60 * 5) {
+                fail("File must not be writeable: %s".formatted(file.getAbsolutePath()));
+              } else {
+                Logger.warning(
+                        "File was writeable, but it was created more than five minutes ago"
+                                + " so we assume a previous test failed to clean it up: %s",
+                        file.getAbsolutePath());
+              }
+            }
+            // Ensure it can be deleted -- make it writeable now.
             boolean writeableSucceeded = file.setWritable(true);
             if (!writeableSucceeded) {
               Logger.warning("Failed to set file to writeable: %s", file.getAbsolutePath());
@@ -283,20 +319,25 @@ class TabulatorTests {
 
   private static void compareFiles(
       ContestConfig config, String stem, String timestampString, String sequentialId) {
-    compareFiles(config, stem, "summary", ".json", timestampString, sequentialId);
-    compareFiles(config, stem, "summary", ".csv", timestampString, sequentialId);
+    compareFiles(config, stem, "summary", ".json", timestampString, sequentialId, false);
+    compareFiles(config, stem, "summary", ".csv", timestampString, sequentialId, false);
     if (config.isGenerateCdfJsonEnabled()) {
-      compareFiles(config, stem, "cvr_cdf", ".json", timestampString, sequentialId);
+      compareFiles(config, stem, "cvr_cdf", ".json", timestampString, sequentialId, false);
     }
   }
 
-  private static void compareFiles(
+  /**
+   * Returns whether the files were compared at all.
+   * If they were compared and not equal, the test will fail.
+   */
+  private static boolean compareFiles(
       ContestConfig config,
       String stem,
       String outputType,
       String extension,
       String timestampString,
-      String sequentialId) {
+      String sequentialId,
+      boolean onlyCheckIfExpectedFileExists) {
     String actualOutputPath =
         ResultsWriter.getOutputFilePath(
                 config.getOutputDirectory(), outputType, timestampString, sequentialId)
@@ -310,12 +351,17 @@ class TabulatorTests {
                 + extension);
 
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
-    if (fileCompare(expectedPath, actualOutputPath)) {
+    boolean didCompare = true;
+    if (onlyCheckIfExpectedFileExists && !new File(expectedPath).exists()) {
+      didCompare = false;
+      Logger.info("Skipping comparison: expected file does not exist.");
+    } else if (fileCompare(expectedPath, actualOutputPath)) {
       Logger.info("Files are equal.");
     } else {
       Logger.info("Files are different.");
       fail();
     }
+    return didCompare;
   }
 
   @BeforeAll
@@ -523,13 +569,13 @@ class TabulatorTests {
   @Test
   @DisplayName("2017 Minneapolis Mayor")
   void test2017MinneapolisMayor() {
-    runTabulationTest("2017_minneapolis_mayor");
+    runTabulationTest("2017_minneapolis_mayor", 4);
   }
 
   @Test
   @DisplayName("2013 Minneapolis Mayor")
   void test2013MinneapolisMayor() {
-    runTabulationTest("2013_minneapolis_mayor");
+    runTabulationTest("2013_minneapolis_mayor", 4);
   }
 
   @Test
@@ -611,15 +657,21 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("precinct example")
+  @DisplayName("tabulate by precinct")
   void precinctExample() {
-    runTabulationTest("precinct_example");
+    runTabulationTest("precinct_example", 2);
+  }
+
+  @Test
+  @DisplayName("tabulate by batch")
+  void batchExample() {
+    runTabulationTest("batch_example");
   }
 
   @Test
   @DisplayName("missing precinct example")
   void missingPrecinctExample() {
-    runTabulationTest("missing_precinct_example");
+    runTabulationTest("missing_precinct_example", 4);
   }
 
   @Test
