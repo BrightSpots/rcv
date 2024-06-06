@@ -197,8 +197,8 @@ class TabulatorTests {
     runTabulationTest(testStem, null, 0);
   }
 
-  private static void runTabulationTest(String testStem, int expectedNumPrecinctFilesToCheck) {
-    runTabulationTest(testStem, null, expectedNumPrecinctFilesToCheck);
+  private static void runTabulationTest(String testStem, int expectedNumSliceFilesToCheck) {
+    runTabulationTest(testStem, null, expectedNumSliceFilesToCheck);
   }
 
   private static void runTabulationTest(String testStem, String expectedException) {
@@ -207,7 +207,7 @@ class TabulatorTests {
 
   // helper function to support running various tabulation tests
   private static void runTabulationTest(String stem, String expectedException,
-                                        int expectedNumPrecinctFilesToCheck) {
+                                        int expectedNumSliceFilesToCheck) {
     String configPath = getTestFilePath(stem, "_config.json");
 
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
@@ -229,19 +229,20 @@ class TabulatorTests {
         compareFiles(config, stem, timestampString, null);
       }
 
-      int numPrecinctFilesChecked = 0;
-      if (config.isTabulateByPrecinctEnabled()) {
-        for (String precinct : session.loadPrecinctNamesFromCvrs(config)) {
-          String outputType = ResultsWriter.sanitizeStringForOutput(precinct + "_precinct_summary");
+      int numSlicedFilesChecked = 0;
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        for (String sliceName : session.loadSliceNamesFromCvrs(slice, config)) {
+          String outputType = ResultsWriter.sanitizeStringForOutput(
+              String.format("%s_%s_summary", sliceName, slice.toLowerString()));
           if (compareFiles(config, stem, outputType, ".json", timestampString, null, true)) {
-            numPrecinctFilesChecked++;
+            numSlicedFilesChecked++;
           }
           if (compareFiles(config, stem, outputType, ".csv", timestampString, null, true)) {
-            numPrecinctFilesChecked++;
+            numSlicedFilesChecked++;
           }
         }
       }
-      assertEquals(numPrecinctFilesChecked, expectedNumPrecinctFilesToCheck);
+      assertEquals(expectedNumSliceFilesToCheck, numSlicedFilesChecked);
 
       cleanOutputFolder(session);
     }
@@ -657,9 +658,15 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("precinct example")
+  @DisplayName("tabulate by precinct")
   void precinctExample() {
     runTabulationTest("precinct_example", 2);
+  }
+
+  @Test
+  @DisplayName("tabulate by batch")
+  void batchExample() {
+    runTabulationTest("batch_example");
   }
 
   @Test
