@@ -456,7 +456,7 @@ public class GuiConfigController implements Initializable {
     Stage stage = (Stage) fromButton.getScene().getWindow();
     File outputFile;
     if (useTemporaryFile) {
-      outputFile = new File(selectedFile.getAbsolutePath() + ".temp");
+      outputFile = getTemporaryFile();
       saveFile(outputFile);
     } else {
       outputFile = getSaveFile(stage);
@@ -475,6 +475,15 @@ public class GuiConfigController implements Initializable {
     JsonParser.writeToFile(fileToSave, createRawContestConfig());
     // Reload to keep GUI fields updated in case invalid values are replaced during save process
     loadFile(fileToSave, true);
+  }
+
+  /**
+   * Where the temporary config files will be placed if saveFile's useTemporaryFile flag is used.
+   *
+   * @return A file that may or may not currently exist on disk
+   */
+  public File getTemporaryFile() {
+    return new File(selectedFile.getAbsolutePath() + ".temp");
   }
 
   /**
@@ -603,6 +612,7 @@ public class GuiConfigController implements Initializable {
       window.setScene(new Scene(root));
       window.setX(GuiContext.getInstance().getMainWindow().getX() + 50);
       window.setY(GuiContext.getInstance().getMainWindow().getY() + 50);
+      window.setOnHiding((event) -> controller.cleanUp());
       window.showAndWait();
     } catch (IOException exception) {
       StringWriter sw = new StringWriter();

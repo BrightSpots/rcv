@@ -16,7 +16,9 @@
 
 package network.brightspots.rcv;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import javafx.concurrent.Service;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -99,6 +101,21 @@ public class GuiTabulateController {
     initializeSaveButtonStatuses();
     setTabulationButtonStatus();
     updateProgressText();
+  }
+
+  /**
+   * Call this before closing the window to delete any lingering temp files.
+   */
+  public void cleanUp() {
+    if (useTemporaryConfigBeforeTabulation) {
+      try {
+        File tempFile = guiConfigController.getTemporaryFile();
+        Files.deleteIfExists(tempFile.toPath());
+      } catch (IOException e) {
+        Logger.severe("Could not delete temporary config file: " + e.getMessage());
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   /**
