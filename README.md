@@ -67,8 +67,6 @@ On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch
 9. Run `gradle run --offline` to launch RCTab
 10. Run `gradle jpackage --offline` to generate a jpackage package
 
-Note: this is not currently available on Silicon-chip Apple Devices. Only Intel Mac is supported.
-
 #### Encrypting the Tabulator Directory
 For security purposes, we **strongly recommend** applying password encryption (e.g. 256-bit SHA) to the directory containing the Tabulator, config files, CVR files, and any other related files.
 

@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ] # add macos-latest-xlarge for silicon (a paid feature)
+        os: [ ubuntu-latest, windows-latest, macos-13, macos-latest ]  # -13 is intel; -latest is ARM
     steps:
       - name: "Create base filename for all artifacts"
         id: basefn
@@ -121,7 +121,7 @@ jobs:
           shaA: 512
 
       - name: "Prepare keychain"
-        if: matrix.os == 'macOS-latest'
+        if: matrix.os == 'macOS-latest' || matrix.os == 'macOS-13'
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
@@ -147,7 +147,7 @@ jobs:
           final-filepath: ${{ steps.exefn.outputs.FILEPATH }}
 
       - name: "Notarize app bundle"
-        if: matrix.os == 'macOS-latest'
+        if: matrix.os == 'macOS-latest' || matrix.os == 'macOS-13'
         env:
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.MACOS_NOTARIZATION_TEAM_ID }}
