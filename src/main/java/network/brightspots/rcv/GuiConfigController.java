@@ -513,22 +513,24 @@ public class GuiConfigController implements Initializable {
     ContestConfig config =
             ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
     ValidatorService service = new ValidatorService(config);
-    service.setOnSucceeded(event -> {
-      setGuiIsBusy(false);
-      if (service.getValue()) {
-        openTabulateWindow();
-      } else {
-        Logger.severe("Validation failed.");
-      }
-    });
+    service.setOnSucceeded(
+        event -> {
+          setGuiIsBusy(false);
+          if (service.getValue()) {
+            openTabulateWindow();
+          } else {
+            Logger.severe("Validation failed!");
+          }
+        });
     service.setOnCancelled(event -> {
       setGuiIsBusy(false);
       Logger.info("Validation canceled.");
     });
-    service.setOnFailed(event -> {
-      setGuiIsBusy(false);
-      Logger.severe("Validation failed.");
-    });
+    service.setOnFailed(
+        event -> {
+          setGuiIsBusy(false);
+          Logger.severe("Validation failed!");
+        });
     service.start();
   }
 

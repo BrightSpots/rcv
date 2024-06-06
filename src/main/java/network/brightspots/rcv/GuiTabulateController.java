@@ -89,9 +89,9 @@ public class GuiTabulateController {
   /** Initialize the GUI with all information required for tabulation. */
   public void initialize(GuiConfigController controller, int numCandidates, int numCvrs) {
     guiConfigController = controller;
-    numberOfCandidates.setText("Number of candidates: " + numCandidates);
-    numberOfCvrFiles.setText("Number of CVR files: " + numCvrs);
-    numberOfBallots.setText("Number of ballots: <Check ballot counts to load>");
+    numberOfCandidates.setText("Number of Candidates: " + numCandidates);
+    numberOfCvrFiles.setText("Number of CVR Files: " + numCvrs);
+    numberOfBallots.setText("Number of Ballots: <Awaiting count>");
     numberOfBallots.setOpacity(0.5);
     filledFieldStyle = "";
     unfilledFieldStyle = "-fx-border-color: red;";
@@ -120,10 +120,12 @@ public class GuiTabulateController {
    *
    * @param actionEvent ignored
    */
-  public void buttonloadCvrsClicked(ActionEvent actionEvent) {
+  public void buttonLoadCvrsClicked(ActionEvent actionEvent) {
     String configPath = getConfigPathOrCreateTempFile();
 
     enableButtonsUpTo(null);
+    numberOfBallots.setText("Number of Ballots: <Counting...>");
+    numberOfBallots.setOpacity(0.5);
     Service<LoadedCvrData> service = guiConfigController.parseAndCountCastVoteRecords(configPath);
 
     watchParseCvrServiceProgress(service);
@@ -211,7 +213,7 @@ public class GuiTabulateController {
     Stage stage = ((Stage) window);
     stage.setOnCloseRequest(event -> event.consume());
 
-    // This is a litle hacky -- we want two listeners on setOnSucceded,
+    // This is a little hacky -- we want two listeners on setOnSucceded,
     // so we enforce that this callback is added second.
     EventHandler<WorkerStateEvent> originalCallback = service.getOnSucceeded();
     if (originalCallback == null) {
@@ -292,7 +294,8 @@ public class GuiTabulateController {
 
     ContestConfig config = ContestConfig.loadContestConfig(path);
     configOutputPath = config.getOutputDirectory();
-    if (!configOutputPath.endsWith("/")) {
+    String os = System.getProperty("os.name").toLowerCase();
+    if (!os.contains("win") && !configOutputPath.endsWith("/")) {
       configOutputPath += "/";
     }
 
