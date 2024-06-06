@@ -304,6 +304,7 @@ class Tiebreak {
       final Stage window = new Stage();
       window.initModality(Modality.APPLICATION_MODAL);
       window.setTitle("RCV Tiebreaker");
+      window.setResizable(false);
       String resourcePath = "/network/brightspots/rcv/GuiTiebreakerLayout.fxml";
       try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));

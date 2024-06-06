@@ -592,6 +592,7 @@ public class GuiConfigController implements Initializable {
     window.initModality(Modality.APPLICATION_MODAL);
     window.setTitle("Tabulate");
     window.initOwner(GuiContext.getInstance().getMainWindow());
+    window.resizableProperty().setValue(Boolean.FALSE);
 
     String resourcePath = "/network/brightspots/rcv/GuiTabulationPopup.fxml";
     try {

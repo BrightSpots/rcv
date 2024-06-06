@@ -67,8 +67,8 @@ public class GuiTabulateController {
   /** The style applied when a required field is unfilled and requires user input. */
   private String unfilledFieldStyle;
 
-  /** If the last task failed. */
-  private boolean lastTaskFailed = false;
+  /** If the last task succeeded. */
+  private boolean lastTaskSucceeded = false;
 
   /** Last-loaded CVR metadata, with the CVRs themselves discarded from memory. */
   private LoadedCvrData lastLoadedCvrData;
@@ -78,7 +78,6 @@ public class GuiTabulateController {
   @FXML private Button tempSaveButton;
   @FXML private Label numberOfCandidates;
   @FXML private Label numberOfCvrFiles;
-  @FXML private Label numberOfBallots;
   @FXML private TextField userNameField;
   @FXML private ProgressBar progressBar;
   @FXML private Button loadCvrButton;
@@ -91,8 +90,6 @@ public class GuiTabulateController {
     guiConfigController = controller;
     numberOfCandidates.setText("Number of Candidates: " + numCandidates);
     numberOfCvrFiles.setText("Number of CVR Files: " + numCvrs);
-    numberOfBallots.setText("Number of Ballots: <Awaiting count>");
-    numberOfBallots.setOpacity(0.5);
     filledFieldStyle = "";
     unfilledFieldStyle = "-fx-border-color: red;";
 
@@ -124,8 +121,7 @@ public class GuiTabulateController {
     String configPath = getConfigPathOrCreateTempFile();
 
     enableButtonsUpTo(null);
-    numberOfBallots.setText("Number of Ballots: <Counting...>");
-    numberOfBallots.setOpacity(0.5);
+    tabulateButton.setText("Tabulate");
     Service<LoadedCvrData> service = guiConfigController.parseAndCountCastVoteRecords(configPath);
 
     watchParseCvrServiceProgress(service);
@@ -155,7 +151,7 @@ public class GuiTabulateController {
    * @param actionEvent ignored
    */
   public void buttonOpenResultsClicked(ActionEvent actionEvent) {
-    if (lastTaskFailed) {
+    if (lastTaskSucceeded) {
       openOutputDirectoryInFileExplorer();
     } else {
       // Close the window
@@ -175,11 +171,11 @@ public class GuiTabulateController {
 
     EventHandler<WorkerStateEvent> onSucceededEvent =
         workerStateEvent -> {
-          lastTaskFailed = service.getValue();
-          if (lastTaskFailed) {
+          lastTaskSucceeded = service.getValue();
+          if (lastTaskSucceeded) {
             openResultsButton.setText("Open Results Folder");
           } else {
-            openResultsButton.setText("View Error Logs");
+            openResultsButton.setText("Close and View Logs");
           }
           enableButtonsUpTo(openResultsButton);
           stage.setOnCloseRequest(null);
@@ -194,8 +190,7 @@ public class GuiTabulateController {
         workerStateEvent -> {
           enableButtonsUpTo(tabulateButton);
           LoadedCvrData data = service.getValue();
-          numberOfBallots.setText("Number of Ballots: " + String.format("%,d", data.numCvrs()));
-          numberOfBallots.setOpacity(1);
+          tabulateButton.setText("Tabulate " + String.format("%,d", data.numCvrs()) + " ballots");
           data.discard();
           lastLoadedCvrData = data;
         };

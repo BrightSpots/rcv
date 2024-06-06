@@ -58,14 +58,6 @@
                   <Insets left="15.0" />
                </VBox.margin>
             </Label>
-            <Label fx:id="numberOfBallots" prefHeight="24.0" prefWidth="349.0" text="Number of Ballots: Y" wrapText="true">
-               <font>
-                  <Font size="16.0" />
-               </font>
-               <VBox.margin>
-                  <Insets left="15.0" />
-               </VBox.margin>
-            </Label>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Auditing Information" wrappingWidth="225.1533203125">
                <font>
                   <Font name="System Bold" size="19.0" />
