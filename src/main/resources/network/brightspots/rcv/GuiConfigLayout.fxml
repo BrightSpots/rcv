@@ -181,13 +181,22 @@
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
                     </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label prefWidth="130.0" text="Batch Column"/>
+                      <TextField prefHeight="25.0" prefWidth="40.0"
+                                 fx:id="textFieldCvrBatchCol"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
                   </VBox>
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <Label text="Path *"/>
-                      <TextField prefHeight="25.0" prefWidth="290.0" fx:id="textFieldCvrFilePath"/>
-                      <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
-                        text="Select" fx:id="buttonCvrFilePath"/>
+                      <TextField prefHeight="25.0" prefWidth="179.0" fx:id="textFieldCvrFilePath"/>
+                      <Button fx:id="buttonCvrFilePath" mnemonicParsing="false"
+                              onAction="#buttonCvrFilePathClicked"
+                              prefHeight="26.0" prefWidth="157.0" text="Select" />
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
@@ -273,6 +282,9 @@
                     <TableColumn fx:id="tableColumnCvrPrecinctCol" minWidth="20.0"
                       prefWidth="70.0"
                       text="Precinct&#10;Column"/>
+                    <TableColumn fx:id="tableColumnCvrBatchCol" minWidth="20.0"
+                                 prefWidth="70.0"
+                                 text="Batch&#10;Column"/>
                     <TableColumn minWidth="20.0"
                       prefWidth="80.0" text="Overvote&#10;Delimiter"
                       fx:id="tableColumnCvrOvervoteDelimiter"/>
@@ -665,6 +677,17 @@
                   </padding>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="4.0">
+                  <CheckBox fx:id="checkBoxTabulateByBatch" mnemonicParsing="false"
+                            text="Tabulate by Batch">
+                    <VBox.margin>
+                      <Insets top="8.0" bottom="8.0"/>
+                    </VBox.margin>
+                  </CheckBox>
+                  <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                  </padding>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="4.0">
                   <CheckBox fx:id="checkBoxGenerateCdfJson" mnemonicParsing="false"
                     text="Generate CDF JSON">
                     <VBox.margin>
@@ -696,13 +719,12 @@
         styleClass="help-text-area" wrapText="true" BorderPane.alignment="TOP_LEFT"/>
     </right>
     <bottom>
-      <TextArea id="textStatus" fx:id="textAreaStatus" editable="false" prefHeight="200.0"
-        prefWidth="200.0" styleClass="console-text-area" wrapText="true"
-        BorderPane.alignment="TOP_LEFT">
+      <ListView id="textStatus" fx:id="textAreaStatus" editable="false" prefHeight="200.0"
+        prefWidth="200.0" styleClass="console-text-area" BorderPane.alignment="TOP_LEFT">
         <BorderPane.margin>
           <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
         </BorderPane.margin>
-      </TextArea>
+      </ListView>
     </bottom>
   </BorderPane>
 </ScrollPane>

@@ -30,6 +30,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 
@@ -273,6 +275,10 @@ class DominionCvrReader extends BaseCvrReader {
       String batchId = session.get("BatchId").toString();
       Integer recordId = (Integer) session.get("RecordId");
       String suppliedId = recordId.toString();
+      String computedId = Stream.of(tabulatorId, batchId, Integer.toString(recordId))
+              .filter(s -> s != null && !s.isEmpty())
+              .collect(Collectors.joining("|"));
+
       // filter out records which are not current and replace them with adjudicated ones
       HashMap adjudicatedData = (HashMap) session.get("Original");
       boolean isCurrent = (boolean) adjudicatedData.get("IsCurrent");
@@ -351,8 +357,8 @@ class DominionCvrReader extends BaseCvrReader {
           }
           // create the new cvr
           CastVoteRecord newCvr =
-              new CastVoteRecord(
-                  contestId, tabulatorId, batchId, suppliedId, precinct, precinctPortion, rankings);
+              new CastVoteRecord(contestId, tabulatorId, batchId, suppliedId,
+                      computedId, precinct, precinctPortion, rankings);
           castVoteRecords.add(newCvr);
         }
       }
