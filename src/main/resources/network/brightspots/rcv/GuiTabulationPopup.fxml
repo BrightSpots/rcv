@@ -13,6 +13,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+
 <Pane prefHeight="513.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="network.brightspots.rcv.GuiTabulateController">
    <children>
       <VBox layoutX="14.0" layoutY="10.0" prefHeight="343.0" prefWidth="573.0" spacing="10.0">
@@ -29,8 +30,7 @@
                         <Insets left="15.0" />
                      </HBox.margin>
                   </TextArea>
-                  <Button fx:id="saveButton" minWidth="70.0" mnemonicParsing="false"
-                          onAction="#buttonSaveClicked" prefHeight="42.0" text="Save"/>
+                  <Button fx:id="saveButton" minWidth="70.0" mnemonicParsing="false" onAction="#buttonSaveClicked" prefHeight="42.0" text="Save" />
                   <Button fx:id="tempSaveButton" minWidth="155.0" mnemonicParsing="false" onAction="#buttonTempSaveClicked" prefHeight="42.0" text="Save Temporary Config" />
                </children>
             </HBox>
@@ -91,15 +91,13 @@
          </font>
       </Text>
       <ProgressBar fx:id="progressBar" layoutX="19.0" layoutY="429.0" prefHeight="20.0" prefWidth="563.0" progress="0.0" />
-      <HBox layoutX="21.0" layoutY="367.0" prefHeight="42.0" prefWidth="556.0" spacing="20.0">
+      <HBox layoutX="21.0" layoutY="367.0" prefHeight="55.0" prefWidth="556.0" spacing="20.0">
          <children>
-            <Button fx:id="loadCvrButton" defaultButton="true" disable="true"
-                    mnemonicParsing="false" onAction="#buttonLoadCvrsClicked" prefHeight="42.0"
-                    prefWidth="200.0" text="Check Ballot Counts"/>
+            <Button fx:id="loadCvrButton" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#buttonLoadCvrsClicked" prefHeight="50.0" prefWidth="200.0" text="Check Ballot Counts" textAlignment="CENTER" />
             <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="&gt;" textAlignment="CENTER" translateY="11.0" />
-            <Button fx:id="tabulateButton" defaultButton="true" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#buttonTabulateClicked" prefHeight="42.0" prefWidth="200.0" text="Tabulate" />
+            <Button fx:id="tabulateButton" defaultButton="true" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#buttonTabulateClicked" prefHeight="50.0" prefWidth="200.0" text="Tabulate" textAlignment="CENTER" wrapText="true" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="&gt;" textAlignment="CENTER" translateY="11.0" />
-            <Button fx:id="openResultsButton" defaultButton="true" disable="true" layoutX="210.0" layoutY="10.0" mnemonicParsing="false" onAction="#buttonOpenResultsClicked" prefHeight="42.0" prefWidth="200.0" text="Open Results Folder" />
+            <Button fx:id="openResultsButton" defaultButton="true" disable="true" layoutX="210.0" layoutY="10.0" mnemonicParsing="false" onAction="#buttonOpenResultsClicked" prefHeight="50.0" prefWidth="200.0" text="Open Results Folder" textAlignment="CENTER" />
          </children>
       </HBox>
    </children>

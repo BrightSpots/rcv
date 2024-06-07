@@ -1681,7 +1681,7 @@ public class GuiConfigController implements Initializable {
     DIFFERENT_BUT_VERSION_IS_TEST,
   }
 
-  private static class AutoLoadCandidatesService extends Service<Boolean> {
+  private static class AutoLoadCandidatesService extends Service<Void> {
 
     private final ContestConfig config;
     private final List<CvrSource> sources;
@@ -1695,13 +1695,12 @@ public class GuiConfigController implements Initializable {
     }
 
     @Override
-    protected Task<Boolean> createTask() {
-      Task<Boolean> task =
+    protected Task<Void> createTask() {
+      Task<Void> task =
           new Task<>() {
             @Override
-            protected Boolean call() {
+            protected Void call() {
               Logger.info("Auto-loading candidates from CVR files...");
-              boolean hasAnyFailures = false;
               boolean cvrsSpecified = true;
               if (sources.isEmpty()) {
                 Logger.warning("No CVR files specified!");
@@ -1720,12 +1719,10 @@ public class GuiConfigController implements Initializable {
                         castVoteRecords, true).keySet();
                     unloadedNames.addAll(unknownCandidates);
                   } catch (ContestConfig.UnrecognizedProviderException e) {
-                    hasAnyFailures = true;
                     Logger.severe(
                         "Unrecognized provider \"%s\" in source file \"%s\": %s",
                         source.getProvider(), source.getFilePath(), e.getMessage());
                   } catch (CastVoteRecord.CvrParseException | IOException e) {
-                    hasAnyFailures = true;
                     Logger.severe(
                         "Failed to read source file \"%s\": ",
                         source.getFilePath(), e.getMessage());
@@ -1742,14 +1739,13 @@ public class GuiConfigController implements Initializable {
                     tableViewCandidates.getItems().add(candidate);
                     successCount++;
                   } else {
-                    hasAnyFailures = true;
                     Logger.severe("Failed to load candidate \"%s\"!", name);
                   }
                 }
 
                 Logger.info("Auto-loaded %d candidates.", successCount);
               }
-              return !hasAnyFailures;
+              return null;
             }
           };
       task.setOnFailed(
