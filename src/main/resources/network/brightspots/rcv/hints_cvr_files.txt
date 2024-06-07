@@ -11,7 +11,7 @@ Path (required): Location of the CVR file.
 * Example: C:\test data\2015-portland-mayor-cvr.xlsx
   NOTE: You can select multiple consecutive files by holding down Shift when you click filenames in the dialog (or multiple non-adjacent files by holding down Ctrl or Cmd). You can also manually add multiple if you enter the values in the Path input box, each separated by two semicolons:
 * Example: C:\test data\precinct14.json;;C:\test data\precinct15.json;;C:\test data\precinct16.json
-  Please ensure none of your file paths contain double semicolons within them, or they'll get split and treated as separate file paths.
+  Consequently, please ensure none of your file paths contain double semicolons within them, or they'll get split and treated as separate file paths.
 NOTE: For providers that require folders to be selected, it's not possible to select multiple at once using the dialog. However, if you manually enter the values in the Path input box, separated with double semicolons, this will work:
 * Example: C:\test data\Dominion Input 1;;C:\test data\Dominion Input 2;;C:\test data\Dominion Input 3
 

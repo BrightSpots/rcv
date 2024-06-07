@@ -587,7 +587,7 @@ public class GuiConfigController implements Initializable {
     Provider provider = getProviderChoice(choiceCvrProvider);
     switch (provider) {
       case CDF -> selectedFiles =
-          chooseFile(provider, new ExtensionFilter("JSON and XML file(s)", "*.json", "*.xml"));
+          chooseFile(provider, new ExtensionFilter("JSON or XML file(s)", "*.json", "*.xml"));
       case CLEAR_BALLOT, CSV -> selectedFiles =
           chooseFile(provider, new ExtensionFilter("CSV file(s)", "*.csv"));
       case DOMINION, HART -> {
@@ -1194,7 +1194,7 @@ public class GuiConfigController implements Initializable {
       switch (choice) {
         case CDF -> buttonCvrFilePath.setText("Select JSON/XML file(s)");
         case CLEAR_BALLOT, CSV -> buttonCvrFilePath.setText("Select CSV file(s)");
-        case DOMINION, HART -> buttonCvrFilePath.setText("Select a directory");
+        case DOMINION, HART -> buttonCvrFilePath.setText("Select a folder");
         case ESS -> buttonCvrFilePath.setText("Select Excel file(s)");
         case PROVIDER_UNKNOWN -> buttonCvrFilePath.setText("Select");
         default -> throw new IllegalStateException("Unexpected value: " + choice);
