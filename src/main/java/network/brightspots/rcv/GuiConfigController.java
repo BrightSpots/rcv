@@ -1843,7 +1843,7 @@ public class GuiConfigController implements Initializable {
               if (errors.isEmpty()) {
                 succeeded();
               } else {
-                Logger.warning("Encountered %d errors during tabulation.", errors.size());
+                Logger.severe("Encountered %d error(s) during tabulation!", errors.size());
                 failed();
               }
               return errors.isEmpty();

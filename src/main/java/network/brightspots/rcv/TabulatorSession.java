@@ -159,7 +159,7 @@ class TabulatorSession {
     boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory());
 
     if (operatorName == null || operatorName.isBlank()) {
-      Logger.severe("Operator name is required for the audit logs.");
+      Logger.severe("Operator name is required for the audit logs!");
       exceptionsEncountered.add(TabulationAbortedException.class.toString());
     } else if (setUpLoggingSuccess && config.validate().isEmpty()) {
       Logger.info("Computer machine name: %s", Utils.getComputerName());

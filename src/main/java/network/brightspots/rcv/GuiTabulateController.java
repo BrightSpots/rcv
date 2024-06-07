@@ -69,8 +69,8 @@ public class GuiTabulateController {
   /** The style applied when a required field is unfilled and requires user input. */
   private String unfilledFieldStyle;
 
-  /** If the last task succeeded. */
-  private boolean lastTaskSucceeded = false;
+  /** If the tabulation task succeeded. */
+  private boolean tabulationSucceeded = false;
 
   /** Last-loaded CVR metadata, with the CVRs themselves discarded from memory. */
   private LoadedCvrData lastLoadedCvrData;
@@ -168,7 +168,7 @@ public class GuiTabulateController {
    * @param actionEvent ignored
    */
   public void buttonOpenResultsClicked(ActionEvent actionEvent) {
-    if (lastTaskSucceeded) {
+    if (tabulationSucceeded) {
       openOutputDirectoryInFileExplorer();
     } else {
       // Close the window
@@ -188,11 +188,11 @@ public class GuiTabulateController {
 
     EventHandler<WorkerStateEvent> onSucceededEvent =
         workerStateEvent -> {
-          lastTaskSucceeded = service.getValue();
-          if (lastTaskSucceeded) {
+          tabulationSucceeded = service.getValue();
+          if (tabulationSucceeded) {
             openResultsButton.setText("Open Results Folder");
           } else {
-            openResultsButton.setText("Close and View Logs");
+            openResultsButton.setText("Close and View Errors");
           }
           enableButtonsUpTo(openResultsButton);
           stage.setOnCloseRequest(null);
