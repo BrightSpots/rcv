@@ -55,7 +55,7 @@ abstract class BaseCvrReader {
       int maxRanking = cvr.candidateRankings.maxRankingNumber();
       if (!isRankingAllowed(maxRanking, cvr.getContestId())) {
         Logger.severe(
-            "CVR \"%s\" has a ranking %d, but contest \"%s\" has max ranking %s",
+            "CVR \"%s\" has a ranking %d, but contest \"%s\" has max ranking %s!",
             cvr.getId(), maxRanking, cvr.getContestId(), config.getMaxRankingsAllowedAsString());
         throw new CastVoteRecord.CvrParseException();
       }

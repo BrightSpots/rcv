@@ -263,10 +263,10 @@ class StreamingCvrReader extends BaseCvrReader {
 
       for (String candidate : candidates) {
         candidate = candidate.trim();
-        if (candidates.length > 1 && (candidate.isEmpty() || candidate.equals(skippedRankLabel))) {
+        if (candidates.length > 1 && (candidate.isBlank() || candidate.equals(skippedRankLabel))) {
           Logger.severe(
-              "If a cell contains multiple candidates split by the overvote delimeter, "
-              + "it's not valid for any of them to be blank or an explicit skipped ranking.");
+              "If a cell contains multiple candidates split by the overvote delimiter, "
+                  + "it's not valid for any of them to be blank or an explicit skipped ranking.");
           encounteredDataErrors = true;
         } else if (!candidate.equals(skippedRankLabel)) {
           // map overvotes to our internal overvote string
