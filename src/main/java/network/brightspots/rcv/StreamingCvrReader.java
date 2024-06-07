@@ -239,11 +239,16 @@ class StreamingCvrReader extends BaseCvrReader {
       currentBatch = cellData;
     } else if (idColumnIndex != null && col == idColumnIndex) {
       currentSuppliedCvrId = cellData;
-    }
+    } else if (col >= firstVoteColumnIndex
+        && (config.isMaxRankingsSetToMaximum()
+            || col < firstVoteColumnIndex + config.getMaxRankingsAllowedWhenNotSetToMaximum())) {
+      // Unlike other CVRs, where having a ranking over the max number of rankings is an error,
+      // in these files it simply defines the "last" column used for rankings.
+      // If the max rankings is set to the maximum, we don't need to check the upper bound --
+      // we read all columns.
+      // Get the current ranking, and update the max ranking
+      int currentRank = col - firstVoteColumnIndex + 1;
 
-    // see if this column is in the ranking range
-    int currentRank = col - firstVoteColumnIndex + 1;
-    if (config.isRankingAllowed(currentRank)) {
       // handle any empty cells which may exist between this cell and any previous one
       handleEmptyCells(currentRank);
       String cellString = cellData.trim();
@@ -253,15 +258,15 @@ class StreamingCvrReader extends BaseCvrReader {
       if (!isNullOrBlank(overvoteDelimiter)) {
         candidates = cellString.split(Pattern.quote(overvoteDelimiter));
       } else {
-        candidates = new String[] {cellString};
+        candidates = new String[]{cellString};
       }
 
       for (String candidate : candidates) {
         candidate = candidate.trim();
-        if (candidates.length > 1 && (candidate.equals("") || candidate.equals(skippedRankLabel))) {
+        if (candidates.length > 1 && (candidate.isBlank() || candidate.equals(skippedRankLabel))) {
           Logger.severe(
-              "If a cell contains multiple candidates split by the overvote delimiter, it's not "
-                  + "valid for any of them to be blank or an explicit skipped ranking.");
+              "If a cell contains multiple candidates split by the overvote delimiter, "
+                  + "it's not valid for any of them to be blank or an explicit skipped ranking.");
           encounteredDataErrors = true;
         } else if (!candidate.equals(skippedRankLabel)) {
           // map overvotes to our internal overvote string
