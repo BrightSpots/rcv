@@ -587,9 +587,9 @@ public class GuiConfigController implements Initializable {
     Provider provider = getProviderChoice(choiceCvrProvider);
     switch (provider) {
       case CDF -> selectedFiles =
-          chooseFile(provider, new ExtensionFilter("JSON and XML files", "*.json", "*.xml"));
+          chooseFile(provider, new ExtensionFilter("JSON or XML file(s)", "*.json", "*.xml"));
       case CLEAR_BALLOT, CSV -> selectedFiles =
-          chooseFile(provider, new ExtensionFilter("CSV files", "*.csv"));
+          chooseFile(provider, new ExtensionFilter("CSV file(s)", "*.csv"));
       case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -597,7 +597,7 @@ public class GuiConfigController implements Initializable {
         selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
       case ESS -> selectedFiles =
-          chooseFile(provider, new ExtensionFilter("Excel files", "*.xls", "*.xlsx"));
+          chooseFile(provider, new ExtensionFilter("Excel file(s)", "*.xls", "*.xlsx"));
       default -> {
         // Do nothing for unhandled providers
       }
@@ -1182,10 +1182,22 @@ public class GuiConfigController implements Initializable {
           textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
         }
         case PROVIDER_UNKNOWN -> {
-          // Do nothing
+          // do nothing
         }
         default -> throw new IllegalStateException(
             "Unexpected value: " + getProviderChoice(choiceCvrProvider));
+      }
+      // Now set the "Select" button label
+      // These don't correspond exactly to the switch statement above, so
+      // do this in its own switch statement.
+      Provider choice = getProviderChoice(choiceCvrProvider);
+      switch (choice) {
+        case CDF -> buttonCvrFilePath.setText("Select JSON/XML file(s)");
+        case CLEAR_BALLOT, CSV -> buttonCvrFilePath.setText("Select CSV file(s)");
+        case DOMINION, HART -> buttonCvrFilePath.setText("Select a folder");
+        case ESS -> buttonCvrFilePath.setText("Select Excel file(s)");
+        case PROVIDER_UNKNOWN -> buttonCvrFilePath.setText("Select");
+        default -> throw new IllegalStateException("Unexpected value: " + choice);
       }
     });
     EditableColumn[] cvrStringColumnsAndProperties = new EditableColumn[]{

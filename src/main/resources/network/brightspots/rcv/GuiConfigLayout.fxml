@@ -193,9 +193,10 @@
                   <VBox spacing="4.0">
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <Label text="Path *"/>
-                      <TextField prefHeight="25.0" prefWidth="290.0" fx:id="textFieldCvrFilePath"/>
-                      <Button mnemonicParsing="false" onAction="#buttonCvrFilePathClicked"
-                        text="Select" fx:id="buttonCvrFilePath"/>
+                      <TextField prefHeight="25.0" prefWidth="179.0" fx:id="textFieldCvrFilePath"/>
+                      <Button fx:id="buttonCvrFilePath" mnemonicParsing="false"
+                              onAction="#buttonCvrFilePathClicked"
+                              prefHeight="26.0" prefWidth="157.0" text="Select" />
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
