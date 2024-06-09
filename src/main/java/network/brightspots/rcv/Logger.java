@@ -47,12 +47,15 @@ import java.util.logging.LogRecord;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -175,6 +178,7 @@ class Logger {
   static void addGuiLogging(ListView<Label> listView) {
     ObservableList<Label> logMessages = FXCollections.observableArrayList();
     listView.setItems(logMessages);
+    listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
     // Clear selection when focus is lost to keep the text legible
     listView.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -251,7 +255,7 @@ class Logger {
               // On Right Click, user can copy text
               ContextMenu contextMenu = new ContextMenu();
               MenuItem copyMenuItem = new MenuItem("Copy");
-              copyMenuItem.setOnAction(event -> copyToClipboard(logLabel));
+              copyMenuItem.setOnAction(this::copyToClipboard);
               contextMenu.getItems().add(copyMenuItem);
               logLabel.setContextMenu(contextMenu);
 
@@ -277,10 +281,14 @@ class Logger {
             listView.scrollTo(logMessages.size() - 1);
           }
 
-          private void copyToClipboard(Label logLabel) {
+          private void copyToClipboard(ActionEvent e) {
             Clipboard clipboard = Clipboard.getSystemClipboard();
             ClipboardContent content = new ClipboardContent();
-            content.putString(logLabel.getText());
+            StringBuilder sb = new StringBuilder();
+            for (Label label : listView.getSelectionModel().getSelectedItems()) {
+              sb.append(label.getText()).append("\n");
+            }
+            content.putString(sb.toString());
             clipboard.setContent(content);
           }
 
