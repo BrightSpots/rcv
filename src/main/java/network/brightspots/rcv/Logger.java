@@ -176,6 +176,13 @@ class Logger {
     ObservableList<Label> logMessages = FXCollections.observableArrayList();
     listView.setItems(logMessages);
 
+    // Clear selection when focus is lost to keep the text legible
+    listView.focusedProperty().addListener((obs, oldVal, newVal) -> {
+      if (!newVal) {
+        listView.getSelectionModel().clearSelection();
+      }
+    });
+
     // Set cell factory to reduce vertical gap
     listView.setCellFactory(param -> new ListCell<Label>() {
       @Override
