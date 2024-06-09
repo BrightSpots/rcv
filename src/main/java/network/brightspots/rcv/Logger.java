@@ -230,7 +230,7 @@ class Logger {
           public void publish(LogRecord record) {
             if (isLoggable(record)) {
               String msg = getFormatter().format(record);
-              Label logLabel = new Label(msg);
+              Label logLabel = new Label(msg.strip());
               logLabel.setPadding(new Insets(0, 0, 0, 3));
               logLabel.setWrapText(true);
 
