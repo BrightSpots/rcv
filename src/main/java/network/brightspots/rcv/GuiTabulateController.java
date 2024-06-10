@@ -84,9 +84,9 @@ public class GuiTabulateController {
   @FXML private Button tempSaveButton;
   @FXML private Label numberOfCandidates;
   @FXML private Label numberOfCvrFiles;
-  @FXML private TableView<Pair<String, Integer>> perSourceCvrCountTable;
-  @FXML private TableColumn<Pair<String, Integer>, String> perSourceCvrColumnFilepath;
-  @FXML private TableColumn<Pair<String, Integer>, String> perSourceCvrColumnCount;
+  @FXML private TableView<Pair<String, String>> perSourceCvrCountTable;
+  @FXML private TableColumn<Pair<String, String>, String> perSourceCvrColumnFilepath;
+  @FXML private TableColumn<Pair<String, String>, String> perSourceCvrColumnCount;
   @FXML private TextField userNameField;
   @FXML private ProgressBar progressBar;
   @FXML private Button loadCvrButton;
@@ -106,9 +106,9 @@ public class GuiTabulateController {
     tempSaveButton.managedProperty().bind(tempSaveButton.visibleProperty());
 
     perSourceCvrColumnFilepath.setCellValueFactory(
-            c -> new SimpleStringProperty(new File(c.getValue().getKey()).getName()));
+            c -> new SimpleStringProperty(c.getValue().getKey()));
     perSourceCvrColumnCount.setCellValueFactory(
-            c -> new SimpleStringProperty(c.getValue().getValue().toString()));
+            c -> new SimpleStringProperty(c.getValue().getValue()));
     perSourceCvrCountTable.getColumns().add(0,
             GuiConfigController.NumberTableCellFactory.createNumberColumn("#", 1));
     perSourceCvrCountTable.setVisible(false);
@@ -223,10 +223,16 @@ public class GuiTabulateController {
       LoadedCvrData data = service.getValue();
       tabulateButton.setText("Tabulate " + String.format("%,d", data.numCvrs()) + " ballots");
 
+      // Populate the per-source CVR count table, and calculate the width of the filename column
       perSourceCvrCountTable.getItems().clear();
+      int maxFilenameLength = 0;
       for (Pair<String, Integer> perSourceCount : data.getPerSourceCvrCounts()) {
-        perSourceCvrCountTable.getItems().add(perSourceCount);
+        String countString = String.format("%,d", perSourceCount.getValue());
+        String fileString = new File(perSourceCount.getKey()).getName();
+        perSourceCvrCountTable.getItems().add(new Pair<>(fileString, countString));
+        maxFilenameLength = Math.max(maxFilenameLength, fileString.length());
       }
+      perSourceCvrColumnFilepath.setPrefWidth(getEstWidthForStringInPixels(maxFilenameLength));
       perSourceCvrCountTable.setVisible(true);
 
       data.discard();
@@ -234,6 +240,10 @@ public class GuiTabulateController {
     };
 
     watchGenericService(service, onSucceededEvent);
+  }
+
+  private float getEstWidthForStringInPixels(int stringLength) {
+    return stringLength * 7.5f;
   }
 
   private <T> void watchGenericService(
