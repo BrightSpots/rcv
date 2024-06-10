@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
@@ -339,9 +338,9 @@ class TabulatorSession {
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
         Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
-        int origNumCvrs = castVoteRecords.size();
+        final int origNumCvrs = castVoteRecords.size();
         reader.readCastVoteRecords(castVoteRecords);
-        int numCvrsRead = castVoteRecords.size() - origNumCvrs;
+        final int numCvrsRead = castVoteRecords.size() - origNumCvrs;
 
         // Update the per-source data for the results writer
         perSourceDataForCsv.add(new ResultsWriter.PerSourceDataForCsv(
@@ -459,7 +458,8 @@ class TabulatorSession {
     private boolean isDiscarded;
     private final boolean doesMatchAllMetadata;
 
-    public LoadedCvrData(List<CastVoteRecord> cvrs, List<Pair<String, Integer>> perSourceCvrCounts) {
+    public LoadedCvrData(List<CastVoteRecord> cvrs,
+                         List<Pair<String, Integer>> perSourceCvrCounts) {
       this.cvrs = cvrs;
       this.successfullyReadAll = cvrs != null;
       this.numCvrs = cvrs != null ? cvrs.size() : 0;

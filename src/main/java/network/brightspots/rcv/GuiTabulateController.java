@@ -218,26 +218,27 @@ public class GuiTabulateController {
   }
 
   private void watchParseCvrServiceProgress(Service<LoadedCvrData> service) {
-    EventHandler<WorkerStateEvent> onSucceededEvent = workerStateEvent -> {
-      enableButtonsUpTo(tabulateButton);
-      LoadedCvrData data = service.getValue();
-      tabulateButton.setText("Tabulate " + String.format("%,d", data.numCvrs()) + " ballots");
+    EventHandler<WorkerStateEvent> onSucceededEvent =
+        workerStateEvent -> {
+          enableButtonsUpTo(tabulateButton);
+          LoadedCvrData data = service.getValue();
+          tabulateButton.setText("Tabulate " + String.format("%,d", data.numCvrs()) + " ballots");
 
-      // Populate the per-source CVR count table, and calculate the width of the filename column
-      perSourceCvrCountTable.getItems().clear();
-      int maxFilenameLength = 0;
-      for (Pair<String, Integer> perSourceCount : data.getPerSourceCvrCounts()) {
-        String countString = String.format("%,d", perSourceCount.getValue());
-        String fileString = new File(perSourceCount.getKey()).getName();
-        perSourceCvrCountTable.getItems().add(new Pair<>(fileString, countString));
-        maxFilenameLength = Math.max(maxFilenameLength, fileString.length());
-      }
-      perSourceCvrColumnFilepath.setPrefWidth(getEstWidthForStringInPixels(maxFilenameLength));
-      perSourceCvrCountTable.setVisible(true);
+          // Populate the per-source CVR count table, and calculate the width of the filename column
+          perSourceCvrCountTable.getItems().clear();
+          int maxFilenameLength = 0;
+          for (Pair<String, Integer> perSourceCount : data.getPerSourceCvrCounts()) {
+            String countString = String.format("%,d", perSourceCount.getValue());
+            String fileString = new File(perSourceCount.getKey()).getName();
+            perSourceCvrCountTable.getItems().add(new Pair<>(fileString, countString));
+            maxFilenameLength = Math.max(maxFilenameLength, fileString.length());
+          }
+          perSourceCvrColumnFilepath.setPrefWidth(getEstWidthForStringInPixels(maxFilenameLength));
+          perSourceCvrCountTable.setVisible(true);
 
-      data.discard();
-      lastLoadedCvrData = data;
-    };
+          data.discard();
+          lastLoadedCvrData = data;
+        };
 
     watchGenericService(service, onSucceededEvent);
   }
