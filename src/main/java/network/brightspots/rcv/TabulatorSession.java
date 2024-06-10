@@ -106,24 +106,21 @@ class TabulatorSession {
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
         LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
-        if (!castVoteRecords.successfullyReadAll) {
-          Logger.severe("Aborting conversion due to cast vote record errors!");
-        } else {
-          Tabulator.SliceIdSet sliceIds =
-              new Tabulator(castVoteRecords.getCvrs(), config).getEnabledSliceIds();
-          ResultsWriter writer =
-              new ResultsWriter()
-                  .setNumRounds(0)
-                  .setSliceIds(sliceIds)
-                  .setContestConfig(config)
-                  .setTimestampString(timestampString);
-          writer.generateCdfJson(castVoteRecords.getCvrs());
-          conversionSuccess = true;
-        }
+        Tabulator.SliceIdSet sliceIds =
+            new Tabulator(castVoteRecords.getCvrs(), config).getEnabledSliceIds();
+        ResultsWriter writer =
+            new ResultsWriter()
+                .setNumRounds(0)
+                .setSliceIds(sliceIds)
+                .setContestConfig(config)
+                .setTimestampString(timestampString);
+        writer.generateCdfJson(castVoteRecords.getCvrs());
+        conversionSuccess = true;
       } catch (IOException
           | UnableToCreateDirectoryException
           | TabulationAbortedException
-          | RoundSnapshotDataMissingException exception) {
+          | RoundSnapshotDataMissingException
+          | CastVoteRecordGenericParseException exception) {
         Logger.severe("Failed to convert CVR(s) to CDF: %s", exception.getMessage());
       }
     }
@@ -140,7 +137,7 @@ class TabulatorSession {
     return conversionSuccess;
   }
 
-  LoadedCvrData parseAndCountCastVoteRecords() {
+  LoadedCvrData parseAndCountCastVoteRecords() throws CastVoteRecordGenericParseException {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     return parseCastVoteRecords(config);
   }
@@ -192,23 +189,17 @@ class TabulatorSession {
           Logger.info(
               "Beginning tabulation for seat #%d...", config.getSequentialWinners().size() + 1);
           // Read cast vote records and slice IDs from CVR files
-          LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
-          if (config.getSequentialWinners().isEmpty()
-                && !castVoteRecords.metadataMatches(expectedCvrData)) {
-            Logger.severe("CVR data has changed between loading the CVRs and reading them!");
-            exceptionsEncountered.add(TabulationAbortedException.class.toString());
-            break;
-          }
-          if (!castVoteRecords.successfullyReadAll) {
-            String errorMessage = "Aborting tabulation due to cast vote record errors!";
-            exceptionsEncountered.add(errorMessage);
-            Logger.severe(errorMessage);
-            break;
-          }
           Set<String> newWinnerSet;
           try {
+            LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
+            if (config.getSequentialWinners().isEmpty()
+                    && !castVoteRecords.metadataMatches(expectedCvrData)) {
+              Logger.severe("CVR data has changed between loading the CVRs and reading them!");
+              exceptionsEncountered.add(TabulationAbortedException.class.toString());
+              break;
+            }
             newWinnerSet = runTabulationForConfig(config, castVoteRecords.getCvrs());
-          } catch (TabulationAbortedException exception) {
+          } catch (TabulationAbortedException | CastVoteRecordGenericParseException exception) {
             exceptionsEncountered.add(exception.getClass().toString());
             Logger.severe(exception.getMessage());
             break;
@@ -235,23 +226,22 @@ class TabulatorSession {
         tabulationSuccess = true;
       } else {
         // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
-        // Read cast vote records and slice IDs from CVR files
-        LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
-        if (!castVoteRecords.metadataMatches(expectedCvrData)) {
-          Logger.severe("CVR data has changed between loading the CVRs and reading them!");
-          exceptionsEncountered.add(TabulationAbortedException.class.toString());
-        } else if (!castVoteRecords.successfullyReadAll) {
-          String errorMessage = "Aborting tabulation due to cast vote record errors!";
-          exceptionsEncountered.add(errorMessage);
-          Logger.severe(errorMessage);
-        } else {
-          try {
+        // Read cast vote records and precinct IDs from CVR files
+        try {
+          LoadedCvrData castVoteRecords = parseCastVoteRecords(config);
+          if (!castVoteRecords.metadataMatches(expectedCvrData)) {
+            Logger.severe("CVR data has changed between loading the CVRs and reading them!");
+            exceptionsEncountered.add(TabulationAbortedException.class.toString());
+          } else {
             runTabulationForConfig(config, castVoteRecords.getCvrs());
             tabulationSuccess = true;
-          } catch (TabulationAbortedException exception) {
-            exceptionsEncountered.add(exception.getClass().toString());
-            Logger.severe(exception.getMessage());
           }
+        } catch (CastVoteRecordGenericParseException exception) {
+          exceptionsEncountered.add(exception.getClass().toString());
+          Logger.severe("Aborting tabulation due to cast vote record errors!");
+        } catch (TabulationAbortedException exception) {
+          exceptionsEncountered.add(exception.getClass().toString());
+          Logger.severe(exception.getMessage());
         }
       }
       Logger.info("Tabulation session completed.");
@@ -268,10 +258,10 @@ class TabulatorSession {
   }
 
   Set<String> loadSliceNamesFromCvrs(ContestConfig.TabulateBySlice slice, ContestConfig config) {
-    List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config).getCvrs();
     try {
+      List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config).getCvrs();
       return new Tabulator(castVoteRecords, config).getEnabledSliceIds().get(slice);
-    } catch (TabulationAbortedException e) {
+    } catch (TabulationAbortedException | CastVoteRecordGenericParseException e) {
       throw new RuntimeException(e);
     }
   }
@@ -312,7 +302,8 @@ class TabulatorSession {
   // parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
   // returns: list of parsed CVRs or null if an error was encountered
-  private LoadedCvrData parseCastVoteRecords(ContestConfig config) {
+  private LoadedCvrData parseCastVoteRecords(ContestConfig config)
+        throws CastVoteRecordGenericParseException {
     Logger.info("Parsing cast vote records...");
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     boolean encounteredSourceProblem = false;
@@ -403,6 +394,11 @@ class TabulatorSession {
     } else {
       Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
     }
+
+    if (castVoteRecords == null) {
+      throw new CastVoteRecordGenericParseException();
+    }
+
     return new LoadedCvrData(castVoteRecords);
   }
 
@@ -414,6 +410,9 @@ class TabulatorSession {
     UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
       this.candidateCounts = candidateCounts;
     }
+  }
+
+  static class CastVoteRecordGenericParseException extends Exception {
   }
 
   /**
@@ -439,7 +438,9 @@ class TabulatorSession {
       this.doesMatchAllMetadata = false;
     }
 
-    /** This constructor will cause metadataMatches to always return true. */
+    /**
+     * This constructor will cause metadataMatches to always return true.
+     */
     private LoadedCvrData() {
       this.cvrs = null;
       this.successfullyReadAll = false;
@@ -457,8 +458,8 @@ class TabulatorSession {
      */
     public boolean metadataMatches(LoadedCvrData other) {
       return other.doesMatchAllMetadata
-          || this.doesMatchAllMetadata
-          || other.numCvrs() == this.numCvrs();
+              || this.doesMatchAllMetadata
+              || other.numCvrs() == this.numCvrs();
     }
 
     public int numCvrs() {

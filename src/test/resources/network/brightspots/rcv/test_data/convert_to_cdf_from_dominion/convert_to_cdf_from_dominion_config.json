@@ -68,7 +68,7 @@
     "decimalPlacesForVoteArithmetic": "4",
     "minimumVoteThreshold": "0",
     "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "8",
+    "maxRankingsAllowed": "5",
     "nonIntegerWinningThreshold": false,
     "hareQuota": false,
     "batchElimination": true,
