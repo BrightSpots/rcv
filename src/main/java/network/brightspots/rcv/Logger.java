@@ -239,7 +239,7 @@ class Logger {
         new Handler() {
           @Override
           public void publish(LogRecord record) {
-            if (isLoggable(record)) {
+            if (isLoggable(record) && !shouldIgnore(record)) {
               String msg = getFormatter().format(record);
               Label logLabel = new Label(msg.strip());
               logLabel.setPadding(new Insets(0, 0, 0, 3));
@@ -271,6 +271,17 @@ class Logger {
                 }
               }
             }
+          }
+
+          private boolean shouldIgnore(LogRecord record) {
+            // On Windows, scrollToBottom can trigger a log message in VirtualFlow.java that causes:
+            // 1. A log message to be added to the queue
+            // 2. The scroll-to-bottom to fail
+            // This can cause a cycle of repeated log spam and sporadic scroll failures.
+            // The problem seems entirely mitigated by ignoring this log message.
+            // The following bug is related, though it has very little information:
+            // https://bugs.openjdk.java.net/browse/JDK-8092801
+            return record.getMessage().startsWith("index exceeds maxCellCount");
           }
 
           private void addFromMainThread() {
