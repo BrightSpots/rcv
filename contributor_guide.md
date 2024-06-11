@@ -66,3 +66,7 @@ If you have any questions or feedback please reach out to Chris Hughes
 at [chris.hughes@rcvresources.org](mailto:chris.hughes@rcvresources.org).
 
 -- The RCTab Team
+
+### Notes on development:
+
+See our pull request merging strategy and other development notes [on our Wiki](https://github.com/BrightSpots/rcv/wiki/Notes-on-Development).
