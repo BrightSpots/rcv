@@ -337,7 +337,7 @@ public class RawContestConfig {
     // This is deprecated and replaced by aliases, but we need to leave it in place
     // here for the purpose of supporting automatic migration from older config versions.
     private void setCode(String code) {
-      if (code != null && !code.isEmpty()) {
+      if (code != null && !code.isBlank()) {
         this.aliases.add(code);
       }
     }

@@ -71,7 +71,7 @@ public class Main extends GuiApplication {
         }
       }
 
-      if (operatorName == null || operatorName.isEmpty()) {
+      if (operatorName == null || operatorName.isBlank()) {
         Logger.severe(
             "Must supply --name as a CLI argument, or run via an interactive shell and actually"
                 + " provide operator name(s)!");

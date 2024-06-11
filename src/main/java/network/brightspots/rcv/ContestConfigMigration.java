@@ -95,7 +95,7 @@ final class ContestConfigMigration {
               WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.getInternalLabel();
           default -> {
             Logger.warning(
-                "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
+                "winnerElectionMode \"%s\" is unrecognized! Supply a valid "
                     + "winnerElectionMode.",
                 oldWinnerElectionMode);
             rules.winnerElectionMode = null;
@@ -123,8 +123,7 @@ final class ContestConfigMigration {
           rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode).getInternalLabel();
         } else {
           Logger.warning(
-              "tiebreakMode \"%s\" is unrecognized! Please supply a valid tiebreakMode.",
-              oldTiebreakMode);
+              "tiebreakMode \"%s\" is unrecognized! Supply a valid tiebreakMode.", oldTiebreakMode);
           rules.tiebreakMode = null;
         }
       }

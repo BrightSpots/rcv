@@ -29,6 +29,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -49,9 +51,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -83,6 +88,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -96,6 +103,7 @@ import network.brightspots.rcv.RawContestConfig.OutputSettings;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
+import network.brightspots.rcv.TabulatorSession.LoadedCvrData;
 
 /**
  * View controller for config layout.
@@ -417,7 +425,11 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private File getSaveFile() {
+  public String getSelectedFilePath() {
+    return selectedFile != null ? selectedFile.getAbsolutePath() : "No file saved yet!";
+  }
+
+  private File getSaveFile(Stage stage) {
     FileChooser fc = new FileChooser();
     if (selectedFile == null) {
       fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
@@ -427,11 +439,33 @@ public class GuiConfigController implements Initializable {
     }
     fc.getExtensionFilters().add(new ExtensionFilter("JSON files", "*.json"));
     fc.setTitle("Save Config");
-    File fileToSave = fc.showSaveDialog(GuiContext.getInstance().getMainWindow());
+    File fileToSave = fc.showSaveDialog(stage);
     if (fileToSave != null) {
       selectedFile = fileToSave;
     }
     return fileToSave;
+  }
+
+  /**
+   * Action when user hits a save button from the Tabulate GUI.
+   *
+   * @param useTemporaryFile whether they hit the Temporary save button
+   * @return The saved file's absolute path, or null if canceled
+   */
+  public String saveFile(Button fromButton, boolean useTemporaryFile) {
+    Stage stage = (Stage) fromButton.getScene().getWindow();
+    File outputFile;
+    if (useTemporaryFile) {
+      outputFile = getTemporaryFile();
+      saveFile(outputFile);
+    } else {
+      outputFile = getSaveFile(stage);
+      if (outputFile != null) {
+        saveFile(outputFile);
+      }
+    }
+
+    return outputFile != null ? outputFile.getAbsolutePath() : null;
   }
 
   private void saveFile(File fileToSave) {
@@ -444,10 +478,19 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
+   * Where the temporary config files will be placed if saveFile's useTemporaryFile flag is used.
+   *
+   * @return A file that may or may not currently exist on disk
+   */
+  public File getTemporaryFile() {
+    return new File(selectedFile.getAbsolutePath() + ".temp");
+  }
+
+  /**
    * Action when save menu item is clicked.
    */
   public void menuItemSaveClicked() {
-    File fileToSave = getSaveFile();
+    File fileToSave = getSaveFile(GuiContext.getInstance().getMainWindow());
     if (fileToSave != null) {
       saveFile(fileToSave);
     }
@@ -472,25 +515,59 @@ public class GuiConfigController implements Initializable {
   }
 
   /**
-   * Tabulate whatever is currently entered into the GUI. Requires user to save if there are unsaved
-   * changes, and creates and launches TabulatorService from the saved config path.
+   * Pops up the Tabulation Confirmation Window, if Validation succeeds.
    */
   public void menuItemTabulateClicked() {
-    Pair<String, Boolean> filePathAndTempStatus = commitConfigToFileAndGetFilePath();
-    if (filePathAndTempStatus != null) {
-      if (GuiContext.getInstance().getConfig() != null) {
-        String operatorName = askUserForName();
-        if (operatorName != null) {
-          setGuiIsBusy(true);
-          TabulatorService service =
-              new TabulatorService(
-                  filePathAndTempStatus.getKey(), operatorName, filePathAndTempStatus.getValue());
-          setUpAndStartService(service);
-        }
-      } else {
-        Logger.warning("Please load a contest config file before attempting to tabulate!");
-      }
-    }
+    setGuiIsBusy(true);
+    ContestConfig config =
+            ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
+    ValidatorService service = new ValidatorService(config);
+    service.setOnSucceeded(
+        event -> {
+          setGuiIsBusy(false);
+          if (service.getValue()) {
+            openTabulateWindow();
+          } else {
+            Logger.severe("Validation failed!");
+          }
+        });
+    service.setOnCancelled(event -> {
+      setGuiIsBusy(false);
+      Logger.info("Validation canceled.");
+    });
+    service.setOnFailed(
+        event -> {
+          setGuiIsBusy(false);
+          Logger.severe("Validation failed!");
+        });
+    service.start();
+  }
+
+  /**
+   * Tabulate whatever is currently entered into the GUI.
+   * Assumes GuiTabulateController checked all prerequisites.
+   */
+  public Service<LoadedCvrData> parseAndCountCastVoteRecords(String configPath) {
+    setGuiIsBusy(true);
+    Service<LoadedCvrData> service = new ReadCastVoteRecordsService(configPath);
+    setUpAndStartService(service);
+    return service;
+  }
+
+  /**
+   * Tabulate whatever is currently entered into the GUI.
+   * Assumes GuiTabulateController checked all prerequisites.
+   */
+  public Service<Boolean> startTabulation(
+        String configPath,
+        String operatorName,
+        boolean deleteConfigOnCompletion,
+        LoadedCvrData expectedCvrData) {
+    setGuiIsBusy(true);
+    TabulatorService service = new TabulatorService(
+        configPath, operatorName, deleteConfigOnCompletion, expectedCvrData);
+    setUpAndStartService(service);
+    return service;
   }
 
   /**
@@ -506,16 +583,43 @@ public class GuiConfigController implements Initializable {
             filePathAndTempStatus.getKey(), filePathAndTempStatus.getValue());
         setUpAndStartService(service);
       } else {
-        Logger.warning("Please load a contest config file before attempting to convert to CDF!");
+        Logger.warning("Load a contest config file before attempting to convert to CDF!");
       }
     }
   }
 
-  private void setUpAndStartService(Service<Void> service) {
+  private <T> void setUpAndStartService(Service<T> service) {
     service.setOnSucceeded(event -> setGuiIsBusy(false));
     service.setOnCancelled(event -> setGuiIsBusy(false));
     service.setOnFailed(event -> setGuiIsBusy(false));
     service.start();
+  }
+
+  private void openTabulateWindow() {
+    RawContestConfig config = createRawContestConfig();
+    final Stage window = new Stage();
+    window.initModality(Modality.APPLICATION_MODAL);
+    window.setTitle("Tabulate");
+    window.initOwner(GuiContext.getInstance().getMainWindow());
+    window.resizableProperty().setValue(Boolean.FALSE);
+
+    String resourcePath = "/network/brightspots/rcv/GuiTabulationPopup.fxml";
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
+      Parent root = loader.load();
+      GuiTabulateController controller = loader.getController();
+      controller.initialize(this, config.candidates.size(), config.cvrFileSources.size());
+      window.setScene(new Scene(root));
+      window.setX(GuiContext.getInstance().getMainWindow().getX() + 50);
+      window.setY(GuiContext.getInstance().getMainWindow().getY() + 50);
+      window.setOnHiding((event) -> controller.cleanUp());
+      window.showAndWait();
+    } catch (IOException exception) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      exception.printStackTrace(pw);
+      Logger.severe("Failed to open: %s:\n%s. ", resourcePath, sw);
+    }
   }
 
   private void exitGui() {
@@ -946,12 +1050,12 @@ public class GuiConfigController implements Initializable {
     setDefaultValues();
   }
 
-  /*
-   * Compares the GUI configuration with the on-disk configuration.
-   * If they differ, also tells you if the on-disk version is "TEST" --
-   * in which case, you may be okay with a difference for ease of development.
+  /**
+   * Compares the GUI configuration with the on-disk configuration. If they differ, also tells you
+   * if the on-disk version is "TEST" -- in which case, you may be okay with a difference for ease
+   * of development.
    */
-  private ConfigComparisonResult compareConfigs() {
+  ConfigComparisonResult compareConfigs() {
     ConfigComparisonResult comparisonResult = ConfigComparisonResult.DIFFERENT;
     try {
       String currentConfigString =
@@ -961,23 +1065,27 @@ public class GuiConfigController implements Initializable {
               .writeValueAsString(createRawContestConfig());
       if (selectedFile == null && currentConfigString.equals(emptyConfigString)) {
         // All fields are currently empty / default values so no point in asking to save
-        comparisonResult = ConfigComparisonResult.SAME;
+        comparisonResult = ConfigComparisonResult.GUI_IS_EMPTY;
       } else if (GuiContext.getInstance().getConfig() != null) {
         // Compare to version currently saved on the hard drive
         RawContestConfig configFromFile =
             JsonParser.readFromFileWithoutLogging(
                 selectedFile.getAbsolutePath(), RawContestConfig.class);
-        String savedConfigString =
-            new ObjectMapper()
-                .writer()
-                .withDefaultPrettyPrinter()
-                .writeValueAsString(configFromFile);
-        if (currentConfigString.equals(savedConfigString)) {
-          comparisonResult = ConfigComparisonResult.SAME;
-        } else if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
-          comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
+        if (configFromFile == null) {
+          Logger.severe("Config file could not be read from disk! Did you move it?");
+        } else {
+          String savedConfigString =
+                  new ObjectMapper()
+                          .writer()
+                          .withDefaultPrettyPrinter()
+                          .writeValueAsString(configFromFile);
+          if (currentConfigString.equals(savedConfigString)) {
+            comparisonResult = ConfigComparisonResult.SAME;
+          } else if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
+            comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
+          }
+          // Otherwise, comparisonResult should remain ConfigComparisonResult.DIFFERENT
         }
-        // Otherwise, comparisonResult should remain ConfigComparisonResult.DIFFERENT
       }
     } catch (JsonProcessingException exception) {
       Logger.warning(
@@ -1005,7 +1113,8 @@ public class GuiConfigController implements Initializable {
   private boolean checkForSaveAndContinue() {
     boolean willContinue = false;
     ConfigComparisonResult comparisonResult = compareConfigs();
-    if (comparisonResult != ConfigComparisonResult.SAME) {
+    if (comparisonResult != ConfigComparisonResult.SAME
+          && comparisonResult != ConfigComparisonResult.GUI_IS_EMPTY) {
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
       ButtonType doNotSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
       Alert alert =
@@ -1018,7 +1127,7 @@ public class GuiConfigController implements Initializable {
       alert.setHeaderText(null);
       Optional<ButtonType> result = alert.showAndWait();
       if (result.isPresent() && result.get() == saveButton) {
-        File fileToSave = getSaveFile();
+        File fileToSave = getSaveFile(GuiContext.getInstance().getMainWindow());
         if (fileToSave != null) {
           saveFile(fileToSave);
           willContinue = true;
@@ -1044,7 +1153,9 @@ public class GuiConfigController implements Initializable {
   private Pair<String, Boolean> commitConfigToFileAndGetFilePath() {
     Pair<String, Boolean> filePathAndTempStatus = null;
     ConfigComparisonResult comparisonResult = compareConfigs();
-    if (comparisonResult != ConfigComparisonResult.SAME) {
+    if (comparisonResult == ConfigComparisonResult.GUI_IS_EMPTY) {
+      Logger.severe("Cannot convert an empty contest config!");
+    } else if (comparisonResult != ConfigComparisonResult.SAME) {
       // Three possible buttons, but only Save/Cancel shown unless version is TEST
       ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
       ButtonType useTempButton = new ButtonType("Use Temporary Config", ButtonBar.ButtonData.NO);
@@ -1071,7 +1182,7 @@ public class GuiConfigController implements Initializable {
 
       // Process the result, handling all three buttons and the "X"
       if (result.isPresent() && result.get() == saveButton) {
-        File fileToSave = getSaveFile();
+        File fileToSave = getSaveFile(GuiContext.getInstance().getMainWindow());
         if (fileToSave != null) {
           saveFile(fileToSave);
           filePathAndTempStatus = new Pair<>(fileToSave.getAbsolutePath(), false);
@@ -1572,7 +1683,11 @@ public class GuiConfigController implements Initializable {
     return config;
   }
 
-  private enum ConfigComparisonResult {
+  /**
+   * The result of comparing the GUI config to the on-disk config.
+   */
+  public enum ConfigComparisonResult {
+    GUI_IS_EMPTY,
     SAME,
     DIFFERENT,
     DIFFERENT_BUT_VERSION_IS_TEST,
@@ -1653,7 +1768,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private static class ValidatorService extends Service<Void> {
+  private static class ValidatorService extends Service<Boolean> {
 
     private final ContestConfig contestConfig;
 
@@ -1662,13 +1777,13 @@ public class GuiConfigController implements Initializable {
     }
 
     @Override
-    protected Task<Void> createTask() {
-      Task<Void> task =
+    protected Task<Boolean> createTask() {
+      Task<Boolean> task =
           new Task<>() {
             @Override
-            protected Void call() {
-              contestConfig.validate();
-              return null;
+            protected Boolean call() {
+              Set<ValidationError> errors = contestConfig.validate();
+              return errors.isEmpty();
             }
           };
       task.setOnFailed(
@@ -1680,7 +1795,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private abstract static class ConfigReaderService extends Service<Void> {
+  private abstract static class ConfigReaderService extends Service<Boolean> {
     private final boolean deleteConfigOnCompletion;
     protected String configPath;
 
@@ -1698,7 +1813,7 @@ public class GuiConfigController implements Initializable {
       }
     }
 
-    protected void setUpTaskCompletionTriggers(Task<Void> task, String failureMessage) {
+    protected void setUpTaskCompletionTriggers(Task<Boolean> task, String failureMessage) {
       task.setOnFailed(
           arg0 -> {
             task.getException().printStackTrace();
@@ -1713,21 +1828,33 @@ public class GuiConfigController implements Initializable {
   // TabulatorService runs a tabulation in the background
   private static class TabulatorService extends ConfigReaderService {
     private final String operatorName;
+    private final LoadedCvrData expectedCvrStatistics;
 
-    TabulatorService(String configPath, String operatorName, boolean deleteConfigOnCompletion) {
+    TabulatorService(
+          String configPath,
+          String operatorName,
+          boolean deleteConfigOnCompletion,
+          LoadedCvrData expectedCvrStatistics) {
       super(configPath, deleteConfigOnCompletion);
       this.operatorName = operatorName;
+      this.expectedCvrStatistics = expectedCvrStatistics;
     }
 
     @Override
-    protected Task<Void> createTask() {
-      Task<Void> task =
+    protected Task<Boolean> createTask() {
+      Task<Boolean> task =
           new Task<>() {
             @Override
-            protected Void call() {
+            protected Boolean call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              session.tabulate(operatorName);
-              return null;
+              List<String> errors = session.tabulate(operatorName, expectedCvrStatistics);
+              if (errors.isEmpty()) {
+                succeeded();
+              } else {
+                Logger.severe("Encountered %d error(s) during tabulation!", errors.size());
+                failed();
+              }
+              return errors.isEmpty();
             }
           };
 
@@ -1743,20 +1870,46 @@ public class GuiConfigController implements Initializable {
     }
 
     @Override
-    protected Task<Void> createTask() {
-      Task<Void> task =
+    protected Task<Boolean> createTask() {
+      Task<Boolean> task =
           new Task<>() {
             @Override
-            protected Void call() {
+            protected Boolean call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              session.convertToCdf();
-
-              return null;
+              return session.convertToCdf();
             }
           };
       setUpTaskCompletionTriggers(task,
           "Error when attempting to convert to CDF:\n%s\nConversion failed!");
       return task;
+    }
+  }
+
+  // ReadCastVoteRecordsService reads CVRs
+  private static class ReadCastVoteRecordsService extends Service<LoadedCvrData> {
+    private final String configPath;
+
+    ReadCastVoteRecordsService(String configPath) {
+      this.configPath = configPath;
+    }
+
+    @Override
+    protected Task<LoadedCvrData> createTask() {
+      return new Task<>() {
+          @Override
+          protected LoadedCvrData call() {
+            TabulatorSession session = new TabulatorSession(configPath);
+            LoadedCvrData cvrStatics = null;
+            try {
+              cvrStatics = session.parseAndCountCastVoteRecords();
+              succeeded();
+            } catch (TabulatorSession.CastVoteRecordGenericParseException e) {
+              Logger.severe("Failed to read CVRs: %s", e.getMessage());
+              failed();
+            }
+            return cvrStatics;
+          }
+        };
     }
   }
 

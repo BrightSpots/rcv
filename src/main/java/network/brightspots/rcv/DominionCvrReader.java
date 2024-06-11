@@ -275,8 +275,9 @@ class DominionCvrReader extends BaseCvrReader {
       String batchId = session.get("BatchId").toString();
       Integer recordId = (Integer) session.get("RecordId");
       String suppliedId = recordId.toString();
-      String computedId = Stream.of(tabulatorId, batchId, Integer.toString(recordId))
-              .filter(s -> s != null && !s.isEmpty())
+      String computedId =
+          Stream.of(tabulatorId, batchId, Integer.toString(recordId))
+              .filter(s -> s != null && !s.isBlank())
               .collect(Collectors.joining("|"));
 
       // filter out records which are not current and replace them with adjudicated ones

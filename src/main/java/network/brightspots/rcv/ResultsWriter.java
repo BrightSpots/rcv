@@ -119,7 +119,7 @@ class ResultsWriter {
       outFile.finalizeAndHash();
     } catch (IOException exception) {
       Logger.severe(
-          "Error writing to JSON file: %s\n%s\nPlease check the file path and permissions!",
+          "Error writing to JSON file: %s\n%s\nCheck the file path and permissions!",
           path, exception);
       throw exception;
     }
@@ -294,7 +294,7 @@ class ResultsWriter {
       csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
     } catch (IOException exception) {
       Logger.severe(
-          "Error creating CSV file: %s\n%s\nPlease check the file path and permissions!",
+          "Error creating CSV file: %s\n%s\nCheck the file path and permissions!",
           csvFile.getAbsolutePath(), exception);
       throw exception;
     }
