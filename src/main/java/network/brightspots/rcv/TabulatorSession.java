@@ -165,15 +165,15 @@ class TabulatorSession {
       Logger.info("Config file: %s", configPath);
 
       try {
-        Logger.fine("Begin config file contents:");
+        Logger.auditable("Begin config file contents:");
         BufferedReader reader =
             new BufferedReader(new FileReader(configPath, StandardCharsets.UTF_8));
         String line = reader.readLine();
         while (line != null) {
-          Logger.fine(line);
+          Logger.auditable(line);
           line = reader.readLine();
         }
-        Logger.fine("End config file contents.");
+        Logger.auditable("End config file contents.");
         reader.close();
       } catch (IOException exception) {
         exceptionsEncountered.add(exception.getClass().toString());

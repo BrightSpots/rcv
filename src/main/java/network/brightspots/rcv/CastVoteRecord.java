@@ -149,7 +149,7 @@ class CastVoteRecord {
       logStringBuilder.append(" [value] ").append(fractionalTransferValue);
     }
 
-    Logger.fine(logStringBuilder.toString());
+    Logger.info(logStringBuilder.toString());
   }
 
   Map<Integer, List<Pair<String, BigDecimal>>> getCdfSnapshotData() {
