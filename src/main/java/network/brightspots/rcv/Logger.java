@@ -83,7 +83,7 @@ class Logger {
 
   static void setup() {
     logger = java.util.logging.Logger.getLogger("");
-    logger.setLevel(Level.FINE);
+    logger.setLevel(Level.INFO);
 
     // logPath is where execution file logging is written
     // "user.dir" property is the current working directory, i.e. folder from whence the rcv jar
