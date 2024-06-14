@@ -129,7 +129,7 @@ class Logger {
             tabulationLogPattern,
             LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
     tabulationHandler.setFormatter(formatter);
-    tabulationHandler.setLevel(Level.FINE);
+    tabulationHandler.setLevel(AUDIT_LEVEL);
     logger.addHandler(tabulationHandler);
     info("Tabulation logging to: %s", tabulationLogPattern.replace("%g", "0"));
   }
