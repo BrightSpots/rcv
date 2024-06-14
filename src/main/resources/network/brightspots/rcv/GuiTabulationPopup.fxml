@@ -13,7 +13,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
 <Pane prefHeight="513.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="network.brightspots.rcv.GuiTabulateController">
    <children>
       <VBox layoutX="14.0" layoutY="10.0" prefHeight="343.0" prefWidth="573.0" spacing="10.0">
@@ -64,7 +63,8 @@
                <VBox prefWidth="500.0" spacing="30.0">
                   <TableView fx:id="perSourceCvrCountTable" prefWidth="330.0">
                      <columns>
-                        <TableColumn fx:id="perSourceCvrColumnCount" minWidth="20.0" prefWidth="70.0" text="Num Ballots" />
+                        <TableColumn fx:id="perSourceCvrColumnCount" minWidth="20.0"
+                                     prefWidth="80.0" text="Num Ballots"/>
                         <TableColumn fx:id="perSourceCvrColumnFilepath" minWidth="20.0" prefWidth="230.0" text="Filepath" />
                      </columns>
                   </TableView>

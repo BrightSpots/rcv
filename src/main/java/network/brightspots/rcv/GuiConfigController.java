@@ -1980,11 +1980,9 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Adapted from https://stackoverflow.com/a/41282740/1057105
-   */
-  public static class NumberTableCellFactory<S, T>
-        implements Callback<TableColumn<S, T>, TableCell<S, T>> {
+  /** Adapted from https://stackoverflow.com/a/41282740/1057105 */
+  static class NumberTableCellFactory<S, T>
+      implements Callback<TableColumn<S, T>, TableCell<S, T>> {
     private final int startNumber;
 
     public NumberTableCellFactory(@NamedArg("startNumber") int startNumber) {
