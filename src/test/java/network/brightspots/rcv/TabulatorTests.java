@@ -511,6 +511,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("More winners allowed than total candidates running is okay")
+  void testMoreWinnersThanCandidates() {
+    runTabulationTest("more_winners_than_candidates");
+  }
+
+  @Test
   @DisplayName("multi-cvr file dominion test")
   void multiFileDominionTest() {
     runTabulationTest("dominion_multi_file");

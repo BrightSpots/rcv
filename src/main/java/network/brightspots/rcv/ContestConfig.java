@@ -678,6 +678,11 @@ class ContestConfig {
       validationErrors.add(ValidationError.CANDIDATE_ALL_EXCLUDED);
       Logger.severe("Contest config must contain at least 1 non-excluded candidate!");
     }
+
+    if (getNumberOfWinners() > getNumDeclaredCandidates()) {
+      // This is not an error, but it should present a warning
+      Logger.warning("There are more winners than candidates -- is this acceptable?");
+    }
   }
 
   private void validateRules() {
@@ -729,7 +734,7 @@ class ContestConfig {
         getNumberOfWinnersRaw(),
         "numberOfWinners",
         MIN_NUMBER_OF_WINNERS,
-        getNumDeclaredCandidates() < 1 ? Integer.MAX_VALUE : getNumDeclaredCandidates(),
+        Integer.MAX_VALUE,
         true)) {
       validationErrors.add(ValidationError.RULES_NUMBER_OF_WINNERS_INVALID);
     }
