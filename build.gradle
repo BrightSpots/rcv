@@ -64,7 +64,7 @@ System.setProperty("org.checkstyle.google.suppressionfilter.config",
 
 spotbugs {
     // Latest version at: https://github.com/spotbugs/spotbugs/tags
-    toolVersion = '4.7.3'
+    toolVersion = '4.8.3'
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
 

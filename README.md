@@ -55,17 +55,16 @@ On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch
 
 #### Method 3 (Least Easy): Building on an Air-Gapped Machine
 
-1. Download Gradle from https://gradle.org/releases/ and place it in your path
+1. Download Gradle from https://gradle.org/releases/ and place it in your path.
 2. Download and extract the source code from
-   the [releases page](https://github.com/BrightSpots/rcv/releases)
-3. Download the appropriate cache files for your OS: cache.[OS].zip
-4. Stop the Gradle daemon with `gradle --stop`
-5. Delete the directory ~/.gradle/caches if it exists
-6. Extract the appropriate caches/[filename].zip to ~/.gradle/caches so that the "caches" directory is in ~/.gradle
-7. In the extracted directory, you may manually verify each dependency using checksums.csv in accordance with your own policies
-8. Run `gradle assemble --offline` and ensure you get no errors
-9. Run `gradle run --offline` to launch RCTab
-10. Run `gradle jpackage --offline` to generate a jpackage package
+   the [releases page](https://github.com/BrightSpots/rcv/releases).
+3. Alongside the release you just downloaded, you will find corresponding cache files (cache.[OS].zip). Download this file too.
+4. Stop the Gradle daemon with `gradle --stop`.
+5. Delete the directory ~/.gradle/caches if it exists.
+6. Extract the appropriate caches/[filename].zip to ~/.gradle/caches so that the "caches" directory is in ~/.gradle.
+7. Alongside these extracted caches is a file named checksums.csv. In the extracted directory, you may manually verify each dependency using checksums.csv in accordance with your own policies.
+8. Run `gradle assemble --offline` and ensure you get no errors.
+9. Run `gradle run --offline` to launch RCTab, or `gradle jpackage --offline` to generate an executable file specific to the OS you are using (a .dmg, .exe, or .deb).
 
 #### Encrypting the Tabulator Directory
 For security purposes, we **strongly recommend** applying password encryption (e.g. 256-bit SHA) to the directory containing the Tabulator, config files, CVR files, and any other related files.

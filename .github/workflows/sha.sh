@@ -12,7 +12,10 @@ if [ $os == 'Windows' ]; then
     echo $(certutil -hashfile $filename SHA$sha_a | sed -n 2p)
 elif [ $os == 'Linux' ]; then
     echo $(sha${sha_a}sum $filename | cut -f1 -d" ")
-else
+elif [ $os == 'macOS' ]; then
     echo $(shasum -a $sha_a $filename | cut -f1 -d" ")
+else
+    echo "Unsupported OS"
+    return -1
 fi
 

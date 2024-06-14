@@ -42,7 +42,7 @@ import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
 import network.brightspots.rcv.ContestConfig.TabulateBySlice;
 import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
 
-class Tabulator {
+final class Tabulator {
 
   static final String OVERVOTE_RULE_ALWAYS_SKIP_TEXT = "Always skip to next rank";
   static final String OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT = "Exhaust immediately";
