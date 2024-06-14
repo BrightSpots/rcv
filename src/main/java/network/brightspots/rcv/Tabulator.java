@@ -133,7 +133,7 @@ class Tabulator {
 
   // run the main tabulation routine to determine contest results
   // returns: set containing winner(s)
-  Set<String> tabulate() throws TabulationAbortedException {
+  Set<String> tabulate(Progress progress) throws TabulationAbortedException {
     if (config.needsRandomSeed()) {
       Random random = new Random(config.getRandomSeed());
       if (config.getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION) {
@@ -269,6 +269,7 @@ class Tabulator {
         for (String loser : eliminated) {
           candidateToRoundEliminated.put(loser, currentRound);
         }
+        progress.markCandidatesEliminated(eliminated.size());
       }
 
       if (config.getNumberOfWinners() > 1) {
@@ -481,6 +482,10 @@ class Tabulator {
     int numWinnersDeclared = winnerToRound.size();
     if (currentRound >= config.getStopTabulationEarlyAfterRound()) {
       keepTabulating = false;
+    } else if (numWinnersDeclared == config.getNumDeclaredCandidates()
+        && config.getNumberOfWinners() > config.getNumCandidates()) {
+      Logger.warning("Config specifies more winners than candidates. Everyone is now elected.");
+      keepTabulating = false;
     } else if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
@@ -556,9 +561,8 @@ class Tabulator {
       // We should only look for more winners if we haven't already filled all the seats.
       int numSeatsUnfilled = config.getNumberOfWinners() - winnerToRound.size();
       if (numSeatsUnfilled > 0) {
-        if (currentRoundTally.activeCandidateSum() == numSeatsUnfilled) {
-          // If the number of continuing candidates equals the number of seats to fill,
-          // everyone wins.
+        if (currentRoundTally.activeCandidateSum() <= numSeatsUnfilled) {
+          // If there are as many or fewer continuing candidates than seats to fill, everyone wins.
           selectedWinners.addAll(currentRoundTally.getCandidates());
         } else if (config.isFirstRoundDeterminesThresholdEnabled()
             && currentRoundTally.activeCandidateSum() - 1 == config.getNumberOfWinners()) {

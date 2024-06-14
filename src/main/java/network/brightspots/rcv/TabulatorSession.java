@@ -33,6 +33,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
@@ -95,27 +97,33 @@ class TabulatorSession {
 
   // special mode to just export the CVR as CDF JSON instead of tabulating
   // returns whether it succeeded
-  boolean convertToCdf() {
+  boolean convertToCdf(BiConsumer<Double, Double> progressUpdate) {
     Logger.info("Starting CDF conversion session...");
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean conversionSuccess = false;
 
+    Progress progress = new Progress(config, 0, progressUpdate);
+
     if (setUpLogging(config.getOutputDirectory(), "to-cdf") && config.validate().isEmpty()) {
       Logger.info("Converting CVR(s) to CDF...");
       try {
         FileUtils.createOutputDirectory(config.getOutputDirectory());
-        LoadedCvrData castVoteRecords = parseCastVoteRecords(config, false);
-        Tabulator.SliceIdSet sliceIds =
-            new Tabulator(castVoteRecords.getCvrs(), config).getEnabledSliceIds();
-        ResultsWriter writer =
-            new ResultsWriter()
-                .setNumRounds(0)
-                .setSliceIds(sliceIds)
-                .setContestConfig(config)
-                .setTimestampString(timestampString);
-        writer.generateCdfJson(castVoteRecords.getCvrs());
-        conversionSuccess = true;
+        LoadedCvrData castVoteRecords = parseCastVoteRecords(config, progress, false);
+        if (!castVoteRecords.successfullyReadAll) {
+          Logger.severe("Aborting conversion due to cast vote record errors!");
+        } else {
+          Tabulator.SliceIdSet sliceIds =
+              new Tabulator(castVoteRecords.getCvrs(), config).getEnabledSliceIds();
+          ResultsWriter writer =
+              new ResultsWriter()
+                  .setNumRounds(0)
+                  .setSliceIds(sliceIds)
+                  .setContestConfig(config)
+                  .setTimestampString(timestampString);
+          writer.generateCdfJson(castVoteRecords.getCvrs());
+          conversionSuccess = true;
+        }
       } catch (IOException
           | UnableToCreateDirectoryException
           | TabulationAbortedException
@@ -137,7 +145,12 @@ class TabulatorSession {
     return conversionSuccess;
   }
 
-  LoadedCvrData parseAndCountCastVoteRecords() throws CastVoteRecordGenericParseException {
+  boolean convertToCdf() {
+    return convertToCdf(null);
+  }
+
+  LoadedCvrData parseAndCountCastVoteRecords(BiConsumer<Double, Double> progressUpdate)
+      throws CastVoteRecordGenericParseException {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory(), "check-ballot-counts");
     if (!setUpLoggingSuccess) {
@@ -147,7 +160,8 @@ class TabulatorSession {
 
     LoadedCvrData castVoteRecords = parseCastVoteRecords(config, false);
     Logger.removeTabulationFileLogging();
-    return castVoteRecords;
+    Progress progress = new Progress(config, 0, progressUpdate);
+    return parseCastVoteRecords(config, progress);
   }
 
   // Returns a List of exception class names that were thrown while tabulating.
@@ -155,7 +169,8 @@ class TabulatorSession {
   // Note: An exception MUST be returned any time tabulation does not run.
   // In general, that means any Logger.severe in this function should be accompanied
   // by an exceptionsEncountered.add(...) call.
-  List<String> tabulate(String operatorName, LoadedCvrData expectedCvrData) {
+  List<String> tabulate(String operatorName, LoadedCvrData expectedCvrData,
+                        BiConsumer<Double, Double> progressUpdate) {
     Logger.info("Starting tabulation session...");
     List<String> exceptionsEncountered = new LinkedList<>();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
@@ -173,20 +188,22 @@ class TabulatorSession {
       Logger.info("Config file: %s", configPath);
 
       try {
-        Logger.fine("Begin config file contents:");
+        Logger.auditable("Begin config file contents:");
         BufferedReader reader =
             new BufferedReader(new FileReader(configPath, StandardCharsets.UTF_8));
         String line = reader.readLine();
         while (line != null) {
-          Logger.fine(line);
+          Logger.auditable(line);
           line = reader.readLine();
         }
-        Logger.fine("End config file contents.");
+        Logger.auditable("End config file contents.");
         reader.close();
       } catch (IOException exception) {
         exceptionsEncountered.add(exception.getClass().toString());
         Logger.severe("Error logging config file: %s\n%s", configPath, exception);
       }
+
+      Progress progress = new Progress(config, 0.5f, progressUpdate);
       Logger.info("Tabulating '%s'...", config.getContestName());
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         Logger.info("This is a multi-pass IRV contest.");
@@ -199,14 +216,14 @@ class TabulatorSession {
           // Read cast vote records and slice IDs from CVR files
           Set<String> newWinnerSet;
           try {
-            LoadedCvrData castVoteRecords = parseCastVoteRecords(config, true);
+            LoadedCvrData castVoteRecords = parseCastVoteRecords(config, progress, true);
             if (config.getSequentialWinners().isEmpty()
                     && !castVoteRecords.metadataMatches(expectedCvrData)) {
               Logger.severe("CVR data has changed between loading the CVRs and reading them!");
               exceptionsEncountered.add(TabulationAbortedException.class.toString());
               break;
             }
-            newWinnerSet = runTabulationForConfig(config, castVoteRecords.getCvrs());
+            newWinnerSet = runTabulationForConfig(config, castVoteRecords.getCvrs(), progress);
           } catch (TabulationAbortedException | CastVoteRecordGenericParseException exception) {
             exceptionsEncountered.add(exception.getClass().toString());
             Logger.severe(exception.getMessage());
@@ -236,12 +253,13 @@ class TabulatorSession {
         // normal operation (not multi-pass IRV, a.k.a. sequential multi-seat)
         // Read cast vote records and precinct IDs from CVR files
         try {
-          LoadedCvrData castVoteRecords = parseCastVoteRecords(config, true);
+          LoadedCvrData castVoteRecords = parseCastVoteRecords(config, progress, true);
           if (!castVoteRecords.metadataMatches(expectedCvrData)) {
             Logger.severe("CVR data has changed between loading the CVRs and reading them!");
             exceptionsEncountered.add(TabulationAbortedException.class.toString());
           } else {
-            runTabulationForConfig(config, castVoteRecords.getCvrs());
+            runTabulationForConfig(config, castVoteRecords.getCvrs(), progress);
+            castVoteRecords.printSummary();
             tabulationSuccess = true;
           }
         } catch (CastVoteRecordGenericParseException exception) {
@@ -262,12 +280,14 @@ class TabulatorSession {
   }
 
   List<String> tabulate(String operatorName) {
-    return tabulate(operatorName, TabulatorSession.LoadedCvrData.MATCHES_ALL);
+    return tabulate(operatorName, TabulatorSession.LoadedCvrData.MATCHES_ALL, null);
   }
 
   Set<String> loadSliceNamesFromCvrs(ContestConfig.TabulateBySlice slice, ContestConfig config) {
+    Progress progress = new Progress(config, 0, null);
     try {
-      List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(config, false).getCvrs();
+      List<CastVoteRecord> castVoteRecords = parseCastVoteRecords(
+          config, progress, false).getCvrs();
       return new Tabulator(castVoteRecords, config).getEnabledSliceIds().get(slice);
     } catch (TabulationAbortedException | CastVoteRecordGenericParseException e) {
       throw new RuntimeException(e);
@@ -294,11 +314,11 @@ class TabulatorSession {
   // execute tabulation for given ContestConfig (a Session may comprise multiple tabulations)
   // returns: set of winners from tabulation
   private Set<String> runTabulationForConfig(
-      ContestConfig config, List<CastVoteRecord> castVoteRecords)
+      ContestConfig config, List<CastVoteRecord> castVoteRecords, Progress progress)
       throws TabulationAbortedException {
     Set<String> winners;
     Tabulator tabulator = new Tabulator(castVoteRecords, config);
-    winners = tabulator.tabulate();
+    winners = tabulator.tabulate(progress);
     try {
       tabulator.generateSummaryFiles(timestampString);
     } catch (IOException exception) {
@@ -310,14 +330,14 @@ class TabulatorSession {
   // parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords
   // param: config object containing CVR file paths to parse
   // returns: list of parsed CVRs or null if an error was encountered
-  private LoadedCvrData parseCastVoteRecords(ContestConfig config, boolean outputGenericCvr)
-        throws CastVoteRecordGenericParseException {
+  private LoadedCvrData parseCastVoteRecords(ContestConfig config, Progress progress,
+        boolean outputGenericCvr) throws CastVoteRecordGenericParseException {
     Logger.info("Parsing cast vote records...");
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     boolean encounteredSourceProblem = false;
 
     // Per-source data for writing generic CSV
-    List<ResultsWriter.PerSourceDataForCsv> perSourceDataForCsv = new ArrayList<>();
+    List<ResultsWriter.CvrSourceData> cvrSourceData = new ArrayList<>();
 
     // At each iteration of the following loop, we add records from another source file.
     for (int sourceIndex = 0; sourceIndex < config.rawConfig.cvrFileSources.size(); ++sourceIndex) {
@@ -327,13 +347,15 @@ class TabulatorSession {
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
         Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
+        final int startIndex = castVoteRecords.size();
         reader.readCastVoteRecords(castVoteRecords);
 
         // Update the per-source data for the results writer
-        perSourceDataForCsv.add(new ResultsWriter.PerSourceDataForCsv(
+        cvrSourceData.add(new ResultsWriter.CvrSourceData(
                 source,
                 reader,
                 sourceIndex,
+                startIndex,
                 castVoteRecords.size() - 1));
 
         // Check for unrecognized candidates
@@ -378,18 +400,21 @@ class TabulatorSession {
         Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath, exception);
         encounteredSourceProblem = true;
       }
+
+      // Update the service % complete
+      progress.markFileRead();
     }
 
     // Output the RCTab-CSV CVR
     if (outputGenericCvr) {
       try {
         ResultsWriter writer =
-                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+              new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
         this.convertedFilePath =
-                writer.writeRctabCvrCsv(
-                        castVoteRecords,
-                        perSourceDataForCsv,
-                        config.getOutputDirectory());
+              writer.writeRctabCvrCsv(
+                      castVoteRecords,
+                      cvrSourceData,
+                      config.getOutputDirectory());
       } catch (IOException exception) {
         // error already logged in ResultsWriter
       }
@@ -409,7 +434,7 @@ class TabulatorSession {
       throw new CastVoteRecordGenericParseException();
     }
 
-    return new LoadedCvrData(castVoteRecords);
+    return new LoadedCvrData(castVoteRecords, cvrSourceData);
   }
 
   static class UnrecognizedCandidatesException extends Exception {
@@ -437,19 +462,23 @@ class TabulatorSession {
 
     private List<CastVoteRecord> cvrs;
     private final int numCvrs;
+    private List<ResultsWriter.CvrSourceData> cvrSourcesData;
     private boolean isDiscarded;
     private final boolean doesMatchAllMetadata;
 
-    public LoadedCvrData(List<CastVoteRecord> cvrs) {
+    public LoadedCvrData(List<CastVoteRecord> cvrs,
+                         List<ResultsWriter.CvrSourceData> cvrSourcesData) {
       this.cvrs = cvrs;
       this.successfullyReadAll = cvrs != null;
       this.numCvrs = cvrs != null ? cvrs.size() : 0;
       this.isDiscarded = false;
       this.doesMatchAllMetadata = false;
+      this.cvrSourcesData = cvrSourcesData;
     }
 
     /**
-     * This constructor will cause metadataMatches to always return true.
+     * This constructor will cause metadataMatches to always return true,
+     * and contains no true statistics.
      */
     private LoadedCvrData() {
       this.cvrs = null;
@@ -457,6 +486,7 @@ class TabulatorSession {
       this.numCvrs = 0;
       this.isDiscarded = false;
       this.doesMatchAllMetadata = true;
+      this.cvrSourcesData = new ArrayList<>();
     }
 
     /**
@@ -476,6 +506,10 @@ class TabulatorSession {
       return numCvrs;
     }
 
+    public List<ResultsWriter.CvrSourceData> getCvrSourcesData() {
+      return cvrSourcesData;
+    }
+
     public void discard() {
       cvrs = null;
       isDiscarded = true;
@@ -486,6 +520,16 @@ class TabulatorSession {
         throw new IllegalStateException("CVRs have been discarded from memory.");
       }
       return cvrs;
+    }
+
+    public void printSummary() {
+      Logger.info("Cast Vote Record summary:");
+      for (ResultsWriter.CvrSourceData sourceData : cvrSourcesData) {
+        Logger.info("Source %d: %s",
+                sourceData.sourceIndex + 1, sourceData.source.getFilePath());
+        Logger.info("  uses provider: %s", sourceData.source.getProvider());
+        Logger.info("  read %d cast vote records", sourceData.getNumCvrs());
+      }
     }
   }
 }

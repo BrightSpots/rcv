@@ -19,6 +19,7 @@ package network.brightspots.rcv;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -27,12 +28,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Pair;
 import network.brightspots.rcv.TabulatorSession.LoadedCvrData;
 
 /** View controller for tabulator layout. */
@@ -80,6 +84,9 @@ public class GuiTabulateController {
   @FXML private Button tempSaveButton;
   @FXML private Label numberOfCandidates;
   @FXML private Label numberOfCvrFiles;
+  @FXML private TableView<Pair<String, String>> perSourceCvrCountTable;
+  @FXML private TableColumn<Pair<String, String>, String> perSourceCvrColumnFilepath;
+  @FXML private TableColumn<Pair<String, String>, String> perSourceCvrColumnCount;
   @FXML private TextField userNameField;
   @FXML private ProgressBar progressBar;
   @FXML private Button loadCvrButton;
@@ -97,6 +104,14 @@ public class GuiTabulateController {
 
     // Allow tempSaveButton to take up no space when hidden
     tempSaveButton.managedProperty().bind(tempSaveButton.visibleProperty());
+
+    perSourceCvrColumnFilepath.setCellValueFactory(
+            c -> new SimpleStringProperty(c.getValue().getKey()));
+    perSourceCvrColumnCount.setCellValueFactory(
+            c -> new SimpleStringProperty(c.getValue().getValue()));
+    perSourceCvrCountTable.getColumns().add(0,
+            GuiConfigController.NumberTableCellFactory.createNumberColumn("#", 1));
+    perSourceCvrCountTable.setVisible(false);
 
     initializeSaveButtonStatuses();
     setTabulationButtonStatus();
@@ -208,11 +223,28 @@ public class GuiTabulateController {
           enableButtonsUpTo(tabulateButton);
           LoadedCvrData data = service.getValue();
           tabulateButton.setText("Tabulate " + String.format("%,d", data.numCvrs()) + " ballots");
+
+          // Populate the per-source CVR count table, and calculate the width of the filename column
+          perSourceCvrCountTable.getItems().clear();
+          int maxFilenameLength = 0;
+          for (ResultsWriter.CvrSourceData sourceData : data.getCvrSourcesData()) {
+            String countString = String.format("%,d", sourceData.getNumCvrs());
+            String fileString = new File(sourceData.source.getFilePath()).getName();
+            perSourceCvrCountTable.getItems().add(new Pair<>(fileString, countString));
+            maxFilenameLength = Math.max(maxFilenameLength, fileString.length());
+          }
+          perSourceCvrColumnFilepath.setPrefWidth(getEstWidthForStringInPixels(maxFilenameLength));
+          perSourceCvrCountTable.setVisible(true);
+
           data.discard();
           lastLoadedCvrData = data;
         };
 
     watchGenericService(service, onSucceededEvent);
+  }
+
+  private float getEstWidthForStringInPixels(int stringLength) {
+    return stringLength * 7.5f;
   }
 
   private <T> void watchGenericService(
