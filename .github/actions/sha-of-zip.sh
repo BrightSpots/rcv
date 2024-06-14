@@ -1,6 +1,6 @@
 #!/bin/bash
 # Unzips the given zip file, then generates a checksum of the zip file that ignores
-# the timestamps by extracting it and SHA'ing a file of all SHAs. This is not recursive:-
+# the timestamps by extracting it and SHA'ing a file of all SHAs. This is not recursive:
 # zips within the zip will not be extracted, and therefore the timestamps of the "inner" zip
 # will be a part of the hash.
 # Usage: ./sha-of-zip.sh <zipFilepath> <OS: Windows, MacOS, or Linux> <sha version: 1, 256, or 512>

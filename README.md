@@ -53,13 +53,13 @@ On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch
     
     `$ chmod 777 gradlew`
 
-#### Method 3 (Least Easy): Building on an airgapped Machine
+#### Method 3 (Least Easy): Building on an Air-Gapped Machine
 
-
-1. Download gradle from https://gradle.org/releases/ and place it in your path
-2. Download and extract the source code from [releases page](https://github.com/BrightSpots/rcv/releases)
+1. Download Gradle from https://gradle.org/releases/ and place it in your path
+2. Download and extract the source code from
+   the [releases page](https://github.com/BrightSpots/rcv/releases)
 3. Download the appropriate cache files for your OS: cache.[OS].zip
-4. Stop the gradle daemon with `gradle --stop`
+4. Stop the Gradle daemon with `gradle --stop`
 5. Delete the directory ~/.gradle/caches if it exists
 6. Extract the appropriate caches/[filename].zip to ~/.gradle/caches so that the "caches" directory is in ~/.gradle
 7. In the extracted directory, you may manually verify each dependency using checksums.csv in accordance with your own policies
@@ -120,7 +120,9 @@ need to set undeclaredWriteInLabel, you should use "Undeclared Write-ins".
 
 ## Viewing Tabulator Output
 
-Tabulator output file names automatically include the current date and time, e.g. `2019-06-25_17-19-28_summary.csv`. This keeps them separate if you tabulate the same contest multiple times.
+Tabulator output filenames automatically include the current date and time,
+e.g. `2019-06-25_17-19-28_summary.csv`. This keeps them separate if you tabulate the same contest
+multiple times.
 
 Look in the console window to see where the output spreadsheet was written, e.g.
 
@@ -128,7 +130,9 @@ Look in the console window to see where the output spreadsheet was written, e.g.
 
 The summary spreadsheet (in .csv format), summary .json, and audit .log files are all readable using a basic text editor.
 
-**Note**: If you intend to print any of the output files, we **strongly recommend** adding headers / footers with page numbers, the file name, the date and time of printing, who is doing the printing, and any other desired information.
+**Note**: If you intend to print any of the output files, we **strongly recommend** adding headers /
+footers with page numbers, the filename, the date and time of printing, who is doing the printing,
+and any other desired information.
 
 ## Acknowledgements
 

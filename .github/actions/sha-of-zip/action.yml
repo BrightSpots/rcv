@@ -3,10 +3,10 @@ description: "Cross-platform helper: timestamp-independent .zip checksum done vi
 
 inputs:
   zipFilename:
-    description: "The output file name"
+    description: "The output filename"
     required: true
   shaA:
-    description: "The sha version (1, 256, or 512)"
+    description: "The SHA version (1, 256, or 512)"
     required: true
 
 runs:
@@ -16,12 +16,12 @@ runs:
       shell: bash
       run: ${{ inputs.command }}
 
-    - name: "Generate zip for Linux/Mac"
+    - name: "Generate SHA of zip for Linux/Mac"
       if: runner.os == 'Linux' || runner.os == 'MacOS'
       shell: bash
       run: ./.github/actions/sha-of-zip.sh ${{ inputs.zipFilename }} ${{ runner.os }} ${{ inputs.shaA }} > ${{ inputs.zipFilename }}.golden.sha${{ inputs.shaA }}
 
-    - name: "Generate zip for Windows"
+    - name: "Generate SHA of zip for Windows"
       if: runner.os == 'Windows'
       shell: powershell
       run: ./.github/actions/sha-of-zip.bat ${{ inputs.zipFilename }} ${{ inputs.shaA }} > ${{ inputs.zipFilename }}.golden.sha${{ inputs.shaA }}

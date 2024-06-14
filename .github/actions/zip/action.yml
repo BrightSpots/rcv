@@ -9,7 +9,7 @@ inputs:
     description: "The command to run first"
     required: true
   zipFilename:
-    description: "The output file name"
+    description: "The output filename"
     required: true
 
 runs:

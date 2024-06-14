@@ -1,6 +1,6 @@
 #!/bin/bash
-# Generates a CSV of checksums for all maven dependencies in the global cache
-# Including their actual SHA 256, and where to verify that online
+# Generates a CSV of checksums for all Maven dependencies in the global cache
+# including their actual SHA 256, and where to verify that online.
 # Usage: ./generate-dependency-hashes.sh <OS: Windows, MacOS, or Linux>
 set -e
 
@@ -22,11 +22,11 @@ for filename in $(find * -type f); do
     version=$(echo $filename | cut -f3 -d/)
     ext=${filename#*.}
     slashSeparatedOrg=$(echo $dotSeparatedOrg | tr "." "/")
-    friendlyurl="https://mvnrepository.com/artifact/$dotSeparatedOrg/$dependencyName/$version"
+    friendlyUrl="https://mvnrepository.com/artifact/$dotSeparatedOrg/$dependencyName/$version"
     directUrl="https://repo1.maven.org/maven2/$slashSeparatedOrg/$dependencyName/$version/$dependencyName-$version.$ext"
     directUrlToSha1="$directUrl.sha1"
     directUrlToSha256="$directUrl.sha256"
     sha1=$($parentPath/sha.sh $filename $os 1)
     sha256=$($parentPath/sha.sh $filename $os 256)
-    echo "$filename,$sha1,$sha256,$friendlyurl,$directUrlToSha1,$directUrlToSha256"
+    echo "$filename,$sha1,$sha256,$friendlyUrl,$directUrlToSha1,$directUrlToSha256"
 done
