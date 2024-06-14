@@ -133,7 +133,7 @@ class Tabulator {
 
   // run the main tabulation routine to determine contest results
   // returns: set containing winner(s)
-  Set<String> tabulate() throws TabulationAbortedException {
+  Set<String> tabulate(Progress progress) throws TabulationAbortedException {
     if (config.needsRandomSeed()) {
       Random random = new Random(config.getRandomSeed());
       if (config.getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION) {
@@ -269,6 +269,7 @@ class Tabulator {
         for (String loser : eliminated) {
           candidateToRoundEliminated.put(loser, currentRound);
         }
+        progress.markCandidatesEliminated(eliminated.size());
       }
 
       if (config.getNumberOfWinners() > 1) {
