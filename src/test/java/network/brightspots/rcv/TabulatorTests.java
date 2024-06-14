@@ -212,8 +212,7 @@ class TabulatorTests {
 
     Logger.info("Running tabulation test: %s\nTabulating config file: %s...", stem, configPath);
     TabulatorSession session = new TabulatorSession(configPath);
-    List<String> exceptionsEncountered = session.tabulate("Automated test",
-        TabulatorSession.LoadedCvrData.MATCHES_ALL, null);
+    List<String> exceptionsEncountered = session.tabulate("Automated test");
     if (expectedException != null) {
       assertTrue(exceptionsEncountered.contains(expectedException));
     } else {
@@ -253,7 +252,7 @@ class TabulatorTests {
   private static void runConvertToCdfTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
     TabulatorSession session = new TabulatorSession(configPath);
-    session.convertToCdf(null);
+    session.convertToCdf();
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
@@ -266,8 +265,7 @@ class TabulatorTests {
   private static void runConvertToCsvTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
     TabulatorSession session = new TabulatorSession(configPath);
-    session.tabulate("Automated test",
-        TabulatorSession.LoadedCvrData.MATCHES_ALL, null);
+    session.tabulate("Automated test");
 
     String expectedPath = getTestFilePath(stem, "_expected.csv");
     assertTrue(fileCompare(session.getConvertedFilePath(), expectedPath));

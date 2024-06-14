@@ -80,10 +80,10 @@ public class Main extends GuiApplication {
 
       TabulatorSession session = new TabulatorSession(path);
       if (convertToCdf) {
-        session.convertToCdf(null);
+        session.convertToCdf();
       } else {
         operatorName = operatorName.trim();
-        session.tabulate(operatorName, TabulatorSession.LoadedCvrData.MATCHES_ALL, null);
+        session.tabulate(operatorName);
       }
     }
 

@@ -144,6 +144,10 @@ class TabulatorSession {
     return conversionSuccess;
   }
 
+  boolean convertToCdf() {
+    return convertToCdf(null);
+  }
+
   LoadedCvrData parseAndCountCastVoteRecords(BiConsumer<Double, Double> progressUpdate)
       throws CastVoteRecordGenericParseException {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
