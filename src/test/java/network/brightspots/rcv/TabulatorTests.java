@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -465,7 +464,7 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("More # winners than # candidates is okay")
+  @DisplayName("More winners allowed than total candidates running is okay")
   void testMoreWinnersThanCandidates() {
     runTabulationTest("more_winners_than_candidates");
   }

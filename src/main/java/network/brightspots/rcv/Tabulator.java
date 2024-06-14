@@ -453,8 +453,8 @@ class Tabulator {
     int numWinnersDeclared = winnerToRound.size();
     if (currentRound >= config.getStopTabulationEarlyAfterRound()) {
       keepTabulating = false;
-    } else if (winnerToRound.size() == config.getNumDeclaredCandidates()
-            && config.getNumberOfWinners() > config.getNumCandidates()) {
+    } else if (numWinnersDeclared == config.getNumDeclaredCandidates()
+        && config.getNumberOfWinners() > config.getNumCandidates()) {
       Logger.warning("Config specifies more winners than candidates. Everyone is now elected.");
       keepTabulating = false;
     } else if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
@@ -533,8 +533,7 @@ class Tabulator {
       int numSeatsUnfilled = config.getNumberOfWinners() - winnerToRound.size();
       if (numSeatsUnfilled > 0) {
         if (currentRoundTally.activeCandidateSum() <= numSeatsUnfilled) {
-          // If the number of continuing candidates equals the number of seats to fill,
-          // everyone wins.
+          // If there are as many or fewer continuing candidates than seats to fill, everyone wins.
           selectedWinners.addAll(currentRoundTally.getCandidates());
         } else if (config.isFirstRoundDeterminesThresholdEnabled()
             && currentRoundTally.activeCandidateSum() - 1 == config.getNumberOfWinners()) {
