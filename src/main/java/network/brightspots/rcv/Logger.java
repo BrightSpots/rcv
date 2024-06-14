@@ -14,8 +14,8 @@
  * log message
  *  |
  *  v
- * Tabulation handler (FINE) -> tabulation "audit" file
- *  When a tabulation is in progress this captures all FINE level logging including audit info.
+ * Tabulation handler (AUDIT) -> tabulation "audit" file
+ *  When a tabulation is in progress this captures all AUDIT level logging including audit info.
  *
  * Execution handler (INFO) -> execution file
  *  Captures all INFO level logging for the execution of a session.
@@ -54,7 +54,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.input.Clipboard;
@@ -65,6 +64,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
 class Logger {
+  // Custom "audit" logging level, designed to fit between FINE and INFO levels
   private static final Level AUDIT_LEVEL = new Level("AUDIT", Level.FINE.intValue() + 1) {};
 
   // execution log file name (%g tracks count of log file if additional versions are created)

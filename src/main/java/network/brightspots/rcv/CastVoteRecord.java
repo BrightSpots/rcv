@@ -48,11 +48,11 @@ class CastVoteRecord {
   // a set is used to handle overvotes
   CandidateRankingsList candidateRankings;
   // contest associated with this CVR
-  private String contestId;
+  private final String contestId;
   // tabulatorId parsed from Dominion CVR data
-  private String tabulatorId;
+  private final String tabulatorId;
   // batchId parsed from Dominion CVR data
-  private String batchId;
+  private final String batchId;
   // the ballot status for the current round, which will change as tabulation progresses.
   private StatusForRound currentRoundStatus = StatusForRound.ACTIVE;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
@@ -149,7 +149,7 @@ class CastVoteRecord {
       logStringBuilder.append(" [value] ").append(fractionalTransferValue);
     }
 
-    Logger.info(logStringBuilder.toString());
+    Logger.auditable(logStringBuilder.toString());
   }
 
   Map<Integer, List<Pair<String, BigDecimal>>> getCdfSnapshotData() {
