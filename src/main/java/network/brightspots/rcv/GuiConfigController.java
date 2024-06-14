@@ -1980,18 +1980,16 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  /**
-   * Adapted from https://stackoverflow.com/a/41282740/1057105
-   */
-  private static class NumberTableCellFactory<S, T>
-        implements Callback<TableColumn<S, T>, TableCell<S, T>> {
+  /** Adapted from https://stackoverflow.com/a/41282740/1057105 */
+  static class NumberTableCellFactory<S, T>
+      implements Callback<TableColumn<S, T>, TableCell<S, T>> {
     private final int startNumber;
 
     public NumberTableCellFactory(@NamedArg("startNumber") int startNumber) {
       this.startNumber = startNumber;
     }
 
-    public static class NumberTableCell<S, T> extends TableCell<S, T> {
+    private static class NumberTableCell<S, T> extends TableCell<S, T> {
       private final int startNumber;
 
       public NumberTableCell(int startNumber) {
@@ -2011,6 +2009,13 @@ public class GuiConfigController implements Initializable {
       return new NumberTableCell<>(startNumber);
     }
 
+    /**
+     * Create a new column that numbers rows starting at the given number.
+     *
+     * @param text The column header text
+     * @param startNumber The number to start counting at
+     * @return The new column
+     */
     public static <T> TableColumn<T, Void> createNumberColumn(String text, int startNumber) {
       TableColumn<T, Void> column = new TableColumn<>(text);
       column.setSortable(false);

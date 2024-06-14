@@ -1,0 +1,46 @@
+{
+  "config" : {
+    "contest" : "More winners than candidates",
+    "date" : "2020-07-19",
+    "generatedBy" : "RCTab 1.3.999",
+    "jurisdiction" : "Alaska",
+    "office" : "Democratic Primary"
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "George Gervin" : "2",
+      "Mookie Blaylock" : "4",
+      "Sedale Threatt" : "1",
+      "Yinka Dare" : "3"
+    },
+    "tallyResults" : [ {
+      "elected" : "Sedale Threatt",
+      "transfers" : { }
+    }, {
+      "elected" : "Yinka Dare",
+      "transfers" : { }
+    }, {
+      "elected" : "George Gervin",
+      "transfers" : { }
+    }, {
+      "elected" : "Mookie Blaylock",
+      "transfers" : { }
+    } ],
+    "threshold" : "2"
+  } ],
+  "summary" : {
+    "finalThreshold" : "2",
+    "numCandidates" : 4,
+    "numWinners" : 5,
+    "totalNumBallots" : "10",
+    "undervotes" : 0
+  }
+}

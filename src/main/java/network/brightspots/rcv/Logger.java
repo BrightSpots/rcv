@@ -14,8 +14,8 @@
  * log message
  *  |
  *  v
- * Tabulation handler (FINE) -> tabulation "audit" file
- *  When a tabulation is in progress this captures all FINE level logging including audit info.
+ * Tabulation handler (AUDIT) -> tabulation "audit" file
+ *  When a tabulation is in progress this captures all AUDIT level logging including audit info.
  *
  * Execution handler (INFO) -> execution file
  *  Captures all INFO level logging for the execution of a session.
@@ -54,7 +54,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.input.Clipboard;
@@ -65,6 +64,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
 class Logger {
+  // Custom "audit" logging level, designed to fit between FINE and INFO levels
+  private static final Level AUDIT_LEVEL = new Level("AUDIT", Level.FINE.intValue() + 1) {};
 
   // execution log file name (%g tracks count of log file if additional versions are created)
   private static final String EXECUTION_LOG_FILE_NAME = "rcv_%g.log";
@@ -83,7 +84,7 @@ class Logger {
 
   static void setup() {
     logger = java.util.logging.Logger.getLogger("");
-    logger.setLevel(Level.FINE);
+    logger.setLevel(AUDIT_LEVEL);
 
     // logPath is where execution file logging is written
     // "user.dir" property is the current working directory, i.e. folder from whence the rcv jar
@@ -128,7 +129,7 @@ class Logger {
             tabulationLogPattern,
             LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
     tabulationHandler.setFormatter(formatter);
-    tabulationHandler.setLevel(Level.FINE);
+    tabulationHandler.setLevel(AUDIT_LEVEL);
     logger.addHandler(tabulationHandler);
     info("Tabulation logging to: %s", tabulationLogPattern.replace("%g", "0"));
   }
@@ -153,8 +154,8 @@ class Logger {
     }
   }
 
-  static void fine(String message, Object... obj) {
-    log(Level.FINE, message, obj);
+  static void auditable(String message, Object... obj) {
+    log(AUDIT_LEVEL, message, obj);
   }
 
   static void info(String message, Object... obj) {
