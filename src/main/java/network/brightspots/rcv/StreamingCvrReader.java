@@ -46,6 +46,8 @@ class StreamingCvrReader extends BaseCvrReader {
 
   // this indicates a missing precinct ID in output files
   private static final String MISSING_PRECINCT_ID = "missing_precinct_id";
+  // this indicates a missing batch ID in output files
+  private static final String MISSING_BATCH_ID = "missing_batch_id";
   // name of the source file
   private final String excelFileName;
   // 0-based column index of first ranking
@@ -54,6 +56,8 @@ class StreamingCvrReader extends BaseCvrReader {
   private final int firstVoteRowIndex;
   // 0-based column index of CVR ID (if present)
   private final Integer idColumnIndex;
+  // 0-based column index of currentBatch name (if present)
+  private final Integer batchColumnIndex;
   // 0-based column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
   // optional delimiter for cells that contain multiple candidates
@@ -70,6 +74,8 @@ class StreamingCvrReader extends BaseCvrReader {
   private LinkedList<String> currentCvrData;
   // supplied CVR ID for CVR in progress
   private String currentSuppliedCvrId;
+  // batch ID for CVR in progress
+  private String currentBatch;
   // precinct ID for CVR in progress
   private String currentPrecinct;
   // place to store input CVR list (new CVRs will be appended as we parse)
@@ -90,6 +96,10 @@ class StreamingCvrReader extends BaseCvrReader {
         isNullOrBlank(source.getIdColumnIndex())
             ? null
             : Integer.parseInt(source.getIdColumnIndex()) - 1;
+    this.batchColumnIndex =
+            !isNullOrBlank(source.getBatchColumnIndex())
+                    ? Integer.parseInt(source.getBatchColumnIndex()) - 1
+                    : null;
     this.precinctColumnIndex =
         !isNullOrBlank(source.getPrecinctColumnIndex())
             ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
@@ -159,6 +169,7 @@ class StreamingCvrReader extends BaseCvrReader {
     currentRankings = new LinkedList<>();
     currentCvrData = new LinkedList<>();
     currentSuppliedCvrId = null;
+    currentBatch = null;
     currentPrecinct = null;
     lastRankSeen = 0;
   }
@@ -182,6 +193,16 @@ class StreamingCvrReader extends BaseCvrReader {
       }
     }
 
+    // add batch ID if needed
+    if (batchColumnIndex != null) {
+      if (currentBatch == null) {
+        // group batch with missing Ids here
+        Logger.warning(
+                "Batch identifier not found for cast vote record: %s", computedCastVoteRecordId);
+        currentBatch = MISSING_BATCH_ID;
+      }
+    }
+
     if (idColumnIndex != null && currentSuppliedCvrId == null) {
       Logger.severe(
           "Cast vote record identifier missing on row %d in file %s. This may be due to an "
@@ -195,9 +216,12 @@ class StreamingCvrReader extends BaseCvrReader {
     Logger.fine("[Raw Data]: " + currentCvrData.toString());
 
     // create new cast vote record
-    CastVoteRecord newRecord =
-        new CastVoteRecord(
-            computedCastVoteRecordId, currentSuppliedCvrId, currentPrecinct, currentRankings);
+    CastVoteRecord newRecord = new CastVoteRecord(
+        computedCastVoteRecordId,
+        currentSuppliedCvrId,
+        currentPrecinct,
+        currentBatch,
+        currentRankings);
     cvrList.add(newRecord);
 
     // provide some user feedback on the CVR count
@@ -211,13 +235,20 @@ class StreamingCvrReader extends BaseCvrReader {
     currentCvrData.add(cellData);
     if (precinctColumnIndex != null && col == precinctColumnIndex) {
       currentPrecinct = cellData;
+    } else if (batchColumnIndex != null && col == batchColumnIndex) {
+      currentBatch = cellData;
     } else if (idColumnIndex != null && col == idColumnIndex) {
       currentSuppliedCvrId = cellData;
-    }
+    } else if (col >= firstVoteColumnIndex
+        && (config.isMaxRankingsSetToMaximum()
+            || col < firstVoteColumnIndex + config.getMaxRankingsAllowedWhenNotSetToMaximum())) {
+      // Unlike other CVRs, where having a ranking over the max number of rankings is an error,
+      // in these files it simply defines the "last" column used for rankings.
+      // If the max rankings is set to the maximum, we don't need to check the upper bound --
+      // we read all columns.
+      // Get the current ranking, and update the max ranking
+      int currentRank = col - firstVoteColumnIndex + 1;
 
-    // see if this column is in the ranking range
-    int currentRank = col - firstVoteColumnIndex + 1;
-    if (config.isRankingAllowed(currentRank)) {
       // handle any empty cells which may exist between this cell and any previous one
       handleEmptyCells(currentRank);
       String cellString = cellData.trim();
@@ -227,15 +258,15 @@ class StreamingCvrReader extends BaseCvrReader {
       if (!isNullOrBlank(overvoteDelimiter)) {
         candidates = cellString.split(Pattern.quote(overvoteDelimiter));
       } else {
-        candidates = new String[] {cellString};
+        candidates = new String[]{cellString};
       }
 
       for (String candidate : candidates) {
         candidate = candidate.trim();
-        if (candidates.length > 1 && (candidate.equals("") || candidate.equals(skippedRankLabel))) {
+        if (candidates.length > 1 && (candidate.isBlank() || candidate.equals(skippedRankLabel))) {
           Logger.severe(
-              "If a cell contains multiple candidates split by the overvote delimiter, it's not "
-                  + "valid for any of them to be blank or an explicit skipped ranking.");
+              "If a cell contains multiple candidates split by the overvote delimiter, "
+                  + "it's not valid for any of them to be blank or an explicit skipped ranking.");
           encounteredDataErrors = true;
         } else if (!candidate.equals(skippedRankLabel)) {
           // map overvotes to our internal overvote string

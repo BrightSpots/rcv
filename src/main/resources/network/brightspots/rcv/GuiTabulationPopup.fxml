@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ RCTab
+  ~ Copyright (c) 2017-2023 Bright Spots Developers.
+  ~
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  -->
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<Pane prefHeight="513.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="network.brightspots.rcv.GuiTabulateController">
+   <children>
+      <VBox layoutX="14.0" layoutY="10.0" prefHeight="343.0" prefWidth="573.0" spacing="10.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Configuration" wrappingWidth="176.1533203125">
+               <font>
+                  <Font name="System Bold" size="19.0" />
+               </font>
+            </Text>
+            <HBox prefHeight="45.0" prefWidth="567.0" spacing="30.0">
+               <children>
+                  <TextArea fx:id="filepath" editable="false" minWidth="200.0" prefHeight="39.0" prefWidth="500.0" style="-fx-background-color: red;" text="C:/filepath.json">
+                     <HBox.margin>
+                        <Insets left="15.0" />
+                     </HBox.margin>
+                  </TextArea>
+                  <Button fx:id="saveButton" minWidth="70.0" mnemonicParsing="false" onAction="#buttonSaveClicked" prefHeight="42.0" text="Save" />
+                  <Button fx:id="tempSaveButton" minWidth="155.0" mnemonicParsing="false" onAction="#buttonTempSaveClicked" prefHeight="42.0" text="Save Temporary Config" />
+               </children>
+            </HBox>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Configuration Summary" wrappingWidth="225.1533203125">
+               <font>
+                  <Font name="System Bold" size="19.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Text>
+            <Label fx:id="numberOfCandidates" prefHeight="24.0" prefWidth="349.0" text="Number of Candidates: X" wrapText="true">
+               <font>
+                  <Font size="16.0" />
+               </font>
+               <VBox.margin>
+                  <Insets left="15.0" />
+               </VBox.margin>
+            </Label>
+            <Label fx:id="numberOfCvrFiles" prefHeight="24.0" prefWidth="349.0" text="Number of CVR Files: Y" wrapText="true">
+               <font>
+                  <Font size="16.0" />
+               </font>
+               <VBox.margin>
+                  <Insets left="15.0" />
+               </VBox.margin>
+            </Label>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Auditing Information" wrappingWidth="225.1533203125">
+               <font>
+                  <Font name="System Bold" size="19.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Text>
+            <HBox prefHeight="49.0" prefWidth="573.0" spacing="30.0">
+               <children>
+                  <Label prefHeight="30.0" prefWidth="126.0" text="Enter your name:">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="15.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="userNameField" onKeyTyped="#nameUpdated" prefHeight="26.0" prefWidth="411.0" style="-fx-border-color: red;">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextField>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <Text fx:id="progressText" layoutX="25.0" layoutY="479.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Step: x/y" textAlignment="CENTER" wrappingWidth="550">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Text>
+      <ProgressBar fx:id="progressBar" layoutX="19.0" layoutY="429.0" prefHeight="20.0" prefWidth="563.0" progress="0.0" />
+      <HBox layoutX="21.0" layoutY="367.0" prefHeight="55.0" prefWidth="556.0" spacing="20.0">
+         <children>
+            <Button fx:id="loadCvrButton" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#buttonLoadCvrsClicked" prefHeight="50.0" prefWidth="200.0" text="Check Ballot Counts" textAlignment="CENTER" />
+            <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="&gt;" textAlignment="CENTER" translateY="11.0" />
+            <Button fx:id="tabulateButton" defaultButton="true" disable="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#buttonTabulateClicked" prefHeight="50.0" prefWidth="200.0" text="Tabulate" textAlignment="CENTER" wrapText="true" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="&gt;" textAlignment="CENTER" translateY="11.0" />
+            <Button fx:id="openResultsButton" defaultButton="true" disable="true" layoutX="210.0" layoutY="10.0" mnemonicParsing="false" onAction="#buttonOpenResultsClicked" prefHeight="50.0" prefWidth="200.0" text="Open Results Folder" textAlignment="CENTER" />
+         </children>
+      </HBox>
+   </children>
+</Pane>

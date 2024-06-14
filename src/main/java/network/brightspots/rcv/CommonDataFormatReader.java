@@ -315,8 +315,8 @@ class CommonDataFormatReader extends BaseCvrReader {
 
         String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
         // create the new CastVoteRecord
-        CastVoteRecord newRecord =
-            new CastVoteRecord(computedCastVoteRecordId, cvr.UniqueId, precinctId, rankings);
+        CastVoteRecord newRecord = new CastVoteRecord(
+            computedCastVoteRecordId, cvr.UniqueId, precinctId, cvr.BatchSequenceId, rankings);
         castVoteRecords.add(newRecord);
 
         // provide some user feedback on the CVR count
@@ -524,10 +524,11 @@ class CommonDataFormatReader extends BaseCvrReader {
       }
 
       String ballotId = (String) cvr.get("BallotPrePrintedId");
+      String batchId = (String) cvr.get("BatchSequenceId");
       String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
       // create the new CastVoteRecord
       CastVoteRecord newRecord =
-          new CastVoteRecord(computedCastVoteRecordId, ballotId, precinctId, rankings);
+          new CastVoteRecord(computedCastVoteRecordId, ballotId, precinctId, batchId, rankings);
       castVoteRecords.add(newRecord);
       // provide some user feedback on the CVR count
       if (castVoteRecords.size() % 50000 == 0) {

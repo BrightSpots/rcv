@@ -41,7 +41,7 @@ abstract class BaseCvrReader {
       throws CastVoteRecord.CvrParseException, IOException;
 
   // Individual contests may have a different value than what the config allows.
-  public boolean isRankingAllowed(int rank, String contestId) {
+  protected boolean isRankingAllowed(int rank, String contestId) {
     return config.isRankingAllowed(rank);
   }
 
@@ -49,10 +49,15 @@ abstract class BaseCvrReader {
   public void runAdditionalValidations(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException {
     for (CastVoteRecord cvr : castVoteRecords) {
-      for (Pair<Integer, CandidatesAtRanking> ranking : cvr.candidateRankings) {
-        if (!this.config.isRankingAllowed(ranking.getKey())) {
-          throw new CastVoteRecord.CvrParseException();
-        }
+      if (cvr.candidateRankings.numRankings() == 0) {
+        continue;
+      }
+      int maxRanking = cvr.candidateRankings.maxRankingNumber();
+      if (!isRankingAllowed(maxRanking, cvr.getContestId())) {
+        Logger.severe(
+            "CVR \"%s\" has a ranking %d, but contest \"%s\" has max ranking %s!",
+            cvr.getId(), maxRanking, cvr.getContestId(), config.getMaxRankingsAllowedAsString());
+        throw new CastVoteRecord.CvrParseException();
       }
     }
   }
