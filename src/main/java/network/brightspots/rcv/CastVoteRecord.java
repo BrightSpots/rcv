@@ -66,23 +66,35 @@ class CastVoteRecord {
       String precinct,
       String precinctPortion,
       List<Pair<Integer, String>> rankings) {
+    this(contestId, tabulatorId, batchId, suppliedId, null, precinct, precinctPortion, rankings);
+  }
+
+  CastVoteRecord(
+          String contestId,
+          String tabulatorId,
+          String batchId,
+          String suppliedId,
+          String computedId,
+          String precinct,
+          String precinctPortion,
+          List<Pair<Integer, String>> rankings) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
     this.batchId = batchId;
-    this.computedId = null;
     this.suppliedId = suppliedId;
+    this.computedId = computedId;
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
     this.candidateRankings = new CandidateRankingsList(rankings);
   }
 
   CastVoteRecord(
-      String computedId, String suppliedId, String precinct, List<Pair<Integer, String>> rankings) {
-    this.computedId = computedId;
-    this.suppliedId = suppliedId;
-    this.precinct = precinct;
-    this.precinctPortion = null;
-    this.candidateRankings = new CandidateRankingsList(rankings);
+      String computedId,
+      String suppliedId,
+      String precinct,
+      String batchId,
+      List<Pair<Integer, String>> rankings) {
+    this(null, null, batchId, suppliedId, computedId, precinct, null, rankings);
   }
 
   String getContestId() {
@@ -93,12 +105,11 @@ class CastVoteRecord {
     return tabulatorId;
   }
 
-  String getBatchId() {
-    return batchId;
-  }
-
-  String getPrecinct() {
-    return precinct;
+  String getSlice(ContestConfig.TabulateBySlice slice) {
+    return switch (slice) {
+      case BATCH -> batchId;
+      case PRECINCT -> precinct;
+    };
   }
 
   String getPrecinctPortion() {
@@ -115,10 +126,10 @@ class CastVoteRecord {
 
     StringBuilder logStringBuilder = new StringBuilder();
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (!isNullOrBlank(suppliedId)) {
-      logStringBuilder.append(suppliedId);
-    } else {
+    if (!isNullOrBlank(computedId)) {
       logStringBuilder.append(computedId);
+    } else {
+      logStringBuilder.append(suppliedId);
     }
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");

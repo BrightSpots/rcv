@@ -59,7 +59,7 @@ public class GuiTiebreakerController {
 
   void populateLabelAndButtonText(boolean isSelectingWinner) {
     labelSelectionPrompt.setText(
-        "Please select a candidate to " + (isSelectingWinner ? "elect" : "eliminate") + ":");
+        "Select a candidate to " + (isSelectingWinner ? "elect" : "eliminate") + ":");
     buttonSelect.setText((isSelectingWinner ? "Elect" : "Eliminate") + " Candidate");
   }
 
