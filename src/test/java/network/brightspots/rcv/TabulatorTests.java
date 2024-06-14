@@ -826,6 +826,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("CSV missing header test")
+  void csvMissingHeaderTest() {
+    runTabulationTest("csv_missing_header_test");
+  }
+
+  @Test
   @DisplayName("no one meets minimum test")
   void noOneMeetsMinimumTest() {
     runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());

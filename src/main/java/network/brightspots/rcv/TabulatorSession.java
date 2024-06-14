@@ -392,8 +392,18 @@ class TabulatorSession {
       progress.markFileRead();
     }
 
-    // Output the RCTab-CSV CVR
-    if (!encounteredSourceProblem) {
+    if (encounteredSourceProblem) {
+      Logger.severe("Parsing cast vote records failed!");
+      castVoteRecords = null;
+    } else {
+      if (castVoteRecords.isEmpty()) {
+        Logger.severe("No cast vote records found!");
+        castVoteRecords = null;
+      } else {
+        Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
+      }
+
+      // Output the RCTab-CSV CVR
       try {
         ResultsWriter writer =
                 new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
