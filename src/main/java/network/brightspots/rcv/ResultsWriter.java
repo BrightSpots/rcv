@@ -551,12 +551,12 @@ class ResultsWriter {
 
   // Write CastVoteRecords for the specified contest to the provided folder,
   // using the simplified RCTab format.
-  // Note that the castVoteRecords list MUST be stable, as perSourceDataForCsv
+  // Note that the castVoteRecords list MUST be stable, as cvrSourceData
   // relies on its exact ordering to determine which source each record came from.
   // Returns the filepath written
   String writeRctabCvrCsv(
       List<CastVoteRecord> castVoteRecords,
-      List<PerSourceDataForCsv> perSourceDataForCsv,
+      List<CvrSourceData> cvrSourceData,
       String csvOutputFolder)
       throws IOException {
     String fileWritten;
@@ -601,16 +601,16 @@ class ResultsWriter {
       csvPrinter.println();
 
       // While the cast vote records are in a flattened list,
-      // we can use the PerSourceDataForCsv to determine which source each record came from.
+      // we can use the CvrSourceData to determine which source each record came from.
       int currentSourceIndex = 0;
-      PerSourceDataForCsv currentSourceData = perSourceDataForCsv.get(currentSourceIndex);
+      CvrSourceData currentSourceData = cvrSourceData.get(currentSourceIndex);
 
       // print rows:
       for (int i = 0; i < castVoteRecords.size(); i++) {
         if (i > currentSourceData.lastIndexInCvrList) {
           // we've moved on to a new contest, so we need to switch to the next source
           currentSourceIndex++;
-          currentSourceData = perSourceDataForCsv.get(currentSourceIndex);
+          currentSourceData = cvrSourceData.get(currentSourceIndex);
 
           if (currentSourceData.sourceIndex != currentSourceIndex) {
             throw new RuntimeException("Source list must be sorted by sourceIndex!");
@@ -1053,18 +1053,30 @@ class ResultsWriter {
   }
 
   // Per-source data to be used in the CSV CVR export
-  static class PerSourceDataForCsv {
+  static class CvrSourceData {
     public final CvrSource source;
     public final BaseCvrReader reader;
     public final int sourceIndex;
+    public final int firstIndexInCvrList;
     public final int lastIndexInCvrList;
 
-    PerSourceDataForCsv(
-        CvrSource source, BaseCvrReader reader, int sourceIndex, int lastIndexInCvrList) {
+    CvrSourceData(
+        CvrSource source, BaseCvrReader reader,
+        int sourceIndex, int firstIndexInCvrList, int lastIndexInCvrList) {
       this.source = source;
       this.reader = reader;
       this.sourceIndex = sourceIndex;
+      this.firstIndexInCvrList = firstIndexInCvrList;
       this.lastIndexInCvrList = lastIndexInCvrList;
+    }
+
+    /**
+     * Get the number of CVRs in this source.
+     *
+     * @return The number of CVRs in this source.
+     */
+    public int getNumCvrs() {
+      return lastIndexInCvrList - firstIndexInCvrList + 1;
     }
   }
 

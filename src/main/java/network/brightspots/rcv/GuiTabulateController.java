@@ -227,9 +227,9 @@ public class GuiTabulateController {
           // Populate the per-source CVR count table, and calculate the width of the filename column
           perSourceCvrCountTable.getItems().clear();
           int maxFilenameLength = 0;
-          for (Pair<String, Integer> perSourceCount : data.getPerSourceCvrCounts()) {
-            String countString = String.format("%,d", perSourceCount.getValue());
-            String fileString = new File(perSourceCount.getKey()).getName();
+          for (ResultsWriter.CvrSourceData sourceData : data.getCvrSourcesData()) {
+            String countString = String.format("%,d", sourceData.getNumCvrs());
+            String fileString = new File(sourceData.source.getFilePath()).getName();
             perSourceCvrCountTable.getItems().add(new Pair<>(fileString, countString));
             maxFilenameLength = Math.max(maxFilenameLength, fileString.length());
           }

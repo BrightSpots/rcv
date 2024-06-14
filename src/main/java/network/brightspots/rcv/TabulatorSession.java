@@ -251,6 +251,7 @@ class TabulatorSession {
             exceptionsEncountered.add(TabulationAbortedException.class.toString());
           } else {
             runTabulationForConfig(config, castVoteRecords.getCvrs(), progress);
+            castVoteRecords.printSummary();
             tabulationSuccess = true;
           }
         } catch (CastVoteRecordGenericParseException exception) {
@@ -324,11 +325,10 @@ class TabulatorSession {
         throws CastVoteRecordGenericParseException {
     Logger.info("Parsing cast vote records...");
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-    List<Pair<String, Integer>> perSourceCvrCounts = new ArrayList<>();
     boolean encounteredSourceProblem = false;
 
     // Per-source data for writing generic CSV
-    List<ResultsWriter.PerSourceDataForCsv> perSourceDataForCsv = new ArrayList<>();
+    List<ResultsWriter.CvrSourceData> cvrSourceData = new ArrayList<>();
 
     // At each iteration of the following loop, we add records from another source file.
     for (int sourceIndex = 0; sourceIndex < config.rawConfig.cvrFileSources.size(); ++sourceIndex) {
@@ -338,15 +338,15 @@ class TabulatorSession {
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
         Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
-        final int origNumCvrs = castVoteRecords.size();
+        final int startIndex = castVoteRecords.size();
         reader.readCastVoteRecords(castVoteRecords);
-        final int numCvrsRead = castVoteRecords.size() - origNumCvrs;
 
         // Update the per-source data for the results writer
-        perSourceDataForCsv.add(new ResultsWriter.PerSourceDataForCsv(
+        cvrSourceData.add(new ResultsWriter.CvrSourceData(
                 source,
                 reader,
                 sourceIndex,
+                startIndex,
                 castVoteRecords.size() - 1));
 
         // Check for unrecognized candidates
@@ -359,9 +359,6 @@ class TabulatorSession {
 
         // Check for any other reader-specific validations
         reader.runAdditionalValidations(castVoteRecords);
-
-        // Update the per-file CVR counts
-        perSourceCvrCounts.add(new Pair<>(cvrPath, numCvrsRead));
       } catch (UnrecognizedCandidatesException exception) {
         Logger.severe("Source file contains unrecognized candidate(s): %s", cvrPath);
         // map from name to number of times encountered
@@ -406,7 +403,7 @@ class TabulatorSession {
       this.convertedFilePath =
               writer.writeRctabCvrCsv(
                       castVoteRecords,
-                      perSourceDataForCsv,
+                      cvrSourceData,
                       config.getOutputDirectory());
     } catch (IOException exception) {
       // error already logged in ResultsWriter
@@ -426,7 +423,7 @@ class TabulatorSession {
       throw new CastVoteRecordGenericParseException();
     }
 
-    return new LoadedCvrData(castVoteRecords, perSourceCvrCounts);
+    return new LoadedCvrData(castVoteRecords, cvrSourceData);
   }
 
   static class UnrecognizedCandidatesException extends Exception {
@@ -454,18 +451,18 @@ class TabulatorSession {
 
     private List<CastVoteRecord> cvrs;
     private final int numCvrs;
-    private List<Pair<String, Integer>> perSourceCvrCounts;
+    private List<ResultsWriter.CvrSourceData> cvrSourcesData;
     private boolean isDiscarded;
     private final boolean doesMatchAllMetadata;
 
     public LoadedCvrData(List<CastVoteRecord> cvrs,
-                         List<Pair<String, Integer>> perSourceCvrCounts) {
+                         List<ResultsWriter.CvrSourceData> cvrSourcesData) {
       this.cvrs = cvrs;
       this.successfullyReadAll = cvrs != null;
       this.numCvrs = cvrs != null ? cvrs.size() : 0;
       this.isDiscarded = false;
       this.doesMatchAllMetadata = false;
-      this.perSourceCvrCounts = perSourceCvrCounts;
+      this.cvrSourcesData = cvrSourcesData;
     }
 
     /**
@@ -478,7 +475,7 @@ class TabulatorSession {
       this.numCvrs = 0;
       this.isDiscarded = false;
       this.doesMatchAllMetadata = true;
-      this.perSourceCvrCounts = new ArrayList<>();
+      this.cvrSourcesData = new ArrayList<>();
     }
 
     /**
@@ -498,8 +495,8 @@ class TabulatorSession {
       return numCvrs;
     }
 
-    public List<Pair<String, Integer>> getPerSourceCvrCounts() {
-      return perSourceCvrCounts;
+    public List<ResultsWriter.CvrSourceData> getCvrSourcesData() {
+      return cvrSourcesData;
     }
 
     public void discard() {
@@ -512,6 +509,16 @@ class TabulatorSession {
         throw new IllegalStateException("CVRs have been discarded from memory.");
       }
       return cvrs;
+    }
+
+    public void printSummary() {
+      Logger.info("Cast Vote Record summary:");
+      for (ResultsWriter.CvrSourceData sourceData : cvrSourcesData) {
+        Logger.info("Source %d: %s",
+                sourceData.sourceIndex + 1, sourceData.source.getFilePath());
+        Logger.info("  uses provider: %s", sourceData.source.getProvider());
+        Logger.info("  read %d cast vote records", sourceData.getNumCvrs());
+      }
     }
   }
 }
