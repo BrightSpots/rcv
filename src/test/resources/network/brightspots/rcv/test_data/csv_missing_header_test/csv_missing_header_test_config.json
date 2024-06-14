@@ -11,7 +11,7 @@
   },
   "cvrFileSources": [
     {
-    "filePath" : "generic_csv_test_cvr.csv",
+    "filePath" : "csv_missing_header_test_cvr.csv",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "provider" : "genericCsv",

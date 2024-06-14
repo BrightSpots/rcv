@@ -401,19 +401,19 @@ class TabulatorSession {
         castVoteRecords = null;
       } else {
         Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
-      }
 
-      // Output the RCTab-CSV CVR
-      try {
-        ResultsWriter writer =
-                new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-        this.convertedFilePath =
-                writer.writeRctabCvrCsv(
-                        castVoteRecords,
-                        perSourceDataForCsv,
-                        config.getOutputDirectory());
-      } catch (IOException exception) {
-        // error already logged in ResultsWriter
+        // Output the RCTab-CSV CVR
+        try {
+          ResultsWriter writer =
+                  new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+          this.convertedFilePath =
+                  writer.writeRctabCvrCsv(
+                          castVoteRecords,
+                          perSourceDataForCsv,
+                          config.getOutputDirectory());
+        } catch (IOException exception) {
+          // error already logged in ResultsWriter
+        }
       }
     }
 
