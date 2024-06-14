@@ -1070,6 +1070,11 @@ class ResultsWriter {
       this.lastIndexInCvrList = lastIndexInCvrList;
     }
 
+    /**
+     * Get the number of CVRs in this source.
+     *
+     * @return The number of CVRs in this source.
+     */
     public int getNumCvrs() {
       return lastIndexInCvrList - firstIndexInCvrList + 1;
     }
