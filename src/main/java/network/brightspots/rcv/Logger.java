@@ -274,7 +274,8 @@ class Logger {
           }
 
           private boolean shouldIgnore(LogRecord record) {
-            // On Windows, scrollToBottom can trigger a log message in VirtualFlow.java that causes:
+            // On Windows, scrollToBottom can trigger a log message in JavaFX.
+            // We'll get log spam from VirtualFlow.java that causes:
             // 1. A log message to be added to the queue
             // 2. The scroll-to-bottom to fail
             // This can cause a cycle of repeated log spam and sporadic scroll failures.
