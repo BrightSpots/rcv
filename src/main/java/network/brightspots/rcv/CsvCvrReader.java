@@ -28,7 +28,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-class CsvCvrReader extends BaseCvrReader {
+final class CsvCvrReader extends BaseCvrReader {
   // 0-based column index of first ranking
   private final int firstVoteColumnIndex;
   // 0-based row index of first CVR
