@@ -15,7 +15,7 @@
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
-    "precinctColumnIndex" : "2",
+    "precinctColumnIndex" : "",
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
