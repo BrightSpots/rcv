@@ -1,0 +1,27 @@
+name: "Create SHA of a .zip file by extracting it"
+description: "Cross-platform helper: timestamp-independent .zip checksum done via zip expansion"
+
+inputs:
+  zipFilename:
+    description: "The output filename"
+    required: true
+  shaA:
+    description: "The SHA version (1, 256, or 512)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Run pre-command"
+      shell: bash
+      run: ${{ inputs.command }}
+
+    - name: "Generate SHA of zip for Linux/Mac"
+      if: runner.os == 'Linux' || runner.os == 'MacOS'
+      shell: bash
+      run: ./.github/actions/sha-of-zip.sh ${{ inputs.zipFilename }} ${{ runner.os }} ${{ inputs.shaA }} > ${{ inputs.zipFilename }}.golden.sha${{ inputs.shaA }}
+
+    - name: "Generate SHA of zip for Windows"
+      if: runner.os == 'Windows'
+      shell: powershell
+      run: ./.github/actions/sha-of-zip.bat ${{ inputs.zipFilename }} ${{ inputs.shaA }} > ${{ inputs.zipFilename }}.golden.sha${{ inputs.shaA }}

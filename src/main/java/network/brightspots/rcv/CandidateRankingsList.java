@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import javafx.util.Pair;
 
-class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRanking>> {
+final class CandidateRankingsList implements Iterable<Pair<Integer, CandidatesAtRanking>> {
   private final CandidatesAtRanking[] rankings;
   private int numRankings;
 

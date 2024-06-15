@@ -23,6 +23,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
+    implementation "com.github.spotbugs:spotbugs:4.8.3"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
 }
@@ -63,7 +64,7 @@ System.setProperty("org.checkstyle.google.suppressionfilter.config",
 
 spotbugs {
     // Latest version at: https://github.com/spotbugs/spotbugs/tags
-    toolVersion = '4.7.3'
+    toolVersion = '4.8.3'
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
 
@@ -234,4 +235,12 @@ tasks.jlink.doLast {
         with sampleInputToCopy
         into JLINK_DIR + "/sample_input"
     }
+}
+
+// Ensure reproducible hashes
+tasks.withType(AbstractArchiveTask) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    dirMode = 0755
+    fileMode = 0644
 }
