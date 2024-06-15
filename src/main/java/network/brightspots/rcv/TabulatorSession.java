@@ -158,10 +158,10 @@ class TabulatorSession {
       throw new CastVoteRecordGenericParseException();
     }
 
-    LoadedCvrData castVoteRecords = parseCastVoteRecords(config, false);
-    Logger.removeTabulationFileLogging();
     Progress progress = new Progress(config, 0, progressUpdate);
-    return parseCastVoteRecords(config, progress);
+    LoadedCvrData castVoteRecords = parseCastVoteRecords(config, progress, false);
+    Logger.removeTabulationFileLogging();
+    return castVoteRecords;
   }
 
   // Returns a List of exception class names that were thrown while tabulating.
