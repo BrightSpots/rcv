@@ -91,19 +91,17 @@ class CsvCvrReader extends BaseCvrReader {
           }
 
           int candidateIndex = col - firstVoteColumnIndex;
-          String candidateId = candidateIndex == undeclaredWriteInColumn
-              ? Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL
-              : candidateNames.get(candidateIndex);
+          String candidateId =
+              candidateIndex == undeclaredWriteInColumn
+                  ? Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL
+                  : candidateNames.get(candidateIndex);
           rankings.add(new Pair<>(rankAsInt, candidateId));
         }
 
         // create the new CastVoteRecord
-        CastVoteRecord newCvr = new CastVoteRecord(
-            Integer.toString(index),
-            "no supplied ID",
-            "no precinct",
-            "no batch ID",
-            rankings);
+        CastVoteRecord newCvr =
+            new CastVoteRecord(
+                Integer.toString(index), "no supplied ID", "no precinct", "no batch ID", rankings);
         castVoteRecords.add(newCvr);
       }
     } catch (IOException exception) {
@@ -113,28 +111,23 @@ class CsvCvrReader extends BaseCvrReader {
   }
 
   private CSVParser getCsvParser(FileInputStream inputStream) throws IOException {
-    CSVFormat format = CSVFormat.Builder.create()
-        .setAllowMissingColumnNames(true)
-        .setNullString("")
-        .build();
-    return CSVParser.parse(
-      inputStream,
-      Charset.defaultCharset(),
-      format);
+    CSVFormat format =
+        CSVFormat.Builder.create().setAllowMissingColumnNames(true).setNullString("").build();
+    return CSVParser.parse(inputStream, Charset.defaultCharset(), format);
   }
 
   /**
-   * This must be called before CVRs are read. It will return candidate names and skip
-   * the appropriate number of rows.
+   * This must be called before CVRs are read. It will return candidate names and skip the
+   * appropriate number of rows.
    */
   private List<String> getCandidateNamesAndInitializeParser(CSVParser parser)
-          throws CastVoteRecord.CvrParseException {
+      throws CastVoteRecord.CvrParseException {
     List<String> candidateNames = new ArrayList<>();
     CSVRecord csvRecord = parser.iterator().next();
     for (int col = firstVoteColumnIndex; col < csvRecord.size(); col++) {
       String candidateName = csvRecord.get(col);
       if (isNullOrBlank(candidateName)) {
-        Logger.severe("Candidate name on column %d cannot be empty", col);
+        Logger.severe("Candidate name at the top of column %d cannot be empty!", col);
         throw new CastVoteRecord.CvrParseException();
       }
       candidateNames.add(candidateName);
