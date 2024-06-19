@@ -112,6 +112,8 @@ final class ContestConfigMigration {
                 TiebreakMode.INTERACTIVE,
                 "previousRoundCountsThenRandom",
                 TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
+                "previousRoundCountsThenConfigPermutation",
+                TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_CONFIG_PERMUTATION,
                 "previousRoundCountsThenInteractive",
                 TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
                 "usePermutationInConfig",

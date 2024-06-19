@@ -1284,6 +1284,9 @@ class Tabulator {
         "previousRoundCountsThenRandom", "Previous round counts (then random)"),
     PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE(
         "previousRoundCountsThenAsk", "Previous round counts (then stop counting and ask)"),
+    PREVIOUS_ROUND_COUNTS_THEN_CONFIG_PERMUTATION(
+            "previousRoundCountsThenConfigPermutation",
+            "Previous round counts (then config permutation)"),
     USE_PERMUTATION_IN_CONFIG("useCandidateOrder", "Use candidate order in the config file"),
     GENERATE_PERMUTATION("generatePermutation", "Generate permutation"),
     MODE_UNKNOWN("modeUnknown", "Unknown mode");

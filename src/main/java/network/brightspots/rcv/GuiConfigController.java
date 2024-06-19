@@ -1390,7 +1390,7 @@ public class GuiConfigController implements Initializable {
         case RANDOM, PREVIOUS_ROUND_COUNTS_THEN_RANDOM, GENERATE_PERMUTATION -> textFieldRandomSeed
             .setDisable(false);
         case INTERACTIVE, PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE, USE_PERMUTATION_IN_CONFIG,
-            MODE_UNKNOWN -> {
+            PREVIOUS_ROUND_COUNTS_THEN_CONFIG_PERMUTATION, MODE_UNKNOWN -> {
           // Do nothing
         }
         default -> throw new IllegalStateException("Unexpected value: "

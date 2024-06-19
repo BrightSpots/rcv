@@ -282,6 +282,8 @@ class Tiebreak {
                   : TiebreakMode.INTERACTIVE.getInternalLabel());
       if (tiebreakMode == TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE) {
         selection = doInteractive(candidatesInContention);
+      } else if (tiebreakMode == TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_CONFIG_PERMUTATION) {
+        selection = doPermutationSelection(candidatesInContention);
       } else { // PREVIOUS_ROUND_COUNTS_THEN_RANDOM
         selection = doRandom(candidatesInContention);
       }
