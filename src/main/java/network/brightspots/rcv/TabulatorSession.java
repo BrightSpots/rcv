@@ -104,7 +104,7 @@ class TabulatorSession {
 
     Progress progress = new Progress(config, 0, progressUpdate);
 
-    if (setUpLogging(config.getOutputDirectory(), "convert-to-cdf")
+    if (setUpLogging(config.getOutputDirectory())
         && config.validate().isEmpty()) {
       Logger.info("Converting CVR(s) to CDF...");
       try {
@@ -152,16 +152,8 @@ class TabulatorSession {
   LoadedCvrData parseAndCountCastVoteRecords(BiConsumer<Double, Double> progressUpdate)
       throws CastVoteRecordGenericParseException {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory(), "check-ballot-counts");
-    if (!setUpLoggingSuccess) {
-      Logger.severe("Failed to configure logger!");
-      throw new CastVoteRecordGenericParseException();
-    }
-
     Progress progress = new Progress(config, 0, progressUpdate);
-    LoadedCvrData castVoteRecords = parseCastVoteRecords(config, progress, false);
-    Logger.removeTabulationFileLogging();
-    return castVoteRecords;
+    return parseCastVoteRecords(config, progress, false);
   }
 
   // Returns a List of exception class names that were thrown while tabulating.
@@ -178,7 +170,7 @@ class TabulatorSession {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
-    boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory(), "tabulate");
+    boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory());
 
     if (operatorName == null || operatorName.isBlank()) {
       Logger.severe("Operator name is required for the audit logs!");
@@ -296,13 +288,13 @@ class TabulatorSession {
     }
   }
 
-  private boolean setUpLogging(String outputDirectory, String filenamePrefix) {
+  private boolean setUpLogging(String outputDirectory) {
     boolean success = false;
     // cache outputPath for testing
     outputPath = outputDirectory;
     try {
       FileUtils.createOutputDirectory(outputDirectory);
-      Logger.addTabulationFileLogging(outputDirectory, timestampString + "_" + filenamePrefix);
+      Logger.addTabulationFileLogging(outputDirectory, timestampString);
       success = true;
     } catch (UnableToCreateDirectoryException | IOException exception) {
       Logger.severe("Failed to configure tabulation logger!\n%s", exception);
@@ -411,26 +403,31 @@ class TabulatorSession {
       progress.markFileRead();
     }
 
-    // Output the simplified RCTab CVR CSV file
-    if (shouldOutputRcTabCvr) {
-      try {
-        ResultsWriter writer =
-            new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-        this.convertedFilePath =
-            writer.writeRcTabCvrCsv(castVoteRecords, cvrSourceData, config.getOutputDirectory());
-      } catch (IOException exception) {
-        // error already logged in ResultsWriter
-      }
-    }
-
     if (encounteredSourceProblem) {
       Logger.severe("Parsing cast vote records failed!");
       castVoteRecords = null;
-    } else if (castVoteRecords.isEmpty()) {
-      Logger.severe("No cast vote records found!");
-      castVoteRecords = null;
     } else {
-      Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
+      if (castVoteRecords.isEmpty()) {
+        Logger.severe("No cast vote records found!");
+        castVoteRecords = null;
+      } else {
+        Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
+
+        // Output the RCTab-CSV CVR
+        if (shouldOutputRcTabCvr) {
+          try {
+            ResultsWriter writer =
+                    new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+            this.convertedFilePath =
+                    writer.writeRcTabCvrCsv(
+                            castVoteRecords,
+                            cvrSourceData,
+                            config.getOutputDirectory());
+          } catch (IOException exception) {
+            // error already logged in ResultsWriter
+          }
+        }
+      }
     }
 
     if (castVoteRecords == null) {
