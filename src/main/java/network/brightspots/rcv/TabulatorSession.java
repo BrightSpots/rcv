@@ -417,12 +417,12 @@ class TabulatorSession {
         if (shouldOutputRcTabCvr) {
           try {
             ResultsWriter writer =
-                    new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+                  new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
             this.convertedFilePath =
-                    writer.writeRcTabCvrCsv(
-                            castVoteRecords,
-                            cvrSourceData,
-                            config.getOutputDirectory());
+                  writer.writeRcTabCvrCsv(
+                          castVoteRecords,
+                          cvrSourceData,
+                          config.getOutputDirectory());
           } catch (IOException exception) {
             // error already logged in ResultsWriter
           }
