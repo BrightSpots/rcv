@@ -554,7 +554,7 @@ class ResultsWriter {
   // Note that the castVoteRecords list MUST be stable, as cvrSourceData
   // relies on its exact ordering to determine which source each record came from.
   // Returns the filepath written
-  String writeRctabCvrCsv(
+  String writeRcTabCvrCsv(
       List<CastVoteRecord> castVoteRecords,
       List<CvrSourceData> cvrSourceData,
       String csvOutputFolder)
