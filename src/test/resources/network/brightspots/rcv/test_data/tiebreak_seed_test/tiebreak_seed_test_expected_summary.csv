@@ -13,7 +13,7 @@ Contest Summary
 Number to be Elected,1
 Number of Candidates,3
 Total Number of Ballots,9
-Number of Undervotes,0
+Number of Ballots with No Rankings,0
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer
 Eliminated,Yinka Dare,,,,,
@@ -23,8 +23,5 @@ George Gervin,3,33.33%,0,3,50.0%,0
 Mookie Blaylock,3,33.33%,0,3,50.0%,0
 Active Ballots,9,,,6,,
 Current Round Threshold,5,,,4,,
-Inactive Ballots by Overvotes,0,,0,0,,0
-Inactive Ballots by Skipped Rankings,0,,0,0,,0
-Inactive Ballots by Exhausted Choices,0,,0,0,,0
-Inactive Ballots by Repeated Rankings,0,,0,0,,0
+Inactive Partially Ranked Ballots by Exhausted Choices,0,,3,3,,0
 Inactive Ballots Total,0,,3,3,,0

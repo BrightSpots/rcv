@@ -1002,8 +1002,10 @@ final class Tabulator {
     String outcomeDescription;
     switch (statusForRound) {
       case ACTIVE -> outcomeDescription = selectedCandidate;
-      case INACTIVE_BY_UNDERVOTE -> outcomeDescription = "undervote" + additionalLogText;
+      case INACTIVE_BY_NO_RANKINGS -> outcomeDescription = "no rankings" + additionalLogText;
       case INACTIVE_BY_OVERVOTE -> outcomeDescription = "overvote" + additionalLogText;
+      case INACTIVE_BY_UNUSED_RANKINGS -> outcomeDescription =
+          "fewer than max rankings" + additionalLogText;
       case INACTIVE_BY_SKIPPED_RANKING -> outcomeDescription =
           "exhausted by skipped ranking" + additionalLogText;
       case INACTIVE_BY_REPEATED_RANKING -> outcomeDescription =
@@ -1068,7 +1070,7 @@ final class Tabulator {
       // check for a CVR with no rankings at all
       if (cvr.candidateRankings.numRankings() == 0) {
         recordSelectionForCastVoteRecord(
-            cvr, roundTally, null, StatusForRound.INACTIVE_BY_UNDERVOTE, "");
+            cvr, roundTally, null, StatusForRound.INACTIVE_BY_NO_RANKINGS, "");
       }
 
       // iterate through the rankings in this cvr from most to least preferred.
@@ -1181,7 +1183,7 @@ final class Tabulator {
           if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
               && maxAllowedRanking - rank > config.getMaxSkippedRanksAllowed()) {
             recordSelectionForCastVoteRecord(
-                cvr, roundTally, null, StatusForRound.INACTIVE_BY_UNDERVOTE, "");
+                cvr, roundTally, null, StatusForRound.INACTIVE_BY_UNUSED_RANKINGS, "");
           } else {
             recordSelectionForCastVoteRecord(
                 cvr, roundTally, null, StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES, "");

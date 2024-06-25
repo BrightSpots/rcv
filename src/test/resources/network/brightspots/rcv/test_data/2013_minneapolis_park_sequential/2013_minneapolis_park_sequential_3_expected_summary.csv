@@ -13,7 +13,7 @@ Contest Summary
 Number to be Elected,1
 Number of Candidates,9
 Total Number of Ballots,80101
-Number of Undervotes,20571
+Number of Ballots with No Rankings,20571
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer,Round 5 Votes,% of vote,transfer,Round 6 Votes,% of vote,transfer,Round 7 Votes,% of vote,transfer,Round 8 Votes,% of vote,transfer
 Eliminated,Undeclared Write-ins,,,CASPER HILL,,,HASHIM YONIS,,,STEVE BARLAND,,,MARY LYNN MCPHERSON,,,ISHMAEL ISRAEL,,,JASON STONE,,,,,
@@ -29,8 +29,5 @@ CASPER HILL,1903,3.48%,5,1908,3.51%,-1908,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,
 Undeclared Write-ins,381,0.69%,-381,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,54598,,,54272,,,53599,,,50679,,,48433,,,46013,,,41986,,,31348,,
 Current Round Threshold,27300,,,27137,,,26800,,,25340,,,24217,,,23007,,,20994,,,15675,,
-Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots by Exhausted Choices,4932,,326,5258,,673,5931,,2920,8851,,2246,11097,,2420,13517,,4027,17544,,10638,28182,,0
-Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Fully Ranked Ballots by Exhausted Choices,4932,,326,5258,,673,5931,,2920,8851,,2246,11097,,2420,13517,,4027,17544,,10638,28182,,0
 Inactive Ballots Total,4932,,326,5258,,673,5931,,2920,8851,,2246,11097,,2420,13517,,4027,17544,,10638,28182,,0

@@ -13,7 +13,7 @@ Contest Summary
 Number to be Elected,3
 Number of Candidates,11
 Total Number of Ballots,80101
-Number of Undervotes,20571
+Number of Ballots with No Rankings,20571
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer,Round 5 Votes,% of vote,transfer,Round 6 Votes,% of vote,transfer,Round 7 Votes,% of vote,transfer,Round 8 Votes,% of vote,transfer,Round 9 Votes,% of vote,transfer,Round 10 Votes,% of vote,transfer,Round 11 Votes,% of vote,transfer
 Eliminated,Undeclared Write-ins,,,CASPER HILL,,,,,,ISHMAEL ISRAEL,,,MARY LYNN MCPHERSON,,,STEVE BARLAND,,,HASHIM YONIS,,,JASON STONE,,,TOM NORDYKE,,,,,,,,
@@ -31,9 +31,6 @@ CASPER HILL,1280,2.15%,4,1284,2.16%,-1284,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,
 Undeclared Write-ins,342,0.57%,-342,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,59463,,,59174,,,58876,,,58876.0000,,,57861.0000,,,56780.0000,,,54875.0000,,,51478.0000,,,48418.0000,,,42155.0000,,,41977.0000,,
 Current Round Threshold,14866,,,14866,,,14866,,,14866,,,14866,,,14866,,,14866,,,14866,,,14866,,,14866,,,14866,,
-Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots by Exhausted Choices,67,,289,356,,298,654,,0.0000,654.0000,,1015.0000,1669.0000,,1081.0000,2750.0000,,1905.0000,4655.0000,,3397.0000,8052.0000,,3060.0000,11112.0000,,6263.0000,17375.0000,,177.5192,17552.5192,,0
-Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Fully Ranked Ballots by Exhausted Choices,67,,289,356,,298,654,,0.0000,654.0000,,1015.0000,1669.0000,,1081.0000,2750.0000,,1905.0000,4655.0000,,3397.0000,8052.0000,,3060.0000,11112.0000,,6263.0000,17375.0000,,177.5192,17552.5192,,0
 Inactive Ballots Total,67,,289,356,,298,654,,0.0000,654.0000,,1015.0000,1669.0000,,1081.0000,2750.0000,,1905.0000,4655.0000,,3397.0000,8052.0000,,3060.0000,11112.0000,,6263.0000,17375.0000,,177.5192,17552.5192,,0
 Residual surplus,0,,,0,,,0,,,0,,,0,,,0,,,0,,,0,,,0,,,0,,,0.4808,,

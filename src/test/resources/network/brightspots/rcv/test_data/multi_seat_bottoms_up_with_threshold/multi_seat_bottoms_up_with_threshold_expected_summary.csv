@@ -13,7 +13,7 @@ Contest Summary
 Number to be Elected,0
 Number of Candidates,8
 Total Number of Ballots,21
-Number of Undervotes,0
+Number of Ballots with No Rankings,0
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer,Round 5 Votes,% of vote,transfer
 Eliminated,F,,,E,,,H,,,D,,,,,
@@ -28,8 +28,4 @@ E,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 F,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,21,,,21,,,21,,,21,,,21,,
 Current Round Threshold,3.1500,,,3.1500,,,3.1500,,,3.1500,,,3.1500,,
-Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0,0,,0

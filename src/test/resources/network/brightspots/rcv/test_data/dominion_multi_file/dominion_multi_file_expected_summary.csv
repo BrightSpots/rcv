@@ -13,7 +13,7 @@ Contest Summary
 Number to be Elected,1
 Number of Candidates,5
 Total Number of Ballots,25
-Number of Undervotes,8
+Number of Ballots with No Rankings,8
 
 Rounds,Round 1 Votes,% of vote,transfer
 Eliminated,,,
@@ -25,8 +25,4 @@ Spencer Simonson,1,5.88%,0
 Undeclared Write-ins,0,0.0%,0
 Active Ballots,17,,
 Current Round Threshold,9,,
-Inactive Ballots by Overvotes,0,,0
-Inactive Ballots by Skipped Rankings,0,,0
-Inactive Ballots by Exhausted Choices,0,,0
-Inactive Ballots by Repeated Rankings,0,,0
 Inactive Ballots Total,0,,0

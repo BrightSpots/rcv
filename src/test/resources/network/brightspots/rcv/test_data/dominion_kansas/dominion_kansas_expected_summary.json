@@ -9,7 +9,8 @@
   "jsonFormatVersion" : "1",
   "results" : [ {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "0",
       "overvotes" : "13",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -43,7 +44,8 @@
     "threshold" : "2349"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "0",
       "overvotes" : "14",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -75,7 +77,8 @@
     "threshold" : "2349"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "0",
       "overvotes" : "15",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -105,7 +108,8 @@
     "threshold" : "2348"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "0",
       "overvotes" : "16",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -133,7 +137,8 @@
     "threshold" : "2348"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "0",
       "overvotes" : "22",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -159,7 +164,8 @@
     "threshold" : "2345"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "39",
       "overvotes" : "23",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -183,7 +189,8 @@
     "threshold" : "2325"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "236",
       "overvotes" : "28",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -205,7 +212,8 @@
     "threshold" : "2224"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "754",
       "overvotes" : "33",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
