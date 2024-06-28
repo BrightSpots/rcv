@@ -377,15 +377,15 @@ class ResultsWriter {
     Pair<String, StatusForRound>[] statusesToPrint =
         new Pair[] {
           new Pair<>("Inactive Ballots by Overvotes",
-                     StatusForRound.INACTIVE_BY_OVERVOTE),
+                     StatusForRound.INVALIDATED_BY_OVERVOTE),
           new Pair<>("Inactive Ballots by Skipped Rankings",
-                     StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
+                     StatusForRound.INVALIDATED_BY_SKIPPED_RANKING),
           new Pair<>("Inactive Ballots by Repeated Rankings",
-                     StatusForRound.INACTIVE_BY_REPEATED_RANKING),
+                     StatusForRound.INVALIDATED_BY_REPEATED_RANKING),
           new Pair<>("Inactive Fully Ranked Ballots by Exhausted Choices",
-                     StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
+                     StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED),
           new Pair<>("Inactive Partially Ranked Ballots by Exhausted Choices",
-                     StatusForRound.INACTIVE_BY_UNUSED_RANKINGS),
+                     StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED),
         };
 
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
@@ -418,11 +418,11 @@ class ResultsWriter {
     }
 
     csvPrinter.print("Inactive Ballots Total");
-    // INACTIVE_BY_NO_RANKINGS should not be included in the Inactive Ballots count, even though we
-    // treat them as such internally. Subtract no-rankings (which are static throughout a contest)
-    // from the inactive ballot totals.
+    // DID_NOT_RANK_ANY_CANDIDATES should not be included in the Inactive Ballots count, even though
+    // we treat them as such internally. Subtract no-rankings (which are static throughout a
+    // contest) from the inactive ballot totals.
     BigDecimal numNoRankings =
-        roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_NO_RANKINGS);
+        roundTallies.get(1).getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
     for (int round = 1; round <= numRounds; round++) {
       BigDecimal thisRoundInactive = roundTallies.get(round).inactiveBallotSum();
       csvPrinter.print(thisRoundInactive.subtract(numNoRankings));
@@ -483,7 +483,7 @@ class ResultsWriter {
   private void addContestSummaryRows(CSVPrinter csvPrinter, RoundTally round1Tally)
       throws IOException {
     BigDecimal numNoRankings =
-        round1Tally.getBallotStatusTally(StatusForRound.INACTIVE_BY_NO_RANKINGS);
+        round1Tally.getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
     BigDecimal totalNumberBallots =
         round1Tally.activeBallotSum().add(round1Tally.inactiveBallotSum());
     csvPrinter.printRecord("Contest Summary");
@@ -953,7 +953,7 @@ class ResultsWriter {
     }
 
     BigDecimal numNoRankings =
-        roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_NO_RANKINGS);
+        roundTallies.get(1).getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
     BigDecimal totalNumberBallots =
         roundTallies.get(1).activeBallotSum().add(roundTallies.get(1).inactiveBallotSum());
     BigDecimal lastRoundThreshold = roundTallies.get(numRounds).getWinningThreshold();
@@ -1005,11 +1005,16 @@ class ResultsWriter {
     Map<String, BigDecimal> inactiveMap = new HashMap<>();
     Pair<String, StatusForRound>[] statusesToPrint =
         new Pair[] {
-          new Pair<>("overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
-          new Pair<>("skippedRankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
-          new Pair<>("repeatedRankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING),
-          new Pair<>("exhaustedChoicesFullyRanked", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
-          new Pair<>("exhaustedChoicesPartiallyRanked", StatusForRound.INACTIVE_BY_UNUSED_RANKINGS),
+          new Pair<>("overvotes",
+                     StatusForRound.INVALIDATED_BY_OVERVOTE),
+          new Pair<>("skippedRankings",
+                     StatusForRound.INVALIDATED_BY_SKIPPED_RANKING),
+          new Pair<>("repeatedRankings",
+                     StatusForRound.INVALIDATED_BY_REPEATED_RANKING),
+          new Pair<>("exhaustedChoicesFullyRanked",
+                     StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED),
+          new Pair<>("exhaustedChoicesPartiallyRanked",
+                     StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED),
         };
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
       inactiveMap.put(
