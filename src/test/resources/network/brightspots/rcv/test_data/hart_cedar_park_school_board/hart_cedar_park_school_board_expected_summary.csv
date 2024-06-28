@@ -28,4 +28,8 @@ Betty McCollum,0,0.0%,0
 Undeclared Write-ins,0,0.0%,0
 Active Ballots,7,,
 Current Round Threshold,4,,
+Inactive Ballots by Overvotes,0,,0
+Inactive Ballots by Skipped Rankings,0,,0
+Inactive Ballots by Repeated Rankings,0,,0
+Inactive Ballots by Exhausted Choices,0,,0
 Inactive Ballots Total,0,,0

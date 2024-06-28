@@ -23,5 +23,8 @@ Elected,,,,"Vail, Christopher L.",,
 "Haadoow, Hamza A.",5,29.41%,-5,0,0.0%,0
 Active Ballots,17,,,12,,
 Current Round Threshold,9,,,9,,
-Inactive Partially Ranked Ballots by Exhausted Choices,0,,5,5,,0
+Inactive Ballots by Overvotes,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,5,5,,0
 Inactive Ballots Total,0,,5,5,,0

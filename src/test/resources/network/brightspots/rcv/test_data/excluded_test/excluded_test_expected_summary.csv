@@ -21,5 +21,8 @@ Elected,George Gervin,,
 George Gervin,3,100.0%,0
 Active Ballots,3,,
 Current Round Threshold,2,,
-Inactive Partially Ranked Ballots by Exhausted Choices,7,,0
+Inactive Ballots by Overvotes,0,,0
+Inactive Ballots by Skipped Rankings,0,,0
+Inactive Ballots by Repeated Rankings,0,,0
+Inactive Ballots by Exhausted Choices,7,,0
 Inactive Ballots Total,7,,0

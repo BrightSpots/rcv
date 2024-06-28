@@ -23,5 +23,9 @@ B,1,11.11%,0,1,25.0%,0
 Undeclared Write-ins,5,55.55%,-5,0,0.0%,0
 Active Ballots,9,,,4,,
 Current Round Threshold,5,,,3,,
-Inactive Fully Ranked Ballots by Exhausted Choices,0,,5,5,,0
+Inactive Ballots by Overvotes,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0
+Inactive Ballots by Exhausted Choices (Fully Ranked),0,,5,5,,0
+Inactive Ballots by Exhausted Choices (Partially Ranked),0,,0,0,,0
 Inactive Ballots Total,0,,5,5,,0

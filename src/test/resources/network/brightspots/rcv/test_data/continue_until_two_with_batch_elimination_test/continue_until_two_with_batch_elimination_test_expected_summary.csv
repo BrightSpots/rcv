@@ -27,5 +27,8 @@ F,1,1.0%,0,1,1.0%,-1,0,0.0%,0,0,0.0%,0
 G,1,1.0%,0,1,1.0%,-1,0,0.0%,0,0,0.0%,0
 Active Ballots,100,,,100,,,91,,,76,,
 Current Round Threshold,51,,,51,,,46,,,39,,
-Inactive Partially Ranked Ballots by Exhausted Choices,0,,0,0,,9,9,,15,24,,0
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,9,9,,15,24,,0
 Inactive Ballots Total,0,,0,0,,9,9,,15,24,,0

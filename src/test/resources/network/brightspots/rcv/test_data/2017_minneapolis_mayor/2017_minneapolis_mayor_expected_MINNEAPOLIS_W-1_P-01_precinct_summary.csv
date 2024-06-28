@@ -38,4 +38,8 @@ Theron Preston Washington,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Undeclared Write-ins,1,0.24%,-1,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,408,,,407,,,389,,,379,,,348,,,304,,
 Current Round Threshold,52243,,,52200,,,50933,,,49874,,,46790,,,40838,,
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0

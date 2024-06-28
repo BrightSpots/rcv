@@ -39,6 +39,8 @@ Troy Benjegerdes,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Undeclared Write-ins,1,1.01%,-1,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,99,,,98,,,96,,,90,,,83,,
 Current Round Threshold,50,,,50,,,49,,,46,,,42,,
-Inactive Fully Ranked Ballots by Exhausted Choices,0,,0,0,,1,1,,2,3,,7,10,,0
-Inactive Partially Ranked Ballots by Exhausted Choices,0,,1,1,,1,2,,4,6,,0,6,,0
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,1,1,,1,2,,4,6,,0,6,,0
 Inactive Ballots Total,0,,1,1,,2,3,,6,9,,7,16,,0

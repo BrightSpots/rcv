@@ -25,4 +25,8 @@ Broccoli,3,11.53%,1,4,15.38%,-4,0,0.0%,0,0,0.0%,0
 Undeclared Write-ins,6,23.07%,-6,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,26,,,26,,,26,,,26,,
 Current Round Threshold,14,,,14,,,14,,,14,,
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0

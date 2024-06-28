@@ -29,5 +29,8 @@ Sylvia Vaugn,2,6.89%,0,2,6.89%,-2,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0
 Undeclared Write-ins,1,3.44%,-1,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,29,,,29,,,29,,,29,,,29,,,29,,,27,,,20,,
 Current Round Threshold,15,,,15,,,15,,,15,,,15,,,15,,,14,,,11,,
-Inactive Fully Ranked Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,2,2,,7,9,,0
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0,0,,0,0,,2,2,,7,9,,0

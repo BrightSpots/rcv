@@ -28,5 +28,8 @@ Emily Stevens,3,10.34%,0,3,10.34%,0,3,10.34%,-3,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0
 Undeclared Write-ins,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,29,,,29,,,29,,,29,,,29,,,29,,,25,,
 Current Round Threshold,15,,,15,,,15,,,15,,,15,,,15,,,13,,
-Inactive Fully Ranked Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,4,4,,0
+Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0,0,,0,0,,4,4,,0

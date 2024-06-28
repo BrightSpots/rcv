@@ -374,31 +374,12 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    Pair<String, StatusForRound>[] statusesToPrint =
-        new Pair[] {
-          new Pair<>("Inactive Ballots by Overvotes",
-                     StatusForRound.INVALIDATED_BY_OVERVOTE),
-          new Pair<>("Inactive Ballots by Skipped Rankings",
-                     StatusForRound.INVALIDATED_BY_SKIPPED_RANKING),
-          new Pair<>("Inactive Ballots by Repeated Rankings",
-                     StatusForRound.INVALIDATED_BY_REPEATED_RANKING),
-          new Pair<>("Inactive Fully Ranked Ballots by Exhausted Choices",
-                     StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED),
-          new Pair<>("Inactive Partially Ranked Ballots by Exhausted Choices",
-                     StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED),
-        };
-
+    List<Pair<String, StatusForRound>> statusesToPrint = getStatusesToPrintInCsv(roundTallies);
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
-      // Skip any "Inactive by X" if no ballots are associated with that bucket
-      RoundTally lastRound = roundTallies.get(numRounds);
-      BigDecimal numUndervotesLastRound = lastRound.getBallotStatusTally(statusToPrint.getValue());
-      if (numUndervotesLastRound.equals(BigDecimal.ZERO)) {
-        continue;
-      }
+      csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
 
-      csvPrinter.print(statusToPrint.getKey());
+      StatusForRound status = statusToPrint.getValue();
       for (int round = 1; round <= numRounds; round++) {
-        StatusForRound status = statusToPrint.getValue();
         BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
         csvPrinter.print(thisRoundInactive);
 
@@ -469,6 +450,46 @@ class ResultsWriter {
       throw exception;
     }
     Logger.info("Summary spreadsheet generated successfully.");
+  }
+
+  // Do not print "partially ranked" when:
+  // 1. The max ranking is set to maximum, and
+  // 2. There are no partially ranked ballots in the final round.
+  // This handles the case when the config is set to max, but there is a Dominion CVR
+  // with a stricter maximum.
+
+  /**
+   * We have special logic for handling what inactive ballot statuses to print in the CSV.
+   * If we don't know the max ranking, then the idea of "fully ranked" doesn't make sense.
+   * There can be odd cases if, for example, the configuration specifies the max ranking is
+   * Max (unlimited), but a CVR file specifies a stricter limit.
+   * This function handles these cases to only print "fully ranked" when it is meaningful.
+   *
+   * @return a pair of the status name and the status enum to print in the CSV.
+   */
+  private List<Pair<String, StatusForRound>> getStatusesToPrintInCsv(RoundTallies roundTallies) {
+    List<Pair<String, StatusForRound>> statusesToPrint = new ArrayList<>();
+    statusesToPrint.add(new Pair<>("Overvotes",
+            StatusForRound.INVALIDATED_BY_OVERVOTE));
+    statusesToPrint.add(new Pair<>("Skipped Rankings",
+            StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
+    statusesToPrint.add(new Pair<>("Repeated Rankings",
+            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
+
+    RoundTally lastRound = roundTallies.get(numRounds);
+    BigDecimal numFullyRankedLastRound = lastRound.getBallotStatusTally(
+            StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED);
+    if (config.isMaxRankingsSetToMaximum() && !numFullyRankedLastRound.equals(BigDecimal.ZERO)) {
+      statusesToPrint.add(new Pair<>("Exhausted Choices (Fully Ranked)",
+              StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED));
+      statusesToPrint.add(new Pair<>("Exhausted Choices (Partially Ranked)",
+              StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED));
+    } else {
+      statusesToPrint.add(new Pair<>("Exhausted Choices",
+              StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED));
+    }
+
+    return statusesToPrint;
   }
 
   // "action" rows describe which candidates were eliminated or elected
