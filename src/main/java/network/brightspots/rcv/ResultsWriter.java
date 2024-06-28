@@ -479,13 +479,13 @@ class ResultsWriter {
     RoundTally lastRound = roundTallies.get(numRounds);
     BigDecimal numFullyRankedLastRound = lastRound.getBallotStatusTally(
             StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED);
-    if (config.isMaxRankingsSetToMaximum() && !numFullyRankedLastRound.equals(BigDecimal.ZERO)) {
+    if (config.isMaxRankingsSetToMaximum() && numFullyRankedLastRound.equals(BigDecimal.ZERO)) {
+      statusesToPrint.add(new Pair<>("Exhausted Choices",
+              StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED));
+    } else {
       statusesToPrint.add(new Pair<>("Exhausted Choices (Fully Ranked)",
               StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED));
       statusesToPrint.add(new Pair<>("Exhausted Choices (Partially Ranked)",
-              StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED));
-    } else {
-      statusesToPrint.add(new Pair<>("Exhausted Choices",
               StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED));
     }
 

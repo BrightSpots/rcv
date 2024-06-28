@@ -135,8 +135,8 @@
     "threshold" : "7.2501"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "3.8760",
-      "exhaustedChoicesPartiallyRanked" : "1.3273",
+      "exhaustedChoicesFullyRanked" : "2.6691",
+      "exhaustedChoicesPartiallyRanked" : "2.5342",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "3.0456"

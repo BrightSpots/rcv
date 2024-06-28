@@ -9,8 +9,8 @@
   "jsonFormatVersion" : "1",
   "results" : [ {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "37",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "8",
+      "exhaustedChoicesPartiallyRanked" : "29",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "38"
@@ -59,8 +59,8 @@
     "threshold" : "52243"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "74",
-      "exhaustedChoicesPartiallyRanked" : "49",
+      "exhaustedChoicesFullyRanked" : "43",
+      "exhaustedChoicesPartiallyRanked" : "80",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "38"
@@ -208,8 +208,8 @@
     "threshold" : "52200"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "1608",
-      "exhaustedChoicesPartiallyRanked" : "1048",
+      "exhaustedChoicesFullyRanked" : "1272",
+      "exhaustedChoicesPartiallyRanked" : "1384",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "38"
@@ -235,8 +235,8 @@
     "threshold" : "50933"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "2899",
-      "exhaustedChoicesPartiallyRanked" : "1875",
+      "exhaustedChoicesFullyRanked" : "2269",
+      "exhaustedChoicesPartiallyRanked" : "2505",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "38"
@@ -260,8 +260,8 @@
     "threshold" : "49874"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "6495",
-      "exhaustedChoicesPartiallyRanked" : "4448",
+      "exhaustedChoicesFullyRanked" : "4958",
+      "exhaustedChoicesPartiallyRanked" : "5985",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "38"
@@ -283,8 +283,8 @@
     "threshold" : "46790"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "15768",
-      "exhaustedChoicesPartiallyRanked" : "7079",
+      "exhaustedChoicesFullyRanked" : "11834",
+      "exhaustedChoicesPartiallyRanked" : "11013",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "38"

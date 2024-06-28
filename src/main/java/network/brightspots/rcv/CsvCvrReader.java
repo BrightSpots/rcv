@@ -99,9 +99,14 @@ final class CsvCvrReader extends BaseCvrReader {
         }
 
         // create the new CastVoteRecord
-        CastVoteRecord newCvr =
-            new CastVoteRecord(
-                Integer.toString(index), "no supplied ID", "no precinct", "no batch ID", rankings);
+        boolean usesLastAllowedRanking = !isRankingAllowed(rankings.size() + 1, null);
+        CastVoteRecord newCvr = new CastVoteRecord(
+            Integer.toString(index),
+            "no supplied ID",
+            "no precinct",
+            "no batch ID",
+            usesLastAllowedRanking,
+            rankings);
         castVoteRecords.add(newCvr);
       }
     } catch (IOException exception) {

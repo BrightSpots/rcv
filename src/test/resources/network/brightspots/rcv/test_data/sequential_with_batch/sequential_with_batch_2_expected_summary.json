@@ -9,8 +9,8 @@
   "jsonFormatVersion" : "1",
   "results" : [ {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "4",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "4",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -38,8 +38,8 @@
     "threshold" : "3"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "5",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "5",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

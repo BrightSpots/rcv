@@ -36,6 +36,8 @@ class CastVoteRecord {
   private final String precinct;
   // which precinct portion this ballot came from
   private final String precinctPortion;
+  // is the last-used ranking the last-allowed ranking in the CVR?
+  private final boolean usesLastAllowedRanking;
   // records winners to whom some fraction of this vote has been allocated
   private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // If CVR CDF output is enabled, we store the necessary info here: for each round, the list of
@@ -65,8 +67,10 @@ class CastVoteRecord {
       String suppliedId,
       String precinct,
       String precinctPortion,
+      boolean usesLastAllowedRanking,
       List<Pair<Integer, String>> rankings) {
-    this(contestId, tabulatorId, batchId, suppliedId, null, precinct, precinctPortion, rankings);
+    this(contestId, tabulatorId, batchId, suppliedId, null, precinct, precinctPortion,
+        usesLastAllowedRanking, rankings);
   }
 
   CastVoteRecord(
@@ -77,6 +81,7 @@ class CastVoteRecord {
           String computedId,
           String precinct,
           String precinctPortion,
+          boolean usesLastAllowedRanking,
           List<Pair<Integer, String>> rankings) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
@@ -85,6 +90,7 @@ class CastVoteRecord {
     this.computedId = computedId;
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
+    this.usesLastAllowedRanking = usesLastAllowedRanking;
     this.candidateRankings = new CandidateRankingsList(rankings);
   }
 
@@ -93,8 +99,10 @@ class CastVoteRecord {
       String suppliedId,
       String precinct,
       String batchId,
+      boolean usesLastAllowedRanking,
       List<Pair<Integer, String>> rankings) {
-    this(null, null, batchId, suppliedId, computedId, precinct, null, rankings);
+    this(null, null, batchId, suppliedId, computedId, precinct, null,
+        usesLastAllowedRanking, rankings);
   }
 
   String getContestId() {
@@ -114,6 +122,10 @@ class CastVoteRecord {
 
   String getPrecinctPortion() {
     return precinctPortion;
+  }
+
+  boolean doesUseLastAllowedRanking() {
+    return usesLastAllowedRanking;
   }
 
   String getId() {

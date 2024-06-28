@@ -66,8 +66,8 @@
     "threshold" : "63070"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "119",
-      "exhaustedChoicesPartiallyRanked" : "1840",
+      "exhaustedChoicesFullyRanked" : "117",
+      "exhaustedChoicesPartiallyRanked" : "1842",
       "overvotes" : "472",
       "repeatedRankings" : "0",
       "skippedRankings" : "191"
@@ -91,8 +91,8 @@
     "threshold" : "62047"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "180",
-      "exhaustedChoicesPartiallyRanked" : "3297",
+      "exhaustedChoicesFullyRanked" : "175",
+      "exhaustedChoicesPartiallyRanked" : "3302",
       "overvotes" : "507",
       "repeatedRankings" : "0",
       "skippedRankings" : "219"
@@ -114,8 +114,8 @@
     "threshold" : "61257"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "272",
-      "exhaustedChoicesPartiallyRanked" : "8313",
+      "exhaustedChoicesFullyRanked" : "265",
+      "exhaustedChoicesPartiallyRanked" : "8320",
       "overvotes" : "580",
       "repeatedRankings" : "0",
       "skippedRankings" : "297"

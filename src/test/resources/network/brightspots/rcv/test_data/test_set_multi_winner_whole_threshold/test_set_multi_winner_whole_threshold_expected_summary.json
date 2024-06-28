@@ -138,8 +138,8 @@
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "2.4408",
-      "exhaustedChoicesPartiallyRanked" : "0.8455",
+      "exhaustedChoicesFullyRanked" : "1.6015",
+      "exhaustedChoicesPartiallyRanked" : "1.6848",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "2.7130"

@@ -357,9 +357,10 @@ class DominionCvrReader extends BaseCvrReader {
             rankings.add(ranking);
           }
           // create the new cvr
+          boolean usesLastAllowedRanking = !isRankingAllowed(rankings.size() + 1, contestId);
           CastVoteRecord newCvr =
               new CastVoteRecord(contestId, tabulatorId, batchId, suppliedId,
-                      computedId, precinct, precinctPortion, rankings);
+                      computedId, precinct, precinctPortion, usesLastAllowedRanking, rankings);
           castVoteRecords.add(newCvr);
         }
       }

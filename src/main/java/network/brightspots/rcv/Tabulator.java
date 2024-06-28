@@ -1138,8 +1138,10 @@ final class Tabulator {
           if (rank == cvr.candidateRankings.maxRankingNumber()) {
             // If the final ranking is an overvote, even if we're trying to skip to the next rank,
             // we consider this inactive by exhausted choices -- not an overvote.
-            recordSelectionForCastVoteRecord(
-                cvr, roundTally, null, StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED, "");
+            StatusForRound status = cvr.doesUseLastAllowedRanking()
+                ? StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED
+                : StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED;
+            recordSelectionForCastVoteRecord(cvr, roundTally, null, status, "");
           }
           continue;
         }
@@ -1182,14 +1184,10 @@ final class Tabulator {
           int maxAllowedRanking = config.isMaxRankingsSetToMaximum()
                   ? config.getNumDeclaredCandidates()
                   : config.getMaxRankingsAllowedWhenNotSetToMaximum();
-          if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
-              && maxAllowedRanking - rank > config.getMaxSkippedRanksAllowed()) {
-            recordSelectionForCastVoteRecord(
-                cvr, roundTally, null, StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED, "");
-          } else {
-            recordSelectionForCastVoteRecord(
-                cvr, roundTally, null, StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED, "");
-          }
+          StatusForRound status = cvr.doesUseLastAllowedRanking()
+                  ? StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED
+                  : StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED;
+          recordSelectionForCastVoteRecord(cvr, roundTally, null, status, "");
         }
       } // end looping over the rankings within one ballot
     } // end looping over all ballots

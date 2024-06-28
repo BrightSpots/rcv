@@ -96,8 +96,8 @@
     "threshold" : "5"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "1",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "1",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -117,8 +117,8 @@
     "threshold" : "5"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "2",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "2",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

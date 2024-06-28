@@ -30,8 +30,8 @@
     "threshold" : "5"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "5",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "0",
+      "exhaustedChoicesPartiallyRanked" : "5",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

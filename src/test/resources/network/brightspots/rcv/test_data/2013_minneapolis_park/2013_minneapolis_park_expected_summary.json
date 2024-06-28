@@ -9,8 +9,8 @@
   "jsonFormatVersion" : "1",
   "results" : [ {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "67",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "9",
+      "exhaustedChoicesPartiallyRanked" : "58",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -48,8 +48,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "356",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "112",
+      "exhaustedChoicesPartiallyRanked" : "244",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -85,8 +85,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "654",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "131",
+      "exhaustedChoicesPartiallyRanked" : "523",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -110,8 +110,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "654.0000",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "131.0000",
+      "exhaustedChoicesPartiallyRanked" : "523.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -144,8 +144,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "1669.0000",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "226.0000",
+      "exhaustedChoicesPartiallyRanked" : "1443.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -176,8 +176,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "2750.0000",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "416.0000",
+      "exhaustedChoicesPartiallyRanked" : "2334.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -206,8 +206,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "4655.0000",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "871.0000",
+      "exhaustedChoicesPartiallyRanked" : "3784.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -234,8 +234,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "8052.0000",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "1707.0000",
+      "exhaustedChoicesPartiallyRanked" : "6345.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -260,8 +260,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "11112.0000",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "3435.0000",
+      "exhaustedChoicesPartiallyRanked" : "7677.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -284,8 +284,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "17375.0000",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "6518.0000",
+      "exhaustedChoicesPartiallyRanked" : "10857.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -309,8 +309,8 @@
     "threshold" : "14866"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "17552.5192",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoicesFullyRanked" : "6653.4994",
+      "exhaustedChoicesPartiallyRanked" : "10899.0198",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
