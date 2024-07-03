@@ -187,6 +187,14 @@ jobs:
             ${{ github.workspace }}/${{ steps.checksumsfn.outputs.FILEPATH }}.sha512
           retention-days: 90
 
+      - uses: dev-drprasad/delete-tag-and-release@v1.1
+        # Note: to update the date of the release, it must be deleted and then recreated
+        if: github.event_name == 'release' || github.event_name == 'schedule'
+        with:
+          tag_name: build-${{ github.ref_name }}
+          delete_release: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: "Upload binaries to release"
         uses: svenstaro/upload-release-action@v2
         if: github.event_name == 'release' || github.event_name == 'schedule'
