@@ -176,7 +176,6 @@ jobs:
           name: Package
           if-no-files-found: error
           overwrite: true
-          retention-days: 90
           path: |
             ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}
             ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}.sha512
@@ -205,3 +204,15 @@ jobs:
           tag: build-${{ github.ref_name }}
           overwrite: true
           file_glob: true
+          make_latest: false
+
+      - name: "Upload cache to release"
+        uses: svenstaro/upload-release-action@v2
+        if: github.event_name == 'release' || github.event_name == 'schedule'
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: cache/*
+          tag: build-${{ github.ref_name }}
+          overwrite: true
+          file_glob: true
+          make_latest: false
