@@ -171,10 +171,12 @@ jobs:
           echo "Attach staple"
           xcrun stapler staple ${{ steps.exefn.outputs.FILEPATH }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Package
           if-no-files-found: error
+          overwrite: true
+          retention-days: 90
           path: |
             ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}
             ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}.sha512
@@ -185,7 +187,6 @@ jobs:
             ${{ github.workspace }}/${{   steps.cachefn.outputs.FILEPATH   }}.sha512
             ${{ github.workspace }}/${{ steps.checksumsfn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.checksumsfn.outputs.FILEPATH }}.sha512
-          retention-days: 90
 
       - uses: dev-drprasad/delete-tag-and-release@v1.1
         # Note: to update the date of the release, it must be deleted and then recreated
