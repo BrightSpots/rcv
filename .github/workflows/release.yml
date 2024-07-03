@@ -104,6 +104,11 @@ jobs:
           input: "~/.gradle/caches"
           zipFilename: ${{steps.cachefn.outputs.FILEPATH}}
 
+      - name: "Generate SHA512 for executable"
+        shell: bash
+        run: |
+          ./.github/workflows/sha.sh ${{ steps.exefn.outputs.FILEPATH }} ${{ runner.os }} 512 > ${{steps.exefn.outputs.FILEPATH}}.sha512
+
       - name: "Generate SHA512 for plugins cache"
         shell: bash
         run: |
