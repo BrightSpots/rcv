@@ -1006,10 +1006,8 @@ final class Tabulator {
           "did not rank any candidates" + additionalLogText;
       case INVALIDATED_BY_OVERVOTE -> outcomeDescription =
           "invalidated by overvote" + additionalLogText;
-      case EXHAUSTED_CHOICE_PARTIALLY_RANKED -> outcomeDescription =
-          "exhausted choice (partially ranked)" + additionalLogText;
-      case EXHAUSTED_CHOICE_FULLY_RANKED -> outcomeDescription =
-          "exhausted choice (fully ranked)" + additionalLogText;
+      case EXHAUSTED_CHOICE -> outcomeDescription =
+          "exhausted choice" + additionalLogText;
       case INVALIDATED_BY_SKIPPED_RANKING -> outcomeDescription =
           "invalidated by skipped ranking" + additionalLogText;
       case INVALIDATED_BY_REPEATED_RANKING -> outcomeDescription =
@@ -1138,10 +1136,8 @@ final class Tabulator {
           if (rank == cvr.candidateRankings.maxRankingNumber()) {
             // If the final ranking is an overvote, even if we're trying to skip to the next rank,
             // we consider this inactive by exhausted choices -- not an overvote.
-            StatusForRound status = cvr.doesUseLastAllowedRanking()
-                ? StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED
-                : StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED;
-            recordSelectionForCastVoteRecord(cvr, roundTally, null, status, "");
+            recordSelectionForCastVoteRecord(
+                cvr, roundTally, null, StatusForRound.EXHAUSTED_CHOICE, "");
           }
           continue;
         }
@@ -1178,16 +1174,8 @@ final class Tabulator {
         // if this is the last ranking we are out of rankings and must exhaust this cvr
         // determine if the reason is skipping too many ranks, or no continuing candidates
         if (rank == cvr.candidateRankings.maxRankingNumber()) {
-          // When determining if this is exhausted by fully or partially ranked, look at either
-          // the max ranking allowed by the config, or if the config does not impose a limit,
-          // look at the number of declared candidates.
-          int maxAllowedRanking = config.isMaxRankingsSetToMaximum()
-                  ? config.getNumDeclaredCandidates()
-                  : config.getMaxRankingsAllowedWhenNotSetToMaximum();
-          StatusForRound status = cvr.doesUseLastAllowedRanking()
-                  ? StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED
-                  : StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED;
-          recordSelectionForCastVoteRecord(cvr, roundTally, null, status, "");
+          recordSelectionForCastVoteRecord(
+              cvr, roundTally, null, StatusForRound.EXHAUSTED_CHOICE, "");
         }
       } // end looping over the rankings within one ballot
     } // end looping over all ballots

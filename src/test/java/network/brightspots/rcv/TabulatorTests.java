@@ -362,15 +362,7 @@ class TabulatorTests {
       Logger.info("Files are different.");
       // If the files are different, overwrite the expected file with the actual file
       // While this PR is in progress -- delete before merging
-      // try {
-      //   Files.copy(
-      //       Paths.get(actualOutputPath),
-      //       Paths.get(expectedPath),
-      //       java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-      // } catch (IOException e) {
-      //   Logger.severe("Failed to copy file: %s", e.getMessage());
-      //   fail();
-      // }
+      try {
       fail();
     }
     return didCompare;

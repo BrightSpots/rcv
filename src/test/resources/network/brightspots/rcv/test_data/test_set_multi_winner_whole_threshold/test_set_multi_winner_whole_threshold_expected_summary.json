@@ -9,8 +9,7 @@
   "jsonFormatVersion" : "1",
   "results" : [ {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "1"
@@ -36,8 +35,7 @@
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "1"
@@ -62,8 +60,7 @@
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "2"
@@ -86,8 +83,7 @@
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "2"
@@ -110,8 +106,7 @@
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0.2222",
+      "exhaustedChoices" : "0.2222",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "2.2222"
@@ -138,8 +133,7 @@
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "1.6015",
-      "exhaustedChoicesPartiallyRanked" : "1.6848",
+      "exhaustedChoices" : "3.2863",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "2.7130"

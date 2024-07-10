@@ -9,8 +9,7 @@
   "jsonFormatVersion" : "1",
   "results" : [ {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -34,8 +33,7 @@
     "threshold" : "15"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -62,8 +60,7 @@
     "threshold" : "15"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -88,8 +85,7 @@
     "threshold" : "15"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -113,8 +109,7 @@
     "threshold" : "15"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "0",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -136,8 +131,7 @@
     "threshold" : "15"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "4",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "4",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -159,8 +153,7 @@
     "threshold" : "13"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "5",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "5",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -181,8 +174,7 @@
     "threshold" : "13"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoicesFullyRanked" : "11",
-      "exhaustedChoicesPartiallyRanked" : "0",
+      "exhaustedChoices" : "11",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

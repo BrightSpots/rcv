@@ -42,6 +42,5 @@ Current Round Threshold,52243,,,52200,,,50933,,,49874,,,46790,,,40838,,
 Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Skipped Rankings,38,,0,38,,0,38,,0,38,,0,38,,0,38,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots by Exhausted Choices (Fully Ranked),8,,35,43,,1229,1272,,997,2269,,2689,4958,,6876,11834,,0
-Inactive Ballots by Exhausted Choices (Partially Ranked),29,,51,80,,1304,1384,,1121,2505,,3480,5985,,5028,11013,,0
+Inactive Ballots by Exhausted Choices,37,,86,123,,2533,2656,,2118,4774,,6169,10943,,11904,22847,,0
 Inactive Ballots Total,75,,86,161,,2533,2694,,2118,4812,,6169,10981,,11904,22885,,0

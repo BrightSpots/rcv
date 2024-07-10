@@ -475,19 +475,8 @@ class ResultsWriter {
             StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
     statusesToPrint.add(new Pair<>("Repeated Rankings",
             StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
-
-    RoundTally lastRound = roundTallies.get(numRounds);
-    BigDecimal numFullyRankedLastRound = lastRound.getBallotStatusTally(
-            StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED);
-    if (config.isMaxRankingsSetToMaximum() && numFullyRankedLastRound.equals(BigDecimal.ZERO)) {
-      statusesToPrint.add(new Pair<>("Exhausted Choices",
-              StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED));
-    } else {
-      statusesToPrint.add(new Pair<>("Exhausted Choices (Fully Ranked)",
-              StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED));
-      statusesToPrint.add(new Pair<>("Exhausted Choices (Partially Ranked)",
-              StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED));
-    }
+    statusesToPrint.add(new Pair<>("Exhausted Choices",
+            StatusForRound.EXHAUSTED_CHOICE));
 
     return statusesToPrint;
   }
@@ -1032,10 +1021,8 @@ class ResultsWriter {
                      StatusForRound.INVALIDATED_BY_SKIPPED_RANKING),
           new Pair<>("repeatedRankings",
                      StatusForRound.INVALIDATED_BY_REPEATED_RANKING),
-          new Pair<>("exhaustedChoicesFullyRanked",
-                     StatusForRound.EXHAUSTED_CHOICE_FULLY_RANKED),
-          new Pair<>("exhaustedChoicesPartiallyRanked",
-                     StatusForRound.EXHAUSTED_CHOICE_PARTIALLY_RANKED),
+          new Pair<>("exhaustedChoices",
+                     StatusForRound.EXHAUSTED_CHOICE),
         };
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
       inactiveMap.put(
