@@ -258,9 +258,11 @@ class ResultsWriter {
   // creates summary files for the votes split by a TabulateBySlice
   // param: roundTalliesBySlice is map from a slice type to the round-by-round vote tallies
   // param: tallyTransfersBySlice is a map from a slice type to tally transfers for that slice
+  // param: candidateOrder is to allow a consistent ordering of candidates, including across slices
   void generateBySliceSummaryFiles(
         Tabulator.BreakdownBySlice<RoundTallies> roundTalliesBySlice,
-        Tabulator.BreakdownBySlice<TallyTransfers> tallyTransfersBySlice)
+        Tabulator.BreakdownBySlice<TallyTransfers> tallyTransfersBySlice,
+        List<String> candidateOrder)
       throws IOException {
     for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
       Set<String> filenames = new HashSet<>();
@@ -271,7 +273,7 @@ class ResultsWriter {
         String sliceFileString = getFileStringForSlice(slice, sliceId, filenames);
         String outputPath = getOutputFilePathFromInstance(
             String.format("%s_summary", sliceFileString));
-        generateSummarySpreadsheet(roundTallies, slice, sliceId, outputPath);
+        generateSummarySpreadsheet(roundTallies, candidateOrder, slice, sliceId, outputPath);
         generateSummaryJson(roundTallies, tallyTransfers, slice, sliceId, outputPath);
       }
     }
@@ -279,12 +281,16 @@ class ResultsWriter {
 
   // create a summary spreadsheet .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
+  // param: candidateOrder is to allow a consistent ordering of candidates, including across slices
   // param: slice indicates which type of slice we're reporting results for (null means all)
   // param: sliceId indicates the specific slice ID we're reporting results for (null means all)
   // param: outputPath is the path to the output file, minus its extension
   private void generateSummarySpreadsheet(
-          RoundTallies roundTallies, TabulateBySlice slice, String sliceId, String outputPath)
-      throws IOException {
+          RoundTallies roundTallies,
+          List<String> candidateOrder,
+          TabulateBySlice slice,
+          String sliceId,
+          String outputPath) throws IOException {
     AuditableFile csvFile = new AuditableFile(outputPath + ".csv");
     Logger.info("Generating summary spreadsheet: %s...", csvFile.getAbsolutePath());
 
@@ -310,16 +316,11 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    // actions don't make sense in individual by-slice results
-    if (isNullOrBlank(sliceId)) {
-      addActionRows(csvPrinter);
-    }
-
-    // Get all candidates sorted by their first round tally. This determines the display order.
-    List<String> sortedCandidates = roundTallies.get(1).getSortedCandidatesByTally();
+    boolean isSlice = !isNullOrBlank(sliceId);
+    addActionRows(csvPrinter, isSlice);
 
     // For each candidate: for each round: output total votes
-    for (String candidate : sortedCandidates) {
+    for (String candidate : candidateOrder) {
       String candidateDisplayName = config.getNameForCandidate(candidate);
       csvPrinter.print(candidateDisplayName);
       for (int round = 1; round <= numRounds; round++) {
@@ -366,13 +367,15 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    csvPrinter.print("Current Round Threshold");
-    for (int round = 1; round <= numRounds; round++) {
-      csvPrinter.print(roundTallies.get(round).getWinningThreshold());
-      csvPrinter.print("");
-      csvPrinter.print("");
+    if (!isSlice) {
+      csvPrinter.print("Current Round Threshold");
+      for (int round = 1; round <= numRounds; round++) {
+        csvPrinter.print(roundTallies.get(round).getWinningThreshold());
+        csvPrinter.print("");
+        csvPrinter.print("");
+      }
+      csvPrinter.println();
     }
-    csvPrinter.println();
 
     Pair<String, StatusForRound>[] statusesToPrint =
         new Pair[] {
@@ -447,6 +450,13 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
+    if (isSlice) {
+      csvPrinter.println();
+      csvPrinter.print(String.format("*Elect/Eliminate decisions are from the full contest. "
+              + "All other results on this report are at the %s level.", slice.toLowerString()));
+      csvPrinter.println();
+    }
+
     try {
       csvPrinter.flush();
       csvPrinter.close();
@@ -459,11 +469,11 @@ class ResultsWriter {
   }
 
   // "action" rows describe which candidates were eliminated or elected
-  private void addActionRows(CSVPrinter csvPrinter) throws IOException {
-    csvPrinter.print("Eliminated");
+  private void addActionRows(CSVPrinter csvPrinter, boolean withAsterisk) throws IOException {
+    csvPrinter.print(withAsterisk ? "Eliminated*" : "Eliminated");
     printActionSummary(csvPrinter, roundToEliminatedCandidates);
 
-    csvPrinter.print("Elected");
+    csvPrinter.print(withAsterisk ? "Elected*" : "Elected");
     printActionSummary(csvPrinter, roundToWinningCandidates);
   }
 
@@ -533,19 +543,27 @@ class ResultsWriter {
         winners.add(config.getNameForCandidate(candidateName));
       }
     }
+
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
-    csvPrinter.printRecord("Final Threshold", winningThreshold);
+
     if (!isNullOrBlank(sliceId)) {
+      // Only silces print the slice information
       csvPrinter.printRecord(slice, sliceId);
+    } else {
+      // Only non-silces print threshold information
+      csvPrinter.printRecord("Final Threshold", winningThreshold);
     }
+
     csvPrinter.println();
   }
 
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a specific slice)
   void generateOverallSummaryFiles(
-      RoundTallies roundTallies, TallyTransfers tallyTransfers) throws IOException {
+      RoundTallies roundTallies,
+      TallyTransfers tallyTransfers,
+      List<String> candidateOrder) throws IOException {
     String outputPath = getOutputFilePathFromInstance("summary");
-    generateSummarySpreadsheet(roundTallies, null, null, outputPath);
+    generateSummarySpreadsheet(roundTallies, candidateOrder, null, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, null, null, outputPath);
   }
 

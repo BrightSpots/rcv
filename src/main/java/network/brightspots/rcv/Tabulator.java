@@ -805,8 +805,9 @@ final class Tabulator {
             .setSliceIds(sliceIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
-    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers);
-    writer.generateBySliceSummaryFiles(roundTalliesBySlices, tallyTransfersBySlice);
+    List<String> candidateOrder = roundTallies.get(1).getSortedCandidatesByTally();
+    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, candidateOrder);
+    writer.generateBySliceSummaryFiles(roundTalliesBySlices, tallyTransfersBySlice, candidateOrder);
 
     if (config.isGenerateCdfJsonEnabled()) {
       try {

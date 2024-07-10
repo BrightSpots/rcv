@@ -7,7 +7,6 @@ Jurisdiction,"Minneapolis, MN"
 Office,Mayor
 Date,2017-11-07
 Winner(s),Jacob Frey
-Final Threshold,40838
 Precinct,MINNEAPOLIS W-1 P-01
 
 Contest Summary
@@ -17,29 +16,32 @@ Total Number of Ballots,408
 Number of Undervotes,0
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer,Round 5 Votes,% of vote,transfer,Round 6 Votes,% of vote,transfer
+Eliminated*,Undeclared Write-ins,,,Aswar Rahman; David Rosenfeld; L.A. Nik; Christopher Zimmerman; Ronald Lischeid; Ian Simpson; Charlie Gers; Captain Jack Sparrow; Theron Preston Washington; David John Wilson; Gregg A. Iverson; Troy Benjegerdes; Al Flowers,,,Nekima Levy-Pounds,,,Tom Hoch,,,Betsy Hodges,,,,,
+Elected*,,,,,,,,,,,,,,,,Jacob Frey,,
 Jacob Frey,95,23.28%,0,95,23.34%,10,105,26.99%,24,129,34.03%,28,157,45.11%,36,193,63.48%,0
 Tom Hoch,77,18.87%,0,77,18.91%,7,84,21.59%,5,89,23.48%,-89,0,0.0%,0,0,0.0%,0
-Nekima Levy-Pounds,69,16.91%,0,69,16.95%,5,74,19.02%,-74,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Betsy Hodges,64,15.68%,0,64,15.72%,3,67,17.22%,17,84,22.16%,11,95,27.29%,-95,0,0.0%,0
 Raymond Dehn,56,13.72%,0,56,13.75%,3,59,15.16%,18,77,20.31%,19,96,27.58%,15,111,36.51%,0
-Aswar Rahman,9,2.2%,0,9,2.21%,-9,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
-L.A. Nik,7,1.71%,0,7,1.71%,-7,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
+Nekima Levy-Pounds,69,16.91%,0,69,16.95%,5,74,19.02%,-74,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Charlie Gers,5,1.22%,0,5,1.22%,-5,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
+Aswar Rahman,9,2.2%,0,9,2.21%,-9,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Al Flowers,5,1.22%,0,5,1.22%,-5,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
-Captain Jack Sparrow,4,0.98%,0,4,0.98%,-4,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
+L.A. Nik,7,1.71%,0,7,1.71%,-7,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 David Rosenfeld,3,0.73%,0,3,0.73%,-3,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
-Ronald Lischeid,3,0.73%,0,3,0.73%,-3,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
-Ian Simpson,3,0.73%,0,3,0.73%,-3,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
+Captain Jack Sparrow,4,0.98%,0,4,0.98%,-4,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Gregg A. Iverson,3,0.73%,0,3,0.73%,-3,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
-Troy Benjegerdes,3,0.73%,0,3,0.73%,-3,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
+Ronald Lischeid,3,0.73%,0,3,0.73%,-3,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 David John Wilson,1,0.24%,0,1,0.24%,-1,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
+Troy Benjegerdes,3,0.73%,0,3,0.73%,-3,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
+Ian Simpson,3,0.73%,0,3,0.73%,-3,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Christopher Zimmerman,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Theron Preston Washington,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Undeclared Write-ins,1,0.24%,-1,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,408,,,407,,,389,,,379,,,348,,,304,,
-Current Round Threshold,52243,,,52200,,,50933,,,49874,,,46790,,,40838,,
 Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+
+*Elect/Eliminate decisions are from the full contest. All other results on this report are at the precinct level.
