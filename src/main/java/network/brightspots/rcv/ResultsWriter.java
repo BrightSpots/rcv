@@ -374,7 +374,16 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    List<Pair<String, StatusForRound>> statusesToPrint = getStatusesToPrintInCsv(roundTallies);
+    List<Pair<String, StatusForRound>> statusesToPrint = new ArrayList<>();
+    statusesToPrint.add(new Pair<>("Overvotes",
+            StatusForRound.INVALIDATED_BY_OVERVOTE));
+    statusesToPrint.add(new Pair<>("Skipped Rankings",
+            StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
+    statusesToPrint.add(new Pair<>("Repeated Rankings",
+            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
+    statusesToPrint.add(new Pair<>("Exhausted Choices",
+            StatusForRound.EXHAUSTED_CHOICE));
+
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
       csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
 
@@ -450,35 +459,6 @@ class ResultsWriter {
       throw exception;
     }
     Logger.info("Summary spreadsheet generated successfully.");
-  }
-
-  // Do not print "partially ranked" when:
-  // 1. The max ranking is set to maximum, and
-  // 2. There are no partially ranked ballots in the final round.
-  // This handles the case when the config is set to max, but there is a Dominion CVR
-  // with a stricter maximum.
-
-  /**
-   * We have special logic for handling what inactive ballot statuses to print in the CSV.
-   * If we don't know the max ranking, then the idea of "fully ranked" doesn't make sense.
-   * There can be odd cases if, for example, the configuration specifies the max ranking is
-   * Max (unlimited), but a CVR file specifies a stricter limit.
-   * This function handles these cases to only print "fully ranked" when it is meaningful.
-   *
-   * @return a pair of the status name and the status enum to print in the CSV.
-   */
-  private List<Pair<String, StatusForRound>> getStatusesToPrintInCsv(RoundTallies roundTallies) {
-    List<Pair<String, StatusForRound>> statusesToPrint = new ArrayList<>();
-    statusesToPrint.add(new Pair<>("Overvotes",
-            StatusForRound.INVALIDATED_BY_OVERVOTE));
-    statusesToPrint.add(new Pair<>("Skipped Rankings",
-            StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
-    statusesToPrint.add(new Pair<>("Repeated Rankings",
-            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
-    statusesToPrint.add(new Pair<>("Exhausted Choices",
-            StatusForRound.EXHAUSTED_CHOICE));
-
-    return statusesToPrint;
   }
 
   // "action" rows describe which candidates were eliminated or elected

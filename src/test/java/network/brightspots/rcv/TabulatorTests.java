@@ -360,9 +360,6 @@ class TabulatorTests {
       Logger.info("Files are equal.");
     } else {
       Logger.info("Files are different.");
-      // If the files are different, overwrite the expected file with the actual file
-      // While this PR is in progress -- delete before merging
-      try {
       fail();
     }
     return didCompare;
