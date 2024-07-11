@@ -5,11 +5,11 @@ on:
     types: [ published ]
   schedule:
     - cron: '0 12 1,15 * *'  # On the 1st and 15th of the month at noon
-## To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
-##  is at the same indent level as "release":
-#  push:
-#    branches:
-#      - 'branch-name'
+# To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
+#  is at the same indent level as "release":
+  push:
+    branches:
+      - 'feature/golden-hash-debugging'
 
 jobs:
   release:

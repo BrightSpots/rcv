@@ -58,8 +58,9 @@ powershell -Command "& {[IO.File]::WriteAllText(\"%HASHFILE_SORTED%\", $([IO.Fil
 :: echo the final hash
 C:\Windows\System32\certutil.exe -hashfile %HASHFILE_SORTED% SHA%SHA_A% | findstr /v ":"
 
-:: For debugging, enable printing the file-by-file hash
-:: echo File-by-file hash
-:: type "%HASHFILE_SORTED%"
+:: For easier debugging, print the file-by-file hash
+echo ##########
+echo This checksum was created by a SHA-%SHA_A% of the following file, after removing the filenames and sorting by their SHAs:
+sort "%HASHFILE_SORTED%"
 
 endlocal
