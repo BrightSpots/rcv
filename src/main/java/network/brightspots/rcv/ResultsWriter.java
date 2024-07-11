@@ -379,10 +379,10 @@ class ResultsWriter {
             StatusForRound.INVALIDATED_BY_OVERVOTE));
     statusesToPrint.add(new Pair<>("Skipped Rankings",
             StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
-    statusesToPrint.add(new Pair<>("Repeated Rankings",
-            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
     statusesToPrint.add(new Pair<>("Exhausted Choices",
             StatusForRound.EXHAUSTED_CHOICE));
+    statusesToPrint.add(new Pair<>("Repeated Rankings",
+            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
 
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
       csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
@@ -408,9 +408,6 @@ class ResultsWriter {
     }
 
     csvPrinter.print("Inactive Ballots Total");
-    // DID_NOT_RANK_ANY_CANDIDATES should not be included in the Inactive Ballots count, even though
-    // we treat them as such internally. Subtract no-rankings (which are static throughout a
-    // contest) from the inactive ballot totals.
     BigDecimal numNoRankings =
         roundTallies.get(1).getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
     for (int round = 1; round <= numRounds; round++) {

@@ -26,6 +26,6 @@ Active Ballots,8,,,6,,,4,,
 Current Round Threshold,5,,,4,,,3,,
 Inactive Ballots by Overvotes,0,,0,0,,0,0,,0
 Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0
-Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0
 Inactive Ballots by Exhausted Choices,0,,2,2,,2,4,,0
+Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,2,2,,2,4,,0
