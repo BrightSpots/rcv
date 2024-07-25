@@ -477,7 +477,7 @@ class ResultsWriter {
     csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
     csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
     csvPrinter.printRecord("Total Number of Ballots", totalNumberBallots);
-    csvPrinter.printRecord("Number of Ballots with No Rankings", numNoRankings);
+    csvPrinter.printRecord("Number of Undervotes (No Rankings)", numNoRankings);
     csvPrinter.println();
   }
 

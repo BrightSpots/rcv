@@ -1172,7 +1172,6 @@ final class Tabulator {
         }
 
         // if this is the last ranking we are out of rankings and must exhaust this cvr
-        // determine if the reason is skipping too many ranks, or no continuing candidates
         if (rank == cvr.candidateRankings.maxRankingNumber()) {
           recordSelectionForCastVoteRecord(
               cvr, roundTally, null, StatusForRound.EXHAUSTED_CHOICE, "");
