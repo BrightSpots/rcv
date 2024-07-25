@@ -600,7 +600,7 @@ class TabulatorTests {
   @Test
   @DisplayName("testMinneapolisMultiSeatThreshold")
   void testMinneapolisMultiSeatThreshold() {
-    runTabulationTest("minneapolis_multi_seat_threshold");
+    runTabulationTest("minneapolis_multi_seat_threshold", 3);
   }
 
   @Test
