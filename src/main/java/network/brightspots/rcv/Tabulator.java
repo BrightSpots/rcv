@@ -383,14 +383,6 @@ final class Tabulator {
         }
       }
 
-      // Re-lock all by-slice tabulations
-      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
-        for (var roundTalliesForSlice : roundTalliesBySlices.get(slice).values()) {
-          RoundTally roundTallyForSlice = roundTalliesForSlice.get(currentRound);
-          roundTallyForSlice.relockAfterSurplusCalculation();
-        }
-      }
-
       // We need to handle residual surplus (fractional surplus that can't be transferred due to
       // rounding).
       // For each winner from the previous round, record the residual surplus and then update
@@ -406,41 +398,11 @@ final class Tabulator {
               winner, roundTally.getWinningThreshold());
           tallyTransfers.addTransfer(
               currentRound, winner, TallyTransfers.RESIDUAL_TARGET, winnerResidual);
-
-          for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
-            for (var entrySet : roundTalliesBySlices.get(slice).entrySet()) {
-              String sliceId = entrySet.getKey();
-              TallyTransfers tallyTransferForSlice = tallyTransfersBySlice.get(slice, sliceId);
-
-              RoundTallies roundTalliesForSlice = entrySet.getValue();
-              RoundTally roundTallyForSlice = roundTalliesForSlice.get(currentRound);
-
-              BigDecimal winnerTallyForSlice = roundTallyForSlice.getCandidateTally(winner);
-              BigDecimal winnerResidualForSlice = winnerTallyForSlice.subtract(
-                      roundTallyForSlice.getWinningThreshold());
-
-              roundTallyForSlice.setCandidateTallyViaSurplusAdjustment(
-                      winner, roundTallyForSlice.getWinningThreshold());
-
-              tallyTransferForSlice.addTransfer(
-                      currentRound,
-                      winner,
-                      TallyTransfers.RESIDUAL_TARGET,
-                      winnerResidualForSlice);
-            }
-          }
         }
       }
     }
 
     roundTally.relockAfterSurplusCalculation();
-
-    // Re-lock each of the by-slice tallies for surplus calculation
-    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
-      for (var roundTalliesForSlice : roundTalliesBySlices.get(slice).values()) {
-        roundTalliesForSlice.get(currentRound).relockAfterSurplusCalculation();
-      }
-    }
   }
 
   // determine and store the threshold to win
