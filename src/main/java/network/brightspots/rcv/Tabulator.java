@@ -310,13 +310,6 @@ final class Tabulator {
     RoundTally previousRoundTally = roundTallies.get(currentRound - 1);
     roundTally.unlockForSurplusCalculation();
 
-    // Unlock each of the by-slice tallies for surplus calculation
-    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
-      for (var roundTalliesForSlice : roundTalliesBySlices.get(slice).values()) {
-        roundTalliesForSlice.get(currentRound).unlockForSurplusCalculation();
-      }
-    }
-
     List<String> winnersToProcess = new LinkedList<>();
     Set<String> winnersRequiringComputation = new HashSet<>();
     for (var entry : winnerToRound.entrySet()) {
@@ -380,6 +373,14 @@ final class Tabulator {
                   winner, fractionalTransferValue);
             }
           }
+        }
+      }
+
+      // Re-lock all by-slice tabulations
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        for (var roundTalliesForSlice : roundTalliesBySlices.get(slice).values()) {
+          RoundTally roundTallyForSlice = roundTalliesForSlice.get(currentRound);
+          roundTallyForSlice.relockAfterSurplusCalculation();
         }
       }
 
