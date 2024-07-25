@@ -550,7 +550,7 @@ class ResultsWriter {
       // Only silces print the slice information
       csvPrinter.printRecord(slice, sliceId);
     } else {
-      // Only non-silces print threshold information
+      // Only non-slices print threshold information
       csvPrinter.printRecord("Final Threshold", winningThreshold);
     }
 
