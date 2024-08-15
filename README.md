@@ -32,7 +32,7 @@ On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch
 
 #### Method 2 (Less Easy): Compile and Run Using Gradle
 
-1. Install [JDK 20 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by
+1. Install [JDK 20](https://www.oracle.com/java/technologies/javase/jdk20-archive-downloads.html), and make sure your Java path is picking it up properly by
    verifying that the following command returns the expected version:
     
     `$ java -version`
