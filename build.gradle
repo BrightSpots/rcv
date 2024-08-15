@@ -6,7 +6,7 @@ plugins {
     id "idea"
     id "java-library"
     // Latest version at: https://github.com/beryx/badass-jlink-plugin/tags
-    id "org.beryx.jlink" version "2.26.0"
+    id "org.beryx.jlink" version "3.0.1"
     // Latest version at: https://github.com/openjfx/javafx-gradle-plugin/tags
     id "org.openjfx.javafxplugin" version "0.0.14"
 }
@@ -78,7 +78,7 @@ idea {
 // ### Java plugin settings
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(20))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -99,7 +99,7 @@ test {
 // ### JavaFX plugin settings
 javafx {
     // Latest version here: https://gluonhq.com/products/javafx/
-    version = "20.0.1"
+    version = "21.0.4"
     modules = ["javafx.base", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
