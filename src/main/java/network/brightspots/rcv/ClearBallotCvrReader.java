@@ -103,7 +103,7 @@ class ClearBallotCvrReader {
           break;
         }
         // parse rankings
-        String[] cvrData = row.split(",");
+        String[] cvrData = row.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         for (var entry : columnIndexToRanking.entrySet()) {
           if (Integer.parseInt(cvrData[entry.getKey()]) == 1) {
