@@ -39,6 +39,8 @@ On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch
     
     If the expected version isn't returned, you'll need to follow the instructions [here](https://www.java.com/en/download/help/path.xml) on how to set your Java path.
 
+    If you are using Linux or MacOS and need to regularly switch between Java versions, consider installing [jEnv](https://www.jenv.be/). For a list of the Java versions installed on your machine, run `/usr/libexec/java_home -V` on MacOS or `update-alternatives --config java` on Linux.
+
 2. Download the [zip of the source code from GitHub](https://github.com/BrightSpots/rcv/archive/master.zip) and unzip it, or install git and use the following command at the terminal / command prompt to clone a local copy on your machine:
     
     `$ git clone https://github.com/BrightSpots/rcv.git`
