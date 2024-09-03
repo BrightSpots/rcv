@@ -315,13 +315,12 @@ class CommonDataFormatReader extends BaseCvrReader {
 
         String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
         // create the new CastVoteRecord
-        boolean usesLastAllowedRanking = isRankingAllowed(rankings.size() + 1, null);
         CastVoteRecord newRecord = new CastVoteRecord(
             computedCastVoteRecordId,
             cvr.UniqueId,
             precinctId,
             cvr.BatchSequenceId,
-            usesLastAllowedRanking,
+            usesLastAllowedRanking(rankings, null),
             rankings);
         castVoteRecords.add(newRecord);
 
@@ -533,13 +532,12 @@ class CommonDataFormatReader extends BaseCvrReader {
       String batchId = (String) cvr.get("BatchSequenceId");
       String computedCastVoteRecordId = String.format("%s(%d)", fileName, ++cvrIndex);
       // create the new CastVoteRecord
-      boolean usesLastAllowedRanking = !isRankingAllowed(rankings.size() + 1, null);
       CastVoteRecord newRecord = new CastVoteRecord(
           computedCastVoteRecordId,
           ballotId,
           precinctId,
           batchId,
-          usesLastAllowedRanking,
+          usesLastAllowedRanking(rankings, null),
           rankings);
       castVoteRecords.add(newRecord);
       // provide some user feedback on the CVR count

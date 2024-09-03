@@ -216,13 +216,12 @@ final class StreamingCvrReader extends BaseCvrReader {
     Logger.auditable("[Raw Data]: " + currentCvrData.toString());
 
     // create new cast vote record
-    boolean usesLastAllowedRanking = !isRankingAllowed(currentRankings.size() + 1, null);
     CastVoteRecord newRecord = new CastVoteRecord(
         computedCastVoteRecordId,
         currentSuppliedCvrId,
         currentPrecinct,
         currentBatch,
-        usesLastAllowedRanking,
+        usesLastAllowedRanking(currentRankings, null),
         currentRankings);
     cvrList.add(newRecord);
 

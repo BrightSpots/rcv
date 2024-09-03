@@ -102,7 +102,6 @@ class ClearBallotCvrReader extends BaseCvrReader {
           }
         }
         // create the cast vote record
-        boolean usesLastAllowedRanking = !isRankingAllowed(rankings.size() + 1, null);
         CastVoteRecord castVoteRecord =
             new CastVoteRecord(
                 source.getContestId(),
@@ -111,7 +110,7 @@ class ClearBallotCvrReader extends BaseCvrReader {
                 cvrData[CvrColumnField.BallotID.ordinal()],
                 cvrData[CvrColumnField.PrecinctID.ordinal()],
                 null,
-                usesLastAllowedRanking,
+                usesLastAllowedRanking(rankings, null),
                 rankings);
 
         castVoteRecords.add(castVoteRecord);

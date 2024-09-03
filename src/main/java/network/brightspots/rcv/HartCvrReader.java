@@ -127,7 +127,6 @@ class HartCvrReader extends BaseCvrReader {
           }
         }
 
-        boolean usesLastAllowedRanking = !isRankingAllowed(rankings.size() + 1, null);
         CastVoteRecord cvr =
             new CastVoteRecord(
                 contest.Id,
@@ -136,7 +135,7 @@ class HartCvrReader extends BaseCvrReader {
                 xmlCvr.CvrGuid,
                 xmlCvr.PrecinctSplit.Name,
                 xmlCvr.PrecinctSplit.Id,
-                usesLastAllowedRanking,
+                usesLastAllowedRanking(rankings, null),
                 rankings);
         castVoteRecords.add(cvr);
 
