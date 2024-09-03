@@ -1221,8 +1221,6 @@ final class Tabulator {
         RoundTallies roundTalliesForSlice = roundTalliesBySlices.get(slice).get(entry.getKey());
         roundTalliesForSlice.put(currentRound, entry.getValue());
         roundTalliesForSlice.get(currentRound).lockInRound();
-        Logger.info("Round %d slice %s %s tallies: %s",
-            currentRound, slice, entry.getKey(), entry.getValue().inactiveBallotSum().toString());
       }
     }
     roundTally.lockInRound();
