@@ -374,18 +374,21 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    Pair<String, StatusForRound>[] statusesToPrint =
-        new Pair[] {
-          new Pair<>("Overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
-          new Pair<>("Skipped Rankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
-          new Pair<>("Exhausted Choices", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
-          new Pair<>("Repeated Rankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING)
-        };
+    List<Pair<String, StatusForRound>> statusesToPrint = new ArrayList<>();
+    statusesToPrint.add(new Pair<>("Overvotes",
+            StatusForRound.INVALIDATED_BY_OVERVOTE));
+    statusesToPrint.add(new Pair<>("Skipped Rankings",
+            StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
+    statusesToPrint.add(new Pair<>("Exhausted Choices",
+            StatusForRound.EXHAUSTED_CHOICE));
+    statusesToPrint.add(new Pair<>("Repeated Rankings",
+            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
 
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
       csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
+
+      StatusForRound status = statusToPrint.getValue();
       for (int round = 1; round <= numRounds; round++) {
-        StatusForRound status = statusToPrint.getValue();
         BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
         csvPrinter.print(thisRoundInactive);
 
@@ -405,14 +408,11 @@ class ResultsWriter {
     }
 
     csvPrinter.print("Inactive Ballots Total");
-    // Undervotes should not be included in the Inactive Ballots count, even though we treat them
-    // as such internally. Subtract undervotes (which are static throughout a contest) from the
-    // inactive ballot totals.
-    BigDecimal numUndervotes =
-        roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
+    BigDecimal numNoRankings =
+        roundTallies.get(1).getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
     for (int round = 1; round <= numRounds; round++) {
       BigDecimal thisRoundInactive = roundTallies.get(round).inactiveBallotSum();
-      csvPrinter.print(thisRoundInactive.subtract(numUndervotes));
+      csvPrinter.print(thisRoundInactive.subtract(numNoRankings));
 
       // Don't display percentage of inactive ballots
       csvPrinter.print("");
@@ -469,15 +469,15 @@ class ResultsWriter {
 
   private void addContestSummaryRows(CSVPrinter csvPrinter, RoundTally round1Tally)
       throws IOException {
-    BigDecimal numUndervotes =
-        round1Tally.getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
+    BigDecimal numNoRankings =
+        round1Tally.getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
     BigDecimal totalNumberBallots =
         round1Tally.activeBallotSum().add(round1Tally.inactiveBallotSum());
     csvPrinter.printRecord("Contest Summary");
     csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
     csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
     csvPrinter.printRecord("Total Number of Ballots", totalNumberBallots);
-    csvPrinter.printRecord("Number of Undervotes", numUndervotes);
+    csvPrinter.printRecord("Number of Undervotes (No Rankings)", numNoRankings);
     csvPrinter.println();
   }
 
@@ -939,8 +939,8 @@ class ResultsWriter {
       configData.put(slice.toLowerString(), sliceId);
     }
 
-    BigDecimal firstRoundUndervotes =
-        roundTallies.get(1).getBallotStatusTally(StatusForRound.INACTIVE_BY_UNDERVOTE);
+    BigDecimal numNoRankings =
+        roundTallies.get(1).getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
     BigDecimal totalNumberBallots =
         roundTallies.get(1).activeBallotSum().add(roundTallies.get(1).inactiveBallotSum());
     BigDecimal lastRoundThreshold = roundTallies.get(numRounds).getWinningThreshold();
@@ -950,7 +950,7 @@ class ResultsWriter {
     summaryData.put("numWinners", config.getNumberOfWinners());
     summaryData.put("numCandidates", config.getCandidateNames().size());
     summaryData.put("totalNumBallots", totalNumberBallots);
-    summaryData.put("undervotes", firstRoundUndervotes.toBigInteger());
+    summaryData.put("undervotes", numNoRankings.toBigInteger());
 
     ArrayList<Object> results = new ArrayList<>();
     for (int round = 1; round <= numRounds; round++) {
@@ -992,10 +992,14 @@ class ResultsWriter {
     Map<String, BigDecimal> inactiveMap = new HashMap<>();
     Pair<String, StatusForRound>[] statusesToPrint =
         new Pair[] {
-          new Pair<>("overvotes", StatusForRound.INACTIVE_BY_OVERVOTE),
-          new Pair<>("skippedRankings", StatusForRound.INACTIVE_BY_SKIPPED_RANKING),
-          new Pair<>("exhaustedChoices", StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES),
-          new Pair<>("repeatedRankings", StatusForRound.INACTIVE_BY_REPEATED_RANKING)
+          new Pair<>("overvotes",
+                     StatusForRound.INVALIDATED_BY_OVERVOTE),
+          new Pair<>("skippedRankings",
+                     StatusForRound.INVALIDATED_BY_SKIPPED_RANKING),
+          new Pair<>("repeatedRankings",
+                     StatusForRound.INVALIDATED_BY_REPEATED_RANKING),
+          new Pair<>("exhaustedChoices",
+                     StatusForRound.EXHAUSTED_CHOICE),
         };
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
       inactiveMap.put(

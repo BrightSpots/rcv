@@ -135,6 +135,7 @@ class HartCvrReader extends BaseCvrReader {
                 xmlCvr.CvrGuid,
                 xmlCvr.PrecinctSplit.Name,
                 xmlCvr.PrecinctSplit.Id,
+                usesLastAllowedRanking(rankings, null),
                 rankings);
         castVoteRecords.add(cvr);
 
