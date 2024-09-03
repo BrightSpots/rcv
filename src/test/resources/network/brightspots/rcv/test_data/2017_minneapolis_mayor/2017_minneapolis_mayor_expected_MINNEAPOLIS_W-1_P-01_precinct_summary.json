@@ -10,7 +10,7 @@
   "jsonFormatVersion" : "1",
   "results" : [ {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "1",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -46,7 +46,7 @@
     "threshold" : "52243"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "2",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -154,7 +154,7 @@
     "threshold" : "52200"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "20",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -180,7 +180,7 @@
     "threshold" : "50933"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "30",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -204,7 +204,7 @@
     "threshold" : "49874"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "61",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -226,7 +226,7 @@
     "threshold" : "46790"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "105",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -246,7 +246,7 @@
     "finalThreshold" : "40838",
     "numCandidates" : 19,
     "numWinners" : 1,
-    "totalNumBallots" : "408",
-    "undervotes" : 0
+    "totalNumBallots" : "411",
+    "undervotes" : 2
   }
 }

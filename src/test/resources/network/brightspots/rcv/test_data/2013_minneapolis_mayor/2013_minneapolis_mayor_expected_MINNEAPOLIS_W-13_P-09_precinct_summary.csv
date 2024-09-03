@@ -13,8 +13,8 @@ Precinct,MINNEAPOLIS W-13 P-09
 Contest Summary
 Number to be Elected,1
 Number of Candidates,36
-Total Number of Ballots,985
-Number of Undervotes,0
+Total Number of Ballots,987
+Number of Undervotes (No Rankings),0
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer,Round 5 Votes,% of vote,transfer,Round 6 Votes,% of vote,transfer,Round 7 Votes,% of vote,transfer,Round 8 Votes,% of vote,transfer,Round 9 Votes,% of vote,transfer,Round 10 Votes,% of vote,transfer,Round 11 Votes,% of vote,transfer,Round 12 Votes,% of vote,transfer,Round 13 Votes,% of vote,transfer,Round 14 Votes,% of vote,transfer,Round 15 Votes,% of vote,transfer,Round 16 Votes,% of vote,transfer,Round 17 Votes,% of vote,transfer,Round 18 Votes,% of vote,transfer,Round 19 Votes,% of vote,transfer,Round 20 Votes,% of vote,transfer,Round 21 Votes,% of vote,transfer,Round 22 Votes,% of vote,transfer,Round 23 Votes,% of vote,transfer,Round 24 Votes,% of vote,transfer,Round 25 Votes,% of vote,transfer,Round 26 Votes,% of vote,transfer,Round 27 Votes,% of vote,transfer,Round 28 Votes,% of vote,transfer,Round 29 Votes,% of vote,transfer,Round 30 Votes,% of vote,transfer,Round 31 Votes,% of vote,transfer,Round 32 Votes,% of vote,transfer,Round 33 Votes,% of vote,transfer
 BETSY HODGES,359,36.44%,0,359,36.44%,0,359,36.44%,0,359,36.48%,0,359,36.48%,0,359,36.48%,0,359,36.48%,0,359,36.48%,0,359,36.48%,0,359,36.52%,0,359,36.52%,0,359,36.59%,0,359,36.59%,0,359,36.59%,0,359,36.59%,0,359,36.59%,0,359,36.59%,0,359,36.59%,0,359,36.59%,0,359,36.63%,2,361,36.87%,0,361,36.87%,0,361,36.87%,0,361,36.87%,0,361,36.87%,0,361,36.87%,0,361,37.13%,0,361,37.13%,1,362,37.35%,2,364,37.6%,2,366,38.4%,23,389,41.33%,69,458,57.39%,0
@@ -55,8 +55,8 @@ JOSHUA REA,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%
 Undeclared Write-ins,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,985,,,985,,,985,,,984,,,984,,,984,,,984,,,984,,,984,,,983,,,983,,,981,,,981,,,981,,,981,,,981,,,981,,,981,,,981,,,980,,,979,,,979,,,979,,,979,,,979,,,979,,,972,,,972,,,969,,,968,,,953,,,941,,,798,,
 Current Round Threshold,39657,,,39638,,,39635,,,39633,,,39627,,,39622,,,39614,,,39608,,,39599,,,39583,,,39568,,,39552,,,39533,,,39522,,,39502,,,39477,,,39462,,,39450,,,39414,,,39387,,,39359,,,39309,,,39247,,,39112,,,39041,,,38981,,,38726,,,38541,,,38312,,,38162,,,37796,,,36810,,,31898,,
-Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Overvotes,2,,0,2,,0,2,,0,2,,0,2,,0,2,,0,2,,0,2,,0,2,,0,2,,0,2,,1,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0
 Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,1,1,,0,1,,0,1,,0,1,,0,1,,0,1,,1,2,,0,2,,1,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,0,3,,1,4,,1,5,,0,5,,0,5,,0,5,,0,5,,0,5,,7,12,,0,12,,3,15,,1,16,,15,31,,12,43,,143,186,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
+Inactive Ballots Total,2,,0,2,,0,2,,1,3,,0,3,,0,3,,0,3,,0,3,,0,3,,1,4,,0,4,,2,6,,0,6,,0,6,,0,6,,0,6,,0,6,,0,6,,0,6,,1,7,,1,8,,0,8,,0,8,,0,8,,0,8,,0,8,,7,15,,0,15,,3,18,,1,19,,15,34,,12,46,,143,189,,0

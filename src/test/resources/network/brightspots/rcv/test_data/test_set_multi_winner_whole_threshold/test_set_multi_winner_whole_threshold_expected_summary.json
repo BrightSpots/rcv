@@ -106,7 +106,7 @@
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "0.2222",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "2.2222"
@@ -133,7 +133,7 @@
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "2.4408",
+      "exhaustedChoices" : "3.2863",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "2.7130"

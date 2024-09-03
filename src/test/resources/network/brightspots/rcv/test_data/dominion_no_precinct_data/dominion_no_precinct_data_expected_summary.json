@@ -155,7 +155,7 @@
     "threshold" : "470"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "3",
       "overvotes" : "5",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -179,7 +179,7 @@
     "threshold" : "468"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "34",
       "overvotes" : "6",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -201,7 +201,7 @@
     "threshold" : "452"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "141",
       "overvotes" : "7",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

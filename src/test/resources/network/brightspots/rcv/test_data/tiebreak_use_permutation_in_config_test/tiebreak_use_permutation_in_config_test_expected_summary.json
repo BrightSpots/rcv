@@ -51,7 +51,7 @@
     "threshold" : "6"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "2",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

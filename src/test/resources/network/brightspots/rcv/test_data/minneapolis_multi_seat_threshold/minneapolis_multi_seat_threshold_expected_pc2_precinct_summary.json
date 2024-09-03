@@ -4,7 +4,8 @@
     "date" : "2018-09-30",
     "generatedBy" : "RCTab 1.3.999",
     "jurisdiction" : "Multi-winner",
-    "office" : "Multi_winner2"
+    "office" : "Multi_winner2",
+    "precinct" : "pc2"
   },
   "jsonFormatVersion" : "1",
   "results" : [ {
@@ -12,23 +13,20 @@
       "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
-      "skippedRankings" : "1"
+      "skippedRankings" : "0"
     },
     "round" : 1,
     "tally" : {
-      "A" : "6",
-      "B" : "5",
-      "C" : "7",
-      "D" : "2",
-      "E" : "6",
-      "F" : "3"
+      "A" : "1",
+      "B" : "1",
+      "C" : "2",
+      "D" : "0",
+      "E" : "1",
+      "F" : "0"
     },
     "tallyResults" : [ {
       "eliminated" : "D",
-      "transfers" : {
-        "C" : "1",
-        "exhausted" : "1"
-      }
+      "transfers" : { }
     } ],
     "threshold" : "8"
   }, {
@@ -36,15 +34,15 @@
       "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
-      "skippedRankings" : "2"
+      "skippedRankings" : "0"
     },
     "round" : 2,
     "tally" : {
-      "A" : "6",
-      "B" : "5",
-      "C" : "8",
-      "E" : "6",
-      "F" : "3"
+      "A" : "1",
+      "B" : "1",
+      "C" : "2",
+      "E" : "1",
+      "F" : "0"
     },
     "tallyResults" : [ {
       "elected" : "C",
@@ -56,22 +54,19 @@
       "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
-      "skippedRankings" : "2"
+      "skippedRankings" : "0"
     },
     "round" : 3,
     "tally" : {
-      "A" : "6",
-      "B" : "5",
-      "C" : "8.0000",
-      "E" : "6.0000",
-      "F" : "3.0000"
+      "A" : "1",
+      "B" : "1",
+      "C" : "2.0000",
+      "E" : "1.0000",
+      "F" : "0"
     },
     "tallyResults" : [ {
       "eliminated" : "F",
-      "transfers" : {
-        "A" : "1",
-        "B" : "2"
-      }
+      "transfers" : { }
     } ],
     "threshold" : "8"
   }, {
@@ -79,20 +74,19 @@
       "exhaustedChoices" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
-      "skippedRankings" : "2"
+      "skippedRankings" : "0"
     },
     "round" : 4,
     "tally" : {
-      "A" : "7",
-      "B" : "7.0000",
-      "C" : "8.0000",
-      "E" : "6.0000"
+      "A" : "1",
+      "B" : "1",
+      "C" : "2.0000",
+      "E" : "1.0000"
     },
     "tallyResults" : [ {
       "eliminated" : "E",
       "transfers" : {
-        "A" : "3",
-        "B" : "3"
+        "B" : "1"
       }
     } ],
     "threshold" : "8"
@@ -101,38 +95,38 @@
       "exhaustedChoices" : "0.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
-      "skippedRankings" : "2.0000"
+      "skippedRankings" : "0.0000"
     },
     "round" : 5,
     "tally" : {
-      "A" : "10.0000",
-      "B" : "10.0000",
-      "C" : "8.0000"
+      "A" : "1",
+      "B" : "2",
+      "C" : "2.0000"
     },
     "tallyResults" : [ {
       "elected" : "A",
       "transfers" : {
-        "exhausted" : "2.0000"
+        "exhausted" : "0.2000"
       }
     }, {
       "elected" : "B",
       "transfers" : {
-        "exhausted" : "2.0000"
+        "exhausted" : "0.4000"
       }
     } ],
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "3.4000",
+      "exhaustedChoices" : "0.6000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
-      "skippedRankings" : "2.6000"
+      "skippedRankings" : "0.0000"
     },
     "round" : 6,
     "tally" : {
-      "A" : "8.0000",
-      "B" : "8.0000",
-      "C" : "8.0000"
+      "A" : "0.8000",
+      "B" : "1.6000",
+      "C" : "2.0000"
     },
     "tallyResults" : [ ],
     "threshold" : "8"
@@ -141,7 +135,7 @@
     "finalThreshold" : "8",
     "numCandidates" : 6,
     "numWinners" : 3,
-    "totalNumBallots" : "30",
+    "totalNumBallots" : "5",
     "undervotes" : 0
   }
 }

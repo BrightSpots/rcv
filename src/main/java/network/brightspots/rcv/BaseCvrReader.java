@@ -119,6 +119,15 @@ abstract class BaseCvrReader {
     return unrecognizedCandidateCounts;
   }
 
+  boolean usesLastAllowedRanking(List<Pair<Integer, String>> rankings, String contestId) {
+    if (rankings.isEmpty()) {
+      return false;
+    }
+
+    int lastRanking = rankings.get(rankings.size() - 1).getKey();
+    return !isRankingAllowed(lastRanking + 1, contestId);
+  }
+
   // Human-readable name for output logs
   public abstract String readerName();
 }

@@ -283,9 +283,10 @@ public class GuiTabulateController {
           onSuccessCallback.handle(workerStateEvent);
         });
     service.setOnFailed(
-            workerStateEvent -> {
-              openResultsButton.setText("Close Close clos");
-            });
+        workerStateEvent -> {
+          openResultsButton.setText("Close");
+          stage.setOnCloseRequest(null);
+        });
   }
 
   private void setButtonsEnabled(

@@ -71,7 +71,7 @@
     "threshold" : "51"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "9",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -91,7 +91,7 @@
     "threshold" : "46"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "24",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

@@ -221,6 +221,7 @@ final class StreamingCvrReader extends BaseCvrReader {
         currentSuppliedCvrId,
         currentPrecinct,
         currentBatch,
+        usesLastAllowedRanking(currentRankings, null),
         currentRankings);
     cvrList.add(newRecord);
 

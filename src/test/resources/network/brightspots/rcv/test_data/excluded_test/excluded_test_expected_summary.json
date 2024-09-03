@@ -9,7 +9,7 @@
   "jsonFormatVersion" : "1",
   "results" : [ {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "7",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -29,6 +29,6 @@
     "numCandidates" : 4,
     "numWinners" : 1,
     "totalNumBallots" : "10",
-    "undervotes" : 7
+    "undervotes" : 0
   }
 }
