@@ -274,6 +274,10 @@ public class GuiTabulateController {
           originalCallback.handle(workerStateEvent);
           onSuccessCallback.handle(workerStateEvent);
         });
+    service.setOnFailed(
+        workerStateEvent -> {
+          stage.setOnCloseRequest(null);
+        });
   }
 
   /**
