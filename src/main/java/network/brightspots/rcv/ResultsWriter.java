@@ -333,8 +333,13 @@ class ResultsWriter {
         // Vote count
         csvPrinter.print(thisRoundTally);
 
-        // Vote %
-        BigDecimal votePctDivisor = roundTallies.get(round).activeAndLockedInBallotSum();
+        // Vote % (divisor is 1st round total in STV or 1st round determines threshold)
+        BigDecimal votePctDivisor;
+        if (config.isSingleWinnerEnabled() || config.isFirstRoundDeterminesThresholdEnabled()) {
+          votePctDivisor = roundTallies.get(round).activeAndLockedInBallotSum();
+        } else {
+          votePctDivisor = roundTallies.get(1).activeAndLockedInBallotSum();
+        }
         if (votePctDivisor != BigDecimal.ZERO) {
           // Turn a decimal into a human-readable percentage (e.g. 0.1234 -> 12.34%)
           BigDecimal divDecimal = thisRoundTally.divide(votePctDivisor, MathContext.DECIMAL32);
