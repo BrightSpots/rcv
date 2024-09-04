@@ -110,6 +110,7 @@ class ClearBallotCvrReader extends BaseCvrReader {
                 cvrData[CvrColumnField.BallotID.ordinal()],
                 cvrData[CvrColumnField.PrecinctID.ordinal()],
                 null,
+                usesLastAllowedRanking(rankings, null),
                 rankings);
 
         castVoteRecords.add(castVoteRecord);

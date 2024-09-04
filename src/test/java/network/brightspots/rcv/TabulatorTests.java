@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -600,7 +601,7 @@ class TabulatorTests {
   @Test
   @DisplayName("testMinneapolisMultiSeatThreshold")
   void testMinneapolisMultiSeatThreshold() {
-    runTabulationTest("minneapolis_multi_seat_threshold");
+    runTabulationTest("minneapolis_multi_seat_threshold", 3);
   }
 
   @Test

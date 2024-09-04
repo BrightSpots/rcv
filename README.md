@@ -32,12 +32,14 @@ On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch
 
 #### Method 2 (Less Easy): Compile and Run Using Gradle
 
-1. Install [JDK 20 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by
+1. Install [JDK 20](https://www.oracle.com/java/technologies/javase/jdk20-archive-downloads.html), and make sure your Java path is picking it up properly by
    verifying that the following command returns the expected version:
     
     `$ java -version`
     
     If the expected version isn't returned, you'll need to follow the instructions [here](https://www.java.com/en/download/help/path.xml) on how to set your Java path.
+
+    If you are using Linux or MacOS and need to regularly switch between Java versions, consider installing [jEnv](https://www.jenv.be/). For a list of the Java versions installed on your machine, run `/usr/libexec/java_home -V` on MacOS or `update-alternatives --config java` on Linux.
 
 2. Download the [zip of the source code from GitHub](https://github.com/BrightSpots/rcv/archive/master.zip) and unzip it, or install git and use the following command at the terminal / command prompt to clone a local copy on your machine:
     

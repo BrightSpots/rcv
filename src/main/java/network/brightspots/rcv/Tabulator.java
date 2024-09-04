@@ -962,6 +962,7 @@ final class Tabulator {
   private void recordSelectionForCastVoteRecord(
       CastVoteRecord cvr,
       RoundTally currentRoundTally,
+      BreakdownBySlice<RoundTally> roundTallyBySlice,
       String selectedCandidate,
       StatusForRound statusForRound,
       String additionalLogText)
@@ -998,19 +999,26 @@ final class Tabulator {
 
     if (statusForRound != StatusForRound.ACTIVE) {
       currentRoundTally.addInactiveBallot(statusForRound, cvr.getFractionalTransferValue());
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        String sliceId = cvr.getSlice(slice);
+        RoundTally sliceRoundTally = roundTallyBySlice.get(slice).get(sliceId);
+        sliceRoundTally.addInactiveBallot(statusForRound, cvr.getFractionalTransferValue());
+      }
     }
 
     String outcomeDescription;
     switch (statusForRound) {
       case ACTIVE -> outcomeDescription = selectedCandidate;
-      case INACTIVE_BY_UNDERVOTE -> outcomeDescription = "undervote" + additionalLogText;
-      case INACTIVE_BY_OVERVOTE -> outcomeDescription = "overvote" + additionalLogText;
-      case INACTIVE_BY_SKIPPED_RANKING -> outcomeDescription =
-          "exhausted by skipped ranking" + additionalLogText;
-      case INACTIVE_BY_REPEATED_RANKING -> outcomeDescription =
-          "duplicate candidate" + additionalLogText;
-      case INACTIVE_BY_EXHAUSTED_CHOICES -> outcomeDescription =
-          "no continuing candidate" + additionalLogText;
+      case DID_NOT_RANK_ANY_CANDIDATES -> outcomeDescription =
+          "did not rank any candidates" + additionalLogText;
+      case INVALIDATED_BY_OVERVOTE -> outcomeDescription =
+          "invalidated by overvote" + additionalLogText;
+      case EXHAUSTED_CHOICE -> outcomeDescription =
+          "exhausted choice" + additionalLogText;
+      case INVALIDATED_BY_SKIPPED_RANKING -> outcomeDescription =
+          "invalidated by skipped ranking" + additionalLogText;
+      case INVALIDATED_BY_REPEATED_RANKING -> outcomeDescription =
+          "invalidated by repeated ranking" + additionalLogText;
       default ->
       // Programming error: we missed a status here
       throw new RuntimeException("Unexpected ballot status: " + statusForRound);
@@ -1051,6 +1059,14 @@ final class Tabulator {
     for (CastVoteRecord cvr : castVoteRecords) {
       if (cvr.isExhausted()) {
         roundTally.addInactiveBallot(cvr.getBallotStatus(), cvr.getFractionalTransferValue());
+
+        // Add inactive ballot to each slice too
+        for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+          String sliceId = cvr.getSlice(slice);
+          RoundTally sliceRoundTally = roundTallyBySlice.get(slice).get(sliceId);
+          sliceRoundTally.addInactiveBallot(
+              cvr.getBallotStatus(), cvr.getFractionalTransferValue());
+        }
         continue;
       }
 
@@ -1069,7 +1085,12 @@ final class Tabulator {
       // check for a CVR with no rankings at all
       if (cvr.candidateRankings.numRankings() == 0) {
         recordSelectionForCastVoteRecord(
-            cvr, roundTally, null, StatusForRound.INACTIVE_BY_UNDERVOTE, "");
+            cvr,
+            roundTally,
+            roundTallyBySlice,
+            null,
+            StatusForRound.DID_NOT_RANK_ANY_CANDIDATES,
+            "");
       }
 
       // iterate through the rankings in this cvr from most to least preferred.
@@ -1098,7 +1119,12 @@ final class Tabulator {
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
           recordSelectionForCastVoteRecord(
-              cvr, roundTally, null, StatusForRound.INACTIVE_BY_SKIPPED_RANKING, "");
+              cvr,
+              roundTally,
+              roundTallyBySlice,
+              null,
+              StatusForRound.INVALIDATED_BY_SKIPPED_RANKING,
+              "");
           break;
         }
         lastRankSeen = rank;
@@ -1118,8 +1144,9 @@ final class Tabulator {
             recordSelectionForCastVoteRecord(
                 cvr,
                 roundTally,
+                roundTallyBySlice,
                 null,
-                StatusForRound.INACTIVE_BY_REPEATED_RANKING,
+                StatusForRound.INVALIDATED_BY_REPEATED_RANKING,
                 " " + duplicateCandidate);
             break;
           }
@@ -1129,14 +1156,24 @@ final class Tabulator {
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidates);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
           recordSelectionForCastVoteRecord(
-              cvr, roundTally, null, StatusForRound.INACTIVE_BY_OVERVOTE, "");
+              cvr,
+              roundTally,
+              roundTallyBySlice,
+              null,
+              StatusForRound.INVALIDATED_BY_OVERVOTE,
+              "");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
           if (rank == cvr.candidateRankings.maxRankingNumber()) {
             // If the final ranking is an overvote, even if we're trying to skip to the next rank,
             // we consider this inactive by exhausted choices -- not an overvote.
             recordSelectionForCastVoteRecord(
-                cvr, roundTally, null, StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES, "");
+                cvr,
+                roundTally,
+                roundTallyBySlice,
+                null,
+                StatusForRound.EXHAUSTED_CHOICE,
+                "");
           }
           continue;
         }
@@ -1155,7 +1192,7 @@ final class Tabulator {
 
           // transfer cvr to selected candidate
           recordSelectionForCastVoteRecord(
-              cvr, roundTally, selectedCandidate, StatusForRound.ACTIVE, "");
+              cvr, roundTally, roundTallyBySlice, selectedCandidate, StatusForRound.ACTIVE, "");
 
           // This will also update the roundTallyBySlice for each enabled slice
           incrementTallies(roundTally, cvr, selectedCandidate, roundTallyBySlice);
@@ -1171,22 +1208,9 @@ final class Tabulator {
         }
 
         // if this is the last ranking we are out of rankings and must exhaust this cvr
-        // determine if the reason is skipping too many ranks, or no continuing candidates
         if (rank == cvr.candidateRankings.maxRankingNumber()) {
-          // When determining if this is an undervote or exhausted choice, look at either
-          // the max ranking allowed by the config, or if the config does not impose a limit,
-          // look at the number of declared candidates.
-          int maxAllowedRanking = config.isMaxRankingsSetToMaximum()
-                  ? config.getNumDeclaredCandidates()
-                  : config.getMaxRankingsAllowedWhenNotSetToMaximum();
-          if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
-              && maxAllowedRanking - rank > config.getMaxSkippedRanksAllowed()) {
-            recordSelectionForCastVoteRecord(
-                cvr, roundTally, null, StatusForRound.INACTIVE_BY_UNDERVOTE, "");
-          } else {
-            recordSelectionForCastVoteRecord(
-                cvr, roundTally, null, StatusForRound.INACTIVE_BY_EXHAUSTED_CHOICES, "");
-          }
+          recordSelectionForCastVoteRecord(
+              cvr, roundTally, roundTallyBySlice, null, StatusForRound.EXHAUSTED_CHOICE, "");
         }
       } // end looping over the rankings within one ballot
     } // end looping over all ballots

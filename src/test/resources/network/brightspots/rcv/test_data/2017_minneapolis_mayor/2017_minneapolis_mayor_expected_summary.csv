@@ -13,7 +13,7 @@ Contest Summary
 Number to be Elected,1
 Number of Candidates,19
 Total Number of Ballots,105928
-Number of Undervotes,1369
+Number of Undervotes (No Rankings),1369
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer,Round 5 Votes,% of vote,transfer,Round 6 Votes,% of vote,transfer
 Eliminated,Undeclared Write-ins,,,Aswar Rahman; David Rosenfeld; L.A. Nik; Christopher Zimmerman; Ronald Lischeid; Ian Simpson; Charlie Gers; Captain Jack Sparrow; Theron Preston Washington; David John Wilson; Gregg A. Iverson; Troy Benjegerdes; Al Flowers,,,Nekima Levy-Pounds,,,Tom Hoch,,,Betsy Hodges,,,,,
@@ -41,6 +41,6 @@ Active Ballots,104484,,,104398,,,101865,,,99747,,,93578,,,81674,,
 Current Round Threshold,52243,,,52200,,,50933,,,49874,,,46790,,,40838,,
 Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Skipped Rankings,38,,0,38,,0,38,,0,38,,0,38,,0,38,,0
-Inactive Ballots by Exhausted Choices,37,,37,74,,1534,1608,,1291,2899,,3596,6495,,9273,15768,,0
+Inactive Ballots by Exhausted Choices,37,,86,123,,2533,2656,,2118,4774,,6169,10943,,11904,22847,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,75,,86,161,,2533,2694,,2118,4812,,6169,10981,,11904,22885,,0

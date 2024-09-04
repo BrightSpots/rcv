@@ -13,7 +13,7 @@ Contest Summary
 Number to be Elected,1
 Number of Candidates,1
 Total Number of Ballots,10
-Number of Undervotes,7
+Number of Undervotes (No Rankings),0
 
 Rounds,Round 1 Votes,% of vote,transfer
 Eliminated,,,
@@ -23,6 +23,6 @@ Active Ballots,3,,
 Current Round Threshold,2,,
 Inactive Ballots by Overvotes,0,,0
 Inactive Ballots by Skipped Rankings,0,,0
-Inactive Ballots by Exhausted Choices,0,,0
+Inactive Ballots by Exhausted Choices,7,,0
 Inactive Ballots by Repeated Rankings,0,,0
-Inactive Ballots Total,0,,0
+Inactive Ballots Total,7,,0
