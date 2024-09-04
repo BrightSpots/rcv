@@ -455,6 +455,22 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
+    if (config.getNumberOfWinners() > 1
+        && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
+      // row for final round surplus (if needed)
+      csvPrinter.print("Final Round Surplus");
+      for (int round = 1; round <= numRounds; round++) {
+        BigDecimal finalRoundSurplus =
+                roundTallies.get(round).getBallotStatusTally(StatusForRound.FINAL_ROUND_SURPLUS);
+        csvPrinter.print(finalRoundSurplus.equals(BigDecimal.ZERO) ? "" : finalRoundSurplus);
+
+        // Don't display transfer or percentage of residual surplus
+        csvPrinter.print("");
+        csvPrinter.print("");
+      }
+      csvPrinter.println();
+    }
+
     if (isSlice) {
       csvPrinter.println();
       csvPrinter.print(String.format("*Elect/Eliminate decisions are from the full contest. "
@@ -1013,17 +1029,21 @@ class ResultsWriter {
 
   private Map<String, BigDecimal> getInactiveJsonMap(RoundTally roundTally) {
     Map<String, BigDecimal> inactiveMap = new HashMap<>();
-    Pair<String, StatusForRound>[] statusesToPrint =
-        new Pair[] {
-          new Pair<>("overvotes",
-                     StatusForRound.INVALIDATED_BY_OVERVOTE),
-          new Pair<>("skippedRankings",
-                     StatusForRound.INVALIDATED_BY_SKIPPED_RANKING),
-          new Pair<>("repeatedRankings",
-                     StatusForRound.INVALIDATED_BY_REPEATED_RANKING),
-          new Pair<>("exhaustedChoices",
-                     StatusForRound.EXHAUSTED_CHOICE),
-        };
+    List<Pair<String, StatusForRound>> statusesToPrint = new ArrayList<>();
+    statusesToPrint.add(new Pair<>("overvotes",
+            StatusForRound.INVALIDATED_BY_OVERVOTE));
+    statusesToPrint.add(new Pair<>("skippedRankings",
+            StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
+    statusesToPrint.add(new Pair<>("exhaustedChoices",
+            StatusForRound.EXHAUSTED_CHOICE));
+    statusesToPrint.add(new Pair<>("repeatedRankings",
+            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
+    if (config.getNumberOfWinners() > 1
+        && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()
+        && roundTally.getRoundNumber() == numRounds) {
+      statusesToPrint.add(new Pair<>("finalRoundSurplus",
+              StatusForRound.FINAL_ROUND_SURPLUS));
+    }
     for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
       inactiveMap.put(
           statusToPrint.getKey(), roundTally.getBallotStatusTally(statusToPrint.getValue()));
@@ -1047,7 +1067,7 @@ class ResultsWriter {
       TallyTransfers tallyTransfers) {
     // check for valid candidates:
     // "drop undeclared write-in" may result in no one actually being eliminated
-    if (candidates != null && candidates.size() > 0) {
+    if (candidates != null && !candidates.isEmpty()) {
       // transfers contains all vote transfers for this round
       // we add one to the round since transfers are currently stored under the round AFTER
       // the tallies which triggered them

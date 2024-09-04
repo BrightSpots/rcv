@@ -284,7 +284,8 @@
     "threshold" : "19821"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "14089.2600",
+      "exhaustedChoices" : "12262",
+      "finalRoundSurplus" : "1827.2600",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

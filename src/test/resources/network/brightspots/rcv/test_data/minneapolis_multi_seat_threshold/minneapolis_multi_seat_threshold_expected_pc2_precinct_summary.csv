@@ -27,8 +27,9 @@ D,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,5,,,5,,,5.0000,,,5.0000,,,5.0000,,,4.4000,,
 Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0.0000,0.0000,,0.0000,0.0000,,0
-Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0.0000,0.0000,,0.6000,0.6000,,0
+Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0.0000,0.0000,,0.0000,0.0000,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0,0,,0
-Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0.0000,0.0000,,0.6000,0.6000,,0
+Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0.0000,0.0000,,0.0000,0.0000,,0
+Final Round Surplus,,,,,,,,,,,,,,,,0.6000,,
 
 *Elect/Eliminate decisions are from the full contest. All other results on this report are at the precinct level.

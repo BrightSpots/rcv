@@ -1019,6 +1019,8 @@ final class Tabulator {
           "invalidated by skipped ranking" + additionalLogText;
       case INVALIDATED_BY_REPEATED_RANKING -> outcomeDescription =
           "invalidated by repeated ranking" + additionalLogText;
+      case FINAL_ROUND_SURPLUS -> outcomeDescription =
+          "final round surplus" + additionalLogText;
       default ->
       // Programming error: we missed a status here
       throw new RuntimeException("Unexpected ballot status: " + statusForRound);
@@ -1095,6 +1097,7 @@ final class Tabulator {
 
       // iterate through the rankings in this cvr from most to least preferred.
       // for each ranking:
+      //  check if it's a final round surplus
       //  if it results in an overvote or undervote, exhaust the cvr
       //  if a selected candidate is continuing, count cvr for that candidate
       //  if no selected candidate is continuing, look at the next ranking
@@ -1114,6 +1117,20 @@ final class Tabulator {
       for (Pair<Integer, CandidatesAtRanking> rankCandidatesPair : cvr.candidateRankings) {
         Integer rank = rankCandidatesPair.getKey();
         CandidatesAtRanking candidates = rankCandidatesPair.getValue();
+
+        // check for final round surplus
+        if (config.getNumberOfWinners() > 1
+            && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()
+            && config.getNumberOfWinners() == winnerToRound.size()) {
+          recordSelectionForCastVoteRecord(
+                  cvr,
+                  roundTally,
+                  roundTallyBySlice,
+                  null,
+                  StatusForRound.FINAL_ROUND_SURPLUS,
+                  "");
+          break;
+        }
 
         // check for skipped ranking exhaustion
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
