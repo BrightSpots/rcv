@@ -32,6 +32,8 @@ import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
 class ClearBallotCvrReader {
 
+  private static final String unQuotedCommaRegex = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+
   private final String cvrPath;
   private final ContestConfig contestConfig;
   private final String undeclaredWriteInLabel;
@@ -58,7 +60,7 @@ class ClearBallotCvrReader {
         Logger.severe("No header row found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
       }
-      String[] headerData = firstRow.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+      String[] headerData = firstRow.split(unQuotedCommaRegex);
       if (headerData.length < CvrColumnField.ChoicesBegin.ordinal()) {
         Logger.severe("No choice columns found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
@@ -103,7 +105,7 @@ class ClearBallotCvrReader {
           break;
         }
         // parse rankings
-        String[] cvrData = row.split(",");
+        String[] cvrData = row.split(unQuotedCommaRegex);
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         for (var entry : columnIndexToRanking.entrySet()) {
           if (Integer.parseInt(cvrData[entry.getKey()]) == 1) {
