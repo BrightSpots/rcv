@@ -335,7 +335,7 @@ class ResultsWriter {
 
         // Vote % (divisor is 1st round total in STV or 1st round determines threshold)
         BigDecimal votePctDivisor;
-        if (config.isSingleWinnerEnabled() || config.isFirstRoundDeterminesThresholdEnabled()) {
+        if (config.isSingleWinnerEnabled() && !config.isFirstRoundDeterminesThresholdEnabled()) {
           votePctDivisor = roundTallies.get(round).activeAndLockedInBallotSum();
         } else {
           votePctDivisor = roundTallies.get(1).activeAndLockedInBallotSum();
