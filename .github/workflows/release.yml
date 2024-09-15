@@ -90,7 +90,7 @@ jobs:
         id: checksumsfn
         shell: bash
         run: |
-          echo "FILEPATH=cache/checksums.csv" >> $GITHUB_OUTPUT
+          echo "FILEPATH=cache/${{ steps.basefn.outputs.FILEPATH }}.checksums.csv" >> $GITHUB_OUTPUT
 
       - name: "Generate SHA1 and SHA256 for each Maven dependency"
         shell: bash
