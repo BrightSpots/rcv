@@ -455,8 +455,7 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    if (config.getNumberOfWinners() > 1
-        && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
+    if (config.usesSurpluses()) {
       // row for final round surplus (if needed)
       csvPrinter.print("Final Round Surplus");
       for (int round = 1; round <= numRounds; round++) {
@@ -1038,8 +1037,7 @@ class ResultsWriter {
             StatusForRound.EXHAUSTED_CHOICE));
     statusesToPrint.add(new Pair<>("repeatedRankings",
             StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
-    if (config.getNumberOfWinners() > 1
-        && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()
+    if (config.usesSurpluses()
         && roundTally.getRoundNumber() == numRounds) {
       statusesToPrint.add(new Pair<>("finalRoundSurplus",
               StatusForRound.FINAL_ROUND_SURPLUS));
