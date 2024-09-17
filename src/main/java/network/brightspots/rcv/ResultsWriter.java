@@ -547,7 +547,7 @@ class ResultsWriter {
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
 
     if (!isNullOrBlank(sliceId)) {
-      // Only silces print the slice information
+      // Only slices print the slice information
       csvPrinter.printRecord(slice, sliceId);
     } else {
       // Only non-slices print threshold information
