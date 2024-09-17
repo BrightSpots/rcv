@@ -672,7 +672,7 @@ class TabulatorTests {
   @Test
   @DisplayName("tabulate by batch")
   void batchExample() {
-    runTabulationTest("batch_example");
+    runTabulationTest("batch_example", 2);
   }
 
   @Test

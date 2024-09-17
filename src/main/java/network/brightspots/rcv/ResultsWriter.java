@@ -316,8 +316,22 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    boolean isSlice = !isNullOrBlank(sliceId);
-    addActionRows(csvPrinter, isSlice);
+    final boolean isSlice = !isNullOrBlank(sliceId);
+    csvPrinter.print(isSlice ? "Eliminated*" : "Eliminated");
+    printActionSummary(csvPrinter, roundToEliminatedCandidates);
+
+    csvPrinter.print(isSlice ? "Elected*" : "Elected");
+    printActionSummary(csvPrinter, roundToWinningCandidates);
+
+    // Check that all candidates are included in the candidate order
+    Set<String> expectedCandidates = roundTallies.get(1).getCandidates();
+    Set<String> providedCandidates = new HashSet<>(candidateOrder);
+    if (!expectedCandidates.equals(providedCandidates)) {
+      throw new IllegalArgumentException(
+              "Candidate order must include all candidates in the contest. "
+                      + "\nExpected: " + expectedCandidates
+                      + "\nProvided: " + providedCandidates);
+    }
 
     // For each candidate: for each round: output total votes
     for (String candidate : candidateOrder) {
@@ -438,7 +452,7 @@ class ResultsWriter {
     // whether the value in the final round is positive.
     // Note that this concept only makes sense when we're reporting the overall tabulation, so we
     // omit it when generating results at the individual by-slice level.
-    if (sliceId == null && roundToResidualSurplus.get(numRounds).signum() == 1) {
+    if (!isSlice && roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round));
@@ -466,15 +480,6 @@ class ResultsWriter {
       throw exception;
     }
     Logger.info("Summary spreadsheet generated successfully.");
-  }
-
-  // "action" rows describe which candidates were eliminated or elected
-  private void addActionRows(CSVPrinter csvPrinter, boolean withAsterisk) throws IOException {
-    csvPrinter.print(withAsterisk ? "Eliminated*" : "Eliminated");
-    printActionSummary(csvPrinter, roundToEliminatedCandidates);
-
-    csvPrinter.print(withAsterisk ? "Elected*" : "Elected");
-    printActionSummary(csvPrinter, roundToWinningCandidates);
   }
 
   private void addContestSummaryRows(CSVPrinter csvPrinter, RoundTally round1Tally)
