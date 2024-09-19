@@ -1005,14 +1005,10 @@ final class Tabulator {
       }
     }
 
-    String outcomeDescription;
-    if (statusForRound == StatusForRound.ACTIVE) {
-      outcomeDescription = selectedCandidate;
-    } else {
-      outcomeDescription = statusForRound.getPlaintext() + additionalLogText;
-    }
-
-    VoteOutcomeType outcomeType =
+    final String outcomeDescription = statusForRound == StatusForRound.ACTIVE
+            ? selectedCandidate
+            : statusForRound.getPlaintext() + additionalLogText;
+    final VoteOutcomeType outcomeType =
         selectedCandidate == null ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
     cvr.logRoundOutcome(
         currentRoundTally.getRoundNumber(),
