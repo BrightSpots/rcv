@@ -291,6 +291,16 @@ class ResultsWriter {
           TabulateBySlice slice,
           String sliceId,
           String outputPath) throws IOException {
+    // Check that all candidates are included in the candidate order
+    Set<String> expectedCandidates = roundTallies.get(1).getCandidates();
+    Set<String> providedCandidates = new HashSet<>(candidateOrder);
+    if (!expectedCandidates.equals(providedCandidates)) {
+      throw new IllegalArgumentException(
+              "Candidate order must include all candidates in the contest. "
+                      + "\nExpected: " + expectedCandidates
+                      + "\nProvided: " + providedCandidates);
+    }
+
     AuditableFile csvFile = new AuditableFile(outputPath + ".csv");
     Logger.info("Generating summary spreadsheet: %s...", csvFile.getAbsolutePath());
 
@@ -322,16 +332,6 @@ class ResultsWriter {
 
     csvPrinter.print(isSlice ? "Elected*" : "Elected");
     printActionSummary(csvPrinter, roundToWinningCandidates);
-
-    // Check that all candidates are included in the candidate order
-    Set<String> expectedCandidates = roundTallies.get(1).getCandidates();
-    Set<String> providedCandidates = new HashSet<>(candidateOrder);
-    if (!expectedCandidates.equals(providedCandidates)) {
-      throw new IllegalArgumentException(
-              "Candidate order must include all candidates in the contest. "
-                      + "\nExpected: " + expectedCandidates
-                      + "\nProvided: " + providedCandidates);
-    }
 
     // For each candidate: for each round: output total votes
     for (String candidate : candidateOrder) {
