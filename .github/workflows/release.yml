@@ -5,6 +5,7 @@ on:
     types: [ published ]
   schedule:
     - cron: '0 12 1,15 * *'  # On the 1st and 15th of the month at noon
+  workflow_dispatch:
 ## To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
 ##  is at the same indent level as "release":
 #  push:
@@ -189,7 +190,7 @@ jobs:
 
       - uses: dev-drprasad/delete-tag-and-release@v1.1
         # Note: to update the date of the release, it must be deleted and then recreated
-        if: github.event_name == 'release' || github.event_name == 'schedule'
+        if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         with:
           tag_name: build-${{ github.ref_name }}
           delete_release: true
@@ -197,7 +198,7 @@ jobs:
 
       - name: "Upload binaries to release"
         uses: svenstaro/upload-release-action@v2
-        if: github.event_name == 'release' || github.event_name == 'schedule'
+        if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/${{ steps.basefn.outputs.FILEPATH }}*
@@ -208,7 +209,7 @@ jobs:
 
       - name: "Upload cache to release"
         uses: svenstaro/upload-release-action@v2
-        if: github.event_name == 'release' || github.event_name == 'schedule'
+        if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: cache/*
