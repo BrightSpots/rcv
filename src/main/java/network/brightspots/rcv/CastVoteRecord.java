@@ -235,28 +235,66 @@ class CastVoteRecord {
   // as far as tabulation is concerned, all that matters is whether
   // it is active or not.
   enum StatusForRound {
-    ACTIVE(false, "active"),
-    DID_NOT_RANK_ANY_CANDIDATES(true, "did not rank any candidates"),
-    EXHAUSTED_CHOICE(true, "exhausted choice"),
-    INVALIDATED_BY_OVERVOTE(true, "invalidated by overvote"),
-    INVALIDATED_BY_SKIPPED_RANKING(true, "invalidated by skipped ranking"),
-    INVALIDATED_BY_REPEATED_RANKING(true, "invalidated by repeated ranking"),
-    FINAL_ROUND_SURPLUS(false, "final round surplus");
+    ACTIVE(
+            false,
+            "Active",
+            "active"
+    ),
+    DID_NOT_RANK_ANY_CANDIDATES(
+            true,
+            "Did Not Rank Any Candidates",
+            "didNotRankAnyCandidates"
+    ),
+    EXHAUSTED_CHOICE(
+            true,
+            "Inactive Ballots by Exhausted Choices",
+            "exhaustedChoices"
+    ),
+    INVALIDATED_BY_OVERVOTE(
+            true,
+            "Inactive Ballots by Overvotes",
+            "overvotes"
+    ),
+    INVALIDATED_BY_SKIPPED_RANKING(
+            true,
+            "Inactive Ballots by Skipped Rankings",
+            "skippedRankings"
+    ),
+    INVALIDATED_BY_REPEATED_RANKING(
+            true,
+            "Inactive Ballots by Repeated Rankings",
+            "repeatedRankings"
+    ),
+    FINAL_ROUND_SURPLUS(
+            false,
+            "Final Round Surplus",
+            "finalRoundSurplus"
+    );
 
     private final boolean isInactiveBallot;
-    private final String plaintext;
+    private final String titleCaseKey;
+    private final String camelCaseKey;
 
-    StatusForRound(boolean isInactiveBallot, String plaintext) {
+    StatusForRound(
+            boolean isInactiveBallot,
+            String titleCaseKey,
+            String camelCaseKey
+    ) {
       this.isInactiveBallot = isInactiveBallot;
-      this.plaintext = plaintext;
+      this.titleCaseKey = titleCaseKey;
+      this.camelCaseKey = camelCaseKey;
     }
 
     public boolean isInactiveBallot() {
       return isInactiveBallot;
     }
 
-    public String getPlaintext() {
-      return plaintext;
+    public String getTitleCaseKey() {
+      return titleCaseKey;
+    }
+
+    public String getCamelCaseKey() {
+      return camelCaseKey;
     }
   }
 

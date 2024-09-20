@@ -382,20 +382,16 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    List<Pair<String, StatusForRound>> statusesToPrint = new ArrayList<>();
-    statusesToPrint.add(new Pair<>("Overvotes",
-            StatusForRound.INVALIDATED_BY_OVERVOTE));
-    statusesToPrint.add(new Pair<>("Skipped Rankings",
-            StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
-    statusesToPrint.add(new Pair<>("Exhausted Choices",
-            StatusForRound.EXHAUSTED_CHOICE));
-    statusesToPrint.add(new Pair<>("Repeated Rankings",
-            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
+    List<StatusForRound> statusesToPrint = new ArrayList<>();
+    statusesToPrint.add(StatusForRound.INVALIDATED_BY_OVERVOTE);
+    statusesToPrint.add(StatusForRound.INVALIDATED_BY_SKIPPED_RANKING);
+    statusesToPrint.add(StatusForRound.EXHAUSTED_CHOICE);
+    statusesToPrint.add(StatusForRound.INVALIDATED_BY_REPEATED_RANKING);
 
-    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
-      csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
+    for (StatusForRound statusToPrint : statusesToPrint) {
+      csvPrinter.print(statusToPrint.getTitleCaseKey());
 
-      StatusForRound status = statusToPrint.getValue();
+      StatusForRound status = statusToPrint;
       for (int round = 1; round <= numRounds; round++) {
         BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
         csvPrinter.print(thisRoundInactive);
@@ -457,7 +453,7 @@ class ResultsWriter {
 
     if (config.usesSurpluses()) {
       // row for final round surplus (if needed)
-      csvPrinter.print("Final Round Surplus");
+      csvPrinter.print(StatusForRound.FINAL_ROUND_SURPLUS.getTitleCaseKey());
       for (int round = 1; round <= numRounds; round++) {
         BigDecimal finalRoundSurplus =
                 roundTallies.get(round).getBallotStatusTally(StatusForRound.FINAL_ROUND_SURPLUS);
@@ -1028,23 +1024,18 @@ class ResultsWriter {
 
   private Map<String, BigDecimal> getInactiveJsonMap(RoundTally roundTally) {
     Map<String, BigDecimal> inactiveMap = new HashMap<>();
-    List<Pair<String, StatusForRound>> statusesToPrint = new ArrayList<>();
-    statusesToPrint.add(new Pair<>("overvotes",
-            StatusForRound.INVALIDATED_BY_OVERVOTE));
-    statusesToPrint.add(new Pair<>("skippedRankings",
-            StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
-    statusesToPrint.add(new Pair<>("exhaustedChoices",
-            StatusForRound.EXHAUSTED_CHOICE));
-    statusesToPrint.add(new Pair<>("repeatedRankings",
-            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
+    List<StatusForRound> statusesToPrint = new ArrayList<>();
+    statusesToPrint.add(StatusForRound.INVALIDATED_BY_OVERVOTE);
+    statusesToPrint.add(StatusForRound.INVALIDATED_BY_SKIPPED_RANKING);
+    statusesToPrint.add(StatusForRound.EXHAUSTED_CHOICE);
+    statusesToPrint.add(StatusForRound.INVALIDATED_BY_REPEATED_RANKING);
     if (config.usesSurpluses()
         && roundTally.getRoundNumber() == numRounds) {
-      statusesToPrint.add(new Pair<>("finalRoundSurplus",
-              StatusForRound.FINAL_ROUND_SURPLUS));
+      statusesToPrint.add(StatusForRound.FINAL_ROUND_SURPLUS);
     }
-    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
+    for (StatusForRound statusToPrint : statusesToPrint) {
       inactiveMap.put(
-          statusToPrint.getKey(), roundTally.getBallotStatusTally(statusToPrint.getValue()));
+          statusToPrint.getCamelCaseKey(), roundTally.getBallotStatusTally(statusToPrint));
     }
     return inactiveMap;
   }

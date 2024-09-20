@@ -1007,7 +1007,7 @@ final class Tabulator {
 
     final String outcomeDescription = statusForRound == StatusForRound.ACTIVE
             ? selectedCandidate
-            : statusForRound.getPlaintext() + additionalLogText;
+            : statusForRound.getTitleCaseKey() + additionalLogText;
     final VoteOutcomeType outcomeType =
         selectedCandidate == null ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
     cvr.logRoundOutcome(
