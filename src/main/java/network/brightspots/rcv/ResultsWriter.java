@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 import network.brightspots.rcv.ContestConfig.TabulateBySlice;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -78,6 +79,14 @@ class ResultsWriter {
   private String timestampString;
   // map from round number to residual surplus generated in that round
   private Map<Integer, BigDecimal> roundToResidualSurplus;
+  // statuses to print in all summary files
+  // (additional fields are added if needed in specific summary filetypes)
+  private static final List<StatusForRound> STATUSES_TO_PRINT = List.of(
+          StatusForRound.INVALIDATED_BY_OVERVOTE,
+          StatusForRound.INVALIDATED_BY_SKIPPED_RANKING,
+          StatusForRound.EXHAUSTED_CHOICE,
+          StatusForRound.INVALIDATED_BY_REPEATED_RANKING);
+
 
   // visible for testing
   @SuppressWarnings("WeakerAccess")
@@ -382,16 +391,9 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    List<StatusForRound> statusesToPrint = new ArrayList<>();
-    statusesToPrint.add(StatusForRound.INVALIDATED_BY_OVERVOTE);
-    statusesToPrint.add(StatusForRound.INVALIDATED_BY_SKIPPED_RANKING);
-    statusesToPrint.add(StatusForRound.EXHAUSTED_CHOICE);
-    statusesToPrint.add(StatusForRound.INVALIDATED_BY_REPEATED_RANKING);
+    for (StatusForRound status : STATUSES_TO_PRINT) {
+      csvPrinter.print(status.getTitleCaseKey());
 
-    for (StatusForRound statusToPrint : statusesToPrint) {
-      csvPrinter.print(statusToPrint.getTitleCaseKey());
-
-      StatusForRound status = statusToPrint;
       for (int round = 1; round <= numRounds; round++) {
         BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
         csvPrinter.print(thisRoundInactive);
@@ -1023,21 +1025,16 @@ class ResultsWriter {
   }
 
   private Map<String, BigDecimal> getInactiveJsonMap(RoundTally roundTally) {
-    Map<String, BigDecimal> inactiveMap = new HashMap<>();
-    List<StatusForRound> statusesToPrint = new ArrayList<>();
-    statusesToPrint.add(StatusForRound.INVALIDATED_BY_OVERVOTE);
-    statusesToPrint.add(StatusForRound.INVALIDATED_BY_SKIPPED_RANKING);
-    statusesToPrint.add(StatusForRound.EXHAUSTED_CHOICE);
-    statusesToPrint.add(StatusForRound.INVALIDATED_BY_REPEATED_RANKING);
-    if (config.usesSurpluses()
-        && roundTally.getRoundNumber() == numRounds) {
-      statusesToPrint.add(StatusForRound.FINAL_ROUND_SURPLUS);
+    Map<String, BigDecimal> result = STATUSES_TO_PRINT.stream()
+            .collect(Collectors.toMap(StatusForRound::getCamelCaseKey,
+                    roundTally::getBallotStatusTally));
+
+    if (config.usesSurpluses() && roundTally.getRoundNumber() == numRounds) {
+      result.put(StatusForRound.FINAL_ROUND_SURPLUS.getCamelCaseKey(),
+              roundTally.getBallotStatusTally(StatusForRound.FINAL_ROUND_SURPLUS));
     }
-    for (StatusForRound statusToPrint : statusesToPrint) {
-      inactiveMap.put(
-          statusToPrint.getCamelCaseKey(), roundTally.getBallotStatusTally(statusToPrint));
-    }
-    return inactiveMap;
+
+    return result;
   }
 
   // adds action objects to input action list representing all actions applied this round
