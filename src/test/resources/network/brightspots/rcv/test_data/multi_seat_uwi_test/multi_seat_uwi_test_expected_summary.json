@@ -86,6 +86,7 @@
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "6.0000",
+      "finalRoundSurplus" : "0.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

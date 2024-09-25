@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 import network.brightspots.rcv.ContestConfig.TabulateBySlice;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -78,6 +79,14 @@ class ResultsWriter {
   private String timestampString;
   // map from round number to residual surplus generated in that round
   private Map<Integer, BigDecimal> roundToResidualSurplus;
+  // statuses to print in all summary files
+  // (additional fields are added if needed in specific summary filetypes)
+  private static final List<StatusForRound> STATUSES_TO_PRINT = List.of(
+          StatusForRound.INVALIDATED_BY_OVERVOTE,
+          StatusForRound.INVALIDATED_BY_SKIPPED_RANKING,
+          StatusForRound.EXHAUSTED_CHOICE,
+          StatusForRound.INVALIDATED_BY_REPEATED_RANKING);
+
 
   // visible for testing
   @SuppressWarnings("WeakerAccess")
@@ -258,9 +267,11 @@ class ResultsWriter {
   // creates summary files for the votes split by a TabulateBySlice
   // param: roundTalliesBySlice is map from a slice type to the round-by-round vote tallies
   // param: tallyTransfersBySlice is a map from a slice type to tally transfers for that slice
+  // param: candidateOrder is to allow a consistent ordering of candidates, including across slices
   void generateBySliceSummaryFiles(
         Tabulator.BreakdownBySlice<RoundTallies> roundTalliesBySlice,
-        Tabulator.BreakdownBySlice<TallyTransfers> tallyTransfersBySlice)
+        Tabulator.BreakdownBySlice<TallyTransfers> tallyTransfersBySlice,
+        List<String> candidateOrder)
       throws IOException {
     for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
       Set<String> filenames = new HashSet<>();
@@ -271,7 +282,7 @@ class ResultsWriter {
         String sliceFileString = getFileStringForSlice(slice, sliceId, filenames);
         String outputPath = getOutputFilePathFromInstance(
             String.format("%s_summary", sliceFileString));
-        generateSummarySpreadsheet(roundTallies, slice, sliceId, outputPath);
+        generateSummarySpreadsheet(roundTallies, candidateOrder, slice, sliceId, outputPath);
         generateSummaryJson(roundTallies, tallyTransfers, slice, sliceId, outputPath);
       }
     }
@@ -279,12 +290,26 @@ class ResultsWriter {
 
   // create a summary spreadsheet .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
+  // param: candidateOrder is to allow a consistent ordering of candidates, including across slices
   // param: slice indicates which type of slice we're reporting results for (null means all)
   // param: sliceId indicates the specific slice ID we're reporting results for (null means all)
   // param: outputPath is the path to the output file, minus its extension
   private void generateSummarySpreadsheet(
-          RoundTallies roundTallies, TabulateBySlice slice, String sliceId, String outputPath)
-      throws IOException {
+          RoundTallies roundTallies,
+          List<String> candidateOrder,
+          TabulateBySlice slice,
+          String sliceId,
+          String outputPath) throws IOException {
+    // Check that all candidates are included in the candidate order
+    Set<String> expectedCandidates = roundTallies.get(1).getCandidates();
+    Set<String> providedCandidates = new HashSet<>(candidateOrder);
+    if (!expectedCandidates.equals(providedCandidates)) {
+      throw new IllegalArgumentException(
+              "Candidate order must include all candidates in the contest. "
+                      + "\nExpected: " + expectedCandidates
+                      + "\nProvided: " + providedCandidates);
+    }
+
     AuditableFile csvFile = new AuditableFile(outputPath + ".csv");
     Logger.info("Generating summary spreadsheet: %s...", csvFile.getAbsolutePath());
 
@@ -310,16 +335,15 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    // actions don't make sense in individual by-slice results
-    if (isNullOrBlank(sliceId)) {
-      addActionRows(csvPrinter);
-    }
+    final boolean isSlice = !isNullOrBlank(sliceId);
+    csvPrinter.print(isSlice ? "Eliminated*" : "Eliminated");
+    printActionSummary(csvPrinter, roundToEliminatedCandidates);
 
-    // Get all candidates sorted by their first round tally. This determines the display order.
-    List<String> sortedCandidates = roundTallies.get(1).getSortedCandidatesByTally();
+    csvPrinter.print(isSlice ? "Elected*" : "Elected");
+    printActionSummary(csvPrinter, roundToWinningCandidates);
 
     // For each candidate: for each round: output total votes
-    for (String candidate : sortedCandidates) {
+    for (String candidate : candidateOrder) {
       String candidateDisplayName = config.getNameForCandidate(candidate);
       csvPrinter.print(candidateDisplayName);
       for (int round = 1; round <= numRounds; round++) {
@@ -332,8 +356,13 @@ class ResultsWriter {
         // Vote count
         csvPrinter.print(thisRoundTally);
 
-        // Vote %
-        BigDecimal votePctDivisor = roundTallies.get(round).activeAndLockedInBallotSum();
+        // Vote % (divisor is 1st round total in STV or 1st round determines threshold)
+        BigDecimal votePctDivisor;
+        if (config.isSingleWinnerEnabled() && !config.isFirstRoundDeterminesThresholdEnabled()) {
+          votePctDivisor = roundTallies.get(round).activeAndLockedInBallotSum();
+        } else {
+          votePctDivisor = roundTallies.get(1).activeAndLockedInBallotSum();
+        }
         if (votePctDivisor != BigDecimal.ZERO) {
           // Turn a decimal into a human-readable percentage (e.g. 0.1234 -> 12.34%)
           BigDecimal divDecimal = thisRoundTally.divide(votePctDivisor, MathContext.DECIMAL32);
@@ -366,28 +395,19 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    csvPrinter.print("Current Round Threshold");
-    for (int round = 1; round <= numRounds; round++) {
-      csvPrinter.print(roundTallies.get(round).getWinningThreshold());
-      csvPrinter.print("");
-      csvPrinter.print("");
+    if (!isSlice) {
+      csvPrinter.print("Current Round Threshold");
+      for (int round = 1; round <= numRounds; round++) {
+        csvPrinter.print(roundTallies.get(round).getWinningThreshold());
+        csvPrinter.print("");
+        csvPrinter.print("");
+      }
+      csvPrinter.println();
     }
-    csvPrinter.println();
 
-    List<Pair<String, StatusForRound>> statusesToPrint = new ArrayList<>();
-    statusesToPrint.add(new Pair<>("Overvotes",
-            StatusForRound.INVALIDATED_BY_OVERVOTE));
-    statusesToPrint.add(new Pair<>("Skipped Rankings",
-            StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
-    statusesToPrint.add(new Pair<>("Exhausted Choices",
-            StatusForRound.EXHAUSTED_CHOICE));
-    statusesToPrint.add(new Pair<>("Repeated Rankings",
-            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
+    for (StatusForRound status : STATUSES_TO_PRINT) {
+      csvPrinter.print(status.getTitleCaseKey());
 
-    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
-      csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
-
-      StatusForRound status = statusToPrint.getValue();
       for (int round = 1; round <= numRounds; round++) {
         BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
         csvPrinter.print(thisRoundInactive);
@@ -435,7 +455,7 @@ class ResultsWriter {
     // whether the value in the final round is positive.
     // Note that this concept only makes sense when we're reporting the overall tabulation, so we
     // omit it when generating results at the individual by-slice level.
-    if (sliceId == null && roundToResidualSurplus.get(numRounds).signum() == 1) {
+    if (!isSlice && roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round));
@@ -444,6 +464,28 @@ class ResultsWriter {
         csvPrinter.print("");
         csvPrinter.print("");
       }
+      csvPrinter.println();
+    }
+
+    if (config.usesSurpluses()) {
+      // row for final round surplus (if needed)
+      csvPrinter.print(StatusForRound.FINAL_ROUND_SURPLUS.getTitleCaseKey());
+      for (int round = 1; round <= numRounds; round++) {
+        BigDecimal finalRoundSurplus =
+                roundTallies.get(round).getBallotStatusTally(StatusForRound.FINAL_ROUND_SURPLUS);
+        csvPrinter.print(finalRoundSurplus.equals(BigDecimal.ZERO) ? "" : finalRoundSurplus);
+
+        // Don't display transfer or percentage of residual surplus
+        csvPrinter.print("");
+        csvPrinter.print("");
+      }
+      csvPrinter.println();
+    }
+
+    if (isSlice) {
+      csvPrinter.println();
+      csvPrinter.print(String.format("*Elect/Eliminate decisions are from the full contest. "
+              + "All other results on this report are at the %s level.", slice.toLowerString()));
       csvPrinter.println();
     }
 
@@ -456,15 +498,6 @@ class ResultsWriter {
       throw exception;
     }
     Logger.info("Summary spreadsheet generated successfully.");
-  }
-
-  // "action" rows describe which candidates were eliminated or elected
-  private void addActionRows(CSVPrinter csvPrinter) throws IOException {
-    csvPrinter.print("Eliminated");
-    printActionSummary(csvPrinter, roundToEliminatedCandidates);
-
-    csvPrinter.print("Elected");
-    printActionSummary(csvPrinter, roundToWinningCandidates);
   }
 
   private void addContestSummaryRows(CSVPrinter csvPrinter, RoundTally round1Tally)
@@ -533,19 +566,27 @@ class ResultsWriter {
         winners.add(config.getNameForCandidate(candidateName));
       }
     }
+
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
-    csvPrinter.printRecord("Final Threshold", winningThreshold);
+
     if (!isNullOrBlank(sliceId)) {
+      // Only slices print the slice information
       csvPrinter.printRecord(slice, sliceId);
+    } else {
+      // Only non-slices print threshold information
+      csvPrinter.printRecord("Final Threshold", winningThreshold);
     }
+
     csvPrinter.println();
   }
 
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a specific slice)
   void generateOverallSummaryFiles(
-      RoundTallies roundTallies, TallyTransfers tallyTransfers) throws IOException {
+      RoundTallies roundTallies,
+      TallyTransfers tallyTransfers,
+      List<String> candidateOrder) throws IOException {
     String outputPath = getOutputFilePathFromInstance("summary");
-    generateSummarySpreadsheet(roundTallies, null, null, outputPath);
+    generateSummarySpreadsheet(roundTallies, candidateOrder, null, null, outputPath);
     generateSummaryJson(roundTallies, tallyTransfers, null, null, outputPath);
   }
 
@@ -989,23 +1030,16 @@ class ResultsWriter {
   }
 
   private Map<String, BigDecimal> getInactiveJsonMap(RoundTally roundTally) {
-    Map<String, BigDecimal> inactiveMap = new HashMap<>();
-    Pair<String, StatusForRound>[] statusesToPrint =
-        new Pair[] {
-          new Pair<>("overvotes",
-                     StatusForRound.INVALIDATED_BY_OVERVOTE),
-          new Pair<>("skippedRankings",
-                     StatusForRound.INVALIDATED_BY_SKIPPED_RANKING),
-          new Pair<>("repeatedRankings",
-                     StatusForRound.INVALIDATED_BY_REPEATED_RANKING),
-          new Pair<>("exhaustedChoices",
-                     StatusForRound.EXHAUSTED_CHOICE),
-        };
-    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
-      inactiveMap.put(
-          statusToPrint.getKey(), roundTally.getBallotStatusTally(statusToPrint.getValue()));
+    Map<String, BigDecimal> result = STATUSES_TO_PRINT.stream()
+            .collect(Collectors.toMap(StatusForRound::getCamelCaseKey,
+                    roundTally::getBallotStatusTally));
+
+    if (config.usesSurpluses() && roundTally.getRoundNumber() == numRounds) {
+      result.put(StatusForRound.FINAL_ROUND_SURPLUS.getCamelCaseKey(),
+              roundTally.getBallotStatusTally(StatusForRound.FINAL_ROUND_SURPLUS));
     }
-    return inactiveMap;
+
+    return result;
   }
 
   // adds action objects to input action list representing all actions applied this round
@@ -1024,7 +1058,7 @@ class ResultsWriter {
       TallyTransfers tallyTransfers) {
     // check for valid candidates:
     // "drop undeclared write-in" may result in no one actually being eliminated
-    if (candidates != null && candidates.size() > 0) {
+    if (candidates != null && !candidates.isEmpty()) {
       // transfers contains all vote transfers for this round
       // we add one to the round since transfers are currently stored under the round AFTER
       // the tallies which triggered them
