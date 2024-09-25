@@ -68,15 +68,15 @@
     "tallyResults" : [ {
       "elected" : "C",
       "transfers" : {
-        "D" : "2.0994",
-        "exhausted" : "0.1497",
+        "exhausted" : "2.2491",
         "residual surplus" : "0.0002"
       }
     } ],
     "threshold" : "2.2501"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0.1497",
+      "exhaustedChoices" : "0",
+      "finalRoundSurplus" : "2.2491",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -86,7 +86,7 @@
       "A" : "2.2501",
       "B" : "2.2501",
       "C" : "2.2501",
-      "D" : "2.0994"
+      "D" : "0"
     },
     "tallyResults" : [ ],
     "threshold" : "2.2501"

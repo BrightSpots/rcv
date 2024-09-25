@@ -206,7 +206,7 @@ final class Tabulator {
         }
         // In multi-seat contests, we always redistribute the surplus (if any) unless bottoms-up
         // is enabled.
-        if (config.getNumberOfWinners() > 1 && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
+        if (config.usesSurpluses()) {
           for (String winner : winners) {
             BigDecimal candidateVotes = currentRoundTally.getCandidateTally(winner);
             // number that were surplus (beyond the required threshold)
@@ -502,9 +502,8 @@ final class Tabulator {
       // bottoms-up is enabled, in which case we can stop as soon as we've declared the winners.
       keepTabulating =
           numWinnersDeclared < config.getNumberOfWinners()
-              || (config.getNumberOfWinners() > 1
-                  && winnerToRound.containsValue(currentRound)
-                  && !config.isMultiSeatBottomsUpUntilNWinnersEnabled());
+              || (config.usesSurpluses()
+                  && winnerToRound.containsValue(currentRound));
     }
     return keepTabulating;
   }
@@ -1006,24 +1005,10 @@ final class Tabulator {
       }
     }
 
-    String outcomeDescription;
-    switch (statusForRound) {
-      case ACTIVE -> outcomeDescription = selectedCandidate;
-      case DID_NOT_RANK_ANY_CANDIDATES -> outcomeDescription =
-          "did not rank any candidates" + additionalLogText;
-      case INVALIDATED_BY_OVERVOTE -> outcomeDescription =
-          "invalidated by overvote" + additionalLogText;
-      case EXHAUSTED_CHOICE -> outcomeDescription =
-          "exhausted choice" + additionalLogText;
-      case INVALIDATED_BY_SKIPPED_RANKING -> outcomeDescription =
-          "invalidated by skipped ranking" + additionalLogText;
-      case INVALIDATED_BY_REPEATED_RANKING -> outcomeDescription =
-          "invalidated by repeated ranking" + additionalLogText;
-      default ->
-      // Programming error: we missed a status here
-      throw new RuntimeException("Unexpected ballot status: " + statusForRound);
-    }
-    VoteOutcomeType outcomeType =
+    final String outcomeDescription = statusForRound == StatusForRound.ACTIVE
+            ? selectedCandidate
+            : statusForRound.getTitleCaseKey() + additionalLogText;
+    final VoteOutcomeType outcomeType =
         selectedCandidate == null ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
     cvr.logRoundOutcome(
         currentRoundTally.getRoundNumber(),
@@ -1095,6 +1080,7 @@ final class Tabulator {
 
       // iterate through the rankings in this cvr from most to least preferred.
       // for each ranking:
+      //  check if it's a final round surplus
       //  if it results in an overvote or undervote, exhaust the cvr
       //  if a selected candidate is continuing, count cvr for that candidate
       //  if no selected candidate is continuing, look at the next ranking
@@ -1114,6 +1100,19 @@ final class Tabulator {
       for (Pair<Integer, CandidatesAtRanking> rankCandidatesPair : cvr.candidateRankings) {
         Integer rank = rankCandidatesPair.getKey();
         CandidatesAtRanking candidates = rankCandidatesPair.getValue();
+
+        // check for final round surplus
+        if (config.usesSurpluses()
+            && config.getNumberOfWinners() == winnerToRound.size()) {
+          recordSelectionForCastVoteRecord(
+                  cvr,
+                  roundTally,
+                  roundTallyBySlice,
+                  null,
+                  StatusForRound.FINAL_ROUND_SURPLUS,
+                  "");
+          break;
+        }
 
         // check for skipped ranking exhaustion
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE

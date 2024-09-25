@@ -123,10 +123,11 @@
     "threshold" : "8"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "3.4000",
+      "exhaustedChoices" : "0.0000",
+      "finalRoundSurplus" : "4.0000",
       "overvotes" : "0",
       "repeatedRankings" : "0",
-      "skippedRankings" : "2.6000"
+      "skippedRankings" : "2.0000"
     },
     "round" : 6,
     "tally" : {

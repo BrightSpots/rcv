@@ -947,6 +947,10 @@ class ContestConfig {
     return rawConfig.rules.nonIntegerWinningThreshold;
   }
 
+  boolean usesSurpluses() {
+    return getNumberOfWinners() > 1 && !isMultiSeatBottomsUpUntilNWinnersEnabled();
+  }
+
   boolean isHareQuotaEnabled() {
     return rawConfig.rules.hareQuota;
   }

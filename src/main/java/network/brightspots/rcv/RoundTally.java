@@ -204,14 +204,15 @@ class RoundTally {
 
   private void countBallots() {
     inactiveBallotSum = BigDecimal.ZERO;
+    activeBallotSum = BigDecimal.ZERO;
     ballotStatusTallies.forEach(
         (statusForRound, tally) -> {
-          if (statusForRound != StatusForRound.ACTIVE) {
+          if (statusForRound.isInactiveBallot()) {
             inactiveBallotSum = inactiveBallotSum.add(tally);
+          } else {
+            activeBallotSum = activeBallotSum.add(tally);
           }
         });
-
-    activeBallotSum = ballotStatusTallies.get(StatusForRound.ACTIVE);
   }
 
   private void ensureFinalized() {
