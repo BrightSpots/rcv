@@ -10,6 +10,7 @@
   "results" : [ {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
+      "finalRoundSurplus" : "0",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"

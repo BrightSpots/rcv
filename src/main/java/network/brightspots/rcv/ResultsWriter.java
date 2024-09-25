@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 import network.brightspots.rcv.ContestConfig.TabulateBySlice;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -78,6 +79,14 @@ class ResultsWriter {
   private String timestampString;
   // map from round number to residual surplus generated in that round
   private Map<Integer, BigDecimal> roundToResidualSurplus;
+  // statuses to print in all summary files
+  // (additional fields are added if needed in specific summary filetypes)
+  private static final List<StatusForRound> STATUSES_TO_PRINT = List.of(
+          StatusForRound.INVALIDATED_BY_OVERVOTE,
+          StatusForRound.INVALIDATED_BY_SKIPPED_RANKING,
+          StatusForRound.EXHAUSTED_CHOICE,
+          StatusForRound.INVALIDATED_BY_REPEATED_RANKING);
+
 
   // visible for testing
   @SuppressWarnings("WeakerAccess")
@@ -382,20 +391,9 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    List<Pair<String, StatusForRound>> statusesToPrint = new ArrayList<>();
-    statusesToPrint.add(new Pair<>("Overvotes",
-            StatusForRound.INVALIDATED_BY_OVERVOTE));
-    statusesToPrint.add(new Pair<>("Skipped Rankings",
-            StatusForRound.INVALIDATED_BY_SKIPPED_RANKING));
-    statusesToPrint.add(new Pair<>("Exhausted Choices",
-            StatusForRound.EXHAUSTED_CHOICE));
-    statusesToPrint.add(new Pair<>("Repeated Rankings",
-            StatusForRound.INVALIDATED_BY_REPEATED_RANKING));
+    for (StatusForRound status : STATUSES_TO_PRINT) {
+      csvPrinter.print(status.getTitleCaseKey());
 
-    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
-      csvPrinter.print("Inactive Ballots by " + statusToPrint.getKey());
-
-      StatusForRound status = statusToPrint.getValue();
       for (int round = 1; round <= numRounds; round++) {
         BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
         csvPrinter.print(thisRoundInactive);
@@ -447,6 +445,21 @@ class ResultsWriter {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round));
+
+        // Don't display transfer or percentage of residual surplus
+        csvPrinter.print("");
+        csvPrinter.print("");
+      }
+      csvPrinter.println();
+    }
+
+    if (config.usesSurpluses()) {
+      // row for final round surplus (if needed)
+      csvPrinter.print(StatusForRound.FINAL_ROUND_SURPLUS.getTitleCaseKey());
+      for (int round = 1; round <= numRounds; round++) {
+        BigDecimal finalRoundSurplus =
+                roundTallies.get(round).getBallotStatusTally(StatusForRound.FINAL_ROUND_SURPLUS);
+        csvPrinter.print(finalRoundSurplus.equals(BigDecimal.ZERO) ? "" : finalRoundSurplus);
 
         // Don't display transfer or percentage of residual surplus
         csvPrinter.print("");
@@ -1012,23 +1025,16 @@ class ResultsWriter {
   }
 
   private Map<String, BigDecimal> getInactiveJsonMap(RoundTally roundTally) {
-    Map<String, BigDecimal> inactiveMap = new HashMap<>();
-    Pair<String, StatusForRound>[] statusesToPrint =
-        new Pair[] {
-          new Pair<>("overvotes",
-                     StatusForRound.INVALIDATED_BY_OVERVOTE),
-          new Pair<>("skippedRankings",
-                     StatusForRound.INVALIDATED_BY_SKIPPED_RANKING),
-          new Pair<>("repeatedRankings",
-                     StatusForRound.INVALIDATED_BY_REPEATED_RANKING),
-          new Pair<>("exhaustedChoices",
-                     StatusForRound.EXHAUSTED_CHOICE),
-        };
-    for (Pair<String, StatusForRound> statusToPrint : statusesToPrint) {
-      inactiveMap.put(
-          statusToPrint.getKey(), roundTally.getBallotStatusTally(statusToPrint.getValue()));
+    Map<String, BigDecimal> result = STATUSES_TO_PRINT.stream()
+            .collect(Collectors.toMap(StatusForRound::getCamelCaseKey,
+                    roundTally::getBallotStatusTally));
+
+    if (config.usesSurpluses() && roundTally.getRoundNumber() == numRounds) {
+      result.put(StatusForRound.FINAL_ROUND_SURPLUS.getCamelCaseKey(),
+              roundTally.getBallotStatusTally(StatusForRound.FINAL_ROUND_SURPLUS));
     }
-    return inactiveMap;
+
+    return result;
   }
 
   // adds action objects to input action list representing all actions applied this round
@@ -1047,7 +1053,7 @@ class ResultsWriter {
       TallyTransfers tallyTransfers) {
     // check for valid candidates:
     // "drop undeclared write-in" may result in no one actually being eliminated
-    if (candidates != null && candidates.size() > 0) {
+    if (candidates != null && !candidates.isEmpty()) {
       // transfers contains all vote transfers for this round
       // we add one to the round since transfers are currently stored under the round AFTER
       // the tallies which triggered them
