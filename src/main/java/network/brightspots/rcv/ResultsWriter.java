@@ -282,10 +282,28 @@ class ResultsWriter {
         String sliceFileString = getFileStringForSlice(slice, sliceId, filenames);
         String outputPath = getOutputFilePathFromInstance(
             String.format("%s_summary", sliceFileString));
-        generateSummarySpreadsheet(roundTallies, candidateOrder, slice, sliceId, outputPath);
+        generateSummaryExtendedCsv(roundTallies, candidateOrder, slice, sliceId, outputPath);
         generateSummaryJson(roundTallies, tallyTransfers, slice, sliceId, outputPath);
       }
     }
+  }
+
+  private void generateSummaryExtendedCsv(
+          RoundTallies roundTallies,
+          List<String> candidateOrder,
+          TabulateBySlice slice,
+          String sliceId,
+          String outputPath) throws IOException {
+    generateSummaryCsvHelper(roundTallies, candidateOrder, slice, sliceId, outputPath, true);
+  }
+
+  private void generateSummaryCsv(
+          RoundTallies roundTallies,
+          List<String> candidateOrder,
+          TabulateBySlice slice,
+          String sliceId,
+          String outputPath) throws IOException {
+    generateSummaryCsvHelper(roundTallies, candidateOrder, slice, sliceId, outputPath, false);
   }
 
   // create a summary spreadsheet .csv file
@@ -294,12 +312,14 @@ class ResultsWriter {
   // param: slice indicates which type of slice we're reporting results for (null means all)
   // param: sliceId indicates the specific slice ID we're reporting results for (null means all)
   // param: outputPath is the path to the output file, minus its extension
-  private void generateSummarySpreadsheet(
+  // param: extended include additional details in the output file?
+  private void generateSummaryCsvHelper(
           RoundTallies roundTallies,
           List<String> candidateOrder,
           TabulateBySlice slice,
           String sliceId,
-          String outputPath) throws IOException {
+          String outputPath,
+          boolean extended) throws IOException {
     // Check that all candidates are included in the candidate order
     Set<String> expectedCandidates = roundTallies.get(1).getCandidates();
     Set<String> providedCandidates = new HashSet<>(candidateOrder);
@@ -363,7 +383,7 @@ class ResultsWriter {
         } else {
           votePctDivisor = roundTallies.get(1).activeAndLockedInBallotSum();
         }
-        if (votePctDivisor != BigDecimal.ZERO) {
+        if (!votePctDivisor.equals(BigDecimal.ZERO)) {
           // Turn a decimal into a human-readable percentage (e.g. 0.1234 -> 12.34%)
           BigDecimal divDecimal = thisRoundTally.divide(votePctDivisor, MathContext.DECIMAL32);
           csvPrinter.print(divDecimal.scaleByPowerOfTen(4).intValue() / 100.0 + "%");
@@ -405,26 +425,28 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    for (StatusForRound status : STATUSES_TO_PRINT) {
-      csvPrinter.print(status.getTitleCaseKey());
+    if (extended) {
+      for (StatusForRound status : STATUSES_TO_PRINT) {
+        csvPrinter.print(status.getTitleCaseKey());
 
-      for (int round = 1; round <= numRounds; round++) {
-        BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
-        csvPrinter.print(thisRoundInactive);
+        for (int round = 1; round <= numRounds; round++) {
+          BigDecimal thisRoundInactive = roundTallies.get(round).getBallotStatusTally(status);
+          csvPrinter.print(thisRoundInactive);
 
-        // Don't display percentage of inactive ballots
-        csvPrinter.print("");
+          // Don't display percentage of inactive ballots
+          csvPrinter.print("");
 
-        // Do display transfer of inactive ballots
-        if (round != numRounds) {
-          BigDecimal nextRoundInactive = roundTallies.get(round + 1).getBallotStatusTally(status);
-          BigDecimal diff = nextRoundInactive.subtract(thisRoundInactive);
-          csvPrinter.print(diff);
-        } else {
-          csvPrinter.print(0);
+          // Do display transfer of inactive ballots
+          if (round != numRounds) {
+            BigDecimal nextRoundInactive = roundTallies.get(round + 1).getBallotStatusTally(status);
+            BigDecimal diff = nextRoundInactive.subtract(thisRoundInactive);
+            csvPrinter.print(diff);
+          } else {
+            csvPrinter.print(0);
+          }
         }
+        csvPrinter.println();
       }
-      csvPrinter.println();
     }
 
     csvPrinter.print("Inactive Ballots Total");
@@ -585,9 +607,11 @@ class ResultsWriter {
       RoundTallies roundTallies,
       TallyTransfers tallyTransfers,
       List<String> candidateOrder) throws IOException {
-    String outputPath = getOutputFilePathFromInstance("summary");
-    generateSummarySpreadsheet(roundTallies, candidateOrder, null, null, outputPath);
-    generateSummaryJson(roundTallies, tallyTransfers, null, null, outputPath);
+    String outputPathSummary = getOutputFilePathFromInstance("summary");
+    String outputPathExtended = getOutputFilePathFromInstance("extended_summary");
+    generateSummaryExtendedCsv(roundTallies, candidateOrder, null, null, outputPathExtended);
+    generateSummaryCsv(roundTallies, candidateOrder, null, null, outputPathSummary);
+    generateSummaryJson(roundTallies, tallyTransfers, null, null, outputPathSummary);
   }
 
   // Write CastVoteRecords for the specified contest to the provided folder,

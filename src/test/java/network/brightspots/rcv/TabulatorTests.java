@@ -18,9 +18,11 @@
 
 package network.brightspots.rcv;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -147,8 +149,8 @@ class TabulatorTests {
 
   private static boolean fileCompareLineByLine(String path1, String path2) {
     boolean result = true;
-    try (BufferedReader br1 = new BufferedReader(new FileReader(path1, StandardCharsets.UTF_8));
-        BufferedReader br2 = new BufferedReader(new FileReader(path2, StandardCharsets.UTF_8))) {
+    try (BufferedReader br1 = new BufferedReader(new FileReader(path1, UTF_8));
+        BufferedReader br2 = new BufferedReader(new FileReader(path2, UTF_8))) {
       int currentLine = 1;
       int errorCount = 0;
 
@@ -321,7 +323,8 @@ class TabulatorTests {
   private static void compareFiles(
       ContestConfig config, String stem, String timestampString, String sequentialId) {
     compareFiles(config, stem, "summary", ".json", timestampString, sequentialId, false);
-    compareFiles(config, stem, "summary", ".csv", timestampString, sequentialId, false);
+    compareFiles(config, stem, "extended_summary", ".csv", timestampString, sequentialId, false);
+    compareExtendedSummaryToSummary(config, timestampString, sequentialId);
     if (config.isGenerateCdfJsonEnabled()) {
       compareFiles(config, stem, "cvr_cdf", ".json", timestampString, sequentialId, false);
     }
@@ -363,6 +366,51 @@ class TabulatorTests {
       fail();
     }
     return didCompare;
+  }
+
+  /**
+   * Rather than storing both the summary and extended summary in the expected files, we can
+   * directly check that the summary is precisely what we expect: everything in summary, except for
+   * the inactive ballot breakdown. This can be extended to remove other lines in the future,
+   * though it is not suitable for removing columns.
+   */
+  private static void compareExtendedSummaryToSummary(
+          ContestConfig config, String timestampString, String sequentialId) {
+    String summaryPath = ResultsWriter.getOutputFilePath(
+            config.getOutputDirectory(), "summary", timestampString, sequentialId)
+            + ".csv";
+    String extendedPath = ResultsWriter.getOutputFilePath(
+            config.getOutputDirectory(), "extended_summary", timestampString, sequentialId)
+            + ".csv";
+
+    try (BufferedReader brSummary = new BufferedReader(new FileReader(summaryPath, UTF_8));
+         BufferedReader brExtended = new BufferedReader(new FileReader(extendedPath, UTF_8))) {
+      while (true) {
+        // First check the extended file to determine if this line should only exist
+        // in the extended file, or if this file has reached its end then both files should have.
+        String lineExtended = brExtended.readLine();
+        if (lineExtended == null) {
+          assertNull(brSummary.readLine(), "Extended file is missing a line");
+          return;
+        }
+
+        if (lineExtended.startsWith("Inactive Ballots by")) {
+          continue;
+        }
+
+        String lineSummary = brSummary.readLine();
+        assertNotNull(lineSummary, "Summary file is missing a line");
+        if (!lineSummary.equals(lineExtended)) {
+          fail();
+        }
+      }
+    } catch (FileNotFoundException exception) {
+      Logger.severe("File not found!\n%s", exception);
+      fail();
+    } catch (IOException exception) {
+      Logger.severe("Error reading file!\n%s", exception);
+      fail();
+    }
   }
 
   @BeforeAll
