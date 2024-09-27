@@ -1,0 +1,31 @@
+Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Record Id,Precinct,Precinct Portion,Rank 1,Rank 2,Rank 3,Rank 4
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,1,,,Candidate D Name File 1,Candidate D Name File 1,Unused Display Name Candidate A,undervote
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,2,,,Candidate C Name File 1,Unused Display Name Candidate A,Candidate D Name File 1,Candidate B Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,3,,,Candidate C Name File 1,Candidate B Name File 1,Unused Display Name Candidate A,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,4,,,Unused Display Name Candidate A,Candidate C Name File 1,Candidate B Name File 1,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,5,,,Candidate B Name File 1,Candidate C Name File 1,Unused Display Name Candidate A,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,6,,,Unused Display Name Candidate A,Candidate C Name File 1,Candidate B Name File 1,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,7,,,Candidate B Name File 1,Unused Display Name Candidate A,Candidate C Name File 1,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,8,,,Unused Display Name Candidate A,Candidate B Name File 1,Candidate C Name File 1,undervote
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,9,,,Candidate B Name File 1,Candidate C Name File 1,Unused Display Name Candidate A,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,10,,,Unused Display Name Candidate A,Candidate B Name File 1,Candidate D Name File 1,Candidate C Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,11,,,Candidate B Name File 1,Candidate C Name File 1,Unused Display Name Candidate A,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,12,,,Candidate B Name File 1,Unused Display Name Candidate A,Candidate D Name File 1,Candidate C Name File 1
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,13,,,Candidate C Name File 1,Candidate B Name File 1,undervote,undervote
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,14,,,Candidate D Name File 1,Candidate C Name File 1,Unused Display Name Candidate A,undervote
+../_shared/cdf_json/cdf_json_file1_cvr.json,cdf,,,,15,,,Unused Display Name Candidate A,Candidate B Name File 1,Candidate D Name File 1,Candidate C Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,1,,,Candidate D Name File 1,Candidate D Name File 1,Unused Display Name Candidate A,undervote
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,2,,,Candidate C Name File 1,Unused Display Name Candidate A,Candidate D Name File 1,Candidate B Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,3,,,Candidate C Name File 1,Candidate B Name File 1,Unused Display Name Candidate A,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,4,,,Unused Display Name Candidate A,Candidate C Name File 1,Candidate B Name File 1,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,5,,,Candidate B Name File 1,Candidate C Name File 1,Unused Display Name Candidate A,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,6,,,Unused Display Name Candidate A,Candidate C Name File 1,Candidate B Name File 1,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,7,,,Candidate B Name File 1,Unused Display Name Candidate A,Candidate C Name File 1,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,8,,,Unused Display Name Candidate A,Candidate B Name File 1,Candidate C Name File 1,undervote
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,9,,,Candidate B Name File 1,Candidate C Name File 1,Unused Display Name Candidate A,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,10,,,Unused Display Name Candidate A,Candidate B Name File 1,Candidate D Name File 1,Candidate C Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,11,,,Candidate B Name File 1,Candidate C Name File 1,Unused Display Name Candidate A,Candidate D Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,12,,,Candidate B Name File 1,Unused Display Name Candidate A,Candidate D Name File 1,Candidate C Name File 1
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,13,,,Candidate C Name File 1,Candidate B Name File 1,undervote,undervote
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,14,,,Candidate D Name File 1,Candidate C Name File 1,Unused Display Name Candidate A,undervote
+../_shared/cdf_json/cdf_json_file2_cvr.json,cdf,,,,15,,,Unused Display Name Candidate A,Candidate B Name File 1,Candidate D Name File 1,Candidate C Name File 1

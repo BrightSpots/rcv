@@ -375,37 +375,37 @@ class TabulatorTests {
   @Test
   @DisplayName("Test Convert to CDF works for CDF")
   void convertToCdfFromCdf() {
-    runConvertToCdfTest("convert_to_cdf_from_cdf");
+    runConvertToCdfTest("conversions_from_cdf");
   }
 
   @Test
   @DisplayName("Test Convert to CDF works for Dominion")
   void convertToCdfFromDominion() {
-    runConvertToCdfTest("convert_to_cdf_from_dominion");
+    runConvertToCdfTest("conversions_from_dominion");
   }
 
   @Test
   @DisplayName("Test Convert to CDF works for ES&S")
   void convertToCdfFromEss() {
-    runConvertToCdfTest("convert_to_cdf_from_ess");
+    runConvertToCdfTest("conversions_from_ess");
   }
 
   @Test
-  @DisplayName("Test Convert to CSV works for CDF")
+  @DisplayName("Test Convert to RCTab CSV works for CDF")
   void convertToCsvFromCdf() {
-    runConvertToCsvTest("convert_to_cdf_from_cdf");
+    runConvertToCsvTest("conversions_from_cdf");
   }
 
   @Test
-  @DisplayName("Test Convert to CSV works for Dominion")
+  @DisplayName("Test Convert to RCTab CSV works for Dominion")
   void convertToCsvFromDominion() {
-    runConvertToCsvTest("convert_to_cdf_from_dominion");
+    runConvertToCsvTest("conversions_from_dominion");
   }
 
   @Test
-  @DisplayName("Test Convert to CSV works for ES&S")
+  @DisplayName("Test Convert to RCTab CSV works for ES&S")
   void convertToCsvFromEss() {
-    runConvertToCsvTest("convert_to_cdf_from_ess");
+    runConvertToCsvTest("conversions_from_ess");
   }
 
   @Test
