@@ -369,10 +369,9 @@ class TabulatorTests {
   }
 
   /**
-   * Rather than storing both the summary and extended summary in the expected files, we can
-   * directly check that the summary is precisely what we expect: everything in summary, except for
-   * the inactive ballot breakdown. This can be extended to remove other lines in the future,
-   * though it is not suitable for removing columns.
+   * Rather than storing both the extended summary and non-extended summary files in git, we can
+   * directly check that the non-extended file is precisely what we expect: everything in the
+   * extended file except for the inactive ballot breakdown.
    */
   private static void compareExtendedSummaryToSummary(
           ContestConfig config, String timestampString, String sequentialId) {
@@ -386,18 +385,22 @@ class TabulatorTests {
     try (BufferedReader brSummary = new BufferedReader(new FileReader(summaryPath, UTF_8));
          BufferedReader brExtended = new BufferedReader(new FileReader(extendedPath, UTF_8))) {
       while (true) {
-        // First check the extended file to determine if this line should only exist
-        // in the extended file, or if this file has reached its end then both files should have.
         String lineExtended = brExtended.readLine();
+        // If the extended file has reached its end, then the non-extended file must have too
         if (lineExtended == null) {
           assertNull(brSummary.readLine(), "Extended file is missing a line");
           return;
         }
 
+        // If the extended file should be excluded, continue without moving the file pointer
+        // in the non-extended file. For now, there's only one type of row excluded, and they
+        // happen to all start with "Inactive Ballots by"
         if (lineExtended.startsWith("Inactive Ballots by")) {
           continue;
         }
 
+        // This line should be equal in both files. Ensure the line exists and they're equal
+        // in both files.
         String lineSummary = brSummary.readLine();
         assertNotNull(lineSummary, "Summary file is missing a line");
         if (!lineSummary.equals(lineExtended)) {
