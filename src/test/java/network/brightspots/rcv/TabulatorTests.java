@@ -262,7 +262,7 @@ class TabulatorTests {
   }
 
   // Validate convert-to-CSV action, run before every tabulation
-  private static void runConvertToCsvTest(String stem) {
+  private static void runConvertToRCTabCvrTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
     TabulatorSession session = new TabulatorSession(configPath);
     session.tabulate("Automated test");
@@ -391,21 +391,21 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("Test Convert to RCTab CSV works for CDF")
-  void convertToCsvFromCdf() {
-    runConvertToCsvTest("conversions_from_cdf");
+  @DisplayName("Test Convert to rctab_cvr works for CDF")
+  void convertToRCTabCvrFromCdf() {
+    runConvertToRCTabCvrTest("conversions_from_cdf");
   }
 
   @Test
-  @DisplayName("Test Convert to RCTab CSV works for Dominion")
-  void convertToCsvFromDominion() {
-    runConvertToCsvTest("conversions_from_dominion");
+  @DisplayName("Test Convert to rctab_cvr works for Dominion")
+  void convertToRCTabCvrFromDominion() {
+    runConvertToRCTabCvrTest("conversions_from_dominion");
   }
 
   @Test
-  @DisplayName("Test Convert to RCTab CSV works for ES&S")
-  void convertToCsvFromEss() {
-    runConvertToCsvTest("conversions_from_ess");
+  @DisplayName("Test Convert to rctab_cvr works for ES&S")
+  void convertToRCTabCvrFromEss() {
+    runConvertToRCTabCvrTest("conversions_from_ess");
   }
 
   @Test
