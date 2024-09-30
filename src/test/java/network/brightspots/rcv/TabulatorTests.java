@@ -33,7 +33,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -234,12 +233,14 @@ class TabulatorTests {
       int numSlicedFilesChecked = 0;
       for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
         for (String sliceName : session.loadSliceNamesFromCvrs(slice, config)) {
-          String outputType = ResultsWriter.sanitizeStringForOutput(
+          String outputTypeJson = ResultsWriter.sanitizeStringForOutput(
               String.format("%s_%s_summary", sliceName, slice.toLowerString()));
-          if (compareFiles(config, stem, outputType, ".json", timestampString, null, true)) {
+          String outputTypeCsv = ResultsWriter.sanitizeStringForOutput(
+                  String.format("%s_%s_extended_summary", sliceName, slice.toLowerString()));
+          if (compareFiles(config, stem, outputTypeJson, ".json", timestampString, null, true)) {
             numSlicedFilesChecked++;
           }
-          if (compareFiles(config, stem, outputType, ".csv", timestampString, null, true)) {
+          if (compareFiles(config, stem, outputTypeCsv, ".csv", timestampString, null, true)) {
             numSlicedFilesChecked++;
           }
         }

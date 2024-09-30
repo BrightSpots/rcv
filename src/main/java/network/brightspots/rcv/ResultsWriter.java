@@ -280,10 +280,12 @@ class ResultsWriter {
         RoundTallies roundTallies = entry.getValue();
         TallyTransfers tallyTransfers = tallyTransfersBySlice.get(slice, sliceId);
         String sliceFileString = getFileStringForSlice(slice, sliceId, filenames);
-        String outputPath = getOutputFilePathFromInstance(
-            String.format("%s_summary", sliceFileString));
-        generateSummaryExtendedCsv(roundTallies, candidateOrder, slice, sliceId, outputPath);
-        generateSummaryJson(roundTallies, tallyTransfers, slice, sliceId, outputPath);
+        String outputPathCsv = getOutputFilePathFromInstance(
+            String.format("%s_extended_summary", sliceFileString));
+        String outputPathJson = getOutputFilePathFromInstance(
+                String.format("%s_summary", sliceFileString));
+        generateSummaryExtendedCsv(roundTallies, candidateOrder, slice, sliceId, outputPathCsv);
+        generateSummaryJson(roundTallies, tallyTransfers, slice, sliceId, outputPathJson);
       }
     }
   }
