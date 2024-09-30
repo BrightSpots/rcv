@@ -405,7 +405,8 @@ class TabulatorTests {
         String lineSummary = brSummary.readLine();
         assertNotNull(lineSummary, "Summary file is missing a line");
         if (!lineSummary.equals(lineExtended)) {
-          fail();
+          fail("Line differes in extended vs non-extended CSV: \n%s\n%s".formatted(
+                  lineSummary, lineExtended));
         }
       }
     } catch (FileNotFoundException exception) {
