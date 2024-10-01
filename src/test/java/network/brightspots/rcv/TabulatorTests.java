@@ -268,7 +268,7 @@ class TabulatorTests {
     session.tabulate("Automated test");
 
     String expectedPath = getTestFilePath(stem, "_expected.csv");
-    assertTrue(fileCompare(session.getConvertedFilePath(), expectedPath));
+    assertTrue(fileCompare(session.getRctabCvrFilePath(), expectedPath));
 
     cleanOutputFolder(session);
   }

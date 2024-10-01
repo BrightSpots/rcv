@@ -47,7 +47,7 @@ class TabulatorSession {
   private final String configPath;
   private final String timestampString;
   private String outputPath;
-  private String convertedFilePath;
+  private String rctabCvrFilePath;
 
   TabulatorSession(String configPath) {
     this.configPath = configPath;
@@ -90,8 +90,8 @@ class TabulatorSession {
 
   // Visible for testing
   @SuppressWarnings("unused")
-  String getConvertedFilePath() {
-    return convertedFilePath;
+  String getRctabCvrFilePath() {
+    return rctabCvrFilePath;
   }
 
   // special mode to just export the CVR as CDF JSON instead of tabulating
@@ -418,7 +418,7 @@ class TabulatorSession {
           try {
             ResultsWriter writer =
                   new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-            this.convertedFilePath =
+            this.rctabCvrFilePath =
                   writer.writeRcTabCvrCsv(
                           castVoteRecords,
                           cvrSourceData,
