@@ -1,6 +1,12 @@
 name: "Build, Lint, and Test"
 
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+  push:
+    branches:
+      - 'develop'
+      - 'main'
 
 jobs:
   build:

@@ -648,6 +648,7 @@ class ResultsWriter {
       // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
       // rank 2 selection, ... rank maxRanks selection
       csvPrinter.print("Source Filepath");
+      csvPrinter.print("CVR Provider");
       csvPrinter.print("Contest Id");
       csvPrinter.print("Tabulator Id");
       csvPrinter.print("Batch Id");
@@ -686,6 +687,7 @@ class ResultsWriter {
 
         CastVoteRecord castVoteRecord = castVoteRecords.get(i);
         csvPrinter.print(currentSourceData.source.getFilePath());
+        csvPrinter.print(currentSourceData.source.getProvider());
         csvPrinter.print(castVoteRecord.getContestId());
         csvPrinter.print(castVoteRecord.getTabulatorId());
         csvPrinter.print(castVoteRecord.getSlice(TabulateBySlice.BATCH));

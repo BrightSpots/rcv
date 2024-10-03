@@ -30,6 +30,8 @@ import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 
 class ClearBallotCvrReader extends BaseCvrReader {
+  private static final String CSV_COMMA_SPLITTER = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+
   ClearBallotCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
   }
@@ -54,7 +56,7 @@ class ClearBallotCvrReader extends BaseCvrReader {
         Logger.severe("No header row found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
       }
-      String[] headerData = firstRow.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+      String[] headerData = firstRow.split(CSV_COMMA_SPLITTER);
       if (headerData.length < CvrColumnField.ChoicesBegin.ordinal()) {
         Logger.severe("No choice columns found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
@@ -93,7 +95,7 @@ class ClearBallotCvrReader extends BaseCvrReader {
           break;
         }
         // parse rankings
-        String[] cvrData = row.split(",");
+        String[] cvrData = row.split(CSV_COMMA_SPLITTER);
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         for (var entry : columnIndexToRanking.entrySet()) {
           if (Integer.parseInt(cvrData[entry.getKey()]) == 1) {
