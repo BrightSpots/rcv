@@ -262,13 +262,13 @@ class TabulatorTests {
   }
 
   // Validate convert-to-CSV action, run before every tabulation
-  private static void runConvertToCsvTest(String stem) {
+  private static void runConvertToRctabCvrTest(String stem) {
     String configPath = getTestFilePath(stem, "_config.json");
     TabulatorSession session = new TabulatorSession(configPath);
     session.tabulate("Automated test");
 
     String expectedPath = getTestFilePath(stem, "_expected.csv");
-    assertTrue(fileCompare(session.getConvertedFilePath(), expectedPath));
+    assertTrue(fileCompare(session.getRctabCvrFilePath(), expectedPath));
 
     cleanOutputFolder(session);
   }
@@ -375,37 +375,37 @@ class TabulatorTests {
   @Test
   @DisplayName("Test Convert to CDF works for CDF")
   void convertToCdfFromCdf() {
-    runConvertToCdfTest("convert_to_cdf_from_cdf");
+    runConvertToCdfTest("conversions_from_cdf");
   }
 
   @Test
   @DisplayName("Test Convert to CDF works for Dominion")
   void convertToCdfFromDominion() {
-    runConvertToCdfTest("convert_to_cdf_from_dominion");
+    runConvertToCdfTest("conversions_from_dominion");
   }
 
   @Test
   @DisplayName("Test Convert to CDF works for ES&S")
   void convertToCdfFromEss() {
-    runConvertToCdfTest("convert_to_cdf_from_ess");
+    runConvertToCdfTest("conversions_from_ess");
   }
 
   @Test
-  @DisplayName("Test Convert to CSV works for CDF")
-  void convertToCsvFromCdf() {
-    runConvertToCsvTest("convert_to_cdf_from_cdf");
+  @DisplayName("Test Convert to rctab_cvr works for CDF")
+  void convertToRctabCvrFromCdf() {
+    runConvertToRctabCvrTest("conversions_from_cdf");
   }
 
   @Test
-  @DisplayName("Test Convert to CSV works for Dominion")
-  void convertToCsvFromDominion() {
-    runConvertToCsvTest("convert_to_cdf_from_dominion");
+  @DisplayName("Test Convert to rctab_cvr works for Dominion")
+  void convertToRctabCvrFromDominion() {
+    runConvertToRctabCvrTest("conversions_from_dominion");
   }
 
   @Test
-  @DisplayName("Test Convert to CSV works for ES&S")
-  void convertToCsvFromEss() {
-    runConvertToCsvTest("convert_to_cdf_from_ess");
+  @DisplayName("Test Convert to rctab_cvr works for ES&S")
+  void convertToRctabCvrFromEss() {
+    runConvertToRctabCvrTest("conversions_from_ess");
   }
 
   @Test
