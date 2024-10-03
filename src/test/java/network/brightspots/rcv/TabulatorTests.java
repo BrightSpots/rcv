@@ -475,6 +475,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Clear Ballot - Inline Comma Parsing")
+  void testClearBallotInlineComma() {
+    runTabulationTest("clear_ballot_with_inline_comma");
+  }
+
+  @Test
   @DisplayName("Hart - Travis County Officers")
   void testHartTravisCountyOfficers() {
     runTabulationTest("hart_travis_county_officers");
