@@ -90,9 +90,9 @@ class ResultsWriter {
           StatusForRound.INVALIDATED_BY_REPEATED_RANKING);
 
   public enum ResultType {
-    SUMMARY_REPORT("summary"/*"summary_report"*/, "csv"),
-    DETAILED_REPORT("extended_summary"/*"detailed_report"*/, "csv"),
-    JSON("summary", "json"),
+    SUMMARY_CSV("summary_report", "csv"),
+    DETAILED_CSV("detailed_report", "csv"),
+    DETAILED_JSON("detailed_report", "json"),
     CDF("cvr_cdf", "json"),
     RCTAB_CVR("rctab_cvr", "csv");
 
@@ -336,8 +336,8 @@ class ResultsWriter {
         String sliceId = entry.getKey();
         RoundTallies roundTallies = entry.getValue();
         TallyTransfers tallyTransfers = tallyTransfersBySlice.get(slice, sliceId);
-        ResultFile resultFileCsv = new ResultFile(ResultType.DETAILED_REPORT, slice, sliceId);
-        ResultFile resultFileJson = new ResultFile(ResultType.JSON, slice, sliceId);
+        ResultFile resultFileCsv = new ResultFile(ResultType.DETAILED_CSV, slice, sliceId);
+        ResultFile resultFileJson = new ResultFile(ResultType.DETAILED_JSON, slice, sliceId);
         generateSummaryCsv(roundTallies, candidateOrder, resultFileCsv);
         generateSummaryJson(roundTallies, tallyTransfers, resultFileJson);
       }
@@ -364,8 +364,8 @@ class ResultsWriter {
           RoundTallies roundTallies,
           List<String> candidateOrder,
           ResultFile resultFile) throws IOException {
-    if (resultFile.resultType != ResultType.SUMMARY_REPORT
-            && resultFile.resultType != ResultType.DETAILED_REPORT) {
+    if (resultFile.resultType != ResultType.SUMMARY_CSV
+            && resultFile.resultType != ResultType.DETAILED_CSV) {
       throw new IllegalArgumentException("ResultFile provided non-CSV type "
               + resultFile.resultType);
     }
@@ -473,7 +473,7 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    if (resultFile.resultType == ResultType.DETAILED_REPORT) {
+    if (resultFile.resultType == ResultType.DETAILED_CSV) {
       for (StatusForRound status : STATUSES_TO_PRINT) {
         csvPrinter.print(status.getTitleCaseKey());
 
@@ -656,9 +656,9 @@ class ResultsWriter {
       RoundTallies roundTallies,
       TallyTransfers tallyTransfers,
       List<String> candidateOrder) throws IOException {
-    generateSummaryCsv(roundTallies, candidateOrder, new ResultFile(ResultType.SUMMARY_REPORT));
-    generateSummaryCsv(roundTallies, candidateOrder, new ResultFile(ResultType.DETAILED_REPORT));
-    generateSummaryJson(roundTallies, tallyTransfers, new ResultFile(ResultType.JSON));
+    generateSummaryCsv(roundTallies, candidateOrder, new ResultFile(ResultType.SUMMARY_CSV));
+    generateSummaryCsv(roundTallies, candidateOrder, new ResultFile(ResultType.DETAILED_CSV));
+    generateSummaryJson(roundTallies, tallyTransfers, new ResultFile(ResultType.DETAILED_JSON));
   }
 
   // Write CastVoteRecords for the specified contest to the provided folder,
