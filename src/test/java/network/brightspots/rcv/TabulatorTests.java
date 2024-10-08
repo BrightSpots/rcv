@@ -34,10 +34,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import network.brightspots.rcv.ResultsWriter.ResultFile;
+import network.brightspots.rcv.ResultsWriter.ResultType;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -188,10 +191,15 @@ class TabulatorTests {
   }
 
   // given stem and suffix returns path to file in test asset folder
+  private static Path getTestDirectory(String stem) {
+    return Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem);
+  }
+
+  // given stem and suffix returns path to file in test asset folder
   private static String getTestFilePath(String stem, String suffix) {
-    return Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem, stem + suffix)
-        .toAbsolutePath()
-        .toString();
+    Path directory = getTestDirectory(stem);
+    String filename = stem + suffix;
+    return Paths.get(directory.toString(), filename).toAbsolutePath().toString();
   }
 
   private static void runTabulationTest(String testStem) {
@@ -224,7 +232,7 @@ class TabulatorTests {
 
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-          compareFiles(config, stem, timestampString, Integer.toString(i));
+          compareFiles(config, stem, timestampString, i);
         }
       } else {
         compareFiles(config, stem, timestampString, null);
@@ -233,14 +241,12 @@ class TabulatorTests {
       int numSlicedFilesChecked = 0;
       for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
         for (String sliceName : session.loadSliceNamesFromCvrs(slice, config)) {
-          String outputTypeJson = ResultsWriter.sanitizeStringForOutput(
-              String.format("%s_%s_summary", sliceName, slice.toLowerString()));
-          String outputTypeCsv = ResultsWriter.sanitizeStringForOutput(
-                  String.format("%s_%s_extended_summary", sliceName, slice.toLowerString()));
-          if (compareFiles(config, stem, outputTypeJson, ".json", timestampString, null, true)) {
+          ResultFile resultFileJson = new ResultFile(ResultType.JSON, slice, sliceName);
+          ResultFile resultFileCsv = new ResultFile(ResultType.DETAILED_REPORT, slice, sliceName);
+          if (compareFiles(config, stem, resultFileJson, timestampString, null, true)) {
             numSlicedFilesChecked++;
           }
-          if (compareFiles(config, stem, outputTypeCsv, ".csv", timestampString, null, true)) {
+          if (compareFiles(config, stem, resultFileCsv, timestampString, null, true)) {
             numSlicedFilesChecked++;
           }
         }
@@ -259,7 +265,7 @@ class TabulatorTests {
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null, false);
+    compareFiles(config, stem, ResultType.CDF, timestampString, null, false);
 
     cleanOutputFolder(session);
   }
@@ -322,13 +328,33 @@ class TabulatorTests {
   }
 
   private static void compareFiles(
-      ContestConfig config, String stem, String timestampString, String sequentialId) {
-    compareFiles(config, stem, "summary", ".json", timestampString, sequentialId, false);
-    compareFiles(config, stem, "extended_summary", ".csv", timestampString, sequentialId, false);
+      ContestConfig config, String stem, String timestampString, Integer sequentialId) {
+    compareFiles(config, stem, ResultType.JSON, timestampString, sequentialId, false);
+    compareFiles(config, stem, ResultType.DETAILED_REPORT, timestampString, sequentialId, false);
     compareExtendedSummaryToSummary(config, timestampString, sequentialId);
     if (config.isGenerateCdfJsonEnabled()) {
-      compareFiles(config, stem, "cvr_cdf", ".json", timestampString, sequentialId, false);
+      compareFiles(config, stem, ResultType.CDF, timestampString, sequentialId, false);
     }
+  }
+
+  /**
+   * Helper comparison for non-slice files.
+   */
+  private static boolean compareFiles(
+          ContestConfig config,
+          String stem,
+          ResultType resultType,
+          String timestampString,
+          Integer sequentialId,
+          boolean onlyCheckIfExpectedFileExists) {
+    ResultFile actualResultFile = new ResultFile(resultType);
+    return compareFiles(
+            config,
+            stem,
+            actualResultFile,
+            timestampString,
+            sequentialId,
+            onlyCheckIfExpectedFileExists);
   }
 
   /**
@@ -338,22 +364,14 @@ class TabulatorTests {
   private static boolean compareFiles(
       ContestConfig config,
       String stem,
-      String outputType,
-      String extension,
+      ResultFile actualResultFile,
       String timestampString,
-      String sequentialId,
+      Integer sequentialId,
       boolean onlyCheckIfExpectedFileExists) {
-    String actualOutputPath =
-        ResultsWriter.getOutputFilePath(
-                config.getOutputDirectory(), outputType, timestampString, sequentialId)
-            + extension;
-    String expectedPath =
-        getTestFilePath(
-            stem,
-            ResultsWriter.sequentialSuffixForOutputPath(sequentialId)
-                + "_expected_"
-                + outputType
-                + extension);
+    String actualOutputPath = actualResultFile.getPath(
+          config.getOutputDirectory(), timestampString, sequentialId).toAbsolutePath().toString();
+    String expectedPath = actualResultFile.getPath(getTestDirectory(stem).toString(),
+            stem, "expected", sequentialId).toString();
 
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
     boolean didCompare = true;
@@ -375,20 +393,19 @@ class TabulatorTests {
    * extended file except for the inactive ballot breakdown.
    */
   private static void compareExtendedSummaryToSummary(
-          ContestConfig config, String timestampString, String sequentialId) {
-    String summaryPath = ResultsWriter.getOutputFilePath(
-            config.getOutputDirectory(), "summary", timestampString, sequentialId)
-            + ".csv";
-    String extendedPath = ResultsWriter.getOutputFilePath(
-            config.getOutputDirectory(), "extended_summary", timestampString, sequentialId)
-            + ".csv";
+          ContestConfig config, String timestampString, Integer sequentialId) {
+    String dir = config.getOutputDirectory();
+    String summaryPath = new ResultFile(ResultType.SUMMARY_REPORT).getPath(
+            dir, timestampString, sequentialId).toAbsolutePath().toString();
+    String detailedPath = new ResultFile(ResultType.DETAILED_REPORT).getPath(
+            dir, timestampString, sequentialId).toAbsolutePath().toString();
 
     try (BufferedReader brSummary = new BufferedReader(new FileReader(summaryPath, UTF_8));
-         BufferedReader brExtended = new BufferedReader(new FileReader(extendedPath, UTF_8))) {
+         BufferedReader brDetailed = new BufferedReader(new FileReader(detailedPath, UTF_8))) {
       while (true) {
-        String lineExtended = brExtended.readLine();
+        String lineDetailed = brDetailed.readLine();
         // If the extended file has reached its end, then the non-extended file must have too
-        if (lineExtended == null) {
+        if (lineDetailed == null) {
           assertNull(brSummary.readLine(), "Extended file is missing a line");
           return;
         }
@@ -396,7 +413,7 @@ class TabulatorTests {
         // If the extended file should be excluded, continue without moving the file pointer
         // in the non-extended file. For now, there's only one type of row excluded, and they
         // happen to all start with "Inactive Ballots by"
-        if (lineExtended.startsWith("Inactive Ballots by")) {
+        if (lineDetailed.startsWith("Inactive Ballots by")) {
           continue;
         }
 
@@ -404,9 +421,9 @@ class TabulatorTests {
         // in both files.
         String lineSummary = brSummary.readLine();
         assertNotNull(lineSummary, "Summary file is missing a line");
-        if (!lineSummary.equals(lineExtended)) {
+        if (!lineSummary.equals(lineDetailed)) {
           fail("Line differes in extended vs non-extended CSV: \n%s\n%s".formatted(
-                  lineSummary, lineExtended));
+                  lineSummary, lineDetailed));
         }
       }
     } catch (FileNotFoundException exception) {
