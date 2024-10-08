@@ -241,8 +241,8 @@ class TabulatorTests {
       int numSlicedFilesChecked = 0;
       for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
         for (String sliceName : session.loadSliceNamesFromCvrs(slice, config)) {
-          ResultFile resultFileJson = new ResultFile(ResultType.JSON, slice, sliceName);
-          ResultFile resultFileCsv = new ResultFile(ResultType.DETAILED_REPORT, slice, sliceName);
+          ResultFile resultFileJson = new ResultFile(ResultType.DETAILED_JSON, slice, sliceName);
+          ResultFile resultFileCsv = new ResultFile(ResultType.DETAILED_CSV, slice, sliceName);
           if (compareFiles(config, stem, resultFileJson, timestampString, null, true)) {
             numSlicedFilesChecked++;
           }
@@ -329,8 +329,8 @@ class TabulatorTests {
 
   private static void compareFiles(
       ContestConfig config, String stem, String timestampString, Integer sequentialId) {
-    compareFiles(config, stem, ResultType.JSON, timestampString, sequentialId, false);
-    compareFiles(config, stem, ResultType.DETAILED_REPORT, timestampString, sequentialId, false);
+    compareFiles(config, stem, ResultType.DETAILED_JSON, timestampString, sequentialId, false);
+    compareFiles(config, stem, ResultType.DETAILED_CSV, timestampString, sequentialId, false);
     compareExtendedSummaryToSummary(config, timestampString, sequentialId);
     if (config.isGenerateCdfJsonEnabled()) {
       compareFiles(config, stem, ResultType.CDF, timestampString, sequentialId, false);
@@ -395,9 +395,9 @@ class TabulatorTests {
   private static void compareExtendedSummaryToSummary(
           ContestConfig config, String timestampString, Integer sequentialId) {
     String dir = config.getOutputDirectory();
-    String summaryPath = new ResultFile(ResultType.SUMMARY_REPORT).getPath(
+    String summaryPath = new ResultFile(ResultType.SUMMARY_CSV).getPath(
             dir, timestampString, sequentialId).toAbsolutePath().toString();
-    String detailedPath = new ResultFile(ResultType.DETAILED_REPORT).getPath(
+    String detailedPath = new ResultFile(ResultType.DETAILED_CSV).getPath(
             dir, timestampString, sequentialId).toAbsolutePath().toString();
 
     try (BufferedReader brSummary = new BufferedReader(new FileReader(summaryPath, UTF_8));
