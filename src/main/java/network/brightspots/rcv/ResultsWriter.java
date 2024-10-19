@@ -358,10 +358,7 @@ class ResultsWriter {
   // create a summary spreadsheet .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
   // param: candidateOrder is to allow a consistent ordering of candidates, including across slices
-  // param: slice indicates which type of slice we're reporting results for (null means all)
-  // param: sliceId indicates the specific slice ID we're reporting results for (null means all)
-  // param: outputPath is the path to the output file, minus its extension
-  // param: extended include additional details in the output file?
+  // param: resultTypeAndSlice must only have type DETAILED_CSV or SUMMARY_CSV
   private void generateSummaryCsv(
           RoundTallies roundTallies,
           List<String> candidateOrder,
@@ -568,7 +565,7 @@ class ResultsWriter {
       csvPrinter.close();
       csvFile.finalizeAndHash();
     } catch (IOException exception) {
-      Logger.severe("Error saving file: %s\n%s", resultTypeAndSlice.resultType, exception);
+      Logger.severe("Error saving file: %s\n%s", csvFile.getAbsolutePath(), exception);
       throw exception;
     }
     Logger.info("Summary spreadsheet generated successfully.");
