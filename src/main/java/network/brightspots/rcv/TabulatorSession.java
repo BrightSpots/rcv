@@ -38,7 +38,7 @@ import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
-import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
+import network.brightspots.rcv.OutputWriter.RoundSnapshotDataMissingException;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 
 @SuppressWarnings("RedundantSuppression")
@@ -115,8 +115,8 @@ class TabulatorSession {
         } else {
           Tabulator.SliceIdSet sliceIds =
               new Tabulator(castVoteRecords.getCvrs(), config).getEnabledSliceIds();
-          ResultsWriter writer =
-              new ResultsWriter()
+          OutputWriter writer =
+              new OutputWriter()
                   .setNumRounds(0)
                   .setSliceIds(sliceIds)
                   .setContestConfig(config)
@@ -338,7 +338,7 @@ class TabulatorSession {
     boolean encounteredSourceProblem = false;
 
     // Per-source data for writing generic CSV
-    List<ResultsWriter.CvrSourceData> cvrSourceData = new ArrayList<>();
+    List<OutputWriter.CvrSourceData> cvrSourceData = new ArrayList<>();
 
     // At each iteration of the following loop, we add records from another source file.
     for (int sourceIndex = 0; sourceIndex < config.rawConfig.cvrFileSources.size(); ++sourceIndex) {
@@ -353,7 +353,7 @@ class TabulatorSession {
 
         // Update the per-source data for the results writer
         cvrSourceData.add(
-            new ResultsWriter.CvrSourceData(
+            new OutputWriter.CvrSourceData(
                 source, reader, sourceIndex, startIndex, castVoteRecords.size() - 1));
 
         // Check for unrecognized candidates
@@ -416,8 +416,8 @@ class TabulatorSession {
         // Output the RCTab-CSV CVR
         if (shouldOutputRcTabCvr) {
           try {
-            ResultsWriter writer =
-                  new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
+            OutputWriter writer =
+                  new OutputWriter().setContestConfig(config).setTimestampString(timestampString);
             this.rctabCvrFilePath =
                   writer.writeRcTabCvrCsv(
                           castVoteRecords,
@@ -461,11 +461,11 @@ class TabulatorSession {
 
     private List<CastVoteRecord> cvrs;
     private final int numCvrs;
-    private final List<ResultsWriter.CvrSourceData> cvrSourcesData;
+    private final List<OutputWriter.CvrSourceData> cvrSourcesData;
     private boolean isDiscarded;
     private final boolean doesMatchAllMetadata;
 
-    LoadedCvrData(List<CastVoteRecord> cvrs, List<ResultsWriter.CvrSourceData> cvrSourcesData) {
+    LoadedCvrData(List<CastVoteRecord> cvrs, List<OutputWriter.CvrSourceData> cvrSourcesData) {
       this.cvrs = cvrs;
       this.successfullyReadAll = cvrs != null;
       this.numCvrs = cvrs != null ? cvrs.size() : 0;
@@ -504,7 +504,7 @@ class TabulatorSession {
       return numCvrs;
     }
 
-    List<ResultsWriter.CvrSourceData> getCvrSourcesData() {
+    List<OutputWriter.CvrSourceData> getCvrSourcesData() {
       return cvrSourcesData;
     }
 
@@ -522,7 +522,7 @@ class TabulatorSession {
 
     public void printSummary() {
       Logger.info("Cast Vote Record summary:");
-      for (ResultsWriter.CvrSourceData sourceData : cvrSourcesData) {
+      for (OutputWriter.CvrSourceData sourceData : cvrSourcesData) {
         Logger.info("Source %d: %s", sourceData.sourceIndex + 1, sourceData.source.getFilePath());
         Logger.info("  uses provider: %s", sourceData.source.getProvider());
         Logger.info("  read %d cast vote records", sourceData.getNumCvrs());

@@ -40,7 +40,7 @@ import java.util.TreeMap;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
 import network.brightspots.rcv.ContestConfig.TabulateBySlice;
-import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
+import network.brightspots.rcv.OutputWriter.RoundSnapshotDataMissingException;
 
 final class Tabulator {
 
@@ -794,8 +794,8 @@ final class Tabulator {
   // to generate the results spreadsheets
   // param: timestamp string to use when creating output filenames
   void generateSummaryFiles(String timestamp) throws IOException {
-    ResultsWriter writer =
-        new ResultsWriter()
+    OutputWriter writer =
+        new OutputWriter()
             .setNumRounds(currentRound)
             .setCandidatesToRoundEliminated(candidateToRoundEliminated)
             .setWinnerToRound(winnerToRound)
@@ -805,8 +805,8 @@ final class Tabulator {
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
     List<String> candidateOrder = roundTallies.get(1).getSortedCandidatesByTally();
-    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, candidateOrder);
-    writer.generateBySliceSummaryFiles(roundTalliesBySlices, tallyTransfersBySlice, candidateOrder);
+    writer.generateContestResultFiles(roundTallies, tallyTransfers, candidateOrder);
+    writer.generateBySliceResultsFiles(roundTalliesBySlices, tallyTransfersBySlice, candidateOrder);
 
     if (config.isGenerateCdfJsonEnabled()) {
       try {
