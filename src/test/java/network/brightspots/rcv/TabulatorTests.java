@@ -39,8 +39,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import network.brightspots.rcv.ResultsWriter.ResultTypeAndSlice;
-import network.brightspots.rcv.ResultsWriter.ResultType;
+import network.brightspots.rcv.OutputWriter.OutputFileIdentifiers;
+import network.brightspots.rcv.OutputWriter.OutputType;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -241,12 +241,12 @@ class TabulatorTests {
       int numSlicedFilesChecked = 0;
       for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
         for (String sliceName : session.loadSliceNamesFromCvrs(slice, config)) {
-          ResultsWriter.ResultTypeAndSlice resultTypeAndSliceJson = new ResultTypeAndSlice(ResultType.DETAILED_JSON, slice, sliceName);
-          ResultsWriter.ResultTypeAndSlice resultTypeAndSliceCsv = new ResultsWriter.ResultTypeAndSlice(ResultType.DETAILED_CSV, slice, sliceName);
-          if (compareFiles(config, stem, resultTypeAndSliceJson, timestampString, null, true)) {
+          OutputFileIdentifiers outputFileIdentifiersJson = new OutputFileIdentifiers(OutputType.DETAILED_JSON, slice, sliceName);
+          OutputFileIdentifiers outputFileIdentifiersCsv = new OutputFileIdentifiers(OutputType.DETAILED_CSV, slice, sliceName);
+          if (compareFiles(config, stem, outputFileIdentifiersJson, timestampString, null, true)) {
             numSlicedFilesChecked++;
           }
-          if (compareFiles(config, stem, resultTypeAndSliceCsv, timestampString, null, true)) {
+          if (compareFiles(config, stem, outputFileIdentifiersCsv, timestampString, null, true)) {
             numSlicedFilesChecked++;
           }
         }
@@ -265,7 +265,7 @@ class TabulatorTests {
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    compareFiles(config, stem, ResultType.CDF_CVR, timestampString, null, false);
+    compareFiles(config, stem, OutputType.CDF_CVR, timestampString, null, false);
 
     cleanOutputFolder(session);
   }
@@ -329,11 +329,11 @@ class TabulatorTests {
 
   private static void compareFiles(
       ContestConfig config, String stem, String timestampString, Integer sequentialId) {
-    compareFiles(config, stem, ResultType.DETAILED_JSON, timestampString, sequentialId, false);
-    compareFiles(config, stem, ResultType.DETAILED_CSV, timestampString, sequentialId, false);
+    compareFiles(config, stem, OutputType.DETAILED_JSON, timestampString, sequentialId, false);
+    compareFiles(config, stem, OutputType.DETAILED_CSV, timestampString, sequentialId, false);
     compareExtendedSummaryToSummary(config, timestampString, sequentialId);
     if (config.isGenerateCdfJsonEnabled()) {
-      compareFiles(config, stem, ResultType.CDF_CVR, timestampString, sequentialId, false);
+      compareFiles(config, stem, OutputType.CDF_CVR, timestampString, sequentialId, false);
     }
   }
 
@@ -343,15 +343,15 @@ class TabulatorTests {
   private static boolean compareFiles(
           ContestConfig config,
           String stem,
-          ResultType resultType,
+          OutputType outputType,
           String timestampString,
           Integer sequentialId,
           boolean onlyCheckIfExpectedFileExists) {
-    ResultsWriter.ResultTypeAndSlice actualResultTypeAndSlice = new ResultTypeAndSlice(resultType);
+    OutputFileIdentifiers actualOutputFileIdentifiers = new OutputFileIdentifiers(outputType);
     return compareFiles(
             config,
             stem,
-            actualResultTypeAndSlice,
+            actualOutputFileIdentifiers,
             timestampString,
             sequentialId,
             onlyCheckIfExpectedFileExists);
@@ -364,13 +364,13 @@ class TabulatorTests {
   private static boolean compareFiles(
       ContestConfig config,
       String stem,
-      ResultsWriter.ResultTypeAndSlice actualResultTypeAndSlice,
+      OutputFileIdentifiers actualOutputFileIdentifiers,
       String timestampString,
       Integer sequentialId,
       boolean onlyCheckIfExpectedFileExists) {
-    String actualOutputPath = actualResultTypeAndSlice.getPath(
+    String actualOutputPath = actualOutputFileIdentifiers.getPath(
           config.getOutputDirectory(), timestampString, sequentialId).toAbsolutePath().toString();
-    String expectedPath = actualResultTypeAndSlice.getPath(getTestDirectory(stem).toString(),
+    String expectedPath = actualOutputFileIdentifiers.getPath(getTestDirectory(stem).toString(),
             stem, "expected", sequentialId).toString();
 
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
@@ -395,9 +395,9 @@ class TabulatorTests {
   private static void compareExtendedSummaryToSummary(
           ContestConfig config, String timestampString, Integer sequentialId) {
     String dir = config.getOutputDirectory();
-    String summaryPath = new ResultTypeAndSlice(ResultType.SUMMARY_CSV).getPath(
+    String summaryPath = new OutputFileIdentifiers(OutputType.SUMMARY_CSV).getPath(
             dir, timestampString, sequentialId).toAbsolutePath().toString();
-    String detailedPath = new ResultsWriter.ResultTypeAndSlice(ResultType.DETAILED_CSV).getPath(
+    String detailedPath = new OutputFileIdentifiers(OutputType.DETAILED_CSV).getPath(
             dir, timestampString, sequentialId).toAbsolutePath().toString();
 
     try (BufferedReader brSummary = new BufferedReader(new FileReader(summaryPath, UTF_8));
