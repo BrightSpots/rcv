@@ -57,7 +57,7 @@ import network.brightspots.rcv.Tabulator.SliceIdSet;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-class ResultsWriter {
+class OutputWriter {
   private static final String CDF_CONTEST_ID = "contest-001";
   private static final String CDF_ELECTION_ID = "election-001";
   private static final String CDF_GPU_ID = "gpu-election";
@@ -89,7 +89,7 @@ class ResultsWriter {
           StatusForRound.EXHAUSTED_CHOICE,
           StatusForRound.INVALIDATED_BY_REPEATED_RANKING);
 
-  public enum ResultType {
+  public enum OutputType {
     SUMMARY_CSV("summary_report", "csv"),
     DETAILED_CSV("detailed_report", "csv"),
     DETAILED_JSON("detailed_report", "json"),
@@ -99,7 +99,7 @@ class ResultsWriter {
     private final String basename;
     private final String extension;
 
-    ResultType(String basename, String extension) {
+    OutputType(String basename, String extension) {
       this.basename = basename;
       this.extension = extension;
     }
@@ -113,27 +113,29 @@ class ResultsWriter {
     }
   }
 
-  public static class ResultTypeAndSlice {
+  // Core traits of any output file
+  // Includes helpers for the work we need to do with the Identifiers to write the actual files themselves
+  public static class OutputFileIdentifiers {
     // Since sanitizing Slice IDs can cause filename collisions, ensure each non-sanitized
     // Slice ID is given a unique sanitized name.
     private static final Dictionary<String, String> sliceIdToUniqueSanitizedId = new Hashtable<>();
     // This is a set of the values in sanitizerCollisionResolution to ensure there are no collisions
     // in the resulting sanitized names.
     private static final HashSet<String> uniqueSanitizedIds = new HashSet<>();
-    private final ResultType resultType;
+    private final OutputType outputType;
     private final boolean isSlice;
     private final TabulateBySlice slice;
     private final String sliceId;
 
-    ResultTypeAndSlice(ResultType resultType) {
-      this.resultType = resultType;
+    OutputFileIdentifiers(OutputType outputType) {
+      this.outputType = outputType;
       this.isSlice = false;
       slice = null;
       sliceId = null;
     }
 
-    ResultTypeAndSlice(ResultType resultType, TabulateBySlice slice, String sliceId) {
-      this.resultType = resultType;
+    OutputFileIdentifiers(OutputType outputType, TabulateBySlice slice, String sliceId) {
+      this.outputType = outputType;
       this.isSlice = true;
       this.slice = slice;
       this.sliceId = sliceId;
@@ -161,10 +163,10 @@ class ResultsWriter {
         parts.add(sanitizeSliceWithoutCollisions(sliceId));
         parts.add(slice.toLowerString());
       }
-      parts.add(resultType.getBasename());
+      parts.add(outputType.getBasename());
 
       String filenameWithoutExt = String.join("_", parts);
-      return Path.of(directory, "%s.%s".formatted(filenameWithoutExt, resultType.getExtension()));
+      return Path.of(directory, "%s.%s".formatted(filenameWithoutExt, outputType.getExtension()));
     }
 
     private String sanitizeSliceWithoutCollisions(String sliceId) {
@@ -276,22 +278,22 @@ class ResultsWriter {
     return sortedCandidatesWithRanks;
   }
 
-  ResultsWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
+  OutputWriter setRoundToResidualSurplus(Map<Integer, BigDecimal> roundToResidualSurplus) {
     this.roundToResidualSurplus = roundToResidualSurplus;
     return this;
   }
 
-  ResultsWriter setNumRounds(int numRounds) {
+  OutputWriter setNumRounds(int numRounds) {
     this.numRounds = numRounds;
     return this;
   }
 
-  ResultsWriter setSliceIds(SliceIdSet sliceIds) {
+  OutputWriter setSliceIds(SliceIdSet sliceIds) {
     this.sliceIds = sliceIds;
     return this;
   }
 
-  ResultsWriter setCandidatesToRoundEliminated(Map<String, Integer> candidatesToRoundEliminated) {
+  OutputWriter setCandidatesToRoundEliminated(Map<String, Integer> candidatesToRoundEliminated) {
     // roundToEliminatedCandidates is the inverse of candidatesToRoundEliminated map,
     // so we can look up who got eliminated for each round
     roundToEliminatedCandidates = new HashMap<>();
@@ -302,7 +304,7 @@ class ResultsWriter {
     return this;
   }
 
-  ResultsWriter setWinnerToRound(Map<String, Integer> winnerToRound) {
+  OutputWriter setWinnerToRound(Map<String, Integer> winnerToRound) {
     // very similar to the logic in setCandidatesToRoundEliminated above
     roundToWinningCandidates = new HashMap<>();
     for (var entry : winnerToRound.entrySet()) {
@@ -312,21 +314,21 @@ class ResultsWriter {
     return this;
   }
 
-  ResultsWriter setContestConfig(ContestConfig config) {
+  OutputWriter setContestConfig(ContestConfig config) {
     this.config = config;
     return this;
   }
 
-  ResultsWriter setTimestampString(String timestampString) {
+  OutputWriter setTimestampString(String timestampString) {
     this.timestampString = timestampString;
     return this;
   }
 
-  // creates summary files for the votes split by a TabulateBySlice
+  // creates results files for the votes split by a TabulateBySlice
   // param: roundTalliesBySlice is map from a slice type to the round-by-round vote tallies
   // param: tallyTransfersBySlice is a map from a slice type to tally transfers for that slice
   // param: candidateOrder is to allow a consistent ordering of candidates, including across slices
-  void generateBySliceSummaryFiles(
+  void generateBySliceResultsFiles(
         Tabulator.BreakdownBySlice<RoundTallies> roundTalliesBySlice,
         Tabulator.BreakdownBySlice<TallyTransfers> tallyTransfersBySlice,
         List<String> candidateOrder)
@@ -336,37 +338,37 @@ class ResultsWriter {
         String sliceId = entry.getKey();
         RoundTallies roundTallies = entry.getValue();
         TallyTransfers tallyTransfers = tallyTransfersBySlice.get(slice, sliceId);
-        ResultTypeAndSlice resultTypeAndSliceCsv =
-                new ResultTypeAndSlice(ResultType.DETAILED_CSV, slice, sliceId);
-        ResultTypeAndSlice resultTypeAndSliceJson =
-                new ResultTypeAndSlice(ResultType.DETAILED_JSON, slice, sliceId);
-        generateSummaryCsv(roundTallies, candidateOrder, resultTypeAndSliceCsv);
-        generateSummaryJson(roundTallies, tallyTransfers, resultTypeAndSliceJson);
+        OutputFileIdentifiers outputFileIdentifiersCsv =
+                new OutputFileIdentifiers(OutputType.DETAILED_CSV, slice, sliceId);
+        OutputFileIdentifiers outputFileIdentifiersJson =
+                new OutputFileIdentifiers(OutputType.DETAILED_JSON, slice, sliceId);
+        generateResultsCsv(roundTallies, candidateOrder, outputFileIdentifiersCsv);
+        generateResultsJson(roundTallies, tallyTransfers, outputFileIdentifiersJson);
       }
     }
   }
 
-  private AuditableFile createAuditableFile(ResultTypeAndSlice resultTypeAndSlice) {
+  private AuditableFile createAuditableFile(OutputFileIdentifiers outputFileIdentifiers) {
     Integer sequentialId = null;
     if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
       sequentialId = config.getSequentialWinners().size() + 1;
     }
-    return new AuditableFile(resultTypeAndSlice.getPath(
+    return new AuditableFile(outputFileIdentifiers.getPath(
             config.getOutputDirectory(), timestampString, sequentialId));
   }
 
-  // create a summary spreadsheet .csv file
+  // create a results .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
   // param: candidateOrder is to allow a consistent ordering of candidates, including across slices
   // param: resultTypeAndSlice must only have type DETAILED_CSV or SUMMARY_CSV
-  private void generateSummaryCsv(
+  private void generateResultsCsv(
           RoundTallies roundTallies,
           List<String> candidateOrder,
-          ResultTypeAndSlice resultTypeAndSlice) throws IOException {
-    if (resultTypeAndSlice.resultType != ResultType.SUMMARY_CSV
-            && resultTypeAndSlice.resultType != ResultType.DETAILED_CSV) {
+          OutputFileIdentifiers outputFileIdentifiers) throws IOException {
+    if (outputFileIdentifiers.outputType != OutputType.SUMMARY_CSV
+            && outputFileIdentifiers.outputType != OutputType.DETAILED_CSV) {
       throw new IllegalArgumentException("ResultFile provided non-CSV type "
-              + resultTypeAndSlice.resultType);
+              + outputFileIdentifiers.outputType);
     }
     // Check that all candidates are included in the candidate order
     Set<String> expectedCandidates = roundTallies.get(1).getCandidates();
@@ -378,7 +380,7 @@ class ResultsWriter {
                       + "\nProvided: " + providedCandidates);
     }
 
-    AuditableFile csvFile = createAuditableFile(resultTypeAndSlice);
+    AuditableFile csvFile = createAuditableFile(outputFileIdentifiers);
     Logger.info("Generating summary spreadsheet: %s...", csvFile.getAbsolutePath());
 
     CSVPrinter csvPrinter;
@@ -394,7 +396,7 @@ class ResultsWriter {
 
     BigDecimal winningThreshold = roundTallies.get(numRounds).getWinningThreshold();
     addContestInformationRows(csvPrinter, winningThreshold,
-            resultTypeAndSlice.slice, resultTypeAndSlice.sliceId);
+            outputFileIdentifiers.slice, outputFileIdentifiers.sliceId);
     addContestSummaryRows(csvPrinter, roundTallies.get(1));
     csvPrinter.print("Rounds");
     for (int round = 1; round <= numRounds; round++) {
@@ -404,10 +406,10 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    csvPrinter.print(resultTypeAndSlice.isSlice ? "Eliminated*" : "Eliminated");
+    csvPrinter.print(outputFileIdentifiers.isSlice ? "Eliminated*" : "Eliminated");
     printActionSummary(csvPrinter, roundToEliminatedCandidates);
 
-    csvPrinter.print(resultTypeAndSlice.isSlice ? "Elected*" : "Elected");
+    csvPrinter.print(outputFileIdentifiers.isSlice ? "Elected*" : "Elected");
     printActionSummary(csvPrinter, roundToWinningCandidates);
 
     // For each candidate: for each round: output total votes
@@ -463,7 +465,7 @@ class ResultsWriter {
     }
     csvPrinter.println();
 
-    if (!resultTypeAndSlice.isSlice) {
+    if (!outputFileIdentifiers.isSlice) {
       csvPrinter.print("Current Round Threshold");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundTallies.get(round).getWinningThreshold());
@@ -473,7 +475,7 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    if (resultTypeAndSlice.resultType == ResultType.DETAILED_CSV) {
+    if (outputFileIdentifiers.outputType == OutputType.DETAILED_CSV) {
       for (StatusForRound status : STATUSES_TO_PRINT) {
         csvPrinter.print(status.getTitleCaseKey());
 
@@ -525,7 +527,7 @@ class ResultsWriter {
     // whether the value in the final round is positive.
     // Note that this concept only makes sense when we're reporting the overall tabulation, so we
     // omit it when generating results at the individual by-slice level.
-    if (!resultTypeAndSlice.isSlice && roundToResidualSurplus.get(numRounds).signum() == 1) {
+    if (!outputFileIdentifiers.isSlice && roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round));
@@ -552,11 +554,11 @@ class ResultsWriter {
       csvPrinter.println();
     }
 
-    if (resultTypeAndSlice.isSlice) {
+    if (outputFileIdentifiers.isSlice) {
       csvPrinter.println();
       csvPrinter.print(String.format("*Elect/Eliminate decisions are from the full contest. "
               + "All other results on this report are at the %s level.",
-              resultTypeAndSlice.slice.toLowerString()));
+              outputFileIdentifiers.slice.toLowerString()));
       csvPrinter.println();
     }
 
@@ -652,16 +654,16 @@ class ResultsWriter {
   }
 
   // creates a summary spreadsheet and JSON for the full contest (as opposed to a specific slice)
-  void generateOverallSummaryFiles(
+  void generateContestResultFiles(
       RoundTallies roundTallies,
       TallyTransfers tallyTransfers,
       List<String> candidateOrder) throws IOException {
-    generateSummaryCsv(roundTallies, candidateOrder,
-            new ResultTypeAndSlice(ResultType.SUMMARY_CSV));
-    generateSummaryCsv(roundTallies, candidateOrder,
-            new ResultTypeAndSlice(ResultType.DETAILED_CSV));
-    generateSummaryJson(roundTallies, tallyTransfers,
-            new ResultTypeAndSlice(ResultType.DETAILED_JSON));
+    generateResultsCsv(roundTallies, candidateOrder,
+            new OutputFileIdentifiers(OutputType.SUMMARY_CSV));
+    generateResultsCsv(roundTallies, candidateOrder,
+            new OutputFileIdentifiers(OutputType.DETAILED_CSV));
+    generateResultsJson(roundTallies, tallyTransfers,
+            new OutputFileIdentifiers(OutputType.DETAILED_JSON));
   }
 
   // Write CastVoteRecords for the specified contest to the provided folder,
@@ -678,8 +680,8 @@ class ResultsWriter {
     // Put the input filename in the output filename in case contestId isn't unique --
     // knowing that it's possible that if both the filename AND the contestId isn't unique,
     // this will fail.
-    ResultTypeAndSlice resultTypeAndSlice = new ResultTypeAndSlice(ResultType.RCTAB_CVR);
-    AuditableFile auditableFile = createAuditableFile(resultTypeAndSlice);
+    OutputFileIdentifiers outputFileIdentifiers = new OutputFileIdentifiers(OutputType.RCTAB_CVR);
+    AuditableFile auditableFile = createAuditableFile(outputFileIdentifiers);
     try {
       Logger.info("Writing cast vote records in generic format to file: %s...",
               auditableFile.getAbsolutePath());
@@ -798,8 +800,8 @@ class ResultsWriter {
     // generate GpUnitIds for precincts "geopolitical units" (can be a precinct or jurisdiction)
     gpUnitIds = generateGpUnitIds();
 
-    ResultTypeAndSlice resultTypeAndSlice = new ResultTypeAndSlice(ResultType.CDF_CVR);
-    AuditableFile auditableFile = createAuditableFile(resultTypeAndSlice);
+    OutputFileIdentifiers outputFileIdentifiers = new OutputFileIdentifiers(OutputType.CDF_CVR);
+    AuditableFile auditableFile = createAuditableFile(outputFileIdentifiers);
     Logger.info("Generating cast vote record CDF JSON file: %s...",
             auditableFile.getAbsolutePath());
 
@@ -1032,12 +1034,12 @@ class ResultsWriter {
   }
 
   // create summary json data for use with external visualizer software, unit tests and other tools
-  private void generateSummaryJson(
+  private void generateResultsJson(
       RoundTallies roundTallies,
       TallyTransfers tallyTransfers,
-      ResultTypeAndSlice resultTypeAndSlice)
+      OutputFileIdentifiers outputFileIdentifiers)
       throws IOException {
-    AuditableFile jsonFile = createAuditableFile(resultTypeAndSlice);
+    AuditableFile jsonFile = createAuditableFile(outputFileIdentifiers);
     Logger.info("Generating summary JSON file: %s...", jsonFile.getAbsolutePath());
 
     // config will contain contest configuration info
@@ -1047,8 +1049,8 @@ class ResultsWriter {
     configData.put("jurisdiction", config.getContestJurisdiction());
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
-    if (resultTypeAndSlice.isSlice) {
-      configData.put(resultTypeAndSlice.slice.toLowerString(), resultTypeAndSlice.sliceId);
+    if (outputFileIdentifiers.isSlice) {
+      configData.put(outputFileIdentifiers.slice.toLowerString(), outputFileIdentifiers.sliceId);
     }
 
     BigDecimal numNoRankings =
