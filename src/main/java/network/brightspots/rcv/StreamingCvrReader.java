@@ -181,7 +181,7 @@ final class StreamingCvrReader extends BaseCvrReader {
       handleEmptyCells(config.getMaxRankingsAllowedWhenNotSetToMaximum() + 1);
     }
     String computedCastVoteRecordId =
-        String.format("%s-%d", ResultsWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
+        String.format("%s-%d", OutputWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
 
     // add precinct ID if needed
     if (precinctColumnIndex != null) {
