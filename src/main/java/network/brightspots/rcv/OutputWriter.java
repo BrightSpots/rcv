@@ -360,7 +360,7 @@ class OutputWriter {
   // create a results .csv file
   // param: roundTallies is the round-by-count count of votes per candidate
   // param: candidateOrder is to allow a consistent ordering of candidates, including across slices
-  // param: resultTypeAndSlice must only have type DETAILED_CSV or SUMMARY_CSV
+  // param: outputFileIdentifiers must only have type DETAILED_CSV or SUMMARY_CSV
   private void generateResultsCsv(
           RoundTallies roundTallies,
           List<String> candidateOrder,
