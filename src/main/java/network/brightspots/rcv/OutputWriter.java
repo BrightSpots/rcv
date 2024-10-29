@@ -114,7 +114,7 @@ class OutputWriter {
   }
 
   // Core traits of any output file
-  // Includes helpers for the work we need to do with the Identifiers to write the actual files themselves
+  // Includes helpers for the work we need to do with the Identifiers to write the actual files
   public static class OutputFileIdentifiers {
     // Since sanitizing Slice IDs can cause filename collisions, ensure each non-sanitized
     // Slice ID is given a unique sanitized name.
@@ -123,22 +123,23 @@ class OutputWriter {
     // in the resulting sanitized names.
     private static final HashSet<String> uniqueSanitizedIds = new HashSet<>();
     private final OutputType outputType;
-    private final boolean isSlice;
     private final TabulateBySlice slice;
     private final String sliceId;
 
     OutputFileIdentifiers(OutputType outputType) {
       this.outputType = outputType;
-      this.isSlice = false;
       slice = null;
       sliceId = null;
     }
 
     OutputFileIdentifiers(OutputType outputType, TabulateBySlice slice, String sliceId) {
       this.outputType = outputType;
-      this.isSlice = true;
       this.slice = slice;
       this.sliceId = sliceId;
+    }
+
+    public boolean isSlice() {
+      return slice != null;
     }
 
     // getPath helper without the modifier argument
@@ -146,9 +147,9 @@ class OutputWriter {
       return getPath(directory, prefix, null, sequentialId);
     }
 
-    // The filename is an underscore-separated string containing all components needed
-    // to create a unique output file. The modifier is likely only used in tests, where
-    // it is set to "expected" to distinguish expected output files from actual output files.
+    // The filename is an underscore-separated string containing all components needed to create a
+    // unique output file. At the time of writing this comment, the modifier is only used in tests,
+    // where it is set to "expected" to distinguish expected output files from actual output files.
     public Path getPath(String directory, String prefix, String modifier, Integer sequentialId) {
       List<String> parts = new ArrayList<>();
       parts.add(prefix);
@@ -158,8 +159,7 @@ class OutputWriter {
       if (modifier != null) {
         parts.add(modifier);
       }
-      if (isSlice) {
-        assert slice != null;
+      if (isSlice()) {
         parts.add(sanitizeSliceWithoutCollisions(sliceId));
         parts.add(slice.toLowerString());
       }
@@ -337,13 +337,14 @@ class OutputWriter {
       for (var entry : roundTalliesBySlice.get(slice).entrySet()) {
         String sliceId = entry.getKey();
         RoundTallies roundTallies = entry.getValue();
-        TallyTransfers tallyTransfers = tallyTransfersBySlice.get(slice, sliceId);
-        OutputFileIdentifiers outputFileIdentifiersCsv =
-                new OutputFileIdentifiers(OutputType.DETAILED_CSV, slice, sliceId);
-        OutputFileIdentifiers outputFileIdentifiersJson =
-                new OutputFileIdentifiers(OutputType.DETAILED_JSON, slice, sliceId);
-        generateResultsCsv(roundTallies, candidateOrder, outputFileIdentifiersCsv);
-        generateResultsJson(roundTallies, tallyTransfers, outputFileIdentifiersJson);
+        generateCsvReport(
+                roundTallies,
+                candidateOrder,
+                new OutputFileIdentifiers(OutputType.DETAILED_CSV, slice, sliceId));
+        generateJsonReport(
+                roundTallies,
+                tallyTransfersBySlice.get(slice, sliceId),
+                new OutputFileIdentifiers(OutputType.DETAILED_JSON, slice, sliceId));
       }
     }
   }
@@ -361,13 +362,13 @@ class OutputWriter {
   // param: roundTallies is the round-by-count count of votes per candidate
   // param: candidateOrder is to allow a consistent ordering of candidates, including across slices
   // param: outputFileIdentifiers must only have type DETAILED_CSV or SUMMARY_CSV
-  private void generateResultsCsv(
+  private void generateCsvReport(
           RoundTallies roundTallies,
           List<String> candidateOrder,
           OutputFileIdentifiers outputFileIdentifiers) throws IOException {
     if (outputFileIdentifiers.outputType != OutputType.SUMMARY_CSV
             && outputFileIdentifiers.outputType != OutputType.DETAILED_CSV) {
-      throw new IllegalArgumentException("ResultFile provided non-CSV type "
+      throw new IllegalArgumentException("ResultFile provided non-CSV Report Type "
               + outputFileIdentifiers.outputType);
     }
     // Check that all candidates are included in the candidate order
@@ -406,10 +407,10 @@ class OutputWriter {
     }
     csvPrinter.println();
 
-    csvPrinter.print(outputFileIdentifiers.isSlice ? "Eliminated*" : "Eliminated");
+    csvPrinter.print(outputFileIdentifiers.isSlice() ? "Eliminated*" : "Eliminated");
     printActionSummary(csvPrinter, roundToEliminatedCandidates);
 
-    csvPrinter.print(outputFileIdentifiers.isSlice ? "Elected*" : "Elected");
+    csvPrinter.print(outputFileIdentifiers.isSlice() ? "Elected*" : "Elected");
     printActionSummary(csvPrinter, roundToWinningCandidates);
 
     // For each candidate: for each round: output total votes
@@ -465,7 +466,7 @@ class OutputWriter {
     }
     csvPrinter.println();
 
-    if (!outputFileIdentifiers.isSlice) {
+    if (!outputFileIdentifiers.isSlice()) {
       csvPrinter.print("Current Round Threshold");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundTallies.get(round).getWinningThreshold());
@@ -527,7 +528,7 @@ class OutputWriter {
     // whether the value in the final round is positive.
     // Note that this concept only makes sense when we're reporting the overall tabulation, so we
     // omit it when generating results at the individual by-slice level.
-    if (!outputFileIdentifiers.isSlice && roundToResidualSurplus.get(numRounds).signum() == 1) {
+    if (!outputFileIdentifiers.isSlice() && roundToResidualSurplus.get(numRounds).signum() == 1) {
       csvPrinter.print("Residual surplus");
       for (int round = 1; round <= numRounds; round++) {
         csvPrinter.print(roundToResidualSurplus.get(round));
@@ -554,7 +555,7 @@ class OutputWriter {
       csvPrinter.println();
     }
 
-    if (outputFileIdentifiers.isSlice) {
+    if (outputFileIdentifiers.isSlice()) {
       csvPrinter.println();
       csvPrinter.print(String.format("*Elect/Eliminate decisions are from the full contest. "
               + "All other results on this report are at the %s level.",
@@ -658,11 +659,11 @@ class OutputWriter {
       RoundTallies roundTallies,
       TallyTransfers tallyTransfers,
       List<String> candidateOrder) throws IOException {
-    generateResultsCsv(roundTallies, candidateOrder,
+    generateCsvReport(roundTallies, candidateOrder,
             new OutputFileIdentifiers(OutputType.SUMMARY_CSV));
-    generateResultsCsv(roundTallies, candidateOrder,
+    generateCsvReport(roundTallies, candidateOrder,
             new OutputFileIdentifiers(OutputType.DETAILED_CSV));
-    generateResultsJson(roundTallies, tallyTransfers,
+    generateJsonReport(roundTallies, tallyTransfers,
             new OutputFileIdentifiers(OutputType.DETAILED_JSON));
   }
 
@@ -1034,7 +1035,7 @@ class OutputWriter {
   }
 
   // create summary json data for use with external visualizer software, unit tests and other tools
-  private void generateResultsJson(
+  private void generateJsonReport(
       RoundTallies roundTallies,
       TallyTransfers tallyTransfers,
       OutputFileIdentifiers outputFileIdentifiers)
@@ -1049,7 +1050,7 @@ class OutputWriter {
     configData.put("jurisdiction", config.getContestJurisdiction());
     configData.put("office", config.getContestOffice());
     configData.put("date", config.getContestDate());
-    if (outputFileIdentifiers.isSlice) {
+    if (outputFileIdentifiers.isSlice()) {
       configData.put(outputFileIdentifiers.slice.toLowerString(), outputFileIdentifiers.sliceId);
     }
 
