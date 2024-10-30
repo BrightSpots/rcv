@@ -241,8 +241,10 @@ class TabulatorTests {
       int numSlicedFilesChecked = 0;
       for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
         for (String sliceName : session.loadSliceNamesFromCvrs(slice, config)) {
-          OutputFileIdentifiers outputFileIdentifiersJson = new OutputFileIdentifiers(OutputType.DETAILED_JSON, slice, sliceName);
-          OutputFileIdentifiers outputFileIdentifiersCsv = new OutputFileIdentifiers(OutputType.DETAILED_CSV, slice, sliceName);
+          OutputFileIdentifiers outputFileIdentifiersJson = new OutputFileIdentifiers(
+                  OutputType.DETAILED_JSON, slice, sliceName);
+          OutputFileIdentifiers outputFileIdentifiersCsv = new OutputFileIdentifiers(
+                  OutputType.DETAILED_CSV, slice, sliceName);
           if (compareFiles(config, stem, outputFileIdentifiersJson, timestampString, null, true)) {
             numSlicedFilesChecked++;
           }

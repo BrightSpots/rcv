@@ -13,8 +13,20 @@ on:
 #      - 'branch-name'
 
 jobs:
+  deleteRelease:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dev-drprasad/delete-tag-and-release@v1.1
+        # Note: to update the date of the release, it must be deleted and then recreated
+        if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: build-${{ github.ref_name }}
+          delete_release: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
   release:
     runs-on: ${{ matrix.os }}
+    needs: deleteRelease
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-13, macos-latest ]  # -13 is intel; -latest is ARM
@@ -187,14 +199,6 @@ jobs:
             ${{ github.workspace }}/${{   steps.cachefn.outputs.FILEPATH   }}.sha512
             ${{ github.workspace }}/${{ steps.checksumsfn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.checksumsfn.outputs.FILEPATH }}.sha512
-
-      - uses: dev-drprasad/delete-tag-and-release@v1.1
-        # Note: to update the date of the release, it must be deleted and then recreated
-        if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        with:
-          tag_name: build-${{ github.ref_name }}
-          delete_release: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Upload binaries to release"
         uses: svenstaro/upload-release-action@v2
