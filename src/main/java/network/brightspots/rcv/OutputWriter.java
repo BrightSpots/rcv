@@ -178,12 +178,14 @@ class OutputWriter {
       } else {
         sanitizedSliceId = sanitizeStringForOutput(sliceId);
 
-        // In most cases, sanitizedSliceId will be unique and we can use it as-is.
+        // In most cases, sanitizedSliceId will be unique, and we can use it as-is.
         // Here, we handle the case where it is not unique.
         int increment = 1;
         while (uniqueSanitizedIds.contains(sanitizedSliceId)) {
           sanitizedSliceId = String.format("%s_%d", sanitizeStringForOutput(sliceId), increment);
           increment++;
+          Logger.warning("The sanitized filename for Precinct %s results is not unique"
+                  + " and has been renamed to %s", sliceId, sanitizedSliceId);
         }
 
         uniqueSanitizedIds.add(sanitizedSliceId);
