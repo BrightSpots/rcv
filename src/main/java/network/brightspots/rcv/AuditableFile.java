@@ -19,10 +19,15 @@ package network.brightspots.rcv;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 final class AuditableFile extends File {
   public AuditableFile(String pathname) {
     super(pathname);
+  }
+
+  public AuditableFile(Path pathname) {
+    super(pathname.toAbsolutePath().toString());
   }
 
   public void finalizeAndHash() {
