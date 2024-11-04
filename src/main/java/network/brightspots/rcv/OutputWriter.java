@@ -184,6 +184,9 @@ class OutputWriter {
         while (uniqueSanitizedIds.contains(sanitizedSliceId)) {
           sanitizedSliceId = String.format("%s_%d", sanitizeStringForOutput(sliceId), increment);
           increment++;
+        }
+
+        if (increment > 1) {
           Logger.warning("The sanitized filename for Precinct %s results is not unique"
                   + " and has been renamed to %s", sliceId, sanitizedSliceId);
         }
