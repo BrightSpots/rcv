@@ -18,9 +18,11 @@
 
 package network.brightspots.rcv;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -31,12 +33,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import network.brightspots.rcv.OutputWriter.OutputFileIdentifiers;
+import network.brightspots.rcv.OutputWriter.OutputType;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -147,8 +151,8 @@ class TabulatorTests {
 
   private static boolean fileCompareLineByLine(String path1, String path2) {
     boolean result = true;
-    try (BufferedReader br1 = new BufferedReader(new FileReader(path1, StandardCharsets.UTF_8));
-        BufferedReader br2 = new BufferedReader(new FileReader(path2, StandardCharsets.UTF_8))) {
+    try (BufferedReader br1 = new BufferedReader(new FileReader(path1, UTF_8));
+        BufferedReader br2 = new BufferedReader(new FileReader(path2, UTF_8))) {
       int currentLine = 1;
       int errorCount = 0;
 
@@ -187,10 +191,15 @@ class TabulatorTests {
   }
 
   // given stem and suffix returns path to file in test asset folder
+  private static Path getTestDirectory(String stem) {
+    return Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem);
+  }
+
+  // given stem and suffix returns path to file in test asset folder
   private static String getTestFilePath(String stem, String suffix) {
-    return Paths.get(System.getProperty("user.dir"), TEST_ASSET_FOLDER, stem, stem + suffix)
-        .toAbsolutePath()
-        .toString();
+    Path directory = getTestDirectory(stem);
+    String filename = stem + suffix;
+    return Paths.get(directory.toString(), filename).toAbsolutePath().toString();
   }
 
   private static void runTabulationTest(String testStem) {
@@ -223,7 +232,7 @@ class TabulatorTests {
 
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         for (int i = 1; i <= config.getNumberOfWinners(); i++) {
-          compareFiles(config, stem, timestampString, Integer.toString(i));
+          compareFiles(config, stem, timestampString, i);
         }
       } else {
         compareFiles(config, stem, timestampString, null);
@@ -232,12 +241,14 @@ class TabulatorTests {
       int numSlicedFilesChecked = 0;
       for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
         for (String sliceName : session.loadSliceNamesFromCvrs(slice, config)) {
-          String outputType = ResultsWriter.sanitizeStringForOutput(
-              String.format("%s_%s_summary", sliceName, slice.toLowerString()));
-          if (compareFiles(config, stem, outputType, ".json", timestampString, null, true)) {
+          OutputFileIdentifiers outputFileIdentifiersJson = new OutputFileIdentifiers(
+                  OutputType.DETAILED_JSON, slice, sliceName);
+          OutputFileIdentifiers outputFileIdentifiersCsv = new OutputFileIdentifiers(
+                  OutputType.DETAILED_CSV, slice, sliceName);
+          if (compareFiles(config, stem, outputFileIdentifiersJson, timestampString, null, true)) {
             numSlicedFilesChecked++;
           }
-          if (compareFiles(config, stem, outputType, ".csv", timestampString, null, true)) {
+          if (compareFiles(config, stem, outputFileIdentifiersCsv, timestampString, null, true)) {
             numSlicedFilesChecked++;
           }
         }
@@ -256,7 +267,7 @@ class TabulatorTests {
 
     String timestampString = session.getTimestampString();
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
-    compareFiles(config, stem, "cvr_cdf", ".json", timestampString, null, false);
+    compareFiles(config, stem, OutputType.CDF_CVR, timestampString, null, false);
 
     cleanOutputFolder(session);
   }
@@ -319,12 +330,33 @@ class TabulatorTests {
   }
 
   private static void compareFiles(
-      ContestConfig config, String stem, String timestampString, String sequentialId) {
-    compareFiles(config, stem, "summary", ".json", timestampString, sequentialId, false);
-    compareFiles(config, stem, "summary", ".csv", timestampString, sequentialId, false);
+      ContestConfig config, String stem, String timestampString, Integer sequentialId) {
+    compareFiles(config, stem, OutputType.DETAILED_JSON, timestampString, sequentialId, false);
+    compareFiles(config, stem, OutputType.DETAILED_CSV, timestampString, sequentialId, false);
+    compareExtendedSummaryToSummary(config, timestampString, sequentialId);
     if (config.isGenerateCdfJsonEnabled()) {
-      compareFiles(config, stem, "cvr_cdf", ".json", timestampString, sequentialId, false);
+      compareFiles(config, stem, OutputType.CDF_CVR, timestampString, sequentialId, false);
     }
+  }
+
+  /**
+   * Helper comparison for non-slice files.
+   */
+  private static boolean compareFiles(
+          ContestConfig config,
+          String stem,
+          OutputType outputType,
+          String timestampString,
+          Integer sequentialId,
+          boolean onlyCheckIfExpectedFileExists) {
+    OutputFileIdentifiers actualOutputFileIdentifiers = new OutputFileIdentifiers(outputType);
+    return compareFiles(
+            config,
+            stem,
+            actualOutputFileIdentifiers,
+            timestampString,
+            sequentialId,
+            onlyCheckIfExpectedFileExists);
   }
 
   /**
@@ -334,22 +366,14 @@ class TabulatorTests {
   private static boolean compareFiles(
       ContestConfig config,
       String stem,
-      String outputType,
-      String extension,
+      OutputFileIdentifiers actualOutputFileIdentifiers,
       String timestampString,
-      String sequentialId,
+      Integer sequentialId,
       boolean onlyCheckIfExpectedFileExists) {
-    String actualOutputPath =
-        ResultsWriter.getOutputFilePath(
-                config.getOutputDirectory(), outputType, timestampString, sequentialId)
-            + extension;
-    String expectedPath =
-        getTestFilePath(
-            stem,
-            ResultsWriter.sequentialSuffixForOutputPath(sequentialId)
-                + "_expected_"
-                + outputType
-                + extension);
+    String actualOutputPath = actualOutputFileIdentifiers.getPath(
+          config.getOutputDirectory(), timestampString, sequentialId).toAbsolutePath().toString();
+    String expectedPath = actualOutputFileIdentifiers.getPath(getTestDirectory(stem).toString(),
+            stem, "expected", sequentialId).toString();
 
     Logger.info("Comparing files:\nGenerated: %s\nReference: %s", actualOutputPath, expectedPath);
     boolean didCompare = true;
@@ -363,6 +387,54 @@ class TabulatorTests {
       fail();
     }
     return didCompare;
+  }
+
+  /**
+   * Rather than storing both the extended summary and non-extended summary files in git, we can
+   * directly check that the non-extended file is precisely what we expect: everything in the
+   * extended file except for the inactive ballot breakdown.
+   */
+  private static void compareExtendedSummaryToSummary(
+          ContestConfig config, String timestampString, Integer sequentialId) {
+    String dir = config.getOutputDirectory();
+    String summaryPath = new OutputFileIdentifiers(OutputType.SUMMARY_CSV).getPath(
+            dir, timestampString, sequentialId).toAbsolutePath().toString();
+    String detailedPath = new OutputFileIdentifiers(OutputType.DETAILED_CSV).getPath(
+            dir, timestampString, sequentialId).toAbsolutePath().toString();
+
+    try (BufferedReader brSummary = new BufferedReader(new FileReader(summaryPath, UTF_8));
+         BufferedReader brDetailed = new BufferedReader(new FileReader(detailedPath, UTF_8))) {
+      while (true) {
+        String lineDetailed = brDetailed.readLine();
+        // If the extended file has reached its end, then the non-extended file must have too
+        if (lineDetailed == null) {
+          assertNull(brSummary.readLine(), "Extended file is missing a line");
+          return;
+        }
+
+        // If the extended file should be excluded, continue without moving the file pointer
+        // in the non-extended file. For now, there's only one type of row excluded, and they
+        // happen to all start with "Inactive Ballots by"
+        if (lineDetailed.startsWith("Inactive Ballots by")) {
+          continue;
+        }
+
+        // This line should be equal in both files. Ensure the line exists and they're equal
+        // in both files.
+        String lineSummary = brSummary.readLine();
+        assertNotNull(lineSummary, "Summary file is missing a line");
+        if (!lineSummary.equals(lineDetailed)) {
+          fail("Line differes in extended vs non-extended CSV: \n%s\n%s".formatted(
+                  lineSummary, lineDetailed));
+        }
+      }
+    } catch (FileNotFoundException exception) {
+      Logger.severe("File not found!\n%s", exception);
+      fail();
+    } catch (IOException exception) {
+      Logger.severe("Error reading file!\n%s", exception);
+      fail();
+    }
   }
 
   @BeforeAll
