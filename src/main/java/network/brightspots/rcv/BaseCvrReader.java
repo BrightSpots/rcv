@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.util.Pair;
+import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 
 abstract class BaseCvrReader {
@@ -68,6 +69,11 @@ abstract class BaseCvrReader {
   public List<String> readCandidateListFromCvr(List<CastVoteRecord> castVoteRecords)
       throws IOException {
     return new ArrayList<>();
+  }
+
+  // Allow any reader-specific postprocessing of the candidate list.
+  public Candidate postprocessAutoloadedCandidate(Candidate candidate) {
+    return candidate;
   }
 
   // Gather candidate names from the CVR that are not in the config.

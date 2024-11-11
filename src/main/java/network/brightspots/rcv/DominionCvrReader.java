@@ -51,7 +51,7 @@ class DominionCvrReader extends BaseCvrReader {
   private Map<Integer, String> precinctPortions;
   // map of contest ID to Contest data
   private Map<String, Contest> contests;
-  private List<Candidate> candidates;
+  private HashMap<String, Candidate> candidates;
 
   DominionCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
@@ -100,9 +100,9 @@ class DominionCvrReader extends BaseCvrReader {
     return precinctsById;
   }
 
-  // returns list of Candidate objects parsed from CandidateManifest.json
-  private static List<Candidate> getCandidates(String candidatePath) {
-    ArrayList<Candidate> candidates = new ArrayList<>();
+  // returns a map of Codes to Candidate objects parsed from CandidateManifest.json
+  private static HashMap<String, Candidate> getCandidates(String candidatePath) {
+    HashMap<String, Candidate> candidates = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(candidatePath, HashMap.class);
       ArrayList candidateList = (ArrayList) json.get("List");
@@ -113,7 +113,7 @@ class DominionCvrReader extends BaseCvrReader {
         String code = id.toString();
         String contestId = candidateMap.get("ContestId").toString();
         Candidate newCandidate = new Candidate(name, code, contestId);
-        candidates.add(newCandidate);
+        candidates.put(code, newCandidate);
       }
     } catch (Exception exception) {
       Logger.severe("Error parsing candidate manifest:\n%s", exception);
@@ -188,7 +188,7 @@ class DominionCvrReader extends BaseCvrReader {
       throws CastVoteRecord.CvrParseException {
     // build a lookup map to optimize CVR parsing
     Map<String, Set<String>> contestIdToCandidateNames = new HashMap<>();
-    for (Candidate candidate : this.candidates) {
+    for (Candidate candidate : this.candidates.values()) {
       Set<String> candidates;
       if (contestIdToCandidateNames.containsKey(candidate.getContestId())) {
         candidates = contestIdToCandidateNames.get(candidate.getContestId());
@@ -224,6 +224,23 @@ class DominionCvrReader extends BaseCvrReader {
         }
       }
     }
+  }
+
+  // The autoloaded candidates loads only codes, and sets them as the name.
+  // Fix these candidates with the correct name, and their code as an alias instead.
+  public RawContestConfig.Candidate postprocessAutoloadedCandidate(
+          RawContestConfig.Candidate candidateToFix) {
+    String candidateCode = candidateToFix.getName();
+    Candidate loadedCandidate = candidates.get(candidateCode);
+    RawContestConfig.Candidate fixedCandidate;
+    if (loadedCandidate != null && loadedCandidate.code.equals(candidateToFix.getName())) {
+      // The auto-loaded candidate loaded their code as a name. Fix it, and make the code an alias.
+      fixedCandidate = new RawContestConfig.Candidate(loadedCandidate.name, candidateCode, false);
+    } else {
+      fixedCandidate = candidateToFix;
+    }
+
+    return fixedCandidate;
   }
 
   // parse the CVR file or files into a List of CastVoteRecords for tabulation
