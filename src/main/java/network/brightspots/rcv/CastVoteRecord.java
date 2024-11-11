@@ -304,5 +304,13 @@ class CastVoteRecord {
     EXHAUSTED,
   }
 
-  static class CvrParseException extends Exception {}
+  static class CvrParseException extends Exception {
+    CvrParseException() {
+      super();
+    }
+
+    CvrParseException(String message) {
+      super(message);
+    }
+  }
 }

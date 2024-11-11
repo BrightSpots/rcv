@@ -226,34 +226,85 @@ class DominionCvrReader extends BaseCvrReader {
     }
   }
 
+  // Given a path that matches a pattern with "%d" in it, extract the number from the path
+  // Note that %d could be of any length, so we must iterate up from 1 digit to find the correct
+  // number length
+  private static int extractNumberFromString(String path, String pattern) {
+    int numberLength = 1;
+    while (true) {
+      String regexPath = pattern.replaceAll("%d", "\\\\d{" + numberLength + "}[0-9]*");
+      if (!path.matches(regexPath)) {
+        numberLength--;
+        break;
+      }
+
+      numberLength++;
+      if (numberLength >= path.length()) {
+        throw new RuntimeException("Bug in extracting file number: " + path);
+      }
+    }
+
+    if (numberLength == 0) {
+      throw new RuntimeException("Bug in extracting file number, no number found: " + path);
+    }
+
+    int startIndex = pattern.indexOf("%d");
+    int endIndex = startIndex + numberLength;
+    String numberString = path.substring(startIndex, endIndex);
+    return Integer.parseInt(numberString);
+  }
+
+  // find the range of files in the directory which match the pattern
+  private static Pair<Integer, Integer> getRangeOfCvrFiles(String cvrPath)
+          throws FileNotFoundException, CvrParseException {
+    // Look at all files in the directory
+    File cvrDirectory = new File(cvrPath);
+
+    // Then find all files that match the expected pattern
+    String regexPath = CVR_EXPORT_PATTERN.replaceAll("%d", "\\\\d+");
+    File[] cvrFiles = cvrDirectory.listFiles((dir, name) -> name.matches(regexPath));
+    if (cvrFiles == null || cvrFiles.length == 0) {
+      throw new FileNotFoundException("No CVR files found in directory: " + cvrPath);
+    }
+
+    // Find the first and last CVR file numbers.
+    // Usually the first index is zero, but not always.
+    int firstCvr = Integer.MAX_VALUE;
+    int lastCvr = Integer.MIN_VALUE;
+    for (File cvrFile : cvrFiles) {
+      String cvrFileName = cvrFile.getName();
+      int cvrNumber = extractNumberFromString(cvrFileName, CVR_EXPORT_PATTERN);
+      firstCvr = Math.min(firstCvr, cvrNumber);
+      lastCvr = Math.max(lastCvr, cvrNumber);
+    }
+
+    // Return the range of CVR files
+    return new Pair<>(firstCvr, lastCvr);
+  }
+
   // parse the CVR file or files into a List of CastVoteRecords for tabulation
   private void gatherCvrsForContest(List<CastVoteRecord> castVoteRecords, String contestIdToLoad) {
     try {
       Path singleCvrPath = Paths.get(cvrPath, CVR_EXPORT);
-      Path firstCvrPath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, 0));
       if (singleCvrPath.toFile().exists()) {
         HashMap json = JsonParser.readFromFile(singleCvrPath.toString(), HashMap.class);
         parseCvrFile(json, castVoteRecords, contestIdToLoad);
-      } else if (firstCvrPath.toFile().exists()) {
+      } else {
         int recordsParsed = 0;
         int recordsParsedAtLastLog = 0;
-        int cvrSequence = 0;
-        Path cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
-        while (cvrFilePath.toFile().exists()) {
+        Pair<Integer, Integer> range = getRangeOfCvrFiles(cvrPath);
+        for (int cvrSequence = range.getKey(); cvrSequence <= range.getValue(); cvrSequence++) {
+          Path cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
+          if (!cvrFilePath.toFile().exists()) {
+            continue;
+          }
           HashMap json = JsonParser.readFromFile(cvrFilePath.toString(), HashMap.class);
           recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad);
           if (recordsParsed - recordsParsedAtLastLog > 50000) {
             Logger.info("Parsed %d records from %d files", recordsParsed, cvrSequence);
             recordsParsedAtLastLog = recordsParsed;
           }
-          cvrSequence++;
-          cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         }
-      } else {
-        throw new FileNotFoundException(
-            String.format(
-                "Error parsing cast vote record: neither %s nor %s exists",
-                singleCvrPath, firstCvrPath));
       }
     } catch (FileNotFoundException | CvrParseException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
