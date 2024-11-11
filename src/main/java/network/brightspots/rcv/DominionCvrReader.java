@@ -226,18 +226,19 @@ class DominionCvrReader extends BaseCvrReader {
     }
   }
 
-  // The autoloaded candidates loads only codes, and sets them as the name.
-  // Fix these candidates with the correct name, and their code as an alias instead.
+  // The Candidate Autoload looks only at the CVR file(s) and not the manifest files, so
+  // it doesn't know about the mapping between a code and the candidate's name. This function
+  // addresses that discrepancy.
   public RawContestConfig.Candidate postprocessAutoloadedCandidate(
-          RawContestConfig.Candidate candidateToFix) {
-    String candidateCode = candidateToFix.getName();
-    Candidate loadedCandidate = candidates.get(candidateCode);
+          RawContestConfig.Candidate autoloadedCandidate) {
+    String autoloadedCandidateName = autoloadedCandidate.getName();
+    Candidate candidateFromManifest = candidates.get(autoloadedCandidateName);
     RawContestConfig.Candidate fixedCandidate;
-    if (loadedCandidate != null && loadedCandidate.code.equals(candidateToFix.getName())) {
-      // The auto-loaded candidate loaded their code as a name. Fix it, and make the code an alias.
-      fixedCandidate = new RawContestConfig.Candidate(loadedCandidate.name, candidateCode, false);
+    if (candidateFromManifest == null) {
+      fixedCandidate = autoloadedCandidate;
     } else {
-      fixedCandidate = candidateToFix;
+      fixedCandidate = new RawContestConfig.Candidate(
+              candidateFromManifest.name, candidateFromManifest.code, false);
     }
 
     return fixedCandidate;
