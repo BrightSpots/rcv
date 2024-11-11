@@ -252,7 +252,7 @@ class DominionCvrReader extends BaseCvrReader {
           }
         }
 
-        if (matchedCvrFiles.size() == 0) {
+        if (matchedCvrFiles.isEmpty()) {
           String errorMessage = "Error parsing Dominion cast vote records:"
                   + " CvrExport.json file(s) not located";
           throw new FileNotFoundException(errorMessage);
