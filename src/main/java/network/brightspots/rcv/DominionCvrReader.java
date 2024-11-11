@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
-import org.slf4j.ILoggerFactory;
 
 @SuppressWarnings("rawtypes")
 class DominionCvrReader extends BaseCvrReader {
@@ -253,8 +252,9 @@ class DominionCvrReader extends BaseCvrReader {
           }
         }
 
-        if(matchedCvrFiles.size() == 0){
-          String errorMessage = "Error parsing Dominion cast vote records: CvrExport.json file(s) not located";
+        if (matchedCvrFiles.size() == 0) {
+          String errorMessage = "Error parsing Dominion cast vote records:"
+                  + " CvrExport.json file(s) not located";
           throw new FileNotFoundException(errorMessage);
         }
 
@@ -262,7 +262,7 @@ class DominionCvrReader extends BaseCvrReader {
         int filesParsed = 0;
         int recordsParsedAtLastLog = 0;
 
-        for(File file : matchedCvrFiles){
+        for (File file : matchedCvrFiles) {
           HashMap json = JsonParser.readFromFile(file.toString(), HashMap.class);
           recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad);
           filesParsed++;
@@ -396,7 +396,6 @@ class DominionCvrReader extends BaseCvrReader {
         Logger.info("Parsed %d cast vote records.", recordsParsed);
       }
     }
-    //Logger.info("%d notCurrentAdjudicated | notCurrent")
     return recordsParsed;
   }
 
