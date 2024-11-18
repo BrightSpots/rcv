@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -675,9 +676,16 @@ public class GuiConfigController implements Initializable {
 
   private List<File> chooseFile(Provider provider, ExtensionFilter filter) {
     FileChooser fc = new FileChooser();
-    fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+    File initialDirectory = new File(FileUtils.getUserDirectory());
+    if (Files.isDirectory(initialDirectory.toPath())) {
+      fc.setInitialDirectory(initialDirectory);
+    } else {
+      Logger.warning("User directory %s does not exist. Using current working directory.",
+          initialDirectory.getAbsolutePath());
+    }
     fc.getExtensionFilters().add(filter);
     fc.setTitle("Select " + provider + " Cast Vote Record Files");
+
     return fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
   }
 
