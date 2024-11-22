@@ -101,7 +101,7 @@ Alternatively, you can run the Tabulator using the command-line interface by inc
 
 Or, if you're compiling and running using Gradle:
 
-`$ gradlew run --args="--cli path/to/config"`
+`$ ./gradlew run --args="--cli path/to/config"`
 
 You can also activate a special `convert-to-cdf` function via the command line to export the CVR as a NIST common data
 format (CDF) .json instead of tabulating the results, e.g.:
@@ -112,9 +112,14 @@ This option is available in the GUI by selecting the "Conversion > Convert CVRs 
 
 Or, again, if you're compiling and running using Gradle:
 
-`$ gradlew run --args="--cli path/to/config --convert-to-cdf"`
+`$ ./gradlew run --args="--cli path/to/config --convert-to-cdf"`
 
-Note: if you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, the label will
+
+
+> Notes:
+> 1. You may be prompted to enter an operator name. The CLI will not tabulate results until this operator name has been entered.
+> 2. As of right now, the file path to the config file must be absolute and not relative.
+> 3. If you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, the label will
 be represented differently in the generated CDF source file than it was in the original CVR source. When you create a
 new config using this generated CDF source file and you need to set overvoteLabel, you should use "overvote". If you
 need to set undeclaredWriteInLabel, you should use "Undeclared Write-ins".
