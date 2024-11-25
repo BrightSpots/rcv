@@ -674,15 +674,20 @@ public class GuiConfigController implements Initializable {
     datePickerContestDate.setValue(null);
   }
 
-  private List<File> chooseFile(Provider provider, ExtensionFilter filter) {
-    FileChooser fc = new FileChooser();
+  private File getInitialDirectory() {
     File initialDirectory = new File(FileUtils.getUserDirectory());
     if (Files.isDirectory(initialDirectory.toPath())) {
-      fc.setInitialDirectory(initialDirectory);
+      return initialDirectory;
     } else {
       Logger.warning("User directory %s does not exist. Using current working directory.",
-          initialDirectory.getAbsolutePath());
+              initialDirectory.getAbsolutePath());
+      return new File(System.getProperty("user.home"));
     }
+  }
+
+  private List<File> chooseFile(Provider provider, ExtensionFilter filter) {
+    FileChooser fc = new FileChooser();
+    fc.setInitialDirectory(getInitialDirectory());
     fc.getExtensionFilters().add(filter);
     fc.setTitle("Select " + provider + " Cast Vote Record Files");
 
@@ -704,7 +709,7 @@ public class GuiConfigController implements Initializable {
           chooseFile(provider, new ExtensionFilter("CSV file(s)", "*.csv"));
       case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
-        dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+        dc.setInitialDirectory(getInitialDirectory());
         dc.setTitle("Select " + provider + " Cast Vote Record Folder");
         selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
