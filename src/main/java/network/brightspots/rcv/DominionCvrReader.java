@@ -240,15 +240,16 @@ class DominionCvrReader extends BaseCvrReader {
         // We are expecting multiple CvrExport_N.json files
         String regexPath = CVR_EXPORT_PATTERN.replaceAll("%d", "\\\\d+");
         File cvrDirectory = new File(cvrPath);
-        List<File> matchedCvrFiles =
-                Arrays.asList(cvrDirectory.listFiles((dir, name) -> name.matches(regexPath)));
-        matchedCvrFiles.sort(Comparator.comparing(File::getAbsolutePath));
+        File[] matchedCvrFileArray = cvrDirectory.listFiles((dir, name) -> name.matches(regexPath));
 
-        if (matchedCvrFiles.isEmpty()) {
+        if (matchedCvrFileArray == null || matchedCvrFileArray.length == 0) {
           String errorMessage = "Error parsing Dominion cast vote records:"
                   + " CvrExport.json file(s) not located";
           throw new FileNotFoundException(errorMessage);
         }
+
+        List<File> matchedCvrFiles = Arrays.asList(matchedCvrFileArray);
+        matchedCvrFiles.sort(Comparator.comparing(File::getAbsolutePath));
 
         int recordsParsed = 0;
         int filesParsed = 0;
