@@ -519,8 +519,9 @@ public class GuiConfigController implements Initializable {
    */
   public void menuItemTabulateClicked() {
     setGuiIsBusy(true);
-    ContestConfig config =
-            ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getConfigDirectory());
+    ContestConfig config = ContestConfig.loadContestConfig(
+            createRawContestConfig(),
+            FileUtils.getConfigDirectory());
     ValidatorService service = new ValidatorService(config);
     service.setOnSucceeded(
         event -> {
