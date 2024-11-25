@@ -412,7 +412,7 @@ public class GuiConfigController implements Initializable {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
       if (selectedFile == null) {
-        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+        fc.setInitialDirectory(getInitialDirectory());
       } else {
         fc.setInitialDirectory(new File(selectedFile.getParent()));
       }
@@ -433,7 +433,7 @@ public class GuiConfigController implements Initializable {
   private File getSaveFile(Stage stage) {
     FileChooser fc = new FileChooser();
     if (selectedFile == null) {
-      fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+      fc.setInitialDirectory(getInitialDirectory());
     } else {
       fc.setInitialDirectory(new File(selectedFile.getParent()));
       fc.setInitialFileName(selectedFile.getName());
@@ -659,7 +659,7 @@ public class GuiConfigController implements Initializable {
    */
   public void buttonOutputDirectoryClicked() {
     DirectoryChooser dc = new DirectoryChooser();
-    dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+    dc.setInitialDirectory(getInitialDirectory());
     dc.setTitle("Output Directory");
     File outputDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
     if (outputDirectory != null) {
