@@ -33,7 +33,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -412,7 +411,7 @@ public class GuiConfigController implements Initializable {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
       if (selectedFile == null) {
-        fc.setInitialDirectory(getInitialDirectory());
+        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
       } else {
         fc.setInitialDirectory(new File(selectedFile.getParent()));
       }
@@ -433,7 +432,7 @@ public class GuiConfigController implements Initializable {
   private File getSaveFile(Stage stage) {
     FileChooser fc = new FileChooser();
     if (selectedFile == null) {
-      fc.setInitialDirectory(getInitialDirectory());
+      fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
     } else {
       fc.setInitialDirectory(new File(selectedFile.getParent()));
       fc.setInitialFileName(selectedFile.getName());
@@ -659,7 +658,7 @@ public class GuiConfigController implements Initializable {
    */
   public void buttonOutputDirectoryClicked() {
     DirectoryChooser dc = new DirectoryChooser();
-    dc.setInitialDirectory(getInitialDirectory());
+    dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
     dc.setTitle("Output Directory");
     File outputDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
     if (outputDirectory != null) {
@@ -674,23 +673,11 @@ public class GuiConfigController implements Initializable {
     datePickerContestDate.setValue(null);
   }
 
-  private File getInitialDirectory() {
-    File initialDirectory = new File(FileUtils.getUserDirectory());
-    if (Files.isDirectory(initialDirectory.toPath())) {
-      return initialDirectory;
-    } else {
-      Logger.warning("User directory %s does not exist. Using current working directory.",
-              initialDirectory.getAbsolutePath());
-      return new File(System.getProperty("user.home"));
-    }
-  }
-
   private List<File> chooseFile(Provider provider, ExtensionFilter filter) {
     FileChooser fc = new FileChooser();
-    fc.setInitialDirectory(getInitialDirectory());
+    fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
     fc.getExtensionFilters().add(filter);
     fc.setTitle("Select " + provider + " Cast Vote Record Files");
-
     return fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
   }
 
@@ -709,7 +696,7 @@ public class GuiConfigController implements Initializable {
           chooseFile(provider, new ExtensionFilter("CSV file(s)", "*.csv"));
       case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
-        dc.setInitialDirectory(getInitialDirectory());
+        dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
         dc.setTitle("Select " + provider + " Cast Vote Record Folder");
         selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }

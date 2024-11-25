@@ -38,7 +38,18 @@ final class FileUtils {
   // return userDirectory if it exists
   // fallback to current working directory
   static String getUserDirectory() {
-    return userDirectory == null ? System.getProperty("user.dir") : userDirectory;
+    String result;
+    if (userDirectory == null) {
+      result = System.getProperty("user.dir");
+    } else if (Files.isDirectory(new File(userDirectory).toPath())) {
+      result = userDirectory;
+    } else {
+      Logger.warning("User directory %s does not exist. Using current working directory.",
+              userDirectory);
+      result = System.getProperty("user.home");
+    }
+
+    return result;
   }
 
   static void setUserDirectory(String userDirectory) {
