@@ -101,7 +101,7 @@ class DominionCvrReader extends BaseCvrReader {
   }
 
   // returns a map of Codes to Candidate objects parsed from CandidateManifest.json
-  private static HashMap<String, Candidate> getCandidates(String candidatePath) {
+  private HashMap<String, Candidate> getCandidates(String candidatePath) {
     HashMap<String, Candidate> candidates = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(candidatePath, HashMap.class);
@@ -112,6 +112,9 @@ class DominionCvrReader extends BaseCvrReader {
         Integer id = (Integer) candidateMap.get("Id");
         String code = id.toString();
         String contestId = candidateMap.get("ContestId").toString();
+        if (contestId.equals(config.getContestName())) {
+          continue;
+        }
         Candidate newCandidate = new Candidate(name, code, contestId);
         candidates.put(code, newCandidate);
       }
@@ -228,20 +231,23 @@ class DominionCvrReader extends BaseCvrReader {
 
   // The Candidate Autoload looks only at the CVR file(s) and not the manifest files, so
   // it doesn't know about the mapping between a code and the candidate's name. This function
-  // addresses that discrepancy.
-  public RawContestConfig.Candidate postprocessAutoloadedCandidate(
-          RawContestConfig.Candidate autoloadedCandidate) {
-    String autoloadedCandidateName = autoloadedCandidate.getName();
-    Candidate candidateFromManifest = candidates.get(autoloadedCandidateName);
-    RawContestConfig.Candidate fixedCandidate;
-    if (candidateFromManifest == null) {
-      fixedCandidate = autoloadedCandidate;
-    } else {
-      fixedCandidate = new RawContestConfig.Candidate(
-              candidateFromManifest.name, candidateFromManifest.code, false);
+  // addresses that discrepancy, while also being much faster than actually reading each ballot.
+  @Override
+  public Set<RawContestConfig.Candidate> gatherUnknownCandidates(
+          List<CastVoteRecord> castVoteRecords) {
+    Set<String> knownNames = config.getCandidateNames();
+    Set<Map.Entry<String, Candidate>> namesFoundInManifest = candidates.entrySet();
+
+    Set<RawContestConfig.Candidate> unknownCandidates = new HashSet<>();
+    for (Map.Entry<String, Candidate> entry : namesFoundInManifest) {
+      Candidate candidate = entry.getValue();
+      if (knownNames.contains(candidate.name)) {
+        continue;
+      }
+      unknownCandidates.add(new RawContestConfig.Candidate(candidate.name, entry.getKey(), false));
     }
 
-    return fixedCandidate;
+    return unknownCandidates;
   }
 
   // parse the CVR file or files into a List of CastVoteRecords for tabulation

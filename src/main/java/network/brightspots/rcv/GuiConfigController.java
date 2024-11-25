@@ -38,10 +38,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -1722,20 +1720,16 @@ public class GuiConfigController implements Initializable {
               }
               if (cvrsSpecified) {
                 // Gather unloaded names from each of the sources and place into the HashSet
-                HashMap<String, Candidate> unloadedNames = new HashMap<>();
+                HashSet<Candidate> unloadedCandidates = new HashSet<>();
                 for (CvrSource source : sources) {
                   Provider provider = ContestConfig.getProvider(source);
                   try {
                     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
                     BaseCvrReader reader = provider.constructReader(config, source);
                     reader.readCastVoteRecords(castVoteRecords);
-                    Set<String> unknownCandidates = reader.gatherUnknownCandidates(
-                        castVoteRecords, true).keySet();
-                    for (String name : unknownCandidates) {
-                      Candidate candidate = new Candidate(name, null, false);
-                      candidate = reader.postprocessAutoloadedCandidate(candidate);
-                      unloadedNames.put(candidate.getName(), candidate);
-                    }
+                    Set<Candidate> unknownCandidates =
+                            reader.gatherUnknownCandidates(castVoteRecords);
+                    unloadedCandidates.addAll(unknownCandidates);
                   } catch (ContestConfig.UnrecognizedProviderException e) {
                     Logger.severe(
                         "Unrecognized provider \"%s\" in source file \"%s\": %s",
@@ -1749,14 +1743,14 @@ public class GuiConfigController implements Initializable {
 
                 // Validate each name and add to the table of candidates
                 int successCount = 0;
-                for (Map.Entry<String, Candidate> entry : unloadedNames.entrySet()) {
+                for (Candidate candidate : unloadedCandidates) {
                   Set<ValidationError> validationErrors =
-                      ContestConfig.performBasicCandidateValidation(entry.getValue());
+                      ContestConfig.performBasicCandidateValidation(candidate);
                   if (validationErrors.isEmpty()) {
-                    tableViewCandidates.getItems().add(entry.getValue());
+                    tableViewCandidates.getItems().add(candidate);
                     successCount++;
                   } else {
-                    Logger.severe("Failed to load candidate \"%s\"!", entry.getKey());
+                    Logger.severe("Failed to load candidate \"%s\"!", candidate.getName());
                   }
                 }
 

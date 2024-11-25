@@ -357,8 +357,8 @@ class TabulatorSession {
                 source, reader, sourceIndex, startIndex, castVoteRecords.size() - 1));
 
         // Check for unrecognized candidates
-        Map<String, Integer> unrecognizedCandidateCounts =
-            reader.gatherUnknownCandidates(castVoteRecords, false);
+        Map<RawContestConfig.Candidate, Integer> unrecognizedCandidateCounts =
+            reader.gatherUnknownCandidateCounts(castVoteRecords, false);
 
         if (!unrecognizedCandidateCounts.isEmpty()) {
           throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
@@ -440,9 +440,9 @@ class TabulatorSession {
   static class UnrecognizedCandidatesException extends Exception {
 
     // count of how many times each unrecognized candidate was encountered during CVR parsing
-    final Map<String, Integer> candidateCounts;
+    final Map<RawContestConfig.Candidate, Integer> candidateCounts;
 
-    UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
+    UnrecognizedCandidatesException(Map<RawContestConfig.Candidate, Integer> candidateCounts) {
       this.candidateCounts = candidateCounts;
     }
   }
