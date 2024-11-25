@@ -25,13 +25,13 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
@@ -238,19 +238,11 @@ class DominionCvrReader extends BaseCvrReader {
         parseCvrFile(json, castVoteRecords, contestIdToLoad);
       } else {
         // We are expecting multiple CvrExport_N.json files
-        Pattern pattern = Pattern.compile("^CvrExport_\\d+\\.json$");
-        HashSet<File> matchedCvrFiles = new HashSet<>();
-
-        // Use regex to find all CvrExport_N.json files
-        File[] files = Paths.get(cvrPath).toFile().listFiles();
-        if (files != null) {
-          for (File file : files) {
-            Matcher matcher = pattern.matcher(file.getName());
-            if (matcher.matches()) {
-              matchedCvrFiles.add(file);
-            }
-          }
-        }
+        String regexPath = CVR_EXPORT_PATTERN.replaceAll("%d", "\\\\d+");
+        File cvrDirectory = new File(cvrPath);
+        List<File> matchedCvrFiles =
+                Arrays.asList(cvrDirectory.listFiles((dir, name) -> name.matches(regexPath)));
+        matchedCvrFiles.sort(Comparator.comparing(File::getAbsolutePath));
 
         if (matchedCvrFiles.isEmpty()) {
           String errorMessage = "Error parsing Dominion cast vote records:"
