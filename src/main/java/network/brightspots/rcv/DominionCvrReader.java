@@ -112,7 +112,7 @@ class DominionCvrReader extends BaseCvrReader {
         Integer id = (Integer) candidateMap.get("Id");
         String code = id.toString();
         String contestId = candidateMap.get("ContestId").toString();
-        if (contestId.equals(config.getContestName())) {
+        if (!source.getContestId().equals(contestId)) {
           continue;
         }
         Candidate newCandidate = new Candidate(name, code, contestId);
