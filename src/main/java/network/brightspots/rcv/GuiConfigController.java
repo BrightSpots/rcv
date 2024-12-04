@@ -890,8 +890,9 @@ public class GuiConfigController implements Initializable {
   /** Action when "Auto-Load Candidates" button is clicked. */
   public void buttonAutoLoadCandidatesClicked() {
     setGuiIsBusy(true);
+    String dir = FileUtils.getInitialDirectory();
     ContestConfig config =
-          ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getInitialDirectory());
+          ContestConfig.loadContestConfig(createRawContestConfig(), dir);
     AutoLoadCandidatesService service = new AutoLoadCandidatesService(
           config,
           tableViewCvrFiles.getItems(),
