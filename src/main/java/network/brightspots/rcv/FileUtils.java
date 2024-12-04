@@ -31,30 +31,31 @@ import java.security.NoSuchAlgorithmException;
 final class FileUtils {
 
   // cache location for finding and creating user files and folders
-  private static String configDirectory = null;
+  private static String initialDirectory = null;
 
   private FileUtils() {}
 
-  // return configDirectory if it exists
-  // fallback to current working directory
-  static String getConfigDirectory() {
+  // When working with filesystem throughout RCTab
+  // remember the latest folder the user was working in
+  // fallback to current working directory if that hasn't been set
+  static String getInitialDirectory() {
     String result;
-    if (configDirectory == null) {
+    if (initialDirectory == null) {
       result = System.getProperty("user.dir");
-    } else if (Files.isDirectory(new File(configDirectory).toPath())) {
-      result = configDirectory;
+    } else if (Files.isDirectory(new File(initialDirectory).toPath())) {
+      result = initialDirectory;
     } else {
       Logger.info("Most recent .config load/save was done at path %s."
                       + " This path no longer exists. Falling back to current working directory.",
-              configDirectory);
+              initialDirectory);
       result = System.getProperty("user.dir");
     }
 
     return result;
   }
 
-  static void setConfigDirectory(String configDirectory) {
-    FileUtils.configDirectory = configDirectory;
+  static void setInitialDirectory(String initialDirectory) {
+    FileUtils.initialDirectory = initialDirectory;
   }
 
   static void createOutputDirectory(String dir) throws UnableToCreateDirectoryException {
