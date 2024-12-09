@@ -25,6 +25,8 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -230,30 +232,41 @@ class DominionCvrReader extends BaseCvrReader {
   private void gatherCvrsForContest(List<CastVoteRecord> castVoteRecords, String contestIdToLoad) {
     try {
       Path singleCvrPath = Paths.get(cvrPath, CVR_EXPORT);
-      Path firstCvrPath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, 0));
+
       if (singleCvrPath.toFile().exists()) {
         HashMap json = JsonParser.readFromFile(singleCvrPath.toString(), HashMap.class);
         parseCvrFile(json, castVoteRecords, contestIdToLoad);
-      } else if (firstCvrPath.toFile().exists()) {
+      } else {
+        // We are expecting multiple CvrExport_N.json files
+        String regexPath = CVR_EXPORT_PATTERN.replaceAll("%d", "\\\\d+");
+        File cvrDirectory = new File(cvrPath);
+        File[] matchedCvrFileArray = cvrDirectory.listFiles((dir, name) -> name.matches(regexPath));
+
+        if (matchedCvrFileArray == null || matchedCvrFileArray.length == 0) {
+          String errorMessage = "Error parsing Dominion cast vote records:"
+                  + " CvrExport.json file(s) not located";
+          throw new FileNotFoundException(errorMessage);
+        }
+
+        List<File> matchedCvrFiles = Arrays.asList(matchedCvrFileArray);
+        matchedCvrFiles.sort(Comparator.comparing(File::getAbsolutePath));
+
         int recordsParsed = 0;
+        int filesParsed = 0;
         int recordsParsedAtLastLog = 0;
-        int cvrSequence = 0;
-        Path cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
-        while (cvrFilePath.toFile().exists()) {
-          HashMap json = JsonParser.readFromFile(cvrFilePath.toString(), HashMap.class);
+
+        for (File file : matchedCvrFiles) {
+          HashMap json = JsonParser.readFromFile(file.toString(), HashMap.class);
           recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad);
+          filesParsed++;
+
           if (recordsParsed - recordsParsedAtLastLog > 50000) {
-            Logger.info("Parsed %d records from %d files", recordsParsed, cvrSequence);
+            Logger.info("Parsed %d records from %d files", recordsParsed, filesParsed);
             recordsParsedAtLastLog = recordsParsed;
           }
-          cvrSequence++;
-          cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         }
-      } else {
-        throw new FileNotFoundException(
-            String.format(
-                "Error parsing cast vote record: neither %s nor %s exists",
-                singleCvrPath, firstCvrPath));
+
+        Logger.info("Parsed %d total records from %d total files", recordsParsed, filesParsed);
       }
     } catch (FileNotFoundException | CvrParseException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
