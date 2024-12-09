@@ -1726,7 +1726,6 @@ public class GuiConfigController implements Initializable {
                   try {
                     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
                     BaseCvrReader reader = provider.constructReader(config, source);
-                    reader.readCastVoteRecords(castVoteRecords);
                     Set<Candidate> unknownCandidates =
                             reader.gatherUnknownCandidates(castVoteRecords);
                     unloadedCandidates.addAll(unknownCandidates);

@@ -129,7 +129,9 @@ abstract class BaseCvrReader {
     return unrecognizedCandidateCounts;
   }
 
-  Set<Candidate> gatherUnknownCandidates(List<CastVoteRecord> castVoteRecords) {
+  Set<Candidate> gatherUnknownCandidates(List<CastVoteRecord> castVoteRecords)
+          throws CastVoteRecord.CvrParseException, IOException {
+    readCastVoteRecords(castVoteRecords);
     return gatherUnknownCandidateCounts(castVoteRecords, true).keySet();
   }
 
