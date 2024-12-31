@@ -351,6 +351,11 @@ class DominionCvrReader extends BaseCvrReader {
             Logger.severe("Unknown contest ID '%s' found while parsing CVR!", contestId);
             throw new CvrParseException();
           }
+          ArrayList outstackConditionIds = (ArrayList) contest.get("OutstackConditionIds");
+          if (outstackConditionIds.contains(7)) {
+            Logger.info("Skipping partial-count ballot. Voter may not vote in this contest.");
+            continue;
+          }
           ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
           // marks is an array of rankings
           ArrayList marks = (ArrayList) contest.get("Marks");
