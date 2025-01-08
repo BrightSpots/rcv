@@ -696,8 +696,9 @@ class OutputWriter {
       CSVFormat format = CSVFormat.DEFAULT.builder().setNullString("").build();
       csvPrinter = new CSVPrinter(writer, format);
       // print header:
-      // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
+      // RCTab UUID, ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
       // rank 2 selection, ... rank maxRanks selection
+      csvPrinter.print("RCTab UUID");
       csvPrinter.print("Source Filepath");
       csvPrinter.print("CVR Provider");
       csvPrinter.print("Contest Id");
@@ -737,6 +738,7 @@ class OutputWriter {
         }
 
         CastVoteRecord castVoteRecord = castVoteRecords.get(i);
+        csvPrinter.print(castVoteRecord.getRctabUuid());
         csvPrinter.print(currentSourceData.source.getFilePath());
         csvPrinter.print(currentSourceData.source.getProvider());
         csvPrinter.print(castVoteRecord.getContestId());

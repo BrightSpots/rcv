@@ -25,9 +25,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 import javafx.util.Pair;
 
 class CastVoteRecord {
+  // unique ID (owned by RCTab)
+  private final String rctabUuid;
   // computed unique ID for this CVR (source file + line number)
   private final String computedId;
   // supplied unique ID for this CVR
@@ -83,6 +86,7 @@ class CastVoteRecord {
           String precinctPortion,
           boolean usesLastAllowedRanking,
           List<Pair<Integer, String>> rankings) {
+    this.rctabUuid = UUID.randomUUID().toString();
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
     this.batchId = batchId;
@@ -128,6 +132,10 @@ class CastVoteRecord {
     return usesLastAllowedRanking;
   }
 
+  public String getRctabUuid() {
+    return rctabUuid;
+  }
+
   String getId() {
     return suppliedId != null ? suppliedId : computedId;
   }
@@ -143,8 +151,9 @@ class CastVoteRecord {
     } else {
       logStringBuilder.append(suppliedId);
     }
+    logStringBuilder.append(" [RCTab UUID] ").append(rctabUuid);
     if (outcomeType == VoteOutcomeType.IGNORED) {
-      logStringBuilder.append(" [was ignored] ");
+      logStringBuilder.append(" [ was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
       logStringBuilder.append(" [became inactive] ");
     } else {
