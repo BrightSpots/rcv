@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
@@ -118,15 +119,9 @@ abstract class BaseCvrReader {
       }
     }
 
-    Map<Candidate, Integer> unrecognizedCandidateCounts = new HashMap<>();
-    for (Map.Entry<String, Integer> entry : unrecognizedNameCounts.entrySet()) {
-      String candidateName = entry.getKey();
-      int count = entry.getValue();
-      Candidate candidate = new Candidate(candidateName, null, false);
-      unrecognizedCandidateCounts.put(candidate, count);
-    }
-
-    return unrecognizedCandidateCounts;
+    // Change the map to use Candidate objects instead of names
+    return unrecognizedNameCounts.entrySet().stream()
+          .collect(Collectors.toMap(entry -> new Candidate(entry.getKey()), Map.Entry::getValue));
   }
 
   Set<Candidate> gatherUnknownCandidates(List<CastVoteRecord> castVoteRecords)

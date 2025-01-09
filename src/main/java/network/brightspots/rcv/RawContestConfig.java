@@ -300,6 +300,10 @@ public class RawContestConfig {
 
     Candidate() {}
 
+    Candidate(String name) {
+      this(name, null, false);
+    }
+
     Candidate(String name, String newlineSeparatedAliases, boolean excluded) {
       this.name.setValue(name);
       this.excluded.setValue(excluded);
