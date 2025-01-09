@@ -247,18 +247,12 @@ class DominionCvrReader extends BaseCvrReader {
     }
 
     Set<String> knownNames = config.getCandidateNames();
-    Set<Map.Entry<String, Candidate>> codesFoundInManifest = candidateCodesToCandidates.entrySet();
 
-    Set<RawContestConfig.Candidate> unknownCandidates = new HashSet<>();
-    for (Map.Entry<String, Candidate> entry : codesFoundInManifest) {
-      Candidate candidate = entry.getValue();
-      if (knownNames.contains(candidate.name)) {
-        continue;
-      }
-      unknownCandidates.add(new RawContestConfig.Candidate(candidate.name, entry.getKey(), false));
-    }
-
-    return unknownCandidates;
+    // Return the candidate codes that are not in the knownNames set
+    return candidateCodesToCandidates.entrySet().stream()
+            .filter(entry -> !knownNames.contains(entry.getValue().name))
+            .map(entry -> new RawContestConfig.Candidate(entry.getValue().name, entry.getKey()))
+            .collect(Collectors.toSet());
   }
 
   // parse the CVR file or files into a List of CastVoteRecords for tabulation

@@ -304,6 +304,10 @@ public class RawContestConfig {
       this(name, null, false);
     }
 
+    Candidate(String name, String newlineSeparatedAliases) {
+      this(name, newlineSeparatedAliases, false);
+    }
+
     Candidate(String name, String newlineSeparatedAliases, boolean excluded) {
       this.name.setValue(name);
       this.excluded.setValue(excluded);
