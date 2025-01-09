@@ -25,12 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 import javafx.util.Pair;
 
 class CastVoteRecord {
-  // unique ID (owned by RCTab)
-  private final String rctabUuid;
   // computed unique ID for this CVR (source file + line number)
   private final String computedId;
   // supplied unique ID for this CVR
@@ -86,7 +83,6 @@ class CastVoteRecord {
           String precinctPortion,
           boolean usesLastAllowedRanking,
           List<Pair<Integer, String>> rankings) {
-    this.rctabUuid = UUID.randomUUID().toString();
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
     this.batchId = batchId;
@@ -132,10 +128,12 @@ class CastVoteRecord {
     return usesLastAllowedRanking;
   }
 
-  public String getRctabUuid() {
-    return rctabUuid;
+  // This represents the canonical ID used for audit logs and RCTab CVR
+  String getPrimaryId() {
+    return !isNullOrBlank(computedId) ? computedId : suppliedId;
   }
 
+  // TODO: Before merging PR determine if we still need getId & the Record ID it prints to the RCTab CVR
   String getId() {
     return suppliedId != null ? suppliedId : computedId;
   }
@@ -146,12 +144,7 @@ class CastVoteRecord {
 
     StringBuilder logStringBuilder = new StringBuilder();
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (!isNullOrBlank(computedId)) {
-      logStringBuilder.append(computedId);
-    } else {
-      logStringBuilder.append(suppliedId);
-    }
-    logStringBuilder.append(" [RCTab UUID] ").append(rctabUuid);
+    logStringBuilder.append(getPrimaryId());
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [ was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {

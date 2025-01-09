@@ -291,7 +291,7 @@ class DominionCvrReader extends BaseCvrReader {
       String computedId =
           Stream.of(tabulatorId, batchId, Integer.toString(recordId))
               .filter(s -> s != null && !s.isBlank())
-              .collect(Collectors.joining("|"));
+              .collect(Collectors.joining("-")); // using a dash since this is an Id
 
       // filter out records which are not current and replace them with adjudicated ones
       HashMap adjudicatedData = (HashMap) session.get("Original");
