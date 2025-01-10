@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
@@ -351,6 +352,12 @@ class DominionCvrReader extends BaseCvrReader {
             Logger.severe("Unknown contest ID '%s' found while parsing CVR!", contestId);
             throw new CvrParseException();
           }
+          boolean contestOutstack = false;
+          //armin's filter
+          ArrayList outstackConditionIdsFromContest = (ArrayList) contest.get("OutstackConditionIds");
+          if (outstackConditionIdsFromContest.contains(7)) {
+            contestOutstack = true;
+          }
           ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
           // marks is an array of rankings
           ArrayList marks = (ArrayList) contest.get("Marks");
@@ -361,6 +368,22 @@ class DominionCvrReader extends BaseCvrReader {
             if (isAmbiguous) {
               continue;
             }
+            // skip invalid contest
+            ArrayList outstackConditionIdsFromRankings = (ArrayList) rankingMap.get("OutstackConditionIds");
+
+            if(outstackConditionIdsFromRankings.contains(7) != outstackConditionIdsFromContest.contains(7)){
+              Logger.info("contest and ranking outstack ids differ");
+            }
+
+            Boolean isInvalidContest = outstackConditionIdsFromRankings.contains(7);
+            if (isInvalidContest) {
+              continue;
+//              if(contestOutstack)
+//                continue;
+//              else
+//                Logger.info("contest and ranking outstack differ");
+            }
+
             String dominionCandidateId = rankingMap.get("CandidateId").toString();
             if (dominionCandidateId.equals(source.getUndeclaredWriteInLabel())) {
               dominionCandidateId = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
