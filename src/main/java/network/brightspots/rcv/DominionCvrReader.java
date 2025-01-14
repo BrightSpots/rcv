@@ -51,7 +51,7 @@ class DominionCvrReader extends BaseCvrReader {
   private Map<Integer, String> precinctPortions;
   // map of contest ID to Contest data
   private Map<String, Contest> contests;
-  private HashMap<String, Candidate> candidateCodesToCandidates;
+  private Map<String, Candidate> candidateCodesToCandidates;
 
   DominionCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
@@ -101,8 +101,8 @@ class DominionCvrReader extends BaseCvrReader {
   }
 
   // returns a map of Codes to Candidate objects parsed from CandidateManifest.json
-  private HashMap<String, Candidate> getCandidates(String candidatePath) {
-    HashMap<String, Candidate> candidateCodesToCandidates = new HashMap<>();
+  private Map<String, Candidate> getCandidates(String candidatePath) {
+    Map<String, Candidate> candidateCodesToCandidates = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(candidatePath, HashMap.class);
       ArrayList candidateList = (ArrayList) json.get("List");
