@@ -39,6 +39,7 @@ import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
 import network.brightspots.rcv.OutputWriter.RoundSnapshotDataMissingException;
+import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 
 @SuppressWarnings("RedundantSuppression")
@@ -357,7 +358,7 @@ class TabulatorSession {
                 source, reader, sourceIndex, startIndex, castVoteRecords.size() - 1));
 
         // Check for unrecognized candidates
-        Map<RawContestConfig.Candidate, Integer> unrecognizedCandidateCounts =
+        Map<Candidate, Integer> unrecognizedCandidateCounts =
             reader.gatherUnknownCandidateCounts(castVoteRecords, false);
 
         if (!unrecognizedCandidateCounts.isEmpty()) {
@@ -440,9 +441,9 @@ class TabulatorSession {
   static class UnrecognizedCandidatesException extends Exception {
 
     // count of how many times each unrecognized candidate was encountered during CVR parsing
-    final Map<RawContestConfig.Candidate, Integer> candidateCounts;
+    final Map<Candidate, Integer> candidateCounts;
 
-    UnrecognizedCandidatesException(Map<RawContestConfig.Candidate, Integer> candidateCounts) {
+    UnrecognizedCandidatesException(Map<Candidate, Integer> candidateCounts) {
       this.candidateCounts = candidateCounts;
     }
   }
