@@ -87,11 +87,11 @@ RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Recor
 26-1-6,../_shared/dominion_alaska/alaska_input_data,dominion,1,26,1,6,,Precinct 1,Joseph R. Biden,Michael R. Bloomberg,Tom Steyer,Pete Buttigieg,Bernie Sanders
 26-1-7,../_shared/dominion_alaska/alaska_input_data,dominion,1,26,1,7,,Precinct 1,Joseph R. Biden,Elizabeth Warren,12,Joseph R. Biden,Bernie Sanders
 26-1-8,../_shared/dominion_alaska/alaska_input_data,dominion,1,26,1,8,,Precinct 1,Elizabeth Warren,Michael R. Bloomberg,Amy Klobuchar,Pete Buttigieg,"Joseph R. Biden
---,Tom Steyer
---,Bernie Sanders
---,Tulsi Gabbard
---,Pete Buttigieg
---,12"
+Tom Steyer
+Bernie Sanders
+Tulsi Gabbard
+Pete Buttigieg
+12"
 26-1-9,../_shared/dominion_alaska/alaska_input_data,dominion,1,26,1,9,,Precinct 1,12,Tulsi Gabbard,Michael R. Bloomberg,Bernie Sanders,Amy Klobuchar
 26-1-10,../_shared/dominion_alaska/alaska_input_data,dominion,1,26,1,10,,Precinct 1,Pete Buttigieg,Tulsi Gabbard,Michael R. Bloomberg,12,Bernie Sanders
 26-1-11,../_shared/dominion_alaska/alaska_input_data,dominion,1,26,1,11,,Precinct 1,Michael R. Bloomberg,Tulsi Gabbard,Joseph R. Biden,12,Amy Klobuchar
@@ -201,8 +201,8 @@ RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Recor
 32-1-15,../_shared/dominion_alaska/alaska_input_data,dominion,1,32,1,15,,Precinct 1,12,Pete Buttigieg,Tom Steyer,Tulsi Gabbard,Elizabeth Warren
 32-1-16,../_shared/dominion_alaska/alaska_input_data,dominion,1,32,1,16,,Precinct 1,12,Pete Buttigieg,Tom Steyer,Bernie Sanders,Joseph R. Biden
 32-1-17,../_shared/dominion_alaska/alaska_input_data,dominion,1,32,1,17,,Precinct 1,Amy Klobuchar,Bernie Sanders,"Tulsi Gabbard
---,Michael R. Bloomberg
---,Pete Buttigieg",Joseph R. Biden,Elizabeth Warren
+Michael R. Bloomberg
+Pete Buttigieg",Joseph R. Biden,Elizabeth Warren
 32-1-18,../_shared/dominion_alaska/alaska_input_data,dominion,1,32,1,18,,Precinct 1,Joseph R. Biden,Tulsi Gabbard,Elizabeth Warren,12,Amy Klobuchar
 32-1-19,../_shared/dominion_alaska/alaska_input_data,dominion,1,32,1,19,,Precinct 1,Elizabeth Warren,Pete Buttigieg,Tom Steyer,12,Tulsi Gabbard
 32-1-20,../_shared/dominion_alaska/alaska_input_data,dominion,1,32,1,20,,Precinct 1,Pete Buttigieg,Amy Klobuchar,12,Joseph R. Biden,Tulsi Gabbard
@@ -389,11 +389,11 @@ RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Recor
 16-1-1,../_shared/dominion_alaska/alaska_input_data,dominion,1,16,1,1,,Precinct 1,Pete Buttigieg,Michael R. Bloomberg,Elizabeth Warren,Tom Steyer,Amy Klobuchar
 16-1-2,../_shared/dominion_alaska/alaska_input_data,dominion,1,16,1,2,,Precinct 1,Joseph R. Biden,12,Tulsi Gabbard,Amy Klobuchar,Michael R. Bloomberg
 16-1-3,../_shared/dominion_alaska/alaska_input_data,dominion,1,16,1,3,,Precinct 1,Pete Buttigieg,Tulsi Gabbard,Michael R. Bloomberg,Amy Klobuchar,"Joseph R. Biden
---,Tom Steyer
---,Bernie Sanders
---,Amy Klobuchar
---,Elizabeth Warren
---,12"
+Tom Steyer
+Bernie Sanders
+Amy Klobuchar
+Elizabeth Warren
+12"
 16-1-4,../_shared/dominion_alaska/alaska_input_data,dominion,1,16,1,4,,Precinct 1,Amy Klobuchar,Pete Buttigieg,Michael R. Bloomberg,12,Elizabeth Warren
 16-1-5,../_shared/dominion_alaska/alaska_input_data,dominion,1,16,1,5,,Precinct 1,12,Elizabeth Warren,Amy Klobuchar,Tom Steyer,Pete Buttigieg
 16-1-6,../_shared/dominion_alaska/alaska_input_data,dominion,1,16,1,6,,Precinct 1,Elizabeth Warren,12,Tom Steyer,Joseph R. Biden,Amy Klobuchar
@@ -500,12 +500,12 @@ RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Recor
 15-1-7,../_shared/dominion_alaska/alaska_input_data,dominion,1,15,1,7,,Precinct 1,Tom Steyer,12,Pete Buttigieg,Michael R. Bloomberg,Amy Klobuchar
 15-1-8,../_shared/dominion_alaska/alaska_input_data,dominion,1,15,1,8,,Precinct 1,Joseph R. Biden,Tulsi Gabbard,Pete Buttigieg,12,Elizabeth Warren
 15-1-9,../_shared/dominion_alaska/alaska_input_data,dominion,1,15,1,9,,Precinct 1,Bernie Sanders,Tom Steyer,Michael R. Bloomberg,Joseph R. Biden,"Joseph R. Biden
---,Amy Klobuchar
---,Tulsi Gabbard
---,Elizabeth Warren
---,Michael R. Bloomberg
---,Pete Buttigieg
---,12"
+Amy Klobuchar
+Tulsi Gabbard
+Elizabeth Warren
+Michael R. Bloomberg
+Pete Buttigieg
+12"
 15-1-10,../_shared/dominion_alaska/alaska_input_data,dominion,1,15,1,10,,Precinct 1,undervote,undervote,undervote,undervote,undervote
 15-1-11,../_shared/dominion_alaska/alaska_input_data,dominion,1,15,1,11,,Precinct 1,undervote,undervote,undervote,undervote,undervote
 15-1-12,../_shared/dominion_alaska/alaska_input_data,dominion,1,15,1,12,,Precinct 1,Joseph R. Biden,Elizabeth Warren,Amy Klobuchar,Pete Buttigieg,Tulsi Gabbard
@@ -554,7 +554,7 @@ RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Recor
 36-1-15,../_shared/dominion_alaska/alaska_input_data,dominion,1,36,1,15,,Precinct 1,undervote,undervote,undervote,undervote,undervote
 36-1-16,../_shared/dominion_alaska/alaska_input_data,dominion,1,36,1,16,,Precinct 1,undervote,undervote,undervote,undervote,undervote
 36-1-17,../_shared/dominion_alaska/alaska_input_data,dominion,1,36,1,17,,Precinct 1,Joseph R. Biden,Bernie Sanders,"Michael R. Bloomberg
---,12",Pete Buttigieg,Amy Klobuchar
+12",Pete Buttigieg,Amy Klobuchar
 36-1-18,../_shared/dominion_alaska/alaska_input_data,dominion,1,36,1,18,,Precinct 1,Tulsi Gabbard,Elizabeth Warren,12,Tom Steyer,Joseph R. Biden
 36-1-19,../_shared/dominion_alaska/alaska_input_data,dominion,1,36,1,19,,Precinct 1,Amy Klobuchar,Tom Steyer,12,Bernie Sanders,Tulsi Gabbard
 36-1-20,../_shared/dominion_alaska/alaska_input_data,dominion,1,36,1,20,,Precinct 1,Tom Steyer,12,Michael R. Bloomberg,Amy Klobuchar,Bernie Sanders
@@ -616,12 +616,12 @@ RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Recor
 13-1-16,../_shared/dominion_alaska/alaska_input_data,dominion,1,13,1,16,,Precinct 1,Tulsi Gabbard,Elizabeth Warren,Pete Buttigieg,Tom Steyer,12
 13-1-17,../_shared/dominion_alaska/alaska_input_data,dominion,1,13,1,17,,Precinct 1,Tom Steyer,Elizabeth Warren,Tulsi Gabbard,Joseph R. Biden,Bernie Sanders
 13-1-18,../_shared/dominion_alaska/alaska_input_data,dominion,1,13,1,18,,Precinct 1,Amy Klobuchar,Elizabeth Warren,12,Bernie Sanders,"Joseph R. Biden
---,Tom Steyer
---,Bernie Sanders
---,Tulsi Gabbard
---,Elizabeth Warren
---,Michael R. Bloomberg
---,Pete Buttigieg"
+Tom Steyer
+Bernie Sanders
+Tulsi Gabbard
+Elizabeth Warren
+Michael R. Bloomberg
+Pete Buttigieg"
 13-1-19,../_shared/dominion_alaska/alaska_input_data,dominion,1,13,1,19,,Precinct 1,12,Joseph R. Biden,Elizabeth Warren,Michael R. Bloomberg,Bernie Sanders
 13-1-20,../_shared/dominion_alaska/alaska_input_data,dominion,1,13,1,20,,Precinct 1,12,Tom Steyer,Pete Buttigieg,Bernie Sanders,Joseph R. Biden
 29-1-1,../_shared/dominion_alaska/alaska_input_data,dominion,1,29,1,1,,Precinct 1,Tulsi Gabbard,Pete Buttigieg,Amy Klobuchar,12,Tom Steyer
@@ -660,8 +660,8 @@ RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Recor
 12-1-14,../_shared/dominion_alaska/alaska_input_data,dominion,1,12,1,14,,Precinct 1,Joseph R. Biden,Joseph R. Biden,Pete Buttigieg,Tom Steyer,12
 12-1-15,../_shared/dominion_alaska/alaska_input_data,dominion,1,12,1,15,,Precinct 1,Bernie Sanders,Amy Klobuchar,Joseph R. Biden,Michael R. Bloomberg,Tulsi Gabbard
 12-1-16,../_shared/dominion_alaska/alaska_input_data,dominion,1,12,1,16,,Precinct 1,Bernie Sanders,Tulsi Gabbard,"Amy Klobuchar
---,Pete Buttigieg
---,12",Michael R. Bloomberg,Joseph R. Biden
+Pete Buttigieg
+12",Michael R. Bloomberg,Joseph R. Biden
 12-1-17,../_shared/dominion_alaska/alaska_input_data,dominion,1,12,1,17,,Precinct 1,Tom Steyer,Michael R. Bloomberg,12,Tulsi Gabbard,Amy Klobuchar
 12-1-18,../_shared/dominion_alaska/alaska_input_data,dominion,1,12,1,18,,Precinct 1,Pete Buttigieg,Elizabeth Warren,Tom Steyer,Joseph R. Biden,12
 12-1-19,../_shared/dominion_alaska/alaska_input_data,dominion,1,12,1,19,,Precinct 1,undervote,undervote,undervote,undervote,undervote
@@ -719,11 +719,11 @@ RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Recor
 11-1-11,../_shared/dominion_alaska/alaska_input_data,dominion,1,11,1,11,,Precinct 1,Michael R. Bloomberg,Elizabeth Warren,12,Bernie Sanders,Tom Steyer
 11-1-12,../_shared/dominion_alaska/alaska_input_data,dominion,1,11,1,12,,Precinct 1,Elizabeth Warren,Tom Steyer,Bernie Sanders,Amy Klobuchar,Michael R. Bloomberg
 11-1-13,../_shared/dominion_alaska/alaska_input_data,dominion,1,11,1,13,,Precinct 1,12,Elizabeth Warren,Pete Buttigieg,"Joseph R. Biden
---,Tom Steyer
---,Bernie Sanders
---,Amy Klobuchar
---,Tulsi Gabbard
---,Michael R. Bloomberg",Elizabeth Warren
+Tom Steyer
+Bernie Sanders
+Amy Klobuchar
+Tulsi Gabbard
+Michael R. Bloomberg",Elizabeth Warren
 11-1-14,../_shared/dominion_alaska/alaska_input_data,dominion,1,11,1,14,,Precinct 1,Tom Steyer,Tulsi Gabbard,Bernie Sanders,Pete Buttigieg,Amy Klobuchar
 11-1-15,../_shared/dominion_alaska/alaska_input_data,dominion,1,11,1,15,,Precinct 1,Elizabeth Warren,Tom Steyer,Pete Buttigieg,12,Bernie Sanders
 11-1-16,../_shared/dominion_alaska/alaska_input_data,dominion,1,11,1,16,,Precinct 1,Tulsi Gabbard,12,Pete Buttigieg,Amy Klobuchar,Joseph R. Biden
@@ -777,13 +777,13 @@ RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Recor
 10-1-4,../_shared/dominion_alaska/alaska_input_data,dominion,1,10,1,4,,Precinct 1,Tom Steyer,Michael R. Bloomberg,Pete Buttigieg,Bernie Sanders,Tulsi Gabbard
 10-1-5,../_shared/dominion_alaska/alaska_input_data,dominion,1,10,1,5,,Precinct 1,Tulsi Gabbard,Michael R. Bloomberg,Elizabeth Warren,12,Bernie Sanders
 10-1-6,../_shared/dominion_alaska/alaska_input_data,dominion,1,10,1,6,,Precinct 1,"Joseph R. Biden
---,Tom Steyer
---,Bernie Sanders
---,Amy Klobuchar
---,Tulsi Gabbard
---,Elizabeth Warren
---,Michael R. Bloomberg
-Joseph R. Biden-Bernie Sanders-,Pete Buttigieg",12,Elizabeth Warren,Joseph R. Biden,Bernie Sanders
+Tom Steyer
+Bernie Sanders
+Amy Klobuchar
+Tulsi Gabbard
+Elizabeth Warren
+Michael R. Bloomberg
+Pete Buttigieg",12,Elizabeth Warren,Joseph R. Biden,Bernie Sanders
 10-1-7,../_shared/dominion_alaska/alaska_input_data,dominion,1,10,1,7,,Precinct 1,Bernie Sanders,12,Elizabeth Warren,Tom Steyer,Joseph R. Biden
 10-1-8,../_shared/dominion_alaska/alaska_input_data,dominion,1,10,1,8,,Precinct 1,Joseph R. Biden,Tulsi Gabbard,Bernie Sanders,Amy Klobuchar,12
 10-1-9,../_shared/dominion_alaska/alaska_input_data,dominion,1,10,1,9,,Precinct 1,undervote,undervote,undervote,undervote,undervote
@@ -912,7 +912,7 @@ Joseph R. Biden-Bernie Sanders-,Pete Buttigieg",12,Elizabeth Warren,Joseph R. Bi
 8-1-12,../_shared/dominion_alaska/alaska_input_data,dominion,1,8,1,12,,Precinct 1,Bernie Sanders,Elizabeth Warren,Tom Steyer,Tulsi Gabbard,Pete Buttigieg
 8-1-13,../_shared/dominion_alaska/alaska_input_data,dominion,1,8,1,13,,Precinct 1,Joseph R. Biden,Tom Steyer,Bernie Sanders,Pete Buttigieg,Tulsi Gabbard
 8-1-14,../_shared/dominion_alaska/alaska_input_data,dominion,1,8,1,14,,Precinct 1,Tulsi Gabbard,Joseph R. Biden,Elizabeth Warren,"Bernie Sanders
---,Amy Klobuchar",Pete Buttigieg
+Amy Klobuchar",Pete Buttigieg
 8-1-15,../_shared/dominion_alaska/alaska_input_data,dominion,1,8,1,15,,Precinct 1,Bernie Sanders,Tulsi Gabbard,Tom Steyer,Amy Klobuchar,12
 8-1-16,../_shared/dominion_alaska/alaska_input_data,dominion,1,8,1,16,,Precinct 1,Bernie Sanders,Tulsi Gabbard,Amy Klobuchar,Elizabeth Warren,12
 8-1-17,../_shared/dominion_alaska/alaska_input_data,dominion,1,8,1,17,,Precinct 1,Pete Buttigieg,Michael R. Bloomberg,Tulsi Gabbard,Elizabeth Warren,12
@@ -964,11 +964,11 @@ Joseph R. Biden-Bernie Sanders-,Pete Buttigieg",12,Elizabeth Warren,Joseph R. Bi
 6-1-3,../_shared/dominion_alaska/alaska_input_data,dominion,1,6,1,3,,Precinct 1,Amy Klobuchar,Tulsi Gabbard,Pete Buttigieg,Bernie Sanders,Michael R. Bloomberg
 6-1-4,../_shared/dominion_alaska/alaska_input_data,dominion,1,6,1,4,,Precinct 1,Tulsi Gabbard,Michael R. Bloomberg,12,Pete Buttigieg,Tom Steyer
 6-1-5,../_shared/dominion_alaska/alaska_input_data,dominion,1,6,1,5,,Precinct 1,"Joseph R. Biden
---,Amy Klobuchar
---,Tulsi Gabbard
---,Michael R. Bloomberg
---,Pete Buttigieg
-Bernie Sanders-Tom Steyer-,12",Tom Steyer,Elizabeth Warren,Bernie Sanders,Tom Steyer
+Amy Klobuchar
+Tulsi Gabbard
+Michael R. Bloomberg
+Pete Buttigieg
+12",Tom Steyer,Elizabeth Warren,Bernie Sanders,Tom Steyer
 6-1-6,../_shared/dominion_alaska/alaska_input_data,dominion,1,6,1,6,,Precinct 1,12,Tulsi Gabbard,Pete Buttigieg,Michael R. Bloomberg,Joseph R. Biden
 6-1-7,../_shared/dominion_alaska/alaska_input_data,dominion,1,6,1,7,,Precinct 1,Michael R. Bloomberg,Tulsi Gabbard,Bernie Sanders,Joseph R. Biden,12
 6-1-8,../_shared/dominion_alaska/alaska_input_data,dominion,1,6,1,8,,Precinct 1,Joseph R. Biden,12,Pete Buttigieg,Tulsi Gabbard,Michael R. Bloomberg
