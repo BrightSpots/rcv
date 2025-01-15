@@ -133,7 +133,8 @@ class CastVoteRecord {
     return !isNullOrBlank(computedId) ? computedId : suppliedId;
   }
 
-  // TODO: Before merging PR determine if we still need getId & the Record ID it prints to the RCTab CVR
+  // TODO: Before merging PR determine if we still need getId &
+  //  the Record ID it prints to the RCTab CVR
   String getId() {
     return suppliedId != null ? suppliedId : computedId;
   }

@@ -696,8 +696,8 @@ class OutputWriter {
       CSVFormat format = CSVFormat.DEFAULT.builder().setNullString("").build();
       csvPrinter = new CSVPrinter(writer, format);
       // print header:
-      // RCTab CVR Id, ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
-      // rank 2 selection, ... rank maxRanks selection
+      // RCTab CVR Id, ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion,
+      // rank 1 selection, rank 2 selection, ... rank maxRanks selection
       csvPrinter.print("RCTab CVR Id");
       csvPrinter.print("Source Filepath");
       csvPrinter.print("CVR Provider");
