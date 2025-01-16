@@ -1,0 +1,66 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Alaska 2024 Congressional",
+    "outputDirectory" : "output",
+    "contestDate" : "2024-11-05",
+    "contestJurisdiction" : "Alaska",
+    "contestOffice" : "US House",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "./partial_cvr/",
+    "contestId" : "7",
+    "firstVoteColumnIndex" : "",
+    "firstVoteRowIndex" : "",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "dominion",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "476",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Howe, John Wayne",
+    "excluded" : false,
+    "aliases" : [ "520" ]
+  }, {
+    "name" : "Peltola, Mary S.",
+    "excluded" : false,
+    "aliases" : [ "518" ]
+  }, {
+    "name" : "Hafner, Eric",
+    "excluded" : false,
+    "aliases" : [ "552" ]
+  }, {
+    "name" : "Begich, Nick",
+    "excluded" : false,
+    "aliases" : [ "517" ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "stopCountingAndAsk",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

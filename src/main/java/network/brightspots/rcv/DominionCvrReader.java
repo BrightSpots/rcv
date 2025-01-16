@@ -47,6 +47,7 @@ class DominionCvrReader extends BaseCvrReader {
   private static final String CONTEST_MANIFEST = "ContestManifest.json";
   private static final String CVR_EXPORT = "CvrExport.json";
   private static final String CVR_EXPORT_PATTERN = "CvrExport_%d.json";
+  private static final int EXCLUDE_CONTEST_CONDITION_ID = 7;
   // map of precinct ID to precinct description
   private Map<Integer, String> precincts;
   // map of precinct portion ID to precinct portion description
@@ -350,6 +351,10 @@ class DominionCvrReader extends BaseCvrReader {
           if (!this.contests.containsKey(contestId)) {
             Logger.severe("Unknown contest ID '%s' found while parsing CVR!", contestId);
             throw new CvrParseException();
+          }
+          ArrayList outstackConditionIds = (ArrayList) contest.get("OutstackConditionIds");
+          if (outstackConditionIds.contains(EXCLUDE_CONTEST_CONDITION_ID)) {
+            continue;
           }
           ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
           // marks is an array of rankings
