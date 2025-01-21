@@ -129,14 +129,12 @@ class CastVoteRecord {
   }
 
   // This represents the canonical ID used for audit logs and RCTab CVR
-  String getPrimaryId() {
+  String getId() {
     return !isNullOrBlank(computedId) ? computedId : suppliedId;
   }
 
-  // TODO: Before merging PR determine if we still need getId &
-  //  the Record ID it prints to the RCTab CVR
-  String getId() {
-    return suppliedId != null ? suppliedId : computedId;
+  String getSuppliedId() {
+    return suppliedId != null ? suppliedId : "";
   }
 
   // logs the outcome for this CVR for this round for auditing purposes
@@ -145,9 +143,9 @@ class CastVoteRecord {
 
     StringBuilder logStringBuilder = new StringBuilder();
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    logStringBuilder.append(getPrimaryId());
+    logStringBuilder.append(getId());
     if (outcomeType == VoteOutcomeType.IGNORED) {
-      logStringBuilder.append(" [ was ignored] ");
+      logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
       logStringBuilder.append(" [became inactive] ");
     } else {

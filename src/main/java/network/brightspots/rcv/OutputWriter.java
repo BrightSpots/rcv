@@ -698,13 +698,13 @@ class OutputWriter {
       // print header:
       // RCTab CVR Id, ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion,
       // rank 1 selection, rank 2 selection, ... rank maxRanks selection
-      csvPrinter.print("RCTab CVR Id");
       csvPrinter.print("Source Filepath");
       csvPrinter.print("CVR Provider");
       csvPrinter.print("Contest Id");
+      csvPrinter.print("RCTab CVR Id");
       csvPrinter.print("Tabulator Id");
       csvPrinter.print("Batch Id");
-      csvPrinter.print("Record Id");
+      csvPrinter.print("Vendor Id");
       csvPrinter.print("Precinct");
       csvPrinter.print("Precinct Portion");
 
@@ -738,13 +738,13 @@ class OutputWriter {
         }
 
         CastVoteRecord castVoteRecord = castVoteRecords.get(i);
-        csvPrinter.print(castVoteRecord.getPrimaryId());
         csvPrinter.print(currentSourceData.source.getFilePath());
         csvPrinter.print(currentSourceData.source.getProvider());
         csvPrinter.print(castVoteRecord.getContestId());
+        csvPrinter.print(castVoteRecord.getId());
         csvPrinter.print(castVoteRecord.getTabulatorId());
         csvPrinter.print(castVoteRecord.getSlice(TabulateBySlice.BATCH));
-        csvPrinter.print(castVoteRecord.getId());
+        csvPrinter.print(castVoteRecord.getSuppliedId());
         csvPrinter.print(castVoteRecord.getSlice(ContestConfig.TabulateBySlice.PRECINCT));
         csvPrinter.print(castVoteRecord.getPrecinctPortion());
         printRankings(currentSourceData.source.getUndeclaredWriteInLabel(), maxRank,
@@ -877,6 +877,7 @@ class OutputWriter {
     for (CastVoteRecord cvr : castVoteRecords) {
       List<Map<String, Object>> cvrSnapshots = new LinkedList<>();
       cvrSnapshots.add(generateCvrSnapshotMap(cvr, null, null));
+      // TODO: Do we want this to use the getSuppliedId or the getId method?
       String sanitizedId = sanitizeStringForOutput(cvr.getId());
       // copy most recent round snapshot data to subsequent rounds
       // until more snapshot data is available
@@ -983,6 +984,7 @@ class OutputWriter {
             entry("@type", "CVR.CVRContest"));
 
     return Map.ofEntries(
+        // TODO: Do we want this to use the getSuppliedId or the getId method?
         entry("@id", generateCvrSnapshotId(sanitizeStringForOutput(cvr.getId()), round)),
         entry("CVRContest", new Map[] {contestMap}),
         entry("Type", round != null ? "interpreted" : "original"),
