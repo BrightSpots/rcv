@@ -1,11 +1,11 @@
-RCTab CVR Id,Source Filepath,CVR Provider,Contest Id,Tabulator Id,Batch Id,Record Id,Precinct,Precinct Portion,Rank 1,Rank 2,Rank 3
-simple_ess_cvr.xlsx-1,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-1,,,Mookie Blaylock,undervote,undervote
-simple_ess_cvr.xlsx-2,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-2,,,Mookie Blaylock,undervote,undervote
-simple_ess_cvr.xlsx-3,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-3,,,Mookie Blaylock,undervote,undervote
-simple_ess_cvr.xlsx-4,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-4,,,Mookie Blaylock,undervote,undervote
-simple_ess_cvr.xlsx-5,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-5,,,Yinka Dare,undervote,undervote
-simple_ess_cvr.xlsx-6,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-6,,,Yinka Dare,undervote,undervote
-simple_ess_cvr.xlsx-7,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-7,,,Yinka Dare,undervote,undervote
-simple_ess_cvr.xlsx-8,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-8,,,George Gervin,undervote,undervote
-simple_ess_cvr.xlsx-9,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-9,,,George Gervin,Yinka Dare,undervote
-simple_ess_cvr.xlsx-10,../_shared/simple_ess_cvr.xlsx,ess,,,,simple_ess_cvr.xlsx-10,,,Sedale Threatt,George Gervin,undervote
+Source Filepath,CVR Provider,Contest Id,RCTab CVR Id,Tabulator Id,Batch Id,Vendor Id,Precinct,Precinct Portion,Rank 1,Rank 2,Rank 3
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-1,,,,,,Mookie Blaylock,undervote,undervote
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-2,,,,,,Mookie Blaylock,undervote,undervote
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-3,,,,,,Mookie Blaylock,undervote,undervote
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-4,,,,,,Mookie Blaylock,undervote,undervote
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-5,,,,,,Yinka Dare,undervote,undervote
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-6,,,,,,Yinka Dare,undervote,undervote
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-7,,,,,,Yinka Dare,undervote,undervote
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-8,,,,,,George Gervin,undervote,undervote
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-9,,,,,,George Gervin,Yinka Dare,undervote
+../_shared/simple_ess_cvr.xlsx,ess,,simple_ess_cvr.xlsx-10,,,,,,Sedale Threatt,George Gervin,undervote
