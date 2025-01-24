@@ -877,7 +877,6 @@ class OutputWriter {
     for (CastVoteRecord cvr : castVoteRecords) {
       List<Map<String, Object>> cvrSnapshots = new LinkedList<>();
       cvrSnapshots.add(generateCvrSnapshotMap(cvr, null, null));
-      // TODO: Do we want this to use the getSuppliedId or the getId method?
       String sanitizedId = sanitizeStringForOutput(cvr.getId());
       // copy most recent round snapshot data to subsequent rounds
       // until more snapshot data is available
@@ -984,7 +983,6 @@ class OutputWriter {
             entry("@type", "CVR.CVRContest"));
 
     return Map.ofEntries(
-        // TODO: Do we want this to use the getSuppliedId or the getId method?
         entry("@id", generateCvrSnapshotId(sanitizeStringForOutput(cvr.getId()), round)),
         entry("CVRContest", new Map[] {contestMap}),
         entry("Type", round != null ? "interpreted" : "original"),
