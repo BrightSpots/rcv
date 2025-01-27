@@ -48,7 +48,7 @@ final class CsvCvrReader extends BaseCvrReader {
   }
 
   @Override
-  public List<String> readCandidateListFromCvr(List<CastVoteRecord> castVoteRecords)
+  public List<String> readCandidateListFromCvr()
       throws IOException {
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
       return getCandidateNamesAndInitializeParser(getCsvParser(inputStream));
