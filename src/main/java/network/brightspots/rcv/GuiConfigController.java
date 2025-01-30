@@ -1722,16 +1722,15 @@ public class GuiConfigController implements Initializable {
               }
               if (cvrsSpecified) {
                 // Gather unloaded names from each of the sources and place into the HashSet
-                Set<String> unloadedNames = new HashSet<>();
+                HashSet<Candidate> unloadedCandidates = new HashSet<>();
                 for (CvrSource source : sources) {
                   Provider provider = ContestConfig.getProvider(source);
                   try {
                     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
                     BaseCvrReader reader = provider.constructReader(config, source);
-                    reader.readCastVoteRecords(castVoteRecords);
-                    Set<String> unknownCandidates = reader.gatherUnknownCandidates(
-                        castVoteRecords, true).keySet();
-                    unloadedNames.addAll(unknownCandidates);
+                    Set<Candidate> unknownCandidates =
+                            reader.gatherUnknownCandidates(castVoteRecords);
+                    unloadedCandidates.addAll(unknownCandidates);
                   } catch (ContestConfig.UnrecognizedProviderException e) {
                     Logger.severe(
                         "Unrecognized provider \"%s\" in source file \"%s\": %s",
@@ -1745,15 +1744,14 @@ public class GuiConfigController implements Initializable {
 
                 // Validate each name and add to the table of candidates
                 int successCount = 0;
-                for (String name : unloadedNames) {
-                  Candidate candidate = new Candidate(name, null, false);
+                for (Candidate candidate : unloadedCandidates) {
                   Set<ValidationError> validationErrors =
                       ContestConfig.performBasicCandidateValidation(candidate);
                   if (validationErrors.isEmpty()) {
                     tableViewCandidates.getItems().add(candidate);
                     successCount++;
                   } else {
-                    Logger.severe("Failed to load candidate \"%s\"!", name);
+                    Logger.severe("Failed to load candidate \"%s\"!", candidate.getName());
                   }
                 }
 

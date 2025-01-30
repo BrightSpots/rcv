@@ -1,0 +1,38 @@
+{
+  "config" : {
+    "contest" : "Alaska 2024 Congressional",
+    "date" : "2024-11-05",
+    "generatedBy" : "RCTab 1.3.999",
+    "jurisdiction" : "Alaska",
+    "office" : "US House"
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "Begich, Nick" : "66",
+      "Hafner, Eric" : "1",
+      "Howe, John Wayne" : "4",
+      "Peltola, Mary S." : "45",
+      "Undeclared Write-ins" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "Begich, Nick",
+      "transfers" : { }
+    } ],
+    "threshold" : "59"
+  } ],
+  "summary" : {
+    "finalThreshold" : "59",
+    "numCandidates" : 5,
+    "numWinners" : 1,
+    "totalNumBallots" : "124",
+    "undervotes" : 8
+  }
+}
