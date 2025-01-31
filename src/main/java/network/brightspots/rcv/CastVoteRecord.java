@@ -134,7 +134,7 @@ class CastVoteRecord {
   }
 
   String getSuppliedId() {
-    return suppliedId != null ? suppliedId : "";
+    return suppliedId;
   }
 
   // logs the outcome for this CVR for this round for auditing purposes

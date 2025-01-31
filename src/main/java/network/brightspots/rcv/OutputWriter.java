@@ -47,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
@@ -744,7 +745,7 @@ class OutputWriter {
         csvPrinter.print(castVoteRecord.getId());
         csvPrinter.print(castVoteRecord.getTabulatorId());
         csvPrinter.print(castVoteRecord.getSlice(TabulateBySlice.BATCH));
-        csvPrinter.print(castVoteRecord.getSuppliedId());
+        csvPrinter.print(Objects.toString(castVoteRecord.getSuppliedId(), ""));
         csvPrinter.print(castVoteRecord.getSlice(ContestConfig.TabulateBySlice.PRECINCT));
         csvPrinter.print(castVoteRecord.getPrecinctPortion());
         printRankings(currentSourceData.source.getUndeclaredWriteInLabel(), maxRank,

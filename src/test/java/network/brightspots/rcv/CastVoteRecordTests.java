@@ -19,6 +19,7 @@
 package network.brightspots.rcv;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,8 +153,8 @@ public class CastVoteRecordTests {
     }
 
     @Test
-    @DisplayName("returns empty string when suppliedId is null")
-    void returnsEmptyStringWhenNull() {
+    @DisplayName("returns null when suppliedId is null")
+    void returnsNullWhenSuppliedIdIsNull() {
       // Arrange
       CastVoteRecord cvr = new CastVoteRecord(
               defaultComputedId,
@@ -165,11 +166,10 @@ public class CastVoteRecordTests {
       );
 
       // Act
-      String expectId = "";
       String actualId = cvr.getSuppliedId();
 
       // Assert
-      assertEquals(expectId, actualId);
+      assertNull(actualId);
     }
 
     @Test
