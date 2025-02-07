@@ -698,17 +698,18 @@ class OutputWriter {
       csvPrinter = new CSVPrinter(writer, format);
       // print header:
       // RCTab CVR Id, ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion,
-      // rank 1 selection, rank 2 selection, ... rank maxRanks selection
-      csvPrinter.print("Source Filepath");
-      csvPrinter.print("CVR Provider");
-      csvPrinter.print("Contest Id");
-      csvPrinter.print("RCTab CVR Id");
-      csvPrinter.print("Tabulator Id");
-      csvPrinter.print("Batch Id");
-      csvPrinter.print("Vendor Id");
+      csvPrinter.print("Source Filepath"); // CvrSource.getFilePath()
+      csvPrinter.print("CVR Provider"); // CvrSource.getProvider()
+      csvPrinter.print("Contest Id"); // CastVoteRecord.getContestId()
+      csvPrinter.print("RCTab CVR Id"); // CastVoteRecord.getId()
+      csvPrinter.print("Tabulator Id"); // CastVoteRecord.getTabulatorId
+      csvPrinter.print("Batch Id"); // CastVoteRecord.getSlice(TabulateBySlice.BATCH)
+      csvPrinter.print("Vendor Id"); // CastVoteRecord.getSuppliedId
+      // CastVoteRecord.getSlice(ContestConfig.TabulateBySlice.PRECINCT)
       csvPrinter.print("Precinct");
-      csvPrinter.print("Precinct Portion");
+      csvPrinter.print("Precinct Portion"); // CastVoteRecord.castVoteRecord.getPrecinctPortion()
 
+      // rank 1 selection, rank 2 selection, ... rank maxRanks selection
       int maxRank;
       if (config.isMaxRankingsSetToMaximum()) {
         maxRank = config.getNumDeclaredCandidates();
