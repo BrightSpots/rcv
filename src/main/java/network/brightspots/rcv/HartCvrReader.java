@@ -24,18 +24,26 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 
 class HartCvrReader extends BaseCvrReader {
   HartCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
+    this.candidateCodesToCandidates = new HashMap<>();
   }
 
   @Override
   public String readerName() {
     return "Hart";
   }
+
+  private Map<String, Candidate> candidateCodesToCandidates;
 
   boolean verifyHashIfNeeded(File cvrXml) {
     boolean isHashNeeded = SecurityConfig.isHartSignatureValidationEnabled();
@@ -93,7 +101,7 @@ class HartCvrReader extends BaseCvrReader {
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   private void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
-      throws IOException {
+      throws IOException, CastVoteRecord.CvrParseException {
     Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
     XmlMapper xmlMapper = new XmlMapper();
@@ -109,10 +117,31 @@ class HartCvrReader extends BaseCvrReader {
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         if (contest.Options != null) {
           for (Option option : contest.Options) {
-            String candidateName = option.Id;
-            if (candidateName.equals(source.getUndeclaredWriteInLabel())) {
-              candidateName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+            String candidateCode = option.Id;
+            String candidateName = option.Name;
+            if (candidateCode.equals(source.getUndeclaredWriteInLabel())) {
+              candidateCode = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             }
+            if (this.candidateCodesToCandidates.containsKey(candidateCode)) {
+              if (!this.candidateCodesToCandidates.get(candidateCode).Name.equals(candidateName)) {
+                String message = """
+                        Candidate Code %s associated with more than one candidate name.
+                        Originally associated with name '%s'.
+                        In CVR at '%s' it is associated with '%s'.
+                        """.formatted(candidateCode,
+                        this.candidateCodesToCandidates.get(candidateCode).Name,
+                        path.getFileName(), candidateName);
+                Logger.severe(message);
+                throw new CastVoteRecord.CvrParseException();
+              }
+            } else {
+              if (candidateCode != Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL) {
+                this.candidateCodesToCandidates.put(candidateCode,
+                        new Candidate(candidateName, candidateCode));
+              }
+            }
+
+
             // Hart RCV election ranks are indicated by a string read left to right:
             // each digit corresponds to a rank and is set to 1 if that rank was voted:
             // 0100 indicates rank 2 was voted
@@ -121,7 +150,7 @@ class HartCvrReader extends BaseCvrReader {
             for (int rank = 1; rank < option.Value.length() + 1; rank++) {
               String rankValue = option.Value.substring(rank - 1, rank);
               if (rankValue.equals("1")) {
-                rankings.add(new Pair<>(rank, candidateName));
+                rankings.add(new Pair<>(rank, candidateCode));
               }
             }
           }
@@ -145,6 +174,31 @@ class HartCvrReader extends BaseCvrReader {
         }
       }
     }
+  }
+
+  @Override
+  public Set<RawContestConfig.Candidate> gatherUnknownCandidates(
+          List<CastVoteRecord> castVoteRecords) {
+
+    Set<String> knownNames = config.getCandidateNames();
+    if (this.candidateCodesToCandidates.entrySet().size() == 0) {
+      try {
+        //Reading the CVRs will load this.candidateCodestoCandidates
+        readCastVoteRecords(castVoteRecords);
+      } catch (CastVoteRecord.CvrParseException e) {
+        Logger.severe("Error gathering Unknown Candidates\n%s", e);
+        return new HashSet<>();
+      } catch (IOException e) {
+        Logger.severe("Error gathering Unknown Candidates\n%s", e);
+        return new HashSet<>();
+      }
+    }
+
+    // Return the candidate codes that are not in the knownNames set
+    return candidateCodesToCandidates.entrySet().stream()
+            .filter(entry -> !knownNames.contains(entry.getValue().Name))
+            .map(entry -> new RawContestConfig.Candidate(entry.getValue().Name, entry.getKey()))
+            .collect(Collectors.toSet());
   }
 
   @SuppressWarnings({"unused", "RedundantSuppression"})
@@ -171,6 +225,19 @@ class HartCvrReader extends BaseCvrReader {
     public String Name;
     public String Id;
     public ArrayList<Option> Options;
+  }
+
+  @SuppressWarnings({"unused", "RedundantSuppression"})
+  static class Candidate {
+
+    public String Name;
+    public String Code;
+
+    Candidate(String name, String code) {
+      this.Name = name;
+      this.Code = code;
+
+    }
   }
 
   @SuppressWarnings({"unused", "RedundantSuppression"})
