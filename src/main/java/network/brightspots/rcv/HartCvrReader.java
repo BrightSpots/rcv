@@ -135,7 +135,7 @@ class HartCvrReader extends BaseCvrReader {
                 throw new CastVoteRecord.CvrParseException();
               }
             } else {
-              if (candidateCode != Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL) {
+              if (!candidateCode.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
                 this.candidateCodesToCandidates.put(candidateCode,
                         new Candidate(candidateName, candidateCode));
               }
@@ -181,7 +181,7 @@ class HartCvrReader extends BaseCvrReader {
           List<CastVoteRecord> castVoteRecords) {
 
     Set<String> knownNames = config.getCandidateNames();
-    if (this.candidateCodesToCandidates.entrySet().size() == 0) {
+    if (this.candidateCodesToCandidates.entrySet().isEmpty()) {
       try {
         //Reading the CVRs will load this.candidateCodestoCandidates
         readCastVoteRecords(castVoteRecords);
