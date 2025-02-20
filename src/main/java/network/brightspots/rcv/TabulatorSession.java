@@ -53,7 +53,7 @@ class TabulatorSession {
   TabulatorSession(String configPath) {
     this.configPath = configPath;
     // current date-time formatted as a string used for creating unique output files names
-    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm").format(new Date());
   }
 
   // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI
@@ -105,11 +105,11 @@ class TabulatorSession {
 
     Progress progress = new Progress(config, 0, progressUpdate);
 
-    if (setUpLogging(config.getOutputDirectory())
+    if (setUpLogging(config.getOutputDirectory(timestampString))
         && config.validate().isEmpty()) {
       Logger.info("Converting CVR(s) to CDF...");
       try {
-        FileUtils.createOutputDirectory(config.getOutputDirectory());
+        FileUtils.createOutputDirectory(config.getOutputDirectory(timestampString));
         LoadedCvrData castVoteRecords = parseCastVoteRecords(config, progress, false);
         if (!castVoteRecords.successfullyReadAll) {
           Logger.severe("Aborting conversion due to cast vote record errors!");
@@ -171,7 +171,7 @@ class TabulatorSession {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
-    boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory());
+    boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory(timestampString));
 
     if (operatorName == null || operatorName.isBlank()) {
       Logger.severe("Operator name is required for the audit logs!");
@@ -423,7 +423,7 @@ class TabulatorSession {
                   writer.writeRcTabCvrCsv(
                           castVoteRecords,
                           cvrSourceData,
-                          config.getOutputDirectory());
+                          config.getOutputDirectory(timestampString));
           } catch (IOException exception) {
             // error already logged in ResultsWriter
           }

@@ -56,12 +56,6 @@ public class GuiTabulateController {
   private boolean useTemporaryConfigBeforeTabulation = false;
 
   /**
-   * The output folder of the tabulated config. It's important to cache this, since Temp Configs
-   * will be deleted after tabulation and we won't know this value without re-reading the GUI state.
-   */
-  private String configOutputPath;
-
-  /**
    * This modal builds upon the GuiConfigController, and the two share some functionality (e.g.
    * saving a config file). The shared functionality lives in GuiConfigController.
    */
@@ -332,11 +326,6 @@ public class GuiTabulateController {
             : savedConfigFilePath;
 
     ContestConfig config = ContestConfig.loadContestConfig(path);
-    configOutputPath = config.getOutputDirectory();
-    String os = System.getProperty("os.name").toLowerCase();
-    if (!os.contains("win") && !configOutputPath.endsWith("/")) {
-      configOutputPath += "/";
-    }
 
     return path;
   }
@@ -415,8 +404,18 @@ public class GuiTabulateController {
   }
 
   private void openOutputDirectoryInFileExplorer() {
+    String configOutputPath = guiConfigController.getLastTabulatorSessionOutputDirectory();
+    if (configOutputPath == null) {
+      Logger.severe("No output directory found to open.");
+      return;
+    }
+
+    String os = System.getProperty("os.name").toLowerCase();
+    if (!os.contains("win") && !configOutputPath.endsWith("/")) {
+      configOutputPath += "/";
+    }
+
     try {
-      String os = System.getProperty("os.name").toLowerCase();
       if (os.contains("win")) {
         // Windows
         Runtime.getRuntime().exec(new String[]{"explorer.exe", "/select,", configOutputPath});

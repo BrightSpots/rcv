@@ -133,6 +133,8 @@ public class GuiConfigController implements Initializable {
   private File selectedFile;
   // GUI is currently busy validating or tabulating
   private boolean guiIsBusy;
+  // The last tabulator session's output directory
+  private String lastTabulatorSessionOutputDirectory;
 
   @FXML
   private ListView<Label> textAreaStatus;
@@ -548,9 +550,9 @@ public class GuiConfigController implements Initializable {
    * Tabulate whatever is currently entered into the GUI.
    * Assumes GuiTabulateController checked all prerequisites.
    */
-  public Service<LoadedCvrData> parseAndCountCastVoteRecords(String configPath) {
+  public GenericService<LoadedCvrData> parseAndCountCastVoteRecords(String configPath) {
     setGuiIsBusy(true);
-    Service<LoadedCvrData> service = new ReadCastVoteRecordsService(configPath);
+    GenericService<LoadedCvrData> service = new ReadCastVoteRecordsService(configPath);
     setUpAndStartService(service);
     return service;
   }
@@ -589,10 +591,18 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private <T> void setUpAndStartService(Service<T> service) {
-    service.setOnSucceeded(event -> setGuiIsBusy(false));
-    service.setOnCancelled(event -> setGuiIsBusy(false));
-    service.setOnFailed(event -> setGuiIsBusy(false));
+  private <T> void sessionDone(GenericService<T> service) {
+    setGuiIsBusy(false);
+
+    if (service.hasSetOutputDirectory()) {
+      this.lastTabulatorSessionOutputDirectory = service.getOutputDirectory();
+    }
+  }
+
+  private <T> void setUpAndStartService(GenericService<T> service) {
+    service.setOnSucceeded(event -> sessionDone(service));
+    service.setOnCancelled(event -> sessionDone(service));
+    service.setOnFailed(event -> sessionDone(service));
     service.start();
   }
 
@@ -1470,6 +1480,10 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  public String getLastTabulatorSessionOutputDirectory() {
+    return lastTabulatorSessionOutputDirectory;
+  }
+
   private void setUpHintsForTab(Tab tab, String hintsFilename) {
     String hints = loadTxtFileIntoString(hintsFilename);
     tab.setOnSelectionChanged(e -> {
@@ -1695,7 +1709,33 @@ public class GuiConfigController implements Initializable {
     DIFFERENT_BUT_VERSION_IS_TEST,
   }
 
-  private static class AutoLoadCandidatesService extends Service<Void> {
+  /**
+   * Many services have callers which need to know the output directory, but not all of them.
+   * This generic service is a simple interface to allow the caller to get the output directory,
+   * but it is the responsibility of the caller to know if the service being used sets
+   * the output directory or not by checking hasSetOutputDirectory().
+   */
+  public abstract static class GenericService<T> extends Service<T> {
+    protected String outputDirectory;
+
+    /**
+     * Get the output directory set by the service if one was set.
+     * The caller should check if the output directory has been set.
+     * @return the output directory set by the service.
+     */
+    public String getOutputDirectory() {
+      if (outputDirectory == null) {
+        throw new IllegalStateException("Output Directory has not been set on this service.");
+      }
+      return outputDirectory;
+    }
+
+    public boolean hasSetOutputDirectory() {
+      return outputDirectory != null;
+    }
+  }
+
+  private static class AutoLoadCandidatesService extends GenericService<Void> {
 
     private final ContestConfig config;
     private final List<CvrSource> sources;
@@ -1768,7 +1808,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private static class ValidatorService extends Service<Boolean> {
+  private static class ValidatorService extends GenericService<Boolean> {
 
     private final ContestConfig contestConfig;
 
@@ -1795,7 +1835,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private abstract static class ConfigReaderService extends Service<Boolean> {
+  private abstract static class ConfigReaderService extends GenericService<Boolean> {
     private final boolean deleteConfigOnCompletion;
     protected String configPath;
 
@@ -1842,6 +1882,7 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<Boolean> createTask() {
+      GenericService<Boolean> svc = this;
       Task<Boolean> task =
           new Task<>() {
             @Override
@@ -1849,6 +1890,7 @@ public class GuiConfigController implements Initializable {
               TabulatorSession session = new TabulatorSession(configPath);
               List<String> errors = session.tabulate(
                       operatorName, expectedCvrStatistics, this::updateProgress);
+              svc.outputDirectory = session.getOutputPath();
               if (errors.isEmpty()) {
                 succeeded();
               } else {
@@ -1872,12 +1914,15 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<Boolean> createTask() {
+      GenericService<Boolean> svc = this;
       Task<Boolean> task =
           new Task<>() {
             @Override
             protected Boolean call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              return session.convertToCdf(this::updateProgress);
+              boolean succeeded = session.convertToCdf(this::updateProgress);
+              svc.outputDirectory = session.getOutputPath();
+              return succeeded;
             }
           };
       setUpTaskCompletionTriggers(task,
@@ -1887,7 +1932,7 @@ public class GuiConfigController implements Initializable {
   }
 
   // ReadCastVoteRecordsService reads CVRs
-  private static class ReadCastVoteRecordsService extends Service<LoadedCvrData> {
+  private static class ReadCastVoteRecordsService extends GenericService<LoadedCvrData> {
     private final String configPath;
 
     ReadCastVoteRecordsService(String configPath) {
@@ -1896,6 +1941,7 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<LoadedCvrData> createTask() {
+      GenericService<LoadedCvrData> svc = this;
       return new Task<>() {
           @Override
           protected LoadedCvrData call() {
@@ -1908,6 +1954,7 @@ public class GuiConfigController implements Initializable {
               Logger.severe("Failed to read CVRs: %s", e.getMessage());
               failed();
             }
+            svc.outputDirectory = session.getOutputPath();
             return cvrStatics;
           }
         };

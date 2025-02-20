@@ -370,8 +370,9 @@ class TabulatorTests {
       String timestampString,
       Integer sequentialId,
       boolean onlyCheckIfExpectedFileExists) {
+    String resultsDir = config.getOutputDirectory(timestampString);
     String actualOutputPath = actualOutputFileIdentifiers.getPath(
-          config.getOutputDirectory(), timestampString, sequentialId).toAbsolutePath().toString();
+          resultsDir, timestampString, sequentialId).toAbsolutePath().toString();
     String expectedPath = actualOutputFileIdentifiers.getPath(getTestDirectory(stem).toString(),
             stem, "expected", sequentialId).toString();
 
@@ -396,7 +397,7 @@ class TabulatorTests {
    */
   private static void compareExtendedSummaryToSummary(
           ContestConfig config, String timestampString, Integer sequentialId) {
-    String dir = config.getOutputDirectory();
+    String dir = config.getOutputDirectory(timestampString);
     String summaryPath = new OutputFileIdentifiers(OutputType.SUMMARY_CSV).getPath(
             dir, timestampString, sequentialId).toAbsolutePath().toString();
     String detailedPath = new OutputFileIdentifiers(OutputType.DETAILED_CSV).getPath(

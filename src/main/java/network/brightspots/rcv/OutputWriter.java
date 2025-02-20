@@ -360,7 +360,7 @@ class OutputWriter {
       sequentialId = config.getSequentialWinners().size() + 1;
     }
     return new AuditableFile(outputFileIdentifiers.getPath(
-            config.getOutputDirectory(), timestampString, sequentialId));
+            config.getOutputDirectory(timestampString), timestampString, sequentialId));
   }
 
   // create a results .csv file
