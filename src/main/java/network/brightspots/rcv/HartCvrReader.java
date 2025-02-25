@@ -120,10 +120,12 @@ class HartCvrReader extends BaseCvrReader {
             Candidate candidate = new Candidate(option.Name, option.Id);
             if (candidate.Code.equals(source.getUndeclaredWriteInLabel())) {
               candidate.Code = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+            } else {
+              this.candidateCodesToCandidates.computeIfAbsent(candidate.Code,
+                      k -> candidate);
             }
-            Candidate existingCandidate = this.candidateCodesToCandidates.get(candidate.Code);
-            if (existingCandidate != null &&
-                    !this.candidateCodesToCandidates.get(candidate.Code).Name.equals(candidate.Name)) {
+
+            if (!this.candidateCodesToCandidates.get(candidate.Code).Name.equals(candidate.Name)) {
                 String message =
                         "Candidate Code %s associated with more than one candidate name." +
                         "Originally associated with name '%s'." +
@@ -133,12 +135,6 @@ class HartCvrReader extends BaseCvrReader {
                         path.getFileName(), candidate.Name);
                 Logger.severe(message);
                 throw new CastVoteRecord.CvrParseException();
-            }
-
-            if (existingCandidate == null &&
-                    !candidate.Code.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-                this.candidateCodesToCandidates.put(candidate.Code,
-                        candidate);
             }
 
 
