@@ -122,21 +122,21 @@ class HartCvrReader extends BaseCvrReader {
               candidate.Code = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             } else {
               this.candidateCodesToCandidates.computeIfAbsent(candidate.Code,
-                      k -> candidate);
-            }
+                    k -> candidate);
 
-            if (!this.candidateCodesToCandidates.get(candidate.Code).Name.equals(candidate.Name)) {
-              String message =
-                      "Candidate Code %s associated with more than one candidate name."
-                      + "Originally associated with name '%s'."
-                      + "In CVR at '%s' it is associated with '%s'."
-                      .formatted(candidate.Code,
-                      this.candidateCodesToCandidates.get(candidate.Code).Name,
-                      path.getFileName(), candidate.Name);
-              Logger.severe(message);
-              throw new CastVoteRecord.CvrParseException();
+              if (!this.candidateCodesToCandidates.get(candidate.Code).Name
+                      .equals(candidate.Name)) {
+                String message =
+                        "Candidate Code %s associated with more than one candidate name."
+                                + "Originally associated with name '%s'."
+                                + "In CVR at '%s' it is associated with '%s'."
+                                .formatted(candidate.Code,
+                                        this.candidateCodesToCandidates.get(candidate.Code).Name,
+                                        path.getFileName(), candidate.Name);
+                Logger.severe(message);
+                throw new CastVoteRecord.CvrParseException();
+              }
             }
-
 
             // Hart RCV election ranks are indicated by a string read left to right:
             // each digit corresponds to a rank and is set to 1 if that rank was voted:
@@ -179,7 +179,7 @@ class HartCvrReader extends BaseCvrReader {
     Set<String> knownNames = config.getCandidateNames();
     if (this.candidateCodesToCandidates.entrySet().isEmpty()) {
       try {
-        //Reading the CVRs will load this.candidateCodestoCandidates
+        //Reading the CVRs will load this.candidateCodesToCandidates
         readCastVoteRecords(castVoteRecords);
       } catch (CastVoteRecord.CvrParseException | IOException e) {
         Logger.severe("Error gathering Unknown Candidates\n%s", e);
