@@ -117,27 +117,26 @@ class HartCvrReader extends BaseCvrReader {
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         if (contest.Options != null) {
           for (Option option : contest.Options) {
-            String candidateCode = option.Id;
-            String candidateName = option.Name;
-            if (candidateCode.equals(source.getUndeclaredWriteInLabel())) {
-              candidateCode = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
+            Candidate candidate = new Candidate(option.Name, option.Id);
+            if (candidate.Code.equals(source.getUndeclaredWriteInLabel())) {
+              candidate.Code = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             }
-            if (this.candidateCodesToCandidates.containsKey(candidateCode)) {
-              if (!this.candidateCodesToCandidates.get(candidateCode).Name.equals(candidateName)) {
+            if (this.candidateCodesToCandidates.containsKey(candidate.Code)) {
+              if (!this.candidateCodesToCandidates.get(candidate.Code).Name.equals(candidate.Name)) {
                 String message = """
                         Candidate Code %s associated with more than one candidate name.
                         Originally associated with name '%s'.
                         In CVR at '%s' it is associated with '%s'.
-                        """.formatted(candidateCode,
-                        this.candidateCodesToCandidates.get(candidateCode).Name,
-                        path.getFileName(), candidateName);
+                        """.formatted(candidate.Code,
+                        this.candidateCodesToCandidates.get(candidate.Code).Name,
+                        path.getFileName(), candidate.Name);
                 Logger.severe(message);
                 throw new CastVoteRecord.CvrParseException();
               }
             } else {
-              if (!candidateCode.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
-                this.candidateCodesToCandidates.put(candidateCode,
-                        new Candidate(candidateName, candidateCode));
+              if (!candidate.Code.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
+                this.candidateCodesToCandidates.put(candidate.Code,
+                        candidate);
               }
             }
 
@@ -150,7 +149,7 @@ class HartCvrReader extends BaseCvrReader {
             for (int rank = 1; rank < option.Value.length() + 1; rank++) {
               String rankValue = option.Value.substring(rank - 1, rank);
               if (rankValue.equals("1")) {
-                rankings.add(new Pair<>(rank, candidateCode));
+                rankings.add(new Pair<>(rank, candidate.Code));
               }
             }
           }
@@ -231,12 +230,12 @@ class HartCvrReader extends BaseCvrReader {
   static class Candidate {
 
     public String Name;
+    @SuppressWarnings({"unused", "unread"})
     public String Code;
 
     Candidate(String name, String code) {
       this.Name = name;
       this.Code = code;
-
     }
   }
 
