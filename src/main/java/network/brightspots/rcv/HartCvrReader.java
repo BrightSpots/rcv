@@ -126,15 +126,15 @@ class HartCvrReader extends BaseCvrReader {
             }
 
             if (!this.candidateCodesToCandidates.get(candidate.Code).Name.equals(candidate.Name)) {
-                String message =
-                        "Candidate Code %s associated with more than one candidate name." +
-                        "Originally associated with name '%s'." +
-                        "In CVR at '%s' it is associated with '%s'."
-                        .formatted(candidate.Code,
-                        this.candidateCodesToCandidates.get(candidate.Code).Name,
-                        path.getFileName(), candidate.Name);
-                Logger.severe(message);
-                throw new CastVoteRecord.CvrParseException();
+              String message =
+                      "Candidate Code %s associated with more than one candidate name."
+                      + "Originally associated with name '%s'."
+                      + "In CVR at '%s' it is associated with '%s'."
+                      .formatted(candidate.Code,
+                      this.candidateCodesToCandidates.get(candidate.Code).Name,
+                      path.getFileName(), candidate.Name);
+              Logger.severe(message);
+              throw new CastVoteRecord.CvrParseException();
             }
 
 
@@ -181,10 +181,7 @@ class HartCvrReader extends BaseCvrReader {
       try {
         //Reading the CVRs will load this.candidateCodestoCandidates
         readCastVoteRecords(castVoteRecords);
-      } catch (CastVoteRecord.CvrParseException e) {
-        Logger.severe("Error gathering Unknown Candidates\n%s", e);
-        return new HashSet<>();
-      } catch (IOException e) {
+      } catch (CastVoteRecord.CvrParseException | IOException e) {
         Logger.severe("Error gathering Unknown Candidates\n%s", e);
         return new HashSet<>();
       }
