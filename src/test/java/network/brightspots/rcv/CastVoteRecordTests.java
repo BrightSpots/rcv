@@ -32,13 +32,13 @@ import org.junit.jupiter.api.Test;
  * Unit tests for the CastVoteRecord.
  */
 public class CastVoteRecordTests {
-  String defaultComputedId = "computed123";
-  String defualtSuppliedId = "supplied456";
-  String idWithSpecialCharacters = "~!@#$%^&*(){}|:<>?[]`,./";
-  String precinct = "precinct1";
-  String batchId = "batch1";
-  boolean usesLastAllowedRanking = false;
-  List<Pair<Integer, String>> rankings = new ArrayList<>();
+  private static final String defaultComputedId = "computed123";
+  private static final String defaultSuppliedId = "supplied456";
+  private static final String idWithSpecialCharacters = "~!@#$%^&*(){}|:<>?[]`,./";
+  private static final String precinct = "precinct1";
+  private static final String batchId = "batch1";
+  private static final boolean usesLastAllowedRanking = false;
+  private static final List<Pair<Integer, String>> rankings = new ArrayList<>();
 
   @Nested
   @DisplayName("getId() tests")
@@ -49,7 +49,7 @@ public class CastVoteRecordTests {
       // Arrange
       CastVoteRecord cvr = new CastVoteRecord(
               defaultComputedId,
-              defualtSuppliedId,
+              defaultSuppliedId,
               precinct,
               batchId,
               usesLastAllowedRanking,
@@ -70,7 +70,7 @@ public class CastVoteRecordTests {
       // Arrange
       CastVoteRecord cvr = new CastVoteRecord(
               null,
-              defualtSuppliedId,
+              defaultSuppliedId,
               precinct,
               batchId,
               usesLastAllowedRanking,
@@ -78,7 +78,7 @@ public class CastVoteRecordTests {
       );
 
       // Act
-      String expectId = defualtSuppliedId;
+      String expectId = defaultSuppliedId;
       String actualId = cvr.getId();
 
       // Assert
@@ -91,7 +91,7 @@ public class CastVoteRecordTests {
       // Arrange
       CastVoteRecord cvr = new CastVoteRecord(
               "",
-              defualtSuppliedId,
+              defaultSuppliedId,
               precinct,
               batchId,
               usesLastAllowedRanking,
@@ -99,7 +99,7 @@ public class CastVoteRecordTests {
       );
 
       // Act
-      String expectId = defualtSuppliedId;
+      String expectId = defaultSuppliedId;
       String actualId = cvr.getId();
 
       // Assert
@@ -112,7 +112,7 @@ public class CastVoteRecordTests {
       // Arrange
       CastVoteRecord cvr = new CastVoteRecord(
               idWithSpecialCharacters,
-              defualtSuppliedId,
+              defaultSuppliedId,
               precinct,
               batchId,
               usesLastAllowedRanking,
@@ -137,7 +137,7 @@ public class CastVoteRecordTests {
       // Arrange
       CastVoteRecord cvr = new CastVoteRecord(
               defaultComputedId,
-              defualtSuppliedId,
+              defaultSuppliedId,
               precinct,
               batchId,
               usesLastAllowedRanking,
@@ -145,7 +145,7 @@ public class CastVoteRecordTests {
       );
 
       // Act
-      String expectId = defualtSuppliedId;
+      String expectId = defaultSuppliedId;
       String actualId = cvr.getSuppliedId();
 
       // Assert
