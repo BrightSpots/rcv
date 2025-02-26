@@ -117,7 +117,9 @@ class HartCvrReader extends BaseCvrReader {
             // each digit corresponds to a rank and is set to 1 if that rank was voted:
             // 0100 indicates rank 2 was voted
             // 0000 indicates no rank was voted (undervote)
-            // 0101 indicates ranks 2 and 4 are voted (overvote)
+            // 0101 indicates ranks 2 and 4 are voted for one candidate (repeat ranking)
+            // 0100 in two different `Value` elements (within different `Option` elements)
+            // in the same CVR indicates two candidates recieved the same rank (overvote)
             for (int rank = 1; rank < option.Value.length() + 1; rank++) {
               String rankValue = option.Value.substring(rank - 1, rank);
               if (rankValue.equals("1")) {
