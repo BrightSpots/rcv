@@ -1721,6 +1721,7 @@ public class GuiConfigController implements Initializable {
     /**
      * Get the output directory set by the service if one was set.
      * The caller should check if the output directory has been set.
+     *
      * @return the output directory set by the service.
      */
     public String getOutputDirectory() {

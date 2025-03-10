@@ -32,6 +32,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -287,9 +288,14 @@ class TabulatorTests {
   private static void cleanOutputFolder(TabulatorSession session) {
     // Test passed so clean up test output folder
     File outputFolder = new File(session.getOutputPath());
-    File[] files = outputFolder.listFiles();
-    if (files != null) {
-      for (File file : files) {
+    File[] fileArray = outputFolder.listFiles();
+    if (fileArray != null) {
+      List<File> files = new java.util.ArrayList<>(List.of(fileArray));
+
+      // Iterate over the list of files. As we encounter certain expected directories,
+      // files within those directories may be added to the files array.
+      for (int i = 0; i < files.size(); ++i) {
+        File file = files.get(i);
         if (file.getName().equals(".DS_Store")) {
           continue;
         }
@@ -322,6 +328,13 @@ class TabulatorTests {
             Files.delete(file.toPath());
           } catch (IOException exception) {
             Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
+          }
+        } else if (file.toString().endsWith(" Checksums")
+                || file.toString().endsWith("Tabulate by Batch")
+                || file.toString().endsWith("Tabulate by Precinct")) {
+          File[] subdirFiles = file.listFiles();
+          if (subdirFiles != null) {
+            files.addAll(List.of(subdirFiles));
           }
         }
       }

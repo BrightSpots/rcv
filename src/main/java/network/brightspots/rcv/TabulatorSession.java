@@ -294,10 +294,9 @@ class TabulatorSession {
     // cache outputPath for testing
     outputPath = outputDirectory;
     try {
-      FileUtils.createOutputDirectory(outputDirectory);
       Logger.addTabulationFileLogging(outputDirectory, timestampString);
       success = true;
-    } catch (UnableToCreateDirectoryException | IOException exception) {
+    } catch (IOException exception) {
       Logger.severe("Failed to configure tabulation logger!\n%s", exception);
     }
     if (!success) {

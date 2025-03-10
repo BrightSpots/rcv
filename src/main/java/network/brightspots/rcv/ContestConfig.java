@@ -976,7 +976,7 @@ class ContestConfig {
 
   // path to directory where output files should be written
   String getOutputDirectory(String timestamp) {
-    return Path.of(resolveConfigPath(getOutputDirectoryRaw()), timestamp + "_Results").toString();
+    return Path.of(resolveConfigPath(getOutputDirectoryRaw()), timestamp + " Results").toString();
   }
 
   private String getTabulatorVersion() {

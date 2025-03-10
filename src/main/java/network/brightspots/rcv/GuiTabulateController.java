@@ -320,14 +320,9 @@ public class GuiTabulateController {
   }
 
   private String getConfigPathOrCreateTempFile() {
-    String path =
-        useTemporaryConfigBeforeTabulation
-            ? guiConfigController.saveFile(tempSaveButton, true)
-            : savedConfigFilePath;
-
-    ContestConfig config = ContestConfig.loadContestConfig(path);
-
-    return path;
+    return useTemporaryConfigBeforeTabulation
+          ? guiConfigController.saveFile(tempSaveButton, true)
+          : savedConfigFilePath;
   }
 
   private boolean isConfigSavedOrTempFileReady() {
