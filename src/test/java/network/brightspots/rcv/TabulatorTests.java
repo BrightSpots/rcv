@@ -32,7 +32,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,6 +39,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import network.brightspots.rcv.OutputWriter.OutputFileIdentifiers;
 import network.brightspots.rcv.OutputWriter.OutputType;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
@@ -288,6 +288,9 @@ class TabulatorTests {
   private static void cleanOutputFolder(TabulatorSession session) {
     // Test passed so clean up test output folder
     File outputFolder = new File(session.getOutputPath());
+    Stack<File> dirsToDeleteIfEmpty = new Stack<>();
+    dirsToDeleteIfEmpty.add(outputFolder);
+
     File[] fileArray = outputFolder.listFiles();
     if (fileArray != null) {
       List<File> files = new java.util.ArrayList<>(List.of(fileArray));
@@ -296,10 +299,12 @@ class TabulatorTests {
       // files within those directories may be added to the files array.
       for (int i = 0; i < files.size(); ++i) {
         File file = files.get(i);
-        if (file.getName().equals(".DS_Store")) {
+        String filename = file.getName();
+
+        if (filename.equals(".DS_Store")) {
           continue;
         }
-        if (file.getName().endsWith(".lck")) {
+        if (filename.endsWith(".lck")) {
           continue;
         }
         if (!file.isDirectory()) {
@@ -329,16 +334,37 @@ class TabulatorTests {
           } catch (IOException exception) {
             Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
           }
-        } else if (file.toString().endsWith(" Checksums")
-                || file.toString().endsWith("Tabulate by Batch")
-                || file.toString().endsWith("Tabulate by Precinct")) {
-          File[] subdirFiles = file.listFiles();
-          if (subdirFiles != null) {
-            files.addAll(List.of(subdirFiles));
+        } else {
+          dirsToDeleteIfEmpty.add(file);
+          Logger.info(file.getName());
+          if (filename.endsWith(" Checksums")
+                  || filename.equals("Log")
+                  || filename.equals("Tabulate by Batch")
+                  || filename.equals("Tabulate by Precinct")) {
+            File[] subdirFiles = file.listFiles();
+            if (subdirFiles != null) {
+              files.addAll(List.of(subdirFiles));
+            }
           }
         }
       }
     }
+
+
+    // Clean up empty directories
+    while (!dirsToDeleteIfEmpty.isEmpty()) {
+      File dir = dirsToDeleteIfEmpty.pop();
+      Logger.info(dir.getName());
+      File[] listOfFiles = dir.listFiles();
+      if (listOfFiles == null || listOfFiles.length == 0) {
+        try {
+          Files.delete(dir.toPath());
+        } catch (IOException exception) {
+          Logger.severe("Error deleting directory: %s\n%s", dir.getAbsolutePath(), exception);
+        }
+      }
+    }
+
     Logger.info("Test complete.");
   }
 
