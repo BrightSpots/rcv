@@ -252,6 +252,7 @@ class Logger {
               } else if (record.getLevel() == Level.WARNING) {
                 logLabel.setBackground(Background.fill(Color.SIENNA));
               }
+              logLabel.setStyle("-fx-text-fill: #FFF; -fx-label-padding: 2px;");
 
               // On Right Click, user can copy text
               ContextMenu contextMenu = new ContextMenu();

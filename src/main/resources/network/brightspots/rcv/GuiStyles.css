@@ -9,7 +9,7 @@
 .button {
     -fx-background-color: #0078d7;
     -fx-text-fill: white;
-    -fx-padding: 10px 20px;
+    -fx-padding: 5px 10px;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
 }
@@ -30,7 +30,7 @@
     -fx-border-color: #c4c4c4;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
-    -fx-padding: 10px;
+    -fx-padding: 5px;
 }
 
 .text-field:focused {
@@ -40,7 +40,7 @@
 /* Label styles */
 .label {
     -fx-text-fill: #333333;
-    -fx-padding: 5px 0;
+    -fx-padding: 5px 5px;
 }
 
 /* TextArea styles */
@@ -73,7 +73,7 @@
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: white;
+    -fx-text-fill: black;
 }
 
 /* ScrollPane styles */

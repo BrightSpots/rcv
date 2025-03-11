@@ -995,7 +995,10 @@ public class GuiConfigController implements Initializable {
       versionText += " -- this is a development version, do not distribute!";
       labelVersion.setBackground(new Background(new BackgroundFill(
           Color.DARKRED, CornerRadii.EMPTY, Insets.EMPTY)));
-      labelVersion.setTextFill(Color.WHITE);
+      labelVersion.setStyle("-fx-text-fill: #FFF;"
+              + "-fx-background-color: darkred;"
+              + "-fx-background-radius: 4px 0px 0px 4px;"
+      );
     }
     labelVersion.setText(versionText);
     labelCurrentlyLoaded.setText("Currently loaded: <New Config>");
