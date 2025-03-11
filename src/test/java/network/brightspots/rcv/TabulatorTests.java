@@ -571,6 +571,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Dominion test - Alaska 2024 Partial Ballot Test")
+  void testDominionAlaskaPartialBallot() {
+    runTabulationTest("2024_alaska_dominion");
+  }
+
+  @Test
   @DisplayName("Dominion test - Kansas test data")
   void testDominionKansas() {
     runTabulationTest("dominion_kansas");
