@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
@@ -80,7 +81,7 @@ class HartCvrReader extends BaseCvrReader {
   // iterate all xml files in the source input folder
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-      throws CastVoteRecord.CvrParseException, IOException {
+          throws CastVoteRecord.CvrParseException, IOException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
@@ -101,7 +102,7 @@ class HartCvrReader extends BaseCvrReader {
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   private void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
-      throws IOException, CastVoteRecord.CvrParseException {
+          throws IOException, CastVoteRecord.CvrParseException {
     Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
     XmlMapper xmlMapper = new XmlMapper();
@@ -117,15 +118,20 @@ class HartCvrReader extends BaseCvrReader {
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         if (contest.Options != null) {
           for (Option option : contest.Options) {
-            Candidate candidate = new Candidate(option.Name, option.Id);
+
+            //Can be null with some write-ins
+            String candidateNameClean = Objects.requireNonNullElse(option.Name, "");
+            Candidate candidate = new Candidate(candidateNameClean, option.Id);
             if (candidate.Code.equals(source.getUndeclaredWriteInLabel())) {
               candidate.Code = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             } else {
-              this.candidateCodesToCandidates.computeIfAbsent(candidate.Code,
-                    k -> candidate);
+              this.candidateCodesToCandidates.putIfAbsent(candidate.Code,
+                      candidate);
 
               if (!this.candidateCodesToCandidates.get(candidate.Code).Name
                       .equals(candidate.Name)) {
+                // Some write-ins, when adjudicated, can have different or empty
+                // values for the option.Name field.
                 String message =
                         "Candidate Code %s associated with more than one candidate name."
                                 + "Originally associated with name '%s'."
@@ -133,8 +139,7 @@ class HartCvrReader extends BaseCvrReader {
                                 .formatted(candidate.Code,
                                         this.candidateCodesToCandidates.get(candidate.Code).Name,
                                         path.getFileName(), candidate.Name);
-                Logger.severe(message);
-                throw new CastVoteRecord.CvrParseException();
+                Logger.warning(message);
               }
             }
 
@@ -153,15 +158,15 @@ class HartCvrReader extends BaseCvrReader {
         }
 
         CastVoteRecord cvr =
-            new CastVoteRecord(
-                contest.Id,
-                null,
-                xmlCvr.BatchNumber,
-                xmlCvr.CvrGuid,
-                xmlCvr.PrecinctSplit.Name,
-                xmlCvr.PrecinctSplit.Id,
-                usesLastAllowedRanking(rankings, null),
-                rankings);
+                new CastVoteRecord(
+                        contest.Id,
+                        null,
+                        xmlCvr.BatchNumber,
+                        xmlCvr.CvrGuid,
+                        xmlCvr.PrecinctSplit.Name,
+                        xmlCvr.PrecinctSplit.Id,
+                        usesLastAllowedRanking(rankings, null),
+                        rankings);
         castVoteRecords.add(cvr);
 
         // provide some user feedback on the Cvr count
