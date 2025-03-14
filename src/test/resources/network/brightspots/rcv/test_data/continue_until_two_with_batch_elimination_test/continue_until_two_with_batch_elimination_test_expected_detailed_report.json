@@ -88,7 +88,7 @@
         "exhausted" : "15"
       }
     } ],
-    "threshold" : "46"
+    "threshold" : "51"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "24",
@@ -102,10 +102,10 @@
       "C" : "16"
     },
     "tallyResults" : [ ],
-    "threshold" : "39"
+    "threshold" : "51"
   } ],
   "summary" : {
-    "finalThreshold" : "39",
+    "finalThreshold" : "51",
     "numCandidates" : 7,
     "numWinners" : 1,
     "totalNumBallots" : "100",
