@@ -1,0 +1,117 @@
+{
+  "config" : {
+    "contest" : "Test Continue until Two Threshold Freeze",
+    "date" : "",
+    "generatedBy" : "RCTab 1.3.999",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "A" : "8",
+      "B" : "3",
+      "C" : "3",
+      "D" : "2",
+      "E" : "1",
+      "F" : "0"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "E",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    }, {
+      "eliminated" : "F",
+      "transfers" : { }
+    } ],
+    "threshold" : "9"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "A" : "8",
+      "B" : "3",
+      "C" : "3",
+      "D" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "exhausted" : "2"
+      }
+    } ],
+    "threshold" : "9"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "3",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "A" : "8",
+      "B" : "3",
+      "C" : "3"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    } ],
+    "threshold" : "8"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "3",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "A" : "8",
+      "B" : "3",
+      "C" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "C",
+      "transfers" : {
+        "exhausted" : "3"
+      }
+    } ],
+    "threshold" : "8"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "6",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 5,
+    "tally" : {
+      "A" : "8",
+      "B" : "3"
+    },
+    "tallyResults" : [ ],
+    "threshold" : "8"
+  } ],
+  "summary" : {
+    "finalThreshold" : "8",
+    "numCandidates" : 6,
+    "numWinners" : 1,
+    "totalNumBallots" : "17",
+    "undervotes" : 0
+  }
+}
