@@ -23,6 +23,7 @@
 package network.brightspots.rcv;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -52,8 +53,22 @@ class TabulatorSession {
 
   TabulatorSession(String configPath) {
     this.configPath = configPath;
+
     // current date-time formatted as a string used for creating unique output files names
-    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm").format(new Date());
+    String timestampPattern = "yyyy-MM-dd_HH-mm";
+    String baseTimestampString = new SimpleDateFormat(timestampPattern).format(new Date());
+    String currTimestampString = baseTimestampString;
+
+    // If there are multiple runs in the same minute, resolve collisions
+    // with a dash and an increment.
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    int count = 1;
+    while (new File(config.getOutputDirectory(currTimestampString)).exists()) {
+      currTimestampString = baseTimestampString +  "-" + count;
+      count++;
+    }
+
+    this.timestampString = currTimestampString;
   }
 
   // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI
