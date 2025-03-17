@@ -377,7 +377,7 @@ class TabulatorSession {
                 candidate ->
                     Logger.severe(
                         "Unrecognized candidate \"%s\" appears %d time(s)!",
-                        candidate, exception.candidateCounts.get(candidate)));
+                        candidate.getName(), exception.candidateCounts.get(candidate)));
         // various incorrect settings can lead to UnrecognizedCandidatesException, so it's hard
         // to know exactly what the problem is
         Logger.info(
