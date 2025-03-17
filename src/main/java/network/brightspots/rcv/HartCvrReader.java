@@ -81,7 +81,7 @@ class HartCvrReader extends BaseCvrReader {
   // iterate all xml files in the source input folder
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
-          throws CastVoteRecord.CvrParseException, IOException {
+      throws CastVoteRecord.CvrParseException, IOException {
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
@@ -102,7 +102,7 @@ class HartCvrReader extends BaseCvrReader {
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   private void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
-          throws IOException, CastVoteRecord.CvrParseException {
+      throws IOException, CastVoteRecord.CvrParseException {
     Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
     XmlMapper xmlMapper = new XmlMapper();
@@ -159,14 +159,14 @@ class HartCvrReader extends BaseCvrReader {
 
         CastVoteRecord cvr =
                 new CastVoteRecord(
-                        contest.Id,
-                        null,
-                        xmlCvr.BatchNumber,
-                        xmlCvr.CvrGuid,
-                        xmlCvr.PrecinctSplit.Name,
-                        xmlCvr.PrecinctSplit.Id,
-                        usesLastAllowedRanking(rankings, null),
-                        rankings);
+                    contest.Id,
+                    null,
+                    xmlCvr.BatchNumber,
+                    xmlCvr.CvrGuid,
+                    xmlCvr.PrecinctSplit.Name,
+                    xmlCvr.PrecinctSplit.Id,
+                    usesLastAllowedRanking(rankings, null),
+                    rankings);
         castVoteRecords.add(cvr);
 
         // provide some user feedback on the Cvr count
