@@ -102,7 +102,7 @@ class HartCvrReader extends BaseCvrReader {
 
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   private void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
-      throws IOException, CastVoteRecord.CvrParseException {
+      throws IOException {
     Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
 
     XmlMapper xmlMapper = new XmlMapper();
