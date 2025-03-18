@@ -1906,10 +1906,12 @@ public class GuiConfigController implements Initializable {
               succeeded();
             } catch (TabulatorSession.CastVoteRecordGenericParseException e) {
               String message = "Failed to read CVRs";
-              if(!isNullOrBlank(e.getMessage()))
+              if (!isNullOrBlank(e.getMessage())) {
                 message += ": " + e.getMessage();
+              }
               Logger.severe(message);
               failed();
+
             }
             return cvrStatics;
           }
