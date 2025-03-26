@@ -37,23 +37,11 @@
     -fx-border-color: #0078d7;
 }
 
-/* Label styles */
-.label {
-    -fx-text-fill: #333333;
-    -fx-padding: 5px 5px;
-}
-
 /* TextArea styles */
 .text-area {
     -fx-background-color: white;
-    -fx-border-color: #c4c4c4;
-    -fx-border-radius: 5px;
     -fx-background-radius: 5px;
     -fx-padding: 10px;
-}
-
-.text-area:focused {
-    -fx-border-color: #0078d7;
 }
 
 /* Table styles */
