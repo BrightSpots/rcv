@@ -705,8 +705,7 @@ class OutputWriter {
       csvPrinter.print("Tabulator Id"); // CastVoteRecord.getTabulatorId
       csvPrinter.print("Batch Id"); // CastVoteRecord.getSlice(TabulateBySlice.BATCH)
       csvPrinter.print("Vendor Id"); // CastVoteRecord.getSuppliedId
-      // CastVoteRecord.getSlice(ContestConfig.TabulateBySlice.PRECINCT)
-      csvPrinter.print("Precinct");
+      csvPrinter.print("Precinct"); // CastVoteRecord.getSlice(TabulateBySlice.PRECINCT)
       csvPrinter.print("Precinct Portion"); // CastVoteRecord.castVoteRecord.getPrecinctPortion()
 
       // rank 1 selection, rank 2 selection, ... rank maxRanks selection
