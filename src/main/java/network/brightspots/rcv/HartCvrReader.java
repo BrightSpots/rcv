@@ -125,8 +125,7 @@ class HartCvrReader extends BaseCvrReader {
             if (candidate.Code.equals(source.getUndeclaredWriteInLabel())) {
               candidate.Code = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             } else {
-              this.candidateCodesToCandidates.putIfAbsent(candidate.Code,
-                      candidate);
+              this.candidateCodesToCandidates.putIfAbsent(candidate.Code, candidate);
 
               if (!this.candidateCodesToCandidates.get(candidate.Code).Name
                       .equals(candidate.Name)) {
