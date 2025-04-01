@@ -174,21 +174,7 @@ final class Tabulator {
           currentRound,
           currentRound == 1 ? BigDecimal.ZERO : roundToResidualSurplus.get(currentRound - 1));
 
-      // The winning threshold in a standard multi-seat contest is based on the number of active
-      // votes in the first round.
-      // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
-      // on the number of active votes in the current round.
-      boolean shouldRecomputeThreshold;
-      if (config.getNumberOfWinners() > 1) {
-        // Multi-winner only computes threshold on round 1
-        shouldRecomputeThreshold = currentRound == 1;
-      } else {
-        // Single-Winner recomputes threshold on round 1 always,
-        // and on other rounds if First Round Determines Threshold is not set
-        shouldRecomputeThreshold =
-            !config.isFirstRoundDeterminesThresholdEnabled() || currentRound == 1;
-      }
-      if (shouldRecomputeThreshold) {
+      if (shouldRecomputeThreshold()) {
         calculateAndSetWinningThreshold(currentRoundTally, config.getMinimumVoteThreshold());
       } else {
         BigDecimal lastRoundThreshold = roundTallies.get(currentRound - 1).getWinningThreshold();
@@ -277,6 +263,36 @@ final class Tabulator {
       }
     }
     return winnerToRound.keySet();
+  }
+
+  private boolean shouldRecomputeThreshold() {
+    // The winning threshold in a standard multi-seat contest is based on the number of active
+    // votes in the first round.
+    // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
+    // on the number of active votes in the current round, unless:
+    // - The first round determines the threshold, in which case we only compute it once.
+    // - We're continuing until two candidates remain, in which case we stop recomputing the
+    //   threshold once a winner has been chosen.
+
+    if (config.getNumberOfWinners() > 1) {
+      // Multi-winner only computes threshold on round 1
+      return currentRound == 1;
+    }
+    if (currentRound == 1) {
+      // Single-Winner recomputes threshold on round 1 always
+      return true;
+    }
+    if (config.isFirstRoundDeterminesThresholdEnabled()) {
+      // If first round determines threshold, no other round will
+      return false;
+    }
+    if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
+      // If continue until two is enabled, the threshold is fixed once a winner is found.
+      return winnerToRound.isEmpty();
+    }
+
+    // Otherwise, it's normal IRV and we recompute the threshold every round
+    return true;
   }
 
   // log some basic info about the contest before starting tabulation
