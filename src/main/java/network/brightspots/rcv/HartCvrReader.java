@@ -120,15 +120,14 @@ class HartCvrReader extends BaseCvrReader {
           for (Option option : contest.Options) {
 
             //Can be null with some write-ins
-            String candidateNameClean = Objects.requireNonNullElse(option.Name, "");
-            Candidate candidate = new Candidate(candidateNameClean, option.Id);
+            Candidate candidate = new Candidate(option.Name, option.Id);
             if (candidate.Code.equals(source.getUndeclaredWriteInLabel())) {
               candidate.Code = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
             } else {
               this.candidateCodesToCandidates.putIfAbsent(candidate.Code, candidate);
 
-              if (!this.candidateCodesToCandidates.get(candidate.Code).Name
-                      .equals(candidate.Name)) {
+              if (!Objects.equals(this.candidateCodesToCandidates.get(candidate.Code).Name,
+                      candidate.Name)) {
                 // Some write-ins, when adjudicated, can have different or empty
                 // values for the option.Name field.
                 String message =
