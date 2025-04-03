@@ -892,6 +892,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("continue until two threshold freeze test")
+  void continueUntilTwoThresholdFreeze() {
+    runTabulationTest("continue_until_two_threshold_freeze");
+  }
+
+  @Test
   @DisplayName("first round determine threshold test")
   void firstRoundDeterminesThresholdTest() {
     runTabulationTest("first_round_determines_threshold_test");
