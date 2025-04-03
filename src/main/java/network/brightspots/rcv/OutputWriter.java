@@ -47,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
@@ -703,17 +704,18 @@ class OutputWriter {
       CSVFormat format = CSVFormat.DEFAULT.builder().setNullString("").build();
       csvPrinter = new CSVPrinter(writer, format);
       // print header:
-      // ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion, rank 1 selection,
-      // rank 2 selection, ... rank maxRanks selection
-      csvPrinter.print("Source Filepath");
-      csvPrinter.print("CVR Provider");
-      csvPrinter.print("Contest Id");
-      csvPrinter.print("Tabulator Id");
-      csvPrinter.print("Batch Id");
-      csvPrinter.print("Record Id");
-      csvPrinter.print("Precinct");
-      csvPrinter.print("Precinct Portion");
+      // RCTab CVR Id, ContestId, TabulatorId, BatchId, RecordId, Precinct, Precinct Portion,
+      csvPrinter.print("Source Filepath"); // CvrSource.getFilePath()
+      csvPrinter.print("CVR Provider"); // CvrSource.getProvider()
+      csvPrinter.print("Contest Id"); // CastVoteRecord.getContestId()
+      csvPrinter.print("RCTab CVR Id"); // CastVoteRecord.getId()
+      csvPrinter.print("Tabulator Id"); // CastVoteRecord.getTabulatorId
+      csvPrinter.print("Batch Id"); // CastVoteRecord.getSlice(TabulateBySlice.BATCH)
+      csvPrinter.print("Vendor Id"); // CastVoteRecord.getSuppliedId
+      csvPrinter.print("Precinct"); // CastVoteRecord.getSlice(TabulateBySlice.PRECINCT)
+      csvPrinter.print("Precinct Portion"); // CastVoteRecord.castVoteRecord.getPrecinctPortion()
 
+      // rank 1 selection, rank 2 selection, ... rank maxRanks selection
       int maxRank;
       if (config.isMaxRankingsSetToMaximum()) {
         maxRank = config.getNumDeclaredCandidates();
@@ -747,9 +749,10 @@ class OutputWriter {
         csvPrinter.print(currentSourceData.source.getFilePath());
         csvPrinter.print(currentSourceData.source.getProvider());
         csvPrinter.print(castVoteRecord.getContestId());
+        csvPrinter.print(castVoteRecord.getId());
         csvPrinter.print(castVoteRecord.getTabulatorId());
         csvPrinter.print(castVoteRecord.getSlice(TabulateBySlice.BATCH));
-        csvPrinter.print(castVoteRecord.getId());
+        csvPrinter.print(Objects.toString(castVoteRecord.getSuppliedId(), ""));
         csvPrinter.print(castVoteRecord.getSlice(ContestConfig.TabulateBySlice.PRECINCT));
         csvPrinter.print(castVoteRecord.getPrecinctPortion());
         printRankings(currentSourceData.source.getUndeclaredWriteInLabel(), maxRank,

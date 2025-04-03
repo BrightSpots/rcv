@@ -321,7 +321,8 @@ class DominionCvrReader extends BaseCvrReader {
       String computedId =
           Stream.of(tabulatorId, batchId, Integer.toString(recordId))
               .filter(s -> s != null && !s.isBlank())
-              .collect(Collectors.joining("|"));
+              // dashes are not escaped when writing to file e.g. CDF
+              .collect(Collectors.joining("-"));
 
       // filter out records which are not current and replace them with adjudicated ones
       HashMap adjudicatedData = (HashMap) session.get("Original");
