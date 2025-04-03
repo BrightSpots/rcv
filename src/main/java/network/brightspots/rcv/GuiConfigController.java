@@ -1751,7 +1751,11 @@ public class GuiConfigController implements Initializable {
                     tableViewCandidates.getItems().add(candidate);
                     successCount++;
                   } else {
-                    Logger.severe("Failed to load candidate \"%s\"!", candidate.getName());
+                    String errors = validationErrors.stream()
+                            .map(x -> x.toString())
+                            .collect(Collectors.joining(", "));
+                    Logger.warning("Autoloaded candidate %s but did not pass validation."
+                        + " (%s)", candidate, errors);
                   }
                 }
 

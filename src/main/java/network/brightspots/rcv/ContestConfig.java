@@ -440,7 +440,6 @@ class ContestConfig {
     Set<ValidationError> validationErrors = new HashSet<>();
     if (isNullOrBlank(candidate.getName())) {
       validationErrors.add(ValidationError.CANDIDATE_NAME_MISSING);
-      Logger.severe("A name is required for each candidate!");
     }
     return validationErrors;
   }
