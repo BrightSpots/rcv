@@ -163,6 +163,13 @@ class OutputWriter {
       if (isSlice()) {
         parts.add(sanitizeSliceWithoutCollisions(sliceId));
         parts.add(slice.toLowerString());
+        directory = Path.of(directory, "Tabulate by " + slice).toString();
+
+        try {
+          FileUtils.createOutputDirectory(directory);
+        } catch (FileUtils.UnableToCreateDirectoryException e) {
+          Logger.severe("Could not create directory %s: %s", directory, e.getMessage());
+        }
       }
       parts.add(outputType.getBasename());
 
@@ -361,7 +368,7 @@ class OutputWriter {
       sequentialId = config.getSequentialWinners().size() + 1;
     }
     return new AuditableFile(outputFileIdentifiers.getPath(
-            config.getOutputDirectory(), timestampString, sequentialId));
+            config.getOutputDirectory(timestampString), timestampString, sequentialId));
   }
 
   // create a results .csv file

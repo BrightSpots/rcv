@@ -39,6 +39,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import network.brightspots.rcv.OutputWriter.OutputFileIdentifiers;
 import network.brightspots.rcv.OutputWriter.OutputType;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
@@ -287,13 +288,23 @@ class TabulatorTests {
   private static void cleanOutputFolder(TabulatorSession session) {
     // Test passed so clean up test output folder
     File outputFolder = new File(session.getOutputPath());
-    File[] files = outputFolder.listFiles();
-    if (files != null) {
-      for (File file : files) {
-        if (file.getName().equals(".DS_Store")) {
+    Stack<File> dirsToDeleteIfEmpty = new Stack<>();
+    dirsToDeleteIfEmpty.add(outputFolder);
+
+    File[] fileArray = outputFolder.listFiles();
+    if (fileArray != null) {
+      List<File> files = new java.util.ArrayList<>(List.of(fileArray));
+
+      // Iterate over the list of files. As we encounter certain expected directories,
+      // files within those directories may be added to the files array.
+      for (int i = 0; i < files.size(); ++i) {
+        File file = files.get(i);
+        String filename = file.getName();
+
+        if (filename.equals(".DS_Store")) {
           continue;
         }
-        if (file.getName().endsWith(".lck")) {
+        if (filename.endsWith(".lck")) {
           continue;
         }
         if (!file.isDirectory()) {
@@ -323,9 +334,37 @@ class TabulatorTests {
           } catch (IOException exception) {
             Logger.severe("Error deleting file: %s\n%s", file.getAbsolutePath(), exception);
           }
+        } else {
+          dirsToDeleteIfEmpty.add(file);
+          Logger.info(file.getName());
+          if (filename.endsWith(" Checksums")
+                  || filename.equals("Log")
+                  || filename.equals("Tabulate by Batch")
+                  || filename.equals("Tabulate by Precinct")) {
+            File[] subdirFiles = file.listFiles();
+            if (subdirFiles != null) {
+              files.addAll(List.of(subdirFiles));
+            }
+          }
         }
       }
     }
+
+
+    // Clean up empty directories
+    while (!dirsToDeleteIfEmpty.isEmpty()) {
+      File dir = dirsToDeleteIfEmpty.pop();
+      Logger.info(dir.getName());
+      File[] listOfFiles = dir.listFiles();
+      if (listOfFiles == null || listOfFiles.length == 0) {
+        try {
+          Files.delete(dir.toPath());
+        } catch (IOException exception) {
+          Logger.severe("Error deleting directory: %s\n%s", dir.getAbsolutePath(), exception);
+        }
+      }
+    }
+
     Logger.info("Test complete.");
   }
 
@@ -370,8 +409,9 @@ class TabulatorTests {
       String timestampString,
       Integer sequentialId,
       boolean onlyCheckIfExpectedFileExists) {
+    String resultsDir = config.getOutputDirectory(timestampString);
     String actualOutputPath = actualOutputFileIdentifiers.getPath(
-          config.getOutputDirectory(), timestampString, sequentialId).toAbsolutePath().toString();
+          resultsDir, timestampString, sequentialId).toAbsolutePath().toString();
     String expectedPath = actualOutputFileIdentifiers.getPath(getTestDirectory(stem).toString(),
             stem, "expected", sequentialId).toString();
 
@@ -396,7 +436,7 @@ class TabulatorTests {
    */
   private static void compareExtendedSummaryToSummary(
           ContestConfig config, String timestampString, Integer sequentialId) {
-    String dir = config.getOutputDirectory();
+    String dir = config.getOutputDirectory(timestampString);
     String summaryPath = new OutputFileIdentifiers(OutputType.SUMMARY_CSV).getPath(
             dir, timestampString, sequentialId).toAbsolutePath().toString();
     String detailedPath = new OutputFileIdentifiers(OutputType.DETAILED_CSV).getPath(
