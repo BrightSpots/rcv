@@ -2,9 +2,9 @@
   "@type" : "CVR.CastVoteRecordReport",
   "CVR" : [ {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "1",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_1_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_1_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -39,7 +39,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-1-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_1_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -74,7 +74,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-1-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_1_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -109,7 +109,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-1-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_1_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -144,13 +144,13 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-1-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_1_-round-3",
     "ElectionId" : "election-001"
   }, {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "2",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_2_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_2_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -199,7 +199,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-2-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_2_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -248,7 +248,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-2-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_2_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -297,7 +297,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-2-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_2_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -346,13 +346,13 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-2-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_2_-round-3",
     "ElectionId" : "election-001"
   }, {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "3",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_3_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_3_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -401,7 +401,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-3-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_3_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -450,7 +450,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-3-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_3_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -499,7 +499,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-3-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_3_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -548,13 +548,13 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-3-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_3_-round-3",
     "ElectionId" : "election-001"
   }, {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "4",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_4_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-4",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_4_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -603,7 +603,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-4-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_4_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -652,7 +652,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-4-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_4_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -701,7 +701,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-4-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_4_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -750,13 +750,13 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-4-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_4_-round-3",
     "ElectionId" : "election-001"
   }, {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "5",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_5_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-5",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_5_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -805,7 +805,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-5-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_5_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -854,7 +854,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-5-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_5_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -903,7 +903,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-5-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_5_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -952,13 +952,13 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-5-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_5_-round-3",
     "ElectionId" : "election-001"
   }, {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "6",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_6_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-6",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_6_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1007,7 +1007,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-6-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_6_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1056,7 +1056,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-6-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_6_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1105,7 +1105,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-6-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_6_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1154,13 +1154,13 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-6-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_6_-round-3",
     "ElectionId" : "election-001"
   }, {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "7",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_7_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-7",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_7_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1209,7 +1209,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-7-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_7_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1258,7 +1258,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-7-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_7_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1307,7 +1307,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-7-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_7_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1356,13 +1356,13 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-7-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_7_-round-3",
     "ElectionId" : "election-001"
   }, {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "8",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_8_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-8",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_8_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1401,7 +1401,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-8-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_8_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1440,7 +1440,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-8-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_8_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1479,7 +1479,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-8-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_8_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1518,417 +1518,13 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-8-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_8_-round-3",
     "ElectionId" : "election-001"
   }, {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "9",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_9_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-9",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "original"
-    }, {
-      "@id" : "ballot-9-round-1",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-9-round-2",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-9-round-3",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    } ],
-    "CurrentSnapshotId" : "ballot-9-round-3",
-    "ElectionId" : "election-001"
-  }, {
-    "@type" : "CVR",
-    "BallotPrePrintedId" : "10",
-    "CVRSnapshot" : [ {
-      "@id" : "ballot-10",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "original"
-    }, {
-      "@id" : "ballot-10-round-1",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-10-round-2",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-10-round-3",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    } ],
-    "CurrentSnapshotId" : "ballot-10-round-3",
-    "ElectionId" : "election-001"
-  }, {
-    "@type" : "CVR",
-    "BallotPrePrintedId" : "11",
-    "CVRSnapshot" : [ {
-      "@id" : "ballot-11",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_9_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -1977,7 +1573,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-11-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_9_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -2026,7 +1622,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-11-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_9_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -2075,7 +1671,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-11-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_9_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -2112,208 +1708,6 @@
         }, {
           "@type" : "CVR.CVRContestSelection",
           "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    } ],
-    "CurrentSnapshotId" : "ballot-11-round-3",
-    "ElectionId" : "election-001"
-  }, {
-    "@type" : "CVR",
-    "BallotPrePrintedId" : "12",
-    "CVRSnapshot" : [ {
-      "@id" : "ballot-12",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "original"
-    }, {
-      "@id" : "ballot-12-round-1",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-12-round-2",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 4
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-12-round-3",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -2326,297 +1720,13 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-12-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_9_-round-3",
     "ElectionId" : "election-001"
   }, {
     "@type" : "CVR",
-    "BallotPrePrintedId" : "13",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_10_",
     "CVRSnapshot" : [ {
-      "@id" : "ballot-13",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "original"
-    }, {
-      "@id" : "ballot-13-round-1",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-13-round-2",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-13-round-3",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_b_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    } ],
-    "CurrentSnapshotId" : "ballot-13-round-3",
-    "ElectionId" : "election-001"
-  }, {
-    "@type" : "CVR",
-    "BallotPrePrintedId" : "14",
-    "CVRSnapshot" : [ {
-      "@id" : "ballot-14",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "unknown",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "original"
-    }, {
-      "@id" : "ballot-14-round-1",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-14-round-2",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    }, {
-      "@id" : "ballot-14-round-3",
-      "@type" : "CVR.CVRSnapshot",
-      "CVRContest" : [ {
-        "@type" : "CVR.CVRContest",
-        "CVRContestSelection" : [ {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_d_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 1
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_c_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "no",
-            "NumberVotes" : 1,
-            "Rank" : 2
-          } ]
-        }, {
-          "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-candidate_a_name",
-          "SelectionPosition" : [ {
-            "@type" : "CVR.SelectionPosition",
-            "HasIndication" : "yes",
-            "IsAllocable" : "yes",
-            "NumberVotes" : 1,
-            "Rank" : 3
-          } ]
-        } ],
-        "ContestId" : "contest-001"
-      } ],
-      "Type" : "interpreted"
-    } ],
-    "CurrentSnapshotId" : "ballot-14-round-3",
-    "ElectionId" : "election-001"
-  }, {
-    "@type" : "CVR",
-    "BallotPrePrintedId" : "15",
-    "CVRSnapshot" : [ {
-      "@id" : "ballot-15",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_10_",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -2665,7 +1775,7 @@
       } ],
       "Type" : "original"
     }, {
-      "@id" : "ballot-15-round-1",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_10_-round-1",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -2714,7 +1824,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-15-round-2",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_10_-round-2",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -2763,7 +1873,7 @@
       } ],
       "Type" : "interpreted"
     }, {
-      "@id" : "ballot-15-round-3",
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_10_-round-3",
       "@type" : "CVR.CVRSnapshot",
       "CVRContest" : [ {
         "@type" : "CVR.CVRContest",
@@ -2812,7 +1922,897 @@
       } ],
       "Type" : "interpreted"
     } ],
-    "CurrentSnapshotId" : "ballot-15-round-3",
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_10_-round-3",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_11_",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_11_",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_11_-round-1",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_11_-round-2",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_11_-round-3",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    } ],
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_11_-round-3",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_12_",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_12_",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_12_-round-1",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_12_-round-2",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_12_-round-3",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    } ],
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_12_-round-3",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_13_",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_13_",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_13_-round-1",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_13_-round-2",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_13_-round-3",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    } ],
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_13_-round-3",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_14_",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_14_",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_14_-round-1",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_14_-round-2",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_14_-round-3",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    } ],
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_14_-round-3",
+    "ElectionId" : "election-001"
+  }, {
+    "@type" : "CVR",
+    "BallotPrePrintedId" : "test_set_7_duplicate_skip_to_next_cvr.json_15_",
+    "CVRSnapshot" : [ {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_15_",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "unknown",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "original"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_15_-round-1",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_15_-round-2",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    }, {
+      "@id" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_15_-round-3",
+      "@type" : "CVR.CVRSnapshot",
+      "CVRContest" : [ {
+        "@type" : "CVR.CVRContest",
+        "CVRContestSelection" : [ {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_a_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "yes",
+            "NumberVotes" : 1,
+            "Rank" : 1
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_b_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 2
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_d_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 3
+          } ]
+        }, {
+          "@type" : "CVR.CVRContestSelection",
+          "ContestSelectionId" : "cs-candidate_c_name",
+          "SelectionPosition" : [ {
+            "@type" : "CVR.SelectionPosition",
+            "HasIndication" : "yes",
+            "IsAllocable" : "no",
+            "NumberVotes" : 1,
+            "Rank" : 4
+          } ]
+        } ],
+        "ContestId" : "contest-001"
+      } ],
+      "Type" : "interpreted"
+    } ],
+    "CurrentSnapshotId" : "ballot-test_set_7_duplicate_skip_to_next_cvr.json_15_-round-3",
     "ElectionId" : "election-001"
   } ],
   "Election" : [ {
@@ -2855,7 +2855,7 @@
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2020-10-03T14:25:09-07:00",
+  "GeneratedDate" : "2025-01-21T04:25:15-05:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
     "@type" : "GpUnit",

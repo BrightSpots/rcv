@@ -23,6 +23,7 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -538,7 +539,9 @@ class ContestConfig {
         String homeDirectory = new File(System.getProperty("user.home")).getCanonicalPath();
         // Strip the username off the file path to get the root Users directory path
         String rootUsersDirectory = homeDirectory.substring(0, homeDirectory.lastIndexOf('\\'));
-        String outputDirectory = new File(getOutputDirectory()).getCanonicalPath();
+        // Since we're not putting anything in the output results directory, just use "sample" to
+        // show we're just using it to check the file location.
+        String outputDirectory = new File(getOutputDirectory("sample")).getCanonicalPath();
         if (outputDirectory.startsWith(rootUsersDirectory)) {
           validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY);
           Logger.severe(
@@ -971,8 +974,8 @@ class ContestConfig {
   }
 
   // path to directory where output files should be written
-  String getOutputDirectory() {
-    return resolveConfigPath(getOutputDirectoryRaw());
+  String getOutputDirectory(String timestamp) {
+    return Path.of(resolveConfigPath(getOutputDirectoryRaw()), timestamp + " Results").toString();
   }
 
   private String getTabulatorVersion() {

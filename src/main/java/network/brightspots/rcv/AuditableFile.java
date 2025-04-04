@@ -37,7 +37,20 @@ final class AuditableFile extends File {
     Logger.info("File %s written with hash %s".formatted(getAbsolutePath(), hash));
 
     // Write hash to hash file
-    File hashFile = new File(getAbsolutePath() + ".hash");
+    String basename = getName();
+    String directory = getParent();
+    String parentDirectoryName = new File(directory).getName();
+    String subdir = Path.of(directory, parentDirectoryName + " Checksums").toString();
+    String hashFilePath = Path.of(subdir, basename + ".hash").toString();
+    File hashFile = new File(hashFilePath);
+
+    // Create subdir if it doesn't exist
+    try {
+      FileUtils.createOutputDirectory(subdir);
+    } catch (FileUtils.UnableToCreateDirectoryException e) {
+      Logger.severe("Could not create directory %s: %s", subdir, e.getMessage());
+    }
+
     writeStringToFile(hashFile, "sha512: " + hash);
 
     // Make both file and its hash file read-only

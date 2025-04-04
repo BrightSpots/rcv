@@ -117,12 +117,18 @@ class Logger {
       throws IOException {
     // log file name is: outputFolder + timestamp + log index
     // FileHandler requires % to be encoded as %%.  %g is the log index
+    String logDir = Path.of(outputFolder, "Log").toString();
     tabulationLogPattern =
         Paths.get(
-                outputFolder.replace("%", "%%"),
+                logDir.replace("%", "%%"),
                 String.format("%s_audit_%%g.log", timestampString))
             .toAbsolutePath()
             .toString();
+    try {
+      FileUtils.createOutputDirectory(logDir);
+    } catch (FileUtils.UnableToCreateDirectoryException e) {
+      Logger.severe("Could not create directory %s: %s", logDir, e.getMessage());
+    }
 
     tabulationHandler =
         new FileHandler(
