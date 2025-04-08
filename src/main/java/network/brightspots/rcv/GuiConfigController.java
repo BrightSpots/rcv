@@ -1792,7 +1792,11 @@ public class GuiConfigController implements Initializable {
                     tableViewCandidates.getItems().add(candidate);
                     successCount++;
                   } else {
-                    Logger.severe("Failed to load candidate \"%s\"!", candidate.getName());
+                    String errors = validationErrors.stream()
+                            .map(x -> x.toString())
+                            .collect(Collectors.joining(", "));
+                    Logger.warning("Autoloaded candidate %s but did not pass validation."
+                        + " (%s)", candidate, errors);
                   }
                 }
 
@@ -1952,8 +1956,13 @@ public class GuiConfigController implements Initializable {
               cvrStatics = session.parseAndCountCastVoteRecords(this::updateProgress);
               succeeded();
             } catch (TabulatorSession.CastVoteRecordGenericParseException e) {
-              Logger.severe("Failed to read CVRs: %s", e.getMessage());
+              String message = "Failed to read CVRs";
+              if (!isNullOrBlank(e.getMessage())) {
+                message += ": " + e.getMessage();
+              }
+              Logger.severe(message);
               failed();
+
             }
             svc.outputDirectory = session.getOutputPath();
             return cvrStatics;
