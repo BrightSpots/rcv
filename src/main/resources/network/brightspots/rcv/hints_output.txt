@@ -4,6 +4,8 @@ Tell the tabulator where results files go and what additional results files you 
 
 Output directory: The location where results files will go. If no value (or a relative path, like "output") is supplied, the location where the config file is saved will be used as the base directory. Absolute paths, like "C:\output" work too.
 
-Tabulate by Precinct: Produce round-by-round results at the precinct level. Results are how ballots at the precinct level transferred in the contest as a whole, not a simulated round-by-round count in the precinct. Requires precinct information in CVR Files tab.
+Tabulate by Precinct: Produce round-by-round results at the precinct level. Round-by-round results file for each precinct is written to a Tabulate By Precinct folder within the configured output directory. Elect/Eliminate decisions are from the full contest.
+
+Tabulate by Batch: Produce round-by-round results at the batch level. Round-by-round results file for each batch are written to a Tabulate by Batch folder within the configured output directory. Elect/Eliminate decisions are from the full contest.
 
 Generate a CDF JSON: Produce a VVSG common data format JSON file of the CVR.
