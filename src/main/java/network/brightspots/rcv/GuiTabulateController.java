@@ -219,7 +219,6 @@ public class GuiTabulateController {
             openResultsButton.setText("Close and View Errors");
             setButtonsEnabled(false, false, true);
           } else {
-            openResultsButton.setText("Check Ballot Counts");
             setButtonsEnabled(true, true, false);
             tabulateButton.setText("Tabulate " + String.format("%,d", data.numCvrs()) + " ballots");
 
