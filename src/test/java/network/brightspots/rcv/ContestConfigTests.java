@@ -58,9 +58,9 @@ class ContestConfigTests {
     // jackson-core to address.
     // https://github.com/FasterXML/jackson-core/issues/1050
     // Once that issue is addressed, the first and third tests below should flip from False to True
-    assertFalse(isVersionNewer("1.4.0-beta", "1.4.0-alpha"));
+    assertTrue(isVersionNewer("1.4.0-beta", "1.4.0-alpha"));
     assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0-beta"));
-    assertFalse(isVersionNewer("1.4.0", "1.4.0-alpha"));
+    assertTrue(isVersionNewer("1.4.0", "1.4.0-alpha"));
     assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0"));
   }
 }
