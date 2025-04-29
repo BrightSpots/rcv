@@ -2,11 +2,11 @@ plugins {
     id "application"
     id "checkstyle"
     // Latest version at: https://github.com/spotbugs/spotbugs-gradle-plugin/tags
-    id "com.github.spotbugs" version "5.0.14"
+    id "com.github.spotbugs" version "6.1.10"
     id "idea"
     id "java-library"
     // Latest version at: https://github.com/beryx/badass-jlink-plugin/tags
-    id "org.beryx.jlink" version "3.0.1"
+    id "org.beryx.jlink" version "3.1.1"
     // Latest version at: https://github.com/openjfx/javafx-gradle-plugin/tags
     id "org.openjfx.javafxplugin" version "0.0.14"
 }
@@ -16,22 +16,22 @@ repositories {
 }
 
 dependencies {
-    implementation 'commons-cli:commons-cli:1.5.0'
-    implementation 'org.apache.commons:commons-csv:1.10.0'
-    implementation 'org.apache.poi:poi-ooxml:5.2.3'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
-    implementation "com.github.spotbugs:spotbugs:4.8.3"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    implementation 'commons-cli:commons-cli:1.9.0'
+    implementation 'org.apache.commons:commons-csv:1.14.0'
+    implementation 'org.apache.poi:poi-ooxml:5.4.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.0'
+    implementation "com.github.spotbugs:spotbugs:4.9.3"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.13.0-M2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.13.0-M2'
 }
 
 // ### Application plugin settings
 application {
-    mainModule = "${moduleName}"
-    mainClass = "${moduleName}.Main"
+    mainModule = "network.brightspots.rcv"
+    mainClass = "network.brightspots.rcv.Main"
 }
 
 // Required to accept a name and tiebreak interactively via CLI
@@ -64,7 +64,7 @@ System.setProperty("org.checkstyle.google.suppressionfilter.config",
 
 spotbugs {
     // Latest version at: https://github.com/spotbugs/spotbugs/tags
-    toolVersion = '4.8.3'
+    toolVersion = '4.9.3'
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
 
@@ -80,15 +80,16 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
     }
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
+
 test {
-    moduleOptions {
-        addExports = [
-                "org.junit.platform.commons/org.junit.platform.commons.util"   : "ALL-UNNAMED",
-                "org.junit.platform.commons/org.junit.platform.commons.logging": "ALL-UNNAMED"
-        ]
-    }
+    jvmArgs += [
+        '--add-exports', 'org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED',
+        '--add-exports', 'org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED'
+    ]
     maxHeapSize = "2056m"
     useJUnitPlatform()
     testLogging {
@@ -99,7 +100,7 @@ test {
 // ### JavaFX plugin settings
 javafx {
     // Latest version here: https://gluonhq.com/products/javafx/
-    version = "21.0.4"
+    version = "21.0.1"
     modules = ["javafx.base", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
@@ -241,6 +242,12 @@ tasks.jlink.doLast {
 tasks.withType(AbstractArchiveTask) {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
-    dirMode = 0755
-    fileMode = 0644
+
+    dirPermissions {
+        unix(0755)
+    }
+
+    filePermissions {
+        unix(0644)
+    }
 }
