@@ -25,6 +25,8 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,13 +47,14 @@ class DominionCvrReader extends BaseCvrReader {
   private static final String CONTEST_MANIFEST = "ContestManifest.json";
   private static final String CVR_EXPORT = "CvrExport.json";
   private static final String CVR_EXPORT_PATTERN = "CvrExport_%d.json";
+  private static final int EXCLUDE_CONTEST_CONDITION_ID = 7;
   // map of precinct ID to precinct description
   private Map<Integer, String> precincts;
   // map of precinct portion ID to precinct portion description
   private Map<Integer, String> precinctPortions;
   // map of contest ID to Contest data
   private Map<String, Contest> contests;
-  private List<Candidate> candidates;
+  private Map<String, Candidate> candidateCodesToCandidates;
 
   DominionCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
@@ -100,9 +103,9 @@ class DominionCvrReader extends BaseCvrReader {
     return precinctsById;
   }
 
-  // returns list of Candidate objects parsed from CandidateManifest.json
-  private static List<Candidate> getCandidates(String candidatePath) {
-    ArrayList<Candidate> candidates = new ArrayList<>();
+  // returns a map of Codes to Candidate objects parsed from CandidateManifest.json
+  private Map<String, Candidate> getCandidates(String candidatePath) {
+    Map<String, Candidate> candidateCodesToCandidates = new HashMap<>();
     try {
       HashMap json = JsonParser.readFromFile(candidatePath, HashMap.class);
       ArrayList candidateList = (ArrayList) json.get("List");
@@ -112,14 +115,17 @@ class DominionCvrReader extends BaseCvrReader {
         Integer id = (Integer) candidateMap.get("Id");
         String code = id.toString();
         String contestId = candidateMap.get("ContestId").toString();
+        if (!source.getContestId().equals(contestId)) {
+          continue;
+        }
         Candidate newCandidate = new Candidate(name, code, contestId);
-        candidates.add(newCandidate);
+        candidateCodesToCandidates.put(code, newCandidate);
       }
     } catch (Exception exception) {
       Logger.severe("Error parsing candidate manifest:\n%s", exception);
-      candidates = null;
+      candidateCodesToCandidates = null;
     }
-    return candidates;
+    return candidateCodesToCandidates;
   }
 
   @Override
@@ -131,6 +137,16 @@ class DominionCvrReader extends BaseCvrReader {
   // them to the input list
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
+    loadManifests();
+
+    gatherCvrsForContest(castVoteRecords, source.getContestId());
+    if (castVoteRecords.isEmpty()) {
+      Logger.severe("No cast vote record data found!");
+      throw new CvrParseException();
+    }
+  }
+
+  private void loadManifests() throws CvrParseException {
     // read metadata files for precincts, precinct portions, contest, and candidates
 
     // Precinct data does not exist for earlier versions of Dominion (only precinct portion)
@@ -157,15 +173,9 @@ class DominionCvrReader extends BaseCvrReader {
       throw new CvrParseException();
     }
     Path candidatePath = Paths.get(cvrPath, CANDIDATE_MANIFEST);
-    this.candidates = getCandidates(candidatePath.toString());
-    if (this.candidates == null) {
+    this.candidateCodesToCandidates = getCandidates(candidatePath.toString());
+    if (this.candidateCodesToCandidates == null) {
       Logger.severe("No candidate data found!");
-      throw new CvrParseException();
-    }
-    // parse the cvr file(s)
-    gatherCvrsForContest(castVoteRecords, source.getContestId());
-    if (castVoteRecords.isEmpty()) {
-      Logger.severe("No cast vote record data found!");
       throw new CvrParseException();
     }
   }
@@ -188,22 +198,22 @@ class DominionCvrReader extends BaseCvrReader {
       throws CastVoteRecord.CvrParseException {
     // build a lookup map to optimize CVR parsing
     Map<String, Set<String>> contestIdToCandidateNames = new HashMap<>();
-    for (Candidate candidate : this.candidates) {
-      Set<String> candidates;
+    for (Candidate candidate : this.candidateCodesToCandidates.values()) {
+      Set<String> candidateNames;
       if (contestIdToCandidateNames.containsKey(candidate.getContestId())) {
-        candidates = contestIdToCandidateNames.get(candidate.getContestId());
+        candidateNames = contestIdToCandidateNames.get(candidate.getContestId());
       } else {
-        candidates = new HashSet<>();
+        candidateNames = new HashSet<>();
       }
-      candidates.add(config.getNameForCandidate(candidate.getCode()));
-      contestIdToCandidateNames.put(candidate.getContestId(), candidates);
+      candidateNames.add(config.getNameForCandidate(candidate.getCode()));
+      contestIdToCandidateNames.put(candidate.getContestId(), candidateNames);
     }
 
     // Check each candidate exists in the contest
     for (CastVoteRecord cvr : castVoteRecords) {
       String contestId = cvr.getContestId();
-      Set<String> candidates = contestIdToCandidateNames.get(contestId);
-      if (candidates == null) {
+      Set<String> candidateNames = contestIdToCandidateNames.get(contestId);
+      if (candidateNames == null) {
         Logger.severe("Contest ID '%s' had no candidates!", contestId);
         throw new CastVoteRecord.CvrParseException();
       }
@@ -216,7 +226,7 @@ class DominionCvrReader extends BaseCvrReader {
           if (candidateId.equals(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
             continue;
           }
-          if (!candidates.contains(candidateName)) {
+          if (!candidateNames.contains(candidateName)) {
             Logger.severe(
                 "Candidate ID '%s' is not valid for contest '%s'!", candidateName, contestId);
             throw new CastVoteRecord.CvrParseException();
@@ -226,34 +236,67 @@ class DominionCvrReader extends BaseCvrReader {
     }
   }
 
+  // The Candidate Autoload looks only at the CVR file(s) and not the manifest files, so
+  // it doesn't know about the mapping between a code and the candidate's name. This function
+  // addresses that discrepancy, while also being much faster than actually reading each ballot.
+  @Override
+  public Set<RawContestConfig.Candidate> gatherUnknownCandidates(
+          List<CastVoteRecord> castVoteRecords) {
+    try {
+      loadManifests();
+    } catch (CvrParseException exception) {
+      Logger.severe("Error loading manifest data:\n%s", exception);
+      return new HashSet<>();
+    }
+
+    Set<String> knownNames = config.getCandidateNames();
+
+    // Return the candidate codes that are not in the knownNames set
+    return candidateCodesToCandidates.entrySet().stream()
+            .filter(entry -> !knownNames.contains(entry.getValue().name))
+            .map(entry -> new RawContestConfig.Candidate(entry.getValue().name, entry.getKey()))
+            .collect(Collectors.toSet());
+  }
+
   // parse the CVR file or files into a List of CastVoteRecords for tabulation
   private void gatherCvrsForContest(List<CastVoteRecord> castVoteRecords, String contestIdToLoad) {
     try {
       Path singleCvrPath = Paths.get(cvrPath, CVR_EXPORT);
-      Path firstCvrPath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, 0));
+
       if (singleCvrPath.toFile().exists()) {
         HashMap json = JsonParser.readFromFile(singleCvrPath.toString(), HashMap.class);
         parseCvrFile(json, castVoteRecords, contestIdToLoad);
-      } else if (firstCvrPath.toFile().exists()) {
+      } else {
+        // We are expecting multiple CvrExport_N.json files
+        String regexPath = CVR_EXPORT_PATTERN.replaceAll("%d", "\\\\d+");
+        File cvrDirectory = new File(cvrPath);
+        File[] matchedCvrFileArray = cvrDirectory.listFiles((dir, name) -> name.matches(regexPath));
+
+        if (matchedCvrFileArray == null || matchedCvrFileArray.length == 0) {
+          String errorMessage = "Error parsing Dominion cast vote records:"
+                  + " CvrExport.json file(s) not located";
+          throw new FileNotFoundException(errorMessage);
+        }
+
+        List<File> matchedCvrFiles = Arrays.asList(matchedCvrFileArray);
+        matchedCvrFiles.sort(Comparator.comparing(File::getAbsolutePath));
+
         int recordsParsed = 0;
+        int filesParsed = 0;
         int recordsParsedAtLastLog = 0;
-        int cvrSequence = 0;
-        Path cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
-        while (cvrFilePath.toFile().exists()) {
-          HashMap json = JsonParser.readFromFile(cvrFilePath.toString(), HashMap.class);
+
+        for (File file : matchedCvrFiles) {
+          HashMap json = JsonParser.readFromFile(file.toString(), HashMap.class);
           recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad);
+          filesParsed++;
+
           if (recordsParsed - recordsParsedAtLastLog > 50000) {
-            Logger.info("Parsed %d records from %d files", recordsParsed, cvrSequence);
+            Logger.info("Parsed %d records from %d files", recordsParsed, filesParsed);
             recordsParsedAtLastLog = recordsParsed;
           }
-          cvrSequence++;
-          cvrFilePath = Paths.get(cvrPath, String.format(CVR_EXPORT_PATTERN, cvrSequence));
         }
-      } else {
-        throw new FileNotFoundException(
-            String.format(
-                "Error parsing cast vote record: neither %s nor %s exists",
-                singleCvrPath, firstCvrPath));
+
+        Logger.info("Parsed %d total records from %d total files", recordsParsed, filesParsed);
       }
     } catch (FileNotFoundException | CvrParseException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
@@ -278,7 +321,8 @@ class DominionCvrReader extends BaseCvrReader {
       String computedId =
           Stream.of(tabulatorId, batchId, Integer.toString(recordId))
               .filter(s -> s != null && !s.isBlank())
-              .collect(Collectors.joining("|"));
+              // dashes are not escaped when writing to file e.g. CDF
+              .collect(Collectors.joining("-"));
 
       // filter out records which are not current and replace them with adjudicated ones
       HashMap adjudicatedData = (HashMap) session.get("Original");
@@ -338,6 +382,10 @@ class DominionCvrReader extends BaseCvrReader {
             Logger.severe("Unknown contest ID '%s' found while parsing CVR!", contestId);
             throw new CvrParseException();
           }
+          ArrayList outstackConditionIds = (ArrayList) contest.get("OutstackConditionIds");
+          if (outstackConditionIds.contains(EXCLUDE_CONTEST_CONDITION_ID)) {
+            continue;
+          }
           ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
           // marks is an array of rankings
           ArrayList marks = (ArrayList) contest.get("Marks");
@@ -357,9 +405,16 @@ class DominionCvrReader extends BaseCvrReader {
             rankings.add(ranking);
           }
           // create the new cvr
-          CastVoteRecord newCvr =
-              new CastVoteRecord(contestId, tabulatorId, batchId, suppliedId,
-                      computedId, precinct, precinctPortion, rankings);
+          CastVoteRecord newCvr = new CastVoteRecord(
+              contestId,
+              tabulatorId,
+              batchId,
+              suppliedId,
+              computedId,
+              precinct,
+              precinctPortion,
+              usesLastAllowedRanking(rankings, contestId),
+              rankings);
           castVoteRecords.add(newCvr);
         }
       }

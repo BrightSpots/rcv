@@ -133,6 +133,8 @@ public class GuiConfigController implements Initializable {
   private File selectedFile;
   // GUI is currently busy validating or tabulating
   private boolean guiIsBusy;
+  // The last tabulator session's output directory
+  private String lastTabulatorSessionOutputDirectory;
 
   @FXML
   private ListView<Label> textAreaStatus;
@@ -389,7 +391,7 @@ public class GuiConfigController implements Initializable {
 
   private void loadFile(File fileToLoad, boolean silentMode) {
     // set the user dir for future loads
-    FileUtils.setUserDirectory(fileToLoad.getParent());
+    FileUtils.setInitialDirectory(fileToLoad.getParent());
     // load and cache the config object
     GuiContext.getInstance()
         .setConfig(ContestConfig.loadContestConfig(fileToLoad.getAbsolutePath(), silentMode));
@@ -411,7 +413,7 @@ public class GuiConfigController implements Initializable {
     if (checkForSaveAndContinue()) {
       FileChooser fc = new FileChooser();
       if (selectedFile == null) {
-        fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+        fc.setInitialDirectory(new File(FileUtils.getInitialDirectory()));
       } else {
         fc.setInitialDirectory(new File(selectedFile.getParent()));
       }
@@ -432,7 +434,7 @@ public class GuiConfigController implements Initializable {
   private File getSaveFile(Stage stage) {
     FileChooser fc = new FileChooser();
     if (selectedFile == null) {
-      fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+      fc.setInitialDirectory(new File(FileUtils.getInitialDirectory()));
     } else {
       fc.setInitialDirectory(new File(selectedFile.getParent()));
       fc.setInitialFileName(selectedFile.getName());
@@ -470,7 +472,7 @@ public class GuiConfigController implements Initializable {
 
   private void saveFile(File fileToSave) {
     // set save file parent folder as the new default user folder
-    FileUtils.setUserDirectory(fileToSave.getParent());
+    FileUtils.setInitialDirectory(fileToSave.getParent());
     // create a rawConfig object from GUI content and serialize it as json
     JsonParser.writeToFile(fileToSave, createRawContestConfig());
     // Reload to keep GUI fields updated in case invalid values are replaced during save process
@@ -509,7 +511,7 @@ public class GuiConfigController implements Initializable {
   public void menuItemValidateClicked() {
     setGuiIsBusy(true);
     ContestConfig config =
-        ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
+        ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getInitialDirectory());
     ValidatorService service = new ValidatorService(config);
     setUpAndStartService(service);
   }
@@ -519,8 +521,9 @@ public class GuiConfigController implements Initializable {
    */
   public void menuItemTabulateClicked() {
     setGuiIsBusy(true);
-    ContestConfig config =
-            ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
+    ContestConfig config = ContestConfig.loadContestConfig(
+            createRawContestConfig(),
+            FileUtils.getInitialDirectory());
     ValidatorService service = new ValidatorService(config);
     service.setOnSucceeded(
         event -> {
@@ -547,9 +550,9 @@ public class GuiConfigController implements Initializable {
    * Tabulate whatever is currently entered into the GUI.
    * Assumes GuiTabulateController checked all prerequisites.
    */
-  public Service<LoadedCvrData> parseAndCountCastVoteRecords(String configPath) {
+  public GenericService<LoadedCvrData> parseAndCountCastVoteRecords(String configPath) {
     setGuiIsBusy(true);
-    Service<LoadedCvrData> service = new ReadCastVoteRecordsService(configPath);
+    GenericService<LoadedCvrData> service = new ReadCastVoteRecordsService(configPath);
     setUpAndStartService(service);
     return service;
   }
@@ -588,10 +591,18 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private <T> void setUpAndStartService(Service<T> service) {
-    service.setOnSucceeded(event -> setGuiIsBusy(false));
-    service.setOnCancelled(event -> setGuiIsBusy(false));
-    service.setOnFailed(event -> setGuiIsBusy(false));
+  private <T> void sessionDone(GenericService<T> service) {
+    setGuiIsBusy(false);
+
+    if (service.hasSetOutputDirectory()) {
+      this.lastTabulatorSessionOutputDirectory = service.getOutputDirectory();
+    }
+  }
+
+  private <T> void setUpAndStartService(GenericService<T> service) {
+    service.setOnSucceeded(event -> sessionDone(service));
+    service.setOnCancelled(event -> sessionDone(service));
+    service.setOnFailed(event -> sessionDone(service));
     service.start();
   }
 
@@ -658,7 +669,7 @@ public class GuiConfigController implements Initializable {
    */
   public void buttonOutputDirectoryClicked() {
     DirectoryChooser dc = new DirectoryChooser();
-    dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+    dc.setInitialDirectory(new File(FileUtils.getInitialDirectory()));
     dc.setTitle("Output Directory");
     File outputDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
     if (outputDirectory != null) {
@@ -675,7 +686,7 @@ public class GuiConfigController implements Initializable {
 
   private List<File> chooseFile(Provider provider, ExtensionFilter filter) {
     FileChooser fc = new FileChooser();
-    fc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+    fc.setInitialDirectory(new File(FileUtils.getInitialDirectory()));
     fc.getExtensionFilters().add(filter);
     fc.setTitle("Select " + provider + " Cast Vote Record Files");
     return fc.showOpenMultipleDialog(GuiContext.getInstance().getMainWindow());
@@ -696,7 +707,7 @@ public class GuiConfigController implements Initializable {
           chooseFile(provider, new ExtensionFilter("CSV file(s)", "*.csv"));
       case DOMINION, HART -> {
         DirectoryChooser dc = new DirectoryChooser();
-        dc.setInitialDirectory(new File(FileUtils.getUserDirectory()));
+        dc.setInitialDirectory(new File(FileUtils.getInitialDirectory()));
         dc.setTitle("Select " + provider + " Cast Vote Record Folder");
         selectedDirectory = dc.showDialog(GuiContext.getInstance().getMainWindow());
       }
@@ -889,8 +900,9 @@ public class GuiConfigController implements Initializable {
   /** Action when "Auto-Load Candidates" button is clicked. */
   public void buttonAutoLoadCandidatesClicked() {
     setGuiIsBusy(true);
+    String dir = FileUtils.getInitialDirectory();
     ContestConfig config =
-          ContestConfig.loadContestConfig(createRawContestConfig(), FileUtils.getUserDirectory());
+          ContestConfig.loadContestConfig(createRawContestConfig(), dir);
     AutoLoadCandidatesService service = new AutoLoadCandidatesService(
           config,
           tableViewCvrFiles.getItems(),
@@ -1468,6 +1480,10 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  public String getLastTabulatorSessionOutputDirectory() {
+    return lastTabulatorSessionOutputDirectory;
+  }
+
   private void setUpHintsForTab(Tab tab, String hintsFilename) {
     String hints = loadTxtFileIntoString(hintsFilename);
     tab.setOnSelectionChanged(e -> {
@@ -1693,7 +1709,34 @@ public class GuiConfigController implements Initializable {
     DIFFERENT_BUT_VERSION_IS_TEST,
   }
 
-  private static class AutoLoadCandidatesService extends Service<Void> {
+  /**
+   * Many services have callers which need to know the output directory, but not all of them.
+   * This generic service is a simple interface to allow the caller to get the output directory,
+   * but it is the responsibility of the caller to know if the service being used sets
+   * the output directory or not by checking hasSetOutputDirectory().
+   */
+  public abstract static class GenericService<T> extends Service<T> {
+    protected String outputDirectory;
+
+    /**
+     * Get the output directory set by the service if one was set.
+     * The caller should check if the output directory has been set.
+     *
+     * @return the output directory set by the service.
+     */
+    public String getOutputDirectory() {
+      if (outputDirectory == null) {
+        throw new IllegalStateException("Output Directory has not been set on this service.");
+      }
+      return outputDirectory;
+    }
+
+    public boolean hasSetOutputDirectory() {
+      return outputDirectory != null;
+    }
+  }
+
+  private static class AutoLoadCandidatesService extends GenericService<Void> {
 
     private final ContestConfig config;
     private final List<CvrSource> sources;
@@ -1720,16 +1763,15 @@ public class GuiConfigController implements Initializable {
               }
               if (cvrsSpecified) {
                 // Gather unloaded names from each of the sources and place into the HashSet
-                Set<String> unloadedNames = new HashSet<>();
+                HashSet<Candidate> unloadedCandidates = new HashSet<>();
                 for (CvrSource source : sources) {
                   Provider provider = ContestConfig.getProvider(source);
                   try {
                     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
                     BaseCvrReader reader = provider.constructReader(config, source);
-                    reader.readCastVoteRecords(castVoteRecords);
-                    Set<String> unknownCandidates = reader.gatherUnknownCandidates(
-                        castVoteRecords, true).keySet();
-                    unloadedNames.addAll(unknownCandidates);
+                    Set<Candidate> unknownCandidates =
+                            reader.gatherUnknownCandidates(castVoteRecords);
+                    unloadedCandidates.addAll(unknownCandidates);
                   } catch (ContestConfig.UnrecognizedProviderException e) {
                     Logger.severe(
                         "Unrecognized provider \"%s\" in source file \"%s\": %s",
@@ -1743,15 +1785,18 @@ public class GuiConfigController implements Initializable {
 
                 // Validate each name and add to the table of candidates
                 int successCount = 0;
-                for (String name : unloadedNames) {
-                  Candidate candidate = new Candidate(name, null, false);
+                for (Candidate candidate : unloadedCandidates) {
                   Set<ValidationError> validationErrors =
                       ContestConfig.performBasicCandidateValidation(candidate);
                   if (validationErrors.isEmpty()) {
                     tableViewCandidates.getItems().add(candidate);
                     successCount++;
                   } else {
-                    Logger.severe("Failed to load candidate \"%s\"!", name);
+                    String errors = validationErrors.stream()
+                            .map(x -> x.toString())
+                            .collect(Collectors.joining(", "));
+                    Logger.warning("Autoloaded candidate %s but did not pass validation."
+                        + " (%s)", candidate, errors);
                   }
                 }
 
@@ -1768,7 +1813,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private static class ValidatorService extends Service<Boolean> {
+  private static class ValidatorService extends GenericService<Boolean> {
 
     private final ContestConfig contestConfig;
 
@@ -1795,7 +1840,7 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private abstract static class ConfigReaderService extends Service<Boolean> {
+  private abstract static class ConfigReaderService extends GenericService<Boolean> {
     private final boolean deleteConfigOnCompletion;
     protected String configPath;
 
@@ -1842,6 +1887,7 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<Boolean> createTask() {
+      GenericService<Boolean> svc = this;
       Task<Boolean> task =
           new Task<>() {
             @Override
@@ -1849,6 +1895,7 @@ public class GuiConfigController implements Initializable {
               TabulatorSession session = new TabulatorSession(configPath);
               List<String> errors = session.tabulate(
                       operatorName, expectedCvrStatistics, this::updateProgress);
+              svc.outputDirectory = session.getOutputPath();
               if (errors.isEmpty()) {
                 succeeded();
               } else {
@@ -1872,12 +1919,15 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<Boolean> createTask() {
+      GenericService<Boolean> svc = this;
       Task<Boolean> task =
           new Task<>() {
             @Override
             protected Boolean call() {
               TabulatorSession session = new TabulatorSession(configPath);
-              return session.convertToCdf(this::updateProgress);
+              boolean succeeded = session.convertToCdf(this::updateProgress);
+              svc.outputDirectory = session.getOutputPath();
+              return succeeded;
             }
           };
       setUpTaskCompletionTriggers(task,
@@ -1887,7 +1937,7 @@ public class GuiConfigController implements Initializable {
   }
 
   // ReadCastVoteRecordsService reads CVRs
-  private static class ReadCastVoteRecordsService extends Service<LoadedCvrData> {
+  private static class ReadCastVoteRecordsService extends GenericService<LoadedCvrData> {
     private final String configPath;
 
     ReadCastVoteRecordsService(String configPath) {
@@ -1896,6 +1946,7 @@ public class GuiConfigController implements Initializable {
 
     @Override
     protected Task<LoadedCvrData> createTask() {
+      GenericService<LoadedCvrData> svc = this;
       return new Task<>() {
           @Override
           protected LoadedCvrData call() {
@@ -1905,9 +1956,15 @@ public class GuiConfigController implements Initializable {
               cvrStatics = session.parseAndCountCastVoteRecords(this::updateProgress);
               succeeded();
             } catch (TabulatorSession.CastVoteRecordGenericParseException e) {
-              Logger.severe("Failed to read CVRs: %s", e.getMessage());
+              String message = "Failed to read CVRs";
+              if (!isNullOrBlank(e.getMessage())) {
+                message += ": " + e.getMessage();
+              }
+              Logger.severe(message);
               failed();
+
             }
+            svc.outputDirectory = session.getOutputPath();
             return cvrStatics;
           }
         };

@@ -19,10 +19,15 @@ package network.brightspots.rcv;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 final class AuditableFile extends File {
   public AuditableFile(String pathname) {
     super(pathname);
+  }
+
+  public AuditableFile(Path pathname) {
+    super(pathname.toAbsolutePath().toString());
   }
 
   public void finalizeAndHash() {
@@ -32,7 +37,20 @@ final class AuditableFile extends File {
     Logger.info("File %s written with hash %s".formatted(getAbsolutePath(), hash));
 
     // Write hash to hash file
-    File hashFile = new File(getAbsolutePath() + ".hash");
+    String basename = getName();
+    String directory = getParent();
+    String parentDirectoryName = new File(directory).getName();
+    String subdir = Path.of(directory, parentDirectoryName + " Checksums").toString();
+    String hashFilePath = Path.of(subdir, basename + ".hash").toString();
+    File hashFile = new File(hashFilePath);
+
+    // Create subdir if it doesn't exist
+    try {
+      FileUtils.createOutputDirectory(subdir);
+    } catch (FileUtils.UnableToCreateDirectoryException e) {
+      Logger.severe("Could not create directory %s: %s", subdir, e.getMessage());
+    }
+
     writeStringToFile(hashFile, "sha512: " + hash);
 
     // Make both file and its hash file read-only

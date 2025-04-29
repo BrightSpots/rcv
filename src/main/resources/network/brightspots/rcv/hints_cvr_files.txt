@@ -25,6 +25,9 @@ ID Column (optional): The column the IDs are in. Not all CVR files contain an ID
 
 Precinct Column (required for ES&S if you want to tabulate by precinct): The column that contains the precinct.
 
+Batch Column (required for ES&S if you want to tabulate by batch): The column that contains the batch identifier.
+
+
 Overvote Delimiter (optional, but must be blank if "Overvote Label" is provided): If using a CVR in ES&S style, overvotes can be reflected in a CVR by displaying all candidates marked at a ranking. Those candidate names will be differentiated from each other by a delimiter, something like a vertical bar | or a slash /. If your overvotes are delimited like this, enter the delimiter used in this field. Note that ES&S files may include only the label "overvote" and no additional information, in which case the "Overvote Label" field should be used instead.
 
 Overvote Label (optional): Some CDF and ES&S CVRs use a particular word/phrase to indicate an overvote.

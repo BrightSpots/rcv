@@ -5,6 +5,7 @@ on:
     types: [ published ]
   schedule:
     - cron: '0 12 1,15 * *'  # On the 1st and 15th of the month at noon
+  workflow_dispatch:
 ## To test this workflow without creating a release, uncomment the following and add a branch name (making sure "push"
 ##  is at the same indent level as "release":
 #  push:
@@ -12,8 +13,20 @@ on:
 #      - 'branch-name'
 
 jobs:
+  deleteRelease:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dev-drprasad/delete-tag-and-release@v1.1
+        # Note: to update the date of the release, it must be deleted and then recreated
+        if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: build-${{ github.ref_name }}
+          delete_release: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
   release:
     runs-on: ${{ matrix.os }}
+    needs: deleteRelease
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-13, macos-latest ]  # -13 is intel; -latest is ARM
@@ -90,7 +103,7 @@ jobs:
         id: checksumsfn
         shell: bash
         run: |
-          echo "FILEPATH=cache/checksums.csv" >> $GITHUB_OUTPUT
+          echo "FILEPATH=cache/${{ steps.basefn.outputs.FILEPATH }}.checksums.csv" >> $GITHUB_OUTPUT
 
       - name: "Generate SHA1 and SHA256 for each Maven dependency"
         shell: bash
@@ -103,6 +116,11 @@ jobs:
           command: ./gradlew assemble && ./gradlew --stop
           input: "~/.gradle/caches"
           zipFilename: ${{steps.cachefn.outputs.FILEPATH}}
+
+      - name: "Generate SHA512 for executable"
+        shell: bash
+        run: |
+          ./.github/workflows/sha.sh ${{ steps.exefn.outputs.FILEPATH }} ${{ runner.os }} 512 > ${{steps.exefn.outputs.FILEPATH}}.sha512
 
       - name: "Generate SHA512 for plugins cache"
         shell: bash
@@ -166,10 +184,11 @@ jobs:
           echo "Attach staple"
           xcrun stapler staple ${{ steps.exefn.outputs.FILEPATH }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Package
           if-no-files-found: error
+          overwrite: true
           path: |
             ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}
             ${{ github.workspace }}/${{    steps.zipfn.outputs.FILEPATH    }}.sha512
@@ -180,14 +199,25 @@ jobs:
             ${{ github.workspace }}/${{   steps.cachefn.outputs.FILEPATH   }}.sha512
             ${{ github.workspace }}/${{ steps.checksumsfn.outputs.FILEPATH }}
             ${{ github.workspace }}/${{ steps.checksumsfn.outputs.FILEPATH }}.sha512
-          retention-days: 90
 
       - name: "Upload binaries to release"
         uses: svenstaro/upload-release-action@v2
-        if: github.event_name == 'release' || github.event_name == 'schedule'
+        if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/${{ steps.basefn.outputs.FILEPATH }}*
-          tag: ${{ github.ref_name }}
+          tag: build-${{ github.ref_name }}
           overwrite: true
           file_glob: true
+          make_latest: false
+
+      - name: "Upload cache to release"
+        uses: svenstaro/upload-release-action@v2
+        if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: cache/*
+          tag: build-${{ github.ref_name }}
+          overwrite: true
+          file_glob: true
+          make_latest: false

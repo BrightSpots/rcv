@@ -21,7 +21,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
+import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 
 abstract class BaseCvrReader {
@@ -63,19 +66,19 @@ abstract class BaseCvrReader {
   }
 
   // Some CVRs have a list of candidates in the file. Read that list and return it.
-  // This will be used in tandem with gatherUnknownCandidates, which only looks for candidates
+  // This will be used in tandem with gatherUnknownCandidateCounts, which only looks for candidates
   // that have at least one vote.
-  public List<String> readCandidateListFromCvr(List<CastVoteRecord> castVoteRecords)
+  public List<String> readCandidateListFromCvr()
       throws IOException {
     return new ArrayList<>();
   }
 
   // Gather candidate names from the CVR that are not in the config.
-  Map<String, Integer> gatherUnknownCandidates(
+  public Map<Candidate, Integer> gatherUnknownCandidateCounts(
       List<CastVoteRecord> castVoteRecords, boolean includeCandidatesWithZeroVotes) {
     // First pass: gather all unrecognized candidates and their counts
     // All CVR Readers have this implemented
-    Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
+    Map<String, Integer> unrecognizedNameCounts = new HashMap<>();
     for (CastVoteRecord cvr : castVoteRecords) {
       for (Pair<Integer, CandidatesAtRanking> ranking : cvr.candidateRankings) {
         for (String candidateName : ranking.getValue()) {
@@ -85,7 +88,7 @@ abstract class BaseCvrReader {
             continue;
           }
 
-          unrecognizedCandidateCounts.merge(candidateName, 1, Integer::sum);
+          unrecognizedNameCounts.merge(candidateName, 1, Integer::sum);
         }
       }
     }
@@ -97,7 +100,7 @@ abstract class BaseCvrReader {
       // during auto-load candidates and just use readCandidateListFromCvr.
       List<String> allCandidates = new ArrayList<>();
       try {
-        allCandidates = readCandidateListFromCvr(castVoteRecords);
+        allCandidates = readCandidateListFromCvr();
       } catch (IOException e) {
         // If we can't read the candidate list, we can't check for unrecognized candidates.
         Logger.warning("IOException reading candidate list from CVR: %s", e.getMessage());
@@ -109,14 +112,31 @@ abstract class BaseCvrReader {
 
       // Combine the lists
       for (String candidateName : allCandidates) {
-        if (!unrecognizedCandidateCounts.containsKey(candidateName)
+        if (!unrecognizedNameCounts.containsKey(candidateName)
             && config.getNameForCandidate(candidateName) == null) {
-          unrecognizedCandidateCounts.put(candidateName, 0);
+          unrecognizedNameCounts.put(candidateName, 0);
         }
       }
     }
 
-    return unrecognizedCandidateCounts;
+    // Change the map to use Candidate objects instead of names
+    return unrecognizedNameCounts.entrySet().stream()
+          .collect(Collectors.toMap(entry -> new Candidate(entry.getKey()), Map.Entry::getValue));
+  }
+
+  Set<Candidate> gatherUnknownCandidates(List<CastVoteRecord> castVoteRecords)
+          throws CastVoteRecord.CvrParseException, IOException {
+    readCastVoteRecords(castVoteRecords);
+    return gatherUnknownCandidateCounts(castVoteRecords, true).keySet();
+  }
+
+  boolean usesLastAllowedRanking(List<Pair<Integer, String>> rankings, String contestId) {
+    if (rankings.isEmpty()) {
+      return false;
+    }
+
+    int lastRanking = rankings.get(rankings.size() - 1).getKey();
+    return !isRankingAllowed(lastRanking + 1, contestId);
   }
 
   // Human-readable name for output logs

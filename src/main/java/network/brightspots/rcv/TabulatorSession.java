@@ -23,6 +23,7 @@
 package network.brightspots.rcv;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +39,8 @@ import network.brightspots.rcv.CastVoteRecord.CvrParseException;
 import network.brightspots.rcv.ContestConfig.Provider;
 import network.brightspots.rcv.ContestConfig.UnrecognizedProviderException;
 import network.brightspots.rcv.FileUtils.UnableToCreateDirectoryException;
-import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
+import network.brightspots.rcv.OutputWriter.RoundSnapshotDataMissingException;
+import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 
 @SuppressWarnings("RedundantSuppression")
@@ -47,12 +49,26 @@ class TabulatorSession {
   private final String configPath;
   private final String timestampString;
   private String outputPath;
-  private String convertedFilePath;
+  private String rctabCvrFilePath;
 
   TabulatorSession(String configPath) {
     this.configPath = configPath;
+
     // current date-time formatted as a string used for creating unique output files names
-    timestampString = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+    String timestampPattern = "yyyy-MM-dd_HH-mm";
+    String baseTimestampString = new SimpleDateFormat(timestampPattern).format(new Date());
+    String currTimestampString = baseTimestampString;
+
+    // If there are multiple runs in the same minute, resolve collisions
+    // with a dash and an increment.
+    ContestConfig config = ContestConfig.loadContestConfig(configPath);
+    int count = 1;
+    while (new File(config.getOutputDirectory(currTimestampString)).exists()) {
+      currTimestampString = baseTimestampString +  "-" + count;
+      count++;
+    }
+
+    this.timestampString = currTimestampString;
   }
 
   // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI
@@ -90,8 +106,8 @@ class TabulatorSession {
 
   // Visible for testing
   @SuppressWarnings("unused")
-  String getConvertedFilePath() {
-    return convertedFilePath;
+  String getRctabCvrFilePath() {
+    return rctabCvrFilePath;
   }
 
   // special mode to just export the CVR as CDF JSON instead of tabulating
@@ -104,19 +120,19 @@ class TabulatorSession {
 
     Progress progress = new Progress(config, 0, progressUpdate);
 
-    if (setUpLogging(config.getOutputDirectory())
+    if (setUpLogging(config.getOutputDirectory(timestampString))
         && config.validate().isEmpty()) {
       Logger.info("Converting CVR(s) to CDF...");
       try {
-        FileUtils.createOutputDirectory(config.getOutputDirectory());
+        FileUtils.createOutputDirectory(config.getOutputDirectory(timestampString));
         LoadedCvrData castVoteRecords = parseCastVoteRecords(config, progress, false);
         if (!castVoteRecords.successfullyReadAll) {
           Logger.severe("Aborting conversion due to cast vote record errors!");
         } else {
           Tabulator.SliceIdSet sliceIds =
               new Tabulator(castVoteRecords.getCvrs(), config).getEnabledSliceIds();
-          ResultsWriter writer =
-              new ResultsWriter()
+          OutputWriter writer =
+              new OutputWriter()
                   .setNumRounds(0)
                   .setSliceIds(sliceIds)
                   .setContestConfig(config)
@@ -170,7 +186,7 @@ class TabulatorSession {
     ContestConfig config = ContestConfig.loadContestConfig(configPath);
     checkConfigVersionMatchesApp(config);
     boolean tabulationSuccess = false;
-    boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory());
+    boolean setUpLoggingSuccess = setUpLogging(config.getOutputDirectory(timestampString));
 
     if (operatorName == null || operatorName.isBlank()) {
       Logger.severe("Operator name is required for the audit logs!");
@@ -293,10 +309,9 @@ class TabulatorSession {
     // cache outputPath for testing
     outputPath = outputDirectory;
     try {
-      FileUtils.createOutputDirectory(outputDirectory);
       Logger.addTabulationFileLogging(outputDirectory, timestampString);
       success = true;
-    } catch (UnableToCreateDirectoryException | IOException exception) {
+    } catch (IOException exception) {
       Logger.severe("Failed to configure tabulation logger!\n%s", exception);
     }
     if (!success) {
@@ -338,7 +353,7 @@ class TabulatorSession {
     boolean encounteredSourceProblem = false;
 
     // Per-source data for writing generic CSV
-    List<ResultsWriter.CvrSourceData> cvrSourceData = new ArrayList<>();
+    List<OutputWriter.CvrSourceData> cvrSourceData = new ArrayList<>();
 
     // At each iteration of the following loop, we add records from another source file.
     for (int sourceIndex = 0; sourceIndex < config.rawConfig.cvrFileSources.size(); ++sourceIndex) {
@@ -353,12 +368,12 @@ class TabulatorSession {
 
         // Update the per-source data for the results writer
         cvrSourceData.add(
-            new ResultsWriter.CvrSourceData(
+            new OutputWriter.CvrSourceData(
                 source, reader, sourceIndex, startIndex, castVoteRecords.size() - 1));
 
         // Check for unrecognized candidates
-        Map<String, Integer> unrecognizedCandidateCounts =
-            reader.gatherUnknownCandidates(castVoteRecords, false);
+        Map<Candidate, Integer> unrecognizedCandidateCounts =
+            reader.gatherUnknownCandidateCounts(castVoteRecords, false);
 
         if (!unrecognizedCandidateCounts.isEmpty()) {
           throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
@@ -376,7 +391,7 @@ class TabulatorSession {
                 candidate ->
                     Logger.severe(
                         "Unrecognized candidate \"%s\" appears %d time(s)!",
-                        candidate, exception.candidateCounts.get(candidate)));
+                        candidate.getName(), exception.candidateCounts.get(candidate)));
         // various incorrect settings can lead to UnrecognizedCandidatesException, so it's hard
         // to know exactly what the problem is
         Logger.info(
@@ -416,13 +431,13 @@ class TabulatorSession {
         // Output the RCTab-CSV CVR
         if (shouldOutputRcTabCvr) {
           try {
-            ResultsWriter writer =
-                  new ResultsWriter().setContestConfig(config).setTimestampString(timestampString);
-            this.convertedFilePath =
+            OutputWriter writer =
+                  new OutputWriter().setContestConfig(config).setTimestampString(timestampString);
+            this.rctabCvrFilePath =
                   writer.writeRcTabCvrCsv(
                           castVoteRecords,
                           cvrSourceData,
-                          config.getOutputDirectory());
+                          config.getOutputDirectory(timestampString));
           } catch (IOException exception) {
             // error already logged in ResultsWriter
           }
@@ -440,9 +455,9 @@ class TabulatorSession {
   static class UnrecognizedCandidatesException extends Exception {
 
     // count of how many times each unrecognized candidate was encountered during CVR parsing
-    final Map<String, Integer> candidateCounts;
+    final Map<Candidate, Integer> candidateCounts;
 
-    UnrecognizedCandidatesException(Map<String, Integer> candidateCounts) {
+    UnrecognizedCandidatesException(Map<Candidate, Integer> candidateCounts) {
       this.candidateCounts = candidateCounts;
     }
   }
@@ -461,11 +476,11 @@ class TabulatorSession {
 
     private List<CastVoteRecord> cvrs;
     private final int numCvrs;
-    private final List<ResultsWriter.CvrSourceData> cvrSourcesData;
+    private final List<OutputWriter.CvrSourceData> cvrSourcesData;
     private boolean isDiscarded;
     private final boolean doesMatchAllMetadata;
 
-    LoadedCvrData(List<CastVoteRecord> cvrs, List<ResultsWriter.CvrSourceData> cvrSourcesData) {
+    LoadedCvrData(List<CastVoteRecord> cvrs, List<OutputWriter.CvrSourceData> cvrSourcesData) {
       this.cvrs = cvrs;
       this.successfullyReadAll = cvrs != null;
       this.numCvrs = cvrs != null ? cvrs.size() : 0;
@@ -504,7 +519,7 @@ class TabulatorSession {
       return numCvrs;
     }
 
-    List<ResultsWriter.CvrSourceData> getCvrSourcesData() {
+    List<OutputWriter.CvrSourceData> getCvrSourcesData() {
       return cvrSourcesData;
     }
 
@@ -522,7 +537,7 @@ class TabulatorSession {
 
     public void printSummary() {
       Logger.info("Cast Vote Record summary:");
-      for (ResultsWriter.CvrSourceData sourceData : cvrSourcesData) {
+      for (OutputWriter.CvrSourceData sourceData : cvrSourcesData) {
         Logger.info("Source %d: %s", sourceData.sourceIndex + 1, sourceData.source.getFilePath());
         Logger.info("  uses provider: %s", sourceData.source.getProvider());
         Logger.info("  read %d cast vote records", sourceData.getNumCvrs());

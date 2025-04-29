@@ -6,16 +6,16 @@
     "contestDate": "2018-09-30",
     "contestJurisdiction": "Multi-winner",
     "contestOffice": "Multi_winner2",
-    "tabulateByPrecinct": false,
+    "tabulateByPrecinct": true,
     "generateCdfJson": false
   },
   "cvrFileSources": [
     {
     "filePath" : "minneapolis_multi_seat_threshold_cvr.xlsx",
-    "firstVoteColumnIndex" : "2",
+    "firstVoteColumnIndex" : "3",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
-    "precinctColumnIndex" : "",
+    "precinctColumnIndex" : "2",
     "provider": "ess",
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "overvote",

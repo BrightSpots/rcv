@@ -48,7 +48,7 @@ final class CsvCvrReader extends BaseCvrReader {
   }
 
   @Override
-  public List<String> readCandidateListFromCvr(List<CastVoteRecord> castVoteRecords)
+  public List<String> readCandidateListFromCvr()
       throws IOException {
     try (FileInputStream inputStream = new FileInputStream(Path.of(cvrPath).toFile())) {
       return getCandidateNamesAndInitializeParser(getCsvParser(inputStream));
@@ -99,9 +99,13 @@ final class CsvCvrReader extends BaseCvrReader {
         }
 
         // create the new CastVoteRecord
-        CastVoteRecord newCvr =
-            new CastVoteRecord(
-                Integer.toString(index), "no supplied ID", "no precinct", "no batch ID", rankings);
+        CastVoteRecord newCvr = new CastVoteRecord(
+            Integer.toString(index),
+            "no supplied ID",
+            "no precinct",
+            "no batch ID",
+            usesLastAllowedRanking(rankings, null),
+            rankings);
         castVoteRecords.add(newCvr);
       }
     } catch (IOException exception) {

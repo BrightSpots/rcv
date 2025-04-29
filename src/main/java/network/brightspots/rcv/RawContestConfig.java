@@ -300,6 +300,14 @@ public class RawContestConfig {
 
     Candidate() {}
 
+    Candidate(String name) {
+      this(name, null, false);
+    }
+
+    Candidate(String name, String newlineSeparatedAliases) {
+      this(name, newlineSeparatedAliases, false);
+    }
+
     Candidate(String name, String newlineSeparatedAliases, boolean excluded) {
       this.name.setValue(name);
       this.excluded.setValue(excluded);
@@ -308,6 +316,16 @@ public class RawContestConfig {
         // Split by newline, and also trim whitespace
         this.aliases.setAll(Utils.splitByNewline(newlineSeparatedAliases));
       }
+    }
+
+    /**
+     *
+     * <p>Making debugging easier to provide all info in one line.</p>
+     */
+    public String toString() {
+      String aliases = this.getAliases().size() == 0 ? "[]" : String.join(", ", this.getAliases());
+      String name = this.getName() == null ? null : "\"" + this.getName() + "\"";
+      return "Name: " + name + " Aliases: " + aliases;
     }
 
     public String getName() {

@@ -1,0 +1,74 @@
+{
+  "config" : {
+    "contest" : "Overvote Exhaust If Multiple Continuing Test",
+    "date" : "2022-08-15",
+    "generatedBy" : "RCTab 1.3.999",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "A" : "0",
+      "B" : "3",
+      "C" : "2",
+      "D" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "A",
+      "transfers" : { }
+    } ],
+    "threshold" : "4"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "B" : "3",
+      "C" : "2",
+      "D" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ],
+    "threshold" : "4"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "B" : "3",
+      "C" : "2"
+    },
+    "tallyResults" : [ {
+      "elected" : "B",
+      "transfers" : { }
+    } ],
+    "threshold" : "3"
+  } ],
+  "summary" : {
+    "finalThreshold" : "3",
+    "numCandidates" : 4,
+    "numWinners" : 1,
+    "totalNumBallots" : "9",
+    "undervotes" : 0
+  }
+}

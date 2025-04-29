@@ -1,0 +1,114 @@
+{
+  "config" : {
+    "contest" : "Continue Until Two + Batch Elimination Test",
+    "date" : "",
+    "generatedBy" : "RCTab 1.3.999",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "A" : "60",
+      "B" : "15",
+      "C" : "14",
+      "D" : "5",
+      "E" : "4",
+      "F" : "1",
+      "G" : "1"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    } ],
+    "threshold" : "51"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "A" : "60",
+      "B" : "15",
+      "C" : "14",
+      "D" : "5",
+      "E" : "4",
+      "F" : "1",
+      "G" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "C" : "2",
+        "exhausted" : "3"
+      }
+    }, {
+      "eliminated" : "E",
+      "transfers" : {
+        "exhausted" : "4"
+      }
+    }, {
+      "eliminated" : "F",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    }, {
+      "eliminated" : "G",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ],
+    "threshold" : "51"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "9",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "A" : "60",
+      "B" : "15",
+      "C" : "16"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "B",
+      "transfers" : {
+        "exhausted" : "15"
+      }
+    } ],
+    "threshold" : "51"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "24",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "A" : "60",
+      "C" : "16"
+    },
+    "tallyResults" : [ ],
+    "threshold" : "51"
+  } ],
+  "summary" : {
+    "finalThreshold" : "51",
+    "numCandidates" : 7,
+    "numWinners" : 1,
+    "totalNumBallots" : "100",
+    "undervotes" : 0
+  }
+}

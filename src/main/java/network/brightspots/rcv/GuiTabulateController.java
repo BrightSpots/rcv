@@ -56,12 +56,6 @@ public class GuiTabulateController {
   private boolean useTemporaryConfigBeforeTabulation = false;
 
   /**
-   * The output folder of the tabulated config. It's important to cache this, since Temp Configs
-   * will be deleted after tabulation and we won't know this value without re-reading the GUI state.
-   */
-  private String configOutputPath;
-
-  /**
    * This modal builds upon the GuiConfigController, and the two share some functionality (e.g.
    * saving a config file). The shared functionality lives in GuiConfigController.
    */
@@ -152,7 +146,7 @@ public class GuiTabulateController {
   public void buttonLoadCvrsClicked(ActionEvent actionEvent) {
     String configPath = getConfigPathOrCreateTempFile();
 
-    enableButtonsUpTo(null);
+    setButtonsEnabled(false, false, false);
     tabulateButton.setText("Tabulate");
     Service<LoadedCvrData> service = guiConfigController.parseAndCountCastVoteRecords(configPath);
 
@@ -209,7 +203,7 @@ public class GuiTabulateController {
           } else {
             openResultsButton.setText("Close and View Errors");
           }
-          enableButtonsUpTo(openResultsButton);
+          setButtonsEnabled(true, true, true);
           stage.setOnCloseRequest(null);
           long endTime = System.currentTimeMillis();
           Logger.info("Tabulation took " + (endTime - startTime) / 1000.0 + " seconds.");
@@ -220,21 +214,28 @@ public class GuiTabulateController {
   private void watchParseCvrServiceProgress(Service<LoadedCvrData> service) {
     EventHandler<WorkerStateEvent> onSucceededEvent =
         workerStateEvent -> {
-          enableButtonsUpTo(tabulateButton);
           LoadedCvrData data = service.getValue();
-          tabulateButton.setText("Tabulate " + String.format("%,d", data.numCvrs()) + " ballots");
+          if (data == null || !data.successfullyReadAll) {
+            openResultsButton.setText("Close and View Errors");
+            setButtonsEnabled(false, false, true);
+          } else {
+            setButtonsEnabled(true, true, false);
+            tabulateButton.setText("Tabulate " + String.format("%,d", data.numCvrs()) + " ballots");
 
-          // Populate the per-source CVR count table, and calculate the width of the filename column
-          perSourceCvrCountTable.getItems().clear();
-          int maxFilenameLength = 0;
-          for (ResultsWriter.CvrSourceData sourceData : data.getCvrSourcesData()) {
-            String countString = String.format("%,d", sourceData.getNumCvrs());
-            String fileString = new File(sourceData.source.getFilePath()).getName();
-            perSourceCvrCountTable.getItems().add(new Pair<>(fileString, countString));
-            maxFilenameLength = Math.max(maxFilenameLength, fileString.length());
+            // Populate the per-source CVR count table,
+            // and calculate the width of the filename column
+            perSourceCvrCountTable.getItems().clear();
+            int maxFilenameLength = 0;
+            for (OutputWriter.CvrSourceData sourceData : data.getCvrSourcesData()) {
+              String countString = String.format("%,d", sourceData.getNumCvrs());
+              String fileString = new File(sourceData.source.getFilePath()).getName();
+              perSourceCvrCountTable.getItems().add(new Pair<>(fileString, countString));
+              maxFilenameLength = Math.max(maxFilenameLength, fileString.length());
+            }
+            float estWidth = getEstWidthForStringInPixels(maxFilenameLength);
+            perSourceCvrColumnFilepath.setPrefWidth(estWidth);
+            perSourceCvrCountTable.setVisible(true);
           }
-          perSourceCvrColumnFilepath.setPrefWidth(getEstWidthForStringInPixels(maxFilenameLength));
-          perSourceCvrCountTable.setVisible(true);
 
           data.discard();
           lastLoadedCvrData = data;
@@ -250,7 +251,7 @@ public class GuiTabulateController {
   private <T> void watchGenericService(
       Service<T> service, EventHandler<WorkerStateEvent> onSuccessCallback) {
     progressBar.progressProperty().bind(service.progressProperty());
-    enableButtonsUpTo(null);
+    setButtonsEnabled(false, false, false);
 
     // Don't let user close the modal while the service is running
     Window window = tabulateButton.getScene().getWindow();
@@ -274,31 +275,18 @@ public class GuiTabulateController {
           originalCallback.handle(workerStateEvent);
           onSuccessCallback.handle(workerStateEvent);
         });
+    service.setOnFailed(
+        workerStateEvent -> {
+          openResultsButton.setText("Close");
+          stage.setOnCloseRequest(null);
+        });
   }
 
-  /**
-   * In the list of three buttons, Read > Tabulate > Open, sets the buttons up until this button as
-   * enabled.
-   *
-   * @param button Last button to be enabled, or null to disable all buttons
-   */
-  private void enableButtonsUpTo(Button button) {
-    loadCvrButton.setDisable(true);
-    tabulateButton.setDisable(true);
-    openResultsButton.setDisable(true);
-
-    if (button == loadCvrButton) {
-      loadCvrButton.setDisable(false);
-    } else if (button == tabulateButton) {
-      loadCvrButton.setDisable(false);
-      tabulateButton.setDisable(false);
-    } else if (button == openResultsButton) {
-      loadCvrButton.setDisable(false);
-      tabulateButton.setDisable(false);
-      openResultsButton.setDisable(false);
-    } else if (button != null) {
-      throw new IllegalArgumentException("Invalid button");
-    }
+  private void setButtonsEnabled(
+        boolean loadCvrEnabled, boolean tabulateEnabled, boolean openResultsEnabled) {
+    loadCvrButton.setDisable(!loadCvrEnabled);
+    tabulateButton.setDisable(!tabulateEnabled);
+    openResultsButton.setDisable(!openResultsEnabled);
   }
 
   /**
@@ -331,19 +319,9 @@ public class GuiTabulateController {
   }
 
   private String getConfigPathOrCreateTempFile() {
-    String path =
-        useTemporaryConfigBeforeTabulation
-            ? guiConfigController.saveFile(tempSaveButton, true)
-            : savedConfigFilePath;
-
-    ContestConfig config = ContestConfig.loadContestConfig(path);
-    configOutputPath = config.getOutputDirectory();
-    String os = System.getProperty("os.name").toLowerCase();
-    if (!os.contains("win") && !configOutputPath.endsWith("/")) {
-      configOutputPath += "/";
-    }
-
-    return path;
+    return useTemporaryConfigBeforeTabulation
+          ? guiConfigController.saveFile(tempSaveButton, true)
+          : savedConfigFilePath;
   }
 
   private boolean isConfigSavedOrTempFileReady() {
@@ -357,9 +335,9 @@ public class GuiTabulateController {
     }
 
     if (isConfigSavedOrTempFileReady() && !userNameField.getText().isBlank()) {
-      enableButtonsUpTo(loadCvrButton);
+      setButtonsEnabled(true, false, false);
     } else {
-      enableButtonsUpTo(null);
+      setButtonsEnabled(false, false, false);
     }
   }
 
@@ -420,8 +398,18 @@ public class GuiTabulateController {
   }
 
   private void openOutputDirectoryInFileExplorer() {
+    String configOutputPath = guiConfigController.getLastTabulatorSessionOutputDirectory();
+    if (configOutputPath == null) {
+      Logger.severe("No output directory found to open.");
+      return;
+    }
+
+    String os = System.getProperty("os.name").toLowerCase();
+    if (!os.contains("win") && !configOutputPath.endsWith("/")) {
+      configOutputPath += "/";
+    }
+
     try {
-      String os = System.getProperty("os.name").toLowerCase();
       if (os.contains("win")) {
         // Windows
         Runtime.getRuntime().exec(new String[]{"explorer.exe", "/select,", configOutputPath});

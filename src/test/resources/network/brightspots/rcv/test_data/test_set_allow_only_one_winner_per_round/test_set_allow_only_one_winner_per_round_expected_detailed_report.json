@@ -1,0 +1,101 @@
+{
+  "config" : {
+    "contest" : "Allow Only One Winner per Round Test",
+    "date" : "2019-01-18",
+    "generatedBy" : "RCTab 1.3.999",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "A" : "3",
+      "B" : "3",
+      "C" : "3",
+      "D" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : {
+        "B" : "0.7497",
+        "residual surplus" : "0.0002"
+      }
+    } ],
+    "threshold" : "2.2501"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "A" : "2.2501",
+      "B" : "3.7497",
+      "C" : "3",
+      "D" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "B",
+      "transfers" : {
+        "C" : "1.4994",
+        "residual surplus" : "0.0002"
+      }
+    } ],
+    "threshold" : "2.2501"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "A" : "2.2501",
+      "B" : "2.2501",
+      "C" : "4.4994",
+      "D" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "C",
+      "transfers" : {
+        "exhausted" : "2.2491",
+        "residual surplus" : "0.0002"
+      }
+    } ],
+    "threshold" : "2.2501"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "finalRoundSurplus" : "2.2491",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "A" : "2.2501",
+      "B" : "2.2501",
+      "C" : "2.2501",
+      "D" : "0"
+    },
+    "tallyResults" : [ ],
+    "threshold" : "2.2501"
+  } ],
+  "summary" : {
+    "finalThreshold" : "2.2501",
+    "numCandidates" : 4,
+    "numWinners" : 3,
+    "totalNumBallots" : "9",
+    "undervotes" : 0
+  }
+}

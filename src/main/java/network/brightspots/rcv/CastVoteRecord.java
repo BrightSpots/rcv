@@ -36,6 +36,8 @@ class CastVoteRecord {
   private final String precinct;
   // which precinct portion this ballot came from
   private final String precinctPortion;
+  // is the last-used ranking the last-allowed ranking in the CVR?
+  private final boolean usesLastAllowedRanking;
   // records winners to whom some fraction of this vote has been allocated
   private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // If CVR CDF output is enabled, we store the necessary info here: for each round, the list of
@@ -65,8 +67,10 @@ class CastVoteRecord {
       String suppliedId,
       String precinct,
       String precinctPortion,
+      boolean usesLastAllowedRanking,
       List<Pair<Integer, String>> rankings) {
-    this(contestId, tabulatorId, batchId, suppliedId, null, precinct, precinctPortion, rankings);
+    this(contestId, tabulatorId, batchId, suppliedId, null, precinct, precinctPortion,
+        usesLastAllowedRanking, rankings);
   }
 
   CastVoteRecord(
@@ -77,6 +81,7 @@ class CastVoteRecord {
           String computedId,
           String precinct,
           String precinctPortion,
+          boolean usesLastAllowedRanking,
           List<Pair<Integer, String>> rankings) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
@@ -85,6 +90,7 @@ class CastVoteRecord {
     this.computedId = computedId;
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
+    this.usesLastAllowedRanking = usesLastAllowedRanking;
     this.candidateRankings = new CandidateRankingsList(rankings);
   }
 
@@ -93,8 +99,10 @@ class CastVoteRecord {
       String suppliedId,
       String precinct,
       String batchId,
+      boolean usesLastAllowedRanking,
       List<Pair<Integer, String>> rankings) {
-    this(null, null, batchId, suppliedId, computedId, precinct, null, rankings);
+    this(null, null, batchId, suppliedId, computedId, precinct, null,
+        usesLastAllowedRanking, rankings);
   }
 
   String getContestId() {
@@ -116,8 +124,17 @@ class CastVoteRecord {
     return precinctPortion;
   }
 
+  boolean doesUseLastAllowedRanking() {
+    return usesLastAllowedRanking;
+  }
+
+  // This represents the canonical ID used for audit logs and RCTab CVR
   String getId() {
-    return suppliedId != null ? suppliedId : computedId;
+    return !isNullOrBlank(computedId) ? computedId : suppliedId;
+  }
+
+  String getSuppliedId() {
+    return suppliedId;
   }
 
   // logs the outcome for this CVR for this round for auditing purposes
@@ -126,11 +143,7 @@ class CastVoteRecord {
 
     StringBuilder logStringBuilder = new StringBuilder();
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (!isNullOrBlank(computedId)) {
-      logStringBuilder.append(computedId);
-    } else {
-      logStringBuilder.append(suppliedId);
-    }
+    logStringBuilder.append(getId());
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
@@ -223,12 +236,67 @@ class CastVoteRecord {
   // as far as tabulation is concerned, all that matters is whether
   // it is active or not.
   enum StatusForRound {
-    ACTIVE,
-    INACTIVE_BY_UNDERVOTE,
-    INACTIVE_BY_OVERVOTE,
-    INACTIVE_BY_SKIPPED_RANKING,
-    INACTIVE_BY_REPEATED_RANKING,
-    INACTIVE_BY_EXHAUSTED_CHOICES
+    ACTIVE(
+            false,
+            "Active",
+            "active"
+    ),
+    DID_NOT_RANK_ANY_CANDIDATES(
+            true,
+            "Did Not Rank Any Candidates",
+            "didNotRankAnyCandidates"
+    ),
+    EXHAUSTED_CHOICE(
+            true,
+            "Inactive Ballots by Exhausted Choices",
+            "exhaustedChoices"
+    ),
+    INVALIDATED_BY_OVERVOTE(
+            true,
+            "Inactive Ballots by Overvotes",
+            "overvotes"
+    ),
+    INVALIDATED_BY_SKIPPED_RANKING(
+            true,
+            "Inactive Ballots by Skipped Rankings",
+            "skippedRankings"
+    ),
+    INVALIDATED_BY_REPEATED_RANKING(
+            true,
+            "Inactive Ballots by Repeated Rankings",
+            "repeatedRankings"
+    ),
+    FINAL_ROUND_SURPLUS(
+            false,
+            "Final Round Surplus",
+            "finalRoundSurplus"
+    );
+
+    private final boolean isInactiveBallot;
+    private final String titleCaseKey;
+    private final String camelCaseKey;
+
+    StatusForRound(
+            boolean isInactiveBallot,
+            String titleCaseKey,
+            String camelCaseKey
+    ) {
+      this.isInactiveBallot = isInactiveBallot;
+      this.titleCaseKey = titleCaseKey;
+      this.camelCaseKey = camelCaseKey;
+    }
+
+    public boolean isInactiveBallot() {
+      return isInactiveBallot;
+    }
+
+    public String getTitleCaseKey() {
+      return titleCaseKey;
+    }
+
+    public String getCamelCaseKey() {
+      return camelCaseKey;
+    }
   }
 
   enum VoteOutcomeType {
