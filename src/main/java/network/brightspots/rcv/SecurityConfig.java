@@ -19,8 +19,14 @@ package network.brightspots.rcv;
 import static network.brightspots.rcv.SecurityXmlParsers.RsaKeyValue;
 
 class SecurityConfig {
-  // Default values for production
+  // Only the unit test modules should ever set this to false, if it is initially set as true.
+  // Note: On some builds, this will be configured to false by default. We will need some
+  // formalized method of toggling this for two versions of builds, which has yet to be determined.
   private static final boolean DEFAULT_HART_SIGNATURE_VALIDATION_ENABLED = false;
+
+  // Is the user allowed to save output files to their Users directory?
+  // Since user accounts retain delete and create permissions to their user account folders,
+  // this should be disallowed to truly ensure output files are read-only.
   private static final boolean DEFAULT_CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY = true;
 
   // ThreadLocal variables for thread-safe overrides

@@ -53,11 +53,7 @@ class ContestConfigTests {
     assertFalse(isVersionNewer("1.0.0", "1"));
     assertFalse(isVersionNewer("1", "1.0"));
 
-    // snapshot info is ignored, though it shouldn't be.
-    // The following tests check the current state, though we have an Issue open with
-    // jackson-core to address.
-    // https://github.com/FasterXML/jackson-core/issues/1050
-    // Once that issue is addressed, the first and third tests below should flip from False to True
+    // Works with snapshot info
     assertTrue(isVersionNewer("1.4.0-beta", "1.4.0-alpha"));
     assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0-beta"));
     assertTrue(isVersionNewer("1.4.0", "1.4.0-alpha"));
