@@ -370,17 +370,14 @@ class CommonDataFormatReader extends BaseCvrReader {
 
   // parse cdf json CastVoteRecordReport into CastVoteRecords and append them to input list
   void parseJson(List<CastVoteRecord> castVoteRecords) throws CvrParseException {
-
     // static election data
-    HashMap<Object, Object> candidates = new HashMap<>();
-    HashMap<Object, Object> gpUnits = new HashMap<>();
-    HashMap<Object, Object> contestSelections = new HashMap<>();
     HashMap contestToTabulate = null;
     HashMap json = JsonParser.readFromFile(cvrPath, HashMap.class);
 
     boolean hasError = false;
 
     // GpUnits
+    HashMap<Object, Object> gpUnits = new HashMap<>();
     ArrayList gpUnitArray = (ArrayList) json.get("GpUnit");
     for (Object gpUnitObject : gpUnitArray) {
       HashMap gpUnit = (HashMap) gpUnitObject;
@@ -389,6 +386,7 @@ class CommonDataFormatReader extends BaseCvrReader {
     }
 
     // Elections
+    HashMap<Object, Object> candidates = new HashMap<>();
     ArrayList electionArray = (ArrayList) json.get("Election");
     for (Object electionObject : electionArray) {
       HashMap election = (HashMap) electionObject;
@@ -419,6 +417,7 @@ class CommonDataFormatReader extends BaseCvrReader {
     String contestToTabulateId = (String) contestToTabulate.get("@id");
 
     // ContestSelections
+    HashMap<Object, Object> contestSelections = new HashMap<>();
     ArrayList contestSelectionArray = (ArrayList) contestToTabulate.get("ContestSelection");
     for (Object contestSelectionObject : contestSelectionArray) {
       HashMap contestSelection = (HashMap) contestSelectionObject;

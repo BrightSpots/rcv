@@ -318,10 +318,7 @@ public class RawContestConfig {
       }
     }
 
-    /**
-     *
-     * <p>Making debugging easier to provide all info in one line.</p>
-     */
+    /** Making debugging easier to provide all info in one line. */
     public String toString() {
       String aliases = this.getAliases().size() == 0 ? "[]" : String.join(", ", this.getAliases());
       String name = this.getName() == null ? null : "\"" + this.getName() + "\"";

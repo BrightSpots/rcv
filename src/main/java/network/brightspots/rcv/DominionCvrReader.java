@@ -317,12 +317,6 @@ class DominionCvrReader extends BaseCvrReader {
       String tabulatorId = session.get("TabulatorId").toString();
       String batchId = session.get("BatchId").toString();
       Integer recordId = (Integer) session.get("RecordId");
-      String suppliedId = recordId.toString();
-      String computedId =
-          Stream.of(tabulatorId, batchId, Integer.toString(recordId))
-              .filter(s -> s != null && !s.isBlank())
-              // dashes are not escaped when writing to file e.g. CDF
-              .collect(Collectors.joining("-"));
 
       // filter out records which are not current and replace them with adjudicated ones
       HashMap adjudicatedData = (HashMap) session.get("Original");
@@ -405,6 +399,12 @@ class DominionCvrReader extends BaseCvrReader {
             rankings.add(ranking);
           }
           // create the new cvr
+          String suppliedId = recordId.toString();
+          String computedId =
+                  Stream.of(tabulatorId, batchId, Integer.toString(recordId))
+                          .filter(s -> s != null && !s.isBlank())
+                          // dashes are not escaped when writing to file e.g. CDF
+                          .collect(Collectors.joining("-"));
           CastVoteRecord newCvr = new CastVoteRecord(
               contestId,
               tabulatorId,
