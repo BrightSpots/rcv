@@ -54,7 +54,7 @@ checkstyle {
     // You must then modify this file to add the following under MissingJavadocMethod:
     // <property name="minLineCount" value="2"/>
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
-    // Additional contex for configPropertiest: https://github.com/gradle/gradle/issues/21409
+    // Additional contex for configProperties: https://github.com/gradle/gradle/issues/21409
     configProperties = [
         "org.checkstyle.google.suppressionfilter.config": file("$projectDir/config/checkstyle/checkstyle-suppressions.xml").absolutePath
     ]
