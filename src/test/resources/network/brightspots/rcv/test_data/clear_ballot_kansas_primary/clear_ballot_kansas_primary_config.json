@@ -16,11 +16,11 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "clearBallot",
-    "contestId": "Democratic Primary",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "skippedRankLabel": "",
-    "undeclaredWriteInLabel": "UWI"
+    "contestId" : "Democratic Primary",
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "UWI"
   } ],
   "candidates" : [ {
     "name" : "Michael Bennet",
@@ -64,20 +64,20 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "0",
-    "numberOfWinners": "1",
-    "bottomsUpPercentageThreshold": "",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "5",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Kansas Primary Rules"
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "bottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "5",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Kansas Primary Rules"
   }
 }

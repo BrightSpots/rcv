@@ -1,15 +1,15 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Portland 2015 Mayoral Race",
-    "outputDirectory": "output",
-    "contestDate": "2015-11-03",
-    "contestJurisdiction": "Portland, ME",
-    "contestOffice": "Mayor",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Portland 2015 Mayoral Race",
+    "outputDirectory" : "output",
+    "contestDate" : "2015-11-03",
+    "contestJurisdiction" : "Portland, ME",
+    "contestOffice" : "Mayor",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
     "filePath" : "2015_portland_mayor_cvr.xlsx",
     "firstVoteColumnIndex" : "4",
@@ -17,10 +17,10 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "2",
     "provider" : "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "skippedRankLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI"
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI"
   } ],
   "candidates" : [ {
     "name" : "Brennan, Michael F.",
@@ -84,19 +84,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "15",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Maine Rules"
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "15",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Maine Rules"
   }
 }

@@ -15,11 +15,11 @@
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
-    "provider": "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "skippedRankLabel": "",
-    "undeclaredWriteInLabel": "UWI"
+    "provider" : "ess",
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "UWI"
   } ],
   "candidates" : [ {
     "name" : "A",
@@ -35,20 +35,20 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
-    "randomSeed": "",
-    "numberOfWinners": "2",
-    "bottomsUpPercentageThreshold": "",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "max",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": ""
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "multiWinnerAllowMultipleWinnersPerRound",
+    "randomSeed" : "",
+    "numberOfWinners" : "2",
+    "bottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : ""
   }
 }

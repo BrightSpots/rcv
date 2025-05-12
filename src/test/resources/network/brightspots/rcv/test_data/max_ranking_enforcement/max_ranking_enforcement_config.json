@@ -1,5 +1,5 @@
 {
-  "tabulatorVersion": "TEST",
+  "tabulatorVersion" : "TEST",
   "outputSettings" : {
     "contestName" : "More ranks than configured",
     "outputDirectory" : "output",

@@ -1,15 +1,15 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Duplicate test",
-    "outputDirectory": "output",
-    "contestDate": "2018-05-21",
-    "contestJurisdiction": "Funkytown, USA",
-    "contestOffice": "Director of Produce",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Duplicate test",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-05-21",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Director of Produce",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
     "filePath" : "duplicate_test_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
@@ -17,10 +17,10 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "skippedRankLabel": "",
-    "undeclaredWriteInLabel": ""
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : ""
   } ],
   "candidates" : [ {
     "name" : "Banana",
@@ -36,19 +36,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "0",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "3",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": true,
-    "rulesDescription": "Doyle Rules"
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : true,
+    "rulesDescription" : "Doyle Rules"
   }
 }

@@ -1,15 +1,15 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Sample Interactive Tiebreak Sequential",
-    "outputDirectory": "output",
-    "contestDate": "2017-12-03",
-    "contestJurisdiction": "Funkytown, USA",
-    "contestOffice": "Sergeant-at-Arms",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Sample Interactive Tiebreak Sequential",
+    "outputDirectory" : "output",
+    "contestDate" : "2017-12-03",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Sergeant-at-Arms",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
     "filePath" : "sample_interactive_tiebreak_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
@@ -36,23 +36,23 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "stopCountingAndAsk",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiPassIrv",
-    "randomSeed": "",
-    "numberOfWinners": "2",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "0",
-    "maxRankingsAllowed": "3",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "skippedRankLabel": "undervote",
-    "undeclaredWriteInLabel": "",
-    "rulesDescription": "Doyle Rules"
+    "tiebreakMode" : "stopCountingAndAsk",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "multiPassIrv",
+    "randomSeed" : "",
+    "numberOfWinners" : "2",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "0",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "rulesDescription" : "Doyle Rules"
   }
 }

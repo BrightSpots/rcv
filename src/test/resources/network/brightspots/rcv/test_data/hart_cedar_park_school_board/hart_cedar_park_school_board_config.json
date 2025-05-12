@@ -10,17 +10,17 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath": "../_shared/hart_cvr_archive",
-    "firstVoteColumnIndex": "",
-    "firstVoteRowIndex": "",
-    "idColumnIndex": "",
-    "precinctColumnIndex": "",
-    "provider": "hart",
-    "contestId": "b651b997-417a-46d9-a676-a43d4df94ddc",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "skippedRankLabel": "",
-    "undeclaredWriteInLabel": "99cefa84-bad0-4d6b-a916-e606bd43f9cd"
+    "filePath" : "../_shared/hart_cvr_archive",
+    "firstVoteColumnIndex" : "",
+    "firstVoteRowIndex" : "",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "provider" : "hart",
+    "contestId" : "b651b997-417a-46d9-a676-a43d4df94ddc",
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "99cefa84-bad0-4d6b-a916-e606bd43f9cd"
   } ],
 
   "candidates" : [
@@ -61,20 +61,20 @@
     }
   ],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "9",
-    "numberOfWinners": "1",
-    "bottomsUpPercentageThreshold": "",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "max",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": ""
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "9",
+    "numberOfWinners" : "1",
+    "bottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : ""
   }
 }

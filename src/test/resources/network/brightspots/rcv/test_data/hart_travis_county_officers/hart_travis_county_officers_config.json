@@ -10,17 +10,17 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath": "../_shared/hart_cvr_archive",
-    "firstVoteColumnIndex": "",
-    "firstVoteRowIndex": "",
-    "idColumnIndex": "",
-    "precinctColumnIndex": "",
-    "provider": "hart",
-    "contestId": "e9ca8235-893e-43df-93eb-3cc61eeb133c",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "skippedRankLabel": "",
-    "undeclaredWriteInLabel": ""
+    "filePath" : "../_shared/hart_cvr_archive",
+    "firstVoteColumnIndex" : "",
+    "firstVoteRowIndex" : "",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "provider" : "hart",
+    "contestId" : "e9ca8235-893e-43df-93eb-3cc61eeb133c",
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : ""
   } ],
   "candidates" : [
     {
@@ -50,20 +50,20 @@
     }
   ],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "9",
-    "numberOfWinners": "1",
-    "bottomsUpPercentageThreshold": "",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "max",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": ""
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "9",
+    "numberOfWinners" : "1",
+    "bottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : ""
   }
 }

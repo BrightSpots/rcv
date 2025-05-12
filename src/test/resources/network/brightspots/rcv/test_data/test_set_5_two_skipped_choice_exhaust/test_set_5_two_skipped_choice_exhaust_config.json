@@ -1,25 +1,25 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Test Set 5",
-    "outputDirectory": "output",
-    "contestDate": "2019-03-06",
-    "contestJurisdiction": "TestSets_Single_winner",
-    "contestOffice": "Skipped choice_allow 1",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": true
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Test Set 5",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-03-06",
+    "contestJurisdiction" : "TestSets_Single_winner",
+    "contestOffice" : "Skipped choice_allow 1",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
     "filePath" : "test_set_5_two_skipped_choice_exhaust_cvr.json",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "cdf",
-    "contestId": "test set 5",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "skippedRankLabel": "",
-    "undeclaredWriteInLabel": ""
+    "contestId" : "test set 5",
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : ""
   } ],
   "candidates" : [ {
     "name" : "Candidate A Name",
@@ -39,19 +39,19 @@
     "excluded" : false
   }],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "0",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "1",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "4",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Skipped choice allowed 1"
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Skipped choice allowed 1"
   }
 }

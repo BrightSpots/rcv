@@ -1,15 +1,15 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "2013 Minneapolis Park Board",
-    "outputDirectory": "output",
-    "contestDate": "",
-    "contestJurisdiction": "Minneapolis",
-    "contestOffice": "Park and Recreation Commissioner",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "2013 Minneapolis Park Board",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "Minneapolis",
+    "contestOffice" : "Park and Recreation Commissioner",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
     "filePath" : "../_shared/2013_minneapolis_park_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
@@ -17,10 +17,10 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "1",
     "provider" : "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "skippedRankLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI"
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI"
   } ],
   "candidates" : [ {
     "name" : "ANNIE YOUNG",
@@ -64,19 +64,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
-    "randomSeed": "0",
-    "numberOfWinners": "3",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "2",
-    "maxRankingsAllowed": "3",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": true,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Minneapolis Rules"
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "multiWinnerAllowMultipleWinnersPerRound",
+    "randomSeed" : "0",
+    "numberOfWinners" : "3",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "2",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : true,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Minneapolis Rules"
   }
 }

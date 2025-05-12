@@ -1,15 +1,15 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Maine 2018 Democratic Governor Primary race",
-    "outputDirectory": "output",
-    "contestDate": "2018-06-12",
-    "contestJurisdiction": "Maine",
-    "contestOffice": "Governor",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Maine 2018 Democratic Governor Primary race",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-06-12",
+    "contestJurisdiction" : "Maine",
+    "contestOffice" : "Governor",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
     "filePath" : "2018_maine_governor_primary_cvr.xlsx",
     "firstVoteColumnIndex" : "4",
@@ -17,10 +17,10 @@
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "2",
     "provider" : "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "skippedRankLabel": "undervote",
-    "undeclaredWriteInLabel": ""
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : ""
   } ],
   "candidates" : [ {
     "name" : "Mills, Janet T.",
@@ -56,19 +56,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "8",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Maine Rules"
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "8",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Maine Rules"
   }
 }

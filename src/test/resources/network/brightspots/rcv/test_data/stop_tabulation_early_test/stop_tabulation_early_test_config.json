@@ -1,15 +1,15 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Stop Tabulation Early Test",
-    "outputDirectory": "output",
-    "contestDate": "2023-03-14",
-    "contestJurisdiction": "Funkytown, USA",
-    "contestOffice": "Sergeant-at-Arms",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Stop Tabulation Early Test",
+    "outputDirectory" : "output",
+    "contestDate" : "2023-03-14",
+    "contestJurisdiction" : "Funkytown, USA",
+    "contestOffice" : "Sergeant-at-Arms",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
     "filePath" : "../_shared/tiebreak_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
@@ -17,10 +17,10 @@
     "idColumnIndex" : "1",
     "precinctColumnIndex" : "",
     "provider" : "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "skippedRankLabel": "undervote",
-    "undeclaredWriteInLabel": ""
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : ""
   } ],
   "candidates" : [ {
     "name" : "Mookie Blaylock",
@@ -36,20 +36,20 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "1",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "0",
-    "maxRankingsAllowed": "3",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Doyle Rules",
-    "stopTabulationEarlyAfterRound": "1"
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "1",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "0",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Doyle Rules",
+    "stopTabulationEarlyAfterRound" : "1"
   }
 }

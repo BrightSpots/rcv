@@ -1,15 +1,15 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "2013 Minneapolis Mayor",
-    "outputDirectory": "output",
-    "contestDate": "",
-    "contestJurisdiction": "Minneapolis",
-    "contestOffice": "Mayor",
-    "tabulateByPrecinct": true,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "2013 Minneapolis Mayor",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "Minneapolis",
+    "contestOffice" : "Mayor",
+    "tabulateByPrecinct" : true,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
     "filePath" : "2013_minneapolis_mayor_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
@@ -17,10 +17,10 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "1",
     "provider" : "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "skippedRankLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI"
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI"
   } ],
   "candidates" : [ {
     "name" : "TROY BENJEGERDES",
@@ -164,19 +164,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "0",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "3",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Maine Rules"
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Maine Rules"
   }
 }

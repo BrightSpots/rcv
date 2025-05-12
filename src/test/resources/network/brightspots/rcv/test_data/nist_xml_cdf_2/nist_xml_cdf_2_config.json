@@ -1,58 +1,58 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "For Governor and Lieutenant Governor",
-    "outputDirectory": "output",
-    "contestDate": "2019-03-06",
-    "contestJurisdiction": "",
-    "contestOffice": "",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "For Governor and Lieutenant Governor",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-03-06",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
-      "filePath": "nist_xml_cdf_2.xml",
-      "idColumnIndex": "",
-      "precinctColumnIndex": "",
-      "provider": "cdf",
-      "contestId": "For Governor and Lieutenant Governor",
-      "treatBlankAsUndeclaredWriteIn": false,
-      "overvoteLabel": "",
-      "skippedRankLabel": "",
-      "undeclaredWriteInLabel": ""
+      "filePath" : "nist_xml_cdf_2.xml",
+      "idColumnIndex" : "",
+      "precinctColumnIndex" : "",
+      "provider" : "cdf",
+      "contestId" : "For Governor and Lieutenant Governor",
+      "treatBlankAsUndeclaredWriteIn" : false,
+      "overvoteLabel" : "",
+      "skippedRankLabel" : "",
+      "undeclaredWriteInLabel" : ""
     }
   ],
-  "candidates": [
+  "candidates" : [
     {
-      "name": "Edward FitzGerald and Sharen Swartz Neuhardt",
-      "code": "",
-      "excluded": false
+      "name" : "Edward FitzGerald and Sharen Swartz Neuhardt",
+      "code" : "",
+      "excluded" : false
     },
     {
-      "name": "John Kasich and Mary Taylor",
-      "code": "",
-      "excluded": false
+      "name" : "John Kasich and Mary Taylor",
+      "code" : "",
+      "excluded" : false
     },
     {
-      "name": "Anita Rios and Bob Fitrakis",
-      "code": "",
-      "excluded": false
+      "name" : "Anita Rios and Bob Fitrakis",
+      "code" : "",
+      "excluded" : false
     }
   ],
-  "rules": {
-    "tiebreakMode": "random",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "0",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "1",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "4",
-    "maxRankingsAllowed": "4",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Skiptonext_exhaustatovervote"
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "4",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Skiptonext_exhaustatovervote"
   }
 }

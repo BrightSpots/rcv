@@ -1,15 +1,15 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Missing Precinct example",
-    "outputDirectory": "output",
-    "contestDate": "2017-11-07",
-    "contestJurisdiction": "Minneapolis, MN",
-    "contestOffice": "Mayor",
-    "tabulateByPrecinct": true,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Missing Precinct example",
+    "outputDirectory" : "output",
+    "contestDate" : "2017-11-07",
+    "contestJurisdiction" : "Minneapolis, MN",
+    "contestOffice" : "Mayor",
+    "tabulateByPrecinct" : true,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
     "filePath" : "missing_precinct_example_cvr.xlsx",
     "firstVoteColumnIndex" : "2",
@@ -17,10 +17,10 @@
     "idColumnIndex" : "",
     "precinctColumnIndex" : "1",
     "provider" : "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "skippedRankLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI"
+    "treatBlankAsUndeclaredWriteIn" : false,
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI"
   } ],
   "candidates" : [ {
     "name" : "Jacob Frey",
@@ -96,19 +96,19 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "3",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Minneapolis Rules"
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Minneapolis Rules"
   }
 }

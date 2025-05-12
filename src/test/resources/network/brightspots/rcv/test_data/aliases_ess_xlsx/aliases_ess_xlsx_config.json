@@ -1,7 +1,7 @@
 {
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
-    "contestName": "Aliases test (ES&S XLSX Format)",
+    "contestName" : "Aliases test (ES&S XLSX Format)",
     "outputDirectory" : "output",
     "contestDate" : "2023-04-28",
     "contestJurisdiction" : "",

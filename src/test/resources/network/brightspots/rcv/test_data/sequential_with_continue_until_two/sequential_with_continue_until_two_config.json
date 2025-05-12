@@ -1,79 +1,79 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Test Sequential with Continue until Two",
-    "outputDirectory": "output",
-    "contestDate": "",
-    "contestJurisdiction": "",
-    "contestOffice": "",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Test Sequential with Continue until Two",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
-      "filePath": "../_shared/simple_sequential_cvr.xlsx",
-      "contestId": "",
-      "firstVoteColumnIndex": "2",
-      "firstVoteRowIndex": "2",
-      "idColumnIndex": "",
-      "precinctColumnIndex": "1",
-      "overvoteDelimiter": "",
-      "provider": "ess",
-      "overvoteLabel": "overvote",
-      "skippedRankLabel": "undervote",
-      "undeclaredWriteInLabel": "",
-      "treatBlankAsUndeclaredWriteIn": false
+      "filePath" : "../_shared/simple_sequential_cvr.xlsx",
+      "contestId" : "",
+      "firstVoteColumnIndex" : "2",
+      "firstVoteRowIndex" : "2",
+      "idColumnIndex" : "",
+      "precinctColumnIndex" : "1",
+      "overvoteDelimiter" : "",
+      "provider" : "ess",
+      "overvoteLabel" : "overvote",
+      "skippedRankLabel" : "undervote",
+      "undeclaredWriteInLabel" : "",
+      "treatBlankAsUndeclaredWriteIn" : false
     }
   ],
-  "candidates": [
+  "candidates" : [
     {
-      "name": "A",
-      "code": "",
-      "excluded": false
+      "name" : "A",
+      "code" : "",
+      "excluded" : false
     },
     {
-      "name": "B",
-      "code": "",
-      "excluded": false
+      "name" : "B",
+      "code" : "",
+      "excluded" : false
     },
     {
-      "name": "C",
-      "code": "",
-      "excluded": false
+      "name" : "C",
+      "code" : "",
+      "excluded" : false
     },
     {
-      "name": "D",
-      "code": "",
-      "excluded": false
+      "name" : "D",
+      "code" : "",
+      "excluded" : false
     },
     {
-      "name": "E",
-      "code": "",
-      "excluded": false
+      "name" : "E",
+      "code" : "",
+      "excluded" : false
     },
     {
-      "name": "F",
-      "code": "",
-      "excluded": false
+      "name" : "F",
+      "code" : "",
+      "excluded" : false
     }
   ],
-  "rules": {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiPassIrv",
-    "randomSeed": "",
-    "numberOfWinners": "3",
-    "multiSeatBottomsUpPercentageThreshold": "",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "2",
-    "maxRankingsAllowed": "3",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "continueUntilTwoCandidatesRemain": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "",
-    "treatBlankAsUndeclaredWriteIn": false
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "multiPassIrv",
+    "randomSeed" : "",
+    "numberOfWinners" : "3",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "2",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : true,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

@@ -1,50 +1,50 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Kansas Dominion test",
-    "outputDirectory": "output",
-    "contestDate": "2020-07-19",
-    "contestJurisdiction": "Kansas",
-    "contestOffice": "Democratic Primary",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Kansas Dominion test",
+    "outputDirectory" : "output",
+    "contestDate" : "2020-07-19",
+    "contestJurisdiction" : "Kansas",
+    "contestOffice" : "Democratic Primary",
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
+  "cvrFileSources" : [
     {
-      "filePath": "kansas_input_data",
-      "provider": "dominion",
-      "contestId": "1",
-      "treatBlankAsUndeclaredWriteIn": false,
-      "overvoteLabel": "",
-      "skippedRankLabel": "",
-      "undeclaredWriteInLabel": "12"
+      "filePath" : "kansas_input_data",
+      "provider" : "dominion",
+      "contestId" : "1",
+      "treatBlankAsUndeclaredWriteIn" : false,
+      "overvoteLabel" : "",
+      "skippedRankLabel" : "",
+      "undeclaredWriteInLabel" : "12"
     }
   ],
-  "candidates": [
+  "candidates" : [
     {
-      "name": "Joseph R. Biden",
-      "code": "1",
-      "excluded": false
+      "name" : "Joseph R. Biden",
+      "code" : "1",
+      "excluded" : false
     },
     {
-      "name": "Tom Steyer",
-      "code": "3",
-      "excluded": false
+      "name" : "Tom Steyer",
+      "code" : "3",
+      "excluded" : false
     },
     {
-      "name": "Bernie Sanders",
-      "code": "4",
-      "excluded": false
+      "name" : "Bernie Sanders",
+      "code" : "4",
+      "excluded" : false
     },
     {
-      "name": "Amy Klobuchar",
-      "code": "5",
-      "excluded": false
+      "name" : "Amy Klobuchar",
+      "code" : "5",
+      "excluded" : false
     },
     {
-      "name": "Tulsi Gabbard",
-      "code": "7",
-      "excluded": false
+      "name" : "Tulsi Gabbard",
+      "code" : "7",
+      "excluded" : false
   }, {
     "name" : "Elizabeth Warren",
     "code" : "8",
@@ -59,18 +59,18 @@
     "excluded" : false
   } ],
   "rules" : {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "",
-    "numberOfWinners": "1",
-    "bottomsUpPercentageThreshold": "",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "8",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "bottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "8",
+    "nonIntegerWinningThreshold" : false,
+    "hareQuota" : false,
     "batchElimination" : true,
     "exhaustOnDuplicateCandidate" : false,
     "rulesDescription" : "Kansas Rules"
