@@ -25,8 +25,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.0'
     implementation "com.github.spotbugs:spotbugs:4.9.3"
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.12.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.12.2'
+    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 // ### Application plugin settings
