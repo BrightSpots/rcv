@@ -48,16 +48,24 @@ run {
 checkstyle {
     // Latest version at https://github.com/checkstyle/checkstyle/tags
     toolVersion = '10.23.1'
+
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.3.2/src/main/resources/google_checks.xml
-    // You must then modify this file to add the following under MissingJavadocMethod:
+
+    // NOTE: After updating the local version of config/checkstyle/google_checks.xml again in the
+    // future, you will need to make two manual changes:
+    //
+    // 1. Allow relative path for suppressions
+    // "${org.checkstyle.google.suppressionfilter.config}"
+    // with:
+    // "${config_loc}/checkstyle-suppressions.xml"
+    // Additional context: https://github.com/gradle/gradle/issues/21409
+
+    // 2. Allow omitting javadoc on short functions
+    // Add the following property into the MissingJavadocMethod module:
     // <property name="minLineCount" value="2"/>
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
-    // Additional contex for configProperties: https://github.com/gradle/gradle/issues/21409
-    configProperties = [
-        "org.checkstyle.google.suppressionfilter.config": file("$projectDir/config/checkstyle/checkstyle-suppressions.xml").absolutePath
-    ]
     maxWarnings = 0
     ignoreFailures = false
 }
