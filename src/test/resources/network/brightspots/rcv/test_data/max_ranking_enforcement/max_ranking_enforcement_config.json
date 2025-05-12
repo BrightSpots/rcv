@@ -16,6 +16,7 @@
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "",
     "provider" : "genericCsv",

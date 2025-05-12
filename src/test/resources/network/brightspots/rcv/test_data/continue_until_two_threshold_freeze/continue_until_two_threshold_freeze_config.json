@@ -16,6 +16,7 @@
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "1",
     "overvoteDelimiter" : "",
     "provider" : "ess",
@@ -55,6 +56,7 @@
     "winnerElectionMode" : "singleWinnerMajority",
     "randomSeed" : "0",
     "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
     "decimalPlacesForVoteArithmetic" : "4",
     "minimumVoteThreshold" : "0",
     "maxSkippedRanksAllowed" : "1",
@@ -64,6 +66,7 @@
     "hareQuota" : false,
     "batchElimination" : true,
     "continueUntilTwoCandidatesRemain" : true,
+    "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
     "rulesDescription" : "Continue until two",
     "treatBlankAsUndeclaredWriteIn" : false

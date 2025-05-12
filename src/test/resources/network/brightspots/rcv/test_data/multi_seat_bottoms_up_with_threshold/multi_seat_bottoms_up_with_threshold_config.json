@@ -12,10 +12,13 @@
   },
   "cvrFileSources" : [ {
     "filePath" : "multi_seat_bottoms_up_with_threshold_cvr.xlsx",
+    "contestId" : "",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "",
     "skippedRankLabel" : "",
@@ -71,6 +74,7 @@
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
     "rulesDescription" : "",
     "treatBlankAsUndeclaredWriteIn" : false

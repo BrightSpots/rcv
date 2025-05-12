@@ -69,6 +69,102 @@ class TabulatorSession {
     }
 
     this.timestampString = currTimestampString;
+
+    try {
+      ContestConfigMigration.migrateConfigVersion(config);
+    } catch (ContestConfigMigration.ConfigVersionIsNewerThanAppVersionException exception) {
+      Logger.severe(
+          "Unable to proces version %s using older version %s of the app!",
+          config.rawConfig.tabulatorVersion, Main.APP_VERSION);
+    }
+    File f = new File(configPath);
+    JsonParser.writeToFile(f, createRawContestConfig(config.rawConfig));
+    throw new RuntimeException();
+  }
+
+  private RawContestConfig createRawContestConfig(RawContestConfig config) {
+    for (Candidate candidate : config.candidates) {
+      candidate.trimNameAndAllAliases();
+    }
+
+    RawContestConfig.ContestRules rules = new RawContestConfig.ContestRules();
+    rules.tiebreakMode = config.rules.tiebreakMode;
+    rules.overvoteRule = config.rules.overvoteRule;
+    rules.winnerElectionMode = config.rules.winnerElectionMode;
+    rules.randomSeed = config.rules.randomSeed;
+    rules.numberOfWinners = config.rules.numberOfWinners;
+    rules.multiSeatBottomsUpPercentageThreshold =
+            config.rules.multiSeatBottomsUpPercentageThreshold;
+    rules.decimalPlacesForVoteArithmetic = config.rules.decimalPlacesForVoteArithmetic;
+    rules.minimumVoteThreshold = config.rules.minimumVoteThreshold;
+    rules.maxSkippedRanksAllowed = config.rules.maxSkippedRanksAllowed;
+    rules.maxRankingsAllowed = config.rules.maxRankingsAllowed;
+    rules.nonIntegerWinningThreshold = config.rules.nonIntegerWinningThreshold;
+    rules.hareQuota = config.rules.hareQuota;
+    rules.batchElimination = config.rules.batchElimination;
+    rules.continueUntilTwoCandidatesRemain =
+            config.rules.continueUntilTwoCandidatesRemain;
+    rules.doesFirstRoundDetermineThreshold = config.rules.doesFirstRoundDetermineThreshold;
+    rules.stopTabulationEarlyAfterRound =
+            config.rules.stopTabulationEarlyAfterRound;
+    rules.exhaustOnDuplicateCandidate = config.rules.exhaustOnDuplicateCandidate;
+    rules.rulesDescription = config.rules.rulesDescription;
+    // For each rule, replace null with ""
+    rules.tiebreakMode =
+            rules.tiebreakMode != null ? rules.tiebreakMode.trim() : "";
+    rules.overvoteRule =
+            rules.overvoteRule != null ? rules.overvoteRule.trim() : "";
+    rules.winnerElectionMode =
+            rules.winnerElectionMode != null ? rules.winnerElectionMode.trim() : "";
+    rules.randomSeed = rules.numberOfWinners != null
+            ? rules.randomSeed.trim()
+            : "";
+    rules.numberOfWinners =
+            rules.numberOfWinners != null ? rules.numberOfWinners.trim() : "";
+    rules.multiSeatBottomsUpPercentageThreshold =
+            rules.multiSeatBottomsUpPercentageThreshold != null
+                    ? rules.multiSeatBottomsUpPercentageThreshold.trim()
+                    : "";
+    rules.decimalPlacesForVoteArithmetic =
+            rules.decimalPlacesForVoteArithmetic != null
+                    ? rules.decimalPlacesForVoteArithmetic.trim()
+                    : "";
+    rules.minimumVoteThreshold =
+            rules.minimumVoteThreshold != null ? rules.minimumVoteThreshold.trim() : "";
+    rules.maxSkippedRanksAllowed =
+            rules.maxSkippedRanksAllowed != null
+                    ? rules.maxSkippedRanksAllowed.trim()
+                    : "";
+    rules.maxRankingsAllowed =
+            rules.maxRankingsAllowed != null ? rules.maxRankingsAllowed.trim() : "";
+    rules.stopTabulationEarlyAfterRound =
+            rules.stopTabulationEarlyAfterRound != null
+                    ? rules.stopTabulationEarlyAfterRound.trim()
+                    : "";
+    config.rules = rules;
+
+    for (RawContestConfig.CvrSource source : config.cvrFileSources) {
+      source.setFilePath(source.getFilePath() != null ? source.getFilePath().trim() : "");
+      source.setIdColumnIndex(
+              source.getIdColumnIndex() != null ? source.getIdColumnIndex().trim() : "");
+      source.setBatchColumnIndex(
+              source.getBatchColumnIndex() != null ? source.getBatchColumnIndex().trim() : "");
+      source.setPrecinctColumnIndex(
+              source.getPrecinctColumnIndex() != null
+                      ? source.getPrecinctColumnIndex().trim() : "");
+      source.setOvervoteDelimiter(
+              source.getOvervoteDelimiter() != null ? source.getOvervoteDelimiter().trim() : "");
+      source.setProvider(source.getProvider() != null ? source.getProvider().trim() : "");
+      source.setContestId(source.getContestId() != null ? source.getContestId().trim() : "");
+      source.setOvervoteLabel(
+              source.getOvervoteLabel() != null ? source.getOvervoteLabel().trim() : "");
+      source.setSkippedRankLabel(
+              source.getSkippedRankLabel() != null ? source.getSkippedRankLabel().trim() : "");
+      source.setUndeclaredWriteInLabel(
+              source.getUndeclaredWriteInLabel() != null ? source.getUndeclaredWriteInLabel().trim()
+                      : "");
+    }
+    return config;
   }
 
   // validation will catch a mismatch and abort anyway, but let's log helpful errors for the CLI

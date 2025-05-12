@@ -13,6 +13,10 @@
   "cvrFileSources" : [ {
     "filePath" : "dominion_multi_file_input_data",
     "contestId" : "13",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
     "provider" : "dominion",
     "overvoteLabel" : "",
     "skippedRankLabel" : "",
@@ -42,6 +46,7 @@
     "winnerElectionMode" : "singleWinnerMajority",
     "randomSeed" : "",
     "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
     "decimalPlacesForVoteArithmetic" : "4",
     "minimumVoteThreshold" : "0",
     "maxSkippedRanksAllowed" : "1",
@@ -51,6 +56,7 @@
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
     "rulesDescription" : "San Francisco Rules",
     "treatBlankAsUndeclaredWriteIn" : false

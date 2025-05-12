@@ -16,6 +16,7 @@
     "firstVoteColumnIndex" : "4",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "",
     "provider" : "ess",
@@ -57,6 +58,7 @@
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : true,
+    "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
     "rulesDescription" : "Continue until Two Candidates Remain Test",
     "treatBlankAsUndeclaredWriteIn" : false
