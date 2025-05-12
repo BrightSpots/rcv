@@ -1,68 +1,70 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Aliases test (JSON CDF Format)",
-    "outputDirectory": "output",
-    "contestDate": "2023-03-23",
-    "contestJurisdiction": "TestSets_Single_winner",
-    "contestOffice": "Aliases test",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": true
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Aliases test (JSON CDF Format)",
+    "outputDirectory" : "output",
+    "contestDate" : "2023-03-23",
+    "contestJurisdiction" : "TestSets_Single_winner",
+    "contestOffice" : "Aliases test",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
   },
-  "cvrFileSources": [
-    {
-      "filePath" : "../_shared/cdf_json/cdf_json_file1_cvr.json",
-      "idColumnIndex" : "",
-      "precinctColumnIndex" : "",
-      "provider" : "cdf",
-      "contestId": "aliases file 1",
-      "treatBlankAsUndeclaredWriteIn": false,
-      "overvoteLabel": "",
-      "skippedRankLabel": "",
-      "undeclaredWriteInLabel": ""
-    },
-    {
-      "filePath" : "../_shared/cdf_json/cdf_json_file2_cvr.json",
-      "idColumnIndex" : "",
-      "precinctColumnIndex" : "",
-      "provider" : "cdf",
-      "contestId": "aliases file 2",
-      "treatBlankAsUndeclaredWriteIn": false,
-      "overvoteLabel": "",
-      "skippedRankLabel": "",
-      "undeclaredWriteInLabel": ""
+  "cvrFileSources" : [ {
+    "filePath" : "../_shared/cdf_json/cdf_json_file1_cvr.json",
+    "contestId" : "aliases file 1",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "provider" : "cdf",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }, {
+    "filePath" : "../_shared/cdf_json/cdf_json_file2_cvr.json",
+    "contestId" : "aliases file 2",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "provider" : "cdf",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
     "name" : "Unused Display Name Candidate A",
-    "aliases" : ["Candidate A Name File 1", "Candidate A Name File 2"],
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "Candidate A Name File 1", "Candidate A Name File 2" ]
   }, {
     "name" : "Candidate B Name File 1",
-    "aliases" : ["Candidate B Name File 2"],
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "Candidate B Name File 2" ]
   }, {
     "name" : "Candidate C Name File 1",
-    "aliases" : ["Unused Name 2", "Candidate C Name File 2"],
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "Unused Name 2", "Candidate C Name File 2" ]
   }, {
     "name" : "Candidate D Name File 1",
-    "aliases" : ["Candidate D Name File 2"],
-    "excluded" : false
-  }],
+    "excluded" : false,
+    "aliases" : [ "Candidate D Name File 2" ]
+  } ],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "0",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "1",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "4",
-    "maxRankingsAllowed": "4",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Duplicate choice skip"
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "4",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Duplicate choice skip",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

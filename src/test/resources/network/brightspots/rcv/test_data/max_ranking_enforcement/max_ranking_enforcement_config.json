@@ -1,11 +1,12 @@
 {
-  "tabulatorVersion": "TEST",
+  "tabulatorVersion" : "TEST",
   "outputSettings" : {
     "contestName" : "More ranks than configured",
     "outputDirectory" : "output",
     "contestDate" : "",
     "contestJurisdiction" : "",
     "contestOffice" : "",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },

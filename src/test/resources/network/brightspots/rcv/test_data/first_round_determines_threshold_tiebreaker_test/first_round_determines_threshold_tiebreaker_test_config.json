@@ -6,6 +6,7 @@
     "contestDate" : "2015-11-03",
     "contestJurisdiction" : "Portland, ME",
     "contestOffice" : "Mayor",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },
@@ -25,20 +26,20 @@
   } ],
   "candidates" : [ {
     "name" : "Carmona, Ralph C.",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Haadoow, Hamza A.",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Vail, Christopher L.",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Excludy McSclude",
-    "code" : "",
-    "excluded" : true
+    "excluded" : true,
+    "aliases" : [ ]
   } ],
   "rules" : {
     "tiebreakMode" : "random",
@@ -46,13 +47,13 @@
     "winnerElectionMode" : "singleWinnerMajority",
     "randomSeed" : "0",
     "numberOfWinners" : "1",
-    "doesFirstRoundDetermineThreshold" : true,
     "multiSeatBottomsUpPercentageThreshold" : "",
     "decimalPlacesForVoteArithmetic" : "5",
     "minimumVoteThreshold" : "0",
     "maxSkippedRanksAllowed" : "1",
     "maxRankingsAllowed" : "15",
     "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : true,
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : true,

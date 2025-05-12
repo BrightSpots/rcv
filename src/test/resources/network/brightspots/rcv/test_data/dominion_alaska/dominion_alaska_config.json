@@ -1,78 +1,74 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Alaska Dominion test",
-    "outputDirectory": "output",
-    "contestDate": "2020-07-19",
-    "contestJurisdiction": "Alaska",
-    "contestOffice": "Democratic Primary",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Alaska Dominion test",
+    "outputDirectory" : "output",
+    "contestDate" : "2020-07-19",
+    "contestJurisdiction" : "Alaska",
+    "contestOffice" : "Democratic Primary",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "../_shared/dominion_alaska/alaska_input_data",
-      "provider": "dominion",
-      "contestId": "1",
-      "treatBlankAsUndeclaredWriteIn": false,
-      "overvoteLabel": "",
-      "skippedRankLabel": "",
-      "undeclaredWriteInLabel": "12"
-    }
-  ],
-  "candidates": [
-    {
-      "name": "Joseph R. Biden",
-      "code": "1",
-      "excluded": false
-    },
-    {
-      "name": "Tom Steyer",
-      "code": "3",
-      "excluded": false
-    },
-    {
-      "name": "Bernie Sanders",
-      "code": "4",
-      "excluded": false
-    },
-    {
-      "name": "Amy Klobuchar",
-      "code": "5",
-      "excluded": false
-    },
-    {
-      "name": "Tulsi Gabbard",
-      "code": "7",
-      "excluded": false
+  "cvrFileSources" : [ {
+    "filePath" : "../_shared/dominion_alaska/alaska_input_data",
+    "contestId" : "1",
+    "provider" : "dominion",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "12",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Joseph R. Biden",
+    "excluded" : false,
+    "aliases" : [ "1" ]
+  }, {
+    "name" : "Tom Steyer",
+    "excluded" : false,
+    "aliases" : [ "3" ]
+  }, {
+    "name" : "Bernie Sanders",
+    "excluded" : false,
+    "aliases" : [ "4" ]
+  }, {
+    "name" : "Amy Klobuchar",
+    "excluded" : false,
+    "aliases" : [ "5" ]
+  }, {
+    "name" : "Tulsi Gabbard",
+    "excluded" : false,
+    "aliases" : [ "7" ]
   }, {
     "name" : "Elizabeth Warren",
-    "code" : "8",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "8" ]
   }, {
     "name" : "Michael R. Bloomberg",
-    "code" : "9",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "9" ]
   }, {
     "name" : "Pete Buttigieg",
-    "code" : "11",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "11" ]
   } ],
   "rules" : {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "",
-    "numberOfWinners": "1",
-    "bottomsUpPercentageThreshold": "",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "8",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Alaska Rules"
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "8",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Alaska Rules",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

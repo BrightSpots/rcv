@@ -1,102 +1,105 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Portland 2015 Mayoral Race",
-    "outputDirectory": "output",
-    "contestDate": "2015-11-03",
-    "contestJurisdiction": "Portland, ME",
-    "contestOffice": "Mayor",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Portland 2015 Mayoral Race",
+    "outputDirectory" : "output",
+    "contestDate" : "2015-11-03",
+    "contestJurisdiction" : "Portland, ME",
+    "contestOffice" : "Mayor",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
+  "cvrFileSources" : [ {
     "filePath" : "2015_portland_mayor_codes_cvr.xlsx",
     "firstVoteColumnIndex" : "4",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "2",
     "provider" : "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "skippedRankLabel": "undervote",
-    "undeclaredWriteInLabel": "UWI"
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
     "name" : "Brennan, Michael F.",
-    "code" : "MFB",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "MFB" ]
   }, {
     "name" : "Bragdon, Charles E.",
-    "code" : "CEB",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "CEB" ]
   }, {
     "name" : "Bryant, Peter G.",
-    "code" : "PGB",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "PGB" ]
   }, {
     "name" : "Carmona, Ralph C.",
-    "code" : "RCC",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "RCC" ]
   }, {
     "name" : "Dodge, Richard A.",
-    "code" : "RAD",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "RAD" ]
   }, {
     "name" : "Duson, Jill C.",
-    "code" : "JCD",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "JCD" ]
   }, {
     "name" : "Eder, John M.",
-    "code" : "JME",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "JME" ]
   }, {
     "name" : "Haadoow, Hamza A.",
-    "code" : "HAH",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "HAH" ]
   }, {
     "name" : "Lapchick, Jodie L.",
-    "code" : "JLL",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "JLL" ]
   }, {
     "name" : "Marshall, David A.",
-    "code" : "DAM",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "DAM" ]
   }, {
     "name" : "Mavodones, Nicholas M. Jr.",
-    "code" : "NMM",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "NMM" ]
   }, {
     "name" : "Miller, Markos S.",
-    "code" : "MSM",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "MSM" ]
   }, {
     "name" : "Rathband, Jed",
-    "code" : "JR",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "JR" ]
   }, {
     "name" : "Strimling, Ethan K.",
-    "code" : "EKS",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "EKS" ]
   }, {
     "name" : "Vail, Christopher L.",
-    "code" : "CLV",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ "CLV" ]
   } ],
   "rules" : {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "15",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Maine Rules"
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "15",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Maine Rules",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

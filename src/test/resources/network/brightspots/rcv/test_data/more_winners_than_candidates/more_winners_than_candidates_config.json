@@ -6,11 +6,12 @@
     "contestDate" : "2020-07-19",
     "contestJurisdiction" : "Alaska",
     "contestOffice" : "Democratic Primary",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "../_shared/simple_ess_cvr.xlsx",        
+    "filePath" : "../_shared/simple_ess_cvr.xlsx",
     "contestId" : "",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",

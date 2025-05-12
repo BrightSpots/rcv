@@ -1,83 +1,76 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "For County Tax Collector (1/3)",
-    "outputDirectory": "output",
-    "contestDate": "2019-03-06",
-    "contestJurisdiction": "",
-    "contestOffice": "",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "For County Tax Collector (1/3)",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-03-06",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "../unisyn_cvrs/101-RCV-CVT_TEST_3_UNIOVS2103-2.xml",
-      "idColumnIndex": "",
-      "precinctColumnIndex": "",
-      "provider": "cdf",
-      "contestId": "For County Tax Collector (1/3)",
-      "treatBlankAsUndeclaredWriteIn": false,
-      "overvoteLabel": "",
-      "skippedRankLabel": "",
-      "undeclaredWriteInLabel": "UWI"
-    }
-  ],
-  "candidates": [
-    {
-      "name": "Greg Smith",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "Wendy McDonald",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "Mel Bonham",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "Brady Gordon",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "Harry Nelson",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "Sandy Wallace",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "Wendy Simpson",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "Daniel Gregory",
-      "code": "",
-      "excluded": false
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "random",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "0",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "1",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "4",
-    "maxRankingsAllowed": "4",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Skiptonext_exhaustatovervote"
+  "cvrFileSources" : [ {
+    "filePath" : "../unisyn_cvrs/101-RCV-CVT_TEST_3_UNIOVS2103-2.xml",
+    "contestId" : "For County Tax Collector (1/3)",
+    "idColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "provider" : "cdf",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "UWI",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Greg Smith",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Wendy McDonald",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Mel Bonham",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Brady Gordon",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Harry Nelson",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Sandy Wallace",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Wendy Simpson",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Daniel Gregory",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "4",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Skiptonext_exhaustatovervote",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

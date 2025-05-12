@@ -1,53 +1,57 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Generic CSV Test",
-    "outputDirectory": "output",
-    "contestDate": "2023-04-03",
-    "contestJurisdiction": "Portland, ME",
-    "contestOffice": "Mayor",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Generic CSV Test",
+    "outputDirectory" : "output",
+    "contestDate" : "2023-04-03",
+    "contestJurisdiction" : "Portland, ME",
+    "contestOffice" : "Mayor",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
+  "cvrFileSources" : [ {
     "filePath" : "generic_csv_test_cvr.csv",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "provider" : "genericCsv",
-    "undeclaredWriteInLabel": "Write-In"
+    "undeclaredWriteInLabel" : "Write-In",
+    "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
     "name" : "Lettuce",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Broccoli",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Cucumber",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Cauliflower",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   } ],
   "rules" : {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "15",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Maine Rules"
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "15",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Maine Rules",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

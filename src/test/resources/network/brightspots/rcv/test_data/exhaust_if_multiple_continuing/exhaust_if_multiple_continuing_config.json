@@ -6,6 +6,7 @@
     "contestDate" : "2022-08-15",
     "contestJurisdiction" : "",
     "contestOffice" : "",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },
@@ -25,20 +26,20 @@
   } ],
   "candidates" : [ {
     "name" : "A",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "B",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "C",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "D",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   } ],
   "rules" : {
     "tiebreakMode" : "useCandidateOrder",
@@ -52,6 +53,7 @@
     "maxSkippedRanksAllowed" : "1",
     "maxRankingsAllowed" : "max",
     "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,

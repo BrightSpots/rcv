@@ -1,57 +1,60 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "overvote skips to next rank",
-    "outputDirectory": "output",
-    "contestDate": "2019-03-06",
-    "contestJurisdiction": "TestSets_Single_winner",
-    "contestOffice": "Exhaust skipped",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": true
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "overvote skips to next rank",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-03-06",
+    "contestJurisdiction" : "TestSets_Single_winner",
+    "contestOffice" : "Exhaust skipped",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
   },
-  "cvrFileSources": [
-    {
+  "cvrFileSources" : [ {
     "filePath" : "test_set_2_overvote_skip_to_next_cvr.json",
+    "contestId" : "overvote skips to next rank",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "cdf",
-    "contestId": "overvote skips to next rank",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "skippedRankLabel": "",
-    "undeclaredWriteInLabel": ""
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
     "name" : "Candidate A Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate B Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate C Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate D Name",
-    "code" : "",
-    "excluded" : false
-  }],
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
   "rules" : {
-    "tiebreakMode": "random",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "0",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "1",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "0",
-    "maxRankingsAllowed": "4",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "OV_skiptonext"
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "0",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "OV_skiptonext",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

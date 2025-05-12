@@ -6,6 +6,7 @@
     "contestDate" : "2019-03-06",
     "contestJurisdiction" : "TestSets_Single_winner",
     "contestOffice" : "Skiptonext_Skiponovervote",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : true
   },
@@ -34,20 +35,20 @@
   } ],
   "candidates" : [ {
     "name" : "Candidate A Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate B Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate C Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate D Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   } ],
   "rules" : {
     "tiebreakMode" : "random",
@@ -61,6 +62,7 @@
     "maxSkippedRanksAllowed" : "4",
     "maxRankingsAllowed" : "4",
     "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,

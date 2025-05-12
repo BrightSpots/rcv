@@ -1,65 +1,68 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "test set multi winner whole",
-    "outputDirectory": "output",
-    "contestDate": "2019-01-18",
-    "contestJurisdiction": "Multi-winner",
-    "contestOffice": "Multi_winner2",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": true
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "test set multi winner whole",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-01-18",
+    "contestJurisdiction" : "Multi-winner",
+    "contestOffice" : "Multi_winner2",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
   },
-  "cvrFileSources": [
-    {
+  "cvrFileSources" : [ {
     "filePath" : "test_set_multi_winner_whole_threshold_cvr.json",
+    "contestId" : "test set multi winner whole",
     "idColumnIndex" : "",
     "precinctColumnIndex" : "",
     "provider" : "cdf",
-    "contestId": "test set multi winner whole",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "",
-    "skippedRankLabel": "",
-    "undeclaredWriteInLabel": ""
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
     "name" : "Candidate A Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate B Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate C Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate D Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate E Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
-    "name": "Candidate F Name",
-    "code": "",
-    "excluded": false
-  }],
+    "name" : "Candidate F Name",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
   "rules" : {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
-    "randomSeed": "",
-    "numberOfWinners": "3",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "6",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Multi-winner Test 3"
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "multiWinnerAllowMultipleWinnersPerRound",
+    "randomSeed" : "",
+    "numberOfWinners" : "3",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "6",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Multi-winner Test 3",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }
