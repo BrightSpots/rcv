@@ -56,14 +56,14 @@ checkstyle {
     // NOTE: After updating the local version of config/checkstyle/google_checks.xml again in the
     // future, you will need to make two manual changes:
     //
-    // 1. Allow relative path for suppressions
+    // 1. Replace the following line in the local copy to prevent suppressions from being ignored:
     // "${org.checkstyle.google.suppressionfilter.config}"
     // with:
     // "${config_loc}/checkstyle-suppressions.xml"
     // Additional context: https://github.com/gradle/gradle/issues/21409
-
-    // 2. Allow omitting javadoc on short functions
-    // Add the following property into the MissingJavadocMethod module:
+    //
+    // 2. Add the following property into the MissingJavadocMethod module
+    // to allow omitting Javadoc on short functions:
     // <property name="minLineCount" value="2"/>
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
     maxWarnings = 0
