@@ -2,7 +2,7 @@
   "config" : {
     "contest" : "overvote skips to next rank",
     "date" : "2019-03-06",
-    "generatedBy" : "RCTab 1.3.999",
+    "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "TestSets_Single_winner",
     "office" : "Exhaust skipped"
   },

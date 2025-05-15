@@ -37,7 +37,7 @@ public class Main extends GuiApplication {
 
   // TODO Sync version number with release.yml and build.gradle:
   // github.com/BrightSpots/rcv/issues/662
-  public static final String APP_VERSION = "1.3.999";
+  public static final String APP_VERSION = "2.0.0";
 
   /**
    * Main entry point to RCTab.

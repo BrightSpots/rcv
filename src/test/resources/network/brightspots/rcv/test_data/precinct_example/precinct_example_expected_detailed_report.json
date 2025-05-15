@@ -2,7 +2,7 @@
   "config" : {
     "contest" : "Precinct example",
     "date" : "2017-11-07",
-    "generatedBy" : "RCTab 1.3.999",
+    "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "Minneapolis, MN",
     "office" : "Mayor"
   },
