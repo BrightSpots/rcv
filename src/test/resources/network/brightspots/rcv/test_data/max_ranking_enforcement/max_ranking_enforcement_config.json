@@ -1,11 +1,12 @@
 {
-  "tabulatorVersion": "TEST",
+  "tabulatorVersion" : "TEST",
   "outputSettings" : {
     "contestName" : "More ranks than configured",
     "outputDirectory" : "output",
     "contestDate" : "",
     "contestJurisdiction" : "",
     "contestOffice" : "",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },
@@ -15,6 +16,7 @@
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "",
     "provider" : "genericCsv",

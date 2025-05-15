@@ -1,11 +1,12 @@
 {
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
-    "contestName": "Aliases test (ES&S XLSX Format)",
+    "contestName" : "Aliases test (ES&S XLSX Format)",
     "outputDirectory" : "output",
     "contestDate" : "2023-04-28",
     "contestJurisdiction" : "",
     "contestOffice" : "",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },
@@ -15,6 +16,7 @@
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "|",
     "provider" : "ess",
@@ -26,13 +28,11 @@
   "candidates" : [ {
     "name" : "C",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : ""
+    "aliases" : [ ]
   }, {
     "name" : "D",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : ""
+    "aliases" : [ ]
   }, {
     "name" : "A",
     "excluded" : false,
@@ -54,9 +54,11 @@
     "maxSkippedRanksAllowed" : "1",
     "maxRankingsAllowed" : "max",
     "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
     "rulesDescription" : "",
     "treatBlankAsUndeclaredWriteIn" : false

@@ -6,6 +6,7 @@
     "contestDate" : "2020-07-19",
     "contestJurisdiction" : "Wyoming",
     "contestOffice" : "Democratic Primary",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : true,
     "generateCdfJson" : false
   },
@@ -13,6 +14,7 @@
     "filePath" : "tabulate_by_precinct_without_precincts_input_data",
     "contestId" : "1",
     "idColumnIndex" : "",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "",
     "provider" : "dominion",
@@ -24,43 +26,35 @@
   "candidates" : [ {
     "name" : "Joseph R. Biden",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : "1"
+    "aliases" : [ "1" ]
   }, {
     "name" : "Tom Steyer",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : "3"
+    "aliases" : [ "3" ]
   }, {
     "name" : "Bernie Sanders",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : "4"
+    "aliases" : [ "4" ]
   }, {
     "name" : "Amy Klobuchar",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : "5"
+    "aliases" : [ "5" ]
   }, {
     "name" : "Tulsi Gabbard",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : "7"
+    "aliases" : [ "7" ]
   }, {
     "name" : "Elizabeth Warren",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : "8"
+    "aliases" : [ "8" ]
   }, {
     "name" : "Michael R. Bloomberg",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : "9"
+    "aliases" : [ "9" ]
   }, {
     "name" : "Pete Buttigieg",
     "excluded" : false,
-    "aliases" : [ ],
-    "code" : "11"
+    "aliases" : [ "11" ]
   } ],
   "rules" : {
     "tiebreakMode" : "useCandidateOrder",
@@ -74,6 +68,7 @@
     "maxSkippedRanksAllowed" : "1",
     "maxRankingsAllowed" : "8",
     "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : true,
     "continueUntilTwoCandidatesRemain" : false,
