@@ -2,11 +2,11 @@ plugins {
     id "application"
     id "checkstyle"
     // Latest version at: https://github.com/spotbugs/spotbugs-gradle-plugin/tags
-    id "com.github.spotbugs" version "5.0.14"
+    id "com.github.spotbugs" version "6.1.10"
     id "idea"
     id "java-library"
     // Latest version at: https://github.com/beryx/badass-jlink-plugin/tags
-    id "org.beryx.jlink" version "2.26.0"
+    id "org.beryx.jlink" version "3.1.1"
     // Latest version at: https://github.com/openjfx/javafx-gradle-plugin/tags
     id "org.openjfx.javafxplugin" version "0.0.14"
 }
@@ -16,22 +16,25 @@ repositories {
 }
 
 dependencies {
-    implementation 'commons-cli:commons-cli:1.5.0'
-    implementation 'org.apache.commons:commons-csv:1.10.0'
-    implementation 'org.apache.poi:poi-ooxml:5.2.3'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2'
-    implementation "com.github.spotbugs:spotbugs:4.8.3"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    implementation 'commons-cli:commons-cli:1.9.0'
+    implementation 'org.apache.commons:commons-csv:1.14.0'
+    implementation 'org.apache.poi:poi-ooxml:5.4.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.0'
+    implementation "com.github.spotbugs:spotbugs:4.9.3"
+
+    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 // ### Application plugin settings
 application {
-    mainModule = "${moduleName}"
-    mainClass = "${moduleName}.Main"
+    mainModule = "network.brightspots.rcv"
+    mainClass = "network.brightspots.rcv.Main"
 }
 
 // Required to accept a name and tiebreak interactively via CLI
@@ -44,27 +47,32 @@ run {
 // ### Checkstyle plugin settings
 checkstyle {
     // Latest version at https://github.com/checkstyle/checkstyle/tags
-    toolVersion = '10.12.1'
+    toolVersion = '10.23.1'
+
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.3.2/src/main/resources/google_checks.xml
+
     // NOTE: After updating the local version of config/checkstyle/google_checks.xml again in the
-    // future, it may be necessary to subsequently replace the following line in the local copy to
-    // prevent suppressions from being ignored:
+    // future, you will need to make two manual changes:
+    //
+    // 1. Replace the following line in the local copy to prevent suppressions from being ignored:
     // "${org.checkstyle.google.suppressionfilter.config}"
     // with:
     // "${config_loc}/checkstyle-suppressions.xml"
     // Additional context: https://github.com/gradle/gradle/issues/21409
+    //
+    // 2. Add the following property into the MissingJavadocMethod module
+    // to allow omitting Javadoc on short functions:
+    // <property name="minLineCount" value="2"/>
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
     maxWarnings = 0
     ignoreFailures = false
 }
-System.setProperty("org.checkstyle.google.suppressionfilter.config",
-        "$projectDir/config/checkstyle/checkstyle-suppressions.xml")
 
 spotbugs {
     // Latest version at: https://github.com/spotbugs/spotbugs/tags
-    toolVersion = '4.8.3'
+    toolVersion = '4.9.3'
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
 
@@ -78,17 +86,18 @@ idea {
 // ### Java plugin settings
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(20))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
+
 test {
-    moduleOptions {
-        addExports = [
-                "org.junit.platform.commons/org.junit.platform.commons.util"   : "ALL-UNNAMED",
-                "org.junit.platform.commons/org.junit.platform.commons.logging": "ALL-UNNAMED"
-        ]
-    }
+    jvmArgs += [
+        '--add-exports', 'org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED',
+        '--add-exports', 'org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED'
+    ]
     maxHeapSize = "2056m"
     useJUnitPlatform()
     testLogging {
@@ -99,7 +108,7 @@ test {
 // ### JavaFX plugin settings
 javafx {
     // Latest version here: https://gluonhq.com/products/javafx/
-    version = "20.0.1"
+    version = "21.0.7"
     modules = ["javafx.base", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
@@ -241,6 +250,12 @@ tasks.jlink.doLast {
 tasks.withType(AbstractArchiveTask) {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
-    dirMode = 0755
-    fileMode = 0644
+
+    dirPermissions {
+        unix(0755)
+    }
+
+    filePermissions {
+        unix(0644)
+    }
 }

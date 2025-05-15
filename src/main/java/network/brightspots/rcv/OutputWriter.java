@@ -998,10 +998,6 @@ class OutputWriter {
   }
 
   private Map<String, Object> generateCdfMapForElection() {
-    // containers for election-level data
-    List<Map<String, Object>> contestSelections = new LinkedList<>();
-    List<Map<String, Object>> candidates = new LinkedList<>();
-
     // iterate all candidates and create Candidate and ContestSelection objects for them
     List<String> candidateNames = new LinkedList<>(config.getCandidateNames());
     // if any of the sources have overvote labels, we also need to register the explicit overvote
@@ -1017,6 +1013,8 @@ class OutputWriter {
       candidateNames.add(Tabulator.EXPLICIT_OVERVOTE_LABEL);
     }
     Collections.sort(candidateNames);
+    List<Map<String, Object>> candidates = new LinkedList<>();
+    List<Map<String, Object>> contestSelections = new LinkedList<>();
     for (String candidateName : candidateNames) {
       candidates.add(
           Map.ofEntries(

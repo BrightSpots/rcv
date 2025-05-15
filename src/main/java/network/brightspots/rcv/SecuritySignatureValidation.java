@@ -132,7 +132,7 @@ class SecuritySignatureValidation {
     if (!actualPublicKey.exponent.equals(expectedPublicKey.exponent)
         || !actualPublicKey.modulus.equals(expectedPublicKey.modulus)) {
       throw new VerificationDidNotRunException(
-              "%s was signed with unexpected public key.\nActual modulus: %s\nExpected: %s"
+              "%s was signed with unexpected public key.%nActual modulus: %s%nExpected: %s"
               .formatted(signatureKeyFile.getAbsolutePath(),
                       actualPublicKey.modulus, expectedPublicKey.modulus)
       );

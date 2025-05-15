@@ -22,12 +22,18 @@ class SecurityConfig {
   // Only the unit test modules should ever set this to false, if it is initially set as true.
   // Note: On some builds, this will be configured to false by default. We will need some
   // formalized method of toggling this for two versions of builds, which has yet to be determined.
-  private static boolean IS_HART_SIGNATURE_VALIDATION_ENABLED = false;
+  private static final boolean DEFAULT_HART_SIGNATURE_VALIDATION_ENABLED = false;
 
   // Is the user allowed to save output files to their Users directory?
   // Since user accounts retain delete and create permissions to their user account folders,
   // this should be disallowed to truly ensure output files are read-only.
-  private static boolean CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY = true;
+  private static final boolean DEFAULT_CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY = true;
+
+  // ThreadLocal variables for thread-safe overrides
+  private static final ThreadLocal<Boolean> hartSignatureValidationEnabled =
+          ThreadLocal.withInitial(() -> DEFAULT_HART_SIGNATURE_VALIDATION_ENABLED);
+  private static final ThreadLocal<Boolean> canOutputFilesSaveToUsersDirectory =
+          ThreadLocal.withInitial(() -> DEFAULT_CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY);
 
   // The base64-encoded RSA public key modulus
   private static final String RSA_MODULUS =
@@ -43,11 +49,11 @@ class SecurityConfig {
   private static RsaKeyValue rsaKeyValue = null;
 
   public static boolean isHartSignatureValidationEnabled() {
-    return IS_HART_SIGNATURE_VALIDATION_ENABLED;
+    return hartSignatureValidationEnabled.get();
   }
 
   public static boolean canOutputFilesSaveToUsersDirectory() {
-    return CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY;
+    return canOutputFilesSaveToUsersDirectory.get();
   }
 
   // Synchronized to prevent a race condition. SpotBugs will complain otherwise, even though
@@ -67,7 +73,7 @@ class SecurityConfig {
       throw new RuntimeException("Only unit tests can edit the security configuration!");
     }
 
-    IS_HART_SIGNATURE_VALIDATION_ENABLED = isEnabled;
+    hartSignatureValidationEnabled.set(isEnabled);
   }
 
   public static void setAllowUsersDirectorySavingForUnitTests(boolean isAllowed) {
@@ -75,7 +81,7 @@ class SecurityConfig {
       throw new RuntimeException("Only unit tests can edit the security configuration!");
     }
 
-    CAN_OUTPUT_FILES_SAVE_TO_USERS_DIRECTORY = isAllowed;
+    canOutputFilesSaveToUsersDirectory.set(isAllowed);
   }
 
   private static boolean isNotCalledByTabulatorTests() {

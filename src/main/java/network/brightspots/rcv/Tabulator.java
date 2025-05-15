@@ -1114,9 +1114,6 @@ final class Tabulator {
 
       // iterate over all ranks in this cvr from most preferred to least
       for (Pair<Integer, CandidatesAtRanking> rankCandidatesPair : cvr.candidateRankings) {
-        Integer rank = rankCandidatesPair.getKey();
-        CandidatesAtRanking candidates = rankCandidatesPair.getValue();
-
         // check for final round surplus
         if (config.usesSurpluses()
             && config.getNumberOfWinners() == winnerToRound.size()) {
@@ -1131,6 +1128,7 @@ final class Tabulator {
         }
 
         // check for skipped ranking exhaustion
+        Integer rank = rankCandidatesPair.getKey();
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
           recordSelectionForCastVoteRecord(
@@ -1145,6 +1143,7 @@ final class Tabulator {
         lastRankSeen = rank;
 
         // check for a duplicate candidate if enabled
+        CandidatesAtRanking candidates = rankCandidatesPair.getValue();
         if (config.isExhaustOnDuplicateCandidateEnabled()) {
           String duplicateCandidate = null;
           for (String candidate : candidates) {
