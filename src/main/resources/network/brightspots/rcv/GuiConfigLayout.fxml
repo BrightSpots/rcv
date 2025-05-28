@@ -328,7 +328,7 @@
                     />
                     <Text
                         text="NOTE: The auto-load feature relies on candidates appearing in vote data to populate the list of candidates. Users should confirm the list of candidates populated against the list of candidates in their election to confirm that all candidates were properly loaded."
-                        style="-fx-font-weight: bold; -fx-font-style: italic; -fx-font-size: 11"
+                        style="-fx-font-style: italic; -fx-font-size: 11"
                         wrappingWidth="250"
                     />
                     <Separator>
@@ -353,7 +353,7 @@
                     <VBox>
                       <Text text="NOTE: Candidate names are case-sensitive and must match the CVR exactly, including any HTML tags or other special characters!"
                             wrappingWidth="350"
-                            style="-fx-font-weight: bold; -fx-font-style: italic; -fx-font-size: 11">
+                            style="-fx-font-style: italic; -fx-font-size: 11">
                       </Text>
                       <padding>
                         <Insets left="8.0" right="8.0" top="8.0"/>
