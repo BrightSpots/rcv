@@ -15,11 +15,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="955.0" prefWidth="1165.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
+            prefHeight="955.0" prefWidth="1195.0" stylesheets="/network/brightspots/rcv/GuiStyles.css"
             xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="network.brightspots.rcv.GuiConfigController">
   <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    prefHeight="955.0" prefWidth="1165.0">
+    prefHeight="955.0" prefWidth="1195.0">
     <top>
       <VBox BorderPane.alignment="TOP_LEFT">
         <MenuBar fx:id="menuBar">
@@ -366,7 +366,7 @@
                     </padding>
                   </Separator>
                   <HBox alignment="CENTER_LEFT" spacing="4.0">
-                    <Label text="Name *" prefWidth="50.0"/>
+                    <Label text="Name *" prefWidth="60.0"/>
                     <TextField prefHeight="25.0" prefWidth="300.0" fx:id="textFieldCandidateName"/>
                     <padding>
                       <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
