@@ -1,0 +1,55 @@
+{
+  "config" : {
+    "contest" : "UWI Test",
+    "date" : "",
+    "generatedBy" : "RCTab 2.0.0",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "A" : "3",
+      "B" : "1",
+      "Undeclared Write-ins" : "5"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Undeclared Write-ins",
+      "transfers" : {
+        "exhausted" : "5"
+      }
+    } ],
+    "threshold" : "5"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "5",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "A" : "3",
+      "B" : "1"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    } ],
+    "threshold" : "3"
+  } ],
+  "summary" : {
+    "finalThreshold" : "3",
+    "numCandidates" : 3,
+    "numWinners" : 1,
+    "totalNumBallots" : "9",
+    "undervotes" : 0
+  }
+}

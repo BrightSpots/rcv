@@ -1,79 +1,74 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Test Sequential with Batch Elimination",
-    "outputDirectory": "output",
-    "contestDate": "",
-    "contestJurisdiction": "",
-    "contestOffice": "",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Test Sequential with Batch Elimination",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "sequential_with_batch_cvr.xlsx",
-      "contestId": "",
-      "firstVoteColumnIndex": "2",
-      "firstVoteRowIndex": "2",
-      "idColumnIndex": "",
-      "precinctColumnIndex": "1",
-      "overvoteDelimiter": "",
-      "provider": "ess",
-      "overvoteLabel": "overvote",
-      "undervoteLabel": "undervote",
-      "undeclaredWriteInLabel": "",
-      "treatBlankAsUndeclaredWriteIn": false
-    }
-  ],
-  "candidates": [
-    {
-      "name": "A",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "B",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "C",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "D",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "E",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "F",
-      "code": "",
-      "excluded": false
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "useCandidateOrder",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiPassIrv",
-    "randomSeed": "",
-    "numberOfWinners": "3",
-    "multiSeatBottomsUpPercentageThreshold": "",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "2",
-    "maxRankingsAllowed": "3",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": true,
-    "continueUntilTwoCandidatesRemain": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "",
-    "treatBlankAsUndeclaredWriteIn": false
+  "cvrFileSources" : [ {
+    "filePath" : "../_shared/simple_sequential_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "1",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "A",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "B",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "C",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "D",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "E",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "F",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "multiPassIrv",
+    "randomSeed" : "",
+    "numberOfWinners" : "3",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "2",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

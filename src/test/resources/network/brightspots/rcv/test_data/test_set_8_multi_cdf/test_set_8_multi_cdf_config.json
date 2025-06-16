@@ -6,6 +6,7 @@
     "contestDate" : "2019-03-06",
     "contestJurisdiction" : "TestSets_Single_winner",
     "contestOffice" : "Skiptonext_Skiponovervote",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : true
   },
@@ -13,41 +14,43 @@
     "filePath" : "test_set_8_multi_cdf_cvr_1.json",
     "contestId" : "Test Set 0",
     "idColumnIndex" : "",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "",
     "provider" : "cdf",
     "overvoteLabel" : "",
-    "undervoteLabel" : "",
+    "skippedRankLabel" : "",
     "undeclaredWriteInLabel" : "",
     "treatBlankAsUndeclaredWriteIn" : false
   }, {
     "filePath" : "test_set_8_multi_cdf_cvr_2.json",
     "contestId" : "Test Set 0",
     "idColumnIndex" : "",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "",
     "provider" : "cdf",
     "overvoteLabel" : "",
-    "undervoteLabel" : "",
+    "skippedRankLabel" : "",
     "undeclaredWriteInLabel" : "",
     "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
     "name" : "Candidate A Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate B Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate C Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "Candidate D Name",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   } ],
   "rules" : {
     "tiebreakMode" : "random",
@@ -61,9 +64,11 @@
     "maxSkippedRanksAllowed" : "4",
     "maxRankingsAllowed" : "4",
     "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
     "rulesDescription" : "Skiptonext_exhaustatovervote",
     "treatBlankAsUndeclaredWriteIn" : false

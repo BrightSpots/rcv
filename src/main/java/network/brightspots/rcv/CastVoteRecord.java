@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,18 +21,13 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import javafx.util.Pair;
 
 class CastVoteRecord {
-
   // computed unique ID for this CVR (source file + line number)
   private final String computedId;
   // supplied unique ID for this CVR
@@ -41,8 +36,8 @@ class CastVoteRecord {
   private final String precinct;
   // which precinct portion this ballot came from
   private final String precinctPortion;
-  // container for ALL CVR data parsed from the source CVR file
-  private final List<String> fullCvrData;
+  // is the last-used ranking the last-allowed ranking in the CVR?
+  private final boolean usesLastAllowedRanking;
   // records winners to whom some fraction of this vote has been allocated
   private final Map<String, BigDecimal> winnerToFractionalValue = new HashMap<>();
   // If CVR CDF output is enabled, we store the necessary info here: for each round, the list of
@@ -53,17 +48,15 @@ class CastVoteRecord {
   private final Map<Integer, List<Pair<String, BigDecimal>>> cdfSnapshotData = new HashMap<>();
   // map of round to all candidates selected for that round
   // a set is used to handle overvotes
-  SortedMap<Integer, Set<String>> rankToCandidateIds;
+  CandidateRankingsList candidateRankings;
   // contest associated with this CVR
-  private String contestId;
+  private final String contestId;
   // tabulatorId parsed from Dominion CVR data
-  private String tabulatorId;
+  private final String tabulatorId;
   // batchId parsed from Dominion CVR data
-  private String batchId;
-  // ballotTypeId parsed from Dominion CVR data
-  private String ballotTypeId;
-  // whether this CVR is exhausted or not
-  private boolean isExhausted;
+  private final String batchId;
+  // the ballot status for the current round, which will change as tabulation progresses.
+  private StatusForRound currentRoundStatus = StatusForRound.ACTIVE;
   // tells us which candidate is currently receiving this CVR's vote (or fractional vote)
   private String currentRecipientOfVote = null;
 
@@ -74,32 +67,42 @@ class CastVoteRecord {
       String suppliedId,
       String precinct,
       String precinctPortion,
-      String ballotTypeId,
+      boolean usesLastAllowedRanking,
       List<Pair<Integer, String>> rankings) {
+    this(contestId, tabulatorId, batchId, suppliedId, null, precinct, precinctPortion,
+        usesLastAllowedRanking, rankings);
+  }
+
+  CastVoteRecord(
+          String contestId,
+          String tabulatorId,
+          String batchId,
+          String suppliedId,
+          String computedId,
+          String precinct,
+          String precinctPortion,
+          boolean usesLastAllowedRanking,
+          List<Pair<Integer, String>> rankings) {
     this.contestId = contestId;
     this.tabulatorId = tabulatorId;
     this.batchId = batchId;
-    this.computedId = null;
     this.suppliedId = suppliedId;
+    this.computedId = computedId;
     this.precinct = precinct;
     this.precinctPortion = precinctPortion;
-    this.ballotTypeId = ballotTypeId;
-    this.fullCvrData = null;
-    sortRankings(rankings);
+    this.usesLastAllowedRanking = usesLastAllowedRanking;
+    this.candidateRankings = new CandidateRankingsList(rankings);
   }
 
   CastVoteRecord(
       String computedId,
       String suppliedId,
       String precinct,
-      List<String> fullCvrData,
+      String batchId,
+      boolean usesLastAllowedRanking,
       List<Pair<Integer, String>> rankings) {
-    this.computedId = computedId;
-    this.suppliedId = suppliedId;
-    this.precinct = precinct;
-    this.precinctPortion = null;
-    this.fullCvrData = fullCvrData;
-    sortRankings(rankings);
+    this(null, null, batchId, suppliedId, computedId, precinct, null,
+        usesLastAllowedRanking, rankings);
   }
 
   String getContestId() {
@@ -110,24 +113,28 @@ class CastVoteRecord {
     return tabulatorId;
   }
 
-  String getBatchId() {
-    return batchId;
-  }
-
-  String getBallotTypeId() {
-    return ballotTypeId;
-  }
-
-  String getPrecinct() {
-    return precinct;
+  String getSlice(ContestConfig.TabulateBySlice slice) {
+    return switch (slice) {
+      case BATCH -> batchId;
+      case PRECINCT -> precinct;
+    };
   }
 
   String getPrecinctPortion() {
     return precinctPortion;
   }
 
+  boolean doesUseLastAllowedRanking() {
+    return usesLastAllowedRanking;
+  }
+
+  // This represents the canonical ID used for audit logs and RCTab CVR
   String getId() {
-    return suppliedId != null ? suppliedId : computedId;
+    return !isNullOrBlank(computedId) ? computedId : suppliedId;
+  }
+
+  String getSuppliedId() {
+    return suppliedId;
   }
 
   // logs the outcome for this CVR for this round for auditing purposes
@@ -136,11 +143,7 @@ class CastVoteRecord {
 
     StringBuilder logStringBuilder = new StringBuilder();
     logStringBuilder.append("[Round] ").append(round).append(" [CVR] ");
-    if (!isNullOrBlank(suppliedId)) {
-      logStringBuilder.append(suppliedId);
-    } else {
-      logStringBuilder.append(computedId);
-    }
+    logStringBuilder.append(getId());
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
@@ -159,13 +162,7 @@ class CastVoteRecord {
       logStringBuilder.append(" [value] ").append(fractionalTransferValue);
     }
 
-    // add complete data for round 1 only
-    if (round == 1) {
-      logStringBuilder.append(" [Raw Data] ");
-      logStringBuilder.append(fullCvrData);
-    }
-
-    Logger.fine(logStringBuilder.toString());
+    Logger.auditable(logStringBuilder.toString());
   }
 
   Map<Integer, List<Pair<String, BigDecimal>>> getCdfSnapshotData() {
@@ -185,13 +182,16 @@ class CastVoteRecord {
     cdfSnapshotData.put(round, data);
   }
 
-  void exhaust() {
-    assert !isExhausted;
-    isExhausted = true;
+  void exhaustBy(StatusForRound status) {
+    this.currentRoundStatus = status;
   }
 
   boolean isExhausted() {
-    return isExhausted;
+    return currentRoundStatus != StatusForRound.ACTIVE;
+  }
+
+  StatusForRound getBallotStatus() {
+    return currentRoundStatus;
   }
 
   // fractional transfer value is one by default but can be less if this
@@ -229,13 +229,73 @@ class CastVoteRecord {
     return winnerToFractionalValue;
   }
 
-  // create a sorted map of ranking to candidates selected at that rank
-  private void sortRankings(List<Pair<Integer, String>> rankings) {
-    rankToCandidateIds = new TreeMap<>();
-    for (Pair<Integer, String> ranking : rankings) {
-      Set<String> candidatesAtRank =
-          rankToCandidateIds.computeIfAbsent(ranking.getKey(), k -> new HashSet<>());
-      candidatesAtRank.add(ranking.getValue());
+  // StatusForRound represents the ballot's status on a given round.
+  // This CastVoteRecord will have different statuses each round,
+  // and this provides a more detailed breakdown than a simple
+  // active/inactive binary. It is only useful in results reporting;
+  // as far as tabulation is concerned, all that matters is whether
+  // it is active or not.
+  enum StatusForRound {
+    ACTIVE(
+            false,
+            "Active",
+            "active"
+    ),
+    DID_NOT_RANK_ANY_CANDIDATES(
+            true,
+            "Did Not Rank Any Candidates",
+            "didNotRankAnyCandidates"
+    ),
+    EXHAUSTED_CHOICE(
+            true,
+            "Inactive Ballots by Exhausted Choices",
+            "exhaustedChoices"
+    ),
+    INVALIDATED_BY_OVERVOTE(
+            true,
+            "Inactive Ballots by Overvotes",
+            "overvotes"
+    ),
+    INVALIDATED_BY_SKIPPED_RANKING(
+            true,
+            "Inactive Ballots by Skipped Rankings",
+            "skippedRankings"
+    ),
+    INVALIDATED_BY_REPEATED_RANKING(
+            true,
+            "Inactive Ballots by Repeated Rankings",
+            "repeatedRankings"
+    ),
+    FINAL_ROUND_SURPLUS(
+            false,
+            "Final Round Surplus",
+            "finalRoundSurplus"
+    );
+
+    private final boolean isInactiveBallot;
+    private final String titleCaseKey;
+    private final String camelCaseKey;
+
+    StatusForRound(
+            boolean isInactiveBallot,
+            String titleCaseKey,
+            String camelCaseKey
+    ) {
+      this.isInactiveBallot = isInactiveBallot;
+      this.titleCaseKey = titleCaseKey;
+      this.camelCaseKey = camelCaseKey;
+    }
+
+    public boolean isInactiveBallot() {
+      return isInactiveBallot;
+    }
+
+    public String getTitleCaseKey() {
+      return titleCaseKey;
+    }
+
+    public String getCamelCaseKey() {
+      return camelCaseKey;
     }
   }
 
@@ -245,7 +305,5 @@ class CastVoteRecord {
     EXHAUSTED,
   }
 
-  static class CvrParseException extends Exception {
-
-  }
+  static class CvrParseException extends Exception {}
 }

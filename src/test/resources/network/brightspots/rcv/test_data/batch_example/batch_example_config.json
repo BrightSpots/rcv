@@ -1,0 +1,122 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Batch example",
+    "outputDirectory" : "output",
+    "contestDate" : "2017-11-07",
+    "contestJurisdiction" : "Minneapolis, MN",
+    "contestOffice" : "Mayor",
+    "tabulateByBatch" : true,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "batch_example_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "2",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "1",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "UWI",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Jacob Frey",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Tom Hoch",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Betsy Hodges",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Raymond Dehn",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Nekima Levy-Pounds",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Charlie Gers",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Aswar Rahman",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Al Flowers",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "L.A. Nik",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "David Rosenfeld",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Captain Jack Sparrow",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Gregg A. Iverson",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Ronald Lischeid",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "David John Wilson",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Troy Benjegerdes",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Ian Simpson",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Christopher Zimmerman",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Theron Preston Washington",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "3",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : true,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Minneapolis Rules",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
@@ -40,6 +39,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import network.brightspots.rcv.Tabulator.RoundTallies;
 import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 
@@ -56,7 +56,7 @@ class Tiebreak {
   private final BigDecimal numVotes;
   // roundTallies: map from round number to map of candidate ID to vote total (for that round)
   // e.g. roundTallies[1] contains a map of candidate IDs to tallies for each candidate in round 1
-  private final Map<Integer, Map<String, BigDecimal>> roundTallies;
+  private final RoundTallies roundTallies;
   private final boolean isSelectingWinner;
   private String selectedCandidate;
   private String explanation;
@@ -74,7 +74,7 @@ class Tiebreak {
       TiebreakMode tiebreakMode,
       int round,
       BigDecimal numVotes,
-      Map<Integer, Map<String, BigDecimal>> roundTallies,
+      RoundTallies roundTallies,
       ArrayList<String> candidatePermutation) {
     this.isSelectingWinner = isSelectingWinner;
     this.allTiedCandidates = allTiedCandidates;
@@ -112,8 +112,8 @@ class Tiebreak {
     switch (tiebreakMode) {
       case INTERACTIVE -> selectedCandidate = doInteractive(allTiedCandidates);
       case RANDOM -> selectedCandidate = doRandom(allTiedCandidates);
-      case GENERATE_PERMUTATION, USE_PERMUTATION_IN_CONFIG ->
-          selectedCandidate = doPermutationSelection(allTiedCandidates);
+      case GENERATE_PERMUTATION, USE_PERMUTATION_IN_CONFIG -> selectedCandidate =
+          doPermutationSelection(allTiedCandidates);
       default -> selectedCandidate = doPreviousRounds(allTiedCandidates);
     }
     return selectedCandidate;
@@ -178,7 +178,7 @@ class Tiebreak {
         // if parseInt failed selection will be null and we will retry
       }
       if (selection == null) {
-        System.out.println("Invalid selection. Please try again.");
+        System.out.println("Invalid selection. Try again.");
         System.out.println(prompt);
       }
     }
@@ -190,12 +190,11 @@ class Tiebreak {
   private String doInteractiveGui(List<String> tiedCandidates) throws TabulationAbortedException {
     Logger.info(
         "Tie in round %d for the following candidates, each of whom has %d votes: %s",
-        round,
-        numVotes.intValue(),
-        String.join(", ", tiedCandidates));
-    Logger.info("Please use the pop-up window to select the candidate who should "
-        + (isSelectingWinner ? "win" : "lose")
-        + " this tiebreaker.");
+        round, numVotes.intValue(), String.join(", ", tiedCandidates));
+    Logger.info(
+        "Use the pop-up window to select the candidate who should "
+            + (isSelectingWinner ? "win" : "lose")
+            + " this tiebreaker.");
 
     String selection = null;
 
@@ -215,7 +214,7 @@ class Tiebreak {
         Logger.severe("Failed to get tiebreaker!\n%s", exception);
       }
       if (selection == null) {
-        Logger.warning("Invalid selection! Please try again.");
+        Logger.warning("Invalid selection! Try again.");
       }
     }
 
@@ -292,16 +291,8 @@ class Tiebreak {
     return selection;
   }
 
-  private static class GuiTiebreakerPromptResponse {
-
-    final boolean tabulationCancelled;
-    final String selectedCandidate;
-
-    GuiTiebreakerPromptResponse(boolean tabulationCancelled, String selectedCandidate) {
-      this.tabulationCancelled = tabulationCancelled;
-      this.selectedCandidate = selectedCandidate;
-    }
-  }
+  private record GuiTiebreakerPromptResponse(
+      boolean tabulationCancelled, String selectedCandidate) {}
 
   class GuiTiebreakerPrompt implements Callable<GuiTiebreakerPromptResponse> {
 
@@ -313,6 +304,7 @@ class Tiebreak {
       final Stage window = new Stage();
       window.initModality(Modality.APPLICATION_MODAL);
       window.setTitle("RCV Tiebreaker");
+      window.setResizable(false);
       String resourcePath = "/network/brightspots/rcv/GuiTiebreakerLayout.fxml";
       try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));

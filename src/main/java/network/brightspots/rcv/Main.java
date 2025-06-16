@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,17 +17,27 @@
 
 package network.brightspots.rcv;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Scanner;
+import java.util.stream.Stream;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
-/**
- * Main entry point to RCTab.
- */
+/** Main entry point to RCTab. */
 @SuppressWarnings("WeakerAccess")
 public class Main extends GuiApplication {
 
   public static final String APP_NAME = "RCTab";
-  public static final String APP_VERSION = "1.3.1";
+
+  // TODO Sync version number with release.yml and build.gradle:
+  // github.com/BrightSpots/rcv/issues/662
+  public static final String APP_VERSION = "2.0.0";
 
   /**
    * Main entry point to RCTab.
@@ -39,48 +49,85 @@ public class Main extends GuiApplication {
     Logger.setup();
     logSystemInfo();
 
-    // Determine if user intends to use the command-line interface, and gather args if so
-    boolean useCli = false;
-    List<String> argsCli = new ArrayList<>();
-    for (String arg : args) {
-      if (!useCli && arg.equals("-cli")) {
-        useCli = true;
-      } else if (useCli) {
-        argsCli.add(arg);
-      }
-    }
-
-    if (!useCli) {
-      // Launch the GUI
+    // Check if args contains string "--cli"
+    if (Arrays.stream(args).filter(arg -> arg.equals("--cli")).findAny().isEmpty()) {
+      // --cli not found. Launch the GUI
       launch(args);
     } else {
-      Logger.info("Tabulator is being used via the CLI.");
-      // Check for unexpected input
-      if (argsCli.size() == 0) {
-        Logger.severe(
-            """
-                No config file path provided on command line!
-                Please provide a path to the config file!
-                See README.md for more details.""");
-        System.exit(1);
-      } else if (argsCli.size() > 2) {
-        Logger.severe(
-            "Too many arguments! Max is 2 but got: %d\n" + "See README.md for more details.",
-            argsCli.size());
-        System.exit(2);
+      Logger.info("Tabulator is being used via the CLI");
+
+      CommandLine cmd = parseArgsForCli(args);
+      String path = cmd.getOptionValue("cli");
+      String operatorName = cmd.getOptionValue("name");
+      boolean convertToCdf = cmd.hasOption("convert-to-cdf");
+
+      if (operatorName == null) {
+        // Name wasn't provided via CLI arg, so prompt user to enter
+        Logger.info("Enter operator name(s), for auditing purposes:");
+
+        Scanner sc = new Scanner(System.in, StandardCharsets.UTF_8);
+        if (sc.hasNextLine()) {
+          operatorName = sc.nextLine();
+        }
       }
-      // Path to either: config file for configuring the tabulator, or Dominion JSONs
-      String providedPath = argsCli.get(0);
-      // Session object will manage the tabulation process
-      TabulatorSession session = new TabulatorSession(providedPath);
-      if (argsCli.size() == 2 && argsCli.get(1).equals("convert-to-cdf")) {
+
+      if (operatorName == null || operatorName.isBlank()) {
+        Logger.severe(
+            "Must supply --name as a CLI argument, or run via an interactive shell and actually"
+                + " provide operator name(s)!");
+        System.exit(1);
+      }
+
+      TabulatorSession session = new TabulatorSession(path);
+      if (convertToCdf) {
         session.convertToCdf();
       } else {
-        session.tabulate();
+        operatorName = operatorName.trim();
+        session.tabulate(operatorName);
       }
     }
 
     System.exit(0);
+  }
+
+  // Call this function if using the command line interface. Do not call if --cli
+  // has not been passed as an argument; it will fail.
+  private static CommandLine parseArgsForCli(String[] args) {
+    // Remove all args that start with "-D" -- these are added automatically when running via
+    // IntelliJ
+    Stream<String> filteredArgs = Arrays.stream(args).filter(arg -> !arg.startsWith("-D"));
+    args = filteredArgs.toArray(String[]::new);
+
+    Options options = new Options();
+
+    Option inputPath =
+        new Option("c", "cli", true, "launch command-line version, providing path to config file");
+    inputPath.setRequired(true);
+    options.addOption(inputPath);
+
+    Option doConvert =
+        new Option("x", "convert-to-cdf", false, "convert CVR(s) to CDF (instead of tabulating)");
+    doConvert.setRequired(false);
+    options.addOption(doConvert);
+
+    Option name = new Option("n", "name", true, "current operator name(s), for auditing purposes");
+    name.setRequired(false);
+    options.addOption(name);
+
+    CommandLineParser parser = new DefaultParser();
+    CommandLine cmd = null;
+
+    try {
+      cmd = parser.parse(options, args);
+    } catch (ParseException e) {
+      Logger.severe(e.getMessage());
+      HelpFormatter formatter = new HelpFormatter();
+      formatter.printHelp("RCTab", options);
+
+      System.exit(1);
+    }
+
+    return cmd;
   }
 
   private static void logSystemInfo() {

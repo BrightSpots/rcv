@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,7 +11,7 @@
  * Purpose: Core contest tabulation logic including:
  * Rank choice flows and vote reallocation.
  * Winner selection, loser selection, and tiebreak rules.
- * Overvote / undervote rules.
+ * Overvote / Skipped Ranking rules.
  * Design: On each loop a round is tallied and tabulated according to selected rules.
  * Inputs: CastVoteRecords for the desired contest and ContestConfig with rules configuration.
  * Results are logged to console and audit file.
@@ -21,6 +21,7 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.CastVoteRecord.StatusForRound;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.io.IOException;
@@ -36,10 +37,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.VoteOutcomeType;
-import network.brightspots.rcv.ResultsWriter.RoundSnapshotDataMissingException;
+import network.brightspots.rcv.ContestConfig.TabulateBySlice;
+import network.brightspots.rcv.OutputWriter.RoundSnapshotDataMissingException;
 
-class Tabulator {
+final class Tabulator {
 
   static final String OVERVOTE_RULE_ALWAYS_SKIP_TEXT = "Always skip to next rank";
   static final String OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT = "Exhaust immediately";
@@ -51,39 +54,56 @@ class Tabulator {
   // cast vote records parsed from CVR input files
   private final List<CastVoteRecord> castVoteRecords;
   // all candidate IDs for this contest parsed from the contest config
-  private final Set<String> candidateIds;
+  private final Set<String> candidateNames;
   // contest config contains specific rules and file paths to be used during tabulation
   private final ContestConfig config;
   // roundTallies is a map from round number to a map from candidate ID to vote total for the round
   // e.g. roundTallies[1] contains a map of all candidate ID -> votes for each candidate in round 1
   // this structure is computed over the course of tabulation
-  private final Map<Integer, Map<String, BigDecimal>> roundTallies = new HashMap<>();
-  // precinctRoundTallies is a map from precinct to roundTallies for that precinct
-  private final Map<String, Map<Integer, Map<String, BigDecimal>>> precinctRoundTallies =
-      new HashMap<>();
+  private final RoundTallies roundTallies = new RoundTallies();
+  // roundTalliesBySlices is a map from a tabulate-by slice to roundTallies for that slice
+  private final BreakdownBySlice<RoundTallies> roundTalliesBySlices = new BreakdownBySlice<>();
   // candidateToRoundEliminated is a map from candidate ID to round in which they were eliminated
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
   // map from candidate ID to the round in which they won
   private final Map<String, Integer> winnerToRound = new HashMap<>();
   // tracks vote transfer summaries (usable by external visualizer software)
   private final TallyTransfers tallyTransfers = new TallyTransfers();
-  private final Map<String, TallyTransfers> precinctTallyTransfers = new HashMap<>();
+  private final BreakdownBySlice<TallyTransfers> tallyTransfersBySlice = new BreakdownBySlice<>();
   // tracks residual surplus from multi-seat contest vote transfers
   private final Map<Integer, BigDecimal> roundToResidualSurplus = new HashMap<>();
-  // precincts which may appear in the cast vote records
-  private final Set<String> precinctNames;
+  // cast vote record metadata on which tabulation can be "split", such as precinct or batch
+  private final SliceIdSet sliceIds = new SliceIdSet();
   // tracks the current round (and when tabulation is completed, the total number of rounds)
   private int currentRound = 0;
-  // tracks required winning threshold
-  private BigDecimal winningThreshold;
 
-  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config, Set<String> precinctNames) {
+  Tabulator(List<CastVoteRecord> castVoteRecords, ContestConfig config)
+      throws TabulationAbortedException {
     this.castVoteRecords = castVoteRecords;
-    this.candidateIds = config.getCandidateCodeList();
+    this.candidateNames = config.getCandidateNames();
     this.config = config;
-    this.precinctNames = precinctNames;
-    if (config.isTabulateByPrecinctEnabled()) {
-      initPrecinctRoundTallies();
+
+    sliceIds.initialize(ContestConfig.TabulateBySlice.BATCH);
+    sliceIds.initialize(ContestConfig.TabulateBySlice.PRECINCT);
+
+    for (CastVoteRecord cvr : castVoteRecords) {
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        String sliceId = cvr.getSlice(slice);
+        if (sliceId != null) {
+          sliceIds.add(slice, sliceId);
+        }
+      }
+    }
+
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      if (sliceIds.isEmpty(slice)) {
+        Logger.severe(
+            "\"Tabulate by %s\" enabled, but CVRs don't list %ss.",
+            slice, slice.toString().toLowerCase());
+        throw new TabulationAbortedException(false);
+      }
+
+      initTabulateBySliceRoundTallies(slice);
     }
   }
 
@@ -96,11 +116,11 @@ class Tabulator {
   //   on the tied candidate's previous round totals to break the tie.
   // param: shouldLog is set to log to console and log file
   static SortedMap<BigDecimal, LinkedList<String>> buildTallyToCandidates(
-      Map<String, BigDecimal> roundTally, Set<String> candidatesToInclude, boolean shouldLog) {
+      RoundTally roundTally, Set<String> candidatesToInclude, boolean shouldLog) {
     SortedMap<BigDecimal, LinkedList<String>> tallyToCandidates = new TreeMap<>();
     // for each candidate record their vote total into the countToCandidates object
     for (String candidate : candidatesToInclude) {
-      BigDecimal votes = roundTally.get(candidate);
+      BigDecimal votes = roundTally.getCandidateTally(candidate);
       if (shouldLog) {
         Logger.info("Candidate \"%s\" got %s vote(s).", candidate, votes);
       }
@@ -113,7 +133,7 @@ class Tabulator {
 
   // run the main tabulation routine to determine contest results
   // returns: set containing winner(s)
-  Set<String> tabulate() throws TabulationAbortedException {
+  Set<String> tabulate(Progress progress) throws TabulationAbortedException {
     if (config.needsRandomSeed()) {
       Random random = new Random(config.getRandomSeed());
       if (config.getTiebreakMode() == TiebreakMode.GENERATE_PERMUTATION) {
@@ -142,44 +162,42 @@ class Tabulator {
       currentRound++;
       Logger.info("Round: %d", currentRound);
 
-      // currentRoundCandidateToTally is a map of candidate ID to vote tally for the current round.
+      // currentRoundTally maps candidate IDs to vote tallies for the current round.
       // At each iteration of this loop that involves eliminating candidates, the eliminatedRound
       // object will gain entries.
-      // Conversely, the currentRoundCandidateToTally object returned here will contain fewer
+      // Conversely, the currentRoundTally object returned here will contain fewer
       // entries, each of which will have as many or more votes than they did in prior rounds.
       // Eventually the winner(s) will be chosen.
-      Map<String, BigDecimal> currentRoundCandidateToTally = computeTalliesForRound(currentRound);
-      roundTallies.put(currentRound, currentRoundCandidateToTally);
+      RoundTally currentRoundTally = computeTalliesForRound(currentRound);
+      roundTallies.put(currentRound, currentRoundTally);
       roundToResidualSurplus.put(
           currentRound,
           currentRound == 1 ? BigDecimal.ZERO : roundToResidualSurplus.get(currentRound - 1));
 
-      // The winning threshold in a standard multi-seat contest is based on the number of active
-      // votes in the first round.
-      // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
-      // on the number of active votes in the current round.
-      if (currentRound == 1 || config.getNumberOfWinners() <= 1) {
-        setWinningThreshold(currentRoundCandidateToTally, config.getMinimumVoteThreshold());
+      if (shouldRecomputeThreshold()) {
+        calculateAndSetWinningThreshold(currentRoundTally, config.getMinimumVoteThreshold());
+      } else {
+        BigDecimal lastRoundThreshold = roundTallies.get(currentRound - 1).getWinningThreshold();
+        setWinningThreshold(currentRound, lastRoundThreshold);
       }
 
       // "invert" map and look for winners
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates =
-          buildTallyToCandidates(
-              currentRoundCandidateToTally, currentRoundCandidateToTally.keySet(), true);
-      List<String> winners =
-          identifyWinners(currentRoundCandidateToTally, currentRoundTallyToCandidates);
+          buildTallyToCandidates(currentRoundTally, currentRoundTally.getCandidates(), true);
+      List<String> winners = identifyWinners(currentRoundTally, currentRoundTallyToCandidates);
 
-      if (winners.size() > 0) {
+      if (!winners.isEmpty()) {
         for (String winner : winners) {
           winnerToRound.put(winner, currentRound);
         }
         // In multi-seat contests, we always redistribute the surplus (if any) unless bottoms-up
         // is enabled.
-        if (config.getNumberOfWinners() > 1 && !config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
+        if (config.usesSurpluses()) {
           for (String winner : winners) {
-            BigDecimal candidateVotes = currentRoundCandidateToTally.get(winner);
+            BigDecimal candidateVotes = currentRoundTally.getCandidateTally(winner);
             // number that were surplus (beyond the required threshold)
-            BigDecimal extraVotes = candidateVotes.subtract(winningThreshold);
+            BigDecimal extraVotes =
+                candidateVotes.subtract(currentRoundTally.getWinningThreshold());
             // fractional transfer percentage
             BigDecimal surplusFraction =
                 extraVotes.signum() == 1
@@ -197,7 +215,7 @@ class Tabulator {
         }
       } else if (winnerToRound.size() < config.getNumberOfWinners()
           || (config.isContinueUntilTwoCandidatesRemainEnabled()
-          && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)
+              && candidateToRoundEliminated.size() < config.getNumCandidates() - 2)
           || config.isMultiSeatBottomsUpWithThresholdEnabled()) {
         // We need to make more eliminations if
         // a) we haven't found all the winners yet, or
@@ -207,15 +225,16 @@ class Tabulator {
         List<String> eliminated;
         // Four mutually exclusive ways to eliminate candidates.
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
-        eliminated = dropUndeclaredWriteIns(currentRoundCandidateToTally);
+        eliminated = dropUndeclaredWriteIns(currentRoundTally);
         // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
         if (eliminated.isEmpty()) {
           eliminated = dropCandidatesBelowThreshold(currentRoundTallyToCandidates);
           // One edge case: if everyone is below the threshold, we can't proceed. This would only
           // happen in the first or (if we drop undeclared write-ins first) second round.
           if (eliminated.size() == config.getNumDeclaredCandidates()) {
-            Logger.severe("Tabulation can't proceed because all declared candidates are below "
-                + "the minimum vote threshold.");
+            Logger.severe(
+                "Tabulation can't proceed because all declared candidates are below "
+                    + "the minimum vote threshold.");
             throw new TabulationAbortedException(false);
           }
         }
@@ -229,24 +248,58 @@ class Tabulator {
           eliminated = doRegularElimination(currentRoundTallyToCandidates);
         }
 
-        assert !eliminated.isEmpty();
+        if (eliminated.isEmpty()) {
+          Logger.severe("Failed to eliminate any candidates!");
+          throw new TabulationAbortedException(false);
+        }
         for (String loser : eliminated) {
           candidateToRoundEliminated.put(loser, currentRound);
         }
+        progress.markCandidatesEliminated(eliminated.size());
       }
 
       if (config.getNumberOfWinners() > 1) {
-        updatePastWinnerTallies();
+        updateWinnerTallies();
       }
     }
     return winnerToRound.keySet();
+  }
+
+  private boolean shouldRecomputeThreshold() {
+    // The winning threshold in a standard multi-seat contest is based on the number of active
+    // votes in the first round.
+    // In a single-seat contest or in the special multi-seat bottoms-up threshold mode, it's based
+    // on the number of active votes in the current round, unless:
+    // - The first round determines the threshold, in which case we only compute it once.
+    // - We're continuing until two candidates remain, in which case we stop recomputing the
+    //   threshold once a winner has been chosen.
+
+    if (config.getNumberOfWinners() > 1) {
+      // Multi-winner only computes threshold on round 1
+      return currentRound == 1;
+    }
+    if (currentRound == 1) {
+      // Single-Winner recomputes threshold on round 1 always
+      return true;
+    }
+    if (config.isFirstRoundDeterminesThresholdEnabled()) {
+      // If first round determines threshold, no other round will
+      return false;
+    }
+    if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
+      // If continue until two is enabled, the threshold is fixed once a winner is found.
+      return winnerToRound.isEmpty();
+    }
+
+    // Otherwise, it's normal IRV and we recompute the threshold every round
+    return true;
   }
 
   // log some basic info about the contest before starting tabulation
   private void logSummaryInfo() {
     Logger.info(
         "There are %d declared candidates for this contest:", config.getNumDeclaredCandidates());
-    for (String candidate : candidateIds) {
+    for (String candidate : candidateNames) {
       if (!candidate.equals(UNDECLARED_WRITE_IN_OUTPUT_LABEL)) {
         Logger.info(
             "%s%s",
@@ -268,9 +321,11 @@ class Tabulator {
   // logic only accumulates votes for continuing candidates (not past winners).
   // We do this computation once for each previous round winner to account for transfers. In
   // subsequent rounds, we can just copy the number from the previous round, since it won't change.
-  private void updatePastWinnerTallies() {
-    Map<String, BigDecimal> roundTally = roundTallies.get(currentRound);
-    Map<String, BigDecimal> previousRoundTally = roundTallies.get(currentRound - 1);
+  private void updateWinnerTallies() {
+    RoundTally roundTally = roundTallies.get(currentRound);
+    RoundTally previousRoundTally = roundTallies.get(currentRound - 1);
+    roundTally.unlockForSurplusCalculation();
+
     List<String> winnersToProcess = new LinkedList<>();
     Set<String> winnersRequiringComputation = new HashSet<>();
     for (var entry : winnerToRound.entrySet()) {
@@ -286,32 +341,33 @@ class Tabulator {
 
     // initialize or populate overall tally
     for (String winner : winnersToProcess) {
-      roundTally.put(
+      roundTally.setCandidateTallyViaSurplusAdjustment(
           winner,
           winnersRequiringComputation.contains(winner)
               ? BigDecimal.ZERO
-              : previousRoundTally.get(winner));
+              : previousRoundTally.getCandidateTally(winner));
     }
 
-    // initialize or populate precinct tallies
-    if (config.isTabulateByPrecinctEnabled()) {
-      // this is all the tallies for the given precinct
-      for (var roundTalliesForPrecinct : precinctRoundTallies.values()) {
-        // and this is the tally for the current round for the precinct
-        Map<String, BigDecimal> roundTallyForPrecinct = roundTalliesForPrecinct.get(currentRound);
+    // initialize or populate tabulate-by slice tallies
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      // this is all the tallies for the given slice
+      for (var roundTalliesForSlice : roundTalliesBySlices.get(slice).values()) {
+        // and this is the tally for the current round for the slice
+        RoundTally roundTallyForSlice = roundTalliesForSlice.get(currentRound);
+        roundTallyForSlice.unlockForSurplusCalculation();
         for (String winner : winnersToProcess) {
-          roundTallyForPrecinct.put(
+          roundTallyForSlice.setCandidateTallyViaSurplusAdjustment(
               winner,
               winnersRequiringComputation.contains(winner)
                   ? BigDecimal.ZERO
-                  : roundTalliesForPrecinct.get(currentRound - 1).get(winner));
+                  : roundTalliesForSlice.get(currentRound - 1).getCandidateTally(winner));
         }
       }
     }
 
     // process all the CVRs if needed (i.e. if we have any winners from the previous round to
     // process)
-    if (winnersRequiringComputation.size() > 0) {
+    if (!winnersRequiringComputation.isEmpty()) {
       for (CastVoteRecord cvr : castVoteRecords) {
         // the record of winners who got partial votes from this CVR
         Map<String, BigDecimal> winnerToFractionalValue = cvr.getWinnerToFractionalValue();
@@ -322,13 +378,25 @@ class Tabulator {
           }
           BigDecimal fractionalTransferValue = entry.getValue();
 
-          incrementTally(roundTally, fractionalTransferValue, winner);
-          if (config.isTabulateByPrecinctEnabled() && cvr.getPrecinct() != null) {
-            incrementTally(
-                precinctRoundTallies.get(cvr.getPrecinct()).get(currentRound),
-                fractionalTransferValue,
-                winner);
+          roundTally.addToCandidateTallyViaSurplusAdjustment(winner, fractionalTransferValue);
+          for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+            String sliceId = cvr.getSlice(slice);
+            if (sliceId != null) {
+              var roundTalliesForSlice = roundTalliesBySlices.get(slice);
+              RoundTallies sliceTallies = roundTalliesForSlice.get(sliceId);
+              RoundTally sliceRoundTally = sliceTallies.get(currentRound);
+              sliceRoundTally.addToCandidateTallyViaSurplusAdjustment(
+                  winner, fractionalTransferValue);
+            }
           }
+        }
+      }
+
+      // Re-lock all by-slice tabulations
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        for (var roundTalliesForSlice : roundTalliesBySlices.get(slice).values()) {
+          RoundTally roundTallyForSlice = roundTalliesForSlice.get(currentRound);
+          roundTallyForSlice.relockAfterSurplusCalculation();
         }
       }
 
@@ -337,28 +405,29 @@ class Tabulator {
       // For each winner from the previous round, record the residual surplus and then update
       // the winner's new total to be exactly the winning threshold value.
       for (String winner : winnersRequiringComputation) {
-        BigDecimal winnerTally = roundTally.get(winner);
-        BigDecimal winnerResidual = winnerTally.subtract(winningThreshold);
+        BigDecimal winnerTally = roundTally.getCandidateTally(winner);
+        BigDecimal winnerResidual = winnerTally.subtract(roundTally.getWinningThreshold());
         if (winnerResidual.signum() == 1) {
           Logger.info("%s had residual surplus of %s.", winner, winnerResidual);
           roundToResidualSurplus.put(
               currentRound, roundToResidualSurplus.get(currentRound).add(winnerResidual));
-          roundTally.put(winner, winningThreshold);
+          roundTally.setCandidateTallyViaSurplusAdjustment(
+              winner, roundTally.getWinningThreshold());
           tallyTransfers.addTransfer(
               currentRound, winner, TallyTransfers.RESIDUAL_TARGET, winnerResidual);
         }
       }
     }
+
+    roundTally.relockAfterSurplusCalculation();
   }
 
   // determine and store the threshold to win
-  private void setWinningThreshold(Map<String, BigDecimal> currentRoundCandidateToTally,
-      BigDecimal minimumVoteThreshold) {
-    BigDecimal currentRoundTotalVotes = BigDecimal.ZERO;
-    for (BigDecimal numVotes : currentRoundCandidateToTally.values()) {
-      currentRoundTotalVotes = currentRoundTotalVotes.add(numVotes);
-    }
+  private void calculateAndSetWinningThreshold(
+        RoundTally currentRoundTally, BigDecimal minimumVoteThreshold) {
+    BigDecimal currentRoundTotalVotes = currentRoundTally.activeBallotSum();
 
+    BigDecimal winningThreshold;
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       winningThreshold =
           currentRoundTotalVotes.multiply(config.getMultiSeatBottomsUpPercentageThreshold());
@@ -379,8 +448,7 @@ class Tabulator {
       // Augend is the smallest unit compatible with our rounding.
       // If we are only using integers, augend is 1
       // augend = 10^(-1 * decimals)
-      BigDecimal augend =
-          BigDecimal.ONE.divide(BigDecimal.TEN.pow(decimals));
+      BigDecimal augend = BigDecimal.ONE.divide(BigDecimal.TEN.pow(decimals));
       if (config.isHareQuotaEnabled()) {
         // Rounding up simulates "greater than or equal to".
         // threshold = ceiling(votes / num_winners)
@@ -388,9 +456,10 @@ class Tabulator {
             currentRoundTotalVotes.divide(divisor, decimals, java.math.RoundingMode.UP);
       } else {
         // Rounding down then adding augend simulates "greater than".
-        // threshold = floor(votes / (numwinners + 1)) + augend
+        // threshold = floor(votes / (numWinners + 1)) + augend
         winningThreshold =
-            currentRoundTotalVotes.divide(divisor, decimals, java.math.RoundingMode.DOWN)
+            currentRoundTotalVotes
+                .divide(divisor, decimals, java.math.RoundingMode.DOWN)
                 .add(augend);
       }
     }
@@ -402,6 +471,22 @@ class Tabulator {
       winningThreshold = minimumVoteThreshold;
     }
 
+    if (currentRoundTally != roundTallies.get(currentRoundTally.getRoundNumber())) {
+      throw new RuntimeException("RoundTally object is not the same as the one in the map.");
+    }
+    setWinningThreshold(currentRoundTally.getRoundNumber(), winningThreshold);
+  }
+
+  private void setWinningThreshold(int roundNumber, BigDecimal winningThreshold) {
+    RoundTally currentRoundTally = roundTallies.get(roundNumber);
+    currentRoundTally.setWinningThreshold(winningThreshold);
+
+    // Do the same for each slice
+    for (TabulateBySlice slice : config.enabledSlices()) {
+      for (var roundTalliesForSlice : roundTalliesBySlices.get(slice).values()) {
+        roundTalliesForSlice.get(roundNumber).setWinningThreshold(winningThreshold);
+      }
+    }
     Logger.info("Winning threshold set to %s.", winningThreshold);
   }
 
@@ -411,12 +496,18 @@ class Tabulator {
     boolean keepTabulating;
     int numEliminatedCandidates = candidateToRoundEliminated.size();
     int numWinnersDeclared = winnerToRound.size();
-    // apply config setting if specified
-    if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
+    if (currentRound >= config.getStopTabulationEarlyAfterRound()) {
+      keepTabulating = false;
+    } else if (numWinnersDeclared == config.getNumDeclaredCandidates()
+        && config.getNumberOfWinners() > config.getNumCandidates()) {
+      Logger.warning("Config specifies more winners than candidates. Everyone is now elected.");
+      keepTabulating = false;
+    } else if (config.isContinueUntilTwoCandidatesRemainEnabled()) {
       // Keep going if there are more than two candidates alive. Also make sure we tabulate one last
       // round after we've made our final elimination.
-      keepTabulating = numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
-          || candidateToRoundEliminated.containsValue(currentRound);
+      keepTabulating =
+          numEliminatedCandidates + numWinnersDeclared + 1 < config.getNumCandidates()
+              || candidateToRoundEliminated.containsValue(currentRound);
     } else if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       // in this mode, we're done as soon as we've declared any winners
       keepTabulating = numWinnersDeclared == 0;
@@ -425,10 +516,10 @@ class Tabulator {
       // But also: if we've selected all the winners in a multi-seat contest, we should tabulate one
       // extra round in order to show the effect of redistributing the final surpluses... unless
       // bottoms-up is enabled, in which case we can stop as soon as we've declared the winners.
-      keepTabulating = numWinnersDeclared < config.getNumberOfWinners()
-          || (config.getNumberOfWinners() > 1
-          && winnerToRound.containsValue(currentRound)
-          && !config.isMultiSeatBottomsUpUntilNWinnersEnabled());
+      keepTabulating =
+          numWinnersDeclared < config.getNumberOfWinners()
+              || (config.usesSurpluses()
+                  && winnerToRound.containsValue(currentRound));
     }
     return keepTabulating;
   }
@@ -457,43 +548,81 @@ class Tabulator {
   }
 
   // determine if one or more winners have been identified in this round
-  // param: currentRoundCandidateToTally map of candidate ID to their tally in a particular round
+  // param: currentRoundTally round tally for a particular round
   // param: currentRoundTallyToCandidates map of tally to candidate ID(s) for a particular round
   // return: list of winning candidates in this round (if any)
   private List<String> identifyWinners(
-      Map<String, BigDecimal> currentRoundCandidateToTally,
+      RoundTally currentRoundTally,
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
       throws TabulationAbortedException {
     List<String> selectedWinners = new LinkedList<>();
 
+    if (getCandidateSignum(UNDECLARED_WRITE_IN_OUTPUT_LABEL, currentRoundTally) != 0) {
+      // No winners can be selected while undeclared candidates are live
+      return selectedWinners;
+    }
+
     if (config.isMultiSeatBottomsUpWithThresholdEnabled()) {
       // if everyone meets the threshold, select them all as winners
-      boolean allMeet = true;
-      for (BigDecimal tally : currentRoundCandidateToTally.values()) {
-        if (tally.compareTo(winningThreshold) < 0) {
-          allMeet = false;
-          break;
-        }
-      }
+      boolean allMeet =
+          currentRoundTally
+                  .getCandidatesWithMoreVotesThan(currentRoundTally.getWinningThreshold())
+                  .size()
+              == currentRoundTally.activeCandidateSum();
       if (allMeet) {
-        selectedWinners.addAll(currentRoundCandidateToTally.keySet());
+        selectedWinners.addAll(currentRoundTally.getCandidates());
       }
     } else {
       // We should only look for more winners if we haven't already filled all the seats.
-      if (winnerToRound.size() < config.getNumberOfWinners()) {
-        // If the number of continuing candidates equals the number of seats to fill, everyone wins.
-        if (currentRoundCandidateToTally.size()
-            == config.getNumberOfWinners() - winnerToRound.size()) {
-          selectedWinners.addAll(currentRoundCandidateToTally.keySet());
+      int numSeatsUnfilled = config.getNumberOfWinners() - winnerToRound.size();
+      if (numSeatsUnfilled > 0) {
+        if (currentRoundTally.activeCandidateSum() <= numSeatsUnfilled) {
+          // If there are as many or fewer continuing candidates than seats to fill, everyone wins.
+          selectedWinners.addAll(currentRoundTally.getCandidates());
+        } else if (config.isFirstRoundDeterminesThresholdEnabled()
+            && currentRoundTally.activeCandidateSum() - 1 == config.getNumberOfWinners()) {
+          // Edge case: if nobody meets the threshold, but we're on the penultimate round when
+          // isFirstRoundDeterminesThresholdEnabled is true, select the max vote getters as
+          // the winners. If isFirstRoundDeterminesThresholdEnabled isn't enabled, it should be
+          // impossible for a single-winner election to end up here.
+          BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
+          selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
         } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
-          selectWinners(currentRoundTallyToCandidates, selectedWinners);
+          // Otherwise, select all winners above the threshold
+          selectWinners(
+              currentRoundTallyToCandidates,
+              currentRoundTally.getWinningThreshold(),
+              selectedWinners);
         }
       }
 
       // Edge case: if we've identified multiple winners in this round, but we're only supposed to
-      // elect one winner per round, pick the top vote-getter and defer the others to subsequent
-      // rounds.
-      if (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() && selectedWinners.size() > 1) {
+      // elect one winner per round, pick the top vote-getter.
+      // * If this is a multi-winner election, defer the others to subsequent rounds.
+      // * If this is a single-winner election in which it's possible for no candidate to reach the
+      //   threshold (i.e. "first round determines threshold" is set), the tiebreaker will choose
+      //   the only winner.
+      boolean needsTiebreakMultipleWinners =
+          selectedWinners.size() > 1
+              && (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
+                  || config.isFirstRoundDeterminesThresholdEnabled());
+      // Edge case: there are two candidates remaining. To avoid having just one candidate in the
+      // final round, we break the tie here. Happens when we have unfilled seats, two candidates
+      // remaining, neither meets the threshold, and both have more than the minimum vote threshold.
+      // Conditions:
+      //  1. Single-winner election
+      //  2. There are two remaining candidates
+      //  3. There is one seat unfilled (i.e. the seat hasn't already been filled in a previous
+      //           round due to "Continue Until Two Remain" config option)
+      //  4. All candidates are over the minimum threshold (see no_one_meets_minimum test)
+      boolean needsTiebreakNoWinners =
+          config.getNumberOfWinners() == 1
+              && selectedWinners.isEmpty()
+              && currentRoundTally.activeCandidateSum() == 2
+              && numSeatsUnfilled == 1
+              && currentRoundTallyToCandidates.keySet().stream()
+                  .allMatch(x -> x.compareTo(config.getMinimumVoteThreshold()) >= 0);
+      if (needsTiebreakMultipleWinners || needsTiebreakNoWinners) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
         selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
@@ -527,14 +656,16 @@ class Tabulator {
     for (String winner : selectedWinners) {
       Logger.info(
           "Candidate \"%s\" was elected in round %d with %s votes.",
-          winner, currentRound, currentRoundCandidateToTally.get(winner));
+          winner, currentRound, currentRoundTally.getCandidateTally(winner));
     }
 
     return selectedWinners;
   }
 
-  private void selectWinners(SortedMap<BigDecimal,
-      LinkedList<String>> currentRoundTallyToCandidates, List<String> selectedWinners) {
+  private void selectWinners(
+      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates,
+      BigDecimal winningThreshold,
+      List<String> selectedWinners) {
     // select all candidates which have equaled or exceeded the winning threshold and add them to
     // the selectedWinners List
     for (var entry : currentRoundTallyToCandidates.entrySet()) {
@@ -552,21 +683,32 @@ class Tabulator {
 
   // function: dropUndeclaredWriteIns
   // purpose: eliminate all undeclared write in candidates
-  // param: currentRoundCandidateToTally map of candidate IDs to their tally for a given round
+  // param: currentRoundTally map of candidate IDs to their tally for a given round
   // returns: eliminated candidates
-  private List<String> dropUndeclaredWriteIns(
-      Map<String, BigDecimal> currentRoundCandidateToTally) {
+  private List<String> dropUndeclaredWriteIns(RoundTally currentRoundTally) {
     List<String> eliminated = new LinkedList<>();
     String label = UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-    if (currentRoundCandidateToTally.get(label) != null
-        && currentRoundCandidateToTally.get(label).signum() == 1) {
+    if (getCandidateSignum(label, currentRoundTally) == 1) {
       eliminated.add(label);
       Logger.info(
           "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It "
               + "had %s votes.",
-          label, currentRound, currentRoundCandidateToTally.get(label));
+          label, currentRound, currentRoundTally.getCandidateTally(label));
     }
     return eliminated;
+  }
+
+  // Returns the signum of the tally for a given label, or 0 if the label is not
+  // in the current round
+  // param: label candidate ID
+  // param: currentRoundTally map of candidate IDs to their tally for a given round
+  // returns: signum of the candidate tally
+  private int getCandidateSignum(String label, RoundTally currentRoundTally) {
+    BigDecimal tally = currentRoundTally.getCandidateTally(label);
+    if (tally == null) {
+      return 0;
+    }
+    return tally.signum();
   }
 
   // eliminate all candidates below a certain tally threshold
@@ -668,31 +810,19 @@ class Tabulator {
   // to generate the results spreadsheets
   // param: timestamp string to use when creating output filenames
   void generateSummaryFiles(String timestamp) throws IOException {
-    ResultsWriter writer =
-        new ResultsWriter()
+    OutputWriter writer =
+        new OutputWriter()
             .setNumRounds(currentRound)
             .setCandidatesToRoundEliminated(candidateToRoundEliminated)
             .setWinnerToRound(winnerToRound)
             .setContestConfig(config)
             .setTimestampString(timestamp)
-            .setWinningThreshold(winningThreshold)
-            .setPrecinctIds(precinctNames)
+            .setSliceIds(sliceIds)
             .setRoundToResidualSurplus(roundToResidualSurplus);
 
-    writer.generateOverallSummaryFiles(roundTallies, tallyTransfers, castVoteRecords.size());
-
-    if (config.isTabulateByPrecinctEnabled()) {
-      Map<String, Integer> numBallotsByPrecinct = new HashMap<>();
-      for (CastVoteRecord cvr : castVoteRecords) {
-        String precinct = cvr.getPrecinct();
-        if (!isNullOrBlank(precinct)) {
-          int currentTally = numBallotsByPrecinct.getOrDefault(precinct, 0);
-          numBallotsByPrecinct.put(precinct, currentTally + 1);
-        }
-      }
-      writer.generatePrecinctSummaryFiles(
-          precinctRoundTallies, precinctTallyTransfers, numBallotsByPrecinct);
-    }
+    List<String> candidateOrder = roundTallies.get(1).getSortedCandidatesByTally();
+    writer.generateContestResultFiles(roundTallies, tallyTransfers, candidateOrder);
+    writer.generateBySliceResultsFiles(roundTalliesBySlices, tallyTransfersBySlice, candidateOrder);
 
     if (config.isGenerateCdfJsonEnabled()) {
       try {
@@ -702,6 +832,10 @@ class Tabulator {
             "CDF JSON generation failed due to missing snapshot for %s", exception.getCvrId());
       }
     }
+  }
+
+  SliceIdSet getEnabledSliceIds() {
+    return sliceIds;
   }
 
   // Function: runBatchElimination
@@ -767,7 +901,7 @@ class Tabulator {
     }
     if (config.isContinueUntilTwoCandidatesRemainEnabled()
         && eliminations.size() + candidateToRoundEliminated.size()
-        == config.getNumCandidates() - 1) {
+            == config.getNumCandidates() - 1) {
       // See the caveat above about continueUntilTwoCandidatesRemain. In this situation, we need to
       // remove the final set of candidates that we had added to the elimination list.
       eliminations = previousEliminations;
@@ -777,27 +911,36 @@ class Tabulator {
 
   // purpose: determine if any overvote has occurred for this ranking set (from a CVR)
   // and if so return how to handle it based on the rule configuration in use
-  // param: candidateSet all candidates this CVR contains at a particular rank
+  // param: candidates all candidates this CVR contains at a particular rank
   // return: an OvervoteDecision enum to be applied to the CVR under consideration
-  private OvervoteDecision getOvervoteDecision(Set<String> candidateSet) {
+  private OvervoteDecision getOvervoteDecision(CandidatesAtRanking candidates)
+      throws TabulationAbortedException {
     OvervoteDecision decision;
     OvervoteRule rule = config.getOvervoteRule();
-    boolean explicitOvervote = candidateSet.contains(EXPLICIT_OVERVOTE_LABEL);
+    boolean explicitOvervote = candidates.contains(EXPLICIT_OVERVOTE_LABEL);
     if (explicitOvervote) {
       // we should never have the explicit overvote flag AND other candidates for a given ranking
-      assert candidateSet.size() == 1;
+      if (candidates.count() != 1) {
+        Logger.severe("Found multiple candidates when explicit overvote label was provided!");
+        throw new TabulationAbortedException(false);
+      }
 
       // if we have an explicit overvote, the only valid rules are exhaust immediately or
       // always skip. (this is enforced when we load the config also)
-      assert rule == OvervoteRule.EXHAUST_IMMEDIATELY
-          || rule == OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK;
+      if (rule != OvervoteRule.EXHAUST_IMMEDIATELY
+          && rule != OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
+        Logger.severe(
+            "Invalid overvote rule \"%s\" selected when explicit overvote label was provided!",
+            rule);
+        throw new TabulationAbortedException(false);
+      }
 
       if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
         decision = OvervoteDecision.EXHAUST;
       } else {
         decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
       }
-    } else if (candidateSet.size() <= 1) {
+    } else if (candidates.count() <= 1) {
       // if undervote or one vote which is not the overvote label, then there is no overvote
       decision = OvervoteDecision.NONE;
     } else if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
@@ -812,7 +955,7 @@ class Tabulator {
       decision = OvervoteDecision.NONE;
       // keep track if we encounter a continuing candidate
       String continuingCandidate = null;
-      for (String candidate : candidateSet) {
+      for (String candidate : candidates) {
         if (isCandidateContinuing(candidate)) {
           if (continuingCandidate != null) { // at least two continuing
             decision = OvervoteDecision.EXHAUST;
@@ -832,37 +975,65 @@ class Tabulator {
   //  logs the results to audit log
   //  update tallyTransfers counts
   private void recordSelectionForCastVoteRecord(
-      CastVoteRecord cvr, int currentRound, String selectedCandidate, String outcomeDescription) {
+      CastVoteRecord cvr,
+      RoundTally currentRoundTally,
+      BreakdownBySlice<RoundTally> roundTallyBySlice,
+      String selectedCandidate,
+      StatusForRound statusForRound,
+      String additionalLogText)
+      throws TabulationAbortedException {
     // update transfer counts (unless there's no value to transfer, which can happen if someone
     // wins with a tally that exactly matches the winning threshold)
     if (cvr.getFractionalTransferValue().signum() == 1) {
       tallyTransfers.addTransfer(
-          currentRound,
+          currentRoundTally.getRoundNumber(),
           cvr.getCurrentRecipientOfVote(),
           selectedCandidate,
           cvr.getFractionalTransferValue());
-      if (config.isTabulateByPrecinctEnabled()) {
-        precinctTallyTransfers
-            .get(cvr.getPrecinct())
-            .addTransfer(
-                currentRound,
-                cvr.getCurrentRecipientOfVote(),
-                selectedCandidate,
-                cvr.getFractionalTransferValue());
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        String sliceId = cvr.getSlice(slice);
+        TallyTransfers tallyTransferForSlice = tallyTransfersBySlice.get(slice, sliceId);
+        if (tallyTransferForSlice == null) {
+          Logger.severe(
+              "%s \"%s\" is not among the %d known %s.",
+              slice, sliceId, sliceIds.size(slice), slice);
+          throw new TabulationAbortedException(false);
+        }
+        tallyTransferForSlice.addTransfer(
+            currentRoundTally.getRoundNumber(),
+            cvr.getCurrentRecipientOfVote(),
+            selectedCandidate,
+            cvr.getFractionalTransferValue());
       }
     }
 
     cvr.setCurrentRecipientOfVote(selectedCandidate);
     if (selectedCandidate == null) {
-      cvr.exhaust();
+      cvr.exhaustBy(statusForRound);
     }
-    VoteOutcomeType outcomeType =
+
+    if (statusForRound != StatusForRound.ACTIVE) {
+      currentRoundTally.addInactiveBallot(statusForRound, cvr.getFractionalTransferValue());
+      for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+        String sliceId = cvr.getSlice(slice);
+        RoundTally sliceRoundTally = roundTallyBySlice.get(slice).get(sliceId);
+        sliceRoundTally.addInactiveBallot(statusForRound, cvr.getFractionalTransferValue());
+      }
+    }
+
+    final String outcomeDescription = statusForRound == StatusForRound.ACTIVE
+            ? selectedCandidate
+            : statusForRound.getTitleCaseKey() + additionalLogText;
+    final VoteOutcomeType outcomeType =
         selectedCandidate == null ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
     cvr.logRoundOutcome(
-        currentRound, outcomeType, outcomeDescription, cvr.getFractionalTransferValue());
+        currentRoundTally.getRoundNumber(),
+        outcomeType,
+        outcomeDescription,
+        cvr.getFractionalTransferValue());
 
     if (config.isGenerateCdfJsonEnabled()) {
-      cvr.logCdfSnapshotData(currentRound);
+      cvr.logCdfSnapshotData(currentRoundTally.getRoundNumber());
     }
   }
 
@@ -870,12 +1041,12 @@ class Tabulator {
   //  - exhaust cvrs if they should be exhausted for various reasons
   //  - assign cvrs to continuing candidates if they have been transferred or in the initial count
   // returns a map of candidate ID to vote tallies for this round
-  private Map<String, BigDecimal> computeTalliesForRound(int currentRound) {
-    Map<String, BigDecimal> roundTally = getNewTally();
-    Map<String, Map<String, BigDecimal>> roundTallyByPrecinct = new HashMap<>();
-    if (config.isTabulateByPrecinctEnabled()) {
-      for (String precinct : precinctRoundTallies.keySet()) {
-        roundTallyByPrecinct.put(precinct, getNewTally());
+  private RoundTally computeTalliesForRound(int currentRound) throws TabulationAbortedException {
+    RoundTally roundTally = getNewTally(currentRound);
+    BreakdownBySlice<RoundTally> roundTallyBySlice = new BreakdownBySlice();
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      for (String sliceId : roundTalliesBySlices.get(slice).keySet()) {
+        roundTallyBySlice.initialize(slice, sliceId, getNewTally(currentRound));
       }
     }
 
@@ -888,6 +1059,15 @@ class Tabulator {
     //  remain exhausted
     for (CastVoteRecord cvr : castVoteRecords) {
       if (cvr.isExhausted()) {
+        roundTally.addInactiveBallot(cvr.getBallotStatus(), cvr.getFractionalTransferValue());
+
+        // Add inactive ballot to each slice too
+        for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+          String sliceId = cvr.getSlice(slice);
+          RoundTally sliceRoundTally = roundTallyBySlice.get(slice).get(sliceId);
+          sliceRoundTally.addInactiveBallot(
+              cvr.getBallotStatus(), cvr.getFractionalTransferValue());
+        }
         continue;
       }
 
@@ -897,27 +1077,33 @@ class Tabulator {
         // current candidate is continuing so rollover their vote into the current round
         incrementTallies(
             roundTally,
-            cvr.getFractionalTransferValue(),
+            cvr,
             cvr.getCurrentRecipientOfVote(),
-            roundTallyByPrecinct,
-            cvr.getPrecinct());
+            roundTallyBySlice);
         continue;
       }
 
       // check for a CVR with no rankings at all
-      if (cvr.rankToCandidateIds.isEmpty()) {
-        recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
+      if (cvr.candidateRankings.numRankings() == 0) {
+        recordSelectionForCastVoteRecord(
+            cvr,
+            roundTally,
+            roundTallyBySlice,
+            null,
+            StatusForRound.DID_NOT_RANK_ANY_CANDIDATES,
+            "");
       }
 
       // iterate through the rankings in this cvr from most to least preferred.
       // for each ranking:
+      //  check if it's a final round surplus
       //  if it results in an overvote or undervote, exhaust the cvr
       //  if a selected candidate is continuing, count cvr for that candidate
       //  if no selected candidate is continuing, look at the next ranking
       //  if there are no more rankings, exhaust the cvr
 
       // lastRankSeen tracks the last rank in the current rankings set
-      // This is used to determine how many skipped rankings occurred for undervotes.
+      // This is used to determine how many skipped rankings occurred.
       int lastRankSeen = 0;
       // candidatesSeen is set of candidates encountered while processing this CVR in this round
       // used to detect duplicate candidates if exhaustOnDuplicateCandidate is enabled
@@ -927,23 +1113,40 @@ class Tabulator {
       String selectedCandidate = null;
 
       // iterate over all ranks in this cvr from most preferred to least
-      for (int rank : cvr.rankToCandidateIds.keySet()) {
-        // check for undervote exhaustion
+      for (Pair<Integer, CandidatesAtRanking> rankCandidatesPair : cvr.candidateRankings) {
+        // check for final round surplus
+        if (config.usesSurpluses()
+            && config.getNumberOfWinners() == winnerToRound.size()) {
+          recordSelectionForCastVoteRecord(
+                  cvr,
+                  roundTally,
+                  roundTallyBySlice,
+                  null,
+                  StatusForRound.FINAL_ROUND_SURPLUS,
+                  "");
+          break;
+        }
+
+        // check for skipped ranking exhaustion
+        Integer rank = rankCandidatesPair.getKey();
         if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
             && (rank - lastRankSeen > config.getMaxSkippedRanksAllowed() + 1)) {
-          recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
+          recordSelectionForCastVoteRecord(
+              cvr,
+              roundTally,
+              roundTallyBySlice,
+              null,
+              StatusForRound.INVALIDATED_BY_SKIPPED_RANKING,
+              "");
           break;
         }
         lastRankSeen = rank;
 
-        // candidateSet contains all candidates selected at the current rank
-        // some ballots support multiple candidates selected at a single rank
-        Set<String> candidateSet = cvr.rankToCandidateIds.get(rank);
-
         // check for a duplicate candidate if enabled
+        CandidatesAtRanking candidates = rankCandidatesPair.getValue();
         if (config.isExhaustOnDuplicateCandidateEnabled()) {
           String duplicateCandidate = null;
-          for (String candidate : candidateSet) {
+          for (String candidate : candidates) {
             if (candidatesSeen.contains(candidate)) {
               duplicateCandidate = candidate;
               break;
@@ -953,46 +1156,62 @@ class Tabulator {
           // if duplicate was found exhaust cvr
           if (!isNullOrBlank(duplicateCandidate)) {
             recordSelectionForCastVoteRecord(
-                cvr, currentRound, null, "duplicate candidate: " + duplicateCandidate);
+                cvr,
+                roundTally,
+                roundTallyBySlice,
+                null,
+                StatusForRound.INVALIDATED_BY_REPEATED_RANKING,
+                " " + duplicateCandidate);
             break;
           }
         }
 
         // check for an overvote
-        OvervoteDecision overvoteDecision = getOvervoteDecision(candidateSet);
+        OvervoteDecision overvoteDecision = getOvervoteDecision(candidates);
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
-          recordSelectionForCastVoteRecord(cvr, currentRound, null, "overvote");
+          recordSelectionForCastVoteRecord(
+              cvr,
+              roundTally,
+              roundTallyBySlice,
+              null,
+              StatusForRound.INVALIDATED_BY_OVERVOTE,
+              "");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
-          if (rank == cvr.rankToCandidateIds.lastKey()) {
-            recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
+          if (rank == cvr.candidateRankings.maxRankingNumber()) {
+            // If the final ranking is an overvote, even if we're trying to skip to the next rank,
+            // we consider this inactive by exhausted choices -- not an overvote.
+            recordSelectionForCastVoteRecord(
+                cvr,
+                roundTally,
+                roundTallyBySlice,
+                null,
+                StatusForRound.EXHAUSTED_CHOICE,
+                "");
           }
           continue;
         }
 
-        // the current ranking is not an overvote or undervote
+        // the current ranking is not inactive by overvote or too many skipped rankings
         // see if any ranked candidates are continuing
 
-        for (String candidate : candidateSet) {
-          if (!isCandidateContinuing(candidate)) {
+        for (String candidate : candidates) {
+          String candidateName = config.getNameForCandidate(candidate);
+          if (!isCandidateContinuing(candidateName)) {
             continue;
           }
 
           // we found a continuing candidate so this cvr counts for them
-          selectedCandidate = candidate;
+          selectedCandidate = candidateName;
 
           // transfer cvr to selected candidate
-          recordSelectionForCastVoteRecord(cvr, currentRound, selectedCandidate, selectedCandidate);
+          recordSelectionForCastVoteRecord(
+              cvr, roundTally, roundTallyBySlice, selectedCandidate, StatusForRound.ACTIVE, "");
 
-          // If enabled, this will also update the roundTallyByPrecinct
-          incrementTallies(
-              roundTally,
-              cvr.getFractionalTransferValue(),
-              selectedCandidate,
-              roundTallyByPrecinct,
-              cvr.getPrecinct());
+          // This will also update the roundTallyBySlice for each enabled slice
+          incrementTallies(roundTally, cvr, selectedCandidate, roundTallyBySlice);
 
-          // There can be at most one continuing candidate in candidateSet; if there were more than
+          // There can be at most one continuing candidate in candidates; if there were more than
           // one, we would have already flagged this as an overvote.
           break;
         }
@@ -1003,69 +1222,56 @@ class Tabulator {
         }
 
         // if this is the last ranking we are out of rankings and must exhaust this cvr
-        // determine if the reason is skipping too many ranks, or no continuing candidates
-        if (rank == cvr.rankToCandidateIds.lastKey()) {
-          if (config.getMaxSkippedRanksAllowed() != Integer.MAX_VALUE
-              && config.getMaxRankingsAllowed() - rank > config.getMaxSkippedRanksAllowed()) {
-            recordSelectionForCastVoteRecord(cvr, currentRound, null, "undervote");
-          } else {
-            recordSelectionForCastVoteRecord(cvr, currentRound, null, "no continuing candidates");
-          }
+        if (rank == cvr.candidateRankings.maxRankingNumber()) {
+          recordSelectionForCastVoteRecord(
+              cvr, roundTally, roundTallyBySlice, null, StatusForRound.EXHAUSTED_CHOICE, "");
         }
       } // end looping over the rankings within one ballot
     } // end looping over all ballots
 
-    // Take the tallies for this round for each precinct and merge them into the main map tracking
-    // the tallies by precinct.
-    if (config.isTabulateByPrecinctEnabled()) {
-      for (var entry : roundTallyByPrecinct.entrySet()) {
-        Map<Integer, Map<String, BigDecimal>> roundTalliesForPrecinct =
-            precinctRoundTallies.get(entry.getKey());
-        roundTalliesForPrecinct.put(currentRound, entry.getValue());
+    // Take the tallies for this round for each slice and merge them into the main map tracking
+    // the tallies by each enabled slice.
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      for (var entry : roundTallyBySlice.get(slice).entrySet()) {
+        RoundTallies roundTalliesForSlice = roundTalliesBySlices.get(slice).get(entry.getKey());
+        roundTalliesForSlice.put(currentRound, entry.getValue());
+        roundTalliesForSlice.get(currentRound).lockInRound();
       }
     }
+    roundTally.lockInRound();
 
     return roundTally;
   }
 
   // create a new initialized tally with all continuing candidates
-  private Map<String, BigDecimal> getNewTally() {
-    Map<String, BigDecimal> tally = new HashMap<>();
-    for (String candidateId : candidateIds) {
-      if (isCandidateContinuing(candidateId)) {
-        tally.put(candidateId, BigDecimal.ZERO);
+  private RoundTally getNewTally(int roundNumber) {
+    return new RoundTally(roundNumber, candidateNames.stream().filter(this::isCandidateContinuing));
+  }
+
+  // transfer vote to round tally and (if valid) the by-slice round tally
+  private void incrementTallies(RoundTally roundTally, CastVoteRecord cvr,
+        String selectedCandidate, BreakdownBySlice<RoundTally> roundTalliesBySlices) {
+    BigDecimal fractionalTransferValue = cvr.getFractionalTransferValue();
+    roundTally.addToCandidateTally(selectedCandidate, fractionalTransferValue);
+    for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
+      String sliceId = cvr.getSlice(slice);
+      if (!isNullOrBlank(sliceId)) {
+        roundTalliesBySlices.get(slice, sliceId)
+                .addToCandidateTally(selectedCandidate, fractionalTransferValue);
       }
     }
-    return tally;
   }
 
-  // add a vote (or fractional share of a vote) to a tally
-  private void incrementTally(
-      Map<String, BigDecimal> tally, BigDecimal fractionalTransferValue, String selectedCandidate) {
-    BigDecimal currentTally = tally.get(selectedCandidate);
-    BigDecimal newTally = currentTally.add(fractionalTransferValue);
-    tally.put(selectedCandidate, newTally);
-  }
+  private void initTabulateBySliceRoundTallies(ContestConfig.TabulateBySlice slice)
+        throws TabulationAbortedException {
+    for (String sliceId : sliceIds.get(slice)) {
+      if (isNullOrBlank(sliceId)) {
+        Logger.severe("Null %s found in %s list: %s", slice, slice, sliceId);
+        throw new TabulationAbortedException(false);
+      }
+      roundTalliesBySlices.initialize(slice, sliceId, new RoundTallies());
+      tallyTransfersBySlice.initialize(slice, sliceId, new TallyTransfers());
 
-  // transfer vote to round tally and (if valid) the precinct round tally
-  private void incrementTallies(
-      Map<String, BigDecimal> roundTally,
-      BigDecimal fractionalTransferValue,
-      String selectedCandidate,
-      Map<String, Map<String, BigDecimal>> roundTallyByPrecinct,
-      String precinct) {
-    incrementTally(roundTally, fractionalTransferValue, selectedCandidate);
-    if (config.isTabulateByPrecinctEnabled() && !isNullOrBlank(precinct)) {
-      incrementTally(
-          roundTallyByPrecinct.get(precinct), fractionalTransferValue, selectedCandidate);
-    }
-  }
-
-  private void initPrecinctRoundTallies() {
-    for (String precinctName : precinctNames) {
-      precinctRoundTallies.put(precinctName, new HashMap<>());
-      precinctTallyTransfers.put(precinctName, new TallyTransfers());
-      assert !isNullOrBlank(precinctName);
     }
   }
 
@@ -1191,22 +1397,84 @@ class Tabulator {
     EXCLUDED,
   }
 
-  // container class used during batch elimination to store the results for later logging output
-  static class BatchElimination {
+  /**
+   * A wrapper around Map&lt;Integer, RoundTally&gt;
+   * A mapping between a round number and that round's corresponding RoundTally.
+   */
+  static class RoundTallies {
+    private final Map<Integer, RoundTally> roundTallies = new HashMap<>();
 
-    // the candidate eliminated
-    final String candidateId;
-    // how many total votes we'd seen at the step of batch elimination when we added this candidate
-    final BigDecimal runningTotal;
-    // next-lowest count total (validates that we were correctly batch-eliminated)
-    final BigDecimal nextLowestTally;
+    public void put(Integer roundNumber, RoundTally roundTally) {
+      roundTallies.put(roundNumber, roundTally);
+    }
 
-    BatchElimination(String candidateId, BigDecimal runningTotal, BigDecimal nextLowestTally) {
-      this.candidateId = candidateId;
-      this.runningTotal = runningTotal;
-      this.nextLowestTally = nextLowestTally;
+    public RoundTally get(Integer roundNumber) {
+      return roundTallies.get(roundNumber);
     }
   }
+
+  /**
+   * A wrapper around Map&lt;TabulateBySlice, Map&lt;String, T&gt;&gt;
+   * Breaks down the templated type T by a specific slice.
+   * The slice type is the outer map (TabulateBySlice), and the slice ID is the inner map (String).
+   */
+  static class BreakdownBySlice<T> {
+    private final Map<ContestConfig.TabulateBySlice, Map<String, T>> breakdownBySlice
+            = new HashMap<>();
+
+    public T initialize(ContestConfig.TabulateBySlice slice, String sliceId, T t) {
+      return breakdownBySlice.computeIfAbsent(slice, k -> new HashMap<>()).put(sliceId, t);
+    }
+
+    public Map<String, T> get(ContestConfig.TabulateBySlice slice) {
+      return breakdownBySlice.get(slice);
+    }
+
+    public T get(ContestConfig.TabulateBySlice slice, String sliceId) {
+      return get(slice).get(sliceId);
+    }
+  }
+
+  /**
+   * A wrapper around Map&lt;TabulateBySlice, Set&lt;String&gt;&gt;
+   * Maps a TabulateBySlice to the set of corresponding slice IDs.
+   */
+  static class SliceIdSet {
+    private final Map<ContestConfig.TabulateBySlice, Set<String>> sliceIds = new HashMap<>();
+
+    public void initialize(ContestConfig.TabulateBySlice slice) {
+      sliceIds.put(slice, new HashSet<>());
+    }
+
+    public void add(TabulateBySlice slice, String sliceId) {
+      sliceIds.get(slice).add(sliceId);
+    }
+
+    public boolean isEmpty(ContestConfig.TabulateBySlice slice) {
+      return sliceIds.get(slice).isEmpty();
+    }
+
+    // Add an enumerator for each Set<String> of a given slice
+    public Set<String> get(ContestConfig.TabulateBySlice slice) {
+      return sliceIds.get(slice);
+    }
+
+    public int size(ContestConfig.TabulateBySlice slice) {
+      return sliceIds.get(slice).size();
+    }
+  }
+
+  /**
+   * Container class used during batch elimination to store the results for later logging output.
+   *
+   * @param candidateId the candidate eliminated
+   * @param runningTotal how many total votes we'd seen at the step of batch elimination when we
+   *     added this candidate
+   * @param nextLowestTally next-lowest count total (validates that we were correctly
+   *     batch-eliminated)
+   */
+  record BatchElimination(
+      String candidateId, BigDecimal runningTotal, BigDecimal nextLowestTally) {}
 
   static class TabulationAbortedException extends Exception {
 

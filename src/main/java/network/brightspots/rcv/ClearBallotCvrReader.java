@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -28,27 +28,25 @@ import java.util.List;
 import java.util.Map;
 import javafx.util.Pair;
 import network.brightspots.rcv.CastVoteRecord.CvrParseException;
-import network.brightspots.rcv.TabulatorSession.UnrecognizedCandidatesException;
 
-class ClearBallotCvrReader {
+class ClearBallotCvrReader extends BaseCvrReader {
+  private static final String CSV_COMMA_SPLITTER = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
 
-  private final String cvrPath;
-  private final ContestConfig contestConfig;
-  private final String undeclaredWriteInLabel;
+  ClearBallotCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
+    super(config, source);
+  }
 
-  ClearBallotCvrReader(String cvrPath, ContestConfig contestConfig, String undeclaredWriteInLabel) {
-    this.cvrPath = cvrPath;
-    this.contestConfig = contestConfig;
-    this.undeclaredWriteInLabel = undeclaredWriteInLabel;
+  @Override
+  public String readerName() {
+    return "Clear Ballot";
   }
 
   // parse Cvr json into CastVoteRecord objects and append them to the input castVoteRecords list
   // see Clear Ballot 2.1 RCV Format Specification for details
-  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords, String contestId)
-      throws CvrParseException, UnrecognizedCandidatesException {
+  @Override
+  void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
+      throws CvrParseException, IOException {
     BufferedReader csvReader;
-    // map for tracking unrecognized candidates during parsing
-    Map<String, Integer> unrecognizedCandidateCounts = new HashMap<>();
     try {
       csvReader = new BufferedReader(new FileReader(this.cvrPath, StandardCharsets.UTF_8));
       // each "choice column" in the input Csv corresponds to a unique ranking: candidate+rank pair
@@ -58,7 +56,7 @@ class ClearBallotCvrReader {
         Logger.severe("No header row found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
       }
-      String[] headerData = firstRow.split(",");
+      String[] headerData = firstRow.split(CSV_COMMA_SPLITTER);
       if (headerData.length < CvrColumnField.ChoicesBegin.ordinal()) {
         Logger.severe("No choice columns found in cast vote record file: %s", this.cvrPath);
         throw new CvrParseException();
@@ -77,24 +75,18 @@ class ClearBallotCvrReader {
         }
         // filter by contest
         String contestName = choiceFields[RcvChoiceHeaderField.CONTEST_NAME.ordinal()];
-        if (!contestName.equals(contestId)) {
+        if (!contestName.equals(source.getContestId())) {
           continue;
         }
         // validate and store the ranking associated with this choice column
         String choiceName = choiceFields[RcvChoiceHeaderField.CHOICE_NAME.ordinal()];
-        if (choiceName.equals(undeclaredWriteInLabel)) {
+        if (choiceName.equals(source.getUndeclaredWriteInLabel())) {
           choiceName = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
-        } else if (!contestConfig.getCandidateCodeList().contains(choiceName)) {
-          unrecognizedCandidateCounts.merge(choiceName, 1, Integer::sum);
         }
         Integer rank = Integer.parseInt(choiceFields[RcvChoiceHeaderField.RANK.ordinal()]);
-        if (rank > this.contestConfig.getMaxRankingsAllowed()) {
-          Logger.severe(
-              "Rank: %d exceeds max rankings allowed in config: %d",
-              rank, this.contestConfig.getMaxRankingsAllowed());
-          throw new CvrParseException();
+        if (this.config.isRankingAllowed(rank)) {
+          columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
         }
-        columnIndexToRanking.put(columnIndex, new Pair<>(rank, choiceName));
       }
       // read all remaining rows and create CastVoteRecords for each one
       while (true) {
@@ -103,7 +95,7 @@ class ClearBallotCvrReader {
           break;
         }
         // parse rankings
-        String[] cvrData = row.split(",");
+        String[] cvrData = row.split(CSV_COMMA_SPLITTER);
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         for (var entry : columnIndexToRanking.entrySet()) {
           if (Integer.parseInt(cvrData[entry.getKey()]) == 1) {
@@ -114,13 +106,13 @@ class ClearBallotCvrReader {
         // create the cast vote record
         CastVoteRecord castVoteRecord =
             new CastVoteRecord(
-                contestId,
+                source.getContestId(),
                 cvrData[CvrColumnField.ScanComputerName.ordinal()],
                 null,
                 cvrData[CvrColumnField.BallotID.ordinal()],
                 cvrData[CvrColumnField.PrecinctID.ordinal()],
                 null,
-                cvrData[CvrColumnField.BallotStyleID.ordinal()],
+                usesLastAllowedRanking(rankings, null),
                 rankings);
 
         castVoteRecords.add(castVoteRecord);
@@ -132,12 +124,6 @@ class ClearBallotCvrReader {
       csvReader.close();
     } catch (FileNotFoundException exception) {
       Logger.severe("Cast vote record file not found!\n%s", exception);
-    } catch (IOException exception) {
-      Logger.severe("Error reading file!\n%s", exception);
-    }
-
-    if (unrecognizedCandidateCounts.size() > 0) {
-      throw new UnrecognizedCandidatesException(unrecognizedCandidateCounts);
     }
   }
 

@@ -1,66 +1,74 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "Multi_winner2",
-    "outputDirectory": "output",
-    "contestDate": "2018-09-30",
-    "contestJurisdiction": "Multi-winner",
-    "contestOffice": "Multi_winner2",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Multi_winner2",
+    "outputDirectory" : "output",
+    "contestDate" : "2018-09-30",
+    "contestJurisdiction" : "Multi-winner",
+    "contestOffice" : "Multi_winner2",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : true,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
+  "cvrFileSources" : [ {
     "filePath" : "minneapolis_multi_seat_threshold_cvr.xlsx",
-    "firstVoteColumnIndex" : "2",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "3",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "",
-    "precinctColumnIndex" : "",
-    "provider": "ess",
-    "treatBlankAsUndeclaredWriteIn": false,
-    "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
-    "undeclaredWriteInLabel": ""
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "2",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
     "name" : "A",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "B",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "C",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "D",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "E",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "F",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   } ],
   "rules" : {
-    "tiebreakMode": "stopCountingAndAsk",
-    "overvoteRule": "alwaysSkipToNextRank",
-    "winnerElectionMode": "multiWinnerAllowMultipleWinnersPerRound",
-    "randomSeed": "",
-    "numberOfWinners": "3",
-    "decimalPlacesForVoteArithmetic": "4",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "1",
-    "maxRankingsAllowed": "6",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Multi-winner Test2"
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "multiWinnerAllowMultipleWinnersPerRound",
+    "randomSeed" : "",
+    "numberOfWinners" : "3",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "6",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Multi-winner Test2",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

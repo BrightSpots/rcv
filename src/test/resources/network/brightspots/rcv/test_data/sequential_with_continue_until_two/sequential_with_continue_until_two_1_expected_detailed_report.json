@@ -1,0 +1,135 @@
+{
+  "config" : {
+    "contest" : "Test Sequential with Continue until Two",
+    "date" : "",
+    "generatedBy" : "RCTab 2.0.0",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2",
+      "D" : "1",
+      "E" : "0",
+      "F" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    } ],
+    "threshold" : "5"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2",
+      "D" : "1",
+      "E" : "0",
+      "F" : "0"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "F",
+      "transfers" : { }
+    } ],
+    "threshold" : "5"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2",
+      "D" : "1",
+      "E" : "0"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "E",
+      "transfers" : { }
+    } ],
+    "threshold" : "5"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2",
+      "D" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ],
+    "threshold" : "5"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 5,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "B",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ],
+    "threshold" : "5"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "2",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 6,
+    "tally" : {
+      "A" : "5",
+      "C" : "2"
+    },
+    "tallyResults" : [ ],
+    "threshold" : "5"
+  } ],
+  "summary" : {
+    "finalThreshold" : "5",
+    "numCandidates" : 6,
+    "numWinners" : 1,
+    "totalNumBallots" : "9",
+    "undervotes" : 0
+  }
+}

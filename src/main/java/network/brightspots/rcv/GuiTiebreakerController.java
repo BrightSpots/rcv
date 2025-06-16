@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,21 +26,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
-/**
- * View controller for tiebreaker layout.
- */
+/** View controller for tiebreaker layout. */
 @SuppressWarnings("WeakerAccess")
 public class GuiTiebreakerController {
 
   private String selectedCandidate;
   private boolean tabulationCancelled = false;
 
-  @FXML
-  private ListView<String> listViewCandidates;
-  @FXML
-  private Label labelSelectionPrompt;
-  @FXML
-  private Button buttonSelect;
+  @FXML private ListView<String> listViewCandidates;
+  @FXML private Label labelSelectionPrompt;
+  @FXML private Button buttonSelect;
 
   String getSelectedCandidate() {
     return selectedCandidate;
@@ -64,7 +59,7 @@ public class GuiTiebreakerController {
 
   void populateLabelAndButtonText(boolean isSelectingWinner) {
     labelSelectionPrompt.setText(
-        "Please select a candidate to " + (isSelectingWinner ? "elect" : "eliminate") + ":");
+        "Select a candidate to " + (isSelectingWinner ? "elect" : "eliminate") + ":");
     buttonSelect.setText((isSelectingWinner ? "Elect" : "Eliminate") + " Candidate");
   }
 

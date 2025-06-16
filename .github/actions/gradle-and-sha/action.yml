@@ -1,0 +1,29 @@
+name: "Run Gradle command and create SHA512"
+description: "Runs a Gradle command and creates SHA512 hashes"
+
+inputs:
+  gradle-command:
+    description: "The Gradle command to run"
+    required: true
+  intermediate-filepath:
+    description: "The initial path of the output file"
+    required: true
+  final-filepath:
+    description: "The desired final path of the output file"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Run Gradle command"
+      shell: bash
+      run: |
+        ./gradlew ${{ inputs.gradle-command }}
+
+    - name: "Rename output file"
+      shell: bash
+      run: mv ${{ inputs.intermediate-filepath }} ${{ inputs.final-filepath }}
+
+    - name: "Generate SHA512"
+      shell: bash
+      run: ./.github/workflows/sha.sh ${{ inputs.final-filepath }} ${{ runner.os }} 512 > ${{ inputs.final-finalpath }}.sha512

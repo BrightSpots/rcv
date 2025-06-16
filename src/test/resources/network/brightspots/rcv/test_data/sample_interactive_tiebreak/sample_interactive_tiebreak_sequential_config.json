@@ -51,7 +51,7 @@
     "exhaustOnDuplicateCandidate": false,
     "treatBlankAsUndeclaredWriteIn": false,
     "overvoteLabel": "overvote",
-    "undervoteLabel": "undervote",
+    "skippedRankLabel": "undervote",
     "undeclaredWriteInLabel": "",
     "rulesDescription": "Doyle Rules"
   }

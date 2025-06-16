@@ -1,0 +1,39 @@
+{
+  "config" : {
+    "contest" : "Test Sequential with Batch Elimination",
+    "date" : "",
+    "generatedBy" : "RCTab 2.0.0",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "A" : "5",
+      "B" : "1",
+      "C" : "2",
+      "D" : "1",
+      "E" : "0",
+      "F" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    } ],
+    "threshold" : "5"
+  } ],
+  "summary" : {
+    "finalThreshold" : "5",
+    "numCandidates" : 6,
+    "numWinners" : 1,
+    "totalNumBallots" : "9",
+    "undervotes" : 0
+  }
+}

@@ -1,58 +1,60 @@
 {
-  "tabulatorVersion": "TEST",
-  "outputSettings": {
-    "contestName": "For Governor and Lieutenant Governor",
-    "outputDirectory": "output",
-    "contestDate": "2019-03-06",
-    "contestJurisdiction": "",
-    "contestOffice": "",
-    "tabulateByPrecinct": false,
-    "generateCdfJson": false
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "For Governor and Lieutenant Governor",
+    "outputDirectory" : "output",
+    "contestDate" : "2019-03-06",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
   },
-  "cvrFileSources": [
-    {
-      "filePath": "nist_xml_cdf_2.xml",
-      "idColumnIndex": "",
-      "precinctColumnIndex": "",
-      "provider": "cdf",
-      "contestId": "For Governor and Lieutenant Governor",
-      "treatBlankAsUndeclaredWriteIn": false,
-      "overvoteLabel": "",
-      "undervoteLabel": "",
-      "undeclaredWriteInLabel": ""
-    }
-  ],
-  "candidates": [
-    {
-      "name": "Edward FitzGerald and Sharen Swartz Neuhardt",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "John Kasich and Mary Taylor",
-      "code": "",
-      "excluded": false
-    },
-    {
-      "name": "Anita Rios and Bob Fitrakis",
-      "code": "",
-      "excluded": false
-    }
-  ],
-  "rules": {
-    "tiebreakMode": "random",
-    "overvoteRule": "exhaustImmediately",
-    "winnerElectionMode": "singleWinnerMajority",
-    "randomSeed": "0",
-    "numberOfWinners": "1",
-    "decimalPlacesForVoteArithmetic": "1",
-    "minimumVoteThreshold": "0",
-    "maxSkippedRanksAllowed": "4",
-    "maxRankingsAllowed": "4",
-    "nonIntegerWinningThreshold": false,
-    "hareQuota": false,
-    "batchElimination": false,
-    "exhaustOnDuplicateCandidate": false,
-    "rulesDescription": "Skiptonext_exhaustatovervote"
+  "cvrFileSources" : [ {
+    "filePath" : "nist_xml_cdf_2.xml",
+    "contestId" : "For Governor and Lieutenant Governor",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "cdf",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Edward FitzGerald and Sharen Swartz Neuhardt",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "John Kasich and Mary Taylor",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Anita Rios and Bob Fitrakis",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "4",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Skiptonext_exhaustatovervote",
+    "treatBlankAsUndeclaredWriteIn" : false
   }
 }

@@ -1,0 +1,36 @@
+{
+  "config" : {
+    "contest" : "Stop Tabulation Early Test",
+    "date" : "2023-03-14",
+    "generatedBy" : "RCTab 2.0.0",
+    "jurisdiction" : "Funkytown, USA",
+    "office" : "Sergeant-at-Arms"
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "George Gervin" : "3",
+      "Mookie Blaylock" : "3",
+      "Yinka Dare" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Yinka Dare",
+      "transfers" : { }
+    } ],
+    "threshold" : "5"
+  } ],
+  "summary" : {
+    "finalThreshold" : "5",
+    "numCandidates" : 3,
+    "numWinners" : 1,
+    "totalNumBallots" : "9",
+    "undervotes" : 0
+  }
+}

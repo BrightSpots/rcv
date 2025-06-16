@@ -1,0 +1,66 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "City_of_Portland__Auditor_2024_08_20_15_04_22",
+    "outputDirectory" : "output",
+    "contestDate" : "2024-11-05",
+    "contestJurisdiction" : "City of Portland",
+    "contestOffice" : "City of Portland, Auditor",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "clear_ballot_with_inline_comma_cvr.csv",
+    "contestId" : "City of Portland, Auditor",
+    "firstVoteColumnIndex" : "",
+    "firstVoteRowIndex" : "",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "clearBallot",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Simone test Rede",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Write-in-28",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Invalid",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Lisa Simpson",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "stopCountingAndAsk",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "",
+    "maxSkippedRanksAllowed" : "50",
+    "maxRankingsAllowed" : "6",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Single Winner City Wide",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

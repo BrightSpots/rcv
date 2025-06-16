@@ -1,0 +1,136 @@
+{
+  "config" : {
+    "contest" : "Multi-Seat Bottoms-up With Threshold",
+    "date" : "",
+    "generatedBy" : "RCTab 2.0.0",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "A" : "5",
+      "B" : "5",
+      "C" : "4",
+      "D" : "3",
+      "E" : "0",
+      "F" : "0",
+      "G" : "3",
+      "H" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "F",
+      "transfers" : { }
+    } ],
+    "threshold" : "3.1500"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "A" : "5",
+      "B" : "5",
+      "C" : "4",
+      "D" : "3",
+      "E" : "0",
+      "G" : "3",
+      "H" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "E",
+      "transfers" : { }
+    } ],
+    "threshold" : "3.1500"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "A" : "5",
+      "B" : "5",
+      "C" : "4",
+      "D" : "3",
+      "G" : "3",
+      "H" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "H",
+      "transfers" : {
+        "G" : "1"
+      }
+    } ],
+    "threshold" : "3.1500"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "A" : "5",
+      "B" : "5",
+      "C" : "4",
+      "D" : "3",
+      "G" : "4"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "D",
+      "transfers" : {
+        "G" : "3"
+      }
+    } ],
+    "threshold" : "3.1500"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "0",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 5,
+    "tally" : {
+      "A" : "5",
+      "B" : "5",
+      "C" : "4",
+      "G" : "7"
+    },
+    "tallyResults" : [ {
+      "elected" : "A",
+      "transfers" : { }
+    }, {
+      "elected" : "B",
+      "transfers" : { }
+    }, {
+      "elected" : "C",
+      "transfers" : { }
+    }, {
+      "elected" : "G",
+      "transfers" : { }
+    } ],
+    "threshold" : "3.1500"
+  } ],
+  "summary" : {
+    "finalThreshold" : "3.1500",
+    "numCandidates" : 8,
+    "numWinners" : 0,
+    "totalNumBallots" : "21",
+    "undervotes" : 0
+  }
+}

@@ -6,6 +6,7 @@
     "contestDate" : "2018-07-28",
     "contestJurisdiction" : "Funkytown, USA",
     "contestOffice" : "Exhausted",
+    "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },
@@ -15,30 +16,31 @@
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
     "idColumnIndex" : "1",
+    "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
-    "undervoteLabel" : "undervote",
+    "skippedRankLabel" : "undervote",
     "undeclaredWriteInLabel" : "",
     "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
     "name" : "A",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "B",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "C",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   }, {
     "name" : "D",
-    "code" : "",
-    "excluded" : false
+    "excluded" : false,
+    "aliases" : [ ]
   } ],
   "rules" : {
     "tiebreakMode" : "random",
@@ -46,15 +48,17 @@
     "winnerElectionMode" : "singleWinnerMajority",
     "randomSeed" : "0",
     "numberOfWinners" : "1",
-    "bottomsUpPercentageThreshold" : "",
+    "multiSeatBottomsUpPercentageThreshold" : "",
     "decimalPlacesForVoteArithmetic" : "4",
     "minimumVoteThreshold" : "0",
     "maxSkippedRanksAllowed" : "1",
     "maxRankingsAllowed" : "4",
     "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
     "rulesDescription" : "Doyle Rules",
     "treatBlankAsUndeclaredWriteIn" : false

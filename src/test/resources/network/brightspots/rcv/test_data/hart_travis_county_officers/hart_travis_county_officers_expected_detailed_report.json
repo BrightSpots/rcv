@@ -1,0 +1,38 @@
+{
+  "config" : {
+    "contest" : "TRAVIS COUNTY OFFICERS",
+    "date" : "",
+    "generatedBy" : "RCTab 2.0.0",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "6",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "Bruce Elfant" : "0",
+      "Jim Sylvester" : "0",
+      "Michael Gottner" : "1",
+      "Sheriff Hamilton" : "0",
+      "William Poole" : "0"
+    },
+    "tallyResults" : [ {
+      "elected" : "Michael Gottner",
+      "transfers" : { }
+    } ],
+    "threshold" : "1"
+  } ],
+  "summary" : {
+    "finalThreshold" : "1",
+    "numCandidates" : 5,
+    "numWinners" : 1,
+    "totalNumBallots" : "9",
+    "undervotes" : 2
+  }
+}

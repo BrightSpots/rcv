@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -24,11 +24,10 @@ class GuiContext {
   private static final GuiContext INSTANCE = new GuiContext();
   // currently-loaded tabulator config
   private ContestConfig config;
-  // cache for main window so we can parent file choosers to it
+  // cache for main window, so we can parent file choosers to it
   private Stage mainWindow;
 
-  private GuiContext() {
-  }
+  private GuiContext() {}
 
   static GuiContext getInstance() {
     return INSTANCE;

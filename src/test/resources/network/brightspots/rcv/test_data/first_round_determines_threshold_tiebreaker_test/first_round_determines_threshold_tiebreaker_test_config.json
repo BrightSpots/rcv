@@ -1,0 +1,66 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Portland 2015 Mayoral Race",
+    "outputDirectory" : "output",
+    "contestDate" : "2015-11-03",
+    "contestJurisdiction" : "Portland, ME",
+    "contestOffice" : "Mayor",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "first_round_determines_threshold_tiebreaker_test_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "4",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Carmona, Ralph C.",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Haadoow, Hamza A.",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Vail, Christopher L.",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Excludy McSclude",
+    "excluded" : true,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "5",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "15",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : true,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : true,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "First Round Determines Threshold Test",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

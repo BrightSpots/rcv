@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,61 +17,24 @@
 
 package network.brightspots.rcv;
 
+import static com.fasterxml.jackson.core.util.VersionUtil.parseVersion;
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.core.Version;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 
 final class ContestConfigMigration {
-
-  private static final Pattern versionNumPattern = Pattern.compile("(\\d+).*");
-
-  private ContestConfigMigration() {
-  }
-
-  private static ArrayList<Integer> parseVersionString(String version) {
-    ArrayList<Integer> parsed = new ArrayList<>();
-    String[] arr = version.split("\\.");
-    for (String numString : arr) {
-      Matcher m = versionNumPattern.matcher(numString);
-      if (m.matches()) {
-        parsed.add(Integer.parseInt(m.group(1)));
-      }
-    }
-
-    return parsed;
-  }
+  private ContestConfigMigration() {}
 
   // not intended to be used if either version is null
-  private static boolean isVersionNewer(String version1, String version2) {
-    boolean isNewer = false;
-    if (!version1.equals(version2)) {
-      ArrayList<Integer> version1Parsed = parseVersionString(version1);
-      ArrayList<Integer> version2Parsed = parseVersionString(version2);
-
-      for (int i = 0; i < version1Parsed.size(); i++) {
-        if (version2Parsed.size() <= i) {
-          isNewer = true;
-          break;
-        }
-        int version1Num = version1Parsed.get(i);
-        int version2Num = version2Parsed.get(i);
-        if (version1Num > version2Num) {
-          isNewer = true;
-          break;
-        } else if (version2Num > version1Num) {
-          break;
-        }
-      }
-    }
-
-    return isNewer;
+  public static boolean isVersionNewer(String version1, String version2) {
+    Version version1Parsed = parseVersion(version1, null, null);
+    Version version2Parsed = parseVersion(version2, null, null);
+    return version1Parsed.compareTo(version2Parsed) > 0;
   }
 
   static boolean isConfigVersionOlderThanAppVersion(String configVersion) {
@@ -95,9 +58,10 @@ final class ContestConfigMigration {
   static void migrateConfigVersion(ContestConfig config)
       throws ConfigVersionIsNewerThanAppVersionException {
     String version = config.rawConfig.tabulatorVersion;
-    boolean needsMigration = version == null
-        || (!version.equals(Main.APP_VERSION) && !version
-        .equals(ContestConfig.AUTOMATED_TEST_VERSION));
+    boolean needsMigration =
+        version == null
+            || (!version.equals(Main.APP_VERSION)
+                && !version.equals(ContestConfig.AUTOMATED_TEST_VERSION));
     if (needsMigration) {
       if (isConfigVersionNewerThanAppVersion(version)) {
         throw new ConfigVersionIsNewerThanAppVersionException();
@@ -113,50 +77,53 @@ final class ContestConfigMigration {
           case "standard" -> rules.winnerElectionMode =
               config.getNumberOfWinners() > 1
                   ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND
-                  .getInternalLabel()
+                      .getInternalLabel()
                   : WinnerElectionMode.STANDARD_SINGLE_WINNER.getInternalLabel();
           case "singleSeatContinueUntilTwoCandidatesRemain" -> {
-            rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER
-                .getInternalLabel();
+            rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER.getInternalLabel();
             rules.continueUntilTwoCandidatesRemain = true;
           }
           case "multiSeatAllowOnlyOneWinnerPerRound" -> rules.winnerElectionMode =
               WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.getInternalLabel();
           case "multiSeatBottomsUp" -> rules.winnerElectionMode =
               config.getNumberOfWinners() == 0
-                  || config.getMultiSeatBottomsUpPercentageThreshold() != null
+                      || config.getMultiSeatBottomsUpPercentageThreshold() != null
                   ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD
-                  .getInternalLabel()
+                      .getInternalLabel()
                   : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.getInternalLabel();
           case "multiSeatSequentialWinnerTakesAll" -> rules.winnerElectionMode =
               WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.getInternalLabel();
           default -> {
             Logger.warning(
-                "winnerElectionMode \"%s\" is unrecognized! Please supply a valid "
-                    + "winnerElectionMode.", oldWinnerElectionMode);
+                "winnerElectionMode \"%s\" is unrecognized! Supply a valid "
+                    + "winnerElectionMode.",
+                oldWinnerElectionMode);
             rules.winnerElectionMode = null;
           }
         }
       }
 
       if (config.getTiebreakMode() == TiebreakMode.MODE_UNKNOWN) {
-        Map<String, TiebreakMode> tiebreakModeMigrationMap = Map.of(
-            "random", TiebreakMode.RANDOM,
-            "interactive", TiebreakMode.INTERACTIVE,
-            "previousRoundCountsThenRandom",
-            TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
-            "previousRoundCountsThenInteractive",
-            TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
-            "usePermutationInConfig", TiebreakMode.USE_PERMUTATION_IN_CONFIG,
-            "generatePermutation", TiebreakMode.GENERATE_PERMUTATION
-        );
+        Map<String, TiebreakMode> tiebreakModeMigrationMap =
+            Map.of(
+                "random",
+                TiebreakMode.RANDOM,
+                "interactive",
+                TiebreakMode.INTERACTIVE,
+                "previousRoundCountsThenRandom",
+                TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
+                "previousRoundCountsThenInteractive",
+                TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
+                "usePermutationInConfig",
+                TiebreakMode.USE_PERMUTATION_IN_CONFIG,
+                "generatePermutation",
+                TiebreakMode.GENERATE_PERMUTATION);
         String oldTiebreakMode = rules.tiebreakMode;
         if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
           rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode).getInternalLabel();
         } else {
           Logger.warning(
-              "tiebreakMode \"%s\" is unrecognized! Please supply a valid tiebreakMode.",
-              oldTiebreakMode);
+              "tiebreakMode \"%s\" is unrecognized! Supply a valid tiebreakMode.", oldTiebreakMode);
           rules.tiebreakMode = null;
         }
       }
@@ -172,7 +139,7 @@ final class ContestConfigMigration {
 
       if (!isNullOrBlank(rules.undervoteLabel)) {
         for (CvrSource source : rawConfig.cvrFileSources) {
-          source.setUndervoteLabel(rules.undervoteLabel);
+          source.setSkippedRankLabel(rules.undervoteLabel);
         }
       }
 
@@ -188,6 +155,21 @@ final class ContestConfigMigration {
         }
       }
 
+      // Migrations from 1.3.0 to 1.4.0
+      if (rules.stopTabulationEarlyAfterRound == null) {
+        rules.stopTabulationEarlyAfterRound = "";
+      }
+      for (CvrSource source : rawConfig.cvrFileSources) {
+        if (source.getUndervoteLabel() != null) {
+          if (source.getSkippedRankLabel() != null) {
+            Logger.severe("Config contains a deprecated field \"%s\". Ignoring.",
+                source.getUndervoteLabel());
+          } else {
+            source.setSkippedRankLabel(source.getUndervoteLabel());
+          }
+        }
+      }
+
       Logger.info(
           "Migrated tabulator config version from %s to %s.",
           config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
@@ -197,7 +179,5 @@ final class ContestConfigMigration {
     }
   }
 
-  static class ConfigVersionIsNewerThanAppVersionException extends Exception {
-
-  }
+  static class ConfigVersionIsNewerThanAppVersionException extends Exception {}
 }

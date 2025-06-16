@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,6 +23,7 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import network.brightspots.rcv.RawContestConfig.Candidate;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.OvervoteRule;
@@ -43,6 +46,7 @@ class ContestConfig {
   // If any booleans are unspecified in config file, they should default to false no matter what
   static final String AUTOMATED_TEST_VERSION = "TEST";
   static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
+  static final boolean SUGGESTED_TABULATE_BY_BATCH = false;
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
   static final boolean SUGGESTED_GENERATE_CDF_JSON = false;
   static final boolean SUGGESTED_CANDIDATE_EXCLUDED = false;
@@ -52,6 +56,7 @@ class ContestConfig {
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
+  static final boolean SUGGESTED_FIRST_ROUND_DETERMINES_THRESHOLD = false;
   static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
@@ -61,7 +66,7 @@ class ContestConfig {
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final boolean SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED = false;
   static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
-  static final String SUGGESTED_UNDERVOTE_LABEL = "undervote";
+  static final String SUGGESTED_SKIPPED_RANK_LABEL = "undervote";
   static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   private static final int MIN_COLUMN_INDEX = 1;
@@ -70,6 +75,7 @@ class ContestConfig {
   private static final int MAX_ROW_INDEX = 100000;
   private static final int MIN_MAX_RANKINGS_ALLOWED = 1;
   private static final int MIN_MAX_SKIPPED_RANKS_ALLOWED = 0;
+  private static final int MIN_NUMBER_OF_ROUNDS = 1;
   private static final int MIN_NUMBER_OF_WINNERS = 0;
   private static final int MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 1;
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
@@ -88,18 +94,16 @@ class ContestConfig {
   private final String sourceDirectory;
   // Used to track a sequential multi-seat race
   private final List<String> sequentialWinners = new LinkedList<>();
-  // Mapping from candidate code to full name
-  private Map<String, String> candidateCodeToNameMap;
+  // Candidate display names (no aliases)
+  private Set<String> candidateNames;
+  // Mapping from any candidate alias to the candidate's display name
+  private Map<String, String> candidateAliasesToNameMap;
   // A list of any validation errors
   private Set<ValidationError> validationErrors = new HashSet<>();
 
   private ContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     this.rawConfig = rawConfig;
     this.sourceDirectory = sourceDirectory;
-  }
-
-  static boolean isCdf(CvrSource source) {
-    return getProvider(source) == Provider.CDF;
   }
 
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
@@ -152,17 +156,17 @@ class ContestConfig {
     } else {
       if (!isNullOrBlank(source.getOvervoteLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getOvervoteLabel(), source, "overvoteLabel")) {
+              source.getOvervoteLabel(), source, "overvoteLabel")) {
         validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
       }
-      if (!isNullOrBlank(source.getUndervoteLabel())
+      if (!isNullOrBlank(source.getSkippedRankLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getUndervoteLabel(), source, "undervoteLabel")) {
-        validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_INVALID);
+              source.getSkippedRankLabel(), source, "skippedRankLabel")) {
+        validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID);
       }
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
           && stringAlreadyInUseElsewhereInSource(
-          source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
+              source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
         validationErrors.add(ValidationError.CVR_UWI_LABEL_INVALID);
       }
 
@@ -170,7 +174,8 @@ class ContestConfig {
       if (provider == Provider.PROVIDER_UNKNOWN) {
         validationErrors.add(ValidationError.CVR_PROVIDER_INVALID);
         Logger.severe("Invalid provider for source: %s", source.getFilePath());
-      } else if (provider == Provider.ESS) {
+      } else if (provider == Provider.ESS || provider == Provider.CSV) {
+        // Both ESS and CSV require firstVoteColumnIndex and firstVoteRowIndex
         if (fieldOutOfRangeOrNotInteger(
             source.getFirstVoteColumnIndex(),
             "firstVoteColumnIndex",
@@ -191,24 +196,49 @@ class ContestConfig {
           validationErrors.add(ValidationError.CVR_FIRST_VOTE_ROW_INVALID);
         }
 
-        if (fieldOutOfRangeOrNotInteger(
-            source.getIdColumnIndex(),
-            "idColumnIndex",
-            MIN_COLUMN_INDEX,
-            MAX_COLUMN_INDEX,
-            false,
-            source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_ID_COLUMN_INVALID);
-        }
+        if (provider == Provider.ESS) {
+          // ESS requires idColumnIndex and precinctColumnIndex
+          if (fieldOutOfRangeOrNotInteger(
+              source.getIdColumnIndex(),
+              "idColumnIndex",
+              MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX,
+              false,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_ID_COLUMN_INVALID);
+          }
 
-        if (fieldOutOfRangeOrNotInteger(
-            source.getPrecinctColumnIndex(),
-            "precinctColumnIndex",
-            MIN_COLUMN_INDEX,
-            MAX_COLUMN_INDEX,
-            false,
-            source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
+          if (fieldOutOfRangeOrNotInteger(
+              source.getPrecinctColumnIndex(),
+              "precinctColumnIndex",
+              MIN_COLUMN_INDEX,
+              MAX_COLUMN_INDEX,
+              false,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
+          }
+        } else {
+          // CSV does not allow idColumnIndex or precinctColumnIndex
+          if (fieldIsDefinedButShouldNotBeForProvider(
+              source.getIdColumnIndex(), "idColumnIndex", provider, source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED);
+          }
+
+          if (fieldIsDefinedButShouldNotBeForProvider(
+              source.getPrecinctColumnIndex(),
+              "precinctColumnIndex",
+              provider,
+              source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
+          }
+
+          if (fieldIsDefinedButShouldNotBeForProvider(
+                  source.getBatchColumnIndex(),
+                  "batchColumnIndex",
+                  provider,
+                  source.getFilePath())) {
+            validationErrors.add(ValidationError.CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED);
+          }
         }
 
         // See the config file documentation for an explanation of this regex
@@ -238,6 +268,7 @@ class ContestConfig {
             validationErrors.add(ValidationError.CVR_OVERVOTE_UNEXPECTEDLY_DEFINED);
           }
         }
+
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getFirstVoteColumnIndex(),
             "firstVoteColumnIndex",
@@ -265,16 +296,24 @@ class ContestConfig {
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
+                source.getBatchColumnIndex(),
+                "batchColumnIndex",
+                provider,
+                source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED);
+        }
+
+        if (fieldIsDefinedButShouldNotBeForProvider(
             source.getOvervoteDelimiter(), "overvoteDelimiter", provider, source.getFilePath())) {
           validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_UNEXPECTEDLY_DEFINED);
         }
 
         if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getUndervoteLabel(), "undervoteLabel", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED);
+            source.getSkippedRankLabel(), "skippedRankLabel", provider, source.getFilePath())) {
+          validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED);
         }
 
-        if (source.isTreatBlankAsUndeclaredWriteIn()) {
+        if (source.getTreatBlankAsUndeclaredWriteIn()) {
           logErrorWithLocation(
               String.format(
                   "treatBlankAsUndeclaredWriteIn should not be true for CVR source with "
@@ -299,7 +338,7 @@ class ContestConfig {
                 getProvider(source)));
       } else if (!providerRequiresContestId
           && fieldIsDefinedButShouldNotBeForProvider(
-          source.getContestId(), "contestId", provider, source.getFilePath())) {
+              source.getContestId(), "contestId", provider, source.getFilePath())) {
         // Helper will log error
         validationErrors.add(ValidationError.CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED);
       }
@@ -402,7 +441,6 @@ class ContestConfig {
     Set<ValidationError> validationErrors = new HashSet<>();
     if (isNullOrBlank(candidate.getName())) {
       validationErrors.add(ValidationError.CANDIDATE_NAME_MISSING);
-      Logger.severe("A name is required for each candidate!");
     }
     return validationErrors;
   }
@@ -427,9 +465,9 @@ class ContestConfig {
       inUse =
           stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, source.getUndervoteLabel(), "undervoteLabel")
+                  string, field, source.getSkippedRankLabel(), "skippedRankLabel")
               || stringMatchesAnotherFieldValue(
-              string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
+                  string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
     }
     return inUse;
   }
@@ -463,7 +501,7 @@ class ContestConfig {
       Logger.info("Contest config validation successful.");
     } else {
       Logger.severe(
-          "Contest config validation failed! Please modify the contest config file and try again.\n"
+          "Contest config validation failed! Modify the contest config file and try again.\n"
               + "See config_file_documentation.txt for more details.");
     }
     return validationErrors;
@@ -495,22 +533,46 @@ class ContestConfig {
       validationErrors.add(ValidationError.OUTPUT_CONTEST_NAME_MISSING);
       Logger.severe("contestName is required!");
     }
+
+    if (!SecurityConfig.canOutputFilesSaveToUsersDirectory()) {
+      try {
+        String homeDirectory = new File(System.getProperty("user.home")).getCanonicalPath();
+        // Strip the username off the file path to get the root Users directory path
+        String rootUsersDirectory = homeDirectory.substring(0, homeDirectory.lastIndexOf('\\'));
+        // Since we're not putting anything in the output results directory, just use "sample" to
+        // show we're just using it to check the file location.
+        String outputDirectory = new File(getOutputDirectory("sample")).getCanonicalPath();
+        if (outputDirectory.startsWith(rootUsersDirectory)) {
+          validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY);
+          Logger.severe(
+              "To ensure read-only access to RCTab output files, users must not"
+                  + " set the output path to user account folders like Documents,"
+                  + " Desktop, etc. -- any path under \"%s\" is prohibited."
+                  + " Specify a new path outside this folder in the Output tab of the"
+                  + " app (e.g. C:\\RCTab\\output).",
+              rootUsersDirectory);
+        }
+      } catch (Exception exception) {
+        Logger.severe("Error checking if output directory was in Users directory: %s", exception);
+        validationErrors.add(ValidationError.OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY);
+      }
+    }
   }
 
-  // checks for conflicts between a candidate name and other name/codes or other reserved strings
-  // param: candidateString is a candidate name or code
-  // param: field is either "name" or "code"
-  // param: candidateStringsSeen is a running set of names/codes we've already encountered
+  // checks for conflicts between a candidate name and other aliases or reserved strings
+  // param: candidateString is a candidate name or alias
+  // param: candidateStringsSeen is a running set of names / aliases we've already encountered
   private boolean candidateStringAlreadyInUseElsewhere(
-      String candidateString, String field, Set<String> candidateStringsSeen) {
+      String candidateString, Set<String> candidateStringsSeen) {
     boolean inUse = false;
     if (candidateStringsSeen.contains(candidateString)) {
       inUse = true;
-      Logger.severe("Duplicate candidate %ss are not allowed: %s", field, candidateString);
+      Logger.severe("Duplicate candidate names or aliases are not allowed: %s", candidateString);
     } else {
       for (CvrSource source : getRawConfig().cvrFileSources) {
         inUse =
-            stringAlreadyInUseElsewhereInSource(candidateString, source, "a candidate " + field);
+            stringAlreadyInUseElsewhereInSource(
+                candidateString, source, "a candidate name or alias");
         if (inUse) {
           break;
         }
@@ -555,18 +617,28 @@ class ContestConfig {
               Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
         }
 
-        if (isCdf(source)) {
+        if (getProvider(source) == Provider.CDF) {
           // Perform CDF checks
-          if (isTabulateByPrecinctEnabled()) {
-            validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT);
-            Logger.severe("tabulateByPrecinct may not be used with CDF files.");
+          for (TabulateBySlice tabulateBySlice : enabledSlices()) {
+            validationErrors.add(ValidationError.CVR_CDF_TABULATE_BY_DISAGREEMENT);
+            Logger.severe("Tabulate-by-%s has not yet been implemented for CDF files.",
+                    tabulateBySlice);
           }
         } else if (getProvider(source) == Provider.ESS) {
           // Perform ES&S checks
-          if (isNullOrBlank(source.getPrecinctColumnIndex()) && isTabulateByPrecinctEnabled()) {
+          if (isNullOrBlank(source.getPrecinctColumnIndex())
+              && isTabulateByEnabled(TabulateBySlice.PRECINCT)) {
             validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN);
             Logger.severe(
-                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s", cvrPath);
+                "precinctColumnIndex is required when tabulateByPrecinct is enabled: %s",
+                cvrPath);
+          }
+          if (isNullOrBlank(source.getBatchColumnIndex())
+              && isTabulateByEnabled(TabulateBySlice.BATCH)) {
+            validationErrors.add(ValidationError.CVR_TABULATE_BY_PRECINCT_REQUIRES_BATCH_COLUMN);
+            Logger.severe(
+                    "batchColumnIndex is required when tabulateByBatch is enabled: %s",
+                    cvrPath);
           }
           if (isNullOrBlank(source.getOvervoteDelimiter())
               && getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
@@ -583,31 +655,22 @@ class ContestConfig {
 
   private void validateCandidates() {
     Set<String> candidateNameSet = new HashSet<>();
-    Set<String> candidateCodeSet = new HashSet<>();
 
     for (Candidate candidate : rawConfig.candidates) {
       validationErrors.addAll(performBasicCandidateValidation(candidate));
 
-      if (!isNullOrBlank(candidate.getName())) {
-        if (candidateStringAlreadyInUseElsewhere(candidate.getName(), "name", candidateNameSet)) {
-          validationErrors.add(ValidationError.CANDIDATE_NAME_INVALID);
-        } else {
-          candidateNameSet.add(candidate.getName());
-        }
-      }
-
-      if (!isNullOrBlank(candidate.getCode())) {
-        if (candidateStringAlreadyInUseElsewhere(candidate.getCode(), "code", candidateCodeSet)) {
-          validationErrors.add(ValidationError.CANDIDATE_CODE_INVALID);
-        } else {
-          candidateCodeSet.add(candidate.getCode());
-        }
-      }
-    }
-
-    if (candidateCodeSet.size() > 0 && candidateCodeSet.size() != candidateNameSet.size()) {
-      validationErrors.add(ValidationError.CANDIDATE_DUPLICATE_CODES);
-      Logger.severe("If candidate codes are used, a unique code is required for each candidate!");
+      // Ensure the candidate name and all aliases are unique, both within each candidate and
+      // across candidates.
+      candidate
+          .createStreamOfNameAndAllAliases()
+          .forEach(
+              nameOrAlias -> {
+                if (candidateStringAlreadyInUseElsewhere(nameOrAlias, candidateNameSet)) {
+                  validationErrors.add(ValidationError.CANDIDATE_DUPLICATE_NAME);
+                } else {
+                  candidateNameSet.add(nameOrAlias);
+                }
+              });
     }
 
     if (getNumDeclaredCandidates() < 1) {
@@ -616,6 +679,11 @@ class ContestConfig {
     } else if (getNumDeclaredCandidates() == excludedCandidates.size()) {
       validationErrors.add(ValidationError.CANDIDATE_ALL_EXCLUDED);
       Logger.severe("Contest config must contain at least 1 non-excluded candidate!");
+    }
+
+    if (getNumberOfWinners() > getNumDeclaredCandidates()) {
+      // This is not an error, but it should present a warning
+      Logger.warning("There are more winners than candidates -- is this acceptable?");
     }
   }
 
@@ -645,9 +713,9 @@ class ContestConfig {
       Logger.severe("Invalid winnerElectionMode!");
     }
 
-    if (getMaxRankingsAllowed() == null
+    if (getMaxRankingsAllowedAsString() == null
         || (getNumDeclaredCandidates() >= 1
-        && getMaxRankingsAllowed() < MIN_MAX_RANKINGS_ALLOWED)) {
+            && !isRankingAllowed(MIN_MAX_RANKINGS_ALLOWED))) {
       validationErrors.add(ValidationError.RULES_MAX_RANKINGS_ALLOWED_INVALID);
       Logger.severe(
           "maxRankingsAllowed must either be \"%s\" or an integer from %d to %d!",
@@ -668,7 +736,7 @@ class ContestConfig {
         getNumberOfWinnersRaw(),
         "numberOfWinners",
         MIN_NUMBER_OF_WINNERS,
-        getNumDeclaredCandidates() < 1 ? Integer.MAX_VALUE : getNumDeclaredCandidates(),
+        Integer.MAX_VALUE,
         true)) {
       validationErrors.add(ValidationError.RULES_NUMBER_OF_WINNERS_INVALID);
     }
@@ -701,6 +769,15 @@ class ContestConfig {
           ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
     }
 
+    if (fieldOutOfRangeOrNotInteger(
+        getStopTabulationEarlyAfterRoundRaw(),
+        "stopEarlyAfterRound",
+        MIN_NUMBER_OF_ROUNDS,
+        Integer.MAX_VALUE,
+        false)) {
+      validationErrors.add(ValidationError.RULES_STOP_TABULATION_EARLY_AFTER_ROUND_INVALID);
+    }
+
     WinnerElectionMode winnerMode = getWinnerElectionMode();
     if (Utils.isInt(getNumberOfWinnersRaw())) {
       if (getNumberOfWinners() > 0) {
@@ -718,17 +795,22 @@ class ContestConfig {
                   ValidationError.RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT);
               Logger.severe(
                   "continueUntilTwoCandidatesRemain can't be true in a multi-seat contest unless "
-                      + "the winner election mode is multi-pass IRV!"
-              );
+                      + "the winner election mode is multi-pass IRV!");
             }
 
             if (isBatchEliminationEnabled()) {
               validationErrors.add(ValidationError.RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT);
               Logger.severe(
                   "batchElimination can't be true in a multi-seat contest unless the "
-                      + "winner election mode is multi-pass IRV!"
-              );
+                      + "winner election mode is multi-pass IRV!");
             }
+          }
+
+          if (isFirstRoundDeterminesThresholdEnabled()) {
+            validationErrors.add(
+                ValidationError.RULES_FIRST_ROUND_DETERMINES_THRESHOLD_TRUE_FOR_MULTI_SEAT);
+            Logger.severe(
+                "doesFirstRoundDetermineThreshold can't be true in a multi-seat contest!");
           }
         } else { // numberOfWinners == 1
           if (!isSingleWinnerEnabled()) {
@@ -748,8 +830,9 @@ class ContestConfig {
 
         if (getMultiSeatBottomsUpPercentageThreshold() == null) {
           validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
-          Logger.severe("If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
-              + "must be specified!");
+          Logger.severe(
+              "If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
+                  + "must be specified!");
         }
       }
     }
@@ -789,6 +872,10 @@ class ContestConfig {
     return rawConfig.rules.numberOfWinners;
   }
 
+  private String getStopTabulationEarlyAfterRoundRaw() {
+    return rawConfig.rules.stopTabulationEarlyAfterRound;
+  }
+
   Integer getNumberOfWinners() {
     return Integer.parseInt(getNumberOfWinnersRaw());
   }
@@ -803,7 +890,7 @@ class ContestConfig {
 
   BigDecimal getMultiSeatBottomsUpPercentageThreshold() {
     return getMultiSeatBottomsUpPercentageThresholdRaw() != null
-        && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()
+            && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()
         ? divide(new BigDecimal(getMultiSeatBottomsUpPercentageThresholdRaw()), new BigDecimal(100))
         : null;
   }
@@ -832,6 +919,10 @@ class ContestConfig {
     return getWinnerElectionMode() == WinnerElectionMode.STANDARD_SINGLE_WINNER;
   }
 
+  boolean isFirstRoundDeterminesThresholdEnabled() {
+    return rawConfig.rules.doesFirstRoundDetermineThreshold;
+  }
+
   boolean isMultiSeatAllowOnlyOneWinnerPerRoundEnabled() {
     return getWinnerElectionMode() == WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND;
   }
@@ -858,6 +949,10 @@ class ContestConfig {
     return rawConfig.rules.nonIntegerWinningThreshold;
   }
 
+  boolean usesSurpluses() {
+    return getNumberOfWinners() > 1 && !isMultiSeatBottomsUpUntilNWinnersEnabled();
+  }
+
   boolean isHareQuotaEnabled() {
     return rawConfig.rules.hareQuota;
   }
@@ -879,8 +974,8 @@ class ContestConfig {
   }
 
   // path to directory where output files should be written
-  String getOutputDirectory() {
-    return resolveConfigPath(getOutputDirectoryRaw());
+  String getOutputDirectory(String timestamp) {
+    return Path.of(resolveConfigPath(getOutputDirectoryRaw()), timestamp + " Results").toString();
   }
 
   private String getTabulatorVersion() {
@@ -903,8 +998,17 @@ class ContestConfig {
     return rawConfig.outputSettings.contestDate;
   }
 
-  boolean isTabulateByPrecinctEnabled() {
-    return rawConfig.outputSettings.tabulateByPrecinct;
+  boolean isTabulateByEnabled(TabulateBySlice slice) {
+    return switch (slice) {
+      case PRECINCT -> rawConfig.outputSettings.tabulateByPrecinct;
+      case BATCH -> rawConfig.outputSettings.tabulateByBatch;
+    };
+  }
+
+  List<TabulateBySlice> enabledSlices() {
+    return Arrays.stream(TabulateBySlice.values())
+            .filter(this::isTabulateByEnabled)
+            .collect(Collectors.toList());
   }
 
   boolean isGenerateCdfJsonEnabled() {
@@ -932,11 +1036,47 @@ class ContestConfig {
     return rawConfig.rules.maxRankingsAllowed;
   }
 
-  Integer getMaxRankingsAllowed() {
-    return stringToIntWithOption(
-        getMaxRankingsAllowedRaw(),
-        MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION,
-        getNumDeclaredCandidates());
+  // Because the max rank can be set to "max", there's no single value that makes sense
+  // to all callers of this function.
+  // Returning MAX_VALUE could cause integer overflows if
+  // the caller tries to do arithmetic with the result (e.g. convert to a max column),
+  // or if the caller is iterating for all values up until the max rank.
+  // Returning NumDeclaredCandidates is not valid in cases where this is used before
+  // candidates are declared.
+  // Instead of returning the max rank, only allow checking via this function,
+  // or returning the value as a string for audit logging.
+  boolean isRankingAllowed(int rank) {
+    if (rank <= 0) {
+      return false;
+    }
+
+    if (isMaxRankingsSetToMaximum()) {
+      return true;
+    }
+
+    return rank <= Integer.parseInt(getMaxRankingsAllowedRaw());
+  }
+
+  // There are times when it is necessary to grab the max ranking, for example,
+  // when iterating up until the max ranking, or when reading inputs where a
+  // "blank" indicates an undeclared write-in.
+  // Force the caller of this function to check isMaxRankingsSetToMaximum first,
+  // so we know they've handled that special case.
+  Integer getMaxRankingsAllowedWhenNotSetToMaximum() {
+    if (isMaxRankingsSetToMaximum()) {
+      throw new RuntimeException(
+              "Do not call this function without first checking isMaxRankingsSetToMaximum!");
+    }
+
+    return Integer.parseInt(getMaxRankingsAllowedRaw());
+  }
+
+  boolean isMaxRankingsSetToMaximum() {
+    return getMaxRankingsAllowedRaw().equals(MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION);
+  }
+
+  String getMaxRankingsAllowedAsString() {
+    return getMaxRankingsAllowedRaw();
   }
 
   boolean isBatchEliminationEnabled() {
@@ -947,8 +1087,14 @@ class ContestConfig {
     return rawConfig.rules.continueUntilTwoCandidatesRemain;
   }
 
+  Integer getStopTabulationEarlyAfterRound() {
+    return isNullOrBlank(getStopTabulationEarlyAfterRoundRaw())
+        ? Integer.MAX_VALUE
+        : Integer.parseInt(getStopTabulationEarlyAfterRoundRaw());
+  }
+
   int getNumDeclaredCandidates() {
-    int size = getCandidateCodeList().size();
+    int size = getCandidateNames().size();
     if (undeclaredWriteInsEnabled()) {
       // we subtract one for UNDECLARED_WRITE_IN_OUTPUT_LABEL;
       size = size - 1;
@@ -957,7 +1103,7 @@ class ContestConfig {
   }
 
   int getNumCandidates() {
-    return getCandidateCodeList().size() - excludedCandidates.size();
+    return getCandidateNames().size() - excludedCandidates.size();
   }
 
   boolean candidateIsExcluded(String candidate) {
@@ -1011,53 +1157,60 @@ class ContestConfig {
     return rawConfig.rules.exhaustOnDuplicateCandidate;
   }
 
-  Set<String> getCandidateCodeList() {
-    return candidateCodeToNameMap.keySet();
+  Set<String> getCandidateNames() {
+    if (candidateNames == null) {
+      candidateNames = new HashSet<>();
+    }
+    return candidateNames;
   }
 
-  String getNameForCandidateCode(String code) {
-    return candidateCodeToNameMap.get(code);
+  String getNameForCandidate(String nameOrAlias) {
+    return candidateAliasesToNameMap.get(nameOrAlias);
   }
 
   ArrayList<String> getCandidatePermutation() {
     return candidatePermutation;
   }
 
-  void setCandidateExclusionStatus(String candidateCode, boolean excluded) {
+  void setCandidateExclusionStatus(String candidateName, boolean excluded) {
     if (excluded) {
-      excludedCandidates.add(candidateCode);
+      excludedCandidates.add(candidateName);
     } else {
-      excludedCandidates.remove(candidateCode);
+      excludedCandidates.remove(candidateName);
     }
   }
 
   // perform pre-processing on candidates:
-  // 1) build map of candidate ID to candidate name
+  // 1) build map of candidate aliases to candidate name
   // 2) generate tie-break ordering if needed
   // 3) add uwi candidate if needed
   private void processCandidateData() {
-    candidateCodeToNameMap = new HashMap<>();
+    candidateAliasesToNameMap = new HashMap<>();
+    candidateNames = new HashSet<>();
+
     if (rawConfig.candidates != null) {
       for (RawContestConfig.Candidate candidate : rawConfig.candidates) {
-        String code = candidate.getCode();
         String name = candidate.getName();
-        if (isNullOrBlank(code)) {
-          code = name;
+        candidateNames.add(name);
+        candidatePermutation.add(name);
+        if (candidate.getExcluded()) {
+          excludedCandidates.add(name);
         }
 
-        // duplicate names or codes get caught in validation
-        candidateCodeToNameMap.put(code, name);
-        candidatePermutation.add(code);
-        if (candidate.isExcluded()) {
-          excludedCandidates.add(code);
-        }
+        Stream<String> aliases = candidate.createStreamOfNameAndAllAliases();
+        aliases.forEach(
+            nameOrAlias -> {
+              // duplicate names and aliases get caught in validation
+              candidateAliasesToNameMap.put(nameOrAlias, name);
+            });
       }
     }
 
     // If any of the sources support undeclared write-ins, we need to recognize them as a valid
     // "candidate" option.
     if (undeclaredWriteInsEnabled()) {
-      candidateCodeToNameMap.put(
+      candidateNames.add(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
+      candidateAliasesToNameMap.put(
           Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
     }
   }
@@ -1066,7 +1219,7 @@ class ContestConfig {
     boolean includeUwi = false;
     for (CvrSource source : rawConfig.cvrFileSources) {
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-          || source.isTreatBlankAsUndeclaredWriteIn()) {
+          || source.getTreatBlankAsUndeclaredWriteIn()) {
         includeUwi = true;
         break;
       }
@@ -1079,15 +1232,17 @@ class ContestConfig {
     TABULATOR_VERSION_MISSING,
     TABULATOR_VERSION_NOT_SUPPORTED,
     OUTPUT_CONTEST_NAME_MISSING,
+    OUTPUT_NOT_ALLOWED_IN_USERS_DIRECTORY,
     CVR_NO_FILES_SPECIFIED,
     CVR_FILE_PATH_MISSING,
     CVR_OVERVOTE_LABEL_INVALID,
-    CVR_UNDERVOTE_LABEL_INVALID,
+    CVR_SKIPPED_RANK_LABEL_INVALID,
     CVR_UWI_LABEL_INVALID,
     CVR_PROVIDER_INVALID,
     CVR_FIRST_VOTE_COLUMN_INVALID,
     CVR_FIRST_VOTE_ROW_INVALID,
     CVR_ID_COLUMN_INVALID,
+    CVR_BATCH_COLUMN_INVALID,
     CVR_PRECINCT_COLUMN_INVALID,
     CVR_OVERVOTE_DELIMITER_INVALID,
     CVR_CDF_FILE_PATH_INVALID,
@@ -1096,7 +1251,8 @@ class ContestConfig {
     CVR_DUPLICATE_FILE_PATHS,
     CVR_FILE_PATH_INVALID,
     CVR_OVERVOTE_LABEL_OVERVOTE_RULE_MISMATCH,
-    CVR_CDF_TABULATE_BY_PRECINCT_DISAGREEMENT,
+    CVR_CDF_TABULATE_BY_DISAGREEMENT,
+    CVR_TABULATE_BY_PRECINCT_REQUIRES_BATCH_COLUMN,
     CVR_TABULATE_BY_PRECINCT_REQUIRES_PRECINCT_COLUMN,
     CVR_OVERVOTE_DELIMITER_AND_LABEL_BOTH_SUPPLIED,
     CVR_OVERVOTE_DELIMITER_MISSING,
@@ -1105,13 +1261,13 @@ class ContestConfig {
     CVR_FIRST_VOTE_UNEXPECTEDLY_DEFINED,
     CVR_FIRST_VOTE_ROW_UNEXPECTEDLY_DEFINED,
     CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED,
+    CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
-    CVR_UNDERVOTE_LABEL_UNEXPECTEDLY_DEFINED,
+    CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
+    CVR_OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY,
     CANDIDATE_NAME_MISSING,
-    CANDIDATE_NAME_INVALID,
-    CANDIDATE_CODE_INVALID,
-    CANDIDATE_DUPLICATE_CODES,
+    CANDIDATE_DUPLICATE_NAME,
     CANDIDATE_NO_CANDIDATES_SPECIFIED,
     CANDIDATE_ALL_EXCLUDED,
     RULES_TIEBREAK_MODE_INVALID,
@@ -1125,9 +1281,11 @@ class ContestConfig {
     RULES_MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC_INVALID,
     RULES_MIN_VOTE_THRESHOLD_INVALID,
     RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID,
+    RULES_STOP_TABULATION_EARLY_AFTER_ROUND_INVALID,
     RULES_NUMBER_OF_WINNERS_INVALID_FOR_WINNER_ELECTION_MODE,
     RULES_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN_TRUE_FOR_MULTI_SEAT,
     RULES_BATCH_ELIMINATION_TRUE_FOR_MULTI_SEAT,
+    RULES_FIRST_ROUND_DETERMINES_THRESHOLD_TRUE_FOR_MULTI_SEAT,
     RULES_WINNER_ELECTION_MODE_INVALID_FOR_SINGLE_SEAT,
     RULES_ZERO_WINNERS_INVALID_WINNER_ELECTION_MODE,
     RULES_PERCENTAGE_THRESHOLD_MISSING,
@@ -1143,6 +1301,7 @@ class ContestConfig {
     DOMINION("dominion", "Dominion"),
     ESS("ess", "ES&S"),
     HART("hart", "Hart"),
+    CSV("genericCsv", "CSV"),
     PROVIDER_UNKNOWN("providerUnknown", "Provider unknown");
 
     private final String internalLabel;
@@ -1160,6 +1319,19 @@ class ContestConfig {
           .orElse(PROVIDER_UNKNOWN);
     }
 
+    BaseCvrReader constructReader(ContestConfig config, CvrSource source)
+        throws UnrecognizedProviderException {
+      return switch (this) {
+        case CDF -> new CommonDataFormatReader(config, source);
+        case CLEAR_BALLOT -> new ClearBallotCvrReader(config, source);
+        case DOMINION -> new DominionCvrReader(config, source);
+        case ESS -> new StreamingCvrReader(config, source);
+        case HART -> new HartCvrReader(config, source);
+        case CSV -> new CsvCvrReader(config, source);
+        default -> throw new UnrecognizedProviderException();
+      };
+    }
+
     @Override
     public String toString() {
       return guiLabel;
@@ -1170,7 +1342,25 @@ class ContestConfig {
     }
   }
 
-  static class UnrecognizedProviderException extends Exception {
+  enum TabulateBySlice {
+    PRECINCT("Precinct"),
+    BATCH("Batch");
 
+    private final String label;
+
+    TabulateBySlice(String label) {
+      this.label = label;
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
+
+    public String toLowerString() {
+      return label.toLowerCase();
+    }
   }
+
+  static class UnrecognizedProviderException extends Exception {}
 }

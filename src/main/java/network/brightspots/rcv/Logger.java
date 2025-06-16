@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2022 Bright Spots Developers.
+ * Copyright (c) 2017-2023 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,14 +14,14 @@
  * log message
  *  |
  *  v
- * Tabulation handler (FINE) -> tabulation "audit" file
- *  When a tabulation is in progress this captures all FINE level logging including audit info.
+ * Tabulation handler (AUDIT) -> tabulation "audit" file
+ *  When a tabulation is in progress this captures all AUDIT level logging including audit info.
  *
  * Execution handler (INFO) -> execution file
  *  Captures all INFO level logging for the execution of a session.
  *  "session" could span multiple tabulations in GUI mode.
  *
- * GUI handler (INFO) -> textArea
+ * GUI handler (INFO) -> listView
  *  Displays INFO level logging in GUI for user feedback in GUI mode.
  *
  * Default handler -> console
@@ -36,16 +36,36 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javafx.application.Platform;
-import javafx.scene.control.TextArea;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 class Logger {
+  // Custom "audit" logging level, designed to fit between FINE and INFO levels
+  private static final Level AUDIT_LEVEL = new Level("AUDIT", Level.FINE.intValue() + 1) {};
 
   // execution log file name (%g tracks count of log file if additional versions are created)
   private static final String EXECUTION_LOG_FILE_NAME = "rcv_%g.log";
@@ -59,10 +79,12 @@ class Logger {
   private static final java.util.logging.Formatter formatter = new LogFormatter();
   private static java.util.logging.Logger logger;
   private static java.util.logging.FileHandler tabulationHandler;
+  private static String tabulationLogPattern;
+  private static final List<Label> labelsQueue = new ArrayList<>();
 
   static void setup() {
     logger = java.util.logging.Logger.getLogger("");
-    logger.setLevel(Level.FINE);
+    logger.setLevel(AUDIT_LEVEL);
 
     // logPath is where execution file logging is written
     // "user.dir" property is the current working directory, i.e. folder from whence the rcv jar
@@ -95,18 +117,25 @@ class Logger {
       throws IOException {
     // log file name is: outputFolder + timestamp + log index
     // FileHandler requires % to be encoded as %%.  %g is the log index
-    String tabulationLogPattern =
-            Paths.get(outputFolder.replace("%", "%%"),
-                    String.format("%s_audit_%%g.log", timestampString))
-                    .toAbsolutePath()
-                    .toString();
+    String logDir = Path.of(outputFolder, "Log").toString();
+    tabulationLogPattern =
+        Paths.get(
+                logDir.replace("%", "%%"),
+                String.format("%s_audit_%%g.log", timestampString))
+            .toAbsolutePath()
+            .toString();
+    try {
+      FileUtils.createOutputDirectory(logDir);
+    } catch (FileUtils.UnableToCreateDirectoryException e) {
+      Logger.severe("Could not create directory %s: %s", logDir, e.getMessage());
+    }
 
-    tabulationHandler = new FileHandler(tabulationLogPattern,
-            LOG_FILE_MAX_SIZE_BYTES,
-            TABULATION_LOG_FILE_COUNT,
-            true);
+    tabulationHandler =
+        new FileHandler(
+            tabulationLogPattern,
+            LOG_FILE_MAX_SIZE_BYTES, TABULATION_LOG_FILE_COUNT, true);
     tabulationHandler.setFormatter(formatter);
-    tabulationHandler.setLevel(Level.FINE);
+    tabulationHandler.setLevel(AUDIT_LEVEL);
     logger.addHandler(tabulationHandler);
     info("Tabulation logging to: %s", tabulationLogPattern.replace("%g", "0"));
   }
@@ -116,10 +145,23 @@ class Logger {
     tabulationHandler.flush();
     tabulationHandler.close();
     logger.removeHandler(tabulationHandler);
+
+    // Find all files we wrote to, and finalize each one
+    int index = 0;
+    while (true) {
+      AuditableFile file = new AuditableFile(tabulationLogPattern
+              .replace("%g", String.valueOf(index)));
+      if (!file.exists()) {
+        break;
+      }
+
+      file.finalizeAndHash();
+      index++;
+    }
   }
 
-  static void fine(String message, Object... obj) {
-    log(Level.FINE, message, obj);
+  static void auditable(String message, Object... obj) {
+    log(AUDIT_LEVEL, message, obj);
   }
 
   static void info(String message, Object... obj) {
@@ -140,30 +182,140 @@ class Logger {
   }
 
   // add logging to the provided text area for display to user in the GUI
-  static void addGuiLogging(TextArea textArea) {
+  static void addGuiLogging(ListView<Label> listView) {
+    ObservableList<Label> logMessages = FXCollections.observableArrayList();
+    listView.setItems(logMessages);
+    listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+    // Clear selection when focus is lost to keep the text legible
+    listView.focusedProperty().addListener((obs, oldVal, newVal) -> {
+      if (!newVal) {
+        listView.getSelectionModel().clearSelection();
+      }
+    });
+
+    // Set cell factory to reduce vertical gap
+    listView.setCellFactory(param -> new ListCell<Label>() {
+      @Override
+      protected void updateItem(Label item, boolean empty) {
+        // Sets zero padding and updates the cell colors
+        super.updateItem(item, empty);
+        if (empty || item == null) {
+          setGraphic(null);
+          setText(null);
+          setStyle(null);
+        } else {
+          // Reset the widths to allow word wrap
+          item.setMinWidth(listView.getWidth() - 50);
+          item.setMaxWidth(listView.getWidth() - 50);
+          item.setPrefWidth(listView.getWidth() - 50);
+
+          // Fix the label padding
+          setPadding(new Insets(0, 0, 0, 3));
+
+          // First remove any existing style, which can either be overridden
+          // (if it needs a custom background) or can remain as the default.
+          setStyle(null);
+
+          // Set the entire background color to the label's background
+          // This changes the background from being a text highlight to taking up the whole row
+          Background bg = item.getBackground();
+          if (bg != null) {
+            List<BackgroundFill> fills = item.getBackground().getFills();
+            if (!fills.isEmpty()) {
+              Paint bgColor = fills.get(0).getFill();
+              String hexColor = bgColor.toString().replace("0x", "#");
+              setStyle("-fx-background-color: " + hexColor);
+            }
+          }
+
+          // Change the look when selected -- lighten it up a bit
+          // while maintaining the warning/severe color
+          if (isSelected()) {
+            setBlendMode(BlendMode.SCREEN);
+          } else {
+            setBlendMode(BlendMode.SRC_OVER);
+          }
+
+          setGraphic(item);
+        }
+      }
+    });
+
     java.util.logging.Handler guiHandler =
         new Handler() {
           @Override
           public void publish(LogRecord record) {
-            if (isLoggable(record)) {
+            if (isLoggable(record) && !shouldIgnore(record)) {
               String msg = getFormatter().format(record);
-              // if we are executing on the GUI thread we can post immediately (e.g. button clicks)
-              // otherwise schedule the text update to run on the GUI thread
-              if (Platform.isFxApplicationThread()) {
-                textArea.appendText(msg);
-              } else {
-                Platform.runLater(() -> textArea.appendText(msg));
+              Label logLabel = new Label(msg.strip());
+              logLabel.setPadding(new Insets(0, 0, 0, 3));
+              logLabel.setWrapText(true);
+
+              // Set background color based on log level
+              if (record.getLevel() == Level.SEVERE) {
+                logLabel.setBackground(Background.fill(Color.DARKRED));
+              } else if (record.getLevel() == Level.WARNING) {
+                logLabel.setBackground(Background.fill(Color.SIENNA));
+              }
+
+              // On Right Click, user can copy text
+              ContextMenu contextMenu = new ContextMenu();
+              MenuItem copyMenuItem = new MenuItem("Copy");
+              copyMenuItem.setOnAction(this::copyToClipboard);
+              contextMenu.getItems().add(copyMenuItem);
+              logLabel.setContextMenu(contextMenu);
+
+              // Rather than adding to the list too many times in a row,
+              // we add to a queue and schedule an occasional update to the UI.
+              // This prevents the UI from lagging when there are many log messages.
+              synchronized (labelsQueue) {
+                labelsQueue.add(logLabel);
+
+                // The first item in the queue is the only one that needs to trigger the update.
+                if (labelsQueue.size() == 1) {
+                  Platform.runLater(this::addFromMainThread);
+                }
               }
             }
           }
 
-          @Override
-          public void flush() {
+          private boolean shouldIgnore(LogRecord record) {
+            // On Windows, scrollToBottom can trigger a log message in JavaFX.
+            // We'll get log spam from VirtualFlow.java that causes:
+            // 1. A log message to be added to the queue
+            // 2. The scroll-to-bottom to fail
+            // This can cause a cycle of repeated log spam and sporadic scroll failures.
+            // The problem seems entirely mitigated by ignoring this log message.
+            // The following bug is related, though it has very little information:
+            // https://bugs.openjdk.java.net/browse/JDK-8092801
+            return record.getMessage().startsWith("index exceeds maxCellCount");
+          }
+
+          private void addFromMainThread() {
+            synchronized (labelsQueue) {
+              logMessages.addAll(labelsQueue);
+              labelsQueue.clear();
+            }
+            listView.scrollTo(logMessages.size() - 1);
+          }
+
+          private void copyToClipboard(ActionEvent e) {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            StringBuilder sb = new StringBuilder();
+            for (Label label : listView.getSelectionModel().getSelectedItems()) {
+              sb.append(label.getText()).append("\n");
+            }
+            content.putString(sb.toString());
+            clipboard.setContent(content);
           }
 
           @Override
-          public void close() {
-          }
+          public void flush() {}
+
+          @Override
+          public void close() {}
         };
     guiHandler.setLevel(Level.INFO);
     guiHandler.setFormatter(formatter);

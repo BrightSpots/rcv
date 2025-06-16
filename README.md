@@ -24,17 +24,22 @@ The Tabulator produces the following as output:
 
 1. Download the pre-compiled Tabulator for your OS from the GitHub [releases page](https://github.com/BrightSpots/rcv/releases).
 
-    **Note**: this download should be a "jlink image", which means you don't even need to have Java installed on your machine to run it!
+    **Note**: this download is a "jlink package", which means you don't even need to have Java installed on your machine to run it!
 
 2. Unzip the file, navigate to the `bin` directory, and launch the RCV Tabulator GUI by running the `rcv` script if using MacOS or Linux, or `rcv.bat` if using Windows.
 
+On Linux, you may install the .deb file, then run `/opt/rcv/bin/RCTab` to launch the tabulator GUI.
+
 #### Method 2 (Less Easy): Compile and Run Using Gradle
 
-1. Install [JDK 17 or higher](https://jdk.java.net/), and make sure your Java path is picking it up properly by verifying that the following command returns the expected version:
+1. Install [JDK 21](https://adoptium.net/temurin/releases/?version=21), and make sure your Java path is picking it up properly by
+   verifying that the following command returns the expected version:
     
     `$ java -version`
     
     If the expected version isn't returned, you'll need to follow the instructions [here](https://www.java.com/en/download/help/path.xml) on how to set your Java path.
+
+    If you are using Linux or MacOS and need to regularly switch between Java versions, consider installing [jEnv](https://www.jenv.be/). For a list of the Java versions installed on your machine, run `/usr/libexec/java_home -V` on MacOS or `update-alternatives --config java` on Linux.
 
 2. Download the [zip of the source code from GitHub](https://github.com/BrightSpots/rcv/archive/master.zip) and unzip it, or install git and use the following command at the terminal / command prompt to clone a local copy on your machine:
     
@@ -49,6 +54,19 @@ The Tabulator produces the following as output:
     If you get a "permission denied" error in Linux or MacOS, you need to mark the script as executable with:
     
     `$ chmod 777 gradlew`
+
+#### Method 3 (Least Easy): Building on an Air-Gapped Machine
+
+1. Download Gradle from https://gradle.org/releases/ and place it in your path.
+2. Download and extract the source code from
+   the [releases page](https://github.com/BrightSpots/rcv/releases).
+3. Alongside the release you just downloaded, you will find corresponding cache files (cache.[OS].zip). Download this file too.
+4. Stop the Gradle daemon with `gradle --stop`.
+5. Delete the directory ~/.gradle/caches if it exists.
+6. Extract the appropriate caches/[filename].zip to ~/.gradle/caches so that the "caches" directory is in ~/.gradle.
+7. Alongside these extracted caches is a file named checksums.csv. In the extracted directory, you may manually verify each dependency using checksums.csv in accordance with your own policies.
+8. Run `gradle assemble --offline` and ensure you get no errors.
+9. Run `gradle run --offline` to launch RCTab, or `gradle jpackage --offline` to generate an executable file specific to the OS you are using (a .dmg, .exe, or .deb).
 
 #### Encrypting the Tabulator Directory
 For security purposes, we **strongly recommend** applying password encryption (e.g. 256-bit SHA) to the directory containing the Tabulator, config files, CVR files, and any other related files.
@@ -77,29 +95,35 @@ The Tabulator includes several example contest configuration files and associate
 
 ## Command-Line Interface
 
-Alternatively, you can run the Tabulator using the command-line interface by including the flag `-cli` and then supplying a path to an existing config file, e.g.:
+Alternatively, you can run the Tabulator using the command-line interface by including the flag `--cli` and then supplying a path to an existing config file, e.g.:
 
-`$ rcv -cli path/to/config`
+`$ rcv --cli path/to/config`
 
 Or, if you're compiling and running using Gradle:
 
-`$ gradlew run --args="-cli path/to/config"`
+`$ gradlew run --args="--cli path/to/config"`
 
-You can also activate a special `convert-to-cdf` function via the command line to export the CVR as a NIST common data format (CDF) .json instead of tabulating the results, e.g.:
+You can also activate a special `convert-to-cdf` function via the command line to export the CVR as a NIST common data
+format (CDF) .json instead of tabulating the results, e.g.:
 
-`$ rcv -cli path/to/config convert-to-cdf`
+`$ rcv --cli path/to/config --convert-to-cdf`
 
 This option is available in the GUI by selecting the "Conversion > Convert CVRs in Current Config to CDF" menu option.
 
 Or, again, if you're compiling and running using Gradle:
 
-`$ gradlew run --args="-cli path/to/config  convert-to-cdf"`
+`$ gradlew run --args="--cli path/to/config --convert-to-cdf"`
 
-Note: if you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, the label will be represented differently in the generated CDF source file than it was in the original CVR source. When you create a new config using this generated CDF source file and you need to set overvoteLabel, you should use "overvote". If you need to set undeclaredWriteInLabel, you should use "Undeclared Write-ins".
+Note: if you convert a source to CDF and that source uses an overvoteLabel or an undeclaredWriteInLabel, the label will
+be represented differently in the generated CDF source file than it was in the original CVR source. When you create a
+new config using this generated CDF source file and you need to set overvoteLabel, you should use "overvote". If you
+need to set undeclaredWriteInLabel, you should use "Undeclared Write-ins".
 
 ## Viewing Tabulator Output
 
-Tabulator output file names automatically include the current date and time, e.g. `2019-06-25_17-19-28_summary.csv`. This keeps them separate if you tabulate the same contest multiple times.
+Tabulator output filenames automatically include the current date and time,
+e.g. `2019-06-25_17-19-28_summary.csv`. This keeps them separate if you tabulate the same contest
+multiple times.
 
 Look in the console window to see where the output spreadsheet was written, e.g.
 
@@ -107,7 +131,9 @@ Look in the console window to see where the output spreadsheet was written, e.g.
 
 The summary spreadsheet (in .csv format), summary .json, and audit .log files are all readable using a basic text editor.
 
-**Note**: If you intend to print any of the output files, we **strongly recommend** adding headers / footers with page numbers, the file name, the date and time of printing, who is doing the printing, and any other desired information.
+**Note**: If you intend to print any of the output files, we **strongly recommend** adding headers /
+footers with page numbers, the filename, the date and time of printing, who is doing the printing,
+and any other desired information.
 
 ## Acknowledgements
 

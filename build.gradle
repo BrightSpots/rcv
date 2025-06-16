@@ -2,11 +2,13 @@ plugins {
     id "application"
     id "checkstyle"
     // Latest version at: https://github.com/spotbugs/spotbugs-gradle-plugin/tags
-    id "com.github.spotbugs" version "5.0.9"
+    id "com.github.spotbugs" version "6.1.10"
     id "idea"
     id "java-library"
-    id "org.beryx.jlink" version "2.25.0"
-    id "org.openjfx.javafxplugin" version "0.0.11"
+    // Latest version at: https://github.com/beryx/badass-jlink-plugin/tags
+    id "org.beryx.jlink" version "3.1.1"
+    // Latest version at: https://github.com/openjfx/javafx-gradle-plugin/tags
+    id "org.openjfx.javafxplugin" version "0.0.14"
 }
 
 repositories {
@@ -14,51 +16,63 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.apache.commons:commons-csv:1.9.0'
-    implementation 'org.apache.poi:poi-ooxml:5.2.2'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.3'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    implementation 'commons-cli:commons-cli:1.9.0'
+    implementation 'org.apache.commons:commons-csv:1.14.0'
+    implementation 'org.apache.poi:poi-ooxml:5.4.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.19.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.19.0'
+    implementation "com.github.spotbugs:spotbugs:4.9.3"
+
+    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 // ### Application plugin settings
 application {
-    mainClass = "${moduleName}.Main"
+    mainModule = "network.brightspots.rcv"
+    mainClass = "network.brightspots.rcv.Main"
 }
 
-// Uncomment below to simulate running from the CLI
-//run {
-//    standardInput = System.in
-//    args = ["-cli", "path/to/config"]
-//}
+// Required to accept a name and tiebreak interactively via CLI
+run {
+    standardInput = System.in
+    // Uncomment below line to quickly switch into CLI mode for development
+//    args = ["--cli", "path/to/config"]
+}
 
 // ### Checkstyle plugin settings
 checkstyle {
     // Latest version at https://github.com/checkstyle/checkstyle/tags
-    toolVersion = '10.3.2'
+    toolVersion = '10.23.1'
+
     // Keep the below file updated along with subsequent versions of Checkstyle (make sure to choose
     // the tag matching the toolVersion above):
     // https://github.com/checkstyle/checkstyle/blob/checkstyle-10.3.2/src/main/resources/google_checks.xml
+
     // NOTE: After updating the local version of config/checkstyle/google_checks.xml again in the
-    // future, it may be necessary to subsequently replace the following line in the local copy to
-    // prevent suppressions from being ignored:
+    // future, you will need to make two manual changes:
+    //
+    // 1. Replace the following line in the local copy to prevent suppressions from being ignored:
     // "${org.checkstyle.google.suppressionfilter.config}"
     // with:
     // "${config_loc}/checkstyle-suppressions.xml"
     // Additional context: https://github.com/gradle/gradle/issues/21409
+    //
+    // 2. Add the following property into the MissingJavadocMethod module
+    // to allow omitting Javadoc on short functions:
+    // <property name="minLineCount" value="2"/>
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
     maxWarnings = 0
     ignoreFailures = false
 }
-System.setProperty("org.checkstyle.google.suppressionfilter.config",
-        "$projectDir/config/checkstyle/checkstyle-suppressions.xml")
 
 spotbugs {
     // Latest version at: https://github.com/spotbugs/spotbugs/tags
-    toolVersion = '4.7.1'
+    toolVersion = '4.9.3'
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
 
@@ -72,17 +86,18 @@ idea {
 // ### Java plugin settings
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
+
 test {
-    moduleOptions {
-        addExports = [
-                "org.junit.platform.commons/org.junit.platform.commons.util"   : "ALL-UNNAMED",
-                "org.junit.platform.commons/org.junit.platform.commons.logging": "ALL-UNNAMED"
-        ]
-    }
+    jvmArgs += [
+        '--add-exports', 'org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED',
+        '--add-exports', 'org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED'
+    ]
     maxHeapSize = "2056m"
     useJUnitPlatform()
     testLogging {
@@ -92,11 +107,14 @@ test {
 
 // ### JavaFX plugin settings
 javafx {
-    version = "18"
+    // Latest version here: https://gluonhq.com/products/javafx/
+    version = "21.0.7"
     modules = ["javafx.base", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
 def JLINK_DIR = "$buildDir/rcv"
+
+// Comma-separated list of modules
 // Necessary to explicitly include due to https://github.com/BrightSpots/rcv/issues/625
 def MODULES_TO_ADD = "com.ctc.wstx"
 
@@ -104,13 +122,69 @@ def MODULES_TO_ADD = "com.ctc.wstx"
 jlink {
     imageDir = file(JLINK_DIR)
     imageZip = file(JLINK_DIR + ".zip")
-    addOptions '--add-modules', MODULES_TO_ADD, '--strip-debug', '--compress', '2',
+    addOptions '--add-modules', MODULES_TO_ADD,
+            '--strip-debug', '--compress', '2',
             '--no-header-files', '--no-man-pages'
     mergedModule {
         requires "java.xml"
     }
     launcher {
-        name = "rcv"
+        // TODO Sync version number with release.yml and Main.java (github.com/BrightSpots/rcv/issues/662)
+        name = "RCTab"
+        version = "1.3.999"
+    }
+
+    jpackage {
+        installerOptions += [
+                '--verbose',
+                '--vendor', 'Ranked Choice Voting Resource Center'
+        ]
+        if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
+            imageOptions += [
+                    '--icon', 'src/main/resources/network/brightspots/rcv/launcher.png',
+            ]
+
+            installerOptions += [
+                    '--linux-package-name', 'rctab',
+                    '--linux-deb-maintainer', 'info@rcvresources.org',
+                    '--linux-shortcut'
+            ]
+        }
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            imageOptions += [
+                    '--icon', 'src/main/resources/network/brightspots/rcv/launcher.ico',
+            ]
+
+            installerOptions += [
+                    '--win-per-user-install',
+                    '--win-dir-chooser',
+                    '--win-menu',
+                    '--win-shortcut'
+            ]
+        }
+        if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+            // .App is signed with the Application certificate
+            imageOptions += [
+                    '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
+                    '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
+                    '--mac-sign',
+                    '--mac-signing-key-user-name', 'Developer ID Application: Election Administration Resource Center (A257HB4NS4',
+                    '--mac-signing-keychain', 'build.keychain'
+            ]
+
+            // DMG is signed with the Installer certificate
+            installerOptions += [
+                    '--type', 'dmg',
+                    '--icon', 'src/main/resources/network/brightspots/rcv/launcher.icns',
+                    '--resource-dir', 'src/main/resources/network/brightspots/rcv/',
+                    '--mac-sign',
+                    '--mac-signing-key-user-name', 'Developer ID Installer: Election Administration Resource Center (A257HB4NS4)',
+                    '--mac-signing-keychain', 'build.keychain',
+                    '--mac-package-name', 'RCTab',
+                    '--mac-package-identifier', 'network.brightspots.rcv',
+                    '--mac-package-signing-prefix', 'network.brightspots.rcv'
+            ]
+        }
     }
 }
 
@@ -123,14 +197,39 @@ def docsToCopy = copySpec {
 def sampleInputToCopy = copySpec {
     includeEmptyDirs = false
     from("$projectDir/src/test/resources/network/brightspots/rcv/test_data") {
-        include "2015_portland_mayor/2015_portland_mayor_config.json"
-        include "2015_portland_mayor/2015_portland_mayor_cvr.xlsx"
+        // Config example: interactive tiebreaking
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_config.json"
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_sequential_config.json"
         include "sample_interactive_tiebreak/sample_interactive_tiebreak_cvr.xlsx"
+
+        // Config example: by-precinct
         include "precinct_example/precinct_example_config.json"
         include "precinct_example/precinct_example_cvr.xlsx"
-        include "dominion_cvr_conversion_alaska/*.json"
+
+        // CVR example: CDF
+        include "aliases_cdf_json/aliases_cdf_json_config.json"
+        include "aliases_cdf_json/aliases_cdf_json_expected_summary.csv"
+
+        // CVR example: Clear Ballot
+        include "clear_ballot_kansas_primary/clear_ballot_kansas_primary_config.json"
+        include "clear_ballot_kansas_primary/clear_ballot_kansas_primary.cvr.csv"
+
+        // CVR example: Dominion
+        include "dominion_kansas/dominion_kansas_config.json"
+        include "dominion_kansas/dominion_kansas/kansas_input_data/*.json"
+
+        // CVR example: ES&S
+        include "2015_portland_mayor/2015_portland_mayor_config.json"
+        include "2015_portland_mayor/2015_portland_mayor_cvr.xlsx"
+
+        // CVR example: Hart
+        include "hart_cedar_park_school_board/hart_cedar_park_school_board_config.json"
+        include "_shared/hart_cvr_archive/*.xml"
+
+        // CSV example: Hart
+        include "generic_csv_test/generic_csv_test_config.json"
+        include "generic_csv_test/generic_csv_test_cvr.json"
+
         exclude "output"
         exclude "**/*expected*"
     }
@@ -144,5 +243,19 @@ tasks.jlink.doLast {
     copy {
         with sampleInputToCopy
         into JLINK_DIR + "/sample_input"
+    }
+}
+
+// Ensure reproducible hashes
+tasks.withType(AbstractArchiveTask) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+
+    dirPermissions {
+        unix(0755)
+    }
+
+    filePermissions {
+        unix(0644)
     }
 }

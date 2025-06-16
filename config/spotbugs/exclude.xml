@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter
-    xmlns="https://github.com/spotbugs/filter/4.6.0"
+    xmlns="https://github.com/spotbugs/filter/4.8.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  xsi:schemaLocation="https://raw.githubusercontent.com/spotbugs/spotbugs/4.6.0/spotbugs/etc/findbugsfilter.xsd">
+  xsi:schemaLocation="https://raw.githubusercontent.com/spotbugs/spotbugs/4.8.3/spotbugs/etc/findbugsfilter.xsd">
   <Match>
     <Class name="~network\.brightspots\.rcv\.(HartCvrReader\$(Contest|Option|PrecinctSplit)|RawContestConfig\$ContestRules)"/>
     <Bug code="UwF"/>
@@ -15,5 +15,32 @@
     <Class name="network.brightspots.rcv.HartCvrReader"/>
     <Method name="readCastVoteRecord"/>
     <Bug code="NP"/>
+  </Match>
+  <Match>
+    <Class name="network.brightspots.rcv.RawContestConfig$CvrSource"/>
+    <Bug code="UwF"/>
+  </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.RawContestConfig\$(CvrSource|Candidate)"/>
+    <Method name="~.*Property"/>
+    <Bug code="EI"/>
+  </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.SecurityXmlParsers\$SignedInfo"/>
+    <Field name="xmlns"/>
+    <Bug code="UrF"/>
+  </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.GuiTabulateController"/>
+    <Method name="initialize"/>
+    <Bug code="EI2"/>
+  </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.TabulatorSession\$LoadedCvrData"/>
+    <Bug code="EI2"/>
+  </Match>
+  <Match>
+    <Class name="~network\.brightspots\.rcv\.TabulatorSession\$LoadedCvrData"/>
+    <Bug code="EI"/>
   </Match>
 </FindBugsFilter>
