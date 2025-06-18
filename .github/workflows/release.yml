@@ -16,6 +16,8 @@ jobs:
   deleteRelease:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: "Delete release and tag using gh CLI"
         if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
@@ -23,10 +25,12 @@ jobs:
             TAG_NAME="build-${{ github.ref_name }}"
             echo "Ref is a branch. Generated TAG_NAME: $TAG_NAME"
             echo "Checking if tag exists: $TAG_NAME"
-            if gh repo view-tag "$TAG_NAME" > /dev/null 2>&1; then
+            git fetch --tags
+            if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
               echo "Tag exists. Deleting release and tag: $TAG_NAME"
-              gh release delete "$TAG_NAME" --yes
-              gh repo delete-tag "$TAG_NAME"
+              gh release delete "$TAG_NAME" --yes --cleanup-tag
+              git tag $TAG_NAME
+              git push origin $TAG_NAME --force
             else
               echo "Tag does not exist. Skipping deletion."
             fi
@@ -45,6 +49,8 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-13, macos-latest ]  # -13 is intel; -latest is ARM
     steps:
+      - uses: actions/checkout@v3
+
       - name: "Create base filename for all artifacts"
         id: basefn
         shell: bash
@@ -99,8 +105,6 @@ jobs:
         id: exefn
         shell: bash
         run: echo "FILEPATH=build/${{ steps.basefn.outputs.FILEPATH }}${{ steps.ext.outputs.EXT }}" >> $GITHUB_OUTPUT
-
-      - uses: actions/checkout@v3
 
       - name: "Set up JDK 21.0.7"
         uses: actions/setup-java@v3
@@ -241,6 +245,7 @@ jobs:
           overwrite: true
           file_glob: true
           make_latest: false
+          prerelease: true
 
       - name: "Upload cache to release"
         uses: svenstaro/upload-release-action@v2
@@ -252,3 +257,4 @@ jobs:
           overwrite: true
           file_glob: true
           make_latest: false
+          prerelease: true
