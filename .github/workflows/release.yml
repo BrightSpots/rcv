@@ -143,11 +143,6 @@ jobs:
           input: "~/.gradle/caches"
           zipFilename: ${{steps.cachefn.outputs.FILEPATH}}
 
-      - name: "Generate SHA512 for executable"
-        shell: bash
-        run: |
-          ./.github/workflows/sha.sh ${{ steps.exefn.outputs.FILEPATH }} ${{ runner.os }} 512 > ${{steps.exefn.outputs.FILEPATH}}.sha512
-
       - name: "Generate SHA512 for plugins cache"
         shell: bash
         run: |
@@ -228,7 +223,9 @@ jobs:
 
       - name: "Get current date"
         id: current_date
-        run: echo "date=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+        run: |
+          node -e "console.log('date=' + new Date().toISOString().split('T')[0])" >> $env:GITHUB_OUTPUT
+        shell: pwsh
 
       - name: "Upload binaries to release"
         uses: svenstaro/upload-release-action@v2
@@ -237,9 +234,9 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/${{ steps.basefn.outputs.FILEPATH }}*
           tag: ${{ steps.tagname.outputs.TAG_NAME }}
-          release_name: Automated Build - ${{ github.ref_name }} Branch on ${{ steps.current_date.outputs.date }}
+          release_name: Automated Build - ${{ github.ref_name }} (${{ steps.current_date.outputs.date }})
           body: |
-            This is an automated build of the ${{ github.ref_name }} branch with the most recent development updates as of ${{ steps.current_date.outputs.date }}. 
+            This is an automated build of "${{ github.ref_name }}" with the most recent development updates as of ${{ steps.current_date.outputs.date }}. 
             It is provided exclusively for testing purposes, to view the most recent updates, and should only be used for that purpose.
           overwrite: true
           file_glob: true
