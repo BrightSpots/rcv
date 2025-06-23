@@ -28,7 +28,8 @@ jobs:
             git fetch --tags
             if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
               echo "Tag exists. Deleting release and tag: $TAG_NAME"
-              gh release delete "$TAG_NAME" --yes --cleanup-tag
+              gh release delete "$TAG_NAME" --yes --cleanup-tag || true
+              git tag -d $TAG_NAME || true
               git tag $TAG_NAME
               git push origin $TAG_NAME --force
             else
@@ -239,8 +240,8 @@ jobs:
           file: build/${{ steps.basefn.outputs.FILEPATH }}*
           tag: ${{ steps.tagname.outputs.TAG_NAME }}
           release_name: Automated Build - ${{ github.ref_name }} (${{ steps.current_date.outputs.date }})
-          body: |
-            This is an automated build of "${{ github.ref_name }}" with the most recent development updates as of ${{ steps.current_date.outputs.date }}. 
+          body: >
+            This is an automated build of "${{ github.ref_name }}" with the most recent development updates as of ${{ steps.current_date.outputs.date }}.
             It is provided exclusively for testing purposes, to view the most recent updates, and should only be used for that purpose.
           overwrite: true
           file_glob: true
