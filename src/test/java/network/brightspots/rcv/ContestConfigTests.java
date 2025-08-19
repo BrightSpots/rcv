@@ -16,7 +16,9 @@
 
 package network.brightspots.rcv;
 
+import static network.brightspots.rcv.ContestConfig.numSigFigsInString;
 import static network.brightspots.rcv.ContestConfigMigration.isVersionNewer;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -58,5 +60,41 @@ class ContestConfigTests {
     assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0-beta"));
     assertTrue(isVersionNewer("1.4.0", "1.4.0-alpha"));
     assertFalse(isVersionNewer("1.4.0-alpha", "1.4.0"));
+  }
+
+  void assertSigFigTestsFails(String input) {
+    try {
+      numSigFigsInString(input);
+      throw new AssertionError("Expected IllegalArgumentException for '" + input + "'");
+    } catch (IllegalArgumentException e) {
+      // Expected exception
+    }
+  }
+
+  @Test
+  @DisplayName("test numSigFigsInString")
+  void testNumSigFigsInString() {
+    // This test ensures that the automatic precision that occurs when setting
+    // the bottoms-up threshold is accurate
+    assertEquals(1, numSigFigsInString("0.1"));
+    assertEquals(2, numSigFigsInString("0.15"));
+    assertEquals(2, numSigFigsInString("0.10"));
+    assertEquals(3, numSigFigsInString("0.100"));
+    assertEquals(4, numSigFigsInString("0.0100"));
+    assertEquals(1, numSigFigsInString("1"));
+    assertEquals(2, numSigFigsInString("10"));
+    assertEquals(3, numSigFigsInString("100"));
+    assertEquals(2, numSigFigsInString("1.0"));
+    assertEquals(3, numSigFigsInString("1.01"));
+    assertEquals(4, numSigFigsInString("50.50"));
+    assertEquals(3, numSigFigsInString("100"));
+    assertEquals(3, numSigFigsInString("100."));
+    assertEquals(4, numSigFigsInString("100.0"));
+    assertSigFigTestsFails("");
+    assertSigFigTestsFails("100..");
+    assertSigFigTestsFails("0.00100.0");
+    assertSigFigTestsFails(null);
+    assertSigFigTestsFails("g.g");
+
   }
 }
