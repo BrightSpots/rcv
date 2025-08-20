@@ -29,7 +29,7 @@
       "eliminated" : "F",
       "transfers" : { }
     } ],
-    "threshold" : "3.1500"
+    "threshold" : "3.15"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
@@ -51,7 +51,7 @@
       "eliminated" : "E",
       "transfers" : { }
     } ],
-    "threshold" : "3.1500"
+    "threshold" : "3.15"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
@@ -74,7 +74,7 @@
         "G" : "1"
       }
     } ],
-    "threshold" : "3.1500"
+    "threshold" : "3.15"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
@@ -96,7 +96,7 @@
         "G" : "3"
       }
     } ],
-    "threshold" : "3.1500"
+    "threshold" : "3.15"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
@@ -124,10 +124,10 @@
       "elected" : "G",
       "transfers" : { }
     } ],
-    "threshold" : "3.1500"
+    "threshold" : "3.15"
   } ],
   "summary" : {
-    "finalThreshold" : "3.1500",
+    "finalThreshold" : "3.15",
     "numCandidates" : 8,
     "numWinners" : 0,
     "totalNumBallots" : "21",

@@ -7,7 +7,7 @@ Jurisdiction,
 Office,
 Date,
 Winner(s),"A, B, C, G"
-Final Threshold,3.1500
+Final Threshold,3.15
 
 Contest Summary
 Number to be Elected,0
@@ -27,7 +27,7 @@ H,1,4.76%,0,1,4.76%,0,1,4.76%,-1,0,0.0%,0,0,0.0%,0
 E,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 F,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,21,,,21,,,21,,,21,,,21,,
-Current Round Threshold,3.1500,,,3.1500,,,3.1500,,,3.1500,,,3.1500,,
+Current Round Threshold,3.15,,,3.15,,,3.15,,,3.15,,,3.15,,
 Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0,0,,0

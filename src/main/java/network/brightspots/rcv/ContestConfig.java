@@ -888,7 +888,7 @@ class ContestConfig {
     return rawConfig.rules.multiSeatBottomsUpPercentageThreshold;
   }
 
-  public static int numSigFigsInString(String number) {
+  public static int numDecimalsInString(String number) {
     if (number == null || number.isEmpty()) {
       throw new IllegalArgumentException("No number provided");
     }
@@ -903,26 +903,33 @@ class ContestConfig {
       throw new IllegalArgumentException("Number " + number + " is not a valid decimal number");
     }
 
-    // Remove leading zeros from integer part
-    String intPart = parts[0];
-    intPart = intPart.replaceFirst("^0+", "");
-
-    // All zeros are significant in the fractional part
     String fracPart = parts.length > 1 ? parts[1] : "";
 
     // Ensure both sides are integers by casting them to ints and ensuring no errors
-    try {
-      if (!intPart.isEmpty()) {
-        Integer.parseInt(intPart);
-      }
-      if (!fracPart.isEmpty()) {
+    if (!fracPart.isEmpty()) {
+      try {
         Integer.parseInt(fracPart);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException(number + " is not a valid fraction");
       }
-    } catch (NumberFormatException e) {
-      throw new IllegalArgumentException(number + " is not a valid fraction");
     }
 
-    return intPart.length() + fracPart.length();
+    return fracPart.length();
+  }
+
+  static BigDecimal getPercentageFromStringWithAccurateSigFigs(String number) {
+    BigDecimal threshold = new BigDecimal(number);
+    BigDecimal divisor = new BigDecimal(100);
+    int numDecimalPlaces;
+    try {
+      numDecimalPlaces = numDecimalsInString(number);
+    } catch (IllegalArgumentException e) {
+      Logger.severe("Invalid multiSeatBottomsUpPercentageThreshold: %s", number);
+      throw new IllegalArgumentException(
+              "multiSeatBottomsUpPercentageThreshold must be a valid decimal number");
+    }
+    numDecimalPlaces += 2; // Since we're dividing by 100, we need two extra decimal places
+    return threshold.divide(divisor, numDecimalPlaces, RoundingMode.HALF_UP);
   }
 
   BigDecimal getMultiSeatBottomsUpPercentageThreshold() {
@@ -930,18 +937,8 @@ class ContestConfig {
             || getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()) {
       return null;
     }
-    String thresholdRaw = getMultiSeatBottomsUpPercentageThresholdRaw();
-    BigDecimal threshold = new BigDecimal(thresholdRaw);
-    BigDecimal divisor = new BigDecimal(100);
-    int numDecimalPlaces;
-    try {
-      numDecimalPlaces = numSigFigsInString(thresholdRaw);
-    } catch (IllegalArgumentException e) {
-      Logger.severe("Invalid multiSeatBottomsUpPercentageThreshold: %s", thresholdRaw);
-      throw new IllegalArgumentException(
-          "multiSeatBottomsUpPercentageThreshold must be a valid decimal number");
-    }
-    return threshold.divide(divisor, numDecimalPlaces, RoundingMode.HALF_UP);
+    String threshold = getMultiSeatBottomsUpPercentageThresholdRaw();
+    return getPercentageFromStringWithAccurateSigFigs(threshold);
   }
 
   List<String> getSequentialWinners() {
