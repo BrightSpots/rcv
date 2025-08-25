@@ -903,15 +903,19 @@ class ContestConfig {
       throw new IllegalArgumentException("Number " + number + " is not a valid decimal number");
     }
 
+    String intPart = parts[0];
     String fracPart = parts.length > 1 ? parts[1] : "";
 
     // Ensure both sides are integers by casting them to ints and ensuring no errors
-    if (!fracPart.isEmpty()) {
-      try {
-        Integer.parseInt(fracPart);
-      } catch (NumberFormatException e) {
-        throw new IllegalArgumentException(number + " is not a valid fraction");
+    try {
+      if (!intPart.isEmpty()) {
+        Integer.parseInt(intPart);
       }
+      if (!fracPart.isEmpty()) {
+        Integer.parseInt(fracPart);
+      }
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(number + " is not a valid fraction");
     }
 
     return fracPart.length();
