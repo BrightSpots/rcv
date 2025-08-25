@@ -1,6 +1,6 @@
 {
   "config" : {
-    "contest" : "Multi-Seat Bottoms-up With Threshold",
+    "contest" : "Multi-Seat Bottoms-up With Dynamic Threshold",
     "date" : "",
     "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "",
@@ -23,13 +23,13 @@
       "E" : "0",
       "F" : "0",
       "G" : "3",
-      "H" : "1"
+      "H" : "2"
     },
     "tallyResults" : [ {
       "eliminated" : "F",
       "transfers" : { }
     } ],
-    "threshold" : "3.15"
+    "threshold" : "3.30"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
@@ -45,13 +45,13 @@
       "D" : "3",
       "E" : "0",
       "G" : "3",
-      "H" : "1"
+      "H" : "2"
     },
     "tallyResults" : [ {
       "eliminated" : "E",
       "transfers" : { }
     } ],
-    "threshold" : "3.15"
+    "threshold" : "3.30"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
@@ -66,18 +66,19 @@
       "C" : "4",
       "D" : "3",
       "G" : "3",
-      "H" : "1"
+      "H" : "2"
     },
     "tallyResults" : [ {
       "eliminated" : "H",
       "transfers" : {
-        "G" : "1"
+        "G" : "1",
+        "exhausted": "1"
       }
     } ],
-    "threshold" : "3.15"
+    "threshold" : "3.30"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "1",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -99,7 +100,7 @@
     "threshold" : "3.15"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "1",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -130,7 +131,7 @@
     "finalThreshold" : "3.15",
     "numCandidates" : 8,
     "numWinners" : 0,
-    "totalNumBallots" : "21",
+    "totalNumBallots" : "22",
     "undervotes" : 0
   }
 }
