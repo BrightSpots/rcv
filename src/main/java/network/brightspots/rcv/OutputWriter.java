@@ -74,10 +74,8 @@ class OutputWriter {
   private SliceIdSet sliceIds;
   // precinct to GpUnitId map (CDF only)
   private Map<String, String> gpUnitIds;
-  // map from round number to list of candidates eliminated in that round
-  private Map<Integer, List<String>> roundToEliminatedCandidates;
-  // map from round number to list of candidates winning in that round
-  private Map<Integer, List<String>> roundToWinningCandidates;
+  // map from round number to list of tally decisions (elected and eliminated) in that round
+  private Map<Integer, List<Tabulator.TallyDecision>> roundToDecisions;
   private ContestConfig config;
   private String timestampString;
   // map from round number to residual surplus generated in that round
@@ -111,6 +109,32 @@ class OutputWriter {
 
     public String getExtension() {
       return extension;
+    }
+  }
+
+  public class Footnote {
+    private final String symbol;
+    private boolean isFootnoteUsed;
+
+    Footnote(String symbol) {
+      this.symbol = symbol;
+      this.isFootnoteUsed = false;
+    }
+
+    public String getSymbol() {
+      return symbol;
+    }
+
+    public String markFootnoteIfActive(String base) {
+      return base + (isFootnoteUsed ? symbol : "");
+    }
+
+    public boolean isFootnoteUsed() {
+      return isFootnoteUsed;
+    }
+
+    public void setFootnoteUsed(boolean used) {
+      isFootnoteUsed = used;
     }
   }
 
@@ -306,24 +330,8 @@ class OutputWriter {
     return this;
   }
 
-  OutputWriter setCandidatesToRoundEliminated(Map<String, Integer> candidatesToRoundEliminated) {
-    // roundToEliminatedCandidates is the inverse of candidatesToRoundEliminated map,
-    // so we can look up who got eliminated for each round
-    roundToEliminatedCandidates = new HashMap<>();
-    for (var entry : candidatesToRoundEliminated.entrySet()) {
-      roundToEliminatedCandidates.computeIfAbsent(entry.getValue(), k -> new LinkedList<>());
-      roundToEliminatedCandidates.get(entry.getValue()).add(entry.getKey());
-    }
-    return this;
-  }
-
-  OutputWriter setWinnerToRound(Map<String, Integer> winnerToRound) {
-    // very similar to the logic in setCandidatesToRoundEliminated above
-    roundToWinningCandidates = new HashMap<>();
-    for (var entry : winnerToRound.entrySet()) {
-      roundToWinningCandidates.computeIfAbsent(entry.getValue(), k -> new LinkedList<>());
-      roundToWinningCandidates.get(entry.getValue()).add(entry.getKey());
-    }
+  OutputWriter setRoundToDecisions(Map<Integer, List<Tabulator.TallyDecision>> roundToDecisions) {
+    this.roundToDecisions = roundToDecisions;
     return this;
   }
 
@@ -408,6 +416,10 @@ class OutputWriter {
       throw exception;
     }
 
+
+    Footnote tallyResultInSlice = new Footnote("†");
+    tallyResultInSlice.setFootnoteUsed(outputFileIdentifiers.isSlice());
+
     BigDecimal winningThreshold = roundTallies.get(numRounds).getWinningThreshold();
     addContestInformationRows(csvPrinter, winningThreshold,
             outputFileIdentifiers.slice, outputFileIdentifiers.sliceId);
@@ -420,11 +432,14 @@ class OutputWriter {
     }
     csvPrinter.println();
 
-    csvPrinter.print(outputFileIdentifiers.isSlice() ? "Eliminated*" : "Eliminated");
-    printActionSummary(csvPrinter, roundToEliminatedCandidates);
+    Footnote tieBrokenFootnote = new Footnote("*");
+    csvPrinter.print(tallyResultInSlice.markFootnoteIfActive("Eliminated"));
+    printActionSummary(
+            csvPrinter, Tabulator.TallyDecision.DecisionType.ELIMINATED, tieBrokenFootnote);
 
-    csvPrinter.print(outputFileIdentifiers.isSlice() ? "Elected*" : "Elected");
-    printActionSummary(csvPrinter, roundToWinningCandidates);
+    csvPrinter.print(tallyResultInSlice.markFootnoteIfActive("Elected"));
+    printActionSummary(
+            csvPrinter, Tabulator.TallyDecision.DecisionType.ELECTED, tieBrokenFootnote);
 
     // For each candidate: for each round: output total votes
     for (String candidate : candidateOrder) {
@@ -568,13 +583,22 @@ class OutputWriter {
       csvPrinter.println();
     }
 
-    if (outputFileIdentifiers.isSlice()) {
+    if (tallyResultInSlice.isFootnoteUsed()) {
       csvPrinter.println();
-      csvPrinter.print(String.format("*Elect/Eliminate decisions are from the full contest. "
+      csvPrinter.print(String.format(tallyResultInSlice.getSymbol()
+              + "Elect/Eliminate decisions are from the full contest. "
               + "All other results on this report are at the %s level.",
               outputFileIdentifiers.slice.toLowerString()));
       csvPrinter.println();
     }
+
+    if (tieBrokenFootnote.isFootnoteUsed()) {
+      csvPrinter.println();
+      csvPrinter.print(String.format(tieBrokenFootnote.getSymbol()
+              + "Tie resolved in accordance with election law"));
+      csvPrinter.println();
+    }
+
 
     try {
       csvPrinter.flush();
@@ -602,11 +626,17 @@ class OutputWriter {
   }
 
   private void printActionSummary(
-      CSVPrinter csvPrinter, Map<Integer, List<String>> roundToCandidates) throws IOException {
+      CSVPrinter csvPrinter,
+      Tabulator.TallyDecision.DecisionType decisionType,
+      Footnote tieBrokenFootnote) throws IOException {
     for (int round = 1; round <= numRounds; round++) {
-      List<String> winners = roundToCandidates.get(round);
-      if (winners != null && winners.size() > 0) {
-        addActionRowCandidates(winners, csvPrinter);
+      List<Tabulator.TallyDecision> decisions = getCandidatesByDecisionType(round, decisionType);
+      if (decisions.stream().anyMatch(Tabulator.TallyDecision::wasDecidedViaTieBreak)) {
+        tieBrokenFootnote.setFootnoteUsed(true);
+      }
+
+      if (!decisions.isEmpty()) {
+        addActionRowCandidates(decisions, csvPrinter, tieBrokenFootnote);
       } else {
         csvPrinter.print("");
       }
@@ -618,12 +648,35 @@ class OutputWriter {
     csvPrinter.println();
   }
 
-  // add the given candidate(s) names to the csv file next cell
-  private void addActionRowCandidates(List<String> candidates, CSVPrinter csvPrinter)
-      throws IOException {
+  // Simple filter to extract candidates with a specific decision type in a given round
+  private List<Tabulator.TallyDecision> getCandidatesByDecisionType(
+          int round, Tabulator.TallyDecision.DecisionType decisionType) {
+    List<Tabulator.TallyDecision> decisionsInRound = roundToDecisions.get(round);
+    return decisionsInRound.stream()
+        .filter(decision -> decision.decisionType() == decisionType)
+        .collect(Collectors.toList());
+  }
+
+  // Simple filter to extract candidate names with a specific decision type in a given round
+  private List<String> getCandidateNamesByDecisionType(
+          int round, Tabulator.TallyDecision.DecisionType decisionType) {
+    return getCandidatesByDecisionType(round, decisionType).stream()
+        .map(Tabulator.TallyDecision::candidateName)
+        .collect(Collectors.toList());
+  }
+
+  private void addActionRowCandidates(
+          List<Tabulator.TallyDecision> decisions,
+          CSVPrinter csvPrinter,
+          Footnote tieBrokenFootnote) throws IOException {
     List<String> candidateDisplayNames = new ArrayList<>();
-    for (String candidate : candidates) {
-      candidateDisplayNames.add(config.getNameForCandidate(candidate));
+    for (Tabulator.TallyDecision decision : decisions) {
+      String candidateName = config.getNameForCandidate(decision.candidateName());
+      // Add footnote symbol if this specific decision was made via tiebreak
+      if (decision.wasDecidedViaTieBreak()) {
+        candidateName += tieBrokenFootnote.getSymbol();
+      }
+      candidateDisplayNames.add(candidateName);
     }
     // use semicolon as delimiter display in a single cell
     String candidateCellText = String.join("; ", candidateDisplayNames);
@@ -644,14 +697,11 @@ class OutputWriter {
     csvPrinter.printRecord("Office", config.getContestOffice());
     csvPrinter.printRecord("Date", config.getContestDate());
 
-    List<String> winners = new LinkedList<>();
-    List<Integer> winningRounds = new ArrayList<>(roundToWinningCandidates.keySet());
-    // make sure we list them in order of election
-    Collections.sort(winningRounds);
-    for (int round : winningRounds) {
-      for (String candidateName : roundToWinningCandidates.get(round)) {
-        winners.add(config.getNameForCandidate(candidateName));
-      }
+    // Extract winners, ordered by round elected
+    List<String> winners = new ArrayList<>();
+    for (int round = 1; round <= numRounds; round++) {
+      winners.addAll(getCandidateNamesByDecisionType(
+              round, Tabulator.TallyDecision.DecisionType.ELECTED));
     }
 
     csvPrinter.printRecord("Winner(s)", String.join(", ", winners));
@@ -1085,10 +1135,12 @@ class OutputWriter {
       HashMap<String, Object> roundData = new HashMap<>();
       roundData.put("round", round);
       ArrayList<Object> actions = new ArrayList<>();
-      addActionObjects(
-          "elected", roundToWinningCandidates.get(round), round, actions, tallyTransfers);
-      addActionObjects(
-          "eliminated", roundToEliminatedCandidates.get(round), round, actions, tallyTransfers);
+      List<String> electedInRound = getCandidateNamesByDecisionType(
+              round, Tabulator.TallyDecision.DecisionType.ELECTED);
+      List<String> eliminatedInRound = getCandidateNamesByDecisionType(
+              round, Tabulator.TallyDecision.DecisionType.ELIMINATED);
+      addActionObjects("elected", electedInRound, round, actions, tallyTransfers);
+      addActionObjects("eliminated", eliminatedInRound, round, actions, tallyTransfers);
       roundData.put("tallyResults", actions);
       roundData.put("tally", updateCandidateNamesInTally(roundTallies.get(round)));
       roundData.put("threshold", roundTallies.get(round).getWinningThreshold());
