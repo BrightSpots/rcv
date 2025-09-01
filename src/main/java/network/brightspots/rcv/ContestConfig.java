@@ -828,11 +828,17 @@ class ContestConfig {
               WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
         }
 
-        if (getMultiSeatBottomsUpPercentageThreshold() == null) {
-          validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
-          Logger.severe(
-              "If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
-                  + "must be specified!");
+
+        try {
+          BigDecimal threshold = getMultiSeatBottomsUpPercentageThreshold();
+          if (threshold == null) {
+            validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
+            Logger.severe(
+                    "If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
+                            + "must be specified!");
+          }
+        } catch (IllegalArgumentException e) {
+          // Error already logged when validating range
         }
       }
     }
@@ -922,7 +928,14 @@ class ContestConfig {
   }
 
   static BigDecimal getPercentageFromStringWithAccurateSigFigs(String number) {
-    BigDecimal threshold = new BigDecimal(number);
+    BigDecimal threshold;
+    try {
+      threshold = new BigDecimal(number);
+    } catch (NumberFormatException e) {
+      Logger.severe("Invalid multiSeatBottomsUpPercentageThreshold: %s", number);
+      throw new IllegalArgumentException(
+              "multiSeatBottomsUpPercentageThreshold must be a valid decimal number");
+    }
     BigDecimal divisor = new BigDecimal(100);
     int numDecimalPlaces;
     try {
@@ -941,6 +954,7 @@ class ContestConfig {
             || getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()) {
       return null;
     }
+
     String threshold = getMultiSeatBottomsUpPercentageThresholdRaw();
     return getPercentageFromStringWithAccurateSigFigs(threshold);
   }
