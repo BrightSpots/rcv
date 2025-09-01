@@ -81,8 +81,10 @@ class ContestConfig {
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
   private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
-  private static final int MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 1;
-  private static final int MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 100;
+  private static final BigDecimal MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD
+          = new BigDecimal(1);
+  private static final BigDecimal MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD
+          = new BigDecimal(100);
   private static final long MIN_RANDOM_SEED = -140737488355328L;
   private static final long MAX_RANDOM_SEED = 140737488355327L;
   // Underlying rawConfig object data
@@ -760,16 +762,6 @@ class ContestConfig {
     }
 
     if (fieldOutOfRangeOrNotInteger(
-        getMultiSeatBottomsUpPercentageThresholdRaw(),
-        "multiSeatBottomsUpPercentageThreshold",
-        MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
-        MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
-        false)) {
-      validationErrors.add(
-          ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
-    }
-
-    if (fieldOutOfRangeOrNotInteger(
         getStopTabulationEarlyAfterRoundRaw(),
         "stopEarlyAfterRound",
         MIN_NUMBER_OF_ROUNDS,
@@ -828,17 +820,31 @@ class ContestConfig {
               WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
         }
 
-
-        try {
-          BigDecimal threshold = getMultiSeatBottomsUpPercentageThreshold();
-          if (threshold == null) {
+        String threshold = getMultiSeatBottomsUpPercentageThresholdRaw();
+        if (threshold == null || threshold.isBlank()) {
             validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
             Logger.severe(
                     "If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
                             + "must be specified!");
+        } else {
+          BigDecimal thresholdNum;
+          try {
+            thresholdNum = new BigDecimal(threshold);
+            if (thresholdNum.compareTo(MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD) < 0
+                || thresholdNum.compareTo(MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD) > 0) {
+                validationErrors.add(
+                        ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
+                Logger.severe(
+                        "multiSeatBottomsUpPercentageThreshold must be between %.2f and %.2f!",
+                        MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
+                        MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD);
+            }
+          } catch (NumberFormatException e) {
+              validationErrors.add(
+                      ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
+              Logger.severe(
+                      "multiSeatBottomsUpPercentageThreshold must be a valid decimal number!");
           }
-        } catch (IllegalArgumentException e) {
-          // Error already logged when validating range
         }
       }
     }
