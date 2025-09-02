@@ -85,6 +85,16 @@
       "Troy Benjegerdes" : "185"
     },
     "tallyResults" : [ {
+      "eliminated" : "Al Flowers",
+      "transfers" : {
+        "Betsy Hodges" : "122",
+        "Jacob Frey" : "60",
+        "Nekima Levy-Pounds" : "136",
+        "Raymond Dehn" : "82",
+        "Tom Hoch" : "107",
+        "exhausted" : "206"
+      }
+    }, {
       "eliminated" : "Aswar Rahman",
       "transfers" : {
         "Betsy Hodges" : "92",
@@ -93,61 +103,6 @@
         "Raymond Dehn" : "105",
         "Tom Hoch" : "129",
         "exhausted" : "212"
-      }
-    }, {
-      "eliminated" : "David Rosenfeld",
-      "transfers" : {
-        "Betsy Hodges" : "65",
-        "Jacob Frey" : "36",
-        "Nekima Levy-Pounds" : "94",
-        "Raymond Dehn" : "102",
-        "Tom Hoch" : "32",
-        "exhausted" : "150"
-      }
-    }, {
-      "eliminated" : "L.A. Nik",
-      "transfers" : {
-        "Betsy Hodges" : "23",
-        "Jacob Frey" : "69",
-        "Nekima Levy-Pounds" : "13",
-        "Raymond Dehn" : "12",
-        "Tom Hoch" : "96",
-        "exhausted" : "403"
-      }
-    }, {
-      "eliminated" : "Christopher Zimmerman",
-      "transfers" : {
-        "Nekima Levy-Pounds" : "1"
-      }
-    }, {
-      "eliminated" : "Ronald Lischeid",
-      "transfers" : {
-        "Betsy Hodges" : "24",
-        "Jacob Frey" : "30",
-        "Nekima Levy-Pounds" : "16",
-        "Raymond Dehn" : "23",
-        "Tom Hoch" : "51",
-        "exhausted" : "177"
-      }
-    }, {
-      "eliminated" : "Ian Simpson",
-      "transfers" : {
-        "Betsy Hodges" : "9",
-        "Jacob Frey" : "13",
-        "Nekima Levy-Pounds" : "7",
-        "Raymond Dehn" : "9",
-        "Tom Hoch" : "15",
-        "exhausted" : "66"
-      }
-    }, {
-      "eliminated" : "Charlie Gers",
-      "transfers" : {
-        "Betsy Hodges" : "64",
-        "Jacob Frey" : "137",
-        "Nekima Levy-Pounds" : "22",
-        "Raymond Dehn" : "45",
-        "Tom Hoch" : "210",
-        "exhausted" : "760"
       }
     }, {
       "eliminated" : "Captain Jack Sparrow",
@@ -160,8 +115,20 @@
         "exhausted" : "212"
       }
     }, {
-      "eliminated" : "Theron Preston Washington",
-      "transfers" : { }
+      "eliminated" : "Charlie Gers",
+      "transfers" : {
+        "Betsy Hodges" : "64",
+        "Jacob Frey" : "137",
+        "Nekima Levy-Pounds" : "22",
+        "Raymond Dehn" : "45",
+        "Tom Hoch" : "210",
+        "exhausted" : "760"
+      }
+    }, {
+      "eliminated" : "Christopher Zimmerman",
+      "transfers" : {
+        "Nekima Levy-Pounds" : "1"
+      }
     }, {
       "eliminated" : "David John Wilson",
       "transfers" : {
@@ -171,6 +138,16 @@
         "Raymond Dehn" : "14",
         "Tom Hoch" : "26",
         "exhausted" : "127"
+      }
+    }, {
+      "eliminated" : "David Rosenfeld",
+      "transfers" : {
+        "Betsy Hodges" : "65",
+        "Jacob Frey" : "36",
+        "Nekima Levy-Pounds" : "94",
+        "Raymond Dehn" : "102",
+        "Tom Hoch" : "32",
+        "exhausted" : "150"
       }
     }, {
       "eliminated" : "Gregg A. Iverson",
@@ -183,6 +160,39 @@
         "exhausted" : "130"
       }
     }, {
+      "eliminated" : "Ian Simpson",
+      "transfers" : {
+        "Betsy Hodges" : "9",
+        "Jacob Frey" : "13",
+        "Nekima Levy-Pounds" : "7",
+        "Raymond Dehn" : "9",
+        "Tom Hoch" : "15",
+        "exhausted" : "66"
+      }
+    }, {
+      "eliminated" : "L.A. Nik",
+      "transfers" : {
+        "Betsy Hodges" : "23",
+        "Jacob Frey" : "69",
+        "Nekima Levy-Pounds" : "13",
+        "Raymond Dehn" : "12",
+        "Tom Hoch" : "96",
+        "exhausted" : "403"
+      }
+    }, {
+      "eliminated" : "Ronald Lischeid",
+      "transfers" : {
+        "Betsy Hodges" : "24",
+        "Jacob Frey" : "30",
+        "Nekima Levy-Pounds" : "16",
+        "Raymond Dehn" : "23",
+        "Tom Hoch" : "51",
+        "exhausted" : "177"
+      }
+    }, {
+      "eliminated" : "Theron Preston Washington",
+      "transfers" : { }
+    }, {
       "eliminated" : "Troy Benjegerdes",
       "transfers" : {
         "Betsy Hodges" : "14",
@@ -191,16 +201,6 @@
         "Raymond Dehn" : "20",
         "Tom Hoch" : "17",
         "exhausted" : "90"
-      }
-    }, {
-      "eliminated" : "Al Flowers",
-      "transfers" : {
-        "Betsy Hodges" : "122",
-        "Jacob Frey" : "60",
-        "Nekima Levy-Pounds" : "136",
-        "Raymond Dehn" : "82",
-        "Tom Hoch" : "107",
-        "exhausted" : "206"
       }
     } ],
     "threshold" : "52200"

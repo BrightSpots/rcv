@@ -424,19 +424,6 @@ class TabulatorTests {
       Logger.info("Files are equal.");
     } else {
       Logger.info("Files are different.");
-      // Copy actual to expected on the filesystem
-      String from = actualOutputPath;
-      String to = expectedPath;
-        try {
-            Files.copy(Path.of(from), Path.of(to), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            Logger.info("Copied generated file to expected location:\n%s\n%s", from, to);
-        } catch (IOException e) {
-            Logger.severe("Error copying generated file to expected location:\n%s\n%s\n%s",
-                from, to, e);
-        }
-
-
-
       fail();
     }
     return didCompare;

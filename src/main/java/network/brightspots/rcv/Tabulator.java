@@ -230,7 +230,7 @@ final class Tabulator {
                 "Candidate \"%s\" was elected with a surplus fraction of %s.",
                 winner, surplusFraction);
             for (CastVoteRecord cvr : castVoteRecords) {
-              if (winner.equals(cvr.getCurrentRecipientOfVote())) {
+              if (winner.candidateName.equals(cvr.getCurrentRecipientOfVote())) {
                 cvr.recordCurrentRecipientAsWinner(surplusFraction, config);
               }
             }

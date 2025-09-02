@@ -112,7 +112,10 @@ class OutputWriter {
     }
   }
 
-  public class Footnote {
+  /**
+   * A Footnote represents a footnote symbol (e.g. "*") that may be appended to certain entries
+   */
+  public static class Footnote {
     private final String symbol;
     private boolean isFootnoteUsed;
 
@@ -652,8 +655,12 @@ class OutputWriter {
   private List<Tabulator.TallyDecision> getCandidatesByDecisionType(
           int round, Tabulator.TallyDecision.DecisionType decisionType) {
     List<Tabulator.TallyDecision> decisionsInRound = roundToDecisions.get(round);
+    if (decisionsInRound == null) {
+      return List.of();
+    }
     return decisionsInRound.stream()
         .filter(decision -> decision.decisionType() == decisionType)
+        .sorted((d1, d2) -> d1.candidateName().compareTo(d2.candidateName()))
         .collect(Collectors.toList());
   }
 
