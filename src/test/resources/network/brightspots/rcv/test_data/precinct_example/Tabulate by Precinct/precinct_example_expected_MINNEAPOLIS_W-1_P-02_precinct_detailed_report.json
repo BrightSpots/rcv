@@ -71,49 +71,49 @@
       "Troy Benjegerdes" : "0"
     },
     "tallyResults" : [ {
+      "eliminated" : "Al Flowers",
+      "transfers" : { }
+    }, {
       "eliminated" : "Aswar Rahman",
-      "transfers" : { }
-    }, {
-      "eliminated" : "David Rosenfeld",
-      "transfers" : { }
-    }, {
-      "eliminated" : "L.A. Nik",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Christopher Zimmerman",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Ronald Lischeid",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Ian Simpson",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Charlie Gers",
       "transfers" : { }
     }, {
       "eliminated" : "Captain Jack Sparrow",
       "transfers" : { }
     }, {
-      "eliminated" : "Theron Preston Washington",
+      "eliminated" : "Charlie Gers",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Christopher Zimmerman",
       "transfers" : { }
     }, {
       "eliminated" : "David John Wilson",
       "transfers" : { }
     }, {
+      "eliminated" : "David Rosenfeld",
+      "transfers" : { }
+    }, {
       "eliminated" : "Gregg A. Iverson",
       "transfers" : { }
     }, {
-      "eliminated" : "Troy Benjegerdes",
+      "eliminated" : "Ian Simpson",
       "transfers" : { }
     }, {
-      "eliminated" : "Al Flowers",
+      "eliminated" : "L.A. Nik",
       "transfers" : { }
     }, {
       "eliminated" : "Nekima Levy-Pounds",
       "transfers" : {
         "Tom Hoch" : "1"
       }
+    }, {
+      "eliminated" : "Ronald Lischeid",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Theron Preston Washington",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Troy Benjegerdes",
+      "transfers" : { }
     } ],
     "threshold" : "50"
   }, {

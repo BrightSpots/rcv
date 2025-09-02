@@ -74,28 +74,20 @@
       "Troy Benjegerdes" : "0"
     },
     "tallyResults" : [ {
+      "eliminated" : "Al Flowers",
+      "transfers" : {
+        "Nekima Levy-Pounds" : "1"
+      }
+    }, {
       "eliminated" : "Aswar Rahman",
       "transfers" : {
         "Jacob Frey" : "1"
       }
     }, {
-      "eliminated" : "David Rosenfeld",
-      "transfers" : { }
-    }, {
-      "eliminated" : "L.A. Nik",
+      "eliminated" : "Captain Jack Sparrow",
       "transfers" : {
-        "Jacob Frey" : "1",
-        "exhausted" : "4"
+        "Nekima Levy-Pounds" : "1"
       }
-    }, {
-      "eliminated" : "Christopher Zimmerman",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Ronald Lischeid",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Ian Simpson",
-      "transfers" : { }
     }, {
       "eliminated" : "Charlie Gers",
       "transfers" : {
@@ -105,18 +97,16 @@
         "exhausted" : "5"
       }
     }, {
-      "eliminated" : "Captain Jack Sparrow",
-      "transfers" : {
-        "Nekima Levy-Pounds" : "1"
-      }
-    }, {
-      "eliminated" : "Theron Preston Washington",
+      "eliminated" : "Christopher Zimmerman",
       "transfers" : { }
     }, {
       "eliminated" : "David John Wilson",
       "transfers" : {
         "Tom Hoch" : "3"
       }
+    }, {
+      "eliminated" : "David Rosenfeld",
+      "transfers" : { }
     }, {
       "eliminated" : "Gregg A. Iverson",
       "transfers" : {
@@ -125,13 +115,23 @@
         "Tom Hoch" : "1"
       }
     }, {
-      "eliminated" : "Troy Benjegerdes",
+      "eliminated" : "Ian Simpson",
       "transfers" : { }
     }, {
-      "eliminated" : "Al Flowers",
+      "eliminated" : "L.A. Nik",
       "transfers" : {
-        "Nekima Levy-Pounds" : "1"
+        "Jacob Frey" : "1",
+        "exhausted" : "4"
       }
+    }, {
+      "eliminated" : "Ronald Lischeid",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Theron Preston Washington",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Troy Benjegerdes",
+      "transfers" : { }
     } ],
     "threshold" : "52200"
   }, {

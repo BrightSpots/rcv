@@ -1179,15 +1179,6 @@
       "MARK ANDREW" : "284"
     },
     "tallyResults" : [ {
-      "eliminated" : "JACKIE CHERRYHOMES",
-      "transfers" : {
-        "BETSY HODGES" : "16",
-        "CAM WINTON" : "1",
-        "DON SAMUELS" : "5",
-        "MARK ANDREW" : "8",
-        "exhausted" : "9"
-      }
-    }, {
       "eliminated" : "BOB FINE",
       "transfers" : {
         "BETSY HODGES" : "7",
@@ -1195,6 +1186,15 @@
         "DON SAMUELS" : "2",
         "MARK ANDREW" : "10",
         "exhausted" : "3"
+      }
+    }, {
+      "eliminated" : "JACKIE CHERRYHOMES",
+      "transfers" : {
+        "BETSY HODGES" : "16",
+        "CAM WINTON" : "1",
+        "DON SAMUELS" : "5",
+        "MARK ANDREW" : "8",
+        "exhausted" : "9"
       }
     } ],
     "threshold" : "37796"
@@ -1213,18 +1213,18 @@
       "MARK ANDREW" : "302"
     },
     "tallyResults" : [ {
-      "eliminated" : "DON SAMUELS",
-      "transfers" : {
-        "BETSY HODGES" : "34",
-        "MARK ANDREW" : "21",
-        "exhausted" : "23"
-      }
-    }, {
       "eliminated" : "CAM WINTON",
       "transfers" : {
         "BETSY HODGES" : "35",
         "MARK ANDREW" : "17",
         "exhausted" : "120"
+      }
+    }, {
+      "eliminated" : "DON SAMUELS",
+      "transfers" : {
+        "BETSY HODGES" : "34",
+        "MARK ANDREW" : "21",
+        "exhausted" : "23"
       }
     } ],
     "threshold" : "36810"

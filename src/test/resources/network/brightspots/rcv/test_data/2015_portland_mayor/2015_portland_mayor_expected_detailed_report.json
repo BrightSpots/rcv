@@ -34,13 +34,13 @@
       "Vail, Christopher L." : "6"
     },
     "tallyResults" : [ {
-      "eliminated" : "Undeclared Write-ins",
-      "transfers" : { }
-    }, {
       "eliminated" : "Strimling, Ethan K.",
       "transfers" : {
         "Vail, Christopher L." : "1"
       }
+    }, {
+      "eliminated" : "Undeclared Write-ins",
+      "transfers" : { }
     } ],
     "threshold" : "50"
   }, {

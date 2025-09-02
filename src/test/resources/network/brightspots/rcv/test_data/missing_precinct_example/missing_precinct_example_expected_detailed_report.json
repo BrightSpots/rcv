@@ -37,49 +37,49 @@
       "Undeclared Write-ins" : "0"
     },
     "tallyResults" : [ {
+      "eliminated" : "Al Flowers",
+      "transfers" : { }
+    }, {
       "eliminated" : "Aswar Rahman",
-      "transfers" : { }
-    }, {
-      "eliminated" : "David Rosenfeld",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Raymond Dehn",
-      "transfers" : { }
-    }, {
-      "eliminated" : "L.A. Nik",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Undeclared Write-ins",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Christopher Zimmerman",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Ronald Lischeid",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Ian Simpson",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Charlie Gers",
       "transfers" : { }
     }, {
       "eliminated" : "Captain Jack Sparrow",
       "transfers" : { }
     }, {
-      "eliminated" : "Theron Preston Washington",
+      "eliminated" : "Charlie Gers",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Christopher Zimmerman",
       "transfers" : { }
     }, {
       "eliminated" : "David John Wilson",
       "transfers" : { }
     }, {
+      "eliminated" : "David Rosenfeld",
+      "transfers" : { }
+    }, {
       "eliminated" : "Gregg A. Iverson",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Ian Simpson",
+      "transfers" : { }
+    }, {
+      "eliminated" : "L.A. Nik",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Raymond Dehn",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Ronald Lischeid",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Theron Preston Washington",
       "transfers" : { }
     }, {
       "eliminated" : "Troy Benjegerdes",
       "transfers" : { }
     }, {
-      "eliminated" : "Al Flowers",
+      "eliminated" : "Undeclared Write-ins",
       "transfers" : { }
     } ],
     "threshold" : "3"

@@ -23,16 +23,16 @@
       "Yinka Dare" : "3"
     },
     "tallyResults" : [ {
-      "elected" : "Sedale Threatt",
-      "transfers" : { }
-    }, {
-      "elected" : "Yinka Dare",
-      "transfers" : { }
-    }, {
       "elected" : "George Gervin",
       "transfers" : { }
     }, {
       "elected" : "Mookie Blaylock",
+      "transfers" : { }
+    }, {
+      "elected" : "Sedale Threatt",
+      "transfers" : { }
+    }, {
+      "elected" : "Yinka Dare",
       "transfers" : { }
     } ],
     "threshold" : "2"

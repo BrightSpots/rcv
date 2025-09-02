@@ -72,7 +72,28 @@
       "Troy Benjegerdes" : "0"
     },
     "tallyResults" : [ {
+      "eliminated" : "Al Flowers",
+      "transfers" : {
+        "Raymond Dehn" : "1"
+      }
+    }, {
       "eliminated" : "Aswar Rahman",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Captain Jack Sparrow",
+      "transfers" : {
+        "Jacob Frey" : "1"
+      }
+    }, {
+      "eliminated" : "Charlie Gers",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    }, {
+      "eliminated" : "Christopher Zimmerman",
+      "transfers" : { }
+    }, {
+      "eliminated" : "David John Wilson",
       "transfers" : { }
     }, {
       "eliminated" : "David Rosenfeld",
@@ -80,44 +101,14 @@
         "Tom Hoch" : "1"
       }
     }, {
-      "eliminated" : "L.A. Nik",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Christopher Zimmerman",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Ronald Lischeid",
+      "eliminated" : "Gregg A. Iverson",
       "transfers" : { }
     }, {
       "eliminated" : "Ian Simpson",
       "transfers" : { }
     }, {
-      "eliminated" : "Charlie Gers",
-      "transfers" : {
-        "exhausted" : "1"
-      }
-    }, {
-      "eliminated" : "Captain Jack Sparrow",
-      "transfers" : {
-        "Jacob Frey" : "1"
-      }
-    }, {
-      "eliminated" : "Theron Preston Washington",
+      "eliminated" : "L.A. Nik",
       "transfers" : { }
-    }, {
-      "eliminated" : "David John Wilson",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Gregg A. Iverson",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Troy Benjegerdes",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Al Flowers",
-      "transfers" : {
-        "Raymond Dehn" : "1"
-      }
     }, {
       "eliminated" : "Nekima Levy-Pounds",
       "transfers" : {
@@ -127,6 +118,15 @@
         "Tom Hoch" : "1",
         "exhausted" : "1"
       }
+    }, {
+      "eliminated" : "Ronald Lischeid",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Theron Preston Washington",
+      "transfers" : { }
+    }, {
+      "eliminated" : "Troy Benjegerdes",
+      "transfers" : { }
     } ],
     "threshold" : "50"
   }, {
