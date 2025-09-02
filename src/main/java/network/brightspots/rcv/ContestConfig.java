@@ -372,27 +372,25 @@ class ContestConfig {
     Logger.severe(message);
   }
 
-  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
-  private static boolean fieldOutOfRangeOrNotInteger(
-      String value, String fieldName, long lowerBoundary, long upperBoundary, boolean isRequired) {
-    return fieldOutOfRangeOrNotInteger(
-        value, fieldName, lowerBoundary, upperBoundary, isRequired, null);
+  @FunctionalInterface
+  private interface NumberValidator<T extends Number & Comparable<T>> {
+    T parse(String value) throws NumberFormatException;
   }
 
-  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
-  private static boolean fieldOutOfRangeOrNotInteger(
+  private static <T extends Number & Comparable<T>> boolean fieldOutOfRangeOrNotNumeric(
       String value,
       String fieldName,
-      long lowerBoundary,
-      long upperBoundary,
+      T lowerBoundary,
+      T upperBoundary,
       boolean isRequired,
-      String inputLocation) {
-    // "integer" in the mathematical sense, not the Java sense
-    String message = String.format("%s must be an integer", fieldName);
-    if (lowerBoundary == upperBoundary) {
-      message += String.format(" equal to %d", lowerBoundary);
+      String inputLocation,
+      String numberType,
+      NumberValidator<T> validator) {
+    String message = String.format("%s must be %s", fieldName, numberType);
+    if (lowerBoundary.compareTo(upperBoundary) == 0) {
+      message += String.format(" equal to %s", lowerBoundary);
     } else {
-      message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
+      message += String.format(" from %s to %s", lowerBoundary, upperBoundary);
     }
     boolean stringValid = true;
     if (isNullOrBlank(value)) {
@@ -402,8 +400,8 @@ class ContestConfig {
       }
     } else {
       try {
-        long stringLong = Long.parseLong(value);
-        if (stringLong < lowerBoundary || stringLong > upperBoundary) {
+        T parsedValue = validator.parse(value);
+        if (parsedValue.compareTo(lowerBoundary) < 0 || parsedValue.compareTo(upperBoundary) > 0) {
           if (!isRequired) {
             message += " if supplied";
           }
@@ -419,6 +417,45 @@ class ContestConfig {
       }
     }
     return !stringValid;
+  }
+
+  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
+  private static boolean fieldOutOfRangeOrNotInteger(
+      String value, String fieldName, long lowerBoundary, long upperBoundary, boolean isRequired) {
+    return fieldOutOfRangeOrNotInteger(
+        value, fieldName, lowerBoundary, upperBoundary, isRequired, null);
+  }
+
+  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
+  private static boolean fieldOutOfRangeOrNotInteger(
+      String value,
+      String fieldName,
+      long lowerBoundary,
+      long upperBoundary,
+      boolean isRequired,
+      String inputLocation) {
+    return fieldOutOfRangeOrNotNumeric(
+        value, fieldName, lowerBoundary, upperBoundary, isRequired, inputLocation,
+        "an integer", Long::parseLong);
+  }
+
+  private static boolean fieldOutOfRangeOrNotDecimal(
+      String value, String fieldName, BigDecimal lowerBoundary, BigDecimal upperBoundary,
+      boolean isRequired) {
+    return fieldOutOfRangeOrNotDecimal(
+        value, fieldName, lowerBoundary, upperBoundary, isRequired, null);
+  }
+
+  private static boolean fieldOutOfRangeOrNotDecimal(
+      String value,
+      String fieldName,
+      BigDecimal lowerBoundary,
+      BigDecimal upperBoundary,
+      boolean isRequired,
+      String inputLocation) {
+    return fieldOutOfRangeOrNotNumeric(
+        value, fieldName, lowerBoundary, upperBoundary, isRequired, inputLocation,
+        "a number", BigDecimal::new);
   }
 
   private static boolean fieldIsDefinedButShouldNotBeForProvider(
@@ -821,30 +858,13 @@ class ContestConfig {
         }
 
         String threshold = getMultiSeatBottomsUpPercentageThresholdRaw();
-        if (threshold == null || threshold.isBlank()) {
-            validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
-            Logger.severe(
-                    "If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
-                            + "must be specified!");
-        } else {
-          BigDecimal thresholdNum;
-          try {
-            thresholdNum = new BigDecimal(threshold);
-            if (thresholdNum.compareTo(MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD) < 0
-                || thresholdNum.compareTo(MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD) > 0) {
-                validationErrors.add(
-                        ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
-                Logger.severe(
-                        "multiSeatBottomsUpPercentageThreshold must be between %.2f and %.2f!",
-                        MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
-                        MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD);
-            }
-          } catch (NumberFormatException e) {
-              validationErrors.add(
-                      ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
-              Logger.severe(
-                      "multiSeatBottomsUpPercentageThreshold must be a valid decimal number!");
-          }
+        if (fieldOutOfRangeOrNotDecimal(threshold,
+            "multiSeatBottomsUpPercentageThreshold",
+            MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
+            MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
+            true)) {
+          validationErrors.add(
+              ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
         }
       }
     }
