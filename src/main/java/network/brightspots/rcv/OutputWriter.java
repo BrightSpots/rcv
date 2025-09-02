@@ -313,6 +313,9 @@ class OutputWriter {
     for (var entry : candidatesToRoundEliminated.entrySet()) {
       roundToEliminatedCandidates.computeIfAbsent(entry.getValue(), k -> new LinkedList<>());
       roundToEliminatedCandidates.get(entry.getValue()).add(entry.getKey());
+
+      // Sort alphabetically
+      Collections.sort(roundToEliminatedCandidates.get(entry.getValue()));
     }
     return this;
   }
@@ -323,6 +326,9 @@ class OutputWriter {
     for (var entry : winnerToRound.entrySet()) {
       roundToWinningCandidates.computeIfAbsent(entry.getValue(), k -> new LinkedList<>());
       roundToWinningCandidates.get(entry.getValue()).add(entry.getKey());
+
+      // Sort alphabetically
+      Collections.sort(roundToWinningCandidates.get(entry.getValue()));
     }
     return this;
   }

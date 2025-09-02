@@ -23,13 +23,13 @@
       "Skeletor" : "2"
     },
     "tallyResults" : [ {
-      "eliminated" : "Odie",
-      "transfers" : { }
-    }, {
       "eliminated" : "Garfield",
       "transfers" : {
         "Gargamel" : "1"
       }
+    }, {
+      "eliminated" : "Odie",
+      "transfers" : { }
     }, {
       "eliminated" : "Skeletor",
       "transfers" : {
