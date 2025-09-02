@@ -16,8 +16,8 @@ Total Number of Ballots,4
 Number of Undervotes (No Rankings),0
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer
-Eliminated,Al Flowers; Aswar Rahman; Captain Jack Sparrow; Charlie Gers; Christopher Zimmerman; David John Wilson; David Rosenfeld; Gregg A. Iverson; Ian Simpson; L.A. Nik; Raymond Dehn; Ronald Lischeid; Theron Preston Washington; Troy Benjegerdes; Undeclared Write-ins,,,Nekima Levy-Pounds,,,Tom Hoch,,,,,
-Elected,,,,,,,,,,Jacob Frey,,
+Eliminated,Al Flowers; Aswar Rahman; Captain Jack Sparrow; Charlie Gers; Christopher Zimmerman; David John Wilson; David Rosenfeld; Gregg A. Iverson; Ian Simpson; L.A. Nik; Raymond Dehn; Ronald Lischeid; Theron Preston Washington; Troy Benjegerdes; Undeclared Write-ins,,,Nekima Levy-Pounds*,,,Tom Hoch*,,,,,
+Elected,,,,,,,,,,Jacob Frey*,,
 Tom Hoch,1,25.0%,0,1,25.0%,0,1,25.0%,-1,0,0.0%,0
 Betsy Hodges,1,25.0%,0,1,25.0%,1,2,50.0%,0,2,50.0%,0
 Jacob Frey,1,25.0%,0,1,25.0%,0,1,25.0%,1,2,50.0%,0
@@ -44,3 +44,5 @@ Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0
+
+*Tie resolved in accordance with election law

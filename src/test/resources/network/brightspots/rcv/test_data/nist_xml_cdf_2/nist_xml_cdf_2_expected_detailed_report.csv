@@ -16,8 +16,8 @@ Total Number of Ballots,1
 Number of Undervotes (No Rankings),1
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer
-Eliminated,John Kasich and Mary Taylor,,,,,
-Elected,,,,Anita Rios and Bob Fitrakis,,
+Eliminated,John Kasich and Mary Taylor*,,,,,
+Elected,,,,Anita Rios and Bob Fitrakis*,,
 Edward FitzGerald and Sharen Swartz Neuhardt,0,,0,0,,0
 John Kasich and Mary Taylor,0,,0,0,,0
 Anita Rios and Bob Fitrakis,0,,0,0,,0
@@ -28,3 +28,5 @@ Inactive Ballots by Skipped Rankings,0,,0,0,,0
 Inactive Ballots by Exhausted Choices,0,,0,0,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0
 Inactive Ballots Total,0,,0,0,,0
+
+*Tie resolved in accordance with election law

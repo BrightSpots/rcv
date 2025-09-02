@@ -16,7 +16,7 @@ Total Number of Ballots,17
 Number of Undervotes (No Rankings),0
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer,Round 5 Votes,% of vote,transfer
-Eliminated,E; F,,,D,,,,,,C,,,,,
+Eliminated,E; F,,,D,,,,,,C*,,,,,
 Elected,,,,,,,A,,,,,,,,
 A,8,47.05%,0,8,50.0%,0,8,57.14%,0,8,57.14%,0,8,72.72%,0
 B,3,17.64%,0,3,18.75%,0,3,21.42%,0,3,21.42%,0,3,27.27%,0
@@ -31,3 +31,5 @@ Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Exhausted Choices,0,,1,1,,2,3,,0,3,,3,6,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,1,1,,2,3,,0,3,,3,6,,0
+
+*Tie resolved in accordance with election law
