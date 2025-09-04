@@ -7,27 +7,27 @@ Jurisdiction,
 Office,
 Date,
 Winner(s),"A, B, C, G"
-Final Threshold,3.15
+Final Threshold,3.90
 
 Contest Summary
 Number to be Elected,0
 Number of Candidates,8
-Total Number of Ballots,22
+Total Number of Ballots,27
 Number of Undervotes (No Rankings),0
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer,Round 5 Votes,% of vote,transfer
 Eliminated,F,,,E,,,H,,,D,,,,,
 Elected,,,,,,,,,,,,,A; B; C; G,,
-A,5,22.72%,0,5,22.72%,0,5,22.72%,0,5,22.72%,0,5,22.72%,0
-B,5,22.72%,0,5,22.72%,0,5,22.72%,0,5,22.72%,0,5,22.72%,0
-C,4,18.18%,0,4,18.18%,0,4,18.18%,0,4,18.18%,0,4,18.18%,0
-D,3,13.63%,0,3,13.63%,0,3,13.63%,0,3,13.63%,-3,0,0.0%,0
-G,3,13.63%,0,3,13.63%,0,3,13.63%,1,4,18.18%,3,7,31.81%,0
-H,2,9.09%,0,2,9.09%,0,2,9.09%,-2,0,0.0%,0,0,0.0%,0
-E,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
+A,9,33.33%,0,9,33.33%,1,10,37.03%,0,10,37.03%,0,10,37.03%,0
+B,5,18.51%,0,5,18.51%,0,5,18.51%,0,5,18.51%,0,5,18.51%,0
+C,4,14.81%,0,4,14.81%,0,4,14.81%,0,4,14.81%,0,4,14.81%,0
+D,3,11.11%,0,3,11.11%,0,3,11.11%,0,3,11.11%,-3,0,0.0%,0
+G,3,11.11%,0,3,11.11%,0,3,11.11%,1,4,14.81%,3,7,25.92%,0
+H,2,7.4%,0,2,7.4%,0,2,7.4%,-2,0,0.0%,0,0,0.0%,0
+E,1,3.7%,0,1,3.7%,-1,0,0.0%,0,0,0.0%,0,0,0.0%,0
 F,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
-Active Ballots,22,,,22,,,22,,,21,,,21,,
-Current Round Threshold,3.30,,,3.30,,,3.30,,,3.15,,,3.15,,
+Active Ballots,27,,,27,,,27,,,26,,,26,,
+Current Round Threshold,4.05,,,4.05,,,4.05,,,3.90,,,3.90,,
 Inactive Ballots by Overvotes,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Skipped Rankings,0,,0,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,1,1,,0,1,,0

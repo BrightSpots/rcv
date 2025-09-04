@@ -16,11 +16,11 @@
     },
     "round" : 1,
     "tally" : {
-      "A" : "5",
+      "A" : "9",
       "B" : "5",
       "C" : "4",
       "D" : "3",
-      "E" : "0",
+      "E" : "1",
       "F" : "0",
       "G" : "3",
       "H" : "2"
@@ -29,7 +29,7 @@
       "eliminated" : "F",
       "transfers" : { }
     } ],
-    "threshold" : "3.30"
+    "threshold" : "4.05"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
@@ -39,19 +39,21 @@
     },
     "round" : 2,
     "tally" : {
-      "A" : "5",
+      "A" : "9",
       "B" : "5",
       "C" : "4",
       "D" : "3",
-      "E" : "0",
+      "E" : "1",
       "G" : "3",
       "H" : "2"
     },
     "tallyResults" : [ {
       "eliminated" : "E",
-      "transfers" : { }
+      "transfers" : {
+        "A" : "1"
+      }
     } ],
-    "threshold" : "3.30"
+    "threshold" : "4.05"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
@@ -61,7 +63,7 @@
     },
     "round" : 3,
     "tally" : {
-      "A" : "5",
+      "A" : "10",
       "B" : "5",
       "C" : "4",
       "D" : "3",
@@ -72,10 +74,10 @@
       "eliminated" : "H",
       "transfers" : {
         "G" : "1",
-        "exhausted": "1"
+        "exhausted" : "1"
       }
     } ],
-    "threshold" : "3.30"
+    "threshold" : "4.05"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "1",
@@ -85,7 +87,7 @@
     },
     "round" : 4,
     "tally" : {
-      "A" : "5",
+      "A" : "10",
       "B" : "5",
       "C" : "4",
       "D" : "3",
@@ -97,7 +99,7 @@
         "G" : "3"
       }
     } ],
-    "threshold" : "3.15"
+    "threshold" : "3.90"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "1",
@@ -107,7 +109,7 @@
     },
     "round" : 5,
     "tally" : {
-      "A" : "5",
+      "A" : "10",
       "B" : "5",
       "C" : "4",
       "G" : "7"
@@ -125,13 +127,13 @@
       "elected" : "G",
       "transfers" : { }
     } ],
-    "threshold" : "3.15"
+    "threshold" : "3.90"
   } ],
   "summary" : {
-    "finalThreshold" : "3.15",
+    "finalThreshold" : "3.90",
     "numCandidates" : 8,
     "numWinners" : 0,
-    "totalNumBallots" : "22",
+    "totalNumBallots" : "27",
     "undervotes" : 0
   }
 }
