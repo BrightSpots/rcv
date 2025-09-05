@@ -776,9 +776,15 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("test bottoms-up multi-seat with threshold logic")
-  void testBottomsUpMultiSeatWithThreshold() {
-    runTabulationTest("multi_seat_bottoms_up_with_threshold");
+  @DisplayName("test bottoms-up multi-seat with static threshold logic")
+  void testBottomsUpMultiSeatWithStaticThreshold() {
+    runTabulationTest("multi_seat_bottoms_up_with_static_threshold");
+  }
+
+  @Test
+  @DisplayName("test bottoms-up multi-seat with dynamic threshold logic")
+  void testBottomsUpMultiSeatWithDynamicThreshold() {
+    runTabulationTest("multi_seat_bottoms_up_with_dynamic_threshold");
   }
 
   @Test

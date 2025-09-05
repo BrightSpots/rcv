@@ -1433,14 +1433,19 @@ public class GuiConfigController implements Initializable {
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
-        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS -> textFieldNumberOfWinners.setDisable(false);
         case MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> {
           textFieldNumberOfWinners.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
-          checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
+        }
+        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS -> {
+          textFieldNumberOfWinners.setDisable(false);
+          checkBoxFirstRoundDeterminesThreshold.setSelected(true);
+          checkBoxFirstRoundDeterminesThreshold.setDisable(false);
         }
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldNumberOfWinners.setText("0");
+          checkBoxFirstRoundDeterminesThreshold.setSelected(true);
+          checkBoxFirstRoundDeterminesThreshold.setDisable(false);
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
         }
         case MODE_UNKNOWN -> {

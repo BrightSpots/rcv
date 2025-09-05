@@ -440,13 +440,18 @@ class OutputWriter {
         // Vote count
         csvPrinter.print(thisRoundTally);
 
-        // Vote % (divisor is 1st round total in STV or 1st round determines threshold)
-        BigDecimal votePctDivisor;
-        if (config.isSingleWinnerEnabled() && !config.isFirstRoundDeterminesThresholdEnabled()) {
-          votePctDivisor = roundTallies.get(round).activeAndLockedInBallotSum();
+        // Vote %. Divisor is:
+        // 1. In IRV, determined by the "first round determines threshold" setting
+        // 2. In bottoms-up with threshold, same
+        // 3. In STV and bottoms-up with N winners, based on 1st round total
+        int divisorRoundNum;
+        if (config.isSingleWinnerEnabled() || config.isMultiSeatBottomsUpWithThresholdEnabled()) {
+          divisorRoundNum = config.isFirstRoundDeterminesThresholdEnabled() ? 1 : round;
         } else {
-          votePctDivisor = roundTallies.get(1).activeAndLockedInBallotSum();
+          divisorRoundNum = 1;
         }
+
+        BigDecimal votePctDivisor = roundTallies.get(divisorRoundNum).activeAndLockedInBallotSum();
         if (!votePctDivisor.equals(BigDecimal.ZERO)) {
           // Turn a decimal into a human-readable percentage (e.g. 0.1234 -> 12.34%)
           BigDecimal divDecimal = thisRoundTally.divide(votePctDivisor, MathContext.DECIMAL32);
