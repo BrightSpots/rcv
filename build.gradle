@@ -235,6 +235,10 @@ def sampleInputToCopy = copySpec {
     }
 }
 
+tasks.processTestResources {
+    exclude '**/output/**'
+}
+
 tasks.jlink.doLast {
     copy {
         with docsToCopy
