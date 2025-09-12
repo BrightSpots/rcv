@@ -598,8 +598,11 @@ class OutputWriter {
         round1Tally.getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
     BigDecimal totalNumberBallots =
         round1Tally.activeBallotSum().add(round1Tally.inactiveBallotSum());
+    String numToBeElected = config.isMultiSeatBottomsUpWithThresholdEnabled()
+        ? "All who reach threshold"
+        : Integer.toString(config.getNumberOfWinners());
     csvPrinter.printRecord("Contest Summary");
-    csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
+    csvPrinter.printRecord("Number to be Elected", numToBeElected);
     csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
     csvPrinter.printRecord("Total Number of Ballots", totalNumberBallots);
     csvPrinter.printRecord("Number of Undervotes (No Rankings)", numNoRankings);
