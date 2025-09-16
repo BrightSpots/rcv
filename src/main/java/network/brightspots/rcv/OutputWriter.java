@@ -599,7 +599,9 @@ class OutputWriter {
     BigDecimal totalNumberBallots =
         round1Tally.activeBallotSum().add(round1Tally.inactiveBallotSum());
     String numToBeElected = config.isMultiSeatBottomsUpWithThresholdEnabled()
-        ? "All who reach threshold"
+        ? "All candidates over the "
+            + config.rawConfig.rules.multiSeatBottomsUpPercentageThreshold
+            + "% threshold"
         : Integer.toString(config.getNumberOfWinners());
     csvPrinter.printRecord("Contest Summary");
     csvPrinter.printRecord("Number to be Elected", numToBeElected);
