@@ -26,15 +26,6 @@
       "Write-in" : "748"
     },
     "tallyResults" : [ {
-      "eliminated" : "Dion, Mark N.",
-      "transfers" : {
-        "Cote, Adam Roland" : "1213",
-        "Eves, Mark W." : "963",
-        "Mills, Janet T." : "1363",
-        "Sweet, Elizabeth A." : "757",
-        "exhausted" : "904"
-      }
-    }, {
       "eliminated" : "Dion, Donna J.",
       "transfers" : {
         "Cote, Adam Roland" : "390",
@@ -44,13 +35,13 @@
         "exhausted" : "375"
       }
     }, {
-      "eliminated" : "Write-in",
+      "eliminated" : "Dion, Mark N.",
       "transfers" : {
-        "Cote, Adam Roland" : "86",
-        "Eves, Mark W." : "39",
-        "Mills, Janet T." : "79",
-        "Sweet, Elizabeth A." : "62",
-        "exhausted" : "482"
+        "Cote, Adam Roland" : "1213",
+        "Eves, Mark W." : "963",
+        "Mills, Janet T." : "1363",
+        "Sweet, Elizabeth A." : "757",
+        "exhausted" : "904"
       }
     }, {
       "eliminated" : "Russell, Diane Marie",
@@ -60,6 +51,15 @@
         "Mills, Janet T." : "503",
         "Sweet, Elizabeth A." : "1128",
         "exhausted" : "285"
+      }
+    }, {
+      "eliminated" : "Write-in",
+      "transfers" : {
+        "Cote, Adam Roland" : "86",
+        "Eves, Mark W." : "39",
+        "Mills, Janet T." : "79",
+        "Sweet, Elizabeth A." : "62",
+        "exhausted" : "482"
       }
     } ],
     "threshold" : "63070"
