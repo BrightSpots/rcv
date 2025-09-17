@@ -81,8 +81,10 @@ class ContestConfig {
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
   private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
   private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
-  private static final int MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 1;
-  private static final int MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD = 100;
+  private static final BigDecimal MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD
+          = new BigDecimal(1);
+  private static final BigDecimal MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD
+          = new BigDecimal(100);
   private static final long MIN_RANDOM_SEED = -140737488355328L;
   private static final long MAX_RANDOM_SEED = 140737488355327L;
   // Underlying rawConfig object data
@@ -370,27 +372,25 @@ class ContestConfig {
     Logger.severe(message);
   }
 
-  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
-  private static boolean fieldOutOfRangeOrNotInteger(
-      String value, String fieldName, long lowerBoundary, long upperBoundary, boolean isRequired) {
-    return fieldOutOfRangeOrNotInteger(
-        value, fieldName, lowerBoundary, upperBoundary, isRequired, null);
+  @FunctionalInterface
+  private interface NumberValidator<T extends Number & Comparable<T>> {
+    T parse(String value) throws NumberFormatException;
   }
 
-  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
-  private static boolean fieldOutOfRangeOrNotInteger(
+  private static <T extends Number & Comparable<T>> boolean fieldOutOfRangeOrNotNumeric(
       String value,
       String fieldName,
-      long lowerBoundary,
-      long upperBoundary,
+      T lowerBoundary,
+      T upperBoundary,
       boolean isRequired,
-      String inputLocation) {
-    // "integer" in the mathematical sense, not the Java sense
-    String message = String.format("%s must be an integer", fieldName);
-    if (lowerBoundary == upperBoundary) {
-      message += String.format(" equal to %d", lowerBoundary);
+      String inputLocation,
+      String numberType,
+      NumberValidator<T> validator) {
+    String message = String.format("%s must be %s", fieldName, numberType);
+    if (lowerBoundary.compareTo(upperBoundary) == 0) {
+      message += String.format(" equal to %s", lowerBoundary);
     } else {
-      message += String.format(" from %d to %d", lowerBoundary, upperBoundary);
+      message += String.format(" from %s to %s", lowerBoundary, upperBoundary);
     }
     boolean stringValid = true;
     if (isNullOrBlank(value)) {
@@ -400,8 +400,8 @@ class ContestConfig {
       }
     } else {
       try {
-        long stringLong = Long.parseLong(value);
-        if (stringLong < lowerBoundary || stringLong > upperBoundary) {
+        T parsedValue = validator.parse(value);
+        if (parsedValue.compareTo(lowerBoundary) < 0 || parsedValue.compareTo(upperBoundary) > 0) {
           if (!isRequired) {
             message += " if supplied";
           }
@@ -417,6 +417,45 @@ class ContestConfig {
       }
     }
     return !stringValid;
+  }
+
+  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
+  private static boolean fieldOutOfRangeOrNotInteger(
+      String value, String fieldName, long lowerBoundary, long upperBoundary, boolean isRequired) {
+    return fieldOutOfRangeOrNotInteger(
+        value, fieldName, lowerBoundary, upperBoundary, isRequired, null);
+  }
+
+  // Returns true if field value can't be converted to a long or isn't within supplied boundaries
+  private static boolean fieldOutOfRangeOrNotInteger(
+      String value,
+      String fieldName,
+      long lowerBoundary,
+      long upperBoundary,
+      boolean isRequired,
+      String inputLocation) {
+    return fieldOutOfRangeOrNotNumeric(
+        value, fieldName, lowerBoundary, upperBoundary, isRequired, inputLocation,
+        "an integer", Long::parseLong);
+  }
+
+  private static boolean fieldOutOfRangeOrNotDecimal(
+      String value, String fieldName, BigDecimal lowerBoundary, BigDecimal upperBoundary,
+      boolean isRequired) {
+    return fieldOutOfRangeOrNotDecimal(
+        value, fieldName, lowerBoundary, upperBoundary, isRequired, null);
+  }
+
+  private static boolean fieldOutOfRangeOrNotDecimal(
+      String value,
+      String fieldName,
+      BigDecimal lowerBoundary,
+      BigDecimal upperBoundary,
+      boolean isRequired,
+      String inputLocation) {
+    return fieldOutOfRangeOrNotNumeric(
+        value, fieldName, lowerBoundary, upperBoundary, isRequired, inputLocation,
+        "a number", BigDecimal::new);
   }
 
   private static boolean fieldIsDefinedButShouldNotBeForProvider(
@@ -760,16 +799,6 @@ class ContestConfig {
     }
 
     if (fieldOutOfRangeOrNotInteger(
-        getMultiSeatBottomsUpPercentageThresholdRaw(),
-        "multiSeatBottomsUpPercentageThreshold",
-        MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
-        MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
-        false)) {
-      validationErrors.add(
-          ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
-    }
-
-    if (fieldOutOfRangeOrNotInteger(
         getStopTabulationEarlyAfterRoundRaw(),
         "stopEarlyAfterRound",
         MIN_NUMBER_OF_ROUNDS,
@@ -828,11 +857,14 @@ class ContestConfig {
               WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD);
         }
 
-        if (getMultiSeatBottomsUpPercentageThreshold() == null) {
-          validationErrors.add(ValidationError.RULES_PERCENTAGE_THRESHOLD_MISSING);
-          Logger.severe(
-              "If numberOfWinners is zero, multiSeatBottomsUpPercentageThreshold "
-                  + "must be specified!");
+        String threshold = getMultiSeatBottomsUpPercentageThresholdRaw();
+        if (fieldOutOfRangeOrNotDecimal(threshold,
+            "multiSeatBottomsUpPercentageThreshold",
+            MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
+            MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD,
+            true)) {
+          validationErrors.add(
+              ValidationError.RULES_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD_INVALID);
         }
       }
     }
@@ -888,11 +920,69 @@ class ContestConfig {
     return rawConfig.rules.multiSeatBottomsUpPercentageThreshold;
   }
 
+  public static int numDecimalsInString(String number) {
+    if (number == null || number.isEmpty()) {
+      throw new IllegalArgumentException("No number provided");
+    }
+
+    boolean atMostOneDecimal = number.indexOf('.') == number.lastIndexOf('.');
+    if (!atMostOneDecimal) {
+      throw new IllegalArgumentException("Number " + number + " has too many decimal points");
+    }
+
+    String[] parts = number.split("\\.");
+    if (parts.length == 0 || parts.length > 2) {
+      throw new IllegalArgumentException("Number " + number + " is not a valid decimal number");
+    }
+
+    String intPart = parts[0];
+    String fracPart = parts.length > 1 ? parts[1] : "";
+
+    // Ensure both sides are integers by casting them to ints and ensuring no errors
+    try {
+      if (!intPart.isEmpty()) {
+        Integer.parseInt(intPart);
+      }
+      if (!fracPart.isEmpty()) {
+        Integer.parseInt(fracPart);
+      }
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(number + " is not a valid fraction");
+    }
+
+    return fracPart.length();
+  }
+
+  static BigDecimal getPercentageFromStringWithAccurateSigFigs(String number) {
+    BigDecimal threshold;
+    try {
+      threshold = new BigDecimal(number);
+    } catch (NumberFormatException e) {
+      Logger.severe("Invalid multiSeatBottomsUpPercentageThreshold: %s", number);
+      throw new IllegalArgumentException(
+              "multiSeatBottomsUpPercentageThreshold must be a valid decimal number");
+    }
+    BigDecimal divisor = new BigDecimal(100);
+    int numDecimalPlaces;
+    try {
+      numDecimalPlaces = numDecimalsInString(number);
+    } catch (IllegalArgumentException e) {
+      Logger.severe("Invalid multiSeatBottomsUpPercentageThreshold: %s", number);
+      throw new IllegalArgumentException(
+              "multiSeatBottomsUpPercentageThreshold must be a valid decimal number");
+    }
+    numDecimalPlaces += 2; // Since we're dividing by 100, we need two extra decimal places
+    return threshold.divide(divisor, numDecimalPlaces, RoundingMode.HALF_UP);
+  }
+
   BigDecimal getMultiSeatBottomsUpPercentageThreshold() {
-    return getMultiSeatBottomsUpPercentageThresholdRaw() != null
-            && !getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()
-        ? divide(new BigDecimal(getMultiSeatBottomsUpPercentageThresholdRaw()), new BigDecimal(100))
-        : null;
+    if (getMultiSeatBottomsUpPercentageThresholdRaw() == null
+            || getMultiSeatBottomsUpPercentageThresholdRaw().isBlank()) {
+      return null;
+    }
+
+    String threshold = getMultiSeatBottomsUpPercentageThresholdRaw();
+    return getPercentageFromStringWithAccurateSigFigs(threshold);
   }
 
   List<String> getSequentialWinners() {

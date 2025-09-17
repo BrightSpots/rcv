@@ -446,13 +446,18 @@ class OutputWriter {
         // Vote count
         csvPrinter.print(thisRoundTally);
 
-        // Vote % (divisor is 1st round total in STV or 1st round determines threshold)
-        BigDecimal votePctDivisor;
-        if (config.isSingleWinnerEnabled() && !config.isFirstRoundDeterminesThresholdEnabled()) {
-          votePctDivisor = roundTallies.get(round).activeAndLockedInBallotSum();
+        // Vote %. Divisor is:
+        // 1. In IRV, determined by the "first round determines threshold" setting
+        // 2. In bottoms-up with threshold, same
+        // 3. In STV and bottoms-up with N winners, based on 1st round total
+        int divisorRoundNum;
+        if (config.isSingleWinnerEnabled() || config.isMultiSeatBottomsUpWithThresholdEnabled()) {
+          divisorRoundNum = config.isFirstRoundDeterminesThresholdEnabled() ? 1 : round;
         } else {
-          votePctDivisor = roundTallies.get(1).activeAndLockedInBallotSum();
+          divisorRoundNum = 1;
         }
+
+        BigDecimal votePctDivisor = roundTallies.get(divisorRoundNum).activeAndLockedInBallotSum();
         if (!votePctDivisor.equals(BigDecimal.ZERO)) {
           // Turn a decimal into a human-readable percentage (e.g. 0.1234 -> 12.34%)
           BigDecimal divDecimal = thisRoundTally.divide(votePctDivisor, MathContext.DECIMAL32);
@@ -599,8 +604,13 @@ class OutputWriter {
         round1Tally.getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
     BigDecimal totalNumberBallots =
         round1Tally.activeBallotSum().add(round1Tally.inactiveBallotSum());
+    String numToBeElected = config.isMultiSeatBottomsUpWithThresholdEnabled()
+        ? "All candidates over the "
+            + config.rawConfig.rules.multiSeatBottomsUpPercentageThreshold
+            + "% threshold"
+        : Integer.toString(config.getNumberOfWinners());
     csvPrinter.printRecord("Contest Summary");
-    csvPrinter.printRecord("Number to be Elected", config.getNumberOfWinners());
+    csvPrinter.printRecord("Number to be Elected", numToBeElected);
     csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
     csvPrinter.printRecord("Total Number of Ballots", totalNumberBallots);
     csvPrinter.printRecord("Number of Undervotes (No Rankings)", numNoRankings);
