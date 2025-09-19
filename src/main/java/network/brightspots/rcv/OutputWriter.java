@@ -119,9 +119,9 @@ class OutputWriter {
     private final String symbol;
     private boolean isFootnoteUsed;
 
-    Footnote(String symbol) {
+    Footnote(String symbol, boolean isFootnoteUsed) {
       this.symbol = symbol;
-      this.isFootnoteUsed = false;
+      this.isFootnoteUsed = isFootnoteUsed;
     }
 
     public String getSymbol() {
@@ -134,10 +134,6 @@ class OutputWriter {
 
     public boolean isFootnoteUsed() {
       return isFootnoteUsed;
-    }
-
-    public void setFootnoteUsed(boolean used) {
-      isFootnoteUsed = used;
     }
   }
 
@@ -420,9 +416,6 @@ class OutputWriter {
     }
 
 
-    Footnote tallyResultInSlice = new Footnote("†");
-    tallyResultInSlice.setFootnoteUsed(outputFileIdentifiers.isSlice());
-
     BigDecimal winningThreshold = roundTallies.get(numRounds).getWinningThreshold();
     addContestInformationRows(csvPrinter, winningThreshold,
             outputFileIdentifiers.slice, outputFileIdentifiers.sliceId);
@@ -435,7 +428,8 @@ class OutputWriter {
     }
     csvPrinter.println();
 
-    Footnote tieBrokenFootnote = new Footnote("*");
+    Footnote tallyResultInSlice = new Footnote("†", outputFileIdentifiers.isSlice());
+    Footnote tieBrokenFootnote = new Footnote("*", wereAnyTiesBroken());
     csvPrinter.print(tallyResultInSlice.markFootnoteIfActive("Eliminated"));
     printActionSummary(
             csvPrinter, Tabulator.TallyDecision.DecisionType.ELIMINATED, tieBrokenFootnote);
@@ -628,16 +622,25 @@ class OutputWriter {
     csvPrinter.println();
   }
 
+  private boolean wereAnyTiesBroken() {
+    for (int round = 1; round <= numRounds; round++) {
+      List<Tabulator.TallyDecision> decisionsInRound = roundToDecisions.get(round);
+      if (decisionsInRound == null) {
+        continue;
+      }
+      if (decisionsInRound.stream().anyMatch(Tabulator.TallyDecision::wasDecidedViaTieBreak)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private void printActionSummary(
       CSVPrinter csvPrinter,
       Tabulator.TallyDecision.DecisionType decisionType,
       Footnote tieBrokenFootnote) throws IOException {
     for (int round = 1; round <= numRounds; round++) {
       List<Tabulator.TallyDecision> decisions = getCandidatesByDecisionType(round, decisionType);
-      if (decisions.stream().anyMatch(Tabulator.TallyDecision::wasDecidedViaTieBreak)) {
-        tieBrokenFootnote.setFootnoteUsed(true);
-      }
-
       if (!decisions.isEmpty()) {
         addActionRowCandidates(decisions, csvPrinter, tieBrokenFootnote);
       } else {
