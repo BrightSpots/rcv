@@ -868,11 +868,6 @@ final class Tabulator {
     return eliminated;
   }
 
-  // getter method for round decisions (used by OutputWriter)
-  Map<Integer, List<TallyDecision>> getRoundToDecisions() {
-    return roundToDecisions;
-  }
-
   // create a ResultsWriter object with the tabulation results data and use it
   // to generate the results spreadsheets
   // param: timestamp string to use when creating output filenames

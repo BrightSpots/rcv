@@ -428,13 +428,13 @@ class OutputWriter {
     }
     csvPrinter.println();
 
-    Footnote tallyResultInSlice = new Footnote("†", outputFileIdentifiers.isSlice());
+    Footnote isSliceFootnote = new Footnote("†", outputFileIdentifiers.isSlice());
     Footnote tieBrokenFootnote = new Footnote("*", wereAnyTiesBroken());
-    csvPrinter.print(tallyResultInSlice.markFootnoteIfActive("Eliminated"));
+    csvPrinter.print(isSliceFootnote.markFootnoteIfActive("Eliminated"));
     printActionSummary(
             csvPrinter, Tabulator.TallyDecision.DecisionType.ELIMINATED, tieBrokenFootnote);
 
-    csvPrinter.print(tallyResultInSlice.markFootnoteIfActive("Elected"));
+    csvPrinter.print(isSliceFootnote.markFootnoteIfActive("Elected"));
     printActionSummary(
             csvPrinter, Tabulator.TallyDecision.DecisionType.ELECTED, tieBrokenFootnote);
 
@@ -585,9 +585,9 @@ class OutputWriter {
       csvPrinter.println();
     }
 
-    if (tallyResultInSlice.isFootnoteUsed()) {
+    if (isSliceFootnote.isFootnoteUsed()) {
       csvPrinter.println();
-      csvPrinter.print(String.format(tallyResultInSlice.getSymbol()
+      csvPrinter.print(String.format(isSliceFootnote.getSymbol()
               + "Elect/Eliminate decisions are from the full contest. "
               + "All other results on this report are at the %s level.",
               outputFileIdentifiers.slice.toLowerString()));
