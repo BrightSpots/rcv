@@ -113,15 +113,16 @@ final class CsvCvrReader extends BaseCvrReader {
         String suppliedId = this.idColumnIndex != null
                 ? csvRecord.get(this.idColumnIndex) : null;
         String computedPrecinctId = null;
-        if(this.precinctColumnIndex != null) {
-                String suppliedPrecinctId = csvRecord.get((this.precinctColumnIndex));
-                computedPrecinctId = isNullOrBlank(suppliedPrecinctId) ? "no precinct id" : suppliedPrecinctId;
+        if (this.precinctColumnIndex != null) {
+          String suppliedPrecinctId = csvRecord.get((this.precinctColumnIndex));
+          computedPrecinctId = isNullOrBlank(suppliedPrecinctId)
+                  ? "no precinct id" : suppliedPrecinctId;
         }
         String computedBatchId = null;
-        if(this.batchColumnIndex != null) {
-            String suppliedBatchId = csvRecord.get((this.batchColumnIndex));
-            computedBatchId = isNullOrBlank(suppliedBatchId) ? "no batch id" : suppliedBatchId;
-          }
+        if (this.batchColumnIndex != null) {
+          String suppliedBatchId = csvRecord.get((this.batchColumnIndex));
+          computedBatchId = isNullOrBlank(suppliedBatchId) ? "no batch id" : suppliedBatchId;
+        }
 
         // create the new CastVoteRecord
         CastVoteRecord newCvr = new CastVoteRecord(
