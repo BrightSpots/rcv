@@ -86,6 +86,8 @@ final class Tabulator {
     sliceIds.initialize(ContestConfig.TabulateBySlice.BATCH);
     sliceIds.initialize(ContestConfig.TabulateBySlice.PRECINCT);
 
+    // Read through each CVR. Create a list of all unique SliceIds for any
+    // tabulateBy slice that is enabled in the config
     for (CastVoteRecord cvr : castVoteRecords) {
       for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
         String sliceId = cvr.getSlice(slice);
