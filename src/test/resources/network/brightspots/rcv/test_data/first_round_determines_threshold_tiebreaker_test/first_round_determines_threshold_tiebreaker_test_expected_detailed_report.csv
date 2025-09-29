@@ -17,7 +17,7 @@ Number of Undervotes (No Rankings),2
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer
 Eliminated,"Haadoow, Hamza A.",,,,,
-Elected,,,,"Vail, Christopher L.",,
+Elected,,,,"Vail, Christopher L.*",,
 "Carmona, Ralph C.",6,35.29%,0,6,35.29%,0
 "Vail, Christopher L.",6,35.29%,0,6,35.29%,0
 "Haadoow, Hamza A.",5,29.41%,-5,0,0.0%,0
@@ -28,3 +28,5 @@ Inactive Ballots by Skipped Rankings,0,,0,0,,0
 Inactive Ballots by Exhausted Choices,0,,5,5,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0
 Inactive Ballots Total,0,,5,5,,0
+
+*Tie resolved in accordance with election law

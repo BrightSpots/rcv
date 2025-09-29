@@ -44,6 +44,24 @@ import network.brightspots.rcv.OutputWriter.RoundSnapshotDataMissingException;
 
 final class Tabulator {
 
+  // This "record" class is used to track when candidates are elected or eliminated,
+  // and whether the decision was made via tiebreak.
+  public record TallyDecision(String candidateName, DecisionType decisionType,
+                              boolean wasDecidedViaTieBreak, int round) {
+    public enum DecisionType {
+      ELECTED,
+      ELIMINATED
+    }
+
+    public boolean isElected() {
+      return decisionType == DecisionType.ELECTED;
+    }
+
+    public boolean isEliminated() {
+      return decisionType == DecisionType.ELIMINATED;
+    }
+  }
+
   static final String OVERVOTE_RULE_ALWAYS_SKIP_TEXT = "Always skip to next rank";
   static final String OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT = "Exhaust immediately";
   static final String OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT = "Exhaust if multiple continuing";
@@ -67,6 +85,8 @@ final class Tabulator {
   private final Map<String, Integer> candidateToRoundEliminated = new HashMap<>();
   // map from candidate ID to the round in which they won
   private final Map<String, Integer> winnerToRound = new HashMap<>();
+  // tracks all tally decisions (elected and eliminated) by round
+  private final Map<Integer, List<TallyDecision>> roundToDecisions = new HashMap<>();
   // tracks vote transfer summaries (usable by external visualizer software)
   private final TallyTransfers tallyTransfers = new TallyTransfers();
   private final BreakdownBySlice<TallyTransfers> tallyTransfersBySlice = new BreakdownBySlice<>();
@@ -184,17 +204,20 @@ final class Tabulator {
       // "invert" map and look for winners
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates =
           buildTallyToCandidates(currentRoundTally, currentRoundTally.getCandidates(), true);
-      List<String> winners = identifyWinners(currentRoundTally, currentRoundTallyToCandidates);
+      List<TallyDecision> winners = identifyWinners(
+              currentRoundTally, currentRoundTallyToCandidates);
 
       if (!winners.isEmpty()) {
-        for (String winner : winners) {
-          winnerToRound.put(winner, currentRound);
+        for (TallyDecision winner : winners) {
+          winnerToRound.put(winner.candidateName(), currentRound);
         }
+        // Add to round decisions map
+        roundToDecisions.computeIfAbsent(currentRound, k -> new LinkedList<>()).addAll(winners);
         // In multi-seat contests, we always redistribute the surplus (if any) unless bottoms-up
         // is enabled.
         if (config.usesSurpluses()) {
-          for (String winner : winners) {
-            BigDecimal candidateVotes = currentRoundTally.getCandidateTally(winner);
+          for (TallyDecision winner : winners) {
+            BigDecimal candidateVotes = currentRoundTally.getCandidateTally(winner.candidateName());
             // number that were surplus (beyond the required threshold)
             BigDecimal extraVotes =
                 candidateVotes.subtract(currentRoundTally.getWinningThreshold());
@@ -207,7 +230,7 @@ final class Tabulator {
                 "Candidate \"%s\" was elected with a surplus fraction of %s.",
                 winner, surplusFraction);
             for (CastVoteRecord cvr : castVoteRecords) {
-              if (winner.equals(cvr.getCurrentRecipientOfVote())) {
+              if (winner.candidateName.equals(cvr.getCurrentRecipientOfVote())) {
                 cvr.recordCurrentRecipientAsWinner(surplusFraction, config);
               }
             }
@@ -222,7 +245,7 @@ final class Tabulator {
         // b) we've found our winner, but we're continuing until we have only two candidates
         // c) not all remaining candidates meet the bottoms-up threshold
 
-        List<String> eliminated;
+        List<TallyDecision> eliminated;
         // Four mutually exclusive ways to eliminate candidates.
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
         eliminated = dropUndeclaredWriteIns(currentRoundTally);
@@ -252,9 +275,11 @@ final class Tabulator {
           Logger.severe("Failed to eliminate any candidates!");
           throw new TabulationAbortedException(false);
         }
-        for (String loser : eliminated) {
-          candidateToRoundEliminated.put(loser, currentRound);
+        for (TallyDecision loser : eliminated) {
+          candidateToRoundEliminated.put(loser.candidateName(), currentRound);
         }
+        // Add to round decisions map
+        roundToDecisions.computeIfAbsent(currentRound, k -> new LinkedList<>()).addAll(eliminated);
         progress.markCandidatesEliminated(eliminated.size());
       }
 
@@ -550,12 +575,13 @@ final class Tabulator {
   // determine if one or more winners have been identified in this round
   // param: currentRoundTally round tally for a particular round
   // param: currentRoundTallyToCandidates map of tally to candidate ID(s) for a particular round
-  // return: list of winning candidates in this round (if any)
-  private List<String> identifyWinners(
+  // return: list of winning decisions in this round (if any)
+  private List<TallyDecision> identifyWinners(
       RoundTally currentRoundTally,
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
       throws TabulationAbortedException {
-    List<String> selectedWinners = new LinkedList<>();
+    List<TallyDecision> selectedWinners = new LinkedList<>();
+    List<String> selectedWinnerNames = new LinkedList<>();
 
     if (getCandidateSignum(UNDECLARED_WRITE_IN_OUTPUT_LABEL, currentRoundTally) != 0) {
       // No winners can be selected while undeclared candidates are live
@@ -570,7 +596,7 @@ final class Tabulator {
                   .size()
               == currentRoundTally.activeCandidateSum();
       if (allMeet) {
-        selectedWinners.addAll(currentRoundTally.getCandidates());
+        selectedWinnerNames.addAll(currentRoundTally.getCandidates());
       }
     } else {
       // We should only look for more winners if we haven't already filled all the seats.
@@ -578,7 +604,7 @@ final class Tabulator {
       if (numSeatsUnfilled > 0) {
         if (currentRoundTally.activeCandidateSum() <= numSeatsUnfilled) {
           // If there are as many or fewer continuing candidates than seats to fill, everyone wins.
-          selectedWinners.addAll(currentRoundTally.getCandidates());
+          selectedWinnerNames.addAll(currentRoundTally.getCandidates());
         } else if (config.isFirstRoundDeterminesThresholdEnabled()
             && currentRoundTally.activeCandidateSum() - 1 == config.getNumberOfWinners()) {
           // Edge case: if nobody meets the threshold, but we're on the penultimate round when
@@ -586,13 +612,13 @@ final class Tabulator {
           // the winners. If isFirstRoundDeterminesThresholdEnabled isn't enabled, it should be
           // impossible for a single-winner election to end up here.
           BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
-          selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
+          selectedWinnerNames = currentRoundTallyToCandidates.get(maxVotes);
         } else if (!config.isMultiSeatBottomsUpUntilNWinnersEnabled()) {
           // Otherwise, select all winners above the threshold
           selectWinners(
               currentRoundTallyToCandidates,
               currentRoundTally.getWinningThreshold(),
-              selectedWinners);
+              selectedWinnerNames);
         }
       }
 
@@ -603,7 +629,7 @@ final class Tabulator {
       //   threshold (i.e. "first round determines threshold" is set), the tiebreaker will choose
       //   the only winner.
       boolean needsTiebreakMultipleWinners =
-          selectedWinners.size() > 1
+          selectedWinnerNames.size() > 1
               && (config.isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
                   || config.isFirstRoundDeterminesThresholdEnabled());
       // Edge case: there are two candidates remaining. To avoid having just one candidate in the
@@ -617,7 +643,7 @@ final class Tabulator {
       //  4. All candidates are over the minimum threshold (see no_one_meets_minimum test)
       boolean needsTiebreakNoWinners =
           config.getNumberOfWinners() == 1
-              && selectedWinners.isEmpty()
+              && selectedWinnerNames.isEmpty()
               && currentRoundTally.activeCandidateSum() == 2
               && numSeatsUnfilled == 1
               && currentRoundTallyToCandidates.keySet().stream()
@@ -625,13 +651,15 @@ final class Tabulator {
       if (needsTiebreakMultipleWinners || needsTiebreakNoWinners) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
-        selectedWinners = currentRoundTallyToCandidates.get(maxVotes);
+        selectedWinnerNames = currentRoundTallyToCandidates.get(maxVotes);
         // But if there are multiple candidates tied for the max tally, we need to break the tie.
-        if (selectedWinners.size() > 1) {
+        boolean wasTiebroken = false;
+        if (selectedWinnerNames.size() > 1) {
+          wasTiebroken = true;
           Tiebreak tiebreak =
               new Tiebreak(
                   true,
-                  selectedWinners,
+                  selectedWinnerNames,
                   config.getTiebreakMode(),
                   currentRound,
                   maxVotes,
@@ -639,8 +667,8 @@ final class Tabulator {
                   config.getCandidatePermutation());
           String winner = tiebreak.selectCandidate();
           // replace the list of tied candidates with our single tie-break winner
-          selectedWinners = new LinkedList<>();
-          selectedWinners.add(winner);
+          selectedWinnerNames = new LinkedList<>();
+          selectedWinnerNames.add(winner);
           Logger.info(
               "Candidate \"%s\" won a tie-breaker in round %d against %s. Each candidate had %s "
                   + "vote(s). %s",
@@ -650,13 +678,29 @@ final class Tabulator {
               maxVotes,
               tiebreak.getExplanation());
         }
+
+        // Convert the winner names to TallyDecision objects
+        for (String winnerName : selectedWinnerNames) {
+          selectedWinners.add(new TallyDecision(
+                  winnerName, TallyDecision.DecisionType.ELECTED, wasTiebroken, currentRound));
+        }
       }
     }
 
-    for (String winner : selectedWinners) {
+    // Convert any remaining winner names to TallyDecision objects (for cases without tiebreaks)
+    if (selectedWinners.isEmpty() && !selectedWinnerNames.isEmpty()) {
+      for (String winnerName : selectedWinnerNames) {
+        selectedWinners.add(new TallyDecision(
+                winnerName, TallyDecision.DecisionType.ELECTED, false, currentRound));
+      }
+    }
+
+    for (TallyDecision winner : selectedWinners) {
       Logger.info(
           "Candidate \"%s\" was elected in round %d with %s votes.",
-          winner, currentRound, currentRoundTally.getCandidateTally(winner));
+              winner.candidateName(),
+              currentRound,
+              currentRoundTally.getCandidateTally(winner.candidateName()));
     }
 
     return selectedWinners;
@@ -685,11 +729,15 @@ final class Tabulator {
   // purpose: eliminate all undeclared write in candidates
   // param: currentRoundTally map of candidate IDs to their tally for a given round
   // returns: eliminated candidates
-  private List<String> dropUndeclaredWriteIns(RoundTally currentRoundTally) {
-    List<String> eliminated = new LinkedList<>();
+  private List<TallyDecision> dropUndeclaredWriteIns(RoundTally currentRoundTally) {
+    List<TallyDecision> eliminated = new LinkedList<>();
     String label = UNDECLARED_WRITE_IN_OUTPUT_LABEL;
     if (getCandidateSignum(label, currentRoundTally) == 1) {
-      eliminated.add(label);
+      eliminated.add(new TallyDecision(
+              label,
+              TallyDecision.DecisionType.ELIMINATED,
+              false,
+              currentRound));
       Logger.info(
           "Eliminated candidate \"%s\" in round %d because it represents undeclared write-ins. It "
               + "had %s votes.",
@@ -714,9 +762,9 @@ final class Tabulator {
   // eliminate all candidates below a certain tally threshold
   // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
   // returns: eliminated candidates
-  private List<String> dropCandidatesBelowThreshold(
+  private List<TallyDecision> dropCandidatesBelowThreshold(
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates) {
-    List<String> eliminated = new LinkedList<>();
+    List<TallyDecision> eliminated = new LinkedList<>();
     // min threshold
     BigDecimal threshold = config.getMinimumVoteThreshold();
     if (threshold.signum() == 1
@@ -724,7 +772,11 @@ final class Tabulator {
       for (var entry : currentRoundTallyToCandidates.entrySet()) {
         if (entry.getKey().compareTo(threshold) < 0) {
           for (String candidate : entry.getValue()) {
-            eliminated.add(candidate);
+            eliminated.add(new TallyDecision(
+                    candidate,
+                    TallyDecision.DecisionType.ELIMINATED,
+                    false,
+                    currentRound));
             Logger.info(
                 "Eliminated candidate \"%s\" in round %d because they only had %s vote(s), below "
                     + "the minimum threshold of %s.",
@@ -741,14 +793,18 @@ final class Tabulator {
   // eliminate all candidates who are mathematically unable to win
   // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
   // returns: eliminated candidates
-  private List<String> doBatchElimination(
+  private List<TallyDecision> doBatchElimination(
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates) {
-    List<String> eliminated = new LinkedList<>();
+    List<TallyDecision> eliminated = new LinkedList<>();
     if (config.isBatchEliminationEnabled()) {
       List<BatchElimination> batchEliminations = runBatchElimination(currentRoundTallyToCandidates);
       if (batchEliminations.size() > 1) {
         for (BatchElimination elimination : batchEliminations) {
-          eliminated.add(elimination.candidateId);
+          eliminated.add(new TallyDecision(
+                  elimination.candidateId,
+                  TallyDecision.DecisionType.ELIMINATED,
+                  false,
+                  currentRound));
           Logger.info(
               "Batch-eliminated candidate \"%s\" in round %d. The running total was %s vote(s) and "
                   + "the next-lowest count was %s vote(s).",
@@ -765,11 +821,12 @@ final class Tabulator {
   // eliminate candidate with the lowest tally using tiebreak if necessary
   // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
   // returns: eliminated candidates
-  private List<String> doRegularElimination(
+  private List<TallyDecision> doRegularElimination(
       SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates)
       throws TabulationAbortedException {
-    List<String> eliminated = new LinkedList<>();
+    List<TallyDecision> eliminated = new LinkedList<>();
     String eliminatedCandidate;
+    boolean wasTiebroken = false;
     // lowest tally in this round
     BigDecimal minVotes = currentRoundTallyToCandidates.firstKey();
     // list of candidates receiving the lowest tally
@@ -788,6 +845,7 @@ final class Tabulator {
               config.getCandidatePermutation());
 
       eliminatedCandidate = tiebreak.selectCandidate();
+      wasTiebroken = true;
       Logger.info(
           "Candidate \"%s\" lost a tie-breaker in round %d against %s. Each candidate had %s "
               + "vote(s). %s",
@@ -802,7 +860,11 @@ final class Tabulator {
           "Candidate \"%s\" was eliminated in round %d with %s vote(s).",
           eliminatedCandidate, currentRound, minVotes);
     }
-    eliminated.add(eliminatedCandidate);
+    eliminated.add(new TallyDecision(
+            eliminatedCandidate,
+            TallyDecision.DecisionType.ELIMINATED,
+            wasTiebroken,
+            currentRound));
     return eliminated;
   }
 
@@ -813,8 +875,7 @@ final class Tabulator {
     OutputWriter writer =
         new OutputWriter()
             .setNumRounds(currentRound)
-            .setCandidatesToRoundEliminated(candidateToRoundEliminated)
-            .setWinnerToRound(winnerToRound)
+            .setRoundToDecisions(roundToDecisions)
             .setContestConfig(config)
             .setTimestampString(timestamp)
             .setSliceIds(sliceIds)
