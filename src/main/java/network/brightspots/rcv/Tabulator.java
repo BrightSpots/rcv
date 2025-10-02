@@ -997,7 +997,7 @@ final class Tabulator {
         TallyTransfers tallyTransferForSlice = tallyTransfersBySlice.get(slice, sliceId);
         if (tallyTransferForSlice == null) {
           Logger.severe(
-              "%s \"%s\" is not among the %d known %s.",
+              "%s \"%s\" is not among the %d known %s(s).",
               slice, sliceId, sliceIds.size(slice), slice);
           throw new TabulationAbortedException(false);
         }
