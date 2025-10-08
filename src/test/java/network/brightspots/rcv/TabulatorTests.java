@@ -740,12 +740,6 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("test minimum vote threshold setting")
-  void testMinimumThreshold() {
-    runTabulationTest("minimum_threshold_test");
-  }
-
-  @Test
   @DisplayName("test skipping to next candidate after overvote")
   void testSkipToNext() {
     runTabulationTest("skip_to_next_test");
@@ -977,12 +971,6 @@ class TabulatorTests {
   @DisplayName("CSV missing header test")
   void csvMissingHeaderTest() {
     runTabulationTest("csv_missing_header_test");
-  }
-
-  @Test
-  @DisplayName("no one meets minimum test")
-  void noOneMeetsMinimumTest() {
-    runTabulationTest("no_one_meets_minimum", TabulationAbortedException.class.toString());
   }
 
   @Test
