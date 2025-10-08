@@ -418,6 +418,7 @@ public class RawContestConfig {
     public boolean doesFirstRoundDetermineThreshold;
     public boolean hareQuota;
     public boolean batchElimination;
+    public boolean bulkElimination;
     public boolean continueUntilTwoCandidatesRemain;
     public String stopTabulationEarlyAfterRound;
     public boolean exhaustOnDuplicateCandidate;

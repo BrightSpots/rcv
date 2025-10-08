@@ -54,6 +54,7 @@ class ContestConfig {
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
+  static final boolean SUGGESTED_BULK_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_FIRST_ROUND_DETERMINES_THRESHOLD = false;
@@ -858,13 +859,6 @@ class ContestConfig {
       }
     }
 
-    if (isMultiSeatBottomsUpWithThresholdEnabled() && isBatchEliminationEnabled()) {
-      validationErrors.add(
-          ValidationError.RULES_BOTTOMS_UP_THRESHOLD_BATCH_ELIMINATION_DISAGREEMENT);
-      Logger.severe(
-          "batchElimination can't be true when winnerElectionMode is \"%s\"!", winnerMode);
-    }
-
     // nonIntegerWinningThreshold and hareQuota are only allowed for multi-seat elections
     if (!isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
         && !isMultiSeatAllowMultipleWinnersPerRoundEnabled()) {
@@ -1160,6 +1154,10 @@ class ContestConfig {
 
   boolean isBatchEliminationEnabled() {
     return rawConfig.rules.batchElimination;
+  }
+
+  boolean isBulkEliminationEnabled() {
+    return rawConfig.rules.bulkElimination;
   }
 
   boolean isContinueUntilTwoCandidatesRemainEnabled() {
