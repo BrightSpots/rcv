@@ -79,8 +79,6 @@ class ContestConfig {
   private static final int MIN_NUMBER_OF_WINNERS = 0;
   private static final int MIN_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 1;
   private static final int MAX_DECIMAL_PLACES_FOR_VOTE_ARITHMETIC = 20;
-  private static final int MIN_MINIMUM_VOTE_THRESHOLD = 0;
-  private static final int MAX_MINIMUM_VOTE_THRESHOLD = 1000000;
   private static final BigDecimal MIN_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD
           = new BigDecimal(1);
   private static final BigDecimal MAX_MULTI_SEAT_BOTTOMS_UP_PERCENTAGE_THRESHOLD
@@ -790,15 +788,6 @@ class ContestConfig {
     }
 
     if (fieldOutOfRangeOrNotInteger(
-        getMinimumVoteThresholdRaw(),
-        "minimumVoteThreshold",
-        MIN_MINIMUM_VOTE_THRESHOLD,
-        MAX_MINIMUM_VOTE_THRESHOLD,
-        false)) {
-      validationErrors.add(ValidationError.RULES_MIN_VOTE_THRESHOLD_INVALID);
-    }
-
-    if (fieldOutOfRangeOrNotInteger(
         getStopTabulationEarlyAfterRoundRaw(),
         "stopEarlyAfterRound",
         MIN_NUMBER_OF_ROUNDS,
@@ -1202,16 +1191,6 @@ class ContestConfig {
 
   OvervoteRule getOvervoteRule() {
     return OvervoteRule.getByInternalLabel(rawConfig.rules.overvoteRule);
-  }
-
-  private String getMinimumVoteThresholdRaw() {
-    return rawConfig.rules.minimumVoteThreshold;
-  }
-
-  BigDecimal getMinimumVoteThreshold() {
-    return isNullOrBlank(getMinimumVoteThresholdRaw())
-        ? BigDecimal.ZERO
-        : new BigDecimal(getMinimumVoteThresholdRaw());
   }
 
   private String getMaxSkippedRanksAllowedRaw() {

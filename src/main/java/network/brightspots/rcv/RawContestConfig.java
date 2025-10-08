@@ -412,7 +412,6 @@ public class RawContestConfig {
     public String numberOfWinners;
     public String multiSeatBottomsUpPercentageThreshold;
     public String decimalPlacesForVoteArithmetic;
-    public String minimumVoteThreshold;
     public String maxSkippedRanksAllowed;
     public String maxRankingsAllowed;
     public boolean nonIntegerWinningThreshold;

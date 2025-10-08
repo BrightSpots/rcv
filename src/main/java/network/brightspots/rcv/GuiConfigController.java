@@ -251,8 +251,6 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldDecimalPlacesForVoteArithmetic;
   @FXML
-  private TextField textFieldMinimumVoteThreshold;
-  @FXML
   private TextField textFieldMaxSkippedRanksAllowed;
   @FXML
   private CheckBox checkBoxMaxSkippedRanksAllowedUnlimited;
@@ -954,8 +952,6 @@ public class GuiConfigController implements Initializable {
     textFieldMaxRankingsAllowed.setDisable(true);
     checkBoxMaxRankingsAllowedMax.setSelected(false);
     checkBoxMaxRankingsAllowedMax.setDisable(true);
-    textFieldMinimumVoteThreshold.clear();
-    textFieldMinimumVoteThreshold.setDisable(true);
     textFieldStopTabulationEarlyAfterRound.clear();
     textFieldStopTabulationEarlyAfterRound.setDisable(true);
     checkBoxBatchElimination.setSelected(false);
@@ -1415,7 +1411,7 @@ public class GuiConfigController implements Initializable {
       clearAndDisableWinningRuleFields();
       setWinningRulesDefaultValues();
       checkBoxMaxRankingsAllowedMax.setDisable(false);
-      textFieldMinimumVoteThreshold.setDisable(false);
+      checkBoxBulkElimination.setDisable(true);
       textFieldStopTabulationEarlyAfterRound.setDisable(false);
       choiceTiebreakMode.setDisable(false);
       switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
@@ -1574,7 +1570,6 @@ public class GuiConfigController implements Initializable {
     textFieldMultiSeatBottomsUpPercentageThreshold
         .setText(rules.multiSeatBottomsUpPercentageThreshold);
     textFieldDecimalPlacesForVoteArithmetic.setText(rules.decimalPlacesForVoteArithmetic);
-    textFieldMinimumVoteThreshold.setText(rules.minimumVoteThreshold);
     if (rules.maxSkippedRanksAllowed
         .equalsIgnoreCase(ContestConfig.MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION)) {
       checkBoxMaxSkippedRanksAllowedUnlimited.setSelected(true);
@@ -1683,7 +1678,6 @@ public class GuiConfigController implements Initializable {
         (textFieldMultiSeatBottomsUpPercentageThreshold));
     rules.decimalPlacesForVoteArithmetic =
         getTextOrEmptyString(textFieldDecimalPlacesForVoteArithmetic);
-    rules.minimumVoteThreshold = getTextOrEmptyString(textFieldMinimumVoteThreshold);
     rules.maxSkippedRanksAllowed = checkBoxMaxSkippedRanksAllowedUnlimited.isSelected()
         ? ContestConfig.MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION
         : getTextOrEmptyString(textFieldMaxSkippedRanksAllowed);
