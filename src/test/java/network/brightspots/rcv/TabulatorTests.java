@@ -788,6 +788,12 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("test bottoms-up multi-seat with bulk eliminate logic")
+  void testBottomsUpMultiSeatWithBulkEliminate() {
+    runTabulationTest("multi_seat_bottoms_up_with_bulk_eliminate");
+  }
+
+  @Test
   @DisplayName("test allow only one winner per round logic")
   void testAllowOnlyOneWinnerPerRound() {
     runTabulationTest("test_set_allow_only_one_winner_per_round");
