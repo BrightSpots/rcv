@@ -859,6 +859,13 @@ class ContestConfig {
       }
     }
 
+    if (isMultiSeatBottomsUpWithThresholdEnabled() && isBatchEliminationEnabled()) {
+      validationErrors.add(
+              ValidationError.RULES_BOTTOMS_UP_THRESHOLD_BATCH_ELIMINATION_DISAGREEMENT);
+      Logger.severe(
+              "batchElimination can't be true when winnerElectionMode is \"%s\"!", winnerMode);
+    }
+
     // nonIntegerWinningThreshold and hareQuota are only allowed for multi-seat elections
     if (!isMultiSeatAllowOnlyOneWinnerPerRoundEnabled()
         && !isMultiSeatAllowMultipleWinnersPerRoundEnabled()) {
