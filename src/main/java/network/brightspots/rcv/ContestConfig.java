@@ -219,28 +219,6 @@ class ContestConfig {
               source.getFilePath())) {
             validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
           }
-        } else {
-          // CSV does not allow idColumnIndex or precinctColumnIndex
-          if (fieldIsDefinedButShouldNotBeForProvider(
-              source.getIdColumnIndex(), "idColumnIndex", provider, source.getFilePath())) {
-            validationErrors.add(ValidationError.CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED);
-          }
-
-          if (fieldIsDefinedButShouldNotBeForProvider(
-              source.getPrecinctColumnIndex(),
-              "precinctColumnIndex",
-              provider,
-              source.getFilePath())) {
-            validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED);
-          }
-
-          if (fieldIsDefinedButShouldNotBeForProvider(
-                  source.getBatchColumnIndex(),
-                  "batchColumnIndex",
-                  provider,
-                  source.getFilePath())) {
-            validationErrors.add(ValidationError.CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED);
-          }
         }
 
         // See the config file documentation for an explanation of this regex

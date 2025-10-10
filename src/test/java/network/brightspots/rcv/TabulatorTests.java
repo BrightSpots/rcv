@@ -964,7 +964,7 @@ class TabulatorTests {
   @Test
   @DisplayName("generic CSV test")
   void genericCsvTest() {
-    runTabulationTest("generic_csv_test");
+    runTabulationTest("generic_csv_test", 6);
   }
 
   @Test

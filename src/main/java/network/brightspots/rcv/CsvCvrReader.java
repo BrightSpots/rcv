@@ -35,11 +35,23 @@ final class CsvCvrReader extends BaseCvrReader {
   private final int firstVoteColumnIndex;
   // 0-based row index of first CVR
   private final int firstVoteRowIndex;
+  private final Integer idColumnIndex;
+  private final Integer precinctColumnIndex;
+  private final Integer batchColumnIndex;
 
   CsvCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
     this.firstVoteColumnIndex = Integer.parseInt(source.getFirstVoteColumnIndex()) - 1;
     this.firstVoteRowIndex = Integer.parseInt(source.getFirstVoteRowIndex()) - 1;
+    this.idColumnIndex = !isNullOrBlank(source.getIdColumnIndex())
+            ? Integer.parseInt(source.getIdColumnIndex()) - 1
+            : null;
+    this.precinctColumnIndex =  !isNullOrBlank(source.getPrecinctColumnIndex())
+              ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
+              : null;
+    this.batchColumnIndex =  !isNullOrBlank(source.getBatchColumnIndex())
+              ? Integer.parseInt(source.getBatchColumnIndex()) - 1
+              : null;
   }
 
   @Override
@@ -98,12 +110,26 @@ final class CsvCvrReader extends BaseCvrReader {
           rankings.add(new Pair<>(rankAsInt, candidateId));
         }
 
+        String suppliedId = this.idColumnIndex != null
+                ? csvRecord.get(this.idColumnIndex) : null;
+        String computedPrecinctId = null;
+        if (this.precinctColumnIndex != null) {
+          String suppliedPrecinctId = csvRecord.get((this.precinctColumnIndex));
+          computedPrecinctId = isNullOrBlank(suppliedPrecinctId)
+                  ? "no precinct id" : suppliedPrecinctId;
+        }
+        String computedBatchId = null;
+        if (this.batchColumnIndex != null) {
+          String suppliedBatchId = csvRecord.get((this.batchColumnIndex));
+          computedBatchId = isNullOrBlank(suppliedBatchId) ? "no batch id" : suppliedBatchId;
+        }
+
         // create the new CastVoteRecord
         CastVoteRecord newCvr = new CastVoteRecord(
             Integer.toString(index),
-            "no supplied ID",
-            "no precinct",
-            "no batch ID",
+            suppliedId,
+            computedPrecinctId,
+            computedBatchId,
             usesLastAllowedRanking(rankings, null),
             rankings);
         castVoteRecords.add(newCvr);

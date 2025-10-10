@@ -1284,11 +1284,15 @@ public class GuiConfigController implements Initializable {
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
           textFieldCvrFirstVoteCol.setDisable(false);
-          textFieldCvrFirstVoteCol
-                  .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_COLUMN));
+          textFieldCvrFirstVoteCol.setText("1");
           textFieldCvrFirstVoteRow.setDisable(false);
           textFieldCvrFirstVoteRow
                   .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
+          textFieldCvrBatchCol.setDisable(false);
+          textFieldCvrIdCol.setDisable(false);
+          textFieldCvrIdCol.setText("");
+          textFieldCvrPrecinctCol.setDisable(false);
+          textFieldCvrPrecinctCol.setText("");
         }
         case CLEAR_BALLOT, DOMINION, HART -> {
           buttonAddCvrFile.setDisable(false);
