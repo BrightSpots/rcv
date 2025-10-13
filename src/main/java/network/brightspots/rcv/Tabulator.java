@@ -762,12 +762,8 @@ final class Tabulator {
         }
       }
     } else if (config.isBulkEliminationEnabled()) {
-      // While bulk eliminate always has only two rounds, for completeness,
-      // we still check this config option
-      int thresholdRound = config.isFirstRoundDeterminesThresholdEnabled() ? 1 : currentRound;
-      BigDecimal threshold = roundTallies.get(thresholdRound).activeBallotSum().multiply(
-          config.getMultiSeatBottomsUpPercentageThreshold());
       RoundTally currentRoundTally = roundTallies.get(currentRound);
+      BigDecimal threshold = currentRoundTally.getWinningThreshold();
       eliminated = currentRoundTally.getCandidates().stream()
           .filter(candidate ->
             currentRoundTally.getCandidateTally(candidate).compareTo(threshold) < 0
