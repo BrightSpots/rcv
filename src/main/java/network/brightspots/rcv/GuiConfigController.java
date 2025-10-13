@@ -1001,7 +1001,7 @@ public class GuiConfigController implements Initializable {
 
   private void setDefaultValues() {
     String versionText = "%s version %s".formatted(Main.APP_NAME, Main.APP_VERSION);
-    if (Main.APP_VERSION.endsWith("999")) {
+    if (ContestConfig.isDevelopmentVersion()) {
       versionText += " -- this is a development version, do not distribute!";
       labelVersion.setBackground(new Background(new BackgroundFill(
           Color.DARKRED, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -1443,8 +1443,6 @@ public class GuiConfigController implements Initializable {
         }
         case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS -> {
           textFieldNumberOfWinners.setDisable(false);
-          checkBoxFirstRoundDeterminesThreshold.setSelected(true);
-          checkBoxFirstRoundDeterminesThreshold.setDisable(false);
         }
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldNumberOfWinners.setText("0");
@@ -1841,10 +1839,16 @@ public class GuiConfigController implements Initializable {
             }
           };
       task.setOnFailed(
-          arg0 ->
-              Logger.severe(
-                  "Error during validation:\n%s\nValidation failed!",
-                  task.getException()));
+          arg0 -> {
+            Logger.severe(
+                    "Error during validation:\n%s\nValidation failed!",
+                    task.getException());
+            if (ContestConfig.isDevelopmentVersion()) {
+              StringWriter stackTrace = new StringWriter();
+              task.getException().printStackTrace(new PrintWriter(stackTrace));
+              Logger.severe(stackTrace.toString());
+            }
+          });
       return task;
     }
   }
