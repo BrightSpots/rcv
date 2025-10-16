@@ -16,8 +16,8 @@ Total Number of Ballots,10
 Number of Undervotes (No Rankings),0
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer
-Eliminated*,Undeclared Write-ins,,,Broccoli,,,Cauliflower,,,,,
-Elected*,,,,,,,,,,Cucumber,,
+Eliminated†,Undeclared Write-ins,,,Broccoli,,,Cauliflower,,,,,
+Elected†,,,,,,,,,,Cucumber,,
 Cucumber,4,40.0%,1,5,50.0%,0,5,50.0%,1,6,60.0%,0
 Lettuce,1,10.0%,2,3,30.0%,1,4,40.0%,0,4,40.0%,0
 Cauliflower,0,0.0%,1,1,10.0%,0,1,10.0%,-1,0,0.0%,0
@@ -30,4 +30,4 @@ Inactive Ballots by Exhausted Choices,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots by Repeated Rankings,0,,0,0,,0,0,,0,0,,0
 Inactive Ballots Total,0,,0,0,,0,0,,0,0,,0
 
-*Elect/Eliminate decisions are from the full contest. All other results on this report are at the batch level.
+†Elect/Eliminate decisions are from the full contest. All other results on this report are at the batch level.
