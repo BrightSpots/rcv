@@ -326,6 +326,10 @@ class ContestConfig {
     return validationErrors;
   }
 
+  static boolean isDevelopmentVersion() {
+    return Main.APP_VERSION.endsWith("999");
+  }
+
   // function: stringMatchesAnotherFieldValue(
   // purpose: Checks to make sure string value of one field doesn't match value of another field
   // param: string to check
@@ -698,9 +702,13 @@ class ContestConfig {
       Logger.severe("Contest config must contain at least 1 non-excluded candidate!");
     }
 
-    if (getNumberOfWinners() > getNumDeclaredCandidates()) {
-      // This is not an error, but it should present a warning
-      Logger.warning("There are more winners than candidates -- is this acceptable?");
+    try {
+      if (getNumberOfWinners() > getNumDeclaredCandidates()) {
+        // This is not an error, but it should present a warning
+        Logger.warning("There are more winners than candidates -- is this acceptable?");
+      }
+    } catch (NumberFormatException exception) {
+      // Ignore -- this will be caught in validateRules()
     }
   }
 
