@@ -264,6 +264,12 @@ class TabulatorSession {
         // Read cast vote records and precinct IDs from CVR files
         try {
           LoadedCvrData castVoteRecords = parseCastVoteRecords(config, progress, true);
+
+          try {
+            HeapDumpUtil.dumpHeapWithTimestamp(".", "after-cvr-parse", true);
+          } catch (IOException e) {
+            Logger.warning("Failed to create heap dump: %s", e.getMessage());
+          }
           if (!castVoteRecords.metadataMatches(expectedCvrData)) {
             Logger.severe("CVR data has changed between loading the CVRs and reading them!");
             exceptionsEncountered.add(TabulationAbortedException.class.toString());
