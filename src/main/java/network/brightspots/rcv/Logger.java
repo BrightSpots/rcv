@@ -308,7 +308,8 @@ class Logger {
             if (logMessages.size() > truncateThreshold) {
               // Create truncation notice
               Label truncationNotice = new Label(
-                  "[Older log messages truncated from GUI. Check audit log files for complete history.]");
+                  "[Older log messages truncated from GUI."
+                          + " Check audit log files for complete history.]");
               truncationNotice.setPadding(new Insets(0, 0, 0, 3));
               truncationNotice.setWrapText(true);
               truncationNotice.setBackground(Background.fill(Color.DARKGRAY));

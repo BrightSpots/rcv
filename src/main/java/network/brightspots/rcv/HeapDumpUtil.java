@@ -31,7 +31,7 @@ public class HeapDumpUtil {
    * @throws IOException If heap dump creation fails
    */
   public static void dumpHeap(String filePath, boolean live) throws IOException {
-    initHotspotMBean();
+    initHotspotMbean();
     hotspotMBean.dumpHeap(filePath, live);
     Logger.info("Heap dump created at: %s", filePath);
   }
@@ -53,7 +53,7 @@ public class HeapDumpUtil {
     return filePath;
   }
 
-  private static void initHotspotMBean() throws IOException {
+  private static void initHotspotMbean() throws IOException {
     if (hotspotMBean == null) {
       synchronized (HeapDumpUtil.class) {
         if (hotspotMBean == null) {
