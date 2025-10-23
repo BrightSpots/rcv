@@ -98,7 +98,7 @@ class HartCvrReader extends BaseCvrReader {
       // Optional: Create heap dump after reading all CVRs for memory profiling
       // Uncomment the following lines to enable heap dumps:
       try {
-        HeapDumpUtil.dumpHeapWithTimestamp(".", "after-cvr-read", true);
+        HeapDumpUtil.dumpHeapWithTimestamp(".", "after-hart-cvr-read", true);
       } catch (IOException e) {
         Logger.warning("Failed to create heap dump: %s", e.getMessage());
       }
