@@ -54,7 +54,7 @@ class ContestConfig {
   static final boolean SUGGESTED_NON_INTEGER_WINNING_THRESHOLD = false;
   static final boolean SUGGESTED_HARE_QUOTA = false;
   static final boolean SUGGESTED_BATCH_ELIMINATION = false;
-  static final boolean SUGGESTED_BULK_ELIMINATION = false;
+  static final boolean SUGGESTED_CUTOFF_ELIMINATION = false;
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_FIRST_ROUND_DETERMINES_THRESHOLD = false;
@@ -1163,8 +1163,8 @@ class ContestConfig {
     return rawConfig.rules.batchElimination;
   }
 
-  boolean isBulkEliminationEnabled() {
-    return rawConfig.rules.bulkElimination;
+  boolean isCutoffEliminationEnabled() {
+    return rawConfig.rules.cutoffElimination;
   }
 
   boolean isContinueUntilTwoCandidatesRemainEnabled() {

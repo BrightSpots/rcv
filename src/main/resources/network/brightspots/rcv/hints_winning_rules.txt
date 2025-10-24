@@ -22,7 +22,7 @@ Stop Tabulation Early After Round: If a winner is not found by the given round, 
 
 Use Batch Elimination: Batch elimination, or simultaneous elimination of all candidates for whom it is mathematically impossible to be elected, eliminates all candidates who cannot receive enough votes to surpass the candidate with the next highest number of votes. Example: in a six candidate contest with 200 votes, Candidate A has 80 votes, Candidate B has 70, and the other four combined have 50. Because those four candidates can never combine their votes to surpass Candidate B, they can be batch eliminated. Available only when Winner Election Mode is "Single-winner majority determines winner" or "Multi-pass IRV."
 
-Use Bulk Elimination: In Bottoms-Up With Percentage Threshold elections, bulk elimination eliminates all candidates who are below the percentage threshold in a single round of counting.
+Eliminate All Candidates Falling Below Threshold in First Round: In Bottoms-Up With Percentage Threshold elections, cutoff elimination eliminates all candidates who are below the percentage threshold in a single round of counting.
 
 Continue until Two Candidates Remain: Single-winner ranked-choice voting elections can stop as soon as a candidate receives a majority of votes, even though 3 or more candidates may still be in the race. Selecting this option will run the round-by-round count until only two candidates remain, regardless of when a candidate wins a majority of votes. Available only when Winner Election Mode is "Single-winner majority determines winner" or "Multi-pass IRV."
 

@@ -269,7 +269,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private CheckBox checkBoxBatchElimination;
   @FXML
-  private CheckBox checkBoxBulkElimination;
+  private CheckBox checkBoxCutoffElimination;
   @FXML
   private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
   @FXML
@@ -958,8 +958,8 @@ public class GuiConfigController implements Initializable {
     textFieldStopTabulationEarlyAfterRound.setDisable(true);
     checkBoxBatchElimination.setSelected(false);
     checkBoxBatchElimination.setDisable(true);
-    checkBoxBulkElimination.setSelected(false);
-    checkBoxBulkElimination.setDisable(true);
+    checkBoxCutoffElimination.setSelected(false);
+    checkBoxCutoffElimination.setDisable(true);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
     checkBoxContinueUntilTwoCandidatesRemain.setDisable(true);
     checkBoxFirstRoundDeterminesThreshold.setSelected(false);
@@ -990,7 +990,7 @@ public class GuiConfigController implements Initializable {
     setThresholdCalculationMethodRadioButton(ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD,
         ContestConfig.SUGGESTED_HARE_QUOTA);
     checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
-    checkBoxBulkElimination.setSelected(ContestConfig.SUGGESTED_BULK_ELIMINATION);
+    checkBoxCutoffElimination.setSelected(ContestConfig.SUGGESTED_CUTOFF_ELIMINATION);
     checkBoxContinueUntilTwoCandidatesRemain
         .setSelected(ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
     checkBoxFirstRoundDeterminesThreshold
@@ -1416,7 +1416,7 @@ public class GuiConfigController implements Initializable {
       clearAndDisableWinningRuleFields();
       setWinningRulesDefaultValues();
       checkBoxMaxRankingsAllowedMax.setDisable(false);
-      checkBoxBulkElimination.setDisable(true);
+      checkBoxCutoffElimination.setDisable(true);
       textFieldStopTabulationEarlyAfterRound.setDisable(false);
       choiceTiebreakMode.setDisable(false);
       switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
@@ -1448,7 +1448,7 @@ public class GuiConfigController implements Initializable {
           checkBoxFirstRoundDeterminesThreshold.setSelected(true);
           checkBoxFirstRoundDeterminesThreshold.setDisable(false);
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
-          checkBoxBulkElimination.setDisable(false);
+          checkBoxCutoffElimination.setDisable(false);
         }
         case MODE_UNKNOWN -> {
           // Do nothing
@@ -1600,7 +1600,7 @@ public class GuiConfigController implements Initializable {
     textFieldRulesDescription.setText(rules.rulesDescription);
     setThresholdCalculationMethodRadioButton(rules.nonIntegerWinningThreshold, rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
-    checkBoxBulkElimination.setSelected(rules.bulkElimination);
+    checkBoxCutoffElimination.setSelected(rules.cutoffElimination);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxFirstRoundDeterminesThreshold.setSelected(rules.doesFirstRoundDetermineThreshold);
     textFieldStopTabulationEarlyAfterRound.setText(rules.stopTabulationEarlyAfterRound);
@@ -1694,7 +1694,7 @@ public class GuiConfigController implements Initializable {
     rules.nonIntegerWinningThreshold = radioThresholdHbQuota.isSelected();
     rules.hareQuota = radioThresholdHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
-    rules.bulkElimination = checkBoxBulkElimination.isSelected();
+    rules.cutoffElimination = checkBoxCutoffElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.doesFirstRoundDetermineThreshold = checkBoxFirstRoundDeterminesThreshold.isSelected();
     rules.stopTabulationEarlyAfterRound =

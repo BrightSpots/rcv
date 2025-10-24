@@ -491,8 +491,8 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <CheckBox fx:id="checkBoxBulkElimination" mnemonicParsing="false"
-                        text="Use Bulk Elimination">
+                      <CheckBox fx:id="checkBoxCutoffElimination" mnemonicParsing="false"
+                        text="Eliminate All Candidates Falling Below Threshold in First Round">
                         <VBox.margin>
                           <Insets top="8.0" bottom="8.0"/>
                         </VBox.margin>

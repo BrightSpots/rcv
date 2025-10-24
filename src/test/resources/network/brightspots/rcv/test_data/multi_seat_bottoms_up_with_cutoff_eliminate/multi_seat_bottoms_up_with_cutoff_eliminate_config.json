@@ -1,7 +1,7 @@
 {
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
-    "contestName" : "Multi-Seat Bottoms-up With Dynamic Threshold And Bulk Eliminate",
+    "contestName" : "Multi-Seat Bottoms-up With Dynamic Threshold And Cutoff Eliminate",
     "outputDirectory" : "output",
     "contestDate" : "",
     "contestJurisdiction" : "",
@@ -73,7 +73,7 @@
     "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
-    "bulkElimination" : true,
+    "cutoffElimination" : true,
     "continueUntilTwoCandidatesRemain" : false,
     "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,

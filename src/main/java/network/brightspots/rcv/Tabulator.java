@@ -761,7 +761,7 @@ final class Tabulator {
               elimination.nextLowestTally);
         }
       }
-    } else if (config.isBulkEliminationEnabled()) {
+    } else if (config.isCutoffEliminationEnabled()) {
       RoundTally currentRoundTally = roundTallies.get(currentRound);
       BigDecimal threshold = currentRoundTally.getWinningThreshold();
       eliminated = currentRoundTally.getCandidates().stream()

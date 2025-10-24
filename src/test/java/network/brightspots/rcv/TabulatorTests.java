@@ -782,9 +782,9 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("test bottoms-up multi-seat with bulk eliminate logic")
-  void testBottomsUpMultiSeatWithBulkEliminate() {
-    runTabulationTest("multi_seat_bottoms_up_with_bulk_eliminate");
+  @DisplayName("test bottoms-up multi-seat with cutoff eliminate logic")
+  void testBottomsUpMultiSeatWithCutoffEliminate() {
+    runTabulationTest("multi_seat_bottoms_up_with_cutoff_eliminate");
   }
 
   @Test
