@@ -412,13 +412,13 @@ public class RawContestConfig {
     public String numberOfWinners;
     public String multiSeatBottomsUpPercentageThreshold;
     public String decimalPlacesForVoteArithmetic;
-    public String minimumVoteThreshold;
     public String maxSkippedRanksAllowed;
     public String maxRankingsAllowed;
     public boolean nonIntegerWinningThreshold;
     public boolean doesFirstRoundDetermineThreshold;
     public boolean hareQuota;
     public boolean batchElimination;
+    public boolean cutoffElimination;
     public boolean continueUntilTwoCandidatesRemain;
     public String stopTabulationEarlyAfterRound;
     public boolean exhaustOnDuplicateCandidate;

@@ -473,13 +473,6 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="220.0" text="Minimum Vote Threshold"/>
-                      <TextField fx:id="textFieldMinimumVoteThreshold" maxWidth="80.0"/>
-                      <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                      </padding>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <Label prefWidth="220.0" text="Stop Tabulation Early after Round"/>
                       <TextField fx:id="textFieldStopTabulationEarlyAfterRound" maxWidth="80.0" />
                       <padding>
@@ -488,7 +481,18 @@
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <CheckBox fx:id="checkBoxBatchElimination" mnemonicParsing="false"
-                        text="Use Batch Elimination">
+                                text="Use Batch Elimination">
+                        <VBox.margin>
+                          <Insets top="8.0" bottom="8.0"/>
+                        </VBox.margin>
+                      </CheckBox>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <CheckBox fx:id="checkBoxCutoffElimination" mnemonicParsing="false"
+                        text="Eliminate All Candidates Falling Below Threshold in First Round">
                         <VBox.margin>
                           <Insets top="8.0" bottom="8.0"/>
                         </VBox.margin>
