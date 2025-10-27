@@ -246,14 +246,18 @@ final class Tabulator {
         // c) not all remaining candidates meet the bottoms-up threshold
 
         List<TallyDecision> eliminated;
-        // Three mutually exclusive ways to eliminate candidates.
+        // Four mutually exclusive ways to eliminate candidates.
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
         eliminated = dropUndeclaredWriteIns(currentRoundTally);
-        // 2. Otherwise, try batch elimination.
+        // 2. if we have a cutoffThreshold, eliminate everyone under it
+        if (eliminated.isEmpty()) {
+          eliminated = doCutoffElimination();
+        }
+        // 3. Otherwise, try batch elimination.
         if (eliminated.isEmpty()) {
           eliminated = doBatchElimination(currentRoundTallyToCandidates);
         }
-        // 3. If we didn't do batch elimination, eliminate the remaining candidate with the lowest
+        // 4. If we didn't do batch elimination, eliminate the remaining candidate with the lowest
         //    tally, breaking a tie if needed.
         if (eliminated.isEmpty()) {
           eliminated = doRegularElimination(currentRoundTallyToCandidates);
@@ -761,15 +765,24 @@ final class Tabulator {
               elimination.nextLowestTally);
         }
       }
-    } else if (config.isCutoffEliminationEnabled()) {
+    }
+
+    return eliminated;
+  }
+
+  // if cutoffElimination is enabled, bulk eliminate anyone under the cutoff
+  // returns: eliminated candidates
+  private List<TallyDecision> doCutoffElimination() {
+    List<TallyDecision> eliminated = new LinkedList<>();
+    if (config.isCutoffEliminationEnabled()) {
       RoundTally currentRoundTally = roundTallies.get(currentRound);
       BigDecimal threshold = currentRoundTally.getWinningThreshold();
       eliminated = currentRoundTally.getCandidates().stream()
-          .filter(candidate ->
-            currentRoundTally.getCandidateTally(candidate).compareTo(threshold) < 0
-          ).map(candidate ->
-            new TallyDecision(candidate, TallyDecision.DecisionType.ELIMINATED, false, currentRound)
-          ).toList();
+        .filter(candidate ->
+          currentRoundTally.getCandidateTally(candidate).compareTo(threshold) < 0
+         ).map(candidate ->
+           new TallyDecision(candidate, TallyDecision.DecisionType.ELIMINATED, false, currentRound)
+         ).toList();
     }
     return eliminated;
   }
