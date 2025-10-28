@@ -197,7 +197,7 @@ final class Tabulator {
           currentRound == 1 ? BigDecimal.ZERO : roundToResidualSurplus.get(currentRound - 1));
 
       if (shouldRecomputeThreshold()) {
-        calculateAndSetWinningThreshold(currentRoundTally, config.getMinimumVoteThreshold());
+        calculateAndSetWinningThreshold(currentRoundTally);
       } else {
         BigDecimal lastRoundThreshold = roundTallies.get(currentRound - 1).getWinningThreshold();
         setWinningThreshold(currentRound, lastRoundThreshold);
@@ -251,17 +251,9 @@ final class Tabulator {
         // Four mutually exclusive ways to eliminate candidates.
         // 1. Some races contain undeclared write-ins that should be dropped immediately.
         eliminated = dropUndeclaredWriteIns(currentRoundTally);
-        // 2. If there's a minimum vote threshold, drop all candidates below that threshold.
+        // 2. if we have a cutoffThreshold, eliminate everyone under it
         if (eliminated.isEmpty()) {
-          eliminated = dropCandidatesBelowThreshold(currentRoundTallyToCandidates);
-          // One edge case: if everyone is below the threshold, we can't proceed. This would only
-          // happen in the first or (if we drop undeclared write-ins first) second round.
-          if (eliminated.size() == config.getNumDeclaredCandidates()) {
-            Logger.severe(
-                "Tabulation can't proceed because all declared candidates are below "
-                    + "the minimum vote threshold.");
-            throw new TabulationAbortedException(false);
-          }
+          eliminated = doCutoffElimination();
         }
         // 3. Otherwise, try batch elimination.
         if (eliminated.isEmpty()) {
@@ -450,8 +442,7 @@ final class Tabulator {
   }
 
   // determine and store the threshold to win
-  private void calculateAndSetWinningThreshold(
-        RoundTally currentRoundTally, BigDecimal minimumVoteThreshold) {
+  private void calculateAndSetWinningThreshold(RoundTally currentRoundTally) {
     BigDecimal currentRoundTotalVotes = currentRoundTally.activeBallotSum();
 
     BigDecimal winningThreshold;
@@ -489,13 +480,6 @@ final class Tabulator {
                 .divide(divisor, decimals, java.math.RoundingMode.DOWN)
                 .add(augend);
       }
-    }
-
-    // We can never set a winning threshold that's less than the minimum vote threshold specified in
-    // the config.
-    if (minimumVoteThreshold.signum() == 1
-        && minimumVoteThreshold.compareTo(winningThreshold) == 1) {
-      winningThreshold = minimumVoteThreshold;
     }
 
     if (currentRoundTally != roundTallies.get(currentRoundTally.getRoundNumber())) {
@@ -647,9 +631,7 @@ final class Tabulator {
           config.getNumberOfWinners() == 1
               && selectedWinnerNames.isEmpty()
               && currentRoundTally.activeCandidateSum() == 2
-              && numSeatsUnfilled == 1
-              && currentRoundTallyToCandidates.keySet().stream()
-                  .allMatch(x -> x.compareTo(config.getMinimumVoteThreshold()) >= 0);
+              && numSeatsUnfilled == 1;
       if (needsTiebreakMultipleWinners || needsTiebreakNoWinners) {
         // currentRoundTallyToCandidates is sorted from low to high, so just look at the last key
         BigDecimal maxVotes = currentRoundTallyToCandidates.lastKey();
@@ -761,37 +743,6 @@ final class Tabulator {
     return tally.signum();
   }
 
-  // eliminate all candidates below a certain tally threshold
-  // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
-  // returns: eliminated candidates
-  private List<TallyDecision> dropCandidatesBelowThreshold(
-      SortedMap<BigDecimal, LinkedList<String>> currentRoundTallyToCandidates) {
-    List<TallyDecision> eliminated = new LinkedList<>();
-    // min threshold
-    BigDecimal threshold = config.getMinimumVoteThreshold();
-    if (threshold.signum() == 1
-        && currentRoundTallyToCandidates.firstKey().compareTo(threshold) < 0) {
-      for (var entry : currentRoundTallyToCandidates.entrySet()) {
-        if (entry.getKey().compareTo(threshold) < 0) {
-          for (String candidate : entry.getValue()) {
-            eliminated.add(new TallyDecision(
-                    candidate,
-                    TallyDecision.DecisionType.ELIMINATED,
-                    false,
-                    currentRound));
-            Logger.info(
-                "Eliminated candidate \"%s\" in round %d because they only had %s vote(s), below "
-                    + "the minimum threshold of %s.",
-                candidate, currentRound, entry.getKey(), threshold);
-          }
-        } else {
-          break;
-        }
-      }
-    }
-    return eliminated;
-  }
-
   // eliminate all candidates who are mathematically unable to win
   // param: currentRoundTallyToCandidates map of tally to candidate IDs for a given round
   // returns: eliminated candidates
@@ -816,6 +767,24 @@ final class Tabulator {
               elimination.nextLowestTally);
         }
       }
+    }
+
+    return eliminated;
+  }
+
+  // if cutoffElimination is enabled, bulk eliminate anyone under the cutoff
+  // returns: eliminated candidates
+  private List<TallyDecision> doCutoffElimination() {
+    List<TallyDecision> eliminated = new LinkedList<>();
+    if (config.isCutoffEliminationEnabled()) {
+      RoundTally currentRoundTally = roundTallies.get(currentRound);
+      BigDecimal threshold = currentRoundTally.getWinningThreshold();
+      eliminated = currentRoundTally.getCandidates().stream()
+        .filter(candidate ->
+          currentRoundTally.getCandidateTally(candidate).compareTo(threshold) < 0
+         ).map(candidate ->
+           new TallyDecision(candidate, TallyDecision.DecisionType.ELIMINATED, false, currentRound)
+         ).toList();
     }
     return eliminated;
   }
