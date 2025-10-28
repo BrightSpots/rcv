@@ -354,7 +354,8 @@ class TabulatorSession {
   private LoadedCvrData parseCastVoteRecords(
       ContestConfig config, Progress progress, boolean shouldOutputRcTabCvr)
       throws CastVoteRecordGenericParseException {
-    Logger.info("Parsing cast vote records...");
+    Logger.info("Beginning parsing of all cast vote records from %d configured sources...",
+            config.rawConfig.cvrFileSources.size());
     List<CastVoteRecord> castVoteRecords = new ArrayList<>();
     boolean encounteredSourceProblem = false;
 
@@ -368,7 +369,8 @@ class TabulatorSession {
       Provider provider = ContestConfig.getProvider(source);
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
-        Logger.info("Reading %s cast vote records from: %s...", reader.readerName(), cvrPath);
+        Logger.info("CVR Source %d | Reading %s cast vote records from: %s..."
+                ,sourceIndex + 1, reader.readerName(), cvrPath);
         final int startIndex = castVoteRecords.size();
         reader.readCastVoteRecords(castVoteRecords);
 
@@ -376,6 +378,9 @@ class TabulatorSession {
         cvrSourceData.add(
             new OutputWriter.CvrSourceData(
                 source, reader, sourceIndex, startIndex, castVoteRecords.size() - 1));
+
+          Logger.info("CVR Source %d | Parsed %,d valid cast vote records.",
+                  sourceIndex + 1, castVoteRecords.size() - startIndex);
 
         // Check for unrecognized candidates
         Map<Candidate, Integer> unrecognizedCandidateCounts =
@@ -432,7 +437,9 @@ class TabulatorSession {
         Logger.severe("No cast vote records found!");
         castVoteRecords = null;
       } else {
-        Logger.info("Parsed %d cast vote records successfully.", castVoteRecords.size());
+        Logger.info("Completed parsing all cast vote records. Parsed %,d valid cast vote records successfully"
+                + " from %d configured CVR sources."
+                , castVoteRecords.size(), config.rawConfig.cvrFileSources.size());
 
         // Output the RCTab-CSV CVR
         if (shouldOutputRcTabCvr) {
