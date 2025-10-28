@@ -82,6 +82,7 @@ class HartCvrReader extends BaseCvrReader {
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException, IOException {
+    int recordsRead = 0;
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
@@ -92,8 +93,14 @@ class HartCvrReader extends BaseCvrReader {
             throw new CastVoteRecord.CvrParseException();
           }
           readCastVoteRecord(castVoteRecords, child.toPath());
+          // provide some user feedback on the Cvr count
+          if (++recordsRead % 10000 == 0) {
+              Logger.info("Parsed %,d cast vote records...", castVoteRecords.size());
+          }
         }
       }
+
+      Logger.info("Parsed %,d cast vote records.", recordsRead);
 
       // Optional: Create heap dump after reading all CVRs for memory profiling
       // Uncomment the following lines to enable heap dumps:
@@ -174,11 +181,6 @@ class HartCvrReader extends BaseCvrReader {
                     usesLastAllowedRanking(rankings, null),
                     rankings);
         castVoteRecords.add(cvr);
-
-        // provide some user feedback on the Cvr count
-        if (castVoteRecords.size() % 5000 == 0) {
-          Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
-        }
       }
     }
   }

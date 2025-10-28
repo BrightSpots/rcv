@@ -290,13 +290,13 @@ class DominionCvrReader extends BaseCvrReader {
           recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad);
           filesParsed++;
 
-          if (recordsParsed - recordsParsedAtLastLog > 50000) {
-            Logger.info("Parsed %d records from %d files", recordsParsed, filesParsed);
+          if (recordsParsed - recordsParsedAtLastLog > 10000) {
+            Logger.info("Parsed %,d records from %,d files", recordsParsed, filesParsed);
             recordsParsedAtLastLog = recordsParsed;
           }
         }
 
-        Logger.info("Parsed %d total records from %d total files", recordsParsed, filesParsed);
+        Logger.info("Parsed %,d total records from %d total files", recordsParsed, filesParsed);
       }
     } catch (FileNotFoundException | CvrParseException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
