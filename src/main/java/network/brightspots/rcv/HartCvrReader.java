@@ -94,6 +94,7 @@ class HartCvrReader extends BaseCvrReader {
           readCastVoteRecord(castVoteRecords, child.toPath());
         }
       }
+<<<<<<< Updated upstream
 
       // Optional: Create heap dump after reading all CVRs for memory profiling
       // Uncomment the following lines to enable heap dumps:
@@ -102,6 +103,8 @@ class HartCvrReader extends BaseCvrReader {
       } catch (IOException e) {
         Logger.warning("Failed to create heap dump: %s", e.getMessage());
       }
+=======
+>>>>>>> Stashed changes
     } else {
       Logger.severe("Unable to find any files in directory: %s", cvrRoot.getAbsolutePath());
       throw new CastVoteRecord.CvrParseException();
