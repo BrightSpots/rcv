@@ -76,6 +76,9 @@ class Logger {
   // how many tabulation files to keep
   // this will effectively keep ALL output from any tabulation
   private static final Integer TABULATION_LOG_FILE_COUNT = 1000;
+  // Maximum number of log messages to keep in GUI memory (older messages are dropped)
+  // Users can check the audit log files for complete history
+  private static final Integer MAX_GUI_LOG_MESSAGES = 1000;
   private static final java.util.logging.Formatter formatter = new LogFormatter();
   private static java.util.logging.Logger logger;
   private static java.util.logging.FileHandler tabulationHandler;
@@ -242,8 +245,16 @@ class Logger {
       }
     });
 
+    ContextMenu contextMenu = new ContextMenu();
+    MenuItem copyMenuItem = new MenuItem("Copy");
+    contextMenu.getItems().add(copyMenuItem);
+
     java.util.logging.Handler guiHandler =
         new Handler() {
+          {
+            copyMenuItem.setOnAction(this::copyToClipboard);
+          }
+
           @Override
           public void publish(LogRecord record) {
             if (isLoggable(record) && !shouldIgnore(record)) {
@@ -259,11 +270,6 @@ class Logger {
                 logLabel.setBackground(Background.fill(Color.SIENNA));
               }
 
-              // On Right Click, user can copy text
-              ContextMenu contextMenu = new ContextMenu();
-              MenuItem copyMenuItem = new MenuItem("Copy");
-              copyMenuItem.setOnAction(this::copyToClipboard);
-              contextMenu.getItems().add(copyMenuItem);
               logLabel.setContextMenu(contextMenu);
 
               // Rather than adding to the list too many times in a row,
@@ -297,6 +303,28 @@ class Logger {
               logMessages.addAll(labelsQueue);
               labelsQueue.clear();
             }
+
+            // Truncate old messages to prevent unbounded memory growth
+            // Wait until we exceed the limit by 50% before truncating to amortize the copy cost
+            // This gives us O(1) amortized cost: we copy ~1000 items every 500 additions
+            int truncateThreshold = MAX_GUI_LOG_MESSAGES + (MAX_GUI_LOG_MESSAGES / 2);
+            if (logMessages.size() > truncateThreshold) {
+              // Create truncation notice
+              Label truncationNotice = new Label(
+                  "[Older log messages truncated from GUI."
+                          + " Check audit log files for complete history.]");
+              truncationNotice.setPadding(new Insets(0, 0, 0, 3));
+              truncationNotice.setWrapText(true);
+              truncationNotice.setBackground(Background.fill(Color.DARKGRAY));
+
+              // Keep most recent MAX_GUI_LOG_MESSAGES plus notice at the front
+              int startIndex = logMessages.size() - MAX_GUI_LOG_MESSAGES;
+              List<Label> newMessages = new ArrayList<>(MAX_GUI_LOG_MESSAGES + 1);
+              newMessages.add(truncationNotice);
+              newMessages.addAll(logMessages.subList(startIndex, logMessages.size()));
+              logMessages.setAll(newMessages);
+            }
+
             listView.scrollTo(logMessages.size() - 1);
           }
 

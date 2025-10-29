@@ -215,6 +215,7 @@ class TabulatorSession {
 
       Progress progress = new Progress(config, 0.5f, progressUpdate);
       Logger.info("Tabulating '%s'...", config.getContestName());
+      logMemoryStats("at the start of tabulation");
       if (config.isMultiSeatSequentialWinnerTakesAllEnabled()) {
         Logger.info("This is a multi-pass IRV contest.");
         int numWinners = config.getNumberOfWinners();
@@ -264,11 +265,14 @@ class TabulatorSession {
         // Read cast vote records and precinct IDs from CVR files
         try {
           LoadedCvrData castVoteRecords = parseCastVoteRecords(config, progress, true);
+          logMemoryStats("after reading CVRs");
+
           if (!castVoteRecords.metadataMatches(expectedCvrData)) {
             Logger.severe("CVR data has changed between loading the CVRs and reading them!");
             exceptionsEncountered.add(TabulationAbortedException.class.toString());
           } else {
             runTabulationForConfig(config, castVoteRecords.getCvrs(), progress);
+            logMemoryStats("after tabulation complete");
             castVoteRecords.printSummary();
             tabulationSuccess = true;
           }
@@ -302,6 +306,14 @@ class TabulatorSession {
     } catch (TabulationAbortedException | CastVoteRecordGenericParseException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static void logMemoryStats(String context) {
+    Runtime runtime = Runtime.getRuntime();
+    Logger.auditable("-- Heap Stats [%s] --", context);
+    Logger.auditable("Max memory: %d MB", runtime.maxMemory() / (1024 * 1024));
+    Logger.auditable("Total memory: %d MB", runtime.totalMemory() / (1024 * 1024));
+    Logger.auditable("Free memory: %d MB", runtime.freeMemory() / (1024 * 1024));
   }
 
   private boolean setUpLogging(String outputDirectory) {
