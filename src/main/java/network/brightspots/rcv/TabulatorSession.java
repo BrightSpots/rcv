@@ -559,8 +559,8 @@ class TabulatorSession {
       Logger.info("Cast Vote Record summary:");
       for (OutputWriter.CvrSourceData sourceData : cvrSourcesData) {
         Logger.info("Source %d: %s", sourceData.sourceIndex + 1, sourceData.source.getFilePath());
-        Logger.info("  uses provider: %s", sourceData.source.getProvider());
-        Logger.info("  read %d cast vote records", sourceData.getNumCvrs());
+        Logger.info("  Uses Provider: %s", sourceData.source.getProvider());
+        Logger.info("  Read %,d cast vote records", sourceData.getNumCvrs());
       }
     }
   }
