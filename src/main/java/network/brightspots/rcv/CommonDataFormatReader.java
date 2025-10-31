@@ -240,8 +240,13 @@ class CommonDataFormatReader extends BaseCvrReader {
 
       // process the Cvrs
       int cvrIndex = 0;
+      int recordsRead = 0;
       String fileName = new File(cvrPath).getName();
       for (CVR cvr : cvrReport.CVR) {
+        if (++recordsRead % 10000 == 0) {
+          Logger.info("Parsed %,d records...", recordsRead);
+        }
+
         CVRContest contest = getCvrContestXml(cvr, contestToTabulate);
         if (contest == null) {
           // the CVR does not contain any votes for this contest
@@ -323,12 +328,8 @@ class CommonDataFormatReader extends BaseCvrReader {
             usesLastAllowedRanking(rankings, null),
             rankings);
         castVoteRecords.add(newRecord);
-
-        // provide some user feedback on the CVR count
-        if (castVoteRecords.size() % 50000 == 0) {
-          Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
-        }
       }
+      Logger.info("Parsed %,d records.", recordsRead);
     }
   }
 
