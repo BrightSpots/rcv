@@ -245,8 +245,16 @@ class Logger {
       }
     });
 
+    ContextMenu contextMenu = new ContextMenu();
+    MenuItem copyMenuItem = new MenuItem("Copy");
+    contextMenu.getItems().add(copyMenuItem);
+
     java.util.logging.Handler guiHandler =
         new Handler() {
+          {
+            copyMenuItem.setOnAction(this::copyToClipboard);
+          }
+
           @Override
           public void publish(LogRecord record) {
             if (isLoggable(record) && !shouldIgnore(record)) {
@@ -262,11 +270,6 @@ class Logger {
                 logLabel.setBackground(Background.fill(Color.SIENNA));
               }
 
-              // On Right Click, user can copy text
-              ContextMenu contextMenu = new ContextMenu();
-              MenuItem copyMenuItem = new MenuItem("Copy");
-              copyMenuItem.setOnAction(this::copyToClipboard);
-              contextMenu.getItems().add(copyMenuItem);
               logLabel.setContextMenu(contextMenu);
 
               // Rather than adding to the list too many times in a row,
