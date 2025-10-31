@@ -375,8 +375,8 @@ class TabulatorSession {
       Provider provider = ContestConfig.getProvider(source);
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
-        Logger.info("CVR Source %d | Reading %s cast vote records from: %s..."
-                ,sourceIndex + 1, reader.readerName(), cvrPath);
+        Logger.info("CVR Source %d | Reading %s cast vote records from: %s...",
+                sourceIndex + 1, reader.readerName(), cvrPath);
         final int startIndex = castVoteRecords.size();
         reader.readCastVoteRecords(castVoteRecords);
 
@@ -385,7 +385,7 @@ class TabulatorSession {
             new OutputWriter.CvrSourceData(
                 source, reader, sourceIndex, startIndex, castVoteRecords.size() - 1));
 
-          Logger.info("CVR Source %d | Parsed %,d valid cast vote records.",
+        Logger.info("CVR Source %d | Parsed %,d valid cast vote records.",
                   sourceIndex + 1, castVoteRecords.size() - startIndex);
 
         // Check for unrecognized candidates
@@ -443,9 +443,10 @@ class TabulatorSession {
         Logger.severe("No cast vote records found!");
         castVoteRecords = null;
       } else {
-        Logger.info("Completed parsing all cast vote records. Parsed %,d valid cast vote records successfully"
-                + " from %d configured CVR sources."
-                , castVoteRecords.size(), config.rawConfig.cvrFileSources.size());
+        Logger.info("Completed parsing all cast vote records."
+                + " Parsed %,d valid cast vote records successfully"
+                + " from %d configured CVR sources.",
+                castVoteRecords.size(), config.rawConfig.cvrFileSources.size());
 
         // Output the RCTab-CSV CVR
         if (shouldOutputRcTabCvr) {
