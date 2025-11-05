@@ -55,6 +55,10 @@ class DominionCvrReader extends BaseCvrReader {
   // map of contest ID to Contest data
   private Map<String, Contest> contests;
   private Map<String, Candidate> candidateCodesToCandidates;
+  // Number of total CVR records found
+  private Integer recordsParsed = 0;
+  // Certain OutstackConditions identify ballots that should not be included in results
+  private Integer recordsWithOutstackCondition = 0;
 
   DominionCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
@@ -266,6 +270,7 @@ class DominionCvrReader extends BaseCvrReader {
       if (singleCvrPath.toFile().exists()) {
         HashMap json = JsonParser.readFromFile(singleCvrPath.toString(), HashMap.class);
         parseCvrFile(json, castVoteRecords, contestIdToLoad);
+        logCvrParsingComplete(1);
       } else {
         // We are expecting multiple CvrExport_N.json files
         String regexPath = CVR_EXPORT_PATTERN.replaceAll("%d", "\\\\d+");
@@ -281,22 +286,14 @@ class DominionCvrReader extends BaseCvrReader {
         List<File> matchedCvrFiles = Arrays.asList(matchedCvrFileArray);
         matchedCvrFiles.sort(Comparator.comparing(File::getAbsolutePath));
 
-        int recordsParsed = 0;
         int filesParsed = 0;
-        int recordsParsedAtLastLog = 0;
 
         for (File file : matchedCvrFiles) {
           HashMap json = JsonParser.readFromFile(file.toString(), HashMap.class);
-          recordsParsed += parseCvrFile(json, castVoteRecords, contestIdToLoad);
+          parseCvrFile(json, castVoteRecords, contestIdToLoad);
           filesParsed++;
-
-          if (recordsParsed - recordsParsedAtLastLog > 10000) {
-            Logger.info("Parsed %,d records from %,d files", recordsParsed, filesParsed);
-            recordsParsedAtLastLog = recordsParsed;
-          }
         }
-
-        Logger.info("Parsed %,d total records from %d total files", recordsParsed, filesParsed);
+        logCvrParsingComplete(filesParsed);
       }
     } catch (FileNotFoundException | CvrParseException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
@@ -304,12 +301,11 @@ class DominionCvrReader extends BaseCvrReader {
     }
   }
 
-  private int parseCvrFile(
+  private void parseCvrFile(
       HashMap json, List<CastVoteRecord> castVoteRecords, String contestIdToLoad)
       throws CvrParseException {
     // top-level "Sessions" object contains a lists of Cvr objects from different tabulators
     ArrayList sessions = (ArrayList) json.get("Sessions");
-    int recordsParsed = 0;
     // for each Cvr object extract various fields
     for (Object sessionObject : sessions) {
       HashMap session = (HashMap) sessionObject;
@@ -378,7 +374,13 @@ class DominionCvrReader extends BaseCvrReader {
           }
           ArrayList outstackConditionIds = (ArrayList) contest.get("OutstackConditionIds");
           if (outstackConditionIds.contains(EXCLUDE_CONTEST_CONDITION_ID)) {
+            this.recordsWithOutstackCondition++;
             continue;
+          }
+
+          this.recordsParsed++;
+          if (recordsParsed > 0 && recordsParsed % 10000 == 0) {
+            Logger.info("Parsed %,d cast vote records...", recordsParsed);
           }
           ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
           // marks is an array of rankings
@@ -418,13 +420,24 @@ class DominionCvrReader extends BaseCvrReader {
           castVoteRecords.add(newCvr);
         }
       }
-      // provide some user feedback on the cvr count
-      recordsParsed++;
-      if (recordsParsed > 0 && recordsParsed % 50000 == 0) {
-        Logger.info("Parsed %d cast vote records.", recordsParsed);
-      }
     }
-    return recordsParsed;
+  }
+
+  private void logCvrParsingComplete(Integer totalFiles) {
+    String message = String.format("Parsed %,d cast vote records", this.recordsParsed);
+
+    if (this.recordsWithOutstackCondition > 0) {
+      message += String.format(
+            " and identified %,d outstack cast vote records", this.recordsWithOutstackCondition);
+    }
+
+    if (totalFiles == 1) {
+      message += " from one file.";
+    } else {
+      message += String.format(" from %,d total files.", totalFiles);
+    }
+
+    Logger.info(message);
   }
 
   // Candidate data from a Dominion candidate manifest Json
