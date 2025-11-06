@@ -223,9 +223,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     cvrList.add(newRecord);
 
     // provide some user feedback on the CVR count
-    if (cvrIndex % 10000 == 0) {
-      Logger.info("Parsed %,d cast vote records...", cvrIndex);
-    }
+    this.logCvrRecordParsed(cvrIndex);
   }
 
   // handle CVR cell data callback
@@ -287,7 +285,7 @@ final class StreamingCvrReader extends BaseCvrReader {
       throws CastVoteRecord.CvrParseException, IOException {
     try {
       parseCvrFileInternal(castVoteRecords);
-      Logger.info("Parsed %,d cast vote records.", this.cvrIndex);
+      this.logCvrParsingComplete(this.cvrIndex);
     } catch (OpenXML4JException | SAXException | ParserConfigurationException e) {
       Logger.severe("Error parsing source file %s", cvrPath);
       Logger.info(

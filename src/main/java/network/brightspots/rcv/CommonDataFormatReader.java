@@ -243,9 +243,7 @@ class CommonDataFormatReader extends BaseCvrReader {
       int recordsRead = 0;
       String fileName = new File(cvrPath).getName();
       for (CVR cvr : cvrReport.CVR) {
-        if (++recordsRead % 10000 == 0) {
-          Logger.info("Parsed %,d records...", recordsRead);
-        }
+        this.logCvrRecordParsed(++recordsRead);
 
         CVRContest contest = getCvrContestXml(cvr, contestToTabulate);
         if (contest == null) {
@@ -329,7 +327,7 @@ class CommonDataFormatReader extends BaseCvrReader {
             rankings);
         castVoteRecords.add(newRecord);
       }
-      Logger.info("Parsed %,d records.", recordsRead);
+      this.logCvrParsingComplete(recordsRead);
     }
   }
 

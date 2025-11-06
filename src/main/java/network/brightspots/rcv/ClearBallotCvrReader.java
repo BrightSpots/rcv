@@ -118,12 +118,10 @@ class ClearBallotCvrReader extends BaseCvrReader {
 
         castVoteRecords.add(castVoteRecord);
         // provide some user feedback on the Cvr count
-        if (++recordsRead % 10000 == 0) {
-          Logger.info("Parsed %,d cast vote records...", recordsRead);
-        }
+        this.logCvrRecordParsed(recordsRead);
       }
       csvReader.close();
-      Logger.info("Parsed %,d cast vote records.", recordsRead);
+      this.logCvrParsingComplete(recordsRead);
     } catch (FileNotFoundException exception) {
       Logger.severe("Cast vote record file not found!\n%s", exception);
     }

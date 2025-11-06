@@ -94,13 +94,11 @@ class HartCvrReader extends BaseCvrReader {
           }
           readCastVoteRecord(castVoteRecords, child.toPath());
           // provide some user feedback on the Cvr count
-          if (++recordsRead % 10000 == 0) {
-            Logger.info("Parsed %,d cast vote records...", castVoteRecords.size());
-          }
+          logCvrRecordParsed(++recordsRead);
         }
       }
 
-      Logger.info("Parsed %,d cast vote records.", recordsRead);
+      logCvrParsingComplete(recordsRead);
     } else {
       Logger.severe("Unable to find any files in directory: %s", cvrRoot.getAbsolutePath());
       throw new CastVoteRecord.CvrParseException();

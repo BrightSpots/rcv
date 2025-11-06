@@ -135,11 +135,9 @@ final class CsvCvrReader extends BaseCvrReader {
             rankings);
         castVoteRecords.add(newCvr);
 
-        if (index % 10000 == 0) {
-          Logger.info("Parsed %,d records...", index);
-        }
+        this.logCvrRecordParsed(index);
       }
-      Logger.info("Parsed %,d records.", index);
+      this.logCvrRecordParsed(index);
     } catch (IOException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
       throw exception;

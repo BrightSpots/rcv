@@ -293,7 +293,7 @@ class DominionCvrReader extends BaseCvrReader {
           parseCvrFile(json, castVoteRecords, contestIdToLoad);
           filesParsed++;
         }
-        logCvrParsingComplete(filesParsed);
+        this.logCvrParsingComplete(filesParsed);
       }
     } catch (FileNotFoundException | CvrParseException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
@@ -379,9 +379,8 @@ class DominionCvrReader extends BaseCvrReader {
           }
 
           this.recordsParsed++;
-          if (recordsParsed > 0 && recordsParsed % 10000 == 0) {
-            Logger.info("Parsed %,d cast vote records...", recordsParsed);
-          }
+          this.logCvrRecordParsed(this.recordsParsed);
+
           ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
           // marks is an array of rankings
           ArrayList marks = (ArrayList) contest.get("Marks");
@@ -423,7 +422,8 @@ class DominionCvrReader extends BaseCvrReader {
     }
   }
 
-  private void logCvrParsingComplete(Integer totalFiles) {
+  @Override
+  public void logCvrParsingComplete(int totalFiles) {
     String message = String.format("Parsed %,d cast vote records", this.recordsParsed);
 
     if (this.recordsWithOutstackCondition > 0) {

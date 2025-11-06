@@ -141,4 +141,14 @@ abstract class BaseCvrReader {
 
   // Human-readable name for output logs
   public abstract String readerName();
+
+  public void logCvrRecordParsed(int recordsParsed) {
+    if (recordsParsed % 10000 == 0) {
+      Logger.info("Parsed %,d cast vote records...", recordsParsed);
+    }
+  }
+
+  public void logCvrParsingComplete(int recordsParsed) {
+    Logger.info("Parsed %,d cast vote records.", recordsParsed);
+  }
 }
