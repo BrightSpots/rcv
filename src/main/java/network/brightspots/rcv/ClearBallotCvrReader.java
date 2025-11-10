@@ -47,7 +47,6 @@ class ClearBallotCvrReader extends BaseCvrReader {
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CvrParseException, IOException {
     BufferedReader csvReader;
-    int recordsRead = 0;
     try {
       csvReader = new BufferedReader(new FileReader(this.cvrPath, StandardCharsets.UTF_8));
       // each "choice column" in the input Csv corresponds to a unique ranking: candidate+rank pair
@@ -118,10 +117,10 @@ class ClearBallotCvrReader extends BaseCvrReader {
 
         castVoteRecords.add(castVoteRecord);
         // provide some user feedback on the Cvr count
-        this.logCvrRecordParsed(recordsRead);
+        this.logCvrRecordParsed();
       }
       csvReader.close();
-      this.logCvrParsingComplete(recordsRead);
+      this.logCvrParsingComplete();
     } catch (FileNotFoundException exception) {
       Logger.severe("Cast vote record file not found!\n%s", exception);
     }

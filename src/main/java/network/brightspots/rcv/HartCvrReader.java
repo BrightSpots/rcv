@@ -82,7 +82,6 @@ class HartCvrReader extends BaseCvrReader {
   @Override
   void readCastVoteRecords(List<CastVoteRecord> castVoteRecords)
       throws CastVoteRecord.CvrParseException, IOException {
-    int recordsRead = 0;
     File cvrRoot = new File(this.cvrPath);
     File[] children = cvrRoot.listFiles();
     if (children != null) {
@@ -94,11 +93,11 @@ class HartCvrReader extends BaseCvrReader {
           }
           readCastVoteRecord(castVoteRecords, child.toPath());
           // provide some user feedback on the Cvr count
-          logCvrRecordParsed(++recordsRead);
+          logCvrRecordParsed();
         }
       }
 
-      logCvrParsingComplete(recordsRead);
+      logCvrParsingComplete();
     } else {
       Logger.severe("Unable to find any files in directory: %s", cvrRoot.getAbsolutePath());
       throw new CastVoteRecord.CvrParseException();
