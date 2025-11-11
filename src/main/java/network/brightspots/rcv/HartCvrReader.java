@@ -92,8 +92,12 @@ class HartCvrReader extends BaseCvrReader {
             throw new CastVoteRecord.CvrParseException();
           }
           readCastVoteRecord(castVoteRecords, child.toPath());
+          // provide some user feedback on the Cvr count
+          logCvrRecordParsed();
         }
       }
+
+      logCvrParsingComplete();
     } else {
       Logger.severe("Unable to find any files in directory: %s", cvrRoot.getAbsolutePath());
       throw new CastVoteRecord.CvrParseException();
@@ -166,11 +170,6 @@ class HartCvrReader extends BaseCvrReader {
                     usesLastAllowedRanking(rankings, null),
                     rankings);
         castVoteRecords.add(cvr);
-
-        // provide some user feedback on the Cvr count
-        if (castVoteRecords.size() % 5000 == 0) {
-          Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
-        }
       }
     }
   }

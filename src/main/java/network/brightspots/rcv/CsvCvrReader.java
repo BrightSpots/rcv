@@ -85,6 +85,7 @@ final class CsvCvrReader extends BaseCvrReader {
       int index = 0;
       for (CSVRecord csvRecord : parser) {
         index++;
+
         ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
         for (int col = firstVoteColumnIndex; col < csvRecord.size(); col++) {
           String rankAsString = csvRecord.get(col);
@@ -133,7 +134,10 @@ final class CsvCvrReader extends BaseCvrReader {
             usesLastAllowedRanking(rankings, null),
             rankings);
         castVoteRecords.add(newCvr);
+
+        this.logCvrRecordParsed();
       }
+      this.logCvrRecordParsed();
     } catch (IOException exception) {
       Logger.severe("Error parsing cast vote record:\n%s", exception);
       throw exception;
