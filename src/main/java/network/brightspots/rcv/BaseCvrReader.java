@@ -151,12 +151,16 @@ abstract class BaseCvrReader {
     }
   }
 
+
+    /**
+     * @param additionalText spaces and punctuation must be handled by caller
+     */
   public void logCvrParsingComplete(String additionalText) {
     String format = "Parsed %,d cast vote records";
-    if (additionalText == null) {
+    if ( additionalText == null || additionalText.isBlank()) {
       format += ".";
     } else {
-      format += " %s.".formatted(additionalText);
+      format += "%s".formatted(additionalText);
     }
     Logger.info(format, numRecordsParsed);
 
