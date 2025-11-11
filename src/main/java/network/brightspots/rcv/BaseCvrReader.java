@@ -31,11 +31,13 @@ abstract class BaseCvrReader {
   protected final ContestConfig config;
   protected final String cvrPath; // may be a file or directory
   protected final CvrSource source;
+  protected int numRecordsParsed;
 
   BaseCvrReader(ContestConfig config, CvrSource source) {
     this.config = config;
     this.source = source;
     this.cvrPath = config.resolveConfigPath(source.getFilePath());
+    this.numRecordsParsed = 0;
   }
 
   // parse CVR for records matching the specified contestId into CastVoteRecord objects and add
@@ -142,13 +144,26 @@ abstract class BaseCvrReader {
   // Human-readable name for output logs
   public abstract String readerName();
 
-  public void logCvrRecordParsed(int recordsParsed) {
-    if (recordsParsed % 10000 == 0) {
-      Logger.info("Parsed %,d cast vote records...", recordsParsed);
+  public void logCvrRecordParsed() {
+    numRecordsParsed++;
+    if (numRecordsParsed % 10000 == 0) {
+      Logger.info("Parsed %,d cast vote records...", numRecordsParsed);
     }
   }
 
-  public void logCvrParsingComplete(int recordsParsed) {
-    Logger.info("Parsed %,d cast vote records.", recordsParsed);
+  public void logCvrParsingComplete(String additionalText) {
+    String format = "Parsed %,d cast vote records";
+    if (additionalText == null) {
+      format += ".";
+    } else {
+      format += " %s.".formatted(additionalText);
+    }
+    Logger.info(format, numRecordsParsed);
+
+    numRecordsParsed = 0;
+  }
+
+  public void logCvrParsingComplete() {
+    logCvrParsingComplete(null);
   }
 }

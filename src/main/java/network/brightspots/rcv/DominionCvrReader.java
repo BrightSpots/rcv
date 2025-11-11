@@ -55,8 +55,6 @@ class DominionCvrReader extends BaseCvrReader {
   // map of contest ID to Contest data
   private Map<String, Contest> contests;
   private Map<String, Candidate> candidateCodesToCandidates;
-  // Number of total CVR records found
-  private Integer recordsParsed = 0;
   // Certain OutstackConditions identify ballots that should not be included in results
   private Integer recordsWithOutstackCondition = 0;
 
@@ -378,8 +376,7 @@ class DominionCvrReader extends BaseCvrReader {
             continue;
           }
 
-          this.recordsParsed++;
-          this.logCvrRecordParsed(this.recordsParsed);
+          this.logCvrRecordParsed();
 
           ArrayList<Pair<Integer, String>> rankings = new ArrayList<>();
           // marks is an array of rankings
@@ -422,22 +419,20 @@ class DominionCvrReader extends BaseCvrReader {
     }
   }
 
-  @Override
   public void logCvrParsingComplete(int totalFiles) {
-    String message = String.format("Parsed %,d cast vote records", this.recordsParsed);
-
+    String additionalText = "";
     if (this.recordsWithOutstackCondition > 0) {
-      message += String.format(
+      additionalText += String.format(
             " and identified %,d outstack cast vote records", this.recordsWithOutstackCondition);
     }
 
     if (totalFiles == 1) {
-      message += " from one file.";
+      additionalText += " from one file.";
     } else {
-      message += String.format(" from %,d total files.", totalFiles);
+      additionalText += String.format(" from %,d total files.", totalFiles);
     }
 
-    Logger.info(message);
+    super.logCvrParsingComplete(additionalText);
   }
 
   // Candidate data from a Dominion candidate manifest Json

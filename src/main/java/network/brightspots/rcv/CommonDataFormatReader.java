@@ -240,10 +240,9 @@ class CommonDataFormatReader extends BaseCvrReader {
 
       // process the Cvrs
       int cvrIndex = 0;
-      int recordsRead = 0;
       String fileName = new File(cvrPath).getName();
       for (CVR cvr : cvrReport.CVR) {
-        this.logCvrRecordParsed(++recordsRead);
+        this.logCvrRecordParsed();
 
         CVRContest contest = getCvrContestXml(cvr, contestToTabulate);
         if (contest == null) {
@@ -327,7 +326,7 @@ class CommonDataFormatReader extends BaseCvrReader {
             rankings);
         castVoteRecords.add(newRecord);
       }
-      this.logCvrParsingComplete(recordsRead);
+      this.logCvrParsingComplete();
     }
   }
 
