@@ -1,21 +1,21 @@
 {
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
-    "contestName" : "Minimum threshold test",
+    "contestName" : "Multi-Seat Bottoms-up With Dynamic Threshold",
     "outputDirectory" : "output",
-    "contestDate" : "2018-01-07",
-    "contestJurisdiction" : "Funkytown, USA",
-    "contestOffice" : "Sergeant-at-Arms",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
     "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "minimum_threshold_test_cvr.xlsx",
+    "filePath" : "../_shared/bottoms_up_cvr.xlsx",
     "contestId" : "",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
-    "idColumnIndex" : "",
+    "idColumnIndex" : "1",
     "batchColumnIndex" : "",
     "precinctColumnIndex" : "",
     "overvoteDelimiter" : "",
@@ -26,37 +26,49 @@
     "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
-    "name" : "Gargamel",
+    "name" : "A",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "Skeletor",
+    "name" : "B",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "Megatron",
+    "name" : "C",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "Garfield",
+    "name" : "D",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "Odie",
+    "name" : "E",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "F",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "G",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "H",
     "excluded" : false,
     "aliases" : [ ]
   } ],
   "rules" : {
-    "tiebreakMode" : "random",
+    "tiebreakMode" : "useCandidateOrder",
     "overvoteRule" : "exhaustImmediately",
-    "winnerElectionMode" : "singleWinnerMajority",
-    "randomSeed" : "0",
-    "numberOfWinners" : "1",
-    "multiSeatBottomsUpPercentageThreshold" : "",
+    "winnerElectionMode" : "bottomsUpUsingPercentageThreshold",
+    "randomSeed" : "",
+    "numberOfWinners" : "0",
+    "multiSeatBottomsUpPercentageThreshold" : "15",
     "decimalPlacesForVoteArithmetic" : "4",
-    "minimumVoteThreshold" : "3",
+    "minimumVoteThreshold" : "0",
     "maxSkippedRanksAllowed" : "1",
-    "maxRankingsAllowed" : "3",
+    "maxRankingsAllowed" : "max",
     "nonIntegerWinningThreshold" : false,
     "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
@@ -64,7 +76,7 @@
     "continueUntilTwoCandidatesRemain" : false,
     "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
-    "rulesDescription" : "Doyle Rules",
+    "rulesDescription" : "",
     "treatBlankAsUndeclaredWriteIn" : false
   }
 }

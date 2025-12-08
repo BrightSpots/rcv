@@ -1,7 +1,7 @@
 {
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
-    "contestName" : "Multi-Seat Bottoms-up With Threshold",
+    "contestName" : "Multi-Seat Bottoms-up With Dynamic Threshold And Cutoff Eliminate",
     "outputDirectory" : "output",
     "contestDate" : "",
     "contestJurisdiction" : "",
@@ -11,7 +11,7 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "multi_seat_bottoms_up_with_threshold_cvr.xlsx",
+    "filePath" : "../_shared/bottoms_up_cvr.xlsx",
     "contestId" : "",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
@@ -73,6 +73,7 @@
     "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
+    "cutoffElimination" : true,
     "continueUntilTwoCandidatesRemain" : false,
     "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,

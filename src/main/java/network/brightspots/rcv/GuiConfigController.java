@@ -251,8 +251,6 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldDecimalPlacesForVoteArithmetic;
   @FXML
-  private TextField textFieldMinimumVoteThreshold;
-  @FXML
   private TextField textFieldMaxSkippedRanksAllowed;
   @FXML
   private CheckBox checkBoxMaxSkippedRanksAllowedUnlimited;
@@ -270,6 +268,8 @@ public class GuiConfigController implements Initializable {
   private RadioButton radioThresholdHareQuota;
   @FXML
   private CheckBox checkBoxBatchElimination;
+  @FXML
+  private CheckBox checkBoxCutoffElimination;
   @FXML
   private CheckBox checkBoxContinueUntilTwoCandidatesRemain;
   @FXML
@@ -954,12 +954,12 @@ public class GuiConfigController implements Initializable {
     textFieldMaxRankingsAllowed.setDisable(true);
     checkBoxMaxRankingsAllowedMax.setSelected(false);
     checkBoxMaxRankingsAllowedMax.setDisable(true);
-    textFieldMinimumVoteThreshold.clear();
-    textFieldMinimumVoteThreshold.setDisable(true);
     textFieldStopTabulationEarlyAfterRound.clear();
     textFieldStopTabulationEarlyAfterRound.setDisable(true);
     checkBoxBatchElimination.setSelected(false);
     checkBoxBatchElimination.setDisable(true);
+    checkBoxCutoffElimination.setSelected(false);
+    checkBoxCutoffElimination.setDisable(true);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(false);
     checkBoxContinueUntilTwoCandidatesRemain.setDisable(true);
     checkBoxFirstRoundDeterminesThreshold.setSelected(false);
@@ -990,6 +990,7 @@ public class GuiConfigController implements Initializable {
     setThresholdCalculationMethodRadioButton(ContestConfig.SUGGESTED_NON_INTEGER_WINNING_THRESHOLD,
         ContestConfig.SUGGESTED_HARE_QUOTA);
     checkBoxBatchElimination.setSelected(ContestConfig.SUGGESTED_BATCH_ELIMINATION);
+    checkBoxCutoffElimination.setSelected(ContestConfig.SUGGESTED_CUTOFF_ELIMINATION);
     checkBoxContinueUntilTwoCandidatesRemain
         .setSelected(ContestConfig.SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN);
     checkBoxFirstRoundDeterminesThreshold
@@ -1001,7 +1002,7 @@ public class GuiConfigController implements Initializable {
 
   private void setDefaultValues() {
     String versionText = "%s version %s".formatted(Main.APP_NAME, Main.APP_VERSION);
-    if (Main.APP_VERSION.endsWith("999")) {
+    if (ContestConfig.isDevelopmentVersion()) {
       versionText += " -- this is a development version, do not distribute!";
       labelVersion.setBackground(new Background(new BackgroundFill(
           Color.DARKRED, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -1284,11 +1285,15 @@ public class GuiConfigController implements Initializable {
           textFieldCvrFilePath.setDisable(false);
           buttonCvrFilePath.setDisable(false);
           textFieldCvrFirstVoteCol.setDisable(false);
-          textFieldCvrFirstVoteCol
-                  .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_COLUMN));
+          textFieldCvrFirstVoteCol.setText("1");
           textFieldCvrFirstVoteRow.setDisable(false);
           textFieldCvrFirstVoteRow
                   .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
+          textFieldCvrBatchCol.setDisable(false);
+          textFieldCvrIdCol.setDisable(false);
+          textFieldCvrIdCol.setText("");
+          textFieldCvrPrecinctCol.setDisable(false);
+          textFieldCvrPrecinctCol.setText("");
         }
         case CLEAR_BALLOT, DOMINION, HART -> {
           buttonAddCvrFile.setDisable(false);
@@ -1415,7 +1420,7 @@ public class GuiConfigController implements Initializable {
       clearAndDisableWinningRuleFields();
       setWinningRulesDefaultValues();
       checkBoxMaxRankingsAllowedMax.setDisable(false);
-      textFieldMinimumVoteThreshold.setDisable(false);
+      checkBoxCutoffElimination.setDisable(true);
       textFieldStopTabulationEarlyAfterRound.setDisable(false);
       choiceTiebreakMode.setDisable(false);
       switch (getWinnerElectionModeChoice(choiceWinnerElectionMode)) {
@@ -1433,15 +1438,19 @@ public class GuiConfigController implements Initializable {
           textFieldDecimalPlacesForVoteArithmetic.setDisable(false);
           textFieldNumberOfWinners.setDisable(false);
         }
-        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS -> textFieldNumberOfWinners.setDisable(false);
         case MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL -> {
           textFieldNumberOfWinners.setDisable(false);
           checkBoxBatchElimination.setDisable(false);
-          checkBoxContinueUntilTwoCandidatesRemain.setDisable(false);
+        }
+        case MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS -> {
+          textFieldNumberOfWinners.setDisable(false);
         }
         case MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD -> {
           textFieldNumberOfWinners.setText("0");
+          checkBoxFirstRoundDeterminesThreshold.setSelected(true);
+          checkBoxFirstRoundDeterminesThreshold.setDisable(false);
           textFieldMultiSeatBottomsUpPercentageThreshold.setDisable(false);
+          checkBoxCutoffElimination.setDisable(false);
         }
         case MODE_UNKNOWN -> {
           // Do nothing
@@ -1569,7 +1578,6 @@ public class GuiConfigController implements Initializable {
     textFieldMultiSeatBottomsUpPercentageThreshold
         .setText(rules.multiSeatBottomsUpPercentageThreshold);
     textFieldDecimalPlacesForVoteArithmetic.setText(rules.decimalPlacesForVoteArithmetic);
-    textFieldMinimumVoteThreshold.setText(rules.minimumVoteThreshold);
     if (rules.maxSkippedRanksAllowed
         .equalsIgnoreCase(ContestConfig.MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION)) {
       checkBoxMaxSkippedRanksAllowedUnlimited.setSelected(true);
@@ -1594,6 +1602,7 @@ public class GuiConfigController implements Initializable {
     textFieldRulesDescription.setText(rules.rulesDescription);
     setThresholdCalculationMethodRadioButton(rules.nonIntegerWinningThreshold, rules.hareQuota);
     checkBoxBatchElimination.setSelected(rules.batchElimination);
+    checkBoxCutoffElimination.setSelected(rules.cutoffElimination);
     checkBoxContinueUntilTwoCandidatesRemain.setSelected(rules.continueUntilTwoCandidatesRemain);
     checkBoxFirstRoundDeterminesThreshold.setSelected(rules.doesFirstRoundDetermineThreshold);
     textFieldStopTabulationEarlyAfterRound.setText(rules.stopTabulationEarlyAfterRound);
@@ -1678,7 +1687,6 @@ public class GuiConfigController implements Initializable {
         (textFieldMultiSeatBottomsUpPercentageThreshold));
     rules.decimalPlacesForVoteArithmetic =
         getTextOrEmptyString(textFieldDecimalPlacesForVoteArithmetic);
-    rules.minimumVoteThreshold = getTextOrEmptyString(textFieldMinimumVoteThreshold);
     rules.maxSkippedRanksAllowed = checkBoxMaxSkippedRanksAllowedUnlimited.isSelected()
         ? ContestConfig.MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION
         : getTextOrEmptyString(textFieldMaxSkippedRanksAllowed);
@@ -1688,6 +1696,7 @@ public class GuiConfigController implements Initializable {
     rules.nonIntegerWinningThreshold = radioThresholdHbQuota.isSelected();
     rules.hareQuota = radioThresholdHareQuota.isSelected();
     rules.batchElimination = checkBoxBatchElimination.isSelected();
+    rules.cutoffElimination = checkBoxCutoffElimination.isSelected();
     rules.continueUntilTwoCandidatesRemain = checkBoxContinueUntilTwoCandidatesRemain.isSelected();
     rules.doesFirstRoundDetermineThreshold = checkBoxFirstRoundDeterminesThreshold.isSelected();
     rules.stopTabulationEarlyAfterRound =
@@ -1832,10 +1841,16 @@ public class GuiConfigController implements Initializable {
             }
           };
       task.setOnFailed(
-          arg0 ->
-              Logger.severe(
-                  "Error during validation:\n%s\nValidation failed!",
-                  task.getException()));
+          arg0 -> {
+            Logger.severe(
+                    "Error during validation:\n%s\nValidation failed!",
+                    task.getException());
+            if (ContestConfig.isDevelopmentVersion()) {
+              StringWriter stackTrace = new StringWriter();
+              task.getException().printStackTrace(new PrintWriter(stackTrace));
+              Logger.severe(stackTrace.toString());
+            }
+          });
       return task;
     }
   }

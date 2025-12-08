@@ -92,8 +92,12 @@ class HartCvrReader extends BaseCvrReader {
             throw new CastVoteRecord.CvrParseException();
           }
           readCastVoteRecord(castVoteRecords, child.toPath());
+          // provide some user feedback on the Cvr count
+          logCvrRecordParsed();
         }
       }
+
+      logCvrParsingComplete();
     } else {
       Logger.severe("Unable to find any files in directory: %s", cvrRoot.getAbsolutePath());
       throw new CastVoteRecord.CvrParseException();
@@ -103,8 +107,6 @@ class HartCvrReader extends BaseCvrReader {
   // parse Cvr xml file into CastVoteRecord objects and add them to the input List<CastVoteRecord>
   private void readCastVoteRecord(List<CastVoteRecord> castVoteRecords, Path path)
       throws IOException {
-    Logger.info("Reading Hart cast vote record file: %s...", path.getFileName());
-
     XmlMapper xmlMapper = new XmlMapper();
     xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     try (FileInputStream inputStream = new FileInputStream(path.toFile())) {
@@ -168,11 +170,6 @@ class HartCvrReader extends BaseCvrReader {
                     usesLastAllowedRanking(rankings, null),
                     rankings);
         castVoteRecords.add(cvr);
-
-        // provide some user feedback on the Cvr count
-        if (castVoteRecords.size() % 50000 == 0) {
-          Logger.info("Parsed %d cast vote records.", castVoteRecords.size());
-        }
       }
     }
   }

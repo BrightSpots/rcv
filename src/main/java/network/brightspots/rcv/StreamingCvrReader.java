@@ -212,9 +212,6 @@ final class StreamingCvrReader extends BaseCvrReader {
       encounteredDataErrors = true;
     }
 
-    // Log the raw data for auditing
-    Logger.auditable("[Raw Data]: " + currentCvrData.toString());
-
     // create new cast vote record
     CastVoteRecord newRecord = new CastVoteRecord(
         computedCastVoteRecordId,
@@ -226,9 +223,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     cvrList.add(newRecord);
 
     // provide some user feedback on the CVR count
-    if (cvrList.size() % 50000 == 0) {
-      Logger.info("Parsed %d cast vote records.", cvrList.size());
-    }
+    this.logCvrRecordParsed();
   }
 
   // handle CVR cell data callback
@@ -290,6 +285,7 @@ final class StreamingCvrReader extends BaseCvrReader {
       throws CastVoteRecord.CvrParseException, IOException {
     try {
       parseCvrFileInternal(castVoteRecords);
+      this.logCvrParsingComplete();
     } catch (OpenXML4JException | SAXException | ParserConfigurationException e) {
       Logger.severe("Error parsing source file %s", cvrPath);
       Logger.info(

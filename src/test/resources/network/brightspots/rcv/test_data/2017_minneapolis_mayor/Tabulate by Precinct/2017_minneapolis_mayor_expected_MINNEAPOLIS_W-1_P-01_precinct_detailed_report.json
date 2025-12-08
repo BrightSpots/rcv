@@ -73,6 +73,14 @@
       "Troy Benjegerdes" : "3"
     },
     "tallyResults" : [ {
+      "eliminated" : "Al Flowers",
+      "transfers" : {
+        "Nekima Levy-Pounds" : "2",
+        "Raymond Dehn" : "1",
+        "Tom Hoch" : "1",
+        "exhausted" : "1"
+      }
+    }, {
       "eliminated" : "Aswar Rahman",
       "transfers" : {
         "Betsy Hodges" : "2",
@@ -82,6 +90,27 @@
         "exhausted" : "1"
       }
     }, {
+      "eliminated" : "Captain Jack Sparrow",
+      "transfers" : {
+        "Jacob Frey" : "2",
+        "exhausted" : "2"
+      }
+    }, {
+      "eliminated" : "Charlie Gers",
+      "transfers" : {
+        "Nekima Levy-Pounds" : "1",
+        "Tom Hoch" : "1",
+        "exhausted" : "3"
+      }
+    }, {
+      "eliminated" : "Christopher Zimmerman",
+      "transfers" : { }
+    }, {
+      "eliminated" : "David John Wilson",
+      "transfers" : {
+        "Nekima Levy-Pounds" : "1"
+      }
+    }, {
       "eliminated" : "David Rosenfeld",
       "transfers" : {
         "Betsy Hodges" : "1",
@@ -89,17 +118,9 @@
         "exhausted" : "1"
       }
     }, {
-      "eliminated" : "L.A. Nik",
+      "eliminated" : "Gregg A. Iverson",
       "transfers" : {
-        "exhausted" : "7"
-      }
-    }, {
-      "eliminated" : "Christopher Zimmerman",
-      "transfers" : { }
-    }, {
-      "eliminated" : "Ronald Lischeid",
-      "transfers" : {
-        "Tom Hoch" : "2",
+        "Jacob Frey" : "2",
         "exhausted" : "1"
       }
     }, {
@@ -110,45 +131,24 @@
         "exhausted" : "1"
       }
     }, {
-      "eliminated" : "Charlie Gers",
+      "eliminated" : "L.A. Nik",
       "transfers" : {
-        "Nekima Levy-Pounds" : "1",
-        "Tom Hoch" : "1",
-        "exhausted" : "3"
+        "exhausted" : "7"
       }
     }, {
-      "eliminated" : "Captain Jack Sparrow",
+      "eliminated" : "Ronald Lischeid",
       "transfers" : {
-        "Jacob Frey" : "2",
-        "exhausted" : "2"
+        "Tom Hoch" : "2",
+        "exhausted" : "1"
       }
     }, {
       "eliminated" : "Theron Preston Washington",
       "transfers" : { }
     }, {
-      "eliminated" : "David John Wilson",
-      "transfers" : {
-        "Nekima Levy-Pounds" : "1"
-      }
-    }, {
-      "eliminated" : "Gregg A. Iverson",
-      "transfers" : {
-        "Jacob Frey" : "2",
-        "exhausted" : "1"
-      }
-    }, {
       "eliminated" : "Troy Benjegerdes",
       "transfers" : {
         "Jacob Frey" : "2",
         "Raymond Dehn" : "1"
-      }
-    }, {
-      "eliminated" : "Al Flowers",
-      "transfers" : {
-        "Nekima Levy-Pounds" : "2",
-        "Raymond Dehn" : "1",
-        "Tom Hoch" : "1",
-        "exhausted" : "1"
       }
     } ],
     "threshold" : "52200"
