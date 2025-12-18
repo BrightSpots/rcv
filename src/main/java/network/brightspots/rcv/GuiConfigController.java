@@ -591,6 +591,111 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when "Increase RCTab Memory (Requires Restart)" menu item is clicked.
+   * Calculates optimal memory, shows confirmation dialog, and restarts the app with new -Xmx
+   * setting.
+   */
+  public void menuItemIncreaseMemoryClicked() {
+    if (guiIsBusy) {
+      Logger.warning("Cannot change memory while an operation is in progress.");
+      showInfoDialog(
+          "Operation in Progress",
+          "Please wait for the current operation to complete before changing memory settings.");
+      return;
+    }
+
+    // Calculate recommended memory
+    long recommendedMb = MemoryManager.calculateRecommendedMemoryMb();
+    long currentMb = MemoryManager.getCurrentMaxHeapMb();
+
+    if (recommendedMb <= 0) {
+      String restartCommand = String.join(" ",
+              ApplicationRestarter.buildRestartCommand("java", "12800m"));
+      showErrorDialog(
+          "Unable to Determine Memory",
+          "Could not determine your system's total RAM. Please restart RCTab manually "
+              + "with the -Xmx parameter to increase memory. Example: "
+              + restartCommand
+              + "\n\n");
+      return;
+    }
+
+    // Check if recommended is less than or equal to current
+    if (recommendedMb <= currentMb) {
+      showInfoDialog(
+          "Memory Already Optimized",
+          String.format(
+              "RCTab is already running with %s of memory.%n%n"
+                  + "Recommended memory based on your system (80%% of total RAM): %s%n%n"
+                  + "No restart needed.",
+              MemoryManager.formatMemorySize(currentMb),
+              MemoryManager.formatMemorySize(recommendedMb)));
+      return;
+    }
+
+    // Show confirmation dialog
+    boolean confirmed = showMemoryIncreaseConfirmation(currentMb, recommendedMb);
+    if (!confirmed) {
+      return;
+    }
+
+    // Check for unsaved changes
+    if (!checkForSaveAndContinue()) {
+      return;
+    }
+
+    // Attempt restart
+    boolean success = ApplicationRestarter.restartWithMemory(recommendedMb);
+    if (!success) {
+      String restartCommand = String.join(" ",
+          ApplicationRestarter.buildRestartCommand("java", recommendedMb + "m"));
+      showErrorDialog(
+          "Restart Failed",
+          String.format(
+              "Unable to restart RCTab automatically. Please restart manually with: %s%n%n",
+                  restartCommand));
+    }
+  }
+
+  private boolean showMemoryIncreaseConfirmation(long currentMb, long recommendedMb) {
+    ButtonType restartButton = new ButtonType("Restart Now", ButtonBar.ButtonData.YES);
+    ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+    Alert alert =
+        new Alert(
+            AlertType.CONFIRMATION,
+            String.format(
+                "RCTab will restart with increased memory.%n%n"
+                    + "Current memory: %s%n"
+                    + "New memory: %s%n%n"
+                    + "This will close RCTab and reopen it with the new memory settings.%n"
+                    + "Any unsaved changes will be lost.",
+                MemoryManager.formatMemorySize(currentMb),
+                MemoryManager.formatMemorySize(recommendedMb)),
+            restartButton,
+            cancelButton);
+    alert.setTitle("Increase RCTab Memory");
+    alert.setHeaderText("Confirm Application Restart");
+
+    Optional<ButtonType> result = alert.showAndWait();
+    return result.isPresent() && result.get() == restartButton;
+  }
+
+  private void showErrorDialog(String title, String message) {
+    Alert alert = new Alert(AlertType.ERROR, message, ButtonType.OK);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.showAndWait();
+  }
+
+  private void showInfoDialog(String title, String message) {
+    Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.showAndWait();
+  }
+
   private <T> void sessionDone(GenericService<T> service) {
     setGuiIsBusy(false);
 

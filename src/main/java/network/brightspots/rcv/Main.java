@@ -135,5 +135,6 @@ public class Main extends GuiApplication {
     Logger.info(
         "Host system: %s version %s",
         System.getProperty("os.name"), System.getProperty("os.version"));
+    Logger.info("Max heap size: %d MB", Runtime.getRuntime().maxMemory() / (1024 * 1024));
   }
 }

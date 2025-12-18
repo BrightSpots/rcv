@@ -34,7 +34,9 @@
             <MenuItem mnemonicParsing="false" onAction="#menuItemValidateClicked" text="Validate"/>
             <MenuItem mnemonicParsing="false" onAction="#menuItemTabulateClicked" text="Tabulate"/>
           </Menu>
-          <Menu mnemonicParsing="false" text="Conversion">
+          <Menu mnemonicParsing="false" text="Tools">
+            <MenuItem mnemonicParsing="false" onAction="#menuItemIncreaseMemoryClicked"
+              text="Increase RCTab Memory (Requires Restart)"/>
             <MenuItem mnemonicParsing="false" onAction="#menuItemConvertToCdfClicked"
               text="Convert CVRs in Current Config to CDF"/>
           </Menu>
