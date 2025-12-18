@@ -591,6 +591,124 @@ public class GuiConfigController implements Initializable {
     }
   }
 
+  /**
+   * Action when "Increase RCTab Memory (Requires Restart)" menu item is clicked.
+   * Calculates optimal memory, shows confirmation dialog, and restarts the app with new -Xmx
+   * setting.
+   */
+  public void menuItemIncreaseMemoryClicked() {
+    if (guiIsBusy) {
+      Logger.warning("Cannot change memory while an operation is in progress.");
+      showInfoDialog(
+          "Operation in Progress",
+          "Please wait for the current operation to complete before changing memory settings.");
+      return;
+    }
+
+    // Calculate recommended memory
+    long recommendedMB = MemoryManager.calculateRecommendedMemoryMB();
+    long currentMB = MemoryManager.getCurrentMaxHeapMB();
+
+    if (recommendedMB <= 0) {
+      showErrorDialog(
+          "Unable to Determine Memory",
+          "Could not determine your system's total RAM. Please restart RCTab manually "
+              + "with the -Xmx parameter to increase memory.\n\n"
+              + "Example: java -Xmx12800m -p app -m network.brightspots.rcv/network.brightspots.rcv.Main");
+      return;
+    }
+
+    // Check if recommended is less than or equal to current
+    if (recommendedMB <= currentMB) {
+      showInfoDialog(
+          "Memory Already Optimized",
+          String.format(
+              "RCTab is already running with %s of memory.\n\n"
+                  + "Recommended memory based on your system (80%% of total RAM): %s\n\n"
+                  + "No restart needed.",
+              MemoryManager.formatMemorySize(currentMB),
+              MemoryManager.formatMemorySize(recommendedMB)));
+      return;
+    }
+
+    // Show confirmation dialog
+    boolean confirmed = showMemoryIncreaseConfirmation(currentMB, recommendedMB);
+    if (confirmed) {
+      // Check for unsaved changes
+      if (!checkForSaveAndContinue()) {
+        return; // User cancelled
+      }
+
+      // Attempt restart
+      boolean success = ApplicationRestarter.restartWithMemory(recommendedMB);
+      if (!success) {
+        showErrorDialog(
+            "Restart Failed",
+            String.format(
+                "Unable to restart RCTab automatically. Please restart manually with:\n\n"
+                    + "java -Xmx%dm -p app -m network.brightspots.rcv/network.brightspots.rcv.Main",
+                recommendedMB));
+      }
+    }
+  }
+
+  /**
+   * Show confirmation dialog for memory increase.
+   *
+   * @param currentMB current max heap in MB
+   * @param recommendedMB recommended max heap in MB
+   * @return true if user confirmed, false otherwise
+   */
+  private boolean showMemoryIncreaseConfirmation(long currentMB, long recommendedMB) {
+    ButtonType restartButton = new ButtonType("Restart Now", ButtonBar.ButtonData.YES);
+    ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+    Alert alert =
+        new Alert(
+            AlertType.CONFIRMATION,
+            String.format(
+                "RCTab will restart with increased memory.\n\n"
+                    + "Current memory: %s\n"
+                    + "New memory: %s\n\n"
+                    + "This will close RCTab and reopen it with the new memory settings.\n"
+                    + "Any unsaved changes will be lost if not saved.",
+                MemoryManager.formatMemorySize(currentMB),
+                MemoryManager.formatMemorySize(recommendedMB)),
+            restartButton,
+            cancelButton);
+    alert.setTitle("Increase RCTab Memory");
+    alert.setHeaderText("Confirm Application Restart");
+
+    Optional<ButtonType> result = alert.showAndWait();
+    return result.isPresent() && result.get() == restartButton;
+  }
+
+  /**
+   * Show error dialog.
+   *
+   * @param title dialog title
+   * @param message dialog message
+   */
+  private void showErrorDialog(String title, String message) {
+    Alert alert = new Alert(AlertType.ERROR, message, ButtonType.OK);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.showAndWait();
+  }
+
+  /**
+   * Show info dialog.
+   *
+   * @param title dialog title
+   * @param message dialog message
+   */
+  private void showInfoDialog(String title, String message) {
+    Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.showAndWait();
+  }
+
   private <T> void sessionDone(GenericService<T> service) {
     setGuiIsBusy(false);
 
