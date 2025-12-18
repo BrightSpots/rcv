@@ -36,7 +36,7 @@ class MemoryManager {
    *
    * @return total physical RAM in MB, or -1 if cannot determine
    */
-  static long getTotalPhysicalMemoryMB() {
+  static long getTotalPhysicalMemoryMb() {
     try {
       OperatingSystemMXBean osBean =
           (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -55,7 +55,7 @@ class MemoryManager {
    *
    * @return current max heap in MB
    */
-  static long getCurrentMaxHeapMB() {
+  static long getCurrentMaxHeapMb() {
     return Runtime.getRuntime().maxMemory() / MEGABYTE;
   }
 
@@ -68,20 +68,20 @@ class MemoryManager {
    *
    * @return recommended heap size in MB, or -1 if unable to determine
    */
-  static long calculateRecommendedMemoryMB() {
-    long totalMB = getTotalPhysicalMemoryMB();
-    if (totalMB <= 0) {
+  static long calculateRecommendedMemoryMb() {
+    long totalMb = getTotalPhysicalMemoryMb();
+    if (totalMb <= 0) {
       Logger.warning("Cannot calculate recommended memory: total physical memory unknown");
       return -1;
     }
 
-    long eightyPercent = (long) (totalMB * PERCENTAGE);
+    long eightyPercent = (long) (totalMb * PERCENTAGE);
     // Round down to nearest 512MB chunk
     long recommended = (eightyPercent / CHUNK_SIZE_MB) * CHUNK_SIZE_MB;
 
     Logger.info(
         "Memory calculation: Total RAM = %d MB, 80%% = %d MB, Rounded = %d MB",
-        totalMB, eightyPercent, recommended);
+        totalMb, eightyPercent, recommended);
 
     return recommended;
   }
@@ -89,11 +89,11 @@ class MemoryManager {
   /**
    * Format memory size for display.
    *
-   * @param memoryMB memory size in megabytes
+   * @param memoryMb memory size in megabytes
    * @return formatted string like "6144 MB (6.0 GB)"
    */
-  static String formatMemorySize(long memoryMB) {
-    double gb = memoryMB / 1024.0;
-    return String.format("%d MB (%.1f GB)", memoryMB, gb);
+  static String formatMemorySize(long memoryMb) {
+    double gb = memoryMb / 1024.0;
+    return String.format("%d MB (%.1f GB)", memoryMb, gb);
   }
 }

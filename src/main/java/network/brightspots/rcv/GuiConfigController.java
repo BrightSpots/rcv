@@ -606,60 +606,59 @@ public class GuiConfigController implements Initializable {
     }
 
     // Calculate recommended memory
-    long recommendedMB = MemoryManager.calculateRecommendedMemoryMB();
-    long currentMB = MemoryManager.getCurrentMaxHeapMB();
+    long recommendedMb = MemoryManager.calculateRecommendedMemoryMb();
+    long currentMb = MemoryManager.getCurrentMaxHeapMb();
 
-    if (recommendedMB <= 0) {
+    if (recommendedMb <= 0) {
+      String restartCommand = String.join(" ",
+              ApplicationRestarter.buildRestartCommand("java", "12800m"));
       showErrorDialog(
           "Unable to Determine Memory",
           "Could not determine your system's total RAM. Please restart RCTab manually "
-              + "with the -Xmx parameter to increase memory.\n\n"
-              + "Example: java -Xmx12800m -p app -m network.brightspots.rcv/network.brightspots.rcv.Main");
+              + "with the -Xmx parameter to increase memory. Example: "
+              + restartCommand
+              + "\n\n");
       return;
     }
 
     // Check if recommended is less than or equal to current
-    if (recommendedMB <= currentMB) {
+    if (recommendedMb <= currentMb) {
       showInfoDialog(
           "Memory Already Optimized",
           String.format(
-              "RCTab is already running with %s of memory.\n\n"
-                  + "Recommended memory based on your system (80%% of total RAM): %s\n\n"
+              "RCTab is already running with %s of memory.%n%n"
+                  + "Recommended memory based on your system (80%% of total RAM): %s%n%n"
                   + "No restart needed.",
-              MemoryManager.formatMemorySize(currentMB),
-              MemoryManager.formatMemorySize(recommendedMB)));
+              MemoryManager.formatMemorySize(currentMb),
+              MemoryManager.formatMemorySize(recommendedMb)));
       return;
     }
 
     // Show confirmation dialog
-    boolean confirmed = showMemoryIncreaseConfirmation(currentMB, recommendedMB);
-    if (confirmed) {
-      // Check for unsaved changes
-      if (!checkForSaveAndContinue()) {
-        return; // User cancelled
-      }
+    boolean confirmed = showMemoryIncreaseConfirmation(currentMb, recommendedMb);
+    if (!confirmed) {
+      return;
+    }
 
-      // Attempt restart
-      boolean success = ApplicationRestarter.restartWithMemory(recommendedMB);
-      if (!success) {
-        showErrorDialog(
-            "Restart Failed",
-            String.format(
-                "Unable to restart RCTab automatically. Please restart manually with:\n\n"
-                    + "java -Xmx%dm -p app -m network.brightspots.rcv/network.brightspots.rcv.Main",
-                recommendedMB));
-      }
+    // Check for unsaved changes
+    if (!checkForSaveAndContinue()) {
+      return;
+    }
+
+    // Attempt restart
+    boolean success = ApplicationRestarter.restartWithMemory(recommendedMb);
+    if (!success) {
+      String restartCommand = String.join(" ",
+          ApplicationRestarter.buildRestartCommand("java", recommendedMb + "m"));
+      showErrorDialog(
+          "Restart Failed",
+          String.format(
+              "Unable to restart RCTab automatically. Please restart manually with: %s%n%n",
+                  restartCommand));
     }
   }
 
-  /**
-   * Show confirmation dialog for memory increase.
-   *
-   * @param currentMB current max heap in MB
-   * @param recommendedMB recommended max heap in MB
-   * @return true if user confirmed, false otherwise
-   */
-  private boolean showMemoryIncreaseConfirmation(long currentMB, long recommendedMB) {
+  private boolean showMemoryIncreaseConfirmation(long currentMb, long recommendedMb) {
     ButtonType restartButton = new ButtonType("Restart Now", ButtonBar.ButtonData.YES);
     ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
@@ -667,13 +666,13 @@ public class GuiConfigController implements Initializable {
         new Alert(
             AlertType.CONFIRMATION,
             String.format(
-                "RCTab will restart with increased memory.\n\n"
-                    + "Current memory: %s\n"
-                    + "New memory: %s\n\n"
-                    + "This will close RCTab and reopen it with the new memory settings.\n"
-                    + "Any unsaved changes will be lost if not saved.",
-                MemoryManager.formatMemorySize(currentMB),
-                MemoryManager.formatMemorySize(recommendedMB)),
+                "RCTab will restart with increased memory.%n%n"
+                    + "Current memory: %s%n"
+                    + "New memory: %s%n%n"
+                    + "This will close RCTab and reopen it with the new memory settings.%n"
+                    + "Any unsaved changes will be lost.",
+                MemoryManager.formatMemorySize(currentMb),
+                MemoryManager.formatMemorySize(recommendedMb)),
             restartButton,
             cancelButton);
     alert.setTitle("Increase RCTab Memory");
@@ -683,12 +682,6 @@ public class GuiConfigController implements Initializable {
     return result.isPresent() && result.get() == restartButton;
   }
 
-  /**
-   * Show error dialog.
-   *
-   * @param title dialog title
-   * @param message dialog message
-   */
   private void showErrorDialog(String title, String message) {
     Alert alert = new Alert(AlertType.ERROR, message, ButtonType.OK);
     alert.setTitle(title);
@@ -696,12 +689,6 @@ public class GuiConfigController implements Initializable {
     alert.showAndWait();
   }
 
-  /**
-   * Show info dialog.
-   *
-   * @param title dialog title
-   * @param message dialog message
-   */
   private void showInfoDialog(String title, String message) {
     Alert alert = new Alert(AlertType.INFORMATION, message, ButtonType.OK);
     alert.setTitle(title);
