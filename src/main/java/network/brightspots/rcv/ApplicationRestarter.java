@@ -1,6 +1,6 @@
 /*
  * RCTab
- * Copyright (c) 2017-2023 Bright Spots Developers.
+ * Copyright (c) 2017-2025 Bright Spots Developers.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -32,17 +32,17 @@ class ApplicationRestarter {
    * Restart the application with specified max heap size.
    * Launches a new process with the updated -Xmx parameter and exits the current instance.
    *
-   * @param maxHeapMB maximum heap size in megabytes
+   * @param maxHeapMb maximum heap size in megabytes
    * @return true if restart initiated successfully, false otherwise
    */
-  static boolean restartWithMemory(long maxHeapMB) {
+  static boolean restartWithMemory(long maxHeapMb) {
     try {
       // Get current java executable path
       String javaPath = getJavaExecutablePath();
       Logger.info("Java executable path: %s", javaPath);
 
       // Build command to restart application
-      List<String> command = buildRestartCommand(javaPath, maxHeapMB);
+      List<String> command = buildRestartCommand(javaPath, maxHeapMb + "m");
       Logger.info("Restart command: %s", String.join(" ", command));
 
       // Start new process
@@ -53,14 +53,14 @@ class ApplicationRestarter {
       builder.redirectErrorStream(true);
 
       Process process = builder.start();
-      Logger.info("New RCTab process started with PID (if available)");
+      Logger.info("New RCTab process started with PID " + process.pid());
 
       // Give the new process a moment to start before we exit
       Thread.sleep(500);
 
       // Exit current instance
       Logger.info("Restarting RCTab with %d MB heap. Shutting down current instance...",
-          maxHeapMB);
+          maxHeapMb);
       Platform.exit();
       System.exit(0);
 
@@ -107,17 +107,17 @@ class ApplicationRestarter {
    * Reconstructs: java -Xmx{mem}m --module-path {path} --module {module}
    *
    * @param javaPath path to java executable
-   * @param maxHeapMB maximum heap size in MB
+   * @param maxHeapString maximum heap size string, e.g. "2048m"
    * @return command as list of strings for ProcessBuilder
    */
-  private static List<String> buildRestartCommand(String javaPath, long maxHeapMB) {
+  public static List<String> buildRestartCommand(String javaPath, String maxHeapString) {
     List<String> command = new ArrayList<>();
 
     // Java executable
     command.add(javaPath);
 
     // Memory parameter
-    command.add("-Xmx" + maxHeapMB + "m");
+    command.add("-Xmx" + maxHeapString);
 
     // Get module path from current runtime
     String modulePath = System.getProperty("jdk.module.path");
@@ -127,7 +127,6 @@ class ApplicationRestarter {
       Logger.info("Using module path: %s", modulePath);
     } else {
       Logger.warning("jdk.module.path not set. Restart may not work correctly.");
-      Logger.warning("This is expected when running from an IDE during development.");
 
       // Try to use classpath as fallback
       String classPath = System.getProperty("java.class.path");
