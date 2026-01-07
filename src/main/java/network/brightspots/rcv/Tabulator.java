@@ -65,6 +65,7 @@ final class Tabulator {
   static final String OVERVOTE_RULE_ALWAYS_SKIP_TEXT = "Always skip to next rank";
   static final String OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT = "Exhaust immediately";
   static final String OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT = "Exhaust if multiple continuing";
+  static final String OVERVOTE_RULE_COUNT_WHEN_SINGLE_TEXT = "Count when single continuing";
   // When the CVR contains an overvote we "normalize" it to use this string
   static final String EXPLICIT_OVERVOTE_LABEL = "overvote";
   // Similarly, we normalize undeclared write-ins to use this string
@@ -981,7 +982,8 @@ final class Tabulator {
       decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
     } else {
       // if we got here, there are multiple candidates and our rule must be
-      // EXHAUST_IF_MULTIPLE_CONTINUING, so the decision depends on how many are continuing
+      // EXHAUST_IF_MULTIPLE_CONTINUING or COUNT_WHEN_SINGLE_CONTINUING,
+      // so the decision depends on how many are continuing
 
       // default is no overvote unless we encounter multiple continuing
       decision = OvervoteDecision.NONE;
@@ -990,11 +992,15 @@ final class Tabulator {
       for (String candidate : candidates) {
         if (isCandidateContinuing(candidate)) {
           if (continuingCandidate != null) { // at least two continuing
-            decision = OvervoteDecision.EXHAUST;
-            break;
-          } else {
-            continuingCandidate = candidate;
+            if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
+              decision = OvervoteDecision.EXHAUST;
+              break;
+            } else if (rule == OvervoteRule.COUNT_WHEN_SINGLE_CONTINUING) {
+              decision = OvervoteDecision.INACTIVE_BY_OVERVOTE;
+              break;
+            }
           }
+          continuingCandidate = candidate;
         }
       }
     }
@@ -1220,8 +1226,19 @@ final class Tabulator {
                 null,
                 StatusForRound.EXHAUSTED_CHOICE,
                 "");
+            break;
           }
-          continue;
+        } else if (overvoteDecision == OvervoteDecision.INACTIVE_BY_OVERVOTE) {
+          // INACTIVE_BY_OVERVOTE decision indicates more than one overvoted candidate is continuing,
+          // so round status is temporarily INVALIDATED_BY_OVERVOTE.
+          recordSelectionForCastVoteRecord(
+              cvr,
+              roundTally,
+              roundTallyBySlice,
+              null,
+              StatusForRound.INVALIDATED_BY_OVERVOTE,
+              "");
+          break;
         }
 
         // the current ranking is not inactive by overvote or too many skipped rankings
@@ -1233,7 +1250,7 @@ final class Tabulator {
             continue;
           }
 
-          // we found a continuing candidate so this cvr counts for them
+          // we found one continuing candidate so this cvr counts for them
           selectedCandidate = candidateName;
 
           // transfer cvr to selected candidate
@@ -1313,6 +1330,10 @@ final class Tabulator {
     EXHAUST_IMMEDIATELY("exhaustImmediately", OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT),
     EXHAUST_IF_MULTIPLE_CONTINUING(
         "exhaustIfMultipleContinuing", OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT),
+    COUNT_WHEN_SINGLE_CONTINUING(
+        "countWhenSingleContinuing", OVERVOTE_RULE_COUNT_WHEN_SINGLE_TEXT),
+    COUNT_WHEN_SINGLE_CONTINUING(
+        "countWhenSingleContinuing", OVERVOTE_RULE_COUNT_WHEN_SINGLE_TEXT),
     RULE_UNKNOWN("ruleUnknown", "Unknown rule");
 
     private final String internalLabel;
@@ -1345,6 +1366,7 @@ final class Tabulator {
     NONE,
     EXHAUST,
     SKIP_TO_NEXT_RANK,
+    INACTIVE_BY_OVERVOTE,
   }
 
   // TiebreakMode determines how ties will be handled

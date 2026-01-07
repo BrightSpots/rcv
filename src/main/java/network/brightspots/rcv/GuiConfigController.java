@@ -241,6 +241,8 @@ public class GuiConfigController implements Initializable {
   @FXML
   private RadioButton radioOvervoteExhaustIfMultiple;
   @FXML
+  private RadioButton radioOvervoteCountWhenSingle;
+  @FXML
   private ChoiceBox<WinnerElectionMode> choiceWinnerElectionMode;
   @FXML
   private TextField textFieldRandomSeed;
@@ -358,6 +360,8 @@ public class GuiConfigController implements Initializable {
       rule = OvervoteRule.EXHAUST_IMMEDIATELY;
     } else if (radioOvervoteExhaustIfMultiple.isSelected()) {
       rule = OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING;
+    } else if (radioOvervoteCountWhenSingle.isSelected()) {
+      rule = OvervoteRule.COUNT_WHEN_SINGLE_CONTINUING;
     }
     return rule.getInternalLabel();
   }
@@ -1050,6 +1054,7 @@ public class GuiConfigController implements Initializable {
     radioOvervoteAlwaysSkip.setSelected(false);
     radioOvervoteExhaustImmediately.setSelected(false);
     radioOvervoteExhaustIfMultiple.setSelected(false);
+    radioOvervoteCountWhenSingle.setSelected(false);
     textFieldMaxSkippedRanksAllowed.clear();
     textFieldMaxSkippedRanksAllowed.setDisable(false);
     checkBoxMaxSkippedRanksAllowedUnlimited.setSelected(false);
@@ -1468,6 +1473,7 @@ public class GuiConfigController implements Initializable {
     radioOvervoteAlwaysSkip.setText(Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT);
     radioOvervoteExhaustImmediately.setText(Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
     radioOvervoteExhaustIfMultiple.setText(Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
+    radioOvervoteCountWhenSingle.setText(Tabulator.OVERVOTE_RULE_COUNT_WHEN_SINGLE_TEXT);
     checkBoxMaxSkippedRanksAllowedUnlimited.setOnAction(event -> {
       textFieldMaxSkippedRanksAllowed.clear();
       textFieldMaxSkippedRanksAllowed.setDisable(
@@ -1625,6 +1631,7 @@ public class GuiConfigController implements Initializable {
       case ALWAYS_SKIP_TO_NEXT_RANK -> radioOvervoteAlwaysSkip.setSelected(true);
       case EXHAUST_IMMEDIATELY -> radioOvervoteExhaustImmediately.setSelected(true);
       case EXHAUST_IF_MULTIPLE_CONTINUING -> radioOvervoteExhaustIfMultiple.setSelected(true);
+      case COUNT_WHEN_SINGLE_CONTINUING -> radioOvervoteCountWhenSingle.setSelected(true);
       case RULE_UNKNOWN -> {
         // Do nothing for unknown overvote rules
       }
