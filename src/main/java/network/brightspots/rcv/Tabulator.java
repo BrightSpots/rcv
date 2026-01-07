@@ -1332,8 +1332,6 @@ final class Tabulator {
         "exhaustIfMultipleContinuing", OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT),
     COUNT_WHEN_SINGLE_CONTINUING(
         "countWhenSingleContinuing", OVERVOTE_RULE_COUNT_WHEN_SINGLE_TEXT),
-    COUNT_WHEN_SINGLE_CONTINUING(
-        "countWhenSingleContinuing", OVERVOTE_RULE_COUNT_WHEN_SINGLE_TEXT),
     RULE_UNKNOWN("ruleUnknown", "Unknown rule");
 
     private final String internalLabel;
