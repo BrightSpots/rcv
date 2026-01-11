@@ -1,0 +1,21 @@
+Ballot ID,1st rank,2nd rank,3rd rank,4th-rank
+1,A,B|C|D,,
+2,A,B|C|D,,
+3,A,B,C,D
+4,A,B,C,D
+5,A,B,C,D
+6,A,B,C,D
+7,A,B,C,D
+8,B,A|C|D,,
+9,B,A|C|D,,
+10,B,C,D,A
+11,B,C,D,A
+12,B,C,D,A
+13,C,D,B,A
+14,C,A|B|D,,
+15,C,A|B|D,,
+16,D,C,A,B
+17,A|B|C|D,,,
+20,A|B,D,C,
+21,C,A|D,B,
+22,B,A|C|D,,
