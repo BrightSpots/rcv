@@ -186,6 +186,8 @@ class CastVoteRecord {
     this.currentRoundStatus = status;
   }
 
+  // check if exhausted, but this check ignores the possibility of a ballot being
+  // temporarily inactive during multiple continuing overvoted candidates
   boolean isExhausted() {
     return currentRoundStatus != StatusForRound.ACTIVE;
   }
