@@ -6,6 +6,7 @@ Overvote Rule (required): How to handle a ballot where a voter has marked multip
   * Always skip to next rank: Skips over an overvote and goes to the next validly-marked ranking on a ballot.
   * Exhaust immediately: A ballot with an overvote exhausts when that overvote is encountered in the rounds of counting.
   * Exhaust if multiple continuing: If a voter has an overvote but only one candidate at that overvote is still in the race when that overvote is encountered, the ballot counts for that candidate. If multiple candidates at the overvote are still in the race, the ballot exhausts.
+  * Count when single continuing: If one, and only one, overvoted candidate has not yet been eliminated, count the ballot for that candidate. Count the ballot as inactive during each counting round in which two or more overvoted candidates are continuing. When all the overvoted candidates have been eliminated, skip to the next rank.
 
 How Many Consecutive Skipped Ranks Are Allowed (required): How many rankings in a row can a voter skip and still have later rankings count? 0 allows no skipped rankings. 1 allows voters to skip rankings one at a time, but not more than 1 in a row, and so on.
   Example: A voter could rank in 1, 3, 5 and not exhaust under this rule, for example.
