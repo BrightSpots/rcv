@@ -611,7 +611,7 @@ public class GuiConfigController implements Initializable {
 
     if (recommendedMb <= 0) {
       String restartCommand = String.join(" ",
-              ApplicationRestarter.buildRestartCommand("java", "12800m"));
+              ApplicationRestarter.buildRestartCommand("12800m"));
       showErrorDialog(
           "Unable to Determine Memory",
           "Could not determine your system's total RAM. Please restart RCTab manually "
@@ -649,7 +649,7 @@ public class GuiConfigController implements Initializable {
     boolean success = ApplicationRestarter.restartWithMemory(recommendedMb);
     if (!success) {
       String restartCommand = String.join(" ",
-          ApplicationRestarter.buildRestartCommand("java", recommendedMb + "m"));
+          ApplicationRestarter.buildRestartCommand(recommendedMb + "m"));
       showErrorDialog(
           "Restart Failed",
           String.format(

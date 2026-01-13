@@ -37,12 +37,8 @@ class ApplicationRestarter {
    */
   static boolean restartWithMemory(long maxHeapMb) {
     try {
-      // Get current java executable path
-      String javaPath = getJavaExecutablePath();
-      Logger.info("Java executable path: %s", javaPath);
-
       // Build command to restart application
-      List<String> command = buildRestartCommand(javaPath, maxHeapMb + "m");
+      List<String> command = buildRestartCommand(maxHeapMb + "m");
       Logger.info("Restart command: %s", String.join(" ", command));
 
       // Start new process
@@ -106,11 +102,11 @@ class ApplicationRestarter {
    * Build command line for restarting the application.
    * Reconstructs: java -Xmx{mem}m --module-path {path} --module {module}
    *
-   * @param javaPath path to java executable
    * @param maxHeapString maximum heap size string, e.g. "2048m"
    * @return command as list of strings for ProcessBuilder
    */
-  public static List<String> buildRestartCommand(String javaPath, String maxHeapString) {
+  public static List<String> buildRestartCommand(String maxHeapString) {
+    String javaPath = getJavaExecutablePath();
     List<String> command = new ArrayList<>();
 
     // Java executable
