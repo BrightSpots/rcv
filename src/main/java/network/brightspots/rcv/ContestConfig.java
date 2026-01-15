@@ -629,14 +629,12 @@ class ContestConfig {
 
         if (!isNullOrBlank(source.getOvervoteLabel())
             && getOvervoteRule() != Tabulator.OvervoteRule.EXHAUST_IMMEDIATELY
-            && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK
-            && getOvervoteRule() != Tabulator.OvervoteRule.COUNT_WHEN_SINGLE_CONTINUING) {
+            && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
           validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_OVERVOTE_RULE_MISMATCH);
           Logger.severe(
-              "When overvoteLabel is supplied, overvoteRule must be \"%s\" or \"%s\" or \"%s\"!",
+              "When overvoteLabel is supplied, overvoteRule must be \"%s\" or \"%s\"!",
               Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT,
-              Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT,
-              Tabulator.OVERVOTE_RULE_COUNT_WHEN_SINGLE_TEXT);
+              Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
         }
 
         if (getProvider(source) == Provider.CDF) {
