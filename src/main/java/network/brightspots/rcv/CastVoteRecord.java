@@ -192,6 +192,12 @@ class CastVoteRecord {
     return currentRoundStatus != StatusForRound.ACTIVE;
   }
 
+  // check if ballot is inactive by overvote, which can be temporary
+  // when overvote rule is count when single continuing
+  boolean isInactiveByOvervote() {
+    return currentRoundStatus != StatusForRound.INVALIDATED_BY_OVERVOTE;
+  }
+
   StatusForRound getBallotStatus() {
     return currentRoundStatus;
   }
