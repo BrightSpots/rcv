@@ -959,7 +959,8 @@ final class Tabulator {
       }
 
       // if we have an explicit overvote, the only valid rules are exhaust immediately or
-      // always skip. (this is enforced when we load the config also)
+      // always skip.
+      // (this is enforced when we load the config also)
       if (rule != OvervoteRule.EXHAUST_IMMEDIATELY
           && rule != OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
         Logger.severe(
@@ -967,12 +968,12 @@ final class Tabulator {
             rule);
         throw new TabulationAbortedException(false);
       }
-
       if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
         decision = OvervoteDecision.EXHAUST;
       } else {
         decision = OvervoteDecision.SKIP_TO_NEXT_RANK;
       }
+
     } else if (candidates.count() <= 1) {
       // if undervote or one vote which is not the overvote label, then there is no overvote
       decision = OvervoteDecision.NONE;
@@ -983,16 +984,16 @@ final class Tabulator {
     } else {
       // if we got here, there are multiple candidates and our rule must be
       // EXHAUST_IF_MULTIPLE_CONTINUING or COUNT_WHEN_SINGLE_CONTINUING,
-      // so the decision depends on how many are continuing
+      // so the decision depends on how many overvoted candidates are continuing
 
       // default is no overvote unless we encounter multiple continuing
       decision = OvervoteDecision.NONE;
       // keep track if we encounter a continuing candidate
       String continuingCandidate = null;
       for (String candidate : candidates) {
-        if (isCandidateContinuing(candidate)) {
+        if (getCandidateStatus(candidate) == CandidateStatus.CONTINUING) {
           if (continuingCandidate != null) { // at least two continuing
-            if (rule == OvervoteRule.EXHAUST_IMMEDIATELY) {
+            if (rule == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
               decision = OvervoteDecision.EXHAUST;
               break;
             } else if (rule == OvervoteRule.COUNT_WHEN_SINGLE_CONTINUING) {
@@ -1006,7 +1007,7 @@ final class Tabulator {
     }
 
     return decision;
-  }
+  } // end getOvervoteDecision
 
   // recordSelectionForCastVoteRecord:
   //  set new recipient of cvr
@@ -1088,6 +1089,9 @@ final class Tabulator {
       }
     }
 
+    // Fetch the overvote rule here just once instead of once for each cvr.
+    OvervoteRule overvoteRule = config.getOvervoteRule();
+
     // Loop over ALL cast vote records to determine who they should count for in this round,
     // based on which candidates have already been eliminated and elected.
     // At each iteration a cvr will either:
@@ -1095,11 +1099,19 @@ final class Tabulator {
     //  count for a different candidate
     //  become exhausted
     //  remain exhausted
+    //  become inactive because two or more overvoted candidates are continuing
+    //  remain inactive during multiple continuing overvoted candidates
     for (CastVoteRecord cvr : castVoteRecords) {
-      if (cvr.isExhausted()) {
-        roundTally.addInactiveBallot(cvr.getBallotStatus(), cvr.getFractionalTransferValue());
 
-        // Add inactive ballot to each slice too
+      // If cvr is exhausted, count that in current round tally.
+      // Consider cvr can be temporarily inactive, which is not exhausted, while
+      // waiting until just one of multiple overvoted candidates is continuing.
+      if (cvr.isExhausted()
+          && (overvoteRule != OvervoteRule.COUNT_WHEN_SINGLE_CONTINUING
+          || (!cvr.isInactiveByOvervote()))) {
+        // Add exhausted ballot to tally.
+        roundTally.addInactiveBallot(cvr.getBallotStatus(), cvr.getFractionalTransferValue());
+        // Add exhausted ballot to each slice too.
         for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
           String sliceId = cvr.getSlice(slice);
           RoundTally sliceRoundTally = roundTallyBySlice.get(slice).get(sliceId);
@@ -1229,8 +1241,8 @@ final class Tabulator {
             break;
           }
         } else if (overvoteDecision == OvervoteDecision.INACTIVE_BY_OVERVOTE) {
-          // INACTIVE_BY_OVERVOTE decision indicates more than one overvoted candidate is continuing,
-          // so round status is temporarily INVALIDATED_BY_OVERVOTE.
+          // INACTIVE_BY_OVERVOTE decision indicates more than one overvoted candidate
+          //  is continuing, so round status is temporarily INVALIDATED_BY_OVERVOTE.
           recordSelectionForCastVoteRecord(
               cvr,
               roundTally,
@@ -1241,32 +1253,31 @@ final class Tabulator {
           break;
         }
 
-        // the current ranking is not inactive by overvote or too many skipped rankings
-        // see if any ranked candidates are continuing
-
+        // If there is a single continuing candidate at this rank,
+        // identify it as the selected candidate.
+        // There can be more than one candidate at this rank
+        // but there cannot be more than one continuing candidate
+        // because that would have been handled as an overvote.
+        selectedCandidate = null;
         for (String candidate : candidates) {
           String candidateName = config.getNameForCandidate(candidate);
-          if (!isCandidateContinuing(candidateName)) {
-            continue;
+          if (!(candidateName == null)) {
+            if (!isCandidateContinuing(candidateName)) {
+              continue;
+            }
+            // we found one continuing candidate so this cvr counts for them
+            selectedCandidate = candidateName;
+            break;
           }
+        }
 
-          // we found one continuing candidate so this cvr counts for them
-          selectedCandidate = candidateName;
-
+        if (selectedCandidate != null) {
           // transfer cvr to selected candidate
           recordSelectionForCastVoteRecord(
               cvr, roundTally, roundTallyBySlice, selectedCandidate, StatusForRound.ACTIVE, "");
-
-          // This will also update the roundTallyBySlice for each enabled slice
+          // also update the roundTallyBySlice for each enabled slice
           incrementTallies(roundTally, cvr, selectedCandidate, roundTallyBySlice);
-
-          // There can be at most one continuing candidate in candidates; if there were more than
-          // one, we would have already flagged this as an overvote.
-          break;
-        }
-
-        // if we found a continuing candidate stop looking through rankings
-        if (selectedCandidate != null) {
+          // we found a continuing candidate so stop looking through rankings
           break;
         }
 
@@ -1357,6 +1368,7 @@ final class Tabulator {
     public String getInternalLabel() {
       return internalLabel;
     }
+
   }
 
   // OvervoteDecision is the result of applying an OvervoteRule to a CVR in a particular round
