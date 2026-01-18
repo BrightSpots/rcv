@@ -1,0 +1,66 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Count-overvote-when-single-continuing",
+    "outputDirectory" : "output",
+    "contestDate" : "2026-01-16",
+    "contestJurisdiction" : "Portlandia",
+    "contestOffice" : "Mayor",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_set_count_overvote_when_single_continuing_ballots.csv",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "4",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "1",
+    "batchColumnIndex" : "3",
+    "precinctColumnIndex" : "2",
+    "overvoteDelimiter" : "",
+    "provider" : "genericCsv",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "Write-In",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Cand_A",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Cand_B",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Cand_C",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Cand_D",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "countWhenSingleContinuing",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "2435",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "15",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Test_Case",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}
