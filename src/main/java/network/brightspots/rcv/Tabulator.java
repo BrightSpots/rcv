@@ -959,8 +959,7 @@ final class Tabulator {
       }
 
       // if we have an explicit overvote, the only valid rules are exhaust immediately or
-      // always skip.
-      // (this is enforced when we load the config also)
+      // always skip. (this is enforced when we load the config also)
       if (rule != OvervoteRule.EXHAUST_IMMEDIATELY
           && rule != OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
         Logger.severe(
@@ -991,7 +990,10 @@ final class Tabulator {
       // keep track if we encounter a continuing candidate
       String continuingCandidate = null;
       for (String candidate : candidates) {
-        if (getCandidateStatus(candidate) == CandidateStatus.CONTINUING) {
+        if (isCandidateContinuing(candidate)) {
+
+        // if (getCandidateStatus(candidate) == CandidateStatus.CONTINUING) {
+
           if (continuingCandidate != null) { // at least two continuing
             if (rule == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
               decision = OvervoteDecision.EXHAUST;
@@ -1240,6 +1242,7 @@ final class Tabulator {
                 "");
             break;
           }
+          continue; // skip to next rank
         } else if (overvoteDecision == OvervoteDecision.INACTIVE_BY_OVERVOTE) {
           // INACTIVE_BY_OVERVOTE decision indicates more than one overvoted candidate
           //  is continuing, so round status is temporarily INVALIDATED_BY_OVERVOTE.
@@ -1368,7 +1371,6 @@ final class Tabulator {
     public String getInternalLabel() {
       return internalLabel;
     }
-
   }
 
   // OvervoteDecision is the result of applying an OvervoteRule to a CVR in a particular round
