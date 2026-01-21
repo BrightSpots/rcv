@@ -991,9 +991,6 @@ final class Tabulator {
       String continuingCandidate = null;
       for (String candidate : candidates) {
         if (isCandidateContinuing(candidate)) {
-
-        // if (getCandidateStatus(candidate) == CandidateStatus.CONTINUING) {
-
           if (continuingCandidate != null) { // at least two continuing
             if (rule == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
               decision = OvervoteDecision.EXHAUST;
