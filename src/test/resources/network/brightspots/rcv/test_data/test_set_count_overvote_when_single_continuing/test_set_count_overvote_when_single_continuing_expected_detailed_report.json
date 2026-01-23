@@ -1,0 +1,119 @@
+{
+  "config" : {
+    "contest" : "Count-overvote-when-single-continuing",
+    "date" : "2026-01-23",
+    "generatedBy" : "RCTab 2.0.1",
+    "jurisdiction" : "Portlandia",
+    "office" : "Mayor"
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "2",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "Cand_A" : "7",
+      "Cand_B" : "6",
+      "Cand_C" : "4",
+      "Cand_D" : "1",
+      "Undeclared Write-ins" : "0",
+      "Write_In" : "0"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Write_In",
+      "transfers" : { }
+    } ],
+    "threshold" : "10"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "2",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "Cand_A" : "7",
+      "Cand_B" : "6",
+      "Cand_C" : "4",
+      "Cand_D" : "1",
+      "Undeclared Write-ins" : "0"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Undeclared Write-ins",
+      "transfers" : { }
+    } ],
+    "threshold" : "10"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "2",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "Cand_A" : "7",
+      "Cand_B" : "6",
+      "Cand_C" : "4",
+      "Cand_D" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Cand_D",
+      "transfers" : {
+        "Cand_C" : "1"
+      }
+    } ],
+    "threshold" : "10"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "2",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "Cand_A" : "7",
+      "Cand_B" : "6",
+      "Cand_C" : "5"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Cand_C",
+      "transfers" : {
+        "Cand_A" : "2",
+        "Cand_B" : "1",
+        "exhausted" : "2"
+      }
+    } ],
+    "threshold" : "10"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 5,
+    "tally" : {
+      "Cand_A" : "9",
+      "Cand_B" : "7"
+    },
+    "tallyResults" : [ {
+      "elected" : "Cand_A",
+      "transfers" : { }
+    } ],
+    "threshold" : "9"
+  } ],
+  "summary" : {
+    "finalThreshold" : "9",
+    "numCandidates" : 6,
+    "numWinners" : 1,
+    "totalNumBallots" : "20",
+    "undervotes" : 0
+  }
+}
