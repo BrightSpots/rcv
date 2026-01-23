@@ -1,14 +1,14 @@
 {
-  "tabulatorVersion" : "TEST",
+  "tabulatorVersion" : "2.0.1",
   "outputSettings" : {
     "contestName" : "Count-overvote-when-single-continuing",
-    "outputDirectory" : "output",
-    "contestDate" : "2026-01-16",
+    "outputDirectory" : "/home/aw/RCTab/rcv/src/test/resources/network/brightspots/rcv/test_data/test_set_count_overvote_when_single_continuing/output",
+    "contestDate" : "2026-01-23",
     "contestJurisdiction" : "Portlandia",
     "contestOffice" : "Mayor",
     "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
-    "generateCdfJson" : false
+    "generateCdfJson" : true
   },
   "cvrFileSources" : [ {
     "filePath" : "test_set_count_overvote_when_single_continuing_ballots.csv",
@@ -26,11 +26,11 @@
     "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
-    "name" : "Cand_A",
+    "name" : "Write_In",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "Cand_B",
+    "name" : "Cand_A",
     "excluded" : false,
     "aliases" : [ ]
   }, {
@@ -39,6 +39,10 @@
     "aliases" : [ ]
   }, {
     "name" : "Cand_D",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Cand_B",
     "excluded" : false,
     "aliases" : [ ]
   } ],
@@ -50,13 +54,13 @@
     "numberOfWinners" : "1",
     "multiSeatBottomsUpPercentageThreshold" : "",
     "decimalPlacesForVoteArithmetic" : "4",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "1",
+    "maxSkippedRanksAllowed" : "unlimited",
     "maxRankingsAllowed" : "15",
     "nonIntegerWinningThreshold" : false,
     "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
+    "cutoffElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
     "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
