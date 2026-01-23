@@ -1,0 +1,78 @@
+{
+  "tabulatorVersion" : "2.0.1",
+  "outputSettings" : {
+    "contestName" : "Count-overvote-when-single-for-multi-winner",
+    "outputDirectory" : "/home/aw/RCTab/rcv/src/test/resources/network/brightspots/rcv/test_data/test_set_count_overvote_when_single_for_multi_winner/output",
+    "contestDate" : "2026-01-23",
+    "contestJurisdiction" : "Portlandia",
+    "contestOffice" : "Mayor",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_set_count_overvote_when_single_for_multi_winner_ballots.csv",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "4",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "1",
+    "batchColumnIndex" : "3",
+    "precinctColumnIndex" : "2",
+    "overvoteDelimiter" : "",
+    "provider" : "genericCsv",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "Write-In",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "oranges",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "pears",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "strawberries",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "cake",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "chocolate",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "burger",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "chicken",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "countWhenSingleContinuing",
+    "winnerElectionMode" : "multiWinnerAllowOnlyOneWinnerPerRound",
+    "randomSeed" : "0",
+    "numberOfWinners" : "3",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "maxSkippedRanksAllowed" : "unlimited",
+    "maxRankingsAllowed" : "max",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "cutoffElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Test_Case",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}
