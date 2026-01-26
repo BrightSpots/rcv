@@ -434,7 +434,11 @@ final class Tabulator {
           roundTally.setCandidateTallyViaSurplusAdjustment(
               winner, roundTally.getWinningThreshold());
           tallyTransfers.addTransfer(
-              currentRound, winner, TallyTransfers.RESIDUAL_TARGET, winnerResidual);
+              currentRound,
+              winner,
+              TallyTransfers.RESIDUAL_TARGET,
+              false,
+              winnerResidual);
         }
       }
     }
@@ -1027,6 +1031,7 @@ final class Tabulator {
           currentRoundTally.getRoundNumber(),
           cvr.getCurrentRecipientOfVote(),
           selectedCandidate,
+          false,
           cvr.getFractionalTransferValue());
       for (ContestConfig.TabulateBySlice slice : config.enabledSlices()) {
         String sliceId = cvr.getSlice(slice);
@@ -1041,6 +1046,7 @@ final class Tabulator {
             currentRoundTally.getRoundNumber(),
             cvr.getCurrentRecipientOfVote(),
             selectedCandidate,
+            false,
             cvr.getFractionalTransferValue());
       }
     }
@@ -1160,6 +1166,9 @@ final class Tabulator {
 
       // selectedCandidate holds the new candidate selection if there is one
       String selectedCandidate = null;
+      // default audit transfer type is exhausted if no target candidate, but allow for
+      // uncounted type if waiting for just single continuing overvoted candidate
+      boolean isUncountedIfNoTarget = false;
 
       // iterate over all ranks in this cvr from most preferred to least
       for (Pair<Integer, CandidatesAtRanking> rankCandidatesPair : cvr.candidateRankings) {
@@ -1250,6 +1259,7 @@ final class Tabulator {
               null,
               StatusForRound.INVALIDATED_BY_OVERVOTE,
               "");
+          isUncountedIfNoTarget = true;
           break;
         }
 
@@ -1331,7 +1341,6 @@ final class Tabulator {
       }
       roundTalliesBySlices.initialize(slice, sliceId, new RoundTallies());
       tallyTransfersBySlice.initialize(slice, sliceId, new TallyTransfers());
-
     }
   }
 

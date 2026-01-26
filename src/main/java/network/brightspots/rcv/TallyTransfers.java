@@ -43,14 +43,25 @@ class TallyTransfers {
   }
 
   // add vote transfer value for given round
-  void addTransfer(int round, String sourceCandidate, String targetCandidate, BigDecimal value) {
-    // null source means we are transferring the initial count
+  void addTransfer(
+      int round,
+      String sourceCandidate,
+      String targetCandidate,
+      boolean isUncountedIfNoTarget,
+      BigDecimal value) {
+    // null source means we are transferring the initial count, or we are
+    // counting cvr as inactive while waiting for just one continuing overvoted candidate
     if (sourceCandidate == null) {
       sourceCandidate = UNCOUNTED;
     }
-    // null target means exhausted
+    // null target means cvr is either exhausted or inactive while waiting
+    // for just one continuing overvoted candidate
     if (targetCandidate == null) {
-      targetCandidate = EXHAUSTED;
+      if (isUncountedIfNoTarget == true) {
+        targetCandidate = UNCOUNTED;
+      } else {
+        targetCandidate = EXHAUSTED;
+      }
     }
 
     // lookup or create entries for specified round
