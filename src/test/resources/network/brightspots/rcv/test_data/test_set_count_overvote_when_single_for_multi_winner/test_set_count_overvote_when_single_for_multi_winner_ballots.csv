@@ -1,4 +1,4 @@
-Response ID,precinct_id,batch_id,oranges,pears,strawberries,cake,chocolate,burger,chicken
+Response ID,precinct_id,batch_id,oranges,pears,strawberries,cake,chocolate,burgers,chicken
 v1,p1,b1,1,2,,,1,,
 v2,p1,b1,1,2,,,,,
 v3,p1,b1,1,2,,,,,

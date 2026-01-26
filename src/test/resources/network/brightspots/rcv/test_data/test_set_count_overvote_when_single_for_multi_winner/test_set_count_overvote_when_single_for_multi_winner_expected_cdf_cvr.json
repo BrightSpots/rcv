@@ -5690,7 +5690,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -5729,7 +5729,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -5768,7 +5768,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -5807,7 +5807,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -5846,7 +5846,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -5885,7 +5885,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -5924,7 +5924,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -5963,7 +5963,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6002,7 +6002,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6041,7 +6041,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6066,7 +6066,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6095,7 +6095,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6124,7 +6124,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6153,7 +6153,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6182,7 +6182,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6211,7 +6211,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6240,7 +6240,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6269,7 +6269,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6298,7 +6298,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6327,7 +6327,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6362,7 +6362,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6391,7 +6391,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6420,7 +6420,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6449,7 +6449,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6478,7 +6478,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6507,7 +6507,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6536,7 +6536,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6565,7 +6565,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6594,7 +6594,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6623,7 +6623,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6658,7 +6658,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6687,7 +6687,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6716,7 +6716,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6745,7 +6745,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6774,7 +6774,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6803,7 +6803,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6832,7 +6832,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6861,7 +6861,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6890,7 +6890,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6919,7 +6919,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6954,7 +6954,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -6983,7 +6983,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7012,7 +7012,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7041,7 +7041,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7070,7 +7070,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7099,7 +7099,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7128,7 +7128,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7157,7 +7157,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7186,7 +7186,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7215,7 +7215,7 @@
         "@type" : "CVR.CVRContest",
         "CVRContestSelection" : [ {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7280,7 +7280,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7329,7 +7329,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7378,7 +7378,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7427,7 +7427,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7476,7 +7476,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7525,7 +7525,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7574,7 +7574,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7623,7 +7623,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7672,7 +7672,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7721,7 +7721,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7766,7 +7766,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7805,7 +7805,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7844,7 +7844,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7883,7 +7883,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7922,7 +7922,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -7961,7 +7961,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8000,7 +8000,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8039,7 +8039,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8078,7 +8078,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8117,7 +8117,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8162,7 +8162,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8201,7 +8201,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8240,7 +8240,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8279,7 +8279,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8318,7 +8318,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8357,7 +8357,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8396,7 +8396,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8435,7 +8435,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8474,7 +8474,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8513,7 +8513,7 @@
           } ]
         }, {
           "@type" : "CVR.CVRContestSelection",
-          "ContestSelectionId" : "cs-burger",
+          "ContestSelectionId" : "cs-burgers",
           "SelectionPosition" : [ {
             "@type" : "CVR.SelectionPosition",
             "HasIndication" : "yes",
@@ -8536,8 +8536,8 @@
       "@id" : "c-undeclared_write-ins",
       "Name" : "Undeclared Write-ins"
     }, {
-      "@id" : "c-burger",
-      "Name" : "burger"
+      "@id" : "c-burgers",
+      "Name" : "burgers"
     }, {
       "@id" : "c-cake",
       "Name" : "cake"
@@ -8565,9 +8565,9 @@
         "@type" : "ContestSelection",
         "CandidateIds" : [ "c-undeclared_write-ins" ]
       }, {
-        "@id" : "cs-burger",
+        "@id" : "cs-burgers",
         "@type" : "ContestSelection",
-        "CandidateIds" : [ "c-burger" ]
+        "CandidateIds" : [ "c-burgers" ]
       }, {
         "@id" : "cs-cake",
         "@type" : "ContestSelection",
@@ -8597,11 +8597,11 @@
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2026-01-23T15:26:32-08:00",
+  "GeneratedDate" : "2026-01-26T10:11:42-08:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
     "@type" : "GpUnit",
-    "Name" : "Portlandia",
+    "Name" : "Wikipedia STV example plus overvotes",
     "OtherType" : "Election Scope Jurisdiction",
     "Type" : "other"
   } ],

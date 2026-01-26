@@ -3,9 +3,9 @@
   "outputSettings" : {
     "contestName" : "Count-overvote-when-single-for-multi-winner",
     "outputDirectory" : "/home/aw/RCTab/rcv/src/test/resources/network/brightspots/rcv/test_data/test_set_count_overvote_when_single_for_multi_winner/output",
-    "contestDate" : "2026-01-23",
-    "contestJurisdiction" : "Portlandia",
-    "contestOffice" : "Mayor",
+    "contestDate" : "2026-01-26",
+    "contestJurisdiction" : "Wikipedia STV example plus overvotes",
+    "contestOffice" : "Three foods to serve",
     "tabulateByBatch" : false,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : true
@@ -46,7 +46,7 @@
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "burger",
+    "name" : "burgers",
     "excluded" : false,
     "aliases" : [ ]
   }, {

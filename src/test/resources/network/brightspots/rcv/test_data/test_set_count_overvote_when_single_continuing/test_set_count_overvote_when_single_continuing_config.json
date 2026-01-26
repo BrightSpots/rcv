@@ -3,7 +3,7 @@
   "outputSettings" : {
     "contestName" : "Count-overvote-when-single-continuing",
     "outputDirectory" : "/home/aw/RCTab/rcv/src/test/resources/network/brightspots/rcv/test_data/test_set_count_overvote_when_single_continuing/output",
-    "contestDate" : "2026-01-23",
+    "contestDate" : "2026-01-26",
     "contestJurisdiction" : "Portlandia",
     "contestOffice" : "Mayor",
     "tabulateByBatch" : false,
@@ -26,11 +26,11 @@
     "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
-    "name" : "Write_In",
+    "name" : "Cand_A",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "Cand_A",
+    "name" : "Cand_B",
     "excluded" : false,
     "aliases" : [ ]
   }, {
@@ -39,10 +39,6 @@
     "aliases" : [ ]
   }, {
     "name" : "Cand_D",
-    "excluded" : false,
-    "aliases" : [ ]
-  }, {
-    "name" : "Cand_B",
     "excluded" : false,
     "aliases" : [ ]
   } ],

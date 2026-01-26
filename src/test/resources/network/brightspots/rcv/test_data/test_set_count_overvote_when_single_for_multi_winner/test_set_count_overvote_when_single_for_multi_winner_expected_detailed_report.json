@@ -1,10 +1,10 @@
 {
   "config" : {
     "contest" : "Count-overvote-when-single-for-multi-winner",
-    "date" : "2026-01-23",
+    "date" : "2026-01-26",
     "generatedBy" : "RCTab 2.0.1",
-    "jurisdiction" : "Portlandia",
-    "office" : "Mayor"
+    "jurisdiction" : "Wikipedia STV example plus overvotes",
+    "office" : "Three foods to serve"
   },
   "jsonFormatVersion" : "1",
   "results" : [ {
@@ -17,7 +17,7 @@
     "round" : 1,
     "tally" : {
       "Undeclared Write-ins" : "0",
-      "burger" : "4",
+      "burgers" : "4",
       "cake" : "3",
       "chicken" : "2",
       "chocolate" : "1",
@@ -43,7 +43,7 @@
     "round" : 2,
     "tally" : {
       "Undeclared Write-ins" : "0",
-      "burger" : "4",
+      "burgers" : "4",
       "cake" : "3",
       "chicken" : "2",
       "chocolate" : "1",
@@ -65,7 +65,7 @@
     },
     "round" : 3,
     "tally" : {
-      "burger" : "4",
+      "burgers" : "4",
       "cake" : "3",
       "chicken" : "2",
       "chocolate" : "1",
@@ -89,7 +89,7 @@
     },
     "round" : 4,
     "tally" : {
-      "burger" : "4",
+      "burgers" : "4",
       "cake" : "4",
       "chicken" : "2",
       "oranges" : "2",
@@ -112,7 +112,7 @@
     },
     "round" : 5,
     "tally" : {
-      "burger" : "4",
+      "burgers" : "4",
       "cake" : "4",
       "chicken" : "2",
       "pears" : "6.0000",
@@ -121,7 +121,7 @@
     "tallyResults" : [ {
       "eliminated" : "chicken",
       "transfers" : {
-        "burger" : "2"
+        "burgers" : "2"
       }
     } ],
     "threshold" : "6"
@@ -134,13 +134,13 @@
     },
     "round" : 6,
     "tally" : {
-      "burger" : "6",
+      "burgers" : "6",
       "cake" : "4",
       "pears" : "6.0000",
       "strawberries" : "2.7500"
     },
     "tallyResults" : [ {
-      "elected" : "burger",
+      "elected" : "burgers",
       "transfers" : { }
     } ],
     "threshold" : "6"
@@ -153,7 +153,7 @@
     },
     "round" : 7,
     "tally" : {
-      "burger" : "6.0000",
+      "burgers" : "6.0000",
       "cake" : "4",
       "pears" : "6.0000",
       "strawberries" : "2.7500"
@@ -175,7 +175,7 @@
     },
     "round" : 8,
     "tally" : {
-      "burger" : "6.0000",
+      "burgers" : "6.0000",
       "cake" : "5.7500",
       "pears" : "6.0000"
     },
@@ -194,7 +194,7 @@
     },
     "round" : 9,
     "tally" : {
-      "burger" : "6.0000",
+      "burgers" : "6.0000",
       "cake" : "5.7500",
       "pears" : "6.0000"
     },
