@@ -26,19 +26,19 @@
     "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
-    "name" : "Cand_A",
+    "name" : "cand_A",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "Cand_B",
+    "name" : "cand_B",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "Cand_C",
+    "name" : "cand_C",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "Cand_D",
+    "name" : "cand_D",
     "excluded" : false,
     "aliases" : [ ]
   } ],

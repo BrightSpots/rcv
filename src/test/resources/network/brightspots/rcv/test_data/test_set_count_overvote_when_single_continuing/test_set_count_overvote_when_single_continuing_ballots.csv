@@ -1,4 +1,4 @@
-Response ID,precinct_id,batch_id,Cand_A,Cand_B,Cand_C,Cand_D
+Response ID,precinct_id,batch_id,cand_A,cand_B,cand_C,cand_D
 v1,p1,b1,1,2,2,2
 v2,p1,b1,1,2,2,2
 v3,p1,b1,1,2,3,4
