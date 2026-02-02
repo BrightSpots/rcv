@@ -1065,11 +1065,18 @@ final class Tabulator {
       }
     }
 
-    final String outcomeDescription = statusForRound == StatusForRound.ACTIVE
-            ? selectedCandidate
-            : statusForRound.getTitleCaseKey() + additionalLogText;
-    final VoteOutcomeType outcomeType =
-        selectedCandidate == null ? VoteOutcomeType.EXHAUSTED : VoteOutcomeType.COUNTED;
+    String outcomeDescription = selectedCandidate;
+    if (statusForRound != StatusForRound.ACTIVE) {
+      outcomeDescription = statusForRound.getTitleCaseKey() + additionalLogText;
+    }
+
+    VoteOutcomeType outcomeType = VoteOutcomeType.COUNTED;
+    if (statusForRound == StatusForRound.INVALIDATED_BY_OVERVOTE) {
+      outcomeType = VoteOutcomeType.INACTIVE_OVERVOTED;
+    } else if (selectedCandidate == null) {
+      outcomeType = VoteOutcomeType.EXHAUSTED;
+    }
+
     cvr.logRoundOutcome(
         currentRoundTally.getRoundNumber(),
         outcomeType,
@@ -1226,13 +1233,14 @@ final class Tabulator {
 
         // check for an overvote
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidates);
+        // If overvote should trigger exhaustion, indicate exhausted.
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
           recordSelectionForCastVoteRecord(
               cvr,
               roundTally,
               roundTallyBySlice,
               null,
-              StatusForRound.INVALIDATED_BY_OVERVOTE,
+              StatusForRound.EXHAUSTED_CHOICE,
               "");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {

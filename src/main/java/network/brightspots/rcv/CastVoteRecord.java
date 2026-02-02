@@ -147,9 +147,9 @@ class CastVoteRecord {
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
-      logStringBuilder.append(" [became inactive] ");
+      logStringBuilder.append(" [became exhausted] ");
     } else if (outcomeType == VoteOutcomeType.INACTIVE_OVERVOTED) {
-      logStringBuilder.append(" [is inactive by overvote] ");
+      logStringBuilder.append(" [counted as inactive by overvote] ");
     } else {
       if (round == 1) {
         logStringBuilder.append(" [counted for] ");
