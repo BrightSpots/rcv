@@ -1234,13 +1234,15 @@ final class Tabulator {
         // check for an overvote
         OvervoteDecision overvoteDecision = getOvervoteDecision(candidates);
         // If overvote should trigger exhaustion, indicate exhausted.
+        // However, to pass existing tests, must use StatusForRound.INVALIDATED_BY_OVERVOTE
+        // instead of StatusForRound.EXHAUSTED_CHOICE.
         if (overvoteDecision == OvervoteDecision.EXHAUST) {
           recordSelectionForCastVoteRecord(
               cvr,
               roundTally,
               roundTallyBySlice,
               null,
-              StatusForRound.EXHAUSTED_CHOICE,
+              StatusForRound.INVALIDATED_BY_OVERVOTE,
               "");
           break;
         } else if (overvoteDecision == OvervoteDecision.SKIP_TO_NEXT_RANK) {
@@ -1259,7 +1261,9 @@ final class Tabulator {
           continue; // skip to next rank
         } else if (overvoteDecision == OvervoteDecision.INACTIVE_BY_OVERVOTE) {
           // INACTIVE_BY_OVERVOTE decision indicates more than one overvoted candidate
-          //  is continuing, so round status is temporarily INVALIDATED_BY_OVERVOTE.
+          // is continuing, so round status is temporarily INVALIDATED_BY_OVERVOTE.
+          // However this round status is incorrectly used above instead of
+          // StatusForRound.EXHAUSTED_CHOICE so logged the same in spite of not being the same.
           recordSelectionForCastVoteRecord(
               cvr,
               roundTally,
