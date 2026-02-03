@@ -5025,25 +5025,29 @@
     "@id" : "election-001",
     "@type" : "Election",
     "Candidate" : [ {
-      "@id" : "c-cand_a",
-      "Name" : "Cand_A"
-    }, {
-      "@id" : "c-cand_b",
-      "Name" : "Cand_B"
-    }, {
-      "@id" : "c-cand_c",
-      "Name" : "Cand_C"
-    }, {
-      "@id" : "c-cand_d",
-      "Name" : "Cand_D"
-    }, {
       "@id" : "c-undeclared_write-ins",
       "Name" : "Undeclared Write-ins"
+    }, {
+      "@id" : "c-cand_a",
+      "Name" : "cand_A"
+    }, {
+      "@id" : "c-cand_b",
+      "Name" : "cand_B"
+    }, {
+      "@id" : "c-cand_c",
+      "Name" : "cand_C"
+    }, {
+      "@id" : "c-cand_d",
+      "Name" : "cand_D"
     } ],
     "Contest" : [ {
       "@id" : "contest-001",
       "@type" : "CandidateContest",
       "ContestSelection" : [ {
+        "@id" : "cs-undeclared_write-ins",
+        "@type" : "ContestSelection",
+        "CandidateIds" : [ "c-undeclared_write-ins" ]
+      }, {
         "@id" : "cs-cand_a",
         "@type" : "ContestSelection",
         "CandidateIds" : [ "c-cand_a" ]
@@ -5059,16 +5063,12 @@
         "@id" : "cs-cand_d",
         "@type" : "ContestSelection",
         "CandidateIds" : [ "c-cand_d" ]
-      }, {
-        "@id" : "cs-undeclared_write-ins",
-        "@type" : "ContestSelection",
-        "CandidateIds" : [ "c-undeclared_write-ins" ]
       } ],
       "Name" : "Count-overvote-when-single-continuing"
     } ],
     "ElectionScopeId" : "gpu-election"
   } ],
-  "GeneratedDate" : "2026-01-26T10:12:27-08:00",
+  "GeneratedDate" : "2026-02-03T08:17:13-08:00",
   "GpUnit" : [ {
     "@id" : "gpu-election",
     "@type" : "GpUnit",

@@ -16,11 +16,11 @@
     },
     "round" : 1,
     "tally" : {
-      "Cand_A" : "7",
-      "Cand_B" : "6",
-      "Cand_C" : "4",
-      "Cand_D" : "1",
-      "Undeclared Write-ins" : "0"
+      "Undeclared Write-ins" : "0",
+      "cand_A" : "7",
+      "cand_B" : "6",
+      "cand_C" : "4",
+      "cand_D" : "1"
     },
     "tallyResults" : [ {
       "eliminated" : "Undeclared Write-ins",
@@ -36,15 +36,15 @@
     },
     "round" : 2,
     "tally" : {
-      "Cand_A" : "7",
-      "Cand_B" : "6",
-      "Cand_C" : "4",
-      "Cand_D" : "1"
+      "cand_A" : "7",
+      "cand_B" : "6",
+      "cand_C" : "4",
+      "cand_D" : "1"
     },
     "tallyResults" : [ {
-      "eliminated" : "Cand_D",
+      "eliminated" : "cand_D",
       "transfers" : {
-        "Cand_C" : "1"
+        "cand_C" : "1"
       }
     } ],
     "threshold" : "10"
@@ -57,15 +57,15 @@
     },
     "round" : 3,
     "tally" : {
-      "Cand_A" : "7",
-      "Cand_B" : "6",
-      "Cand_C" : "5"
+      "cand_A" : "7",
+      "cand_B" : "6",
+      "cand_C" : "5"
     },
     "tallyResults" : [ {
-      "eliminated" : "Cand_C",
+      "eliminated" : "cand_C",
       "transfers" : {
-        "Cand_A" : "2",
-        "Cand_B" : "1",
+        "cand_A" : "2",
+        "cand_B" : "1",
         "exhausted" : "2"
       }
     } ],
@@ -79,11 +79,11 @@
     },
     "round" : 4,
     "tally" : {
-      "Cand_A" : "9",
-      "Cand_B" : "7"
+      "cand_A" : "9",
+      "cand_B" : "7"
     },
     "tallyResults" : [ {
-      "elected" : "Cand_A",
+      "elected" : "cand_A",
       "transfers" : { }
     } ],
     "threshold" : "9"

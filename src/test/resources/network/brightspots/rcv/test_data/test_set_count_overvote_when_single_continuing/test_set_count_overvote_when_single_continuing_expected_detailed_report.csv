@@ -6,7 +6,7 @@ Contest,Count-overvote-when-single-continuing
 Jurisdiction,Portlandia
 Office,Mayor
 Date,2026-01-26
-Winner(s),Cand_A
+Winner(s),cand_A
 Final Threshold,9
 
 Contest Summary
@@ -16,12 +16,12 @@ Total Number of Ballots,20
 Number of Undervotes (No Rankings),0
 
 Rounds,Round 1 Votes,% of vote,transfer,Round 2 Votes,% of vote,transfer,Round 3 Votes,% of vote,transfer,Round 4 Votes,% of vote,transfer
-Eliminated,Undeclared Write-ins,,,Cand_D,,,Cand_C,,,,,
-Elected,,,,,,,,,,Cand_A,,
-Cand_A,7,38.88%,0,7,38.88%,0,7,38.88%,2,9,56.25%,0
-Cand_B,6,33.33%,0,6,33.33%,0,6,33.33%,1,7,43.75%,0
-Cand_C,4,22.22%,0,4,22.22%,1,5,27.77%,-5,0,0.0%,0
-Cand_D,1,5.55%,0,1,5.55%,-1,0,0.0%,0,0,0.0%,0
+Eliminated,Undeclared Write-ins,,,cand_D,,,cand_C,,,,,
+Elected,,,,,,,,,,cand_A,,
+cand_A,7,38.88%,0,7,38.88%,0,7,38.88%,2,9,56.25%,0
+cand_B,6,33.33%,0,6,33.33%,0,6,33.33%,1,7,43.75%,0
+cand_C,4,22.22%,0,4,22.22%,1,5,27.77%,-5,0,0.0%,0
+cand_D,1,5.55%,0,1,5.55%,-1,0,0.0%,0,0,0.0%,0
 Undeclared Write-ins,0,0.0%,0,0,0.0%,0,0,0.0%,0,0,0.0%,0
 Active Ballots,18,,,18,,,18,,,16,,
 Current Round Threshold,10,,,10,,,10,,,9,,
