@@ -10,66 +10,25 @@
   "results" : [ {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
-      "overvotes" : "2",
+      "overvotes" : "4",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
     },
     "round" : 1,
     "tally" : {
       "Undeclared Write-ins" : "0",
-      "cand_A" : "7",
-      "cand_B" : "6",
+      "cand_A" : "6",
+      "cand_B" : "5",
       "cand_C" : "4",
-      "cand_D" : "1"
+      "cand_D" : "3",
+      "cand_E" : "2",
+      "cand_F" : "1"
     },
     "tallyResults" : [ {
       "eliminated" : "Undeclared Write-ins",
       "transfers" : { }
     } ],
-    "threshold" : "10"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "0",
-      "overvotes" : "2",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 2,
-    "tally" : {
-      "cand_A" : "7",
-      "cand_B" : "6",
-      "cand_C" : "4",
-      "cand_D" : "1"
-    },
-    "tallyResults" : [ {
-      "eliminated" : "cand_D",
-      "transfers" : {
-        "cand_C" : "1"
-      }
-    } ],
-    "threshold" : "10"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "0",
-      "overvotes" : "2",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 3,
-    "tally" : {
-      "cand_A" : "7",
-      "cand_B" : "6",
-      "cand_C" : "5"
-    },
-    "tallyResults" : [ {
-      "eliminated" : "cand_C",
-      "transfers" : {
-        "cand_A" : "2",
-        "cand_B" : "1",
-        "exhausted" : "2"
-      }
-    } ],
-    "threshold" : "10"
+    "threshold" : "11"
   }, {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
@@ -77,22 +36,108 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
     },
+    "round" : 2,
+    "tally" : {
+      "cand_A" : "6",
+      "cand_B" : "5",
+      "cand_C" : "4",
+      "cand_D" : "3",
+      "cand_E" : "2",
+      "cand_F" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "cand_F",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ],
+    "threshold" : "11"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "cand_A" : "6",
+      "cand_B" : "5",
+      "cand_C" : "4",
+      "cand_D" : "3",
+      "cand_E" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "cand_E",
+      "transfers" : {
+        "exhausted" : "2"
+      }
+    } ],
+    "threshold" : "11"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "3",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
     "round" : 4,
     "tally" : {
-      "cand_A" : "9",
-      "cand_B" : "7"
+      "cand_A" : "6",
+      "cand_B" : "5",
+      "cand_C" : "4",
+      "cand_D" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "cand_D",
+      "transfers" : {
+        "exhausted" : "3"
+      }
+    } ],
+    "threshold" : "10"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "6",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 5,
+    "tally" : {
+      "cand_A" : "6",
+      "cand_B" : "5",
+      "cand_C" : "4"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "cand_C",
+      "transfers" : {
+        "exhausted" : "4"
+      }
+    } ],
+    "threshold" : "8"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "10",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 6,
+    "tally" : {
+      "cand_A" : "6",
+      "cand_B" : "5"
     },
     "tallyResults" : [ {
       "elected" : "cand_A",
       "transfers" : { }
     } ],
-    "threshold" : "9"
+    "threshold" : "6"
   } ],
   "summary" : {
-    "finalThreshold" : "9",
-    "numCandidates" : 5,
+    "finalThreshold" : "6",
+    "numCandidates" : 7,
     "numWinners" : 1,
-    "totalNumBallots" : "20",
+    "totalNumBallots" : "25",
     "undervotes" : 0
   }
 }
