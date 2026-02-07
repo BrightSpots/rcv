@@ -41,6 +41,14 @@
     "name" : "cand_D",
     "excluded" : false,
     "aliases" : [ ]
+  }, {
+    "name" : "cand_E",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "cand_F",
+    "excluded" : false,
+    "aliases" : [ ]
   } ],
   "rules" : {
     "tiebreakMode" : "useCandidateOrder",
@@ -51,7 +59,7 @@
     "multiSeatBottomsUpPercentageThreshold" : "",
     "decimalPlacesForVoteArithmetic" : "4",
     "maxSkippedRanksAllowed" : "unlimited",
-    "maxRankingsAllowed" : "15",
+    "maxRankingsAllowed" : "10",
     "nonIntegerWinningThreshold" : false,
     "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
