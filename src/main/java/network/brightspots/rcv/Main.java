@@ -37,7 +37,7 @@ public class Main extends GuiApplication {
 
   // TODO Sync version number with release.yml and build.gradle:
   // github.com/BrightSpots/rcv/issues/662
-  public static final String APP_VERSION = "2.0.1";
+  public static final String APP_VERSION = "2.0.2";
 
   /**
    * Main entry point to RCTab.
@@ -135,5 +135,6 @@ public class Main extends GuiApplication {
     Logger.info(
         "Host system: %s version %s",
         System.getProperty("os.name"), System.getProperty("os.version"));
+    Logger.info("Max heap size: %d MB", Runtime.getRuntime().maxMemory() / (1024 * 1024));
   }
 }

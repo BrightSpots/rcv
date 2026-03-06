@@ -4,6 +4,8 @@ module network.brightspots.rcv {
   requires com.fasterxml.jackson.databind;
   requires com.fasterxml.jackson.dataformat.xml;
   requires java.logging;
+  requires java.management;
+  requires jdk.management;
   requires javafx.base;
   requires javafx.controls;
   requires javafx.fxml;
