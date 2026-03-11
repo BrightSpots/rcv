@@ -22,8 +22,10 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
@@ -60,6 +62,8 @@ final class StreamingCvrReader extends BaseCvrReader {
   private final Integer batchColumnIndex;
   // 0-based column index of currentPrecinct name (if present)
   private final Integer precinctColumnIndex;
+  // 0-based column index of Ballot Style (if present)
+  private final Integer ballotStyleColumnIndex;
   // optional delimiter for cells that contain multiple candidates
   private final String overvoteDelimiter;
   private final String overvoteLabel;
@@ -84,6 +88,8 @@ final class StreamingCvrReader extends BaseCvrReader {
   private int lastRankSeen;
   // flag indicating data issues during parsing
   private boolean encounteredDataErrors = false;
+  // Does this ballot style have any empty rankings?
+  private Map<String, Boolean> ballotStyleHasEmptyRankings = new HashMap<>();
 
   StreamingCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
@@ -104,6 +110,7 @@ final class StreamingCvrReader extends BaseCvrReader {
         !isNullOrBlank(source.getPrecinctColumnIndex())
             ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
             : null;
+    this.ballotStyleColumnIndex = /** AS A TEST **/ 8;
     this.overvoteDelimiter = source.getOvervoteDelimiter();
     this.overvoteLabel = source.getOvervoteLabel();
     this.skippedRankLabel = source.getSkippedRankLabel();
@@ -183,9 +190,25 @@ final class StreamingCvrReader extends BaseCvrReader {
     String computedCastVoteRecordId =
         String.format("%s-%d", OutputWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
 
-    boolean areAllCandidatesEmpty = currentRankings.stream().allMatch(
+    boolean areAllCurrentRankingsEmpty = currentRankings.stream().allMatch(
             ranking -> isNullOrBlank(ranking.getValue()));
-    if (areAllCandidatesEmpty) {
+    if (ballotStyleColumnIndex != null) {
+      String ballotStyle = currentCvrData.size() > ballotStyleColumnIndex
+              ? currentCvrData.get(ballotStyleColumnIndex)
+              : null;
+
+      if (ballotStyleHasEmptyRankings.containsKey(ballotStyle)) {
+        Boolean hasPreviousEmptyRankings = ballotStyleHasEmptyRankings.get(ballotStyle);
+        if (hasPreviousEmptyRankings != areAllCurrentRankingsEmpty) {
+          Logger.severe("Ballot style %s has some cast vote records with votes and some without. "
+                       + "Cast vote record file: %s", ballotStyle, excelFileName);
+          encounteredDataErrors = true;
+        } else {
+          ballotStyleHasEmptyRankings.put(ballotStyle, areAllCurrentRankingsEmpty);
+        }
+      }
+    }
+    if (areAllCurrentRankingsEmpty) {
       Logger.auditable(
               "Skipping cast vote record with no votes for any candidates: %s", computedCastVoteRecordId);
       return;
