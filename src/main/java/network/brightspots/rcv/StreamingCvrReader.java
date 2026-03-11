@@ -183,6 +183,14 @@ final class StreamingCvrReader extends BaseCvrReader {
     String computedCastVoteRecordId =
         String.format("%s-%d", OutputWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
 
+    boolean areAllCandidatesEmpty = currentRankings.stream().allMatch(
+            ranking -> isNullOrBlank(ranking.getValue()));
+    if (areAllCandidatesEmpty) {
+      Logger.auditable(
+              "Skipping cast vote record with no votes for any candidates: %s", computedCastVoteRecordId);
+      return;
+    }
+
     // add precinct ID if needed
     if (precinctColumnIndex != null) {
       if (currentPrecinct == null) {

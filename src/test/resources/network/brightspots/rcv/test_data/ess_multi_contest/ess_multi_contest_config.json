@@ -1,0 +1,86 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "ES&S Multi-Contest",
+    "outputDirectory" : "output",
+    "contestDate" : "",
+    "contestJurisdiction" : "",
+    "contestOffice" : "",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : false
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "ess_multi_contest_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "9",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "4",
+    "batchColumnIndex" : "5",
+    "precinctColumnIndex" : "7",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "Write-in",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "Mickey Mouse",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "George Washington",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Luke Skywalker",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Zelda",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Abraham Lincoln",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Michael Jackson",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Indiana Jones",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Bugs Bunny",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "John Oliver",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "exhaustImmediately",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "5",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "cutoffElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

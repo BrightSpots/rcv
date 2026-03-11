@@ -991,6 +991,12 @@ class TabulatorTests {
   @DisplayName("halting error when CVRs have a ranking larger than the max-configured value")
   void maxRankingValidationFails() {
     runTabulationTest("max_ranking_enforcement",
-        TabulatorSession.CastVoteRecordGenericParseException.class.toString());
+            TabulatorSession.CastVoteRecordGenericParseException.class.toString());
+  }
+
+  @Test
+  @DisplayName("ES&S correctly ignores empty CVRs in multi-contest CVR")
+  void essMultiContest() {
+    runTabulationTest("ess_multi_contest");
   }
 }
