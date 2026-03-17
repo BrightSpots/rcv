@@ -82,6 +82,8 @@ final class StreamingCvrReader extends BaseCvrReader {
   private List<CastVoteRecord> cvrList;
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
+  // has this CVR had any non-blank candidate cells?
+  private boolean hasSeenAnyNonBlankCandidateCells;
   // flag indicating data issues during parsing
   private boolean encounteredDataErrors = false;
 
@@ -172,6 +174,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     currentBatch = null;
     currentPrecinct = null;
     lastRankSeen = 0;
+    hasSeenAnyNonBlankCandidateCells = false;
   }
 
   // complete construction of new CVR object
@@ -183,11 +186,9 @@ final class StreamingCvrReader extends BaseCvrReader {
     String computedCastVoteRecordId =
         String.format("%s-%d", OutputWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
 
-    boolean areAllCandidatesEmpty = currentRankings.stream().allMatch(
-            ranking -> isNullOrBlank(ranking.getValue()));
-    if (areAllCandidatesEmpty) {
-      Logger.auditable(
-              "Skipping cast vote record with no votes for any candidates: %s", computedCastVoteRecordId);
+    if (!hasSeenAnyNonBlankCandidateCells) {
+      Logger.info(
+              "Skipping CVR with no votes for any candidates: %s", computedCastVoteRecordId);
       return;
     }
 
@@ -267,6 +268,7 @@ final class StreamingCvrReader extends BaseCvrReader {
 
       for (String candidate : candidates) {
         candidate = candidate.trim();
+        hasSeenAnyNonBlankCandidateCells |= !candidate.isBlank();
         if (candidates.length > 1 && (candidate.isBlank() || candidate.equals(skippedRankLabel))) {
           Logger.severe(
               "If a cell contains multiple candidates split by the overvote delimiter, "

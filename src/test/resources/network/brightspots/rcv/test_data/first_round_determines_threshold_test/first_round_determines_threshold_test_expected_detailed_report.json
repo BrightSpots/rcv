@@ -49,7 +49,7 @@
     "finalThreshold" : "9",
     "numCandidates" : 4,
     "numWinners" : 1,
-    "totalNumBallots" : "19",
-    "undervotes" : 3
+    "totalNumBallots" : "16",
+    "undervotes" : 0
   }
 }
