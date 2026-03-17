@@ -187,7 +187,7 @@ final class StreamingCvrReader extends BaseCvrReader {
         String.format("%s-%d", OutputWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
 
     if (!hasSeenAnyNonBlankCandidateCells) {
-      Logger.info(
+      Logger.auditable(
               "Skipping CVR with no votes for any candidates: %s", computedCastVoteRecordId);
       return;
     }
