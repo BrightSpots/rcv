@@ -86,6 +86,8 @@ final class StreamingCvrReader extends BaseCvrReader {
   private List<CastVoteRecord> cvrList;
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
+  // has this CVR had any non-blank candidate cells?
+  private boolean hasSeenAnyNonBlankCandidateCells;
   // flag indicating data issues during parsing
   private boolean encounteredDataErrors = false;
   // Does this ballot style have any empty rankings?
@@ -110,7 +112,7 @@ final class StreamingCvrReader extends BaseCvrReader {
         !isNullOrBlank(source.getPrecinctColumnIndex())
             ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
             : null;
-    this.ballotStyleColumnIndex = /** AS A TEST **/ 8;
+    this.ballotStyleColumnIndex = /** AS A TEST **/ null;
     this.overvoteDelimiter = source.getOvervoteDelimiter();
     this.overvoteLabel = source.getOvervoteLabel();
     this.skippedRankLabel = source.getSkippedRankLabel();
@@ -179,6 +181,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     currentBatch = null;
     currentPrecinct = null;
     lastRankSeen = 0;
+    hasSeenAnyNonBlankCandidateCells = false;
   }
 
   // complete construction of new CVR object
@@ -190,27 +193,25 @@ final class StreamingCvrReader extends BaseCvrReader {
     String computedCastVoteRecordId =
         String.format("%s-%d", OutputWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
 
-    boolean areAllCurrentRankingsEmpty = currentRankings.stream().allMatch(
-            ranking -> isNullOrBlank(ranking.getValue()));
     if (ballotStyleColumnIndex != null) {
       String ballotStyle = currentCvrData.size() > ballotStyleColumnIndex
               ? currentCvrData.get(ballotStyleColumnIndex)
               : null;
 
       if (ballotStyleHasEmptyRankings.containsKey(ballotStyle)) {
-        Boolean hasPreviousEmptyRankings = ballotStyleHasEmptyRankings.get(ballotStyle);
-        if (hasPreviousEmptyRankings != areAllCurrentRankingsEmpty) {
+        Boolean hasPreviouslySeenNonBlankCandidateCells = ballotStyleHasEmptyRankings.get(ballotStyle);
+        if (hasPreviouslySeenNonBlankCandidateCells != hasSeenAnyNonBlankCandidateCells) {
           Logger.severe("Ballot style %s has some cast vote records with votes and some without. "
                        + "Cast vote record file: %s", ballotStyle, excelFileName);
           encounteredDataErrors = true;
         } else {
-          ballotStyleHasEmptyRankings.put(ballotStyle, areAllCurrentRankingsEmpty);
+          ballotStyleHasEmptyRankings.put(ballotStyle, hasSeenAnyNonBlankCandidateCells);
         }
       }
     }
-    if (areAllCurrentRankingsEmpty) {
+    if (!hasSeenAnyNonBlankCandidateCells) {
       Logger.auditable(
-              "Skipping cast vote record with no votes for any candidates: %s", computedCastVoteRecordId);
+              "Skipping CVR with no votes for any candidates: %s", computedCastVoteRecordId);
       return;
     }
 
@@ -290,6 +291,7 @@ final class StreamingCvrReader extends BaseCvrReader {
 
       for (String candidate : candidates) {
         candidate = candidate.trim();
+        hasSeenAnyNonBlankCandidateCells |= !candidate.isBlank();
         if (candidates.length > 1 && (candidate.isBlank() || candidate.equals(skippedRankLabel))) {
           Logger.severe(
               "If a cell contains multiple candidates split by the overvote delimiter, "
