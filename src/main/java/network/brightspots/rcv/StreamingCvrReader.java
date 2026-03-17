@@ -112,7 +112,7 @@ final class StreamingCvrReader extends BaseCvrReader {
         !isNullOrBlank(source.getPrecinctColumnIndex())
             ? Integer.parseInt(source.getPrecinctColumnIndex()) - 1
             : null;
-    this.ballotStyleColumnIndex = /** AS A TEST **/ null;
+    this.ballotStyleColumnIndex = null; // to be implemented
     this.overvoteDelimiter = source.getOvervoteDelimiter();
     this.overvoteLabel = source.getOvervoteLabel();
     this.skippedRankLabel = source.getSkippedRankLabel();
@@ -199,7 +199,8 @@ final class StreamingCvrReader extends BaseCvrReader {
               : null;
 
       if (ballotStyleHasEmptyRankings.containsKey(ballotStyle)) {
-        Boolean hasPreviouslySeenNonBlankCandidateCells = ballotStyleHasEmptyRankings.get(ballotStyle);
+        Boolean hasPreviouslySeenNonBlankCandidateCells =
+              ballotStyleHasEmptyRankings.get(ballotStyle);
         if (hasPreviouslySeenNonBlankCandidateCells != hasSeenAnyNonBlankCandidateCells) {
           Logger.severe("Ballot style %s has some cast vote records with votes and some without. "
                        + "Cast vote record file: %s", ballotStyle, excelFileName);
