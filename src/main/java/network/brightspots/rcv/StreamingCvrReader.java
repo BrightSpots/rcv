@@ -84,6 +84,8 @@ final class StreamingCvrReader extends BaseCvrReader {
   private int lastRankSeen;
   // has this CVR had any non-blank candidate cells?
   private boolean hasSeenAnyNonBlankCandidateCells;
+  // total number of rows where there were only blank candidates
+  private int numRowsIgnoredBecauseAllBlank;
   // flag indicating data issues during parsing
   private boolean encounteredDataErrors = false;
 
@@ -175,6 +177,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     currentPrecinct = null;
     lastRankSeen = 0;
     hasSeenAnyNonBlankCandidateCells = false;
+    numRowsIgnoredBecauseAllBlank = 0;
   }
 
   // complete construction of new CVR object
@@ -189,6 +192,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     if (!hasSeenAnyNonBlankCandidateCells) {
       Logger.auditable(
               "Skipping CVR with no votes for any candidates: %s", computedCastVoteRecordId);
+      numRowsIgnoredBecauseAllBlank++;
       return;
     }
 
@@ -378,6 +382,11 @@ final class StreamingCvrReader extends BaseCvrReader {
     xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));
     // close zip file without saving
     pkg.revert();
+
+    if (numRowsIgnoredBecauseAllBlank > 0) {
+      Logger.warning("Ignored %d rows with no votes for any candidates.",
+          numRowsIgnoredBecauseAllBlank);
+    }
 
     if (encounteredDataErrors) {
       throw new CvrDataFormatException();
