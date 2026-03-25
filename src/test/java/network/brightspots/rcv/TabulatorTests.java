@@ -27,9 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,8 +51,7 @@ import org.junit.jupiter.api.Test;
 class TabulatorTests {
 
   // folder where we store test inputs
-  private static final String TEST_ASSET_FOLDER =
-      "src/test/resources/network/brightspots/rcv/test_data";
+  private static final String TEST_ASSET_FOLDER = Common.TEST_ASSET_FOLDER;
   // limit log output to avoid spam
   private static final Integer MAX_LOG_ERRORS = 10;
 
@@ -496,73 +493,46 @@ class TabulatorTests {
 
   @Test
   @DisplayName("Test CVRs with same data but different formats produce same results")
-  void testSameDataDifferentFormats() throws IOException {
-    String[] stems = {"ess", "cdf"};
-    String sharedDir = Paths.get(System.getProperty("user.dir"),
-        TEST_ASSET_FOLDER, "_shared", "same_data_different_formats").toString();
-
-    ObjectMapper mapper = new ObjectMapper();
-    File baseConfigFile = Paths.get(sharedDir, "base_config.json").toFile();
-    JsonNode baseConfig = mapper.readTree(baseConfigFile);
-
+  void testSameDataDifferentFormats() throws Exception {
     List<Path> detailedJsonPaths = new ArrayList<>();
     List<Path> detailedCsvPaths = new ArrayList<>();
     List<TabulatorSession> sessions = new ArrayList<>();
-    List<File> tempConfigs = new ArrayList<>();
 
-    // First pass: run each tabulation and assert it succeeds
-    for (String stem : stems) {
-      File stemConfigFile = Paths.get(sharedDir, stem + "_config.json").toFile();
-      JsonNode stemSources = mapper.readTree(stemConfigFile);
+    Common.runForEachProvider(configPath -> {
+      String configPathStr = configPath.toString();
+      TabulatorSession session = new TabulatorSession(configPathStr);
+      List<String> exceptions = session.tabulate("Automated test");
+      assertTrue(exceptions.isEmpty(),
+          "Tabulation failed for \"" + configPath.getFileName() + "\": " + exceptions);
+      sessions.add(session);
 
-      ObjectNode mergedConfig = baseConfig.deepCopy();
-      mergedConfig.set("cvrFileSources", stemSources);
+      String timestampString = session.getTimestampString();
+      ContestConfig config = ContestConfig.loadContestConfig(configPathStr);
+      assertNotNull(config);
+      String resultsDir = config.getOutputDirectory(timestampString);
 
-      File tempConfig = Paths.get(sharedDir, stem + "_combined_config.json").toFile();
-      mapper.writeValue(tempConfig, mergedConfig);
-      tempConfigs.add(tempConfig);
+      detailedJsonPaths.add(new OutputFileIdentifiers(OutputType.DETAILED_JSON)
+          .getPath(resultsDir, timestampString, null));
+      detailedCsvPaths.add(new OutputFileIdentifiers(OutputType.DETAILED_CSV)
+          .getPath(resultsDir, timestampString, null));
+    });
+
+    // Verify all outputs match the first stem's outputs
+    String firstJson = detailedJsonPaths.getFirst().toString();
+    String firstCsv = detailedCsvPaths.getFirst().toString();
+    for (int i = 1; i < detailedJsonPaths.size(); i++) {
+      String thisJson = detailedJsonPaths.get(i).toString();
+      String thisCsv = detailedCsvPaths.get(i).toString();
+      assertTrue(
+          fileCompare(firstJson, thisJson),
+          "detailed_report.json differs between \"" + firstJson + "\" and \"" + thisJson + "\"");
+      assertTrue(
+          fileCompare(firstCsv, thisCsv),
+          "detailed_report.csv differs between \"" + firstCsv + "\" and \"" + thisCsv + "\"");
     }
 
-    try {
-      for (File tempConfig : tempConfigs) {
-        String configPath = tempConfig.getAbsolutePath();
-        TabulatorSession session = new TabulatorSession(configPath);
-        List<String> exceptions = session.tabulate("Automated test");
-        assertTrue(exceptions.isEmpty(),
-            "Tabulation failed for stem \"" + tempConfig.getName() + "\": " + exceptions);
-        sessions.add(session);
-
-        String timestampString = session.getTimestampString();
-        ContestConfig config = ContestConfig.loadContestConfig(configPath);
-        assertNotNull(config);
-        String resultsDir = config.getOutputDirectory(timestampString);
-
-        detailedJsonPaths.add(new OutputFileIdentifiers(OutputType.DETAILED_JSON)
-            .getPath(resultsDir, timestampString, null));
-        detailedCsvPaths.add(new OutputFileIdentifiers(OutputType.DETAILED_CSV)
-            .getPath(resultsDir, timestampString, null));
-      }
-
-      // Second pass: verify all outputs match the first stem's outputs
-      String firstJson = detailedJsonPaths.getFirst().toString();
-      String firstCsv = detailedCsvPaths.getFirst().toString();
-      for (int i = 1; i < stems.length; i++) {
-        assertTrue(
-            fileCompare(firstJson, detailedJsonPaths.get(i).toString()),
-            "detailed_report.json differs between \"" + stems[0] + "\" and \"" + stems[i] + "\"");
-        assertTrue(
-            fileCompare(firstCsv, detailedCsvPaths.get(i).toString()),
-            "detailed_report.csv differs between \"" + stems[0] + "\" and \"" + stems[i] + "\"");
-      }
-
-      // Clean up output folders on success
-      for (TabulatorSession session : sessions) {
-        cleanOutputFolder(session);
-      }
-    } finally {
-      for (File tempConfig : tempConfigs) {
-        Files.deleteIfExists(tempConfig.toPath());
-      }
+    for (TabulatorSession session : sessions) {
+      cleanOutputFolder(session);
     }
   }
 
