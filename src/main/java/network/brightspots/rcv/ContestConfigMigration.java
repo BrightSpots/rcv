@@ -151,7 +151,18 @@ final class ContestConfigMigration {
 
       if (rules.treatBlankAsUndeclaredWriteIn) {
         for (CvrSource source : rawConfig.cvrFileSources) {
-          source.setTreatBlankAsUndeclaredWriteIn(rules.treatBlankAsUndeclaredWriteIn);
+          source.setBlankInterpretation(
+              ContestConfig.BlankInterpretation.UNDECLARED_WRITE_IN.getInternalLabel());
+        }
+      }
+
+      // Migrate per-source treatBlankAsUndeclaredWriteIn boolean to blankInterpretation string
+      for (CvrSource source : rawConfig.cvrFileSources) {
+        if (isNullOrBlank(source.getBlankInterpretation())) {
+          source.setBlankInterpretation(
+              Boolean.TRUE.equals(source.getTreatBlankAsUndeclaredWriteIn())
+                  ? ContestConfig.BlankInterpretation.UNDECLARED_WRITE_IN.getInternalLabel()
+                  : ContestConfig.BlankInterpretation.INVALID.getInternalLabel());
         }
       }
 

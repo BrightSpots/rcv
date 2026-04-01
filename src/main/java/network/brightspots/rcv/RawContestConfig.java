@@ -19,11 +19,14 @@ package network.brightspots.rcv;
 
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -79,10 +82,11 @@ public class RawContestConfig {
     private final SimpleStringProperty overvoteLabel = new SimpleStringProperty();
     private final SimpleStringProperty skippedRankLabel = new SimpleStringProperty();
     private final SimpleStringProperty undeclaredWriteInLabel = new SimpleStringProperty();
-    private final SimpleBooleanProperty treatBlankAsUndeclaredWriteIn = new SimpleBooleanProperty();
+    private final SimpleStringProperty blankInterpretation = new SimpleStringProperty();
 
-    // Deprecated fields
+    // Deprecated fields — kept only to migrate old config files
     private String undervoteLabel;
+    @Deprecated private Boolean treatBlankAsUndeclaredWriteIn;
 
     CvrSource() {}
 
@@ -99,7 +103,7 @@ public class RawContestConfig {
         String overvoteLabel,
         String skippedRankLabel,
         String undeclaredWriteInLabel,
-        boolean treatBlankAsUndeclaredWriteIn) {
+        String blankInterpretation) {
       this.filePath.set(filePath);
       this.firstVoteColumnIndex.set(firstVoteColumnIndex);
       this.firstVoteRowIndex.set(firstVoteRowIndex);
@@ -112,7 +116,7 @@ public class RawContestConfig {
       this.overvoteLabel.set(overvoteLabel);
       this.skippedRankLabel.set(skippedRankLabel);
       this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
-      this.treatBlankAsUndeclaredWriteIn.set(treatBlankAsUndeclaredWriteIn);
+      this.blankInterpretation.set(blankInterpretation);
     }
 
     public String getFilePath() {
@@ -215,12 +219,26 @@ public class RawContestConfig {
       this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
     }
 
-    public boolean getTreatBlankAsUndeclaredWriteIn() {
-      return treatBlankAsUndeclaredWriteIn.get();
+    public String getBlankInterpretation() {
+      return blankInterpretation.get();
     }
 
+    public void setBlankInterpretation(String blankInterpretation) {
+      this.blankInterpretation.set(blankInterpretation);
+    }
+
+    /** @deprecated Use {@link #getBlankInterpretation()} instead. */
+    @Deprecated
+    @JsonIgnore
+    public Boolean getTreatBlankAsUndeclaredWriteIn() {
+      return treatBlankAsUndeclaredWriteIn;
+    }
+
+    /** @deprecated Used only to read legacy config files during migration. */
+    @Deprecated
+    @JsonSetter("treatBlankAsUndeclaredWriteIn")
     public void setTreatBlankAsUndeclaredWriteIn(Boolean treatBlankAsUndeclaredWriteIn) {
-      this.treatBlankAsUndeclaredWriteIn.set(treatBlankAsUndeclaredWriteIn);
+      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
 
     /**
@@ -275,8 +293,8 @@ public class RawContestConfig {
       return undeclaredWriteInLabel;
     }
 
-    public SimpleBooleanProperty treatBlankAsUndeclaredWriteInProperty() {
-      return treatBlankAsUndeclaredWriteIn;
+    public SimpleStringProperty blankInterpretationProperty() {
+      return blankInterpretation;
     }
 
     // Deprecated fields

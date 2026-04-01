@@ -58,7 +58,7 @@ class ContestConfig {
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_FIRST_ROUND_DETERMINES_THRESHOLD = false;
-  static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
+  static final BlankInterpretation SUGGESTED_BLANK_INTERPRETATION = BlankInterpretation.UNDERVOTE;
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
   static final int SUGGESTED_CVR_ID_COLUMN = 1;
@@ -68,6 +68,7 @@ class ContestConfig {
   static final boolean SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED = false;
   static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
   static final String SUGGESTED_SKIPPED_RANK_LABEL = "undervote";
+  static final String SUGGESTED_UWI_LABEL = "Write-In";
   static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   private static final int MIN_COLUMN_INDEX = 1;
@@ -155,19 +156,29 @@ class ContestConfig {
       validationErrors.add(ValidationError.CVR_FILE_PATH_MISSING);
       Logger.severe("filePath is required for each cast vote record file!");
     } else {
-      if (!isNullOrBlank(source.getOvervoteLabel())
-          && stringAlreadyInUseElsewhereInSource(
+      if (isNullOrBlank(source.getOvervoteLabel())
+          || stringAlreadyInUseElsewhereInSource(
               source.getOvervoteLabel(), source, "overvoteLabel")) {
+        Logger.severe(
+            "Overvote label must be defined and unique from other labels for CVR source: %s",
+            source.getFilePath());
         validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
       }
-      if (!isNullOrBlank(source.getSkippedRankLabel())
-          && stringAlreadyInUseElsewhereInSource(
+      if (isNullOrBlank(source.getSkippedRankLabel())
+          || stringAlreadyInUseElsewhereInSource(
               source.getSkippedRankLabel(), source, "skippedRankLabel")) {
+        Logger.severe(
+            "Skipped rank label must be defined and unique from other labels for CVR source: %s",
+            source.getFilePath());
         validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID);
       }
-      if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-          && stringAlreadyInUseElsewhereInSource(
+      if (isNullOrBlank(source.getUndeclaredWriteInLabel())
+          || stringAlreadyInUseElsewhereInSource(
               source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
+        Logger.severe(
+            "Undeclared write-in label must be defined and unique"
+                + " from other labels for CVR source: %s",
+            source.getFilePath());
         validationErrors.add(ValidationError.CVR_UWI_LABEL_INVALID);
       }
 
@@ -218,6 +229,15 @@ class ContestConfig {
               source.getFilePath())) {
             validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
           }
+        } else if (getBlankInterpretation(source) != BlankInterpretation.INVALID) {
+          // blankInterpretation is only supported for ESS (StreamingCvrReader)
+          logErrorWithLocation(
+              String.format(
+                  "blankInterpretation should not be set for CVR source with provider \"%s\":"
+                      + " only ES&S sources support this field",
+                  provider),
+              source.getFilePath());
+          validationErrors.add(ValidationError.CVR_BLANK_INTERPRETATION_UNEXPECTEDLY_DEFINED);
         }
 
         // See the config file documentation for an explanation of this regex
@@ -292,14 +312,13 @@ class ContestConfig {
           validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED);
         }
 
-        if (source.getTreatBlankAsUndeclaredWriteIn()) {
+        if (getBlankInterpretation(source) != BlankInterpretation.INVALID) {
           logErrorWithLocation(
               String.format(
-                  "treatBlankAsUndeclaredWriteIn should not be true for CVR source with "
-                      + "provider \"%s\"",
+                  "blankInterpretation should not be set for CVR source with provider \"%s\"",
                   provider),
               source.getFilePath());
-          validationErrors.add(ValidationError.CVR_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE);
+          validationErrors.add(ValidationError.CVR_BLANK_INTERPRETATION_UNEXPECTEDLY_DEFINED);
         }
       }
 
@@ -523,6 +542,11 @@ class ContestConfig {
       Logger.severe(
           "Contest config validation failed! Modify the contest config file and try again.\n"
               + "See config_file_documentation.txt for more details.");
+
+      for (ValidationError error : validationErrors) {
+        // TODO -- we should really have a message summary for each of these
+        Logger.severe("- %s", error);
+      }
     }
     return validationErrors;
   }
@@ -1276,15 +1300,63 @@ class ContestConfig {
   }
 
   private boolean undeclaredWriteInsEnabled() {
-    boolean includeUwi = false;
     for (CvrSource source : rawConfig.cvrFileSources) {
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-          || source.getTreatBlankAsUndeclaredWriteIn()) {
-        includeUwi = true;
-        break;
+          || getBlankInterpretation(source) == BlankInterpretation.UNDECLARED_WRITE_IN) {
+        return true;
       }
     }
-    return includeUwi;
+    return false;
+  }
+
+  /** How blank rankings in a CVR are interpreted during tabulation. */
+  enum BlankInterpretation {
+    INVALID("invalid", "Invalid"),
+    UNDECLARED_WRITE_IN(
+        "undeclaredWriteIn", "Undeclared Write-In"),
+    IRRELEVANT_CONTEST("irrelevantContest", "Irrelevant Contest"),
+    UNDERVOTE("undervote", "Undervote");
+
+    private final String internalLabel;
+    private final String displayName;
+
+    BlankInterpretation(String internalLabel, String displayName) {
+      this.internalLabel = internalLabel;
+      this.displayName = displayName;
+    }
+
+    public String getInternalLabel() {
+      return internalLabel;
+    }
+
+    @Override
+    public String toString() {
+      return displayName;
+    }
+
+    static BlankInterpretation getByInternalLabel(String label) {
+      if (label != null) {
+        for (BlankInterpretation v : values()) {
+          if (v.internalLabel.equals(label)) {
+            return v;
+          }
+        }
+      }
+      return INVALID;
+    }
+  }
+
+  static BlankInterpretation getBlankInterpretation(CvrSource source) {
+    return BlankInterpretation.getByInternalLabel(source.getBlankInterpretation());
+  }
+
+  public boolean doesAnySourceInterpretBlanksAs(BlankInterpretation interpretation) {
+    for (CvrSource source : rawConfig.cvrFileSources) {
+      if (getBlankInterpretation(source) == interpretation) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // Possible validation errors
@@ -1306,7 +1378,7 @@ class ContestConfig {
     CVR_PRECINCT_COLUMN_INVALID,
     CVR_OVERVOTE_DELIMITER_INVALID,
     CVR_CDF_FILE_PATH_INVALID,
-    CVR_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE,
+    CVR_BLANK_INTERPRETATION_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_INVALID,
     CVR_DUPLICATE_FILE_PATHS,
     CVR_FILE_PATH_INVALID,

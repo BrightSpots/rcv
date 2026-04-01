@@ -236,12 +236,12 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <CheckBox fx:id="checkBoxCvrTreatBlankAsUndeclaredWriteIn"
-                        mnemonicParsing="false" text="Treat Blank as Undeclared Write-in">
+                      <Label prefWidth="174.0" text="Treat Blanks As"/>
+                      <ChoiceBox fx:id="choiceBoxCvrBlankInterpretation">
                         <VBox.margin>
                           <Insets top="8.0" bottom="8.0"/>
                         </VBox.margin>
-                      </CheckBox>
+                      </ChoiceBox>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>
@@ -299,8 +299,8 @@
                     <TableColumn minWidth="20.0"
                       prefWidth="90.0" text="Undeclared&#10;Write-In&#10;Label"
                       fx:id="tableColumnCvrUndeclaredWriteInLabel"/>
-                    <TableColumn fx:id="tableColumnCvrTreatBlankAsUndeclaredWriteIn" minWidth="20.0"
-                      prefWidth="120.0" text="Treat Blank&#10;As Undeclared&#10;Write-In"/>
+                    <TableColumn fx:id="tableColumnCvrBlankInterpretation" minWidth="20.0"
+                      prefWidth="180.0" text="Blank&#10;Interpretation"/>
                   </columns>
                 </TableView>
                 <padding>

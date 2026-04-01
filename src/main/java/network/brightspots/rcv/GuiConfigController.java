@@ -80,6 +80,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -187,7 +188,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrUndeclaredWriteInLabel;
   @FXML
-  private TableColumn<CvrSource, Boolean> tableColumnCvrTreatBlankAsUndeclaredWriteIn;
+  private TableColumn<CvrSource, String> tableColumnCvrBlankInterpretation;
   @FXML
   private ChoiceBox<Provider> choiceCvrProvider;
   @FXML
@@ -217,7 +218,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCvrUndeclaredWriteInLabel;
   @FXML
-  private CheckBox checkBoxCvrTreatBlankAsUndeclaredWriteIn;
+  private ChoiceBox<ContestConfig.BlankInterpretation> choiceBoxCvrBlankInterpretation;
   @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
@@ -850,7 +851,7 @@ public class GuiConfigController implements Initializable {
     String overvoteLabel = getTextOrEmptyString(textFieldCvrOvervoteLabel);
     String skippedRankLabel = getTextOrEmptyString(textFieldCvrSkippedRankLabel);
     String undeclaredWriteInLabel = getTextOrEmptyString(textFieldCvrUndeclaredWriteInLabel);
-    boolean treatBlankAsUndeclaredWriteIn = checkBoxCvrTreatBlankAsUndeclaredWriteIn.isSelected();
+    String blankInterpretation = choiceBoxCvrBlankInterpretation.getValue().getInternalLabel();
 
     cvrPaths.forEach(filePath -> {
       CvrSource cvrSource =
@@ -867,7 +868,7 @@ public class GuiConfigController implements Initializable {
               overvoteLabel,
               skippedRankLabel,
               undeclaredWriteInLabel,
-              treatBlankAsUndeclaredWriteIn
+              blankInterpretation
           );
       Set<ValidationError> validationErrors =
           ContestConfig.performBasicCvrSourceValidation(cvrSource);
@@ -989,8 +990,8 @@ public class GuiConfigController implements Initializable {
     textFieldCvrSkippedRankLabel.setDisable(true);
     textFieldCvrUndeclaredWriteInLabel.clear();
     textFieldCvrUndeclaredWriteInLabel.setDisable(true);
-    checkBoxCvrTreatBlankAsUndeclaredWriteIn.setSelected(false);
-    checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(true);
+    choiceBoxCvrBlankInterpretation.setValue(ContestConfig.SUGGESTED_BLANK_INTERPRETATION);
+    choiceBoxCvrBlankInterpretation.setDisable(true);
   }
 
   /**
@@ -1356,9 +1357,29 @@ public class GuiConfigController implements Initializable {
     clearAndDisableCvrFilesTabFields();
     choiceCvrProvider.getItems().addAll(Provider.values());
     choiceCvrProvider.getItems().remove(Provider.PROVIDER_UNKNOWN);
+    choiceBoxCvrBlankInterpretation.getItems()
+        .addAll(ContestConfig.BlankInterpretation.values());
+    choiceBoxCvrBlankInterpretation.setOnAction(event -> {
+      boolean isUndervote = choiceBoxCvrBlankInterpretation.getValue()
+          == ContestConfig.BlankInterpretation.UNDERVOTE;
+      if (isUndervote) {
+        textFieldCvrSkippedRankLabel.clear();
+        textFieldCvrSkippedRankLabel.setDisable(true);
+      } else {
+        Provider provider = getProviderChoice(choiceCvrProvider);
+        if (provider == Provider.ESS || provider == Provider.CSV) {
+          textFieldCvrSkippedRankLabel.setDisable(false);
+          if (textFieldCvrSkippedRankLabel.getText().isEmpty()) {
+            textFieldCvrSkippedRankLabel.setText(ContestConfig.SUGGESTED_SKIPPED_RANK_LABEL);
+          }
+        }
+      }
+    });
     choiceCvrProvider.setOnAction(event -> {
       clearAndDisableCvrFilesTabFields();
       textFieldCvrUndeclaredWriteInLabel.setDisable(false);
+      textFieldCvrUndeclaredWriteInLabel.setText(ContestConfig.SUGGESTED_UWI_LABEL); // For all providers or just for ES&S?
+
       switch (getProviderChoice(choiceCvrProvider)) {
         case ESS -> {
           buttonAddCvrFile.setDisable(false);
@@ -1381,9 +1402,8 @@ public class GuiConfigController implements Initializable {
           textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
           textFieldCvrSkippedRankLabel.setDisable(false);
           textFieldCvrSkippedRankLabel.setText(ContestConfig.SUGGESTED_SKIPPED_RANK_LABEL);
-          checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(false);
-          checkBoxCvrTreatBlankAsUndeclaredWriteIn
-              .setSelected(ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
+          choiceBoxCvrBlankInterpretation.setDisable(false);
+          choiceBoxCvrBlankInterpretation.setValue(ContestConfig.SUGGESTED_BLANK_INTERPRETATION);
         }
         case CSV -> {
           buttonAddCvrFile.setDisable(false);
@@ -1446,8 +1466,8 @@ public class GuiConfigController implements Initializable {
         new EditableColumnString(tableColumnCvrSkippedRankLabel, "skippedRankLabel"),
         new EditableColumnString(tableColumnCvrUndeclaredWriteInLabel,
            "undeclaredWriteInLabel"),
-        new EditableColumnBoolean(tableColumnCvrTreatBlankAsUndeclaredWriteIn,
-           "treatBlankAsUndeclaredWriteIn"),
+        new EditableColumnEnum(tableColumnCvrBlankInterpretation, "blankInterpretation",
+            ContestConfig.BlankInterpretation.values()),
     };
     setUpEditableTableStrings(cvrStringColumnsAndProperties);
 
@@ -1464,8 +1484,6 @@ public class GuiConfigController implements Initializable {
         .setCellValueFactory(new PropertyValueFactory<>("skippedRankLabel"));
     tableColumnCvrUndeclaredWriteInLabel
         .setCellValueFactory(new PropertyValueFactory<>("undeclaredWriteInLabel"));
-    tableColumnCvrTreatBlankAsUndeclaredWriteIn
-        .setCellValueFactory(new PropertyValueFactory<>("treatBlankAsUndeclaredWriteIn"));
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCvrFiles.setEditable(true);
     tableViewCvrFiles.getColumns().add(0, NumberTableCellFactory.createNumberColumn("#", 1));
@@ -2154,6 +2172,57 @@ public class GuiConfigController implements Initializable {
     @Override
     public void setCellFactory() {
       column.setCellFactory(tc -> new EditableTableCellPopup<Candidate>());
+    }
+  }
+
+  /**
+   * An editable table column backed by an enum's internal label string, displayed and edited via
+   * an inline ChoiceBox that shows human-readable display names.
+   *
+   * <p>The model property stores the internal label. The ChoiceBox items are also internal labels,
+   * but a StringConverter renders each as its display name. This means ChoiceBoxTableCell commits
+   * the selected internal label directly back to the property via the default onEditCommit handler,
+   * and it can pre-select the current value correctly when editing starts.
+   */
+  private static class EditableColumnEnum extends EditableColumn {
+    private final ContestConfig.BlankInterpretation[] values;
+
+    public EditableColumnEnum(
+        TableColumn column,
+        String propertyName,
+        ContestConfig.BlankInterpretation[] values) {
+      super(column, propertyName);
+      this.values = values;
+    }
+
+    @Override
+    public Class propertyType() {
+      return String.class;
+    }
+
+    @Override
+    public void setCellFactory() {
+      // Converter: internal label → display name for rendering; fromString unused by ChoiceBoxTableCell
+      StringConverter<String> converter =
+          new StringConverter<>() {
+            @Override
+            public String toString(String internalLabel) {
+              return ContestConfig.BlankInterpretation.getByInternalLabel(internalLabel).toString();
+            }
+
+            @Override
+            public String fromString(String s) {
+              return s;
+            }
+          };
+
+      // Items are internal labels so commitEdit writes the right value to the model property
+      String[] internalLabels =
+          Arrays.stream(values)
+              .map(ContestConfig.BlankInterpretation::getInternalLabel)
+              .toArray(String[]::new);
+
+      column.setCellFactory(ChoiceBoxTableCell.forTableColumn(converter, internalLabels));
     }
   }
 
