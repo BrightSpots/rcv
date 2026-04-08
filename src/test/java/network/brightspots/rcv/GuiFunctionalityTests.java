@@ -16,9 +16,11 @@
 
 package network.brightspots.rcv;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,10 +51,13 @@ class GuiFunctionalityTests {
         configPath -> {
           String configPathStr = configPath.toString();
           ContestConfig config = ContestConfig.loadContestConfig(configPathStr);
-          assertSame(1,
-              GuiConfigController.gatherAutoloadedCandidates(
-                  config, config.getRawConfig().cvrFileSources).size(),
-              "Expected one missing candidate to be autoloaded in " + configPath.getFileName());
+          Set<RawContestConfig.Candidate> unloaded = GuiConfigController.gatherAutoloadedCandidates(
+                      config, config.getRawConfig().cvrFileSources);
+          assertEquals(
+              Set.of(new RawContestConfig.Candidate("Candidate A Name")),
+              unloaded,
+              "Expected exactly the removed candidate to be autoloaded in "
+                  + configPath.getFileName());
         },
         config -> {
           config.withArray("candidates").remove(0);
