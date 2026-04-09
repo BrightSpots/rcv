@@ -237,7 +237,9 @@ public class GuiTabulateController {
             perSourceCvrCountTable.setVisible(true);
           }
 
-          data.discard();
+          if (data != null) {
+            data.discard();
+          }
           lastLoadedCvrData = data;
         };
 

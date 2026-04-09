@@ -151,8 +151,9 @@ final class ContestConfigMigration {
 
       if (rules.treatBlankAsUndeclaredWriteIn) {
         for (CvrSource source : rawConfig.cvrFileSources) {
+          // Previously blanks were treated as write-ins; images now handle write-ins instead.
           source.setBlankInterpretation(
-              ContestConfig.BlankInterpretation.UNDECLARED_WRITE_IN.getInternalLabel());
+              ContestConfig.BlankInterpretation.IRRELEVANT_CONTEST.getInternalLabel());
         }
       }
 
@@ -161,7 +162,7 @@ final class ContestConfigMigration {
         if (isNullOrBlank(source.getBlankInterpretation())) {
           source.setBlankInterpretation(
               Boolean.TRUE.equals(source.getTreatBlankAsUndeclaredWriteIn())
-                  ? ContestConfig.BlankInterpretation.UNDECLARED_WRITE_IN.getInternalLabel()
+                  ? ContestConfig.BlankInterpretation.IRRELEVANT_CONTEST.getInternalLabel()
                   : ContestConfig.BlankInterpretation.INVALID.getInternalLabel());
         }
       }

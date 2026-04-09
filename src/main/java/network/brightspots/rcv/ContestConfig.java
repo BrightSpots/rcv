@@ -58,7 +58,8 @@ class ContestConfig {
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_FIRST_ROUND_DETERMINES_THRESHOLD = false;
-  static final BlankInterpretation SUGGESTED_BLANK_INTERPRETATION = BlankInterpretation.UNDERVOTE;
+  static final BlankInterpretation SUGGESTED_BLANK_INTERPRETATION =
+      BlankInterpretation.IRRELEVANT_CONTEST;
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
   static final int SUGGESTED_CVR_ID_COLUMN = 1;
@@ -1301,8 +1302,7 @@ class ContestConfig {
 
   private boolean undeclaredWriteInsEnabled() {
     for (CvrSource source : rawConfig.cvrFileSources) {
-      if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-          || getBlankInterpretation(source) == BlankInterpretation.UNDECLARED_WRITE_IN) {
+      if (!isNullOrBlank(source.getUndeclaredWriteInLabel())) {
         return true;
       }
     }
@@ -1312,10 +1312,7 @@ class ContestConfig {
   /** How blank rankings in a CVR are interpreted during tabulation. */
   enum BlankInterpretation {
     INVALID("invalid", "Invalid"),
-    UNDECLARED_WRITE_IN(
-        "undeclaredWriteIn", "Undeclared Write-In"),
-    IRRELEVANT_CONTEST("irrelevantContest", "Irrelevant Contest"),
-    UNDERVOTE("undervote", "Undervote");
+    IRRELEVANT_CONTEST("irrelevantContest", "Irrelevant Contest");
 
     private final String internalLabel;
     private final String displayName;

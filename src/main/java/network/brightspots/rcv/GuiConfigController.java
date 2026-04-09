@@ -1360,18 +1360,11 @@ public class GuiConfigController implements Initializable {
     choiceBoxCvrBlankInterpretation.getItems()
         .addAll(ContestConfig.BlankInterpretation.values());
     choiceBoxCvrBlankInterpretation.setOnAction(event -> {
-      boolean isUndervote = choiceBoxCvrBlankInterpretation.getValue()
-          == ContestConfig.BlankInterpretation.UNDERVOTE;
-      if (isUndervote) {
-        textFieldCvrSkippedRankLabel.clear();
-        textFieldCvrSkippedRankLabel.setDisable(true);
-      } else {
-        Provider provider = getProviderChoice(choiceCvrProvider);
-        if (provider == Provider.ESS || provider == Provider.CSV) {
-          textFieldCvrSkippedRankLabel.setDisable(false);
-          if (textFieldCvrSkippedRankLabel.getText().isEmpty()) {
-            textFieldCvrSkippedRankLabel.setText(ContestConfig.SUGGESTED_SKIPPED_RANK_LABEL);
-          }
+      Provider provider = getProviderChoice(choiceCvrProvider);
+      if (provider == Provider.ESS || provider == Provider.CSV) {
+        textFieldCvrSkippedRankLabel.setDisable(false);
+        if (textFieldCvrSkippedRankLabel.getText().isEmpty()) {
+          textFieldCvrSkippedRankLabel.setText(ContestConfig.SUGGESTED_SKIPPED_RANK_LABEL);
         }
       }
     });
