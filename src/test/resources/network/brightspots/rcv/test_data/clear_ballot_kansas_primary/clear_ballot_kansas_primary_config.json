@@ -6,7 +6,7 @@
     "contestDate" : "",
     "contestJurisdiction" : "Kansas",
     "contestOffice" : "Democratic Presidential Primary",
-    "tabulateByBatch" : false,
+    "tabulateByBatch" : true,
     "tabulateByPrecinct" : false,
     "generateCdfJson" : false
   },
