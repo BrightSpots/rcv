@@ -108,7 +108,7 @@ class ClearBallotCvrReader extends BaseCvrReader {
             new CastVoteRecord(
                 source.getContestId(),
                 cvrData[CvrColumnField.ScanComputerName.ordinal()],
-                null,
+                cvrData[CvrColumnField.BoxID.ordinal()],
                 cvrData[CvrColumnField.BallotID.ordinal()],
                 cvrData[CvrColumnField.PrecinctID.ordinal()],
                 null,

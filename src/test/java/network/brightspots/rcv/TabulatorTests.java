@@ -590,7 +590,7 @@ class TabulatorTests {
   @Test
   @DisplayName("Clear Ballot - Kansas Primary")
   void testClearBallotKansasPrimary() {
-    runTabulationTest("clear_ballot_kansas_primary");
+    runTabulationTest("clear_ballot_kansas_primary", 1);
   }
 
   @Test
