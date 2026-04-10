@@ -27,7 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -489,6 +492,78 @@ class TabulatorTests {
     Logger.setup();
     SecurityConfig.setEnableValidationForUnitTests(false);
     SecurityConfig.setAllowUsersDirectorySavingForUnitTests(true);
+  }
+
+  @Test
+  @DisplayName("Test CVRs with same data but different formats produce same results")
+  void testSameDataDifferentFormats() throws IOException {
+    String[] stems = {"ess", "cdf"};
+    String sharedDir = Paths.get(System.getProperty("user.dir"),
+        TEST_ASSET_FOLDER, "_shared", "same_data_different_formats").toString();
+
+    ObjectMapper mapper = new ObjectMapper();
+    File baseConfigFile = Paths.get(sharedDir, "base_config.json").toFile();
+    JsonNode baseConfig = mapper.readTree(baseConfigFile);
+
+    List<Path> detailedJsonPaths = new ArrayList<>();
+    List<Path> detailedCsvPaths = new ArrayList<>();
+    List<TabulatorSession> sessions = new ArrayList<>();
+    List<File> tempConfigs = new ArrayList<>();
+
+    // First pass: run each tabulation and assert it succeeds
+    for (String stem : stems) {
+      File stemConfigFile = Paths.get(sharedDir, stem + "_config.json").toFile();
+      JsonNode stemSources = mapper.readTree(stemConfigFile);
+
+      ObjectNode mergedConfig = baseConfig.deepCopy();
+      mergedConfig.set("cvrFileSources", stemSources);
+
+      File tempConfig = Paths.get(sharedDir, stem + "_combined_config.json").toFile();
+      mapper.writeValue(tempConfig, mergedConfig);
+      tempConfigs.add(tempConfig);
+    }
+
+    try {
+      for (File tempConfig : tempConfigs) {
+        String configPath = tempConfig.getAbsolutePath();
+        TabulatorSession session = new TabulatorSession(configPath);
+        List<String> exceptions = session.tabulate("Automated test");
+        assertTrue(exceptions.isEmpty(),
+            "Tabulation failed for stem \"" + tempConfig.getName() + "\": " + exceptions);
+        sessions.add(session);
+
+        String timestampString = session.getTimestampString();
+        ContestConfig config = ContestConfig.loadContestConfig(configPath);
+        assertNotNull(config);
+        String resultsDir = config.getOutputDirectory(timestampString);
+
+        detailedJsonPaths.add(new OutputFileIdentifiers(OutputType.DETAILED_JSON)
+            .getPath(resultsDir, timestampString, null));
+        detailedCsvPaths.add(new OutputFileIdentifiers(OutputType.DETAILED_CSV)
+            .getPath(resultsDir, timestampString, null));
+      }
+
+      // Second pass: verify all outputs match the first stem's outputs
+      String firstJson = detailedJsonPaths.getFirst().toString();
+      String firstCsv = detailedCsvPaths.getFirst().toString();
+      for (int i = 1; i < stems.length; i++) {
+        assertTrue(
+            fileCompare(firstJson, detailedJsonPaths.get(i).toString()),
+            "detailed_report.json differs between \"" + stems[0] + "\" and \"" + stems[i] + "\"");
+        assertTrue(
+            fileCompare(firstCsv, detailedCsvPaths.get(i).toString()),
+            "detailed_report.csv differs between \"" + stems[0] + "\" and \"" + stems[i] + "\"");
+      }
+
+      // Clean up output folders on success
+      for (TabulatorSession session : sessions) {
+        cleanOutputFolder(session);
+      }
+    } finally {
+      for (File tempConfig : tempConfigs) {
+        Files.deleteIfExists(tempConfig.toPath());
+      }
+    }
   }
 
   @Test
