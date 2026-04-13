@@ -376,24 +376,6 @@ public class RawContestConfig {
       this.excluded.setValue(excluded);
     }
 
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (!(o instanceof Candidate other)) {
-        return false;
-      }
-      return java.util.Objects.equals(getName(), other.getName())
-          && java.util.Objects.equals(getAliases(), other.getAliases())
-          && getExcluded() == other.getExcluded();
-    }
-
-    @Override
-    public int hashCode() {
-      return java.util.Objects.hash(getName(), getAliases(), getExcluded());
-    }
-
     // This is deprecated and replaced by aliases, but we need to leave it in place
     // here for the purpose of supporting automatic migration from older config versions.
     private void setCode(String code) {
