@@ -909,9 +909,9 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("treat blank as undeclared write-in")
-  void treatBlankAsUndeclaredWriteInTest() {
-    runTabulationTest("test_set_treat_blank_as_undeclared_write_in");
+  @DisplayName("treat ES&S images as undeclared write-in")
+  void treatImagesAsUndeclaredWriteInTest() {
+    runTabulationTest("test_set_treat_images_as_undeclared_write_in");
   }
 
   @Test
