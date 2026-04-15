@@ -476,7 +476,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     }
 
     @Override
-    public void startElement(String uri, String localName, String qName, Attributes attrs) {
+    public void startElement(String uri, String localName, String qualifiedName, Attributes attrs) {
       text.setLength(0);
       if (!XDR_NS.equals(uri)) {
         return;
@@ -487,16 +487,28 @@ final class StreamingCvrReader extends BaseCvrReader {
           fromRow = -1;
           hasPic = false;
         }
-        case "from" -> inFrom = true;
-        case "col" -> { if (inFrom) inCol = true; }
-        case "row" -> { if (inFrom) inRow = true; }
-        case "pic" -> hasPic = true;
-        default -> { }
+        case "from" -> {
+          inFrom = true;
+        }
+        case "col" -> {
+          if (inFrom) {
+            inCol = true;
+          }
+        }
+        case "row" -> {
+          if (inFrom) {
+            inRow = true;
+          }
+        }
+        case "pic" -> {
+          hasPic = true;
+        }
+        default -> {}
       }
     }
 
     @Override
-    public void endElement(String uri, String localName, String qName) {
+    public void endElement(String uri, String localName, String qualifiedName) {
       if (XDR_NS.equals(uri)) {
         switch (localName) {
           case "from" -> inFrom = false;
@@ -517,7 +529,7 @@ final class StreamingCvrReader extends BaseCvrReader {
               imageCells.add(fromCol + "," + fromRow);
             }
           }
-          default -> { }
+          default -> {}
         }
       }
       text.setLength(0);
