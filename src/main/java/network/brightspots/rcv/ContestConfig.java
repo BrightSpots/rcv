@@ -154,16 +154,16 @@ class ContestConfig {
       validationErrors.add(ValidationError.CVR_FILE_PATH_MISSING);
       Logger.severe("filePath is required for each cast vote record file!");
     } else {
-      if (isNullOrBlank(source.getOvervoteLabel())
-          || stringAlreadyInUseElsewhereInSource(
+      if (!isNullOrBlank(source.getOvervoteLabel())
+          && stringAlreadyInUseElsewhereInSource(
               source.getOvervoteLabel(), source, "overvoteLabel")) {
         Logger.severe(
             "Overvote label must be defined and unique from other labels for CVR source: %s",
             source.getFilePath());
         validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
       }
-      if (isNullOrBlank(source.getUndeclaredWriteInLabel())
-          || stringAlreadyInUseElsewhereInSource(
+      if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
+          && stringAlreadyInUseElsewhereInSource(
               source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
         Logger.severe(
             "Undeclared write-in label must be defined and unique"
