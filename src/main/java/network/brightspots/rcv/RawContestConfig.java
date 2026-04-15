@@ -80,9 +80,7 @@ public class RawContestConfig {
     private final SimpleStringProperty overvoteDelimiter = new SimpleStringProperty();
     private final SimpleStringProperty provider = new SimpleStringProperty();
     private final SimpleStringProperty overvoteLabel = new SimpleStringProperty();
-    private final SimpleStringProperty skippedRankLabel = new SimpleStringProperty();
     private final SimpleStringProperty undeclaredWriteInLabel = new SimpleStringProperty();
-    private final SimpleStringProperty blankInterpretation = new SimpleStringProperty();
 
     // Deprecated fields — kept only to migrate old config files
     private String undervoteLabel;
@@ -101,9 +99,7 @@ public class RawContestConfig {
         String provider,
         String contestId,
         String overvoteLabel,
-        String skippedRankLabel,
-        String undeclaredWriteInLabel,
-        String blankInterpretation) {
+        String undeclaredWriteInLabel) {
       this.filePath.set(filePath);
       this.firstVoteColumnIndex.set(firstVoteColumnIndex);
       this.firstVoteRowIndex.set(firstVoteRowIndex);
@@ -114,9 +110,7 @@ public class RawContestConfig {
       this.provider.set(provider);
       this.contestId.set(contestId);
       this.overvoteLabel.set(overvoteLabel);
-      this.skippedRankLabel.set(skippedRankLabel);
       this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
-      this.blankInterpretation.set(blankInterpretation);
     }
 
     public String getFilePath() {
@@ -203,42 +197,12 @@ public class RawContestConfig {
       this.overvoteLabel.set(overvoteLabel);
     }
 
-    public String getSkippedRankLabel() {
-      return skippedRankLabel.get();
-    }
-
-    public void setSkippedRankLabel(String skippedRankLabel) {
-      this.skippedRankLabel.set(skippedRankLabel);
-    }
-
     public String getUndeclaredWriteInLabel() {
       return undeclaredWriteInLabel.get();
     }
 
     public void setUndeclaredWriteInLabel(String undeclaredWriteInLabel) {
       this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
-    }
-
-    public String getBlankInterpretation() {
-      return blankInterpretation.get();
-    }
-
-    public void setBlankInterpretation(String blankInterpretation) {
-      this.blankInterpretation.set(blankInterpretation);
-    }
-
-    /** @deprecated Use {@link #getBlankInterpretation()} instead. */
-    @Deprecated
-    @JsonIgnore
-    public Boolean getTreatBlankAsUndeclaredWriteIn() {
-      return treatBlankAsUndeclaredWriteIn;
-    }
-
-    /** @deprecated Used only to read legacy config files during migration. */
-    @Deprecated
-    @JsonSetter("treatBlankAsUndeclaredWriteIn")
-    public void setTreatBlankAsUndeclaredWriteIn(Boolean treatBlankAsUndeclaredWriteIn) {
-      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
 
     /**
@@ -285,16 +249,8 @@ public class RawContestConfig {
       return overvoteLabel;
     }
 
-    public SimpleStringProperty skippedRankLabelProperty() {
-      return skippedRankLabel;
-    }
-
     public SimpleStringProperty undeclaredWriteInLabelProperty() {
       return undeclaredWriteInLabel;
-    }
-
-    public SimpleStringProperty blankInterpretationProperty() {
-      return blankInterpretation;
     }
 
     // Deprecated fields
@@ -444,9 +400,7 @@ public class RawContestConfig {
 
     // These are deprecated (moved to individual CVRs), but we need to leave them in place here for
     // the purpose of supporting automatic migration from older config versions.
-    public boolean treatBlankAsUndeclaredWriteIn;
     public String overvoteLabel;
-    public String undervoteLabel;
     public String undeclaredWriteInLabel;
   }
 }

@@ -58,8 +58,6 @@ class ContestConfig {
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_FIRST_ROUND_DETERMINES_THRESHOLD = false;
-  static final BlankInterpretation SUGGESTED_BLANK_INTERPRETATION =
-      BlankInterpretation.IRRELEVANT_CONTEST;
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
   static final int SUGGESTED_CVR_ID_COLUMN = 1;
@@ -68,8 +66,7 @@ class ContestConfig {
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final boolean SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED = false;
   static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
-  static final String SUGGESTED_SKIPPED_RANK_LABEL = "undervote";
-  static final String SUGGESTED_UWI_LABEL = "Write-In";
+  static final String SUGGESTED_UWI_LABEL = "Write-in";
   static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   private static final int MIN_COLUMN_INDEX = 1;
@@ -165,14 +162,6 @@ class ContestConfig {
             source.getFilePath());
         validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
       }
-      if (isNullOrBlank(source.getSkippedRankLabel())
-          || stringAlreadyInUseElsewhereInSource(
-              source.getSkippedRankLabel(), source, "skippedRankLabel")) {
-        Logger.severe(
-            "Skipped rank label must be defined and unique from other labels for CVR source: %s",
-            source.getFilePath());
-        validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID);
-      }
       if (isNullOrBlank(source.getUndeclaredWriteInLabel())
           || stringAlreadyInUseElsewhereInSource(
               source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
@@ -230,15 +219,6 @@ class ContestConfig {
               source.getFilePath())) {
             validationErrors.add(ValidationError.CVR_PRECINCT_COLUMN_INVALID);
           }
-        } else if (getBlankInterpretation(source) != BlankInterpretation.INVALID) {
-          // blankInterpretation is only supported for ESS (StreamingCvrReader)
-          logErrorWithLocation(
-              String.format(
-                  "blankInterpretation should not be set for CVR source with provider \"%s\":"
-                      + " only ES&S sources support this field",
-                  provider),
-              source.getFilePath());
-          validationErrors.add(ValidationError.CVR_BLANK_INTERPRETATION_UNEXPECTEDLY_DEFINED);
         }
 
         // See the config file documentation for an explanation of this regex
@@ -306,20 +286,6 @@ class ContestConfig {
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getOvervoteDelimiter(), "overvoteDelimiter", provider, source.getFilePath())) {
           validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_UNEXPECTEDLY_DEFINED);
-        }
-
-        if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getSkippedRankLabel(), "skippedRankLabel", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED);
-        }
-
-        if (getBlankInterpretation(source) != BlankInterpretation.INVALID) {
-          logErrorWithLocation(
-              String.format(
-                  "blankInterpretation should not be set for CVR source with provider \"%s\"",
-                  provider),
-              source.getFilePath());
-          validationErrors.add(ValidationError.CVR_BLANK_INTERPRETATION_UNEXPECTEDLY_DEFINED);
         }
       }
 
@@ -504,8 +470,6 @@ class ContestConfig {
     if (!inUse) {
       inUse =
           stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
-              || stringMatchesAnotherFieldValue(
-                  string, field, source.getSkippedRankLabel(), "skippedRankLabel")
               || stringMatchesAnotherFieldValue(
                   string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
     }
@@ -1309,53 +1273,6 @@ class ContestConfig {
     return false;
   }
 
-  /** How blank rankings in a CVR are interpreted during tabulation. */
-  enum BlankInterpretation {
-    INVALID("invalid", "Invalid"),
-    IRRELEVANT_CONTEST("irrelevantContest", "Irrelevant Contest");
-
-    private final String internalLabel;
-    private final String displayName;
-
-    BlankInterpretation(String internalLabel, String displayName) {
-      this.internalLabel = internalLabel;
-      this.displayName = displayName;
-    }
-
-    public String getInternalLabel() {
-      return internalLabel;
-    }
-
-    @Override
-    public String toString() {
-      return displayName;
-    }
-
-    static BlankInterpretation getByInternalLabel(String label) {
-      if (label != null) {
-        for (BlankInterpretation v : values()) {
-          if (v.internalLabel.equals(label)) {
-            return v;
-          }
-        }
-      }
-      return INVALID;
-    }
-  }
-
-  static BlankInterpretation getBlankInterpretation(CvrSource source) {
-    return BlankInterpretation.getByInternalLabel(source.getBlankInterpretation());
-  }
-
-  public boolean doesAnySourceInterpretBlanksAs(BlankInterpretation interpretation) {
-    for (CvrSource source : rawConfig.cvrFileSources) {
-      if (getBlankInterpretation(source) == interpretation) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   // Possible validation errors
   enum ValidationError {
     TABULATOR_VERSION_MISSING,
@@ -1365,7 +1282,6 @@ class ContestConfig {
     CVR_NO_FILES_SPECIFIED,
     CVR_FILE_PATH_MISSING,
     CVR_OVERVOTE_LABEL_INVALID,
-    CVR_SKIPPED_RANK_LABEL_INVALID,
     CVR_UWI_LABEL_INVALID,
     CVR_PROVIDER_INVALID,
     CVR_FIRST_VOTE_COLUMN_INVALID,
@@ -1375,7 +1291,6 @@ class ContestConfig {
     CVR_PRECINCT_COLUMN_INVALID,
     CVR_OVERVOTE_DELIMITER_INVALID,
     CVR_CDF_FILE_PATH_INVALID,
-    CVR_BLANK_INTERPRETATION_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_INVALID,
     CVR_DUPLICATE_FILE_PATHS,
     CVR_FILE_PATH_INVALID,
@@ -1392,7 +1307,6 @@ class ContestConfig {
     CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
-    CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
     CVR_OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY,
     CANDIDATE_NAME_MISSING,

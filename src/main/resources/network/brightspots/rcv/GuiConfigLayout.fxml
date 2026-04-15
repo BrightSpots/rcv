@@ -145,14 +145,6 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label text="Contest ID *" prefWidth="110.0"/>
-                      <TextField prefHeight="25.0" prefWidth="160.0"
-                        fx:id="textFieldCvrContestId"/>
-                      <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                      </padding>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <Label prefWidth="130.0" text="First Vote Column *"/>
                       <TextField prefHeight="25.0" prefWidth="40.0"
                         fx:id="textFieldCvrFirstVoteCol"/>
@@ -204,6 +196,14 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
+                      <Label text="Contest ID *" prefWidth="110.0"/>
+                      <TextField prefHeight="25.0" prefWidth="160.0"
+                                 fx:id="textFieldCvrContestId"/>
+                      <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                      </padding>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <Label prefWidth="174.0" text="Overvote Delimiter"/>
                       <TextField prefHeight="25.0" prefWidth="40.0"
                         fx:id="textFieldCvrOvervoteDelimiter"/>
@@ -220,28 +220,9 @@
                       </padding>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="174.0" text="Skipped-Rank Label"/>
-                      <TextField prefHeight="25.0" prefWidth="200.0"
-                        fx:id="textFieldCvrSkippedRankLabel"/>
-                      <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                      </padding>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" spacing="4.0">
                       <Label prefWidth="174.0" text="Undeclared Write-In Label"/>
                       <TextField prefHeight="25.0" prefWidth="200.0"
                         fx:id="textFieldCvrUndeclaredWriteInLabel"/>
-                      <padding>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                      </padding>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" spacing="4.0">
-                      <Label prefWidth="174.0" text="Treat Blanks As"/>
-                      <ChoiceBox fx:id="choiceBoxCvrBlankInterpretation">
-                        <VBox.margin>
-                          <Insets top="8.0" bottom="8.0"/>
-                        </VBox.margin>
-                      </ChoiceBox>
                       <padding>
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                       </padding>

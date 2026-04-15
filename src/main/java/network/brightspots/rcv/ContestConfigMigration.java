@@ -137,49 +137,15 @@ final class ContestConfigMigration {
         }
       }
 
-      if (!isNullOrBlank(rules.undervoteLabel)) {
-        for (CvrSource source : rawConfig.cvrFileSources) {
-          source.setSkippedRankLabel(rules.undervoteLabel);
-        }
-      }
-
       if (!isNullOrBlank(rules.undeclaredWriteInLabel)) {
         for (CvrSource source : rawConfig.cvrFileSources) {
           source.setUndeclaredWriteInLabel(rules.undeclaredWriteInLabel);
         }
       }
 
-      if (rules.treatBlankAsUndeclaredWriteIn) {
-        for (CvrSource source : rawConfig.cvrFileSources) {
-          // Previously blanks were treated as write-ins; images now handle write-ins instead.
-          source.setBlankInterpretation(
-              ContestConfig.BlankInterpretation.IRRELEVANT_CONTEST.getInternalLabel());
-        }
-      }
-
-      // Migrate per-source treatBlankAsUndeclaredWriteIn boolean to blankInterpretation string
-      for (CvrSource source : rawConfig.cvrFileSources) {
-        if (isNullOrBlank(source.getBlankInterpretation())) {
-          source.setBlankInterpretation(
-              Boolean.TRUE.equals(source.getTreatBlankAsUndeclaredWriteIn())
-                  ? ContestConfig.BlankInterpretation.IRRELEVANT_CONTEST.getInternalLabel()
-                  : ContestConfig.BlankInterpretation.INVALID.getInternalLabel());
-        }
-      }
-
       // Migrations from 1.3.0 to 1.4.0
       if (rules.stopTabulationEarlyAfterRound == null) {
         rules.stopTabulationEarlyAfterRound = "";
-      }
-      for (CvrSource source : rawConfig.cvrFileSources) {
-        if (source.getUndervoteLabel() != null) {
-          if (source.getSkippedRankLabel() != null) {
-            Logger.severe("Config contains a deprecated field \"%s\". Ignoring.",
-                source.getUndervoteLabel());
-          } else {
-            source.setSkippedRankLabel(source.getUndervoteLabel());
-          }
-        }
       }
 
       Logger.info(

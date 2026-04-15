@@ -53,6 +53,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 final class StreamingCvrReader extends BaseCvrReader {
 
+  // this indicates a voter did not use this ranking
+  private static final String SKIPPED_RANK_STRING = "undervote";
   // this indicates a missing precinct ID in output files
   private static final String MISSING_PRECINCT_ID = "missing_precinct_id";
   // this indicates a missing batch ID in output files
@@ -72,9 +74,7 @@ final class StreamingCvrReader extends BaseCvrReader {
   // optional delimiter for cells that contain multiple candidates
   private final String overvoteDelimiter;
   private final String overvoteLabel;
-  private final String skippedRankLabel;
   private final String undeclaredWriteInLabel;
-  private final ContestConfig.BlankInterpretation blankInterpretation;
   // used for generating CVR IDs
   private int cvrIndex = 0;
   // list of currentRankings for CVR in progress
@@ -91,6 +91,8 @@ final class StreamingCvrReader extends BaseCvrReader {
   private List<CastVoteRecord> cvrList;
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
+  // has this CVR had any blank candidate cells?
+  private boolean hasSeenAnyBlankCandidateCells;
   // has this CVR had any non-blank candidate cells?
   private boolean hasSeenAnyNonBlankCandidateCells;
   // total number of rows where there were only blank candidates
@@ -123,9 +125,7 @@ final class StreamingCvrReader extends BaseCvrReader {
             : null;
     this.overvoteDelimiter = source.getOvervoteDelimiter();
     this.overvoteLabel = source.getOvervoteLabel();
-    this.skippedRankLabel = source.getSkippedRankLabel();
     this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
-    this.blankInterpretation = ContestConfig.getBlankInterpretation(source);
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -178,14 +178,8 @@ final class StreamingCvrReader extends BaseCvrReader {
         currentRankings.add(new Pair<>(rank, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL));
         hasSeenAnyNonBlankCandidateCells = true;
       } else {
+        hasSeenAnyBlankCandidateCells = true;
         currentCvrData.add("empty cell");
-        if (blankInterpretation == ContestConfig.BlankInterpretation.INVALID) {
-          Logger.severe(
-              "Blank ranking cell found at rank %d in %s but blanks are configured as Invalid.",
-              rank, excelFileName);
-          encounteredDataErrors = true;
-        }
-        // IRRELEVANT_CONTEST: do nothing
       }
     }
   }
@@ -200,6 +194,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     currentPrecinct = null;
     lastRankSeen = 0;
     hasSeenAnyNonBlankCandidateCells = false;
+    hasSeenAnyBlankCandidateCells = false;
   }
 
   // complete construction of new CVR object
@@ -211,8 +206,10 @@ final class StreamingCvrReader extends BaseCvrReader {
     String computedCastVoteRecordId =
         String.format("%s-%d", OutputWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
 
-    if (this.blankInterpretation == ContestConfig.BlankInterpretation.IRRELEVANT_CONTEST
-            && !hasSeenAnyNonBlankCandidateCells) {
+    if (hasSeenAnyNonBlankCandidateCells && hasSeenAnyBlankCandidateCells) {
+      Logger.severe("Blank cells are not allowed unless the entire row is blank (CVR %s)",
+              computedCastVoteRecordId);
+    } else if (!hasSeenAnyNonBlankCandidateCells) {
       Logger.auditable(
               "Skipping CVR for irrelevant contest: %s", computedCastVoteRecordId);
       numRowsIgnoredBecauseAllBlank++;
@@ -296,14 +293,16 @@ final class StreamingCvrReader extends BaseCvrReader {
       for (String candidate : candidates) {
         candidate = candidate.trim();
         hasSeenAnyNonBlankCandidateCells |= !candidate.isBlank();
-        if (candidates.length > 1 && (candidate.isBlank() || candidate.equals(skippedRankLabel))) {
+        hasSeenAnyBlankCandidateCells |= candidate.isBlank();
+        if (candidates.length > 1 && candidate.isBlank()) {
           Logger.severe(
               "If a cell contains multiple candidates split by the overvote delimiter, "
                   + "it's not valid for any of them to be blank or an explicit skipped ranking.");
           encounteredDataErrors = true;
-        } else if (!ignoreCandidate(candidate)) {
-          // map overvotes to our internal overvote string
-          if (candidate.equals(overvoteLabel)) {
+        } else if (!candidate.isBlank()) {
+          if (candidate.equals(SKIPPED_RANK_STRING)) {
+            continue;
+          } else if (candidate.equals(overvoteLabel)) {
             candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
           } else if (isUndeclaredWriteIn(candidate)) {
             candidate = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
@@ -315,16 +314,6 @@ final class StreamingCvrReader extends BaseCvrReader {
       // update lastRankSeen - used to handle empty ranking cells
       lastRankSeen = currentRank;
     }
-  }
-
-  boolean ignoreCandidate(String candidateName) {
-    if (candidateName.equals(skippedRankLabel)) {
-      return true;
-    }
-    if (!candidateName.isBlank()) {
-      return false;
-    }
-    return blankInterpretation == ContestConfig.BlankInterpretation.IRRELEVANT_CONTEST;
   }
 
   boolean isUndeclaredWriteIn(String candidateName) {

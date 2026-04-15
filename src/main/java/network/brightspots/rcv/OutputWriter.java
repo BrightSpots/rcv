@@ -615,11 +615,8 @@ class OutputWriter {
 
   private void addContestSummaryRows(CSVPrinter csvPrinter, RoundTally round1Tally)
       throws IOException {
-    boolean doesAnySourceIgnoreBlankRows = config.doesAnySourceInterpretBlanksAs(
-        ContestConfig.BlankInterpretation.IRRELEVANT_CONTEST);
     BigDecimal numNoRankings =
         round1Tally.getBallotStatusTally(StatusForRound.DID_NOT_RANK_ANY_CANDIDATES);
-    String numNoRankingsString = doesAnySourceIgnoreBlankRows ? numNoRankings.toString() : "N/A";
     BigDecimal totalNumberBallots =
         round1Tally.activeBallotSum().add(round1Tally.inactiveBallotSum());
     String numToBeElected = config.isMultiSeatBottomsUpWithThresholdEnabled()
@@ -631,7 +628,7 @@ class OutputWriter {
     csvPrinter.printRecord("Number to be Elected", numToBeElected);
     csvPrinter.printRecord("Number of Candidates", config.getNumCandidates());
     csvPrinter.printRecord("Total Number of Ballots", totalNumberBallots);
-    csvPrinter.printRecord("Number of Undervotes (No Rankings)", numNoRankingsString);
+    csvPrinter.printRecord("Number of Undervotes (No Rankings)", numNoRankings.toString());
     csvPrinter.println();
   }
 
