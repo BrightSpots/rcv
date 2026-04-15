@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +51,7 @@ import org.junit.jupiter.api.Test;
 class TabulatorTests {
 
   // folder where we store test inputs
-  private static final String TEST_ASSET_FOLDER =
-      "src/test/resources/network/brightspots/rcv/test_data";
+  private static final String TEST_ASSET_FOLDER = Common.TEST_ASSET_FOLDER;
   // limit log output to avoid spam
   private static final Integer MAX_LOG_ERRORS = 10;
 
@@ -492,6 +492,51 @@ class TabulatorTests {
   }
 
   @Test
+  @DisplayName("Test CVRs with same data but different formats produce same results")
+  void testSameDataDifferentFormats() throws Exception {
+    List<Path> detailedJsonPaths = new ArrayList<>();
+    List<Path> detailedCsvPaths = new ArrayList<>();
+    List<TabulatorSession> sessions = new ArrayList<>();
+
+    Common.runForEachProvider(configPath -> {
+      String configPathStr = configPath.toString();
+      TabulatorSession session = new TabulatorSession(configPathStr);
+      List<String> exceptions = session.tabulate("Automated test");
+      assertTrue(exceptions.isEmpty(),
+          "Tabulation failed for \"" + configPath.getFileName() + "\": " + exceptions);
+      sessions.add(session);
+
+      String timestampString = session.getTimestampString();
+      ContestConfig config = ContestConfig.loadContestConfig(configPathStr);
+      assertNotNull(config);
+      String resultsDir = config.getOutputDirectory(timestampString);
+
+      detailedJsonPaths.add(new OutputFileIdentifiers(OutputType.DETAILED_JSON)
+          .getPath(resultsDir, timestampString, null));
+      detailedCsvPaths.add(new OutputFileIdentifiers(OutputType.DETAILED_CSV)
+          .getPath(resultsDir, timestampString, null));
+    });
+
+    // Verify all outputs match the first stem's outputs
+    String firstJson = detailedJsonPaths.getFirst().toString();
+    String firstCsv = detailedCsvPaths.getFirst().toString();
+    for (int i = 1; i < detailedJsonPaths.size(); i++) {
+      String thisJson = detailedJsonPaths.get(i).toString();
+      String thisCsv = detailedCsvPaths.get(i).toString();
+      assertTrue(
+          fileCompare(firstJson, thisJson),
+          "detailed_report.json differs between \"" + firstJson + "\" and \"" + thisJson + "\"");
+      assertTrue(
+          fileCompare(firstCsv, thisCsv),
+          "detailed_report.csv differs between \"" + firstCsv + "\" and \"" + thisCsv + "\"");
+    }
+
+    for (TabulatorSession session : sessions) {
+      cleanOutputFolder(session);
+    }
+  }
+
+  @Test
   @DisplayName("Test Convert to CDF works for CDF")
   void convertToCdfFromCdf() {
     runConvertToCdfTest("conversions_from_cdf");
@@ -590,7 +635,7 @@ class TabulatorTests {
   @Test
   @DisplayName("Clear Ballot - Kansas Primary")
   void testClearBallotKansasPrimary() {
-    runTabulationTest("clear_ballot_kansas_primary");
+    runTabulationTest("clear_ballot_kansas_primary", 1);
   }
 
   @Test

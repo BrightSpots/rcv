@@ -289,6 +289,33 @@ public class RawContestConfig {
       return "Name: " + name + " Aliases: " + aliases;
     }
 
+    /** The key for dictionaries includes:
+      1. [excluded|not]
+      2. name
+      3. newline-separated aliases
+      This is unique for each candidate because newline is the only truly-disallowed character
+     */
+    @Override
+    public int hashCode() {
+      String nameString = getName() == null ? "" : getName();
+      String aliasesString = String.join("\n", getAliases());
+      return "%b%n%s%n%s".formatted(getExcluded(), nameString, aliasesString).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (!(o instanceof Candidate other)) {
+        return false;
+      }
+      return this.getExcluded() == other.getExcluded()
+         && this.getName().equals(other.getName())
+         && this.getAliases().equals(other.getAliases());
+    }
+
+
     public String getName() {
       return name.getValue();
     }
