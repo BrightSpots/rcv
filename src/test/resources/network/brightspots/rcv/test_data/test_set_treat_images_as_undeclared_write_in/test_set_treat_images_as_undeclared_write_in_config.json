@@ -11,7 +11,7 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "test_set_treat_blank_as_undeclared_write_in_cvr.xlsx",
+    "filePath" : "test_set_treat_images_as_undeclared_write_in_cvr.xlsx",
     "contestId" : "",
     "firstVoteColumnIndex" : "2",
     "firstVoteRowIndex" : "2",
