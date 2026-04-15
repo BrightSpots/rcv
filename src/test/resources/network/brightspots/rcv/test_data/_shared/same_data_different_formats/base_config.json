@@ -12,21 +12,21 @@
   },
   "cvrFileSources" : [],
   "candidates" : [ {
-    "name" : "Unused Display Name Candidate A",
+    "name" : "Candidate A Name",
     "excluded" : false,
-    "aliases" : [ "Candidate A Name File 1", "Candidate A Name File 2" ]
+    "aliases" : [ ]
   }, {
-    "name" : "Candidate B Name File 1",
+    "name" : "Candidate B Name",
     "excluded" : false,
-    "aliases" : [ "Candidate B Name File 2" ]
+    "aliases" : [ ]
   }, {
-    "name" : "Candidate C Name File 1",
+    "name" : "Candidate C Name",
     "excluded" : false,
-    "aliases" : [ "Unused Name 2", "Candidate C Name File 2" ]
+    "aliases" : [ ]
   }, {
-    "name" : "Candidate D Name File 1",
+    "name" : "Candidate D Name",
     "excluded" : false,
-    "aliases" : [ "Candidate D Name File 2" ]
+    "aliases" : [ ]
   } ],
   "rules" : {
     "tiebreakMode" : "random",

@@ -778,19 +778,19 @@
     "Candidate" : [
       {
         "@id" : "candidate-a",
-        "Name" : "Candidate A Name File 2"
+        "Name" : "Candidate A Name"
       },
       {
         "@id" : "candidate-b",
-        "Name" : "Candidate B Name File 2"
+        "Name" : "Candidate B Name"
       },
       {
         "@id" : "candidate-c",
-        "Name" : "Candidate C Name File 2"
+        "Name" : "Candidate C Name"
       },
       {
         "@id" : "candidate-d",
-        "Name" : "Candidate D Name File 2"
+        "Name" : "Candidate D Name"
       }
     ],
     "Contest" : [ {

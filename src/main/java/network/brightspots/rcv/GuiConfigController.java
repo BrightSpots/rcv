@@ -1869,53 +1869,8 @@ public class GuiConfigController implements Initializable {
           new Task<>() {
             @Override
             protected Void call() {
-              Logger.info("Auto-loading candidates from CVR files...");
-              boolean cvrsSpecified = true;
-              if (sources.isEmpty()) {
-                Logger.warning("No CVR files specified!");
-                cvrsSpecified = false;
-              }
-              if (cvrsSpecified) {
-                // Gather unloaded names from each of the sources and place into the HashSet
-                HashSet<Candidate> unloadedCandidates = new HashSet<>();
-                for (CvrSource source : sources) {
-                  Provider provider = ContestConfig.getProvider(source);
-                  try {
-                    List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-                    BaseCvrReader reader = provider.constructReader(config, source);
-                    Set<Candidate> unknownCandidates =
-                            reader.gatherUnknownCandidates(castVoteRecords);
-                    unloadedCandidates.addAll(unknownCandidates);
-                  } catch (ContestConfig.UnrecognizedProviderException e) {
-                    Logger.severe(
-                        "Unrecognized provider \"%s\" in source file \"%s\": %s",
-                        source.getProvider(), source.getFilePath(), e.getMessage());
-                  } catch (CastVoteRecord.CvrParseException | IOException e) {
-                    Logger.severe(
-                        "Failed to read source file \"%s\": ",
-                        source.getFilePath(), e.getMessage());
-                  }
-                }
-
-                // Validate each name and add to the table of candidates
-                int successCount = 0;
-                for (Candidate candidate : unloadedCandidates) {
-                  Set<ValidationError> validationErrors =
-                      ContestConfig.performBasicCandidateValidation(candidate);
-                  if (validationErrors.isEmpty()) {
-                    tableViewCandidates.getItems().add(candidate);
-                    successCount++;
-                  } else {
-                    String errors = validationErrors.stream()
-                            .map(x -> x.toString())
-                            .collect(Collectors.joining(", "));
-                    Logger.warning("Autoloaded candidate %s but did not pass validation."
-                        + " (%s)", candidate, errors);
-                  }
-                }
-
-                Logger.info("Auto-loaded %d candidates.", successCount);
-              }
+              Set<Candidate> newCandidates = gatherAutoloadedCandidates(config, sources);
+              tableViewCandidates.getItems().addAll(newCandidates);
               return null;
             }
           };
@@ -1925,6 +1880,57 @@ public class GuiConfigController implements Initializable {
               task.getException()));
       return task;
     }
+  }
+
+  /**
+   * Reads all CVR sources and returns candidates found in the CVRs that are not already listed
+   * in the config. Candidates that fail basic validation are logged and excluded from the result.
+   */
+  static Set<Candidate> gatherAutoloadedCandidates(
+      ContestConfig config, List<CvrSource> sources) {
+    Logger.info("Auto-loading candidates from CVR files...");
+    if (sources.isEmpty()) {
+      Logger.warning("No CVR files specified!");
+      return Set.of();
+    }
+
+    // Gather unknown candidates across all sources into a single set
+    HashSet<Candidate> unloadedCandidates = new HashSet<>();
+    for (CvrSource source : sources) {
+      Provider provider = ContestConfig.getProvider(source);
+      try {
+        List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+        BaseCvrReader reader = provider.constructReader(config, source);
+        unloadedCandidates.addAll(reader.gatherUnknownCandidates(castVoteRecords));
+      } catch (ContestConfig.UnrecognizedProviderException e) {
+        Logger.severe(
+            "Unrecognized provider \"%s\" in source file \"%s\": %s",
+            source.getProvider(), source.getFilePath(), e.getMessage());
+      } catch (CastVoteRecord.CvrParseException | IOException e) {
+        Logger.severe(
+            "Failed to read source file \"%s\": ",
+            source.getFilePath(), e.getMessage());
+      }
+    }
+
+    // Filter out candidates that fail basic validation
+    HashSet<Candidate> validCandidates = new HashSet<>();
+    for (Candidate candidate : unloadedCandidates) {
+      Set<ValidationError> validationErrors =
+          ContestConfig.performBasicCandidateValidation(candidate);
+      if (validationErrors.isEmpty()) {
+        validCandidates.add(candidate);
+      } else {
+        String errors = validationErrors.stream()
+            .map(ValidationError::toString)
+            .collect(Collectors.joining(", "));
+        Logger.warning(
+            "Autoloaded candidate %s but did not pass validation. (%s)", candidate, errors);
+      }
+    }
+
+    Logger.info("Auto-loaded %d candidates.", validCandidates.size());
+    return validCandidates;
   }
 
   private static class ValidatorService extends GenericService<Boolean> {
