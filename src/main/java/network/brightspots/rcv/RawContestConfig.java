@@ -81,10 +81,6 @@ public class RawContestConfig {
     private final SimpleStringProperty overvoteLabel = new SimpleStringProperty();
     private final SimpleStringProperty undeclaredWriteInLabel = new SimpleStringProperty();
 
-    // Deprecated fields — kept only to migrate old config files
-    private String undervoteLabel;
-    @Deprecated private Boolean treatBlankAsUndeclaredWriteIn;
-
     CvrSource() {}
 
     CvrSource(
@@ -251,11 +247,6 @@ public class RawContestConfig {
     public SimpleStringProperty undeclaredWriteInLabelProperty() {
       return undeclaredWriteInLabel;
     }
-
-    // Deprecated fields
-    public String getUndervoteLabel() {
-      return undervoteLabel;
-    }
   }
 
   /** Contest candidate data that can be serialized and deserialized. */
@@ -399,6 +390,7 @@ public class RawContestConfig {
 
     // These are deprecated (moved to individual CVRs), but we need to leave them in place here for
     // the purpose of supporting automatic migration from older config versions.
+    // This only includes fields that were moved or renamed, not deprecated
     public String overvoteLabel;
     public String undeclaredWriteInLabel;
   }

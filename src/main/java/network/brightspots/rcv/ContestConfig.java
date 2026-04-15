@@ -507,11 +507,6 @@ class ContestConfig {
       Logger.severe(
           "Contest config validation failed! Modify the contest config file and try again.\n"
               + "See config_file_documentation.txt for more details.");
-
-      for (ValidationError error : validationErrors) {
-        // TODO -- we should really have a message summary for each of these
-        Logger.severe("- %s", error);
-      }
     }
     return validationErrors;
   }
