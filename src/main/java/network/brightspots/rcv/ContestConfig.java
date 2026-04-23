@@ -1149,7 +1149,7 @@ class ContestConfig {
 
   int getNumDeclaredCandidates() {
     int size = getCandidateNames().size();
-    if (undeclaredWriteInsEnabled()) {
+    if (undeclaredWriteInsExplicitlyEnabled()) {
       // we subtract one for UNDECLARED_WRITE_IN_OUTPUT_LABEL;
       size = size - 1;
     }
@@ -1251,15 +1251,19 @@ class ContestConfig {
     }
 
     // If any of the sources support undeclared write-ins, we need to recognize them as a valid
-    // "candidate" option.
-    if (undeclaredWriteInsEnabled()) {
+    // "candidate" option. Note: it's possible that
+    if (undeclaredWriteInsExplicitlyEnabled()) {
       candidateNames.add(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
       candidateAliasesToNameMap.put(
           Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
     }
   }
 
-  private boolean undeclaredWriteInsEnabled() {
+  /**
+   * Note: it is possible for UWIs to be _implictly_ declared, e.g., if images are found in ES&S
+   * .XLSXs, we assume they are UWIs.
+   */
+  private boolean undeclaredWriteInsExplicitlyEnabled() {
     for (CvrSource source : rawConfig.cvrFileSources) {
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())) {
         return true;

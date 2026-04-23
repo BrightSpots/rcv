@@ -81,6 +81,12 @@ public class RawContestConfig {
     private final SimpleStringProperty overvoteLabel = new SimpleStringProperty();
     private final SimpleStringProperty undeclaredWriteInLabel = new SimpleStringProperty();
 
+
+    // Deprecated fields
+    private String skippedRankLabel;
+    private boolean treatBlankAsUndeclaredWriteIn;
+    private String undervoteLabel;
+
     CvrSource() {}
 
     CvrSource(
@@ -198,6 +204,25 @@ public class RawContestConfig {
 
     public void setUndeclaredWriteInLabel(String undeclaredWriteInLabel) {
       this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
+    }
+
+    /**
+     * The following properties are deprecated
+     */
+    public String getSkippedRankLabel() {
+      return skippedRankLabel;
+    }
+
+    public void setSkippedRankLabel(String skippedRankLabel) {
+      this.skippedRankLabel = skippedRankLabel;
+    }
+
+    public boolean getTreatBlankAsUndeclaredWriteIn() {
+      return treatBlankAsUndeclaredWriteIn;
+    }
+
+    public void setTreatBlankAsUndeclaredWriteIn(Boolean treatBlankAsUndeclaredWriteIn) {
+      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
 
     /**

@@ -26,6 +26,7 @@ import network.brightspots.rcv.RawContestConfig.ContestRules;
 import network.brightspots.rcv.RawContestConfig.CvrSource;
 import network.brightspots.rcv.Tabulator.TiebreakMode;
 import network.brightspots.rcv.Tabulator.WinnerElectionMode;
+import org.apache.poi.util.StringUtil;
 
 final class ContestConfigMigration {
   private ContestConfigMigration() {}
@@ -57,104 +58,130 @@ final class ContestConfigMigration {
 
   static void migrateConfigVersion(ContestConfig config)
       throws ConfigVersionIsNewerThanAppVersionException {
-    String version = config.rawConfig.tabulatorVersion;
+    String originalVersion = config.rawConfig.tabulatorVersion;
     boolean needsMigration =
-        version == null
-            || (!version.equals(Main.APP_VERSION)
-                && !version.equals(ContestConfig.AUTOMATED_TEST_VERSION));
-    if (needsMigration) {
-      if (isConfigVersionNewerThanAppVersion(version)) {
-        throw new ConfigVersionIsNewerThanAppVersionException();
-      }
-
-      // Any necessary future version migration logic goes here
-      RawContestConfig rawConfig = config.getRawConfig();
-      ContestRules rules = rawConfig.rules;
-
-      if (config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
-        String oldWinnerElectionMode = rules.winnerElectionMode;
-        switch (oldWinnerElectionMode) {
-          case "standard" -> rules.winnerElectionMode =
-              config.getNumberOfWinners() > 1
-                  ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND
-                      .getInternalLabel()
-                  : WinnerElectionMode.STANDARD_SINGLE_WINNER.getInternalLabel();
-          case "singleSeatContinueUntilTwoCandidatesRemain" -> {
-            rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER.getInternalLabel();
-            rules.continueUntilTwoCandidatesRemain = true;
-          }
-          case "multiSeatAllowOnlyOneWinnerPerRound" -> rules.winnerElectionMode =
-              WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.getInternalLabel();
-          case "multiSeatBottomsUp" -> rules.winnerElectionMode =
-              config.getNumberOfWinners() == 0
-                      || config.getMultiSeatBottomsUpPercentageThreshold() != null
-                  ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD
-                      .getInternalLabel()
-                  : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.getInternalLabel();
-          case "multiSeatSequentialWinnerTakesAll" -> rules.winnerElectionMode =
-              WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.getInternalLabel();
-          default -> {
-            Logger.warning(
-                "winnerElectionMode \"%s\" is unrecognized! Supply a valid "
-                    + "winnerElectionMode.",
-                oldWinnerElectionMode);
-            rules.winnerElectionMode = null;
-          }
-        }
-      }
-
-      if (config.getTiebreakMode() == TiebreakMode.MODE_UNKNOWN) {
-        Map<String, TiebreakMode> tiebreakModeMigrationMap =
-            Map.of(
-                "random",
-                TiebreakMode.RANDOM,
-                "interactive",
-                TiebreakMode.INTERACTIVE,
-                "previousRoundCountsThenRandom",
-                TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
-                "previousRoundCountsThenInteractive",
-                TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
-                "usePermutationInConfig",
-                TiebreakMode.USE_PERMUTATION_IN_CONFIG,
-                "generatePermutation",
-                TiebreakMode.GENERATE_PERMUTATION);
-        String oldTiebreakMode = rules.tiebreakMode;
-        if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
-          rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode).getInternalLabel();
-        } else {
-          Logger.warning(
-              "tiebreakMode \"%s\" is unrecognized! Supply a valid tiebreakMode.", oldTiebreakMode);
-          rules.tiebreakMode = null;
-        }
-      }
-
-      // These four fields were previously at the config level, but are now set on a per-source
-      // basis.
-
-      if (!isNullOrBlank(rules.overvoteLabel)) {
-        for (CvrSource source : rawConfig.cvrFileSources) {
-          source.setOvervoteLabel(rules.overvoteLabel);
-        }
-      }
-
-      if (!isNullOrBlank(rules.undeclaredWriteInLabel)) {
-        for (CvrSource source : rawConfig.cvrFileSources) {
-          source.setUndeclaredWriteInLabel(rules.undeclaredWriteInLabel);
-        }
-      }
-
-      // Migrations from 1.3.0 to 1.4.0
-      if (rules.stopTabulationEarlyAfterRound == null) {
-        rules.stopTabulationEarlyAfterRound = "";
-      }
-
-      Logger.info(
-          "Migrated tabulator config version from %s to %s.",
-          config.rawConfig.tabulatorVersion != null ? config.rawConfig.tabulatorVersion : "unknown",
-          Main.APP_VERSION);
-
-      config.rawConfig.tabulatorVersion = Main.APP_VERSION;
+            originalVersion == null
+                    || (!originalVersion.equals(Main.APP_VERSION));
+    if (!needsMigration) {
+      return;
     }
+
+    if (isConfigVersionNewerThanAppVersion(originalVersion)) {
+      throw new ConfigVersionIsNewerThanAppVersionException();
+    }
+
+    if (originalVersion == null || isVersionNewer("2.0.2", originalVersion)) {
+      migrateUnversionedTo202(config);
+    }
+    if (isVersionNewer("2.1.0", originalVersion)) {
+      migrate201To210(config);
+    }
+
+    Logger.info(
+            "Migrated tabulator config version from %s to %s.",
+            originalVersion != null ? originalVersion : "unknown",
+            config.rawConfig.tabulatorVersion);
+  }
+
+  private static void migrate201To210(ContestConfig config) {
+    RawContestConfig rawConfig = config.getRawConfig();
+
+    for (CvrSource source : rawConfig.cvrFileSources) {
+      if (StringUtil.isNotBlank(source.getUndeclaredWriteInLabel()) && ContestConfig.Provider.ESS
+            == ContestConfig.Provider.getByInternalLabel(source.getProvider())) {
+        Logger.warning("ES&S no longer supports custom write-in labels. Ignoring.");
+        source.setUndeclaredWriteInLabel(null);
+      }
+    }
+
+    config.rawConfig.tabulatorVersion = "2.1.0";
+  }
+
+  private static void migrateUnversionedTo202(ContestConfig config) {
+    RawContestConfig rawConfig = config.getRawConfig();
+    ContestRules rules = rawConfig.rules;
+
+    if (config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
+      String oldWinnerElectionMode = rules.winnerElectionMode;
+      switch (oldWinnerElectionMode) {
+        case "standard" -> rules.winnerElectionMode =
+                config.getNumberOfWinners() > 1
+                        ? WinnerElectionMode.MULTI_SEAT_ALLOW_MULTIPLE_WINNERS_PER_ROUND
+                        .getInternalLabel()
+                        : WinnerElectionMode.STANDARD_SINGLE_WINNER.getInternalLabel();
+        case "singleSeatContinueUntilTwoCandidatesRemain" -> {
+          rules.winnerElectionMode = WinnerElectionMode.STANDARD_SINGLE_WINNER.getInternalLabel();
+          rules.continueUntilTwoCandidatesRemain = true;
+        }
+        case "multiSeatAllowOnlyOneWinnerPerRound" -> rules.winnerElectionMode =
+                WinnerElectionMode.MULTI_SEAT_ALLOW_ONLY_ONE_WINNER_PER_ROUND.getInternalLabel();
+        case "multiSeatBottomsUp" -> rules.winnerElectionMode =
+                config.getNumberOfWinners() == 0
+                        || config.getMultiSeatBottomsUpPercentageThreshold() != null
+                        ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD
+                        .getInternalLabel()
+                        : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.getInternalLabel();
+        case "multiSeatSequentialWinnerTakesAll" -> rules.winnerElectionMode =
+                WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.getInternalLabel();
+        default -> {
+          Logger.warning(
+                  "winnerElectionMode \"%s\" is unrecognized! Supply a valid "
+                          + "winnerElectionMode.",
+                  oldWinnerElectionMode);
+          rules.winnerElectionMode = null;
+        }
+      }
+    }
+
+    if (config.getTiebreakMode() == TiebreakMode.MODE_UNKNOWN) {
+      Map<String, TiebreakMode> tiebreakModeMigrationMap =
+              Map.of(
+                      "random",
+                      TiebreakMode.RANDOM,
+                      "interactive",
+                      TiebreakMode.INTERACTIVE,
+                      "previousRoundCountsThenRandom",
+                      TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_RANDOM,
+                      "previousRoundCountsThenInteractive",
+                      TiebreakMode.PREVIOUS_ROUND_COUNTS_THEN_INTERACTIVE,
+                      "usePermutationInConfig",
+                      TiebreakMode.USE_PERMUTATION_IN_CONFIG,
+                      "generatePermutation",
+                      TiebreakMode.GENERATE_PERMUTATION);
+      String oldTiebreakMode = rules.tiebreakMode;
+      if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
+        rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode).getInternalLabel();
+      } else {
+        Logger.warning(
+                "tiebreakMode \"%s\" is unrecognized! Supply a valid tiebreakMode.", oldTiebreakMode);
+        rules.tiebreakMode = null;
+      }
+    }
+
+    // These fields were previously at the config level, but are now set on a per-source basis.
+    // They used to include undervoteLabel and treatBlankAsUndeclaredWriteIn, both of which were
+    // removed in 2.1.0, so by ignoring them we effectively delete them.
+    // That means the output of this function is not exactly compatible with 2.0.2, but rather,
+    // a correct stepping stone while migrating up to the current app version.
+
+    if (!isNullOrBlank(rules.overvoteLabel)) {
+      for (CvrSource source : rawConfig.cvrFileSources) {
+        source.setOvervoteLabel(rules.overvoteLabel);
+      }
+    }
+
+    if (!isNullOrBlank(rules.undeclaredWriteInLabel)) {
+      for (CvrSource source : rawConfig.cvrFileSources) {
+        source.setUndeclaredWriteInLabel(rules.undeclaredWriteInLabel);
+      }
+    }
+
+    // Migrations from 1.3.0 to 1.4.0
+    if (rules.stopTabulationEarlyAfterRound == null) {
+      rules.stopTabulationEarlyAfterRound = "";
+    }
+
+    config.rawConfig.tabulatorVersion = "2.0.2";
   }
 
   static class ConfigVersionIsNewerThanAppVersionException extends Exception {}

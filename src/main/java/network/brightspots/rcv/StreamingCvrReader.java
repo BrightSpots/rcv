@@ -213,6 +213,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     if (hasSeenAnyNonBlankCandidateCells && hasSeenAnyBlankCandidateCells) {
       Logger.severe("Blank cells are not allowed unless the entire row is blank (CVR %s)",
               computedCastVoteRecordId);
+      encounteredDataErrors = true;
     } else if (!hasSeenAnyNonBlankCandidateCells) {
       Logger.auditable(
               "Skipping CVR for irrelevant contest: %s", computedCastVoteRecordId);
