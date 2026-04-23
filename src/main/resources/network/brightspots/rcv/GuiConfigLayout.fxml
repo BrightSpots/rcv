@@ -275,13 +275,8 @@
                       prefWidth="80.0" text="Overvote&#10;Label"
                       fx:id="tableColumnCvrOvervoteLabel"/>
                     <TableColumn minWidth="20.0"
-                      prefWidth="90.0" text="Skipped Rank&#10;Label"
-                      fx:id="tableColumnCvrSkippedRankLabel"/>
-                    <TableColumn minWidth="20.0"
                       prefWidth="90.0" text="Undeclared&#10;Write-In&#10;Label"
                       fx:id="tableColumnCvrUndeclaredWriteInLabel"/>
-                    <TableColumn fx:id="tableColumnCvrBlankInterpretation" minWidth="20.0"
-                      prefWidth="180.0" text="Blank&#10;Interpretation"/>
                   </columns>
                 </TableView>
                 <padding>
