@@ -41,6 +41,10 @@
     "name" : "Excludy McSclude",
     "excluded" : true,
     "aliases" : [ ]
+  }, {
+    "name" : "Undeclared Write-ins",
+    "excluded" : false,
+    "aliases" : [ ]
   } ],
   "rules" : {
     "tiebreakMode" : "random",

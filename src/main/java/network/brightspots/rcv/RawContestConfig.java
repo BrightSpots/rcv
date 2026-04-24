@@ -207,7 +207,7 @@ public class RawContestConfig {
     }
 
     /**
-     * The following properties are deprecated
+     * The following properties are deprecated.
      */
     public String getSkippedRankLabel() {
       return skippedRankLabel;

@@ -120,7 +120,8 @@ final class ContestConfigMigration {
                         || config.getMultiSeatBottomsUpPercentageThreshold() != null
                         ? WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_USING_PERCENTAGE_THRESHOLD
                         .getInternalLabel()
-                        : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS.getInternalLabel();
+                        : WinnerElectionMode.MULTI_SEAT_BOTTOMS_UP_UNTIL_N_WINNERS
+                        .getInternalLabel();
         case "multiSeatSequentialWinnerTakesAll" -> rules.winnerElectionMode =
                 WinnerElectionMode.MULTI_SEAT_SEQUENTIAL_WINNER_TAKES_ALL.getInternalLabel();
         default -> {
@@ -152,8 +153,8 @@ final class ContestConfigMigration {
       if (tiebreakModeMigrationMap.containsKey(oldTiebreakMode)) {
         rules.tiebreakMode = tiebreakModeMigrationMap.get(oldTiebreakMode).getInternalLabel();
       } else {
-        Logger.warning(
-                "tiebreakMode \"%s\" is unrecognized! Supply a valid tiebreakMode.", oldTiebreakMode);
+        Logger.warning("tiebreakMode \"%s\" is unrecognized! Supply a valid tiebreakMode.",
+            oldTiebreakMode);
         rules.tiebreakMode = null;
       }
     }
