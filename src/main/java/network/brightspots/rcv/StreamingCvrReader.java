@@ -59,6 +59,8 @@ final class StreamingCvrReader extends BaseCvrReader {
   private static final String MISSING_PRECINCT_ID = "missing_precinct_id";
   // this indicates a missing batch ID in output files
   private static final String MISSING_BATCH_ID = "missing_batch_id";
+  // this indicates a write-in on files without exported images
+  private static final String UNDECLARED_WRITE_IN = "Write-in";
   // name of the source file
   private final String excelFileName;
   // 0-based column index of first ranking
@@ -125,7 +127,7 @@ final class StreamingCvrReader extends BaseCvrReader {
             : null;
     this.overvoteDelimiter = source.getOvervoteDelimiter();
     this.overvoteLabel = source.getOvervoteLabel();
-    this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
+    this.undeclaredWriteInLabel = UNDECLARED_WRITE_IN;
   }
 
   private static long hashForCell(int row, int col) {
@@ -178,7 +180,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {
       int col = firstVoteColumnIndex + rank - 1;
       if (imageCells.contains(hashForCell(currentRowIndex, col))) {
-        currentCvrData.add("image (write-in)");
+        currentCvrData.add(undeclaredWriteInLabel);
         currentRankings.add(new Pair<>(rank, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL));
         hasSeenAnyNonBlankCandidateCells = true;
       } else {

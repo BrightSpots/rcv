@@ -108,11 +108,21 @@ class ContestConfig {
 
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
+
     try {
-      config.processCandidateData();
-    } catch (Exception exception) {
-      Logger.severe("Error processing candidate data:\n%s", exception);
+      ContestConfigMigration.migrateConfigVersion(config);
+    } catch (ContestConfigMigration.ConfigVersionIsNewerThanAppVersionException exception) {
+      Logger.severe("Error migrating config to current version:\n%s", exception);
       config = null;
+    }
+
+    if (config != null) {
+      try {
+        config.processCandidateData();
+      } catch (Exception exception) {
+        Logger.severe("Error processing candidate data:\n%s", exception);
+        config = null;
+      }
     }
     return config;
   }

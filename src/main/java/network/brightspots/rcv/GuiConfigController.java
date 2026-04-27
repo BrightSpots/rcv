@@ -1612,7 +1612,6 @@ public class GuiConfigController implements Initializable {
   private void loadConfig(ContestConfig config) throws ConfigVersionIsNewerThanAppVersionException {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
-    ContestConfigMigration.migrateConfigVersion(config);
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
