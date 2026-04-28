@@ -123,11 +123,11 @@ class ContestConfigTests {
             "brightspots\\rcv\\test_data\\bar\\bar_config.json"));
 
     assertTrue(ContestConfig.isConfigFileInTestDir(
-            "brightspotsXrcvYtest_dataZbazZbaz_config.json")); // permissive separators
+            "/path/to/brightspots/rcv/test_data/foo/foo_config.json"));
 
     // Invalid: filename doesn't match directory
     assertFalse(ContestConfig.isConfigFileInTestDir(
-            "brightspots/rcv/test_data/foo/bar_config.json"));
+            "/path/to/brightspots/rcv/test_data/foo/bar_config.json"));
 
     // Invalid: wrong extension
     assertFalse(ContestConfig.isConfigFileInTestDir(

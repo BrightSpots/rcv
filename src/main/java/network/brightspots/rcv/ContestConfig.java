@@ -157,7 +157,7 @@ class ContestConfig {
   }
 
   static boolean isConfigFileInTestDir(String filepath) {
-    final String regex = "^brightspots.rcv.test_data.([^/\\\\]+).\\1_config\\.json$";
+    final String regex = "^.*brightspots.rcv.test_data.([^/\\\\]+).\\1_config\\.json$";
     return filepath.matches(regex);
   }
 
