@@ -74,6 +74,10 @@ final class ContestConfigMigration {
       migrateUnversionedTo202(config);
     }
 
+    if (isVersionNewer("2.1.0", originalVersion)) {
+      migrate201To210(config);
+    }
+
     // Always bump to the current app version, even if there is no change in config fields.
     if (!Main.APP_VERSION.equals(config.rawConfig.tabulatorVersion)) {
       config.rawConfig.tabulatorVersion = Main.APP_VERSION;
@@ -83,6 +87,20 @@ final class ContestConfigMigration {
             "Migrated tabulator config version from %s to %s.",
             originalVersion != null ? originalVersion : "unknown",
             config.rawConfig.tabulatorVersion);
+  }
+
+  private static void migrate201To210(ContestConfig config) {
+    RawContestConfig rawConfig = config.getRawConfig();
+
+    for (CvrSource source : rawConfig.cvrFileSources) {
+      if (StringUtil.isNotBlank(source.getSkippedRankLabel()) && ContestConfig.Provider.ESS
+              == ContestConfig.Provider.getByInternalLabel(source.getProvider())) {
+        Logger.warning("ES&S no longer supports custom undervote labels. Ignoring.");
+        source.setSkippedRankLabel(null);
+      }
+    }
+
+    config.rawConfig.tabulatorVersion = "2.1.0";
   }
 
   private static void migrateUnversionedTo202(ContestConfig config) {
