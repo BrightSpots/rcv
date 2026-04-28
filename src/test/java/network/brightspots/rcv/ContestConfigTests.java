@@ -111,4 +111,38 @@ class ContestConfigTests {
             getPercentageFromStringWithAccurateSigFigs(".9999"));
 
   }
+
+  @Test
+  @DisplayName("test isConfigFileInTestDir")
+  void testIsConfigFileInTestDir() {
+    // Valid cases
+    assertTrue(ContestConfig.isConfigFileInTestDir(
+            "brightspots/rcv/test_data/foo/foo_config.json"));
+
+    assertTrue(ContestConfig.isConfigFileInTestDir(
+            "brightspots\\rcv\\test_data\\bar\\bar_config.json"));
+
+    assertTrue(ContestConfig.isConfigFileInTestDir(
+            "brightspotsXrcvYtest_dataZbazZbaz_config.json")); // permissive separators
+
+    // Invalid: filename doesn't match directory
+    assertFalse(ContestConfig.isConfigFileInTestDir(
+            "brightspots/rcv/test_data/foo/bar_config.json"));
+
+    // Invalid: wrong extension
+    assertFalse(ContestConfig.isConfigFileInTestDir(
+            "brightspots/rcv/test_data/foo/foo_config.txt"));
+
+    // Invalid: missing directory name in filename
+    assertFalse(ContestConfig.isConfigFileInTestDir(
+            "brightspots/rcv/test_data/foo/_config.json"));
+
+    // Invalid: extra suffix
+    assertFalse(ContestConfig.isConfigFileInTestDir(
+            "brightspots/rcv/test_data/foo/foo_config.json.bak"));
+
+    // Invalid: wrong path prefix
+    assertFalse(ContestConfig.isConfigFileInTestDir(
+            "src/test/resources/configs/test_config.json"));
+  }
 }

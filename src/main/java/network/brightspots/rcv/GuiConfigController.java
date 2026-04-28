@@ -80,7 +80,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -1179,8 +1178,8 @@ public class GuiConfigController implements Initializable {
                           .writeValueAsString(configFromFile);
           if (currentConfigString.equals(savedConfigString)) {
             comparisonResult = ConfigComparisonResult.SAME;
-          } else if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
-            comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
+          } else if (ContestConfig.isConfigFileInTestDir(selectedFile.getAbsolutePath())) {
+            comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_FILE_IN_TEST_DIR;
           }
           // Otherwise, comparisonResult should remain ConfigComparisonResult.DIFFERENT
         }
@@ -1261,7 +1260,7 @@ public class GuiConfigController implements Initializable {
 
       // Pop up either a two-button or three-button alert
       Alert alert;
-      if (comparisonResult == ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST) {
+      if (comparisonResult == ConfigComparisonResult.DIFFERENT_BUT_FILE_IN_TEST_DIR) {
         alert =
             new Alert(
                 AlertType.WARNING,
@@ -1787,7 +1786,7 @@ public class GuiConfigController implements Initializable {
     GUI_IS_EMPTY,
     SAME,
     DIFFERENT,
-    DIFFERENT_BUT_VERSION_IS_TEST,
+    DIFFERENT_BUT_FILE_IN_TEST_DIR,
   }
 
   /**

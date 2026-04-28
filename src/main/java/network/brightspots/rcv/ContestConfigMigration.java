@@ -73,8 +73,10 @@ final class ContestConfigMigration {
     if (originalVersion == null || isVersionNewer("2.0.2", originalVersion)) {
       migrateUnversionedTo202(config);
     }
-    if (isVersionNewer("2.1.0", originalVersion)) {
-      migrate201To210(config);
+
+    // Always bump to the current app version, even if there is no change in config fields.
+    if (!Main.APP_VERSION.equals(config.rawConfig.tabulatorVersion)) {
+      config.rawConfig.tabulatorVersion = Main.APP_VERSION;
     }
 
     Logger.info(
@@ -83,26 +85,17 @@ final class ContestConfigMigration {
             config.rawConfig.tabulatorVersion);
   }
 
-  private static void migrate201To210(ContestConfig config) {
-    RawContestConfig rawConfig = config.getRawConfig();
-
-    for (CvrSource source : rawConfig.cvrFileSources) {
-      if (StringUtil.isNotBlank(source.getUndeclaredWriteInLabel()) && ContestConfig.Provider.ESS
-            == ContestConfig.Provider.getByInternalLabel(source.getProvider())) {
-        Logger.warning("ES&S no longer supports custom write-in labels. Ignoring.");
-        source.setUndeclaredWriteInLabel(null);
-      }
-    }
-
-    config.rawConfig.tabulatorVersion = "2.1.0";
-  }
-
   private static void migrateUnversionedTo202(ContestConfig config) {
     RawContestConfig rawConfig = config.getRawConfig();
     ContestRules rules = rawConfig.rules;
 
     if (config.getWinnerElectionMode() == WinnerElectionMode.MODE_UNKNOWN) {
       String oldWinnerElectionMode = rules.winnerElectionMode;
+      if (oldWinnerElectionMode == null) {
+        Logger.severe("winnerElectionMode is required but was not found in the config! "
+                + "Supply a valid winnerElectionMode.");
+        return;
+      }
       switch (oldWinnerElectionMode) {
         case "standard" -> rules.winnerElectionMode =
                 config.getNumberOfWinners() > 1
