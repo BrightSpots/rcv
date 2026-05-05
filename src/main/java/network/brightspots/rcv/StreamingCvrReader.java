@@ -23,9 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.util.Pair;
@@ -99,8 +102,8 @@ final class StreamingCvrReader extends BaseCvrReader {
   private int numRowsIgnoredBecauseAllBlank;
   // flag indicating data issues during parsing
   private boolean encounteredDataErrors = false;
-  // set of packed (col, row) cell addresses that contain images in the drawing layer
-  private Set<Long> imageCells = new HashSet<>();
+  // map of row → set of columns that contain images in the drawing layer (both 0-based)
+  private Map<Integer, Set<Integer>> imageCells = new HashMap<>();
   // 0-based row index of the row currently being parsed
   private int currentRowIndex;
 
@@ -126,10 +129,6 @@ final class StreamingCvrReader extends BaseCvrReader {
     this.overvoteDelimiter = source.getOvervoteDelimiter();
     this.overvoteLabel = source.getOvervoteLabel();
     this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
-  }
-
-  private static long hashForCell(int row, int col) {
-    return ((long) col << 32) | (row & 0xFFFFFFFFL);
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -175,9 +174,10 @@ final class StreamingCvrReader extends BaseCvrReader {
   // occur in a ranking's cell.
   // param: currentRank the rank at which we stop inferring empty cells for this invocation
   private void handleEmptyCells(int currentRank) {
+    Set<Integer> rowImageCols = imageCells.getOrDefault(currentRowIndex, Set.of());
     for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {
       int col = firstVoteColumnIndex + rank - 1;
-      if (imageCells.contains(hashForCell(currentRowIndex, col))) {
+      if (rowImageCols.contains(col)) {
         currentCvrData.add(undeclaredWriteInLabel);
         currentRankings.add(new Pair<>(rank, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL));
         hasSeenAnyNonBlankCandidateCells = true;
@@ -206,6 +206,16 @@ final class StreamingCvrReader extends BaseCvrReader {
     // handle any empty cells which may appear at the end of this row
     if (!config.isMaxRankingsSetToMaximum()) {
       handleEmptyCells(config.getMaxRankingsAllowedWhenNotSetToMaximum() + 1);
+    } else {
+      // With no upper bound on rankings, trailing blank cells are never visited by the SAX
+      // parser, so we must still sweep up any write-in images that sit beyond lastRankSeen.
+      Set<Integer> rowImageCols = imageCells.getOrDefault(currentRowIndex, Set.of());
+      if (!rowImageCols.isEmpty()) {
+        int maxImageRank = Collections.max(rowImageCols) - firstVoteColumnIndex + 1;
+        if (maxImageRank > lastRankSeen) {
+          handleEmptyCells(maxImageRank + 1);
+        }
+      }
     }
     String computedCastVoteRecordId =
         String.format("%s-%d", OutputWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
@@ -434,9 +444,9 @@ final class StreamingCvrReader extends BaseCvrReader {
   // Images in xlsx are floating objects in a separate drawing part, not embedded in cell data,
   // so they never appear in XSSFSheetXMLHandler callbacks. The anchor's "from" element gives the
   // 0-based (col, row) of the cell the image is anchored to.
-  private Set<Long> buildImageCellSet(XSSFReader xssfReader, OPCPackage pkg)
+  private Map<Integer, Set<Integer>> buildImageCellSet(XSSFReader xssfReader, OPCPackage pkg)
       throws OpenXML4JException, IOException, SAXException, ParserConfigurationException {
-    Set<Long> cells = new HashSet<>();
+    Map<Integer, Set<Integer>> cells = new HashMap<>();
     XSSFReader.SheetIterator sheetIter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
     if (!sheetIter.hasNext()) {
       return cells;
@@ -467,7 +477,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     private static final String XDR_NS =
         "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
 
-    private final Set<Long> imageCells;
+    private final Map<Integer, Set<Integer>> imageCells;
     private boolean inFrom = false;
     private boolean inCol = false;
     private boolean inRow = false;
@@ -476,7 +486,7 @@ final class StreamingCvrReader extends BaseCvrReader {
     private int fromRow = -1;
     private final StringBuilder text = new StringBuilder();
 
-    DrawingImageHandler(Set<Long> imageCells) {
+    DrawingImageHandler(Map<Integer, Set<Integer>> imageCells) {
       this.imageCells = imageCells;
     }
 
@@ -533,7 +543,11 @@ final class StreamingCvrReader extends BaseCvrReader {
           }
           case "twoCellAnchor", "oneCellAnchor" -> {
             if (hasPic && fromCol >= 0 && fromRow >= 0) {
-              imageCells.add(hashForCell(fromRow, fromCol));
+              boolean added =
+                  imageCells.computeIfAbsent(fromRow, k -> new HashSet<>()).add(fromCol);
+              if (!added) {
+                Logger.severe("Multiple images found in cell at row %d, col %d", fromRow, fromCol);
+              }
             }
           }
           default -> {}
