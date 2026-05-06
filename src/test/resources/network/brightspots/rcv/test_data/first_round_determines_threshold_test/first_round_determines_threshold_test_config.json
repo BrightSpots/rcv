@@ -22,7 +22,7 @@
     "provider" : "ess",
     "overvoteLabel" : "overvote",
     "skippedRankLabel" : "undervote",
-    "undeclaredWriteInLabel" : "",
+    "undeclaredWriteInLabel" : "(image)",
     "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
@@ -41,11 +41,7 @@
     "name" : "Excludy McSclude",
     "excluded" : true,
     "aliases" : [ ]
-  }, {
-    "name" : "Undeclared Write-ins",
-    "excluded" : false,
-    "aliases" : [ ]
-  } ],
+  }],
   "rules" : {
     "tiebreakMode" : "random",
     "overvoteRule" : "exhaustImmediately",

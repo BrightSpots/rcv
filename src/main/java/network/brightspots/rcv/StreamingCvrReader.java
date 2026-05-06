@@ -82,8 +82,6 @@ final class StreamingCvrReader extends BaseCvrReader {
   private int cvrIndex = 0;
   // list of currentRankings for CVR in progress
   private LinkedList<Pair<Integer, String>> currentRankings;
-  // list of raw strings for CVR in progress
-  private LinkedList<String> currentCvrData;
   // supplied CVR ID for CVR in progress
   private String currentSuppliedCvrId;
   // batch ID for CVR in progress
@@ -178,12 +176,14 @@ final class StreamingCvrReader extends BaseCvrReader {
     for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {
       int col = firstVoteColumnIndex + rank - 1;
       if (rowImageCols.contains(col)) {
-        currentCvrData.add(undeclaredWriteInLabel);
+        rowImageCols.remove(col);
+        if (rowImageCols.isEmpty()) {
+          imageCells.remove(currentRowIndex);
+        }
         currentRankings.add(new Pair<>(rank, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL));
         hasSeenAnyNonBlankCandidateCells = true;
       } else {
         hasSeenAnyBlankCandidateCells = true;
-        currentCvrData.add("empty cell");
       }
     }
   }
@@ -192,7 +192,6 @@ final class StreamingCvrReader extends BaseCvrReader {
   private void beginCvr() {
     cvrIndex++;
     currentRankings = new LinkedList<>();
-    currentCvrData = new LinkedList<>();
     currentSuppliedCvrId = null;
     currentBatch = null;
     currentPrecinct = null;
@@ -276,7 +275,6 @@ final class StreamingCvrReader extends BaseCvrReader {
 
   // handle CVR cell data callback
   private void cvrCell(int col, String cellData) {
-    currentCvrData.add(cellData);
     if (precinctColumnIndex != null && col == precinctColumnIndex) {
       currentPrecinct = cellData;
     } else if (batchColumnIndex != null && col == batchColumnIndex) {
@@ -427,6 +425,15 @@ final class StreamingCvrReader extends BaseCvrReader {
     xmlReader.setContentHandler(handler);
     // parse
     xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));
+
+    for (Map.Entry<Integer, Set<Integer>> entry : imageCells.entrySet()) {
+      for (int col : entry.getValue()) {
+        Logger.severe("Image at row %d, col %d was never visited during parsing",
+            entry.getKey(), col);
+        encounteredDataErrors = true;
+      }
+    }
+
     // close zip file without saving
     pkg.revert();
 
