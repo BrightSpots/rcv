@@ -227,6 +227,7 @@ final class StreamingCvrReader extends BaseCvrReader {
       Logger.auditable(
               "Skipping CVR for irrelevant contest: %s", computedCastVoteRecordId);
       numRowsIgnoredBecauseAllBlank++;
+      imageCells.getOrDefault(currentRowIndex, Set.of()).clear();
       return;
     }
 
