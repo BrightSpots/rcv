@@ -440,9 +440,10 @@ public class RawContestConfig {
     public boolean exhaustOnDuplicateCandidate;
     public String rulesDescription;
 
-    // These are deprecated (moved to individual CVRs), but we need to leave them in place here for
+    // These field have been moved to individual CVRs, but we need to leave them in place here for
     // the purpose of supporting automatic migration from older config versions.
-    // This only includes fields that were moved or renamed, not deprecated
+    // Fields that were not moved/renamed, but rather were deleted, are not included here:
+    // when loading CVRs with those fields, they will simply be ignored and deleted on when saved.
     public String overvoteLabel;
     public String undeclaredWriteInLabel;
   }

@@ -438,7 +438,8 @@ final class StreamingCvrReader extends BaseCvrReader {
     pkg.revert();
 
     if (numRowsIgnoredBecauseAllBlank > 0) {
-      Logger.warning("Ignored %d rows with no votes for any candidates.",
+      Logger.warning("Ignored %d rows because the ES&S CVR format indicates the "
+              + "configured contest did not appear on those ballots.",
           numRowsIgnoredBecauseAllBlank);
     }
 
