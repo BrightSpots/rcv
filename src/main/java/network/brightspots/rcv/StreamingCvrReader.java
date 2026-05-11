@@ -227,7 +227,6 @@ final class StreamingCvrReader extends BaseCvrReader {
       Logger.auditable(
               "Skipping CVR for irrelevant contest: %s", computedCastVoteRecordId);
       numRowsIgnoredBecauseAllBlank++;
-      imageCells.getOrDefault(currentRowIndex, Set.of()).clear();
       return;
     }
 
@@ -469,9 +468,13 @@ final class StreamingCvrReader extends BaseCvrReader {
 
     SAXParserFactory factory = SAXParserFactory.newInstance();
     factory.setNamespaceAware(true);
+    int lastVoteColExclusive = config.isMaxRankingsSetToMaximum()
+        ? Integer.MAX_VALUE
+        : firstVoteColumnIndex + config.getMaxRankingsAllowedWhenNotSetToMaximum();
     for (PackageRelationship rel : drawingRels) {
       PackagePart drawingPart = sheetPart.getRelatedPart(rel);
-      DrawingImageHandler handler = new DrawingImageHandler(cells);
+      DrawingImageHandler handler = new DrawingImageHandler(
+          cells, firstVoteRowIndex, firstVoteColumnIndex, lastVoteColExclusive);
       try (InputStream is = drawingPart.getInputStream()) {
         factory.newSAXParser().parse(is, handler);
       }
@@ -486,6 +489,9 @@ final class StreamingCvrReader extends BaseCvrReader {
         "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
 
     private final Map<Integer, Set<Integer>> imageCells;
+    private final int firstVoteRowIndex;
+    private final int firstVoteColumnIndex;
+    private final int lastVoteColExclusive;
     private boolean inFrom = false;
     private boolean inCol = false;
     private boolean inRow = false;
@@ -494,8 +500,12 @@ final class StreamingCvrReader extends BaseCvrReader {
     private int fromRow = -1;
     private final StringBuilder text = new StringBuilder();
 
-    DrawingImageHandler(Map<Integer, Set<Integer>> imageCells) {
+    DrawingImageHandler(Map<Integer, Set<Integer>> imageCells,
+        int firstVoteRowIndex, int firstVoteColumnIndex, int lastVoteColExclusive) {
       this.imageCells = imageCells;
+      this.firstVoteRowIndex = firstVoteRowIndex;
+      this.firstVoteColumnIndex = firstVoteColumnIndex;
+      this.lastVoteColExclusive = lastVoteColExclusive;
     }
 
     @Override
@@ -550,7 +560,8 @@ final class StreamingCvrReader extends BaseCvrReader {
             }
           }
           case "twoCellAnchor", "oneCellAnchor" -> {
-            if (hasPic && fromCol >= 0 && fromRow >= 0) {
+            if (hasPic && fromRow >= firstVoteRowIndex
+                && fromCol >= firstVoteColumnIndex && fromCol < lastVoteColExclusive) {
               boolean added =
                   imageCells.computeIfAbsent(fromRow, k -> new HashSet<>()).add(fromCol);
               if (!added) {
