@@ -2,7 +2,7 @@
   "config" : {
     "contest" : "Portland 2015 Mayoral Race",
     "date" : "2015-11-03",
-    "generatedBy" : "RCTab 2.1.0",
+    "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "Portland, ME",
     "office" : "Mayor"
   },
@@ -18,19 +18,18 @@
     "tally" : {
       "Carmona, Ralph C." : "5",
       "Haadoow, Hamza A." : "5",
-      "Undeclared Write-ins" : "1",
-      "Vail, Christopher L." : "5"
+      "Vail, Christopher L." : "6"
     },
     "tallyResults" : [ {
-      "eliminated" : "Undeclared Write-ins",
+      "eliminated" : "Haadoow, Hamza A.",
       "transfers" : {
-        "Haadoow, Hamza A." : "1"
+        "exhausted" : "5"
       }
     } ],
     "threshold" : "9"
   }, {
     "inactiveBallots" : {
-      "exhaustedChoices" : "0",
+      "exhaustedChoices" : "5",
       "overvotes" : "0",
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
@@ -38,37 +37,17 @@
     "round" : 2,
     "tally" : {
       "Carmona, Ralph C." : "5",
-      "Haadoow, Hamza A." : "6",
-      "Vail, Christopher L." : "5"
+      "Vail, Christopher L." : "6"
     },
     "tallyResults" : [ {
-      "eliminated" : "Vail, Christopher L.",
-      "transfers" : {
-        "Haadoow, Hamza A." : "5"
-      }
-    } ],
-    "threshold" : "9"
-  }, {
-    "inactiveBallots" : {
-      "exhaustedChoices" : "0",
-      "overvotes" : "0",
-      "repeatedRankings" : "0",
-      "skippedRankings" : "0"
-    },
-    "round" : 3,
-    "tally" : {
-      "Carmona, Ralph C." : "5",
-      "Haadoow, Hamza A." : "11"
-    },
-    "tallyResults" : [ {
-      "elected" : "Haadoow, Hamza A.",
+      "elected" : "Vail, Christopher L.",
       "transfers" : { }
     } ],
     "threshold" : "9"
   } ],
   "summary" : {
     "finalThreshold" : "9",
-    "numCandidates" : 5,
+    "numCandidates" : 4,
     "numWinners" : 1,
     "totalNumBallots" : "16",
     "undervotes" : 0
