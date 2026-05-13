@@ -93,9 +93,15 @@ final class ContestConfigMigration {
     RawContestConfig rawConfig = config.getRawConfig();
 
     for (CvrSource source : rawConfig.cvrFileSources) {
-      if (StringUtil.isNotBlank(source.getSkippedRankLabel()) && ContestConfig.Provider.ESS
-              == ContestConfig.Provider.getByInternalLabel(source.getProvider())) {
-        Logger.warning("ES&S no longer supports custom undervote labels. Ignoring.");
+      if (StringUtil.isNotBlank(source.getSkippedRankLabel())
+              && ContestConfig.Provider.ESS
+                == ContestConfig.Provider.getByInternalLabel(source.getProvider())
+              && !"undervote".equals(source.getSkippedRankLabel())) {
+        Logger.warning(
+                "Migrating config to v2.1.0 - the previously configured undervote label "
+                + source.getSkippedRankLabel()
+                + " is not compatible with the ES&S default of \"undervote\". Please review your "
+                + "CVR to ensure undervotes are properly identified with \"undervote\".");
         source.setSkippedRankLabel(null);
       }
     }
