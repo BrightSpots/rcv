@@ -27,4 +27,11 @@ runs:
     - name: "Generate zip for Windows"
       if: runner.os == 'Windows'
       shell: powershell
-      run: Compress-Archive -Path ${{inputs.input}} -Destination ${{inputs.zipFilename}}
+      run: |
+        $inputPath = "${{inputs.input}}"
+        if ($inputPath -match '^/([a-zA-Z])/(.+)$') {
+            $inputPath = $Matches[1].ToUpper() + ':' + ($Matches[2] -replace '/', '\')
+        } else {
+            $inputPath = $inputPath -replace '^~', $HOME
+        }
+        Compress-Archive -Path $inputPath -Destination ${{inputs.zipFilename}}
