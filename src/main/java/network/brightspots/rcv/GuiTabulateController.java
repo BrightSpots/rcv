@@ -237,7 +237,9 @@ public class GuiTabulateController {
             perSourceCvrCountTable.setVisible(true);
           }
 
-          data.discard();
+          if (data != null) {
+            data.discard();
+          }
           lastLoadedCvrData = data;
         };
 
@@ -372,7 +374,7 @@ public class GuiTabulateController {
         saveButton.setText("Save*");
         tempSaveButton.setVisible(false);
         break;
-      case DIFFERENT_BUT_VERSION_IS_TEST:
+      case DIFFERENT_BUT_FILE_IN_TEST_DIR:
         saveButton.setText("Save*");
         tempSaveButton.setVisible(true);
         break;

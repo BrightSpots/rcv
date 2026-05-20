@@ -183,11 +183,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrOvervoteLabel;
   @FXML
-  private TableColumn<CvrSource, String> tableColumnCvrSkippedRankLabel;
-  @FXML
   private TableColumn<CvrSource, String> tableColumnCvrUndeclaredWriteInLabel;
-  @FXML
-  private TableColumn<CvrSource, Boolean> tableColumnCvrTreatBlankAsUndeclaredWriteIn;
   @FXML
   private ChoiceBox<Provider> choiceCvrProvider;
   @FXML
@@ -213,11 +209,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCvrOvervoteLabel;
   @FXML
-  private TextField textFieldCvrSkippedRankLabel;
-  @FXML
   private TextField textFieldCvrUndeclaredWriteInLabel;
-  @FXML
-  private CheckBox checkBoxCvrTreatBlankAsUndeclaredWriteIn;
   @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
@@ -848,9 +840,7 @@ public class GuiConfigController implements Initializable {
     String provider = getProviderChoice(choiceCvrProvider).getInternalLabel();
     String contestId = getTextOrEmptyString(textFieldCvrContestId);
     String overvoteLabel = getTextOrEmptyString(textFieldCvrOvervoteLabel);
-    String skippedRankLabel = getTextOrEmptyString(textFieldCvrSkippedRankLabel);
     String undeclaredWriteInLabel = getTextOrEmptyString(textFieldCvrUndeclaredWriteInLabel);
-    boolean treatBlankAsUndeclaredWriteIn = checkBoxCvrTreatBlankAsUndeclaredWriteIn.isSelected();
 
     cvrPaths.forEach(filePath -> {
       CvrSource cvrSource =
@@ -865,9 +855,7 @@ public class GuiConfigController implements Initializable {
               provider,
               contestId,
               overvoteLabel,
-              skippedRankLabel,
-              undeclaredWriteInLabel,
-              treatBlankAsUndeclaredWriteIn
+              undeclaredWriteInLabel
           );
       Set<ValidationError> validationErrors =
           ContestConfig.performBasicCvrSourceValidation(cvrSource);
@@ -893,7 +881,6 @@ public class GuiConfigController implements Initializable {
         textFieldCvrPrecinctCol,
         textFieldCvrOvervoteDelimiter,
         textFieldCvrOvervoteLabel,
-        textFieldCvrSkippedRankLabel,
         textFieldCvrUndeclaredWriteInLabel
     );
     controlsToClear.forEach(GuiConfigController::clearErrorStyling);
@@ -941,10 +928,6 @@ public class GuiConfigController implements Initializable {
       addErrorStyling(textFieldCvrOvervoteLabel);
     }
 
-    if (validationErrors.contains(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID)) {
-      addErrorStyling(textFieldCvrSkippedRankLabel);
-    }
-
     if (validationErrors.contains(ValidationError.CVR_UWI_LABEL_INVALID)) {
       addErrorStyling(textFieldCvrUndeclaredWriteInLabel);
     }
@@ -985,12 +968,8 @@ public class GuiConfigController implements Initializable {
     textFieldCvrContestId.setDisable(true);
     textFieldCvrOvervoteLabel.clear();
     textFieldCvrOvervoteLabel.setDisable(true);
-    textFieldCvrSkippedRankLabel.clear();
-    textFieldCvrSkippedRankLabel.setDisable(true);
     textFieldCvrUndeclaredWriteInLabel.clear();
     textFieldCvrUndeclaredWriteInLabel.setDisable(true);
-    checkBoxCvrTreatBlankAsUndeclaredWriteIn.setSelected(false);
-    checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(true);
   }
 
   /**
@@ -1199,8 +1178,8 @@ public class GuiConfigController implements Initializable {
                           .writeValueAsString(configFromFile);
           if (currentConfigString.equals(savedConfigString)) {
             comparisonResult = ConfigComparisonResult.SAME;
-          } else if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
-            comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
+          } else if (ContestConfig.isConfigFileInTestDir(selectedFile.getAbsolutePath())) {
+            comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_FILE_IN_TEST_DIR;
           }
           // Otherwise, comparisonResult should remain ConfigComparisonResult.DIFFERENT
         }
@@ -1281,7 +1260,7 @@ public class GuiConfigController implements Initializable {
 
       // Pop up either a two-button or three-button alert
       Alert alert;
-      if (comparisonResult == ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST) {
+      if (comparisonResult == ConfigComparisonResult.DIFFERENT_BUT_FILE_IN_TEST_DIR) {
         alert =
             new Alert(
                 AlertType.WARNING,
@@ -1359,6 +1338,8 @@ public class GuiConfigController implements Initializable {
     choiceCvrProvider.setOnAction(event -> {
       clearAndDisableCvrFilesTabFields();
       textFieldCvrUndeclaredWriteInLabel.setDisable(false);
+      textFieldCvrUndeclaredWriteInLabel.setText(ContestConfig.SUGGESTED_UWI_LABEL);
+
       switch (getProviderChoice(choiceCvrProvider)) {
         case ESS -> {
           buttonAddCvrFile.setDisable(false);
@@ -1379,11 +1360,6 @@ public class GuiConfigController implements Initializable {
           textFieldCvrOvervoteDelimiter.setDisable(false);
           textFieldCvrOvervoteLabel.setDisable(false);
           textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
-          textFieldCvrSkippedRankLabel.setDisable(false);
-          textFieldCvrSkippedRankLabel.setText(ContestConfig.SUGGESTED_SKIPPED_RANK_LABEL);
-          checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(false);
-          checkBoxCvrTreatBlankAsUndeclaredWriteIn
-              .setSelected(ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
         }
         case CSV -> {
           buttonAddCvrFile.setDisable(false);
@@ -1443,11 +1419,8 @@ public class GuiConfigController implements Initializable {
         new EditableColumnString(tableColumnCvrOvervoteDelimiter, "overvoteDelimiter"),
         new EditableColumnString(tableColumnCvrContestId, "contestId"),
         new EditableColumnString(tableColumnCvrOvervoteLabel, "overvoteLabel"),
-        new EditableColumnString(tableColumnCvrSkippedRankLabel, "skippedRankLabel"),
         new EditableColumnString(tableColumnCvrUndeclaredWriteInLabel,
            "undeclaredWriteInLabel"),
-        new EditableColumnBoolean(tableColumnCvrTreatBlankAsUndeclaredWriteIn,
-           "treatBlankAsUndeclaredWriteIn"),
     };
     setUpEditableTableStrings(cvrStringColumnsAndProperties);
 
@@ -1460,12 +1433,8 @@ public class GuiConfigController implements Initializable {
     );
     tableColumnCvrContestId.setCellValueFactory(new PropertyValueFactory<>("contestId"));
     tableColumnCvrOvervoteLabel.setCellValueFactory(new PropertyValueFactory<>("overvoteLabel"));
-    tableColumnCvrSkippedRankLabel
-        .setCellValueFactory(new PropertyValueFactory<>("skippedRankLabel"));
     tableColumnCvrUndeclaredWriteInLabel
         .setCellValueFactory(new PropertyValueFactory<>("undeclaredWriteInLabel"));
-    tableColumnCvrTreatBlankAsUndeclaredWriteIn
-        .setCellValueFactory(new PropertyValueFactory<>("treatBlankAsUndeclaredWriteIn"));
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCvrFiles.setEditable(true);
     tableViewCvrFiles.getColumns().add(0, NumberTableCellFactory.createNumberColumn("#", 1));
@@ -1642,7 +1611,6 @@ public class GuiConfigController implements Initializable {
   private void loadConfig(ContestConfig config) throws ConfigVersionIsNewerThanAppVersionException {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
-    ContestConfigMigration.migrateConfigVersion(config);
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
@@ -1767,8 +1735,6 @@ public class GuiConfigController implements Initializable {
       source.setContestId(source.getContestId() != null ? source.getContestId().trim() : "");
       source.setOvervoteLabel(
           source.getOvervoteLabel() != null ? source.getOvervoteLabel().trim() : "");
-      source.setSkippedRankLabel(
-          source.getSkippedRankLabel() != null ? source.getSkippedRankLabel().trim() : "");
       source.setUndeclaredWriteInLabel(
           source.getUndeclaredWriteInLabel() != null ? source.getUndeclaredWriteInLabel().trim()
               : "");
@@ -1820,7 +1786,7 @@ public class GuiConfigController implements Initializable {
     GUI_IS_EMPTY,
     SAME,
     DIFFERENT,
-    DIFFERENT_BUT_VERSION_IS_TEST,
+    DIFFERENT_BUT_FILE_IN_TEST_DIR,
   }
 
   /**

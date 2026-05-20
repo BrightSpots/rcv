@@ -954,9 +954,9 @@ class TabulatorTests {
   }
 
   @Test
-  @DisplayName("treat blank as undeclared write-in")
-  void treatBlankAsUndeclaredWriteInTest() {
-    runTabulationTest("test_set_treat_blank_as_undeclared_write_in");
+  @DisplayName("treat ES&S images as undeclared write-in")
+  void treatImagesAsUndeclaredWriteInTest() {
+    runTabulationTest("test_set_treat_images_as_undeclared_write_in");
   }
 
   @Test
@@ -1036,6 +1036,12 @@ class TabulatorTests {
   @DisplayName("halting error when CVRs have a ranking larger than the max-configured value")
   void maxRankingValidationFails() {
     runTabulationTest("max_ranking_enforcement",
-        TabulatorSession.CastVoteRecordGenericParseException.class.toString());
+            TabulatorSession.CastVoteRecordGenericParseException.class.toString());
+  }
+
+  @Test
+  @DisplayName("ES&S correctly ignores empty CVRs in multi-contest CVR")
+  void essMultiContest() {
+    runTabulationTest("ess_multi_contest");
   }
 }

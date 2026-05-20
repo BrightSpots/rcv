@@ -44,7 +44,6 @@ import network.brightspots.rcv.Tabulator.WinnerElectionMode;
 class ContestConfig {
 
   // If any booleans are unspecified in config file, they should default to false no matter what
-  static final String AUTOMATED_TEST_VERSION = "TEST";
   static final String SUGGESTED_OUTPUT_DIRECTORY = "output";
   static final boolean SUGGESTED_TABULATE_BY_BATCH = false;
   static final boolean SUGGESTED_TABULATE_BY_PRECINCT = false;
@@ -58,7 +57,6 @@ class ContestConfig {
   static final boolean SUGGESTED_CONTINUE_UNTIL_TWO_CANDIDATES_REMAIN = false;
   static final boolean SUGGESTED_EXHAUST_ON_DUPLICATE_CANDIDATES = false;
   static final boolean SUGGESTED_FIRST_ROUND_DETERMINES_THRESHOLD = false;
-  static final boolean SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN = false;
   static final int SUGGESTED_CVR_FIRST_VOTE_COLUMN = 4;
   static final int SUGGESTED_CVR_FIRST_VOTE_ROW = 2;
   static final int SUGGESTED_CVR_ID_COLUMN = 1;
@@ -67,7 +65,7 @@ class ContestConfig {
   static final int SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED = 1;
   static final boolean SUGGESTED_MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED = false;
   static final String SUGGESTED_OVERVOTE_LABEL = "overvote";
-  static final String SUGGESTED_SKIPPED_RANK_LABEL = "undervote";
+  static final String SUGGESTED_UWI_LABEL = ""; // note: non-blank UWI labels creates UWI candidates
   static final String MAX_SKIPPED_RANKS_ALLOWED_UNLIMITED_OPTION = "unlimited";
   static final String MAX_RANKINGS_ALLOWED_NUM_CANDIDATES_OPTION = "max";
   private static final int MIN_COLUMN_INDEX = 1;
@@ -109,11 +107,21 @@ class ContestConfig {
 
   static ContestConfig loadContestConfig(RawContestConfig rawConfig, String sourceDirectory) {
     ContestConfig config = new ContestConfig(rawConfig, sourceDirectory);
+
     try {
-      config.processCandidateData();
-    } catch (Exception exception) {
-      Logger.severe("Error processing candidate data:\n%s", exception);
+      ContestConfigMigration.migrateConfigVersion(config);
+    } catch (ContestConfigMigration.ConfigVersionIsNewerThanAppVersionException exception) {
+      Logger.severe("Error migrating config to current version:\n%s", exception);
       config = null;
+    }
+
+    if (config != null) {
+      try {
+        config.processCandidateData();
+      } catch (Exception exception) {
+        Logger.severe("Error processing candidate data:\n%s", exception);
+        config = null;
+      }
     }
     return config;
   }
@@ -148,6 +156,11 @@ class ContestConfig {
     return loadContestConfig(configPath, false);
   }
 
+  static boolean isConfigFileInTestDir(String filepath) {
+    final String regex = "^.*brightspots.rcv.test_data.([^/\\\\]+).\\1_config\\.json$";
+    return filepath.matches(regex);
+  }
+
   /* Performs basic validation on CVR sources and returns a set of validation errors. **/
   static Set<ValidationError> performBasicCvrSourceValidation(CvrSource source) {
     Set<ValidationError> validationErrors = new HashSet<>();
@@ -158,16 +171,18 @@ class ContestConfig {
       if (!isNullOrBlank(source.getOvervoteLabel())
           && stringAlreadyInUseElsewhereInSource(
               source.getOvervoteLabel(), source, "overvoteLabel")) {
+        Logger.severe(
+            "Overvote label must be defined and unique from other labels for CVR source: %s",
+            source.getFilePath());
         validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_INVALID);
-      }
-      if (!isNullOrBlank(source.getSkippedRankLabel())
-          && stringAlreadyInUseElsewhereInSource(
-              source.getSkippedRankLabel(), source, "skippedRankLabel")) {
-        validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID);
       }
       if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
           && stringAlreadyInUseElsewhereInSource(
               source.getUndeclaredWriteInLabel(), source, "undeclaredWriteInLabel")) {
+        Logger.severe(
+            "Undeclared write-in label must be defined and unique"
+                + " from other labels for CVR source: %s",
+            source.getFilePath());
         validationErrors.add(ValidationError.CVR_UWI_LABEL_INVALID);
       }
 
@@ -285,21 +300,6 @@ class ContestConfig {
         if (fieldIsDefinedButShouldNotBeForProvider(
             source.getOvervoteDelimiter(), "overvoteDelimiter", provider, source.getFilePath())) {
           validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_UNEXPECTEDLY_DEFINED);
-        }
-
-        if (fieldIsDefinedButShouldNotBeForProvider(
-            source.getSkippedRankLabel(), "skippedRankLabel", provider, source.getFilePath())) {
-          validationErrors.add(ValidationError.CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED);
-        }
-
-        if (source.getTreatBlankAsUndeclaredWriteIn()) {
-          logErrorWithLocation(
-              String.format(
-                  "treatBlankAsUndeclaredWriteIn should not be true for CVR source with "
-                      + "provider \"%s\"",
-                  provider),
-              source.getFilePath());
-          validationErrors.add(ValidationError.CVR_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE);
         }
       }
 
@@ -485,8 +485,6 @@ class ContestConfig {
       inUse =
           stringMatchesAnotherFieldValue(string, field, source.getOvervoteLabel(), "overvoteLabel")
               || stringMatchesAnotherFieldValue(
-                  string, field, source.getSkippedRankLabel(), "skippedRankLabel")
-              || stringMatchesAnotherFieldValue(
                   string, field, source.getUndeclaredWriteInLabel(), "undeclaredWriteInLabel");
     }
     return inUse;
@@ -534,13 +532,9 @@ class ContestConfig {
     if (isNullOrBlank(getTabulatorVersion())) {
       validationErrors.add(ValidationError.TABULATOR_VERSION_MISSING);
       Logger.severe("tabulatorVersion is required!");
-    } else {
-      // ignore this check for test data, but otherwise require version to match current app version
-      if (!getTabulatorVersion().equals(AUTOMATED_TEST_VERSION)
-          && !getTabulatorVersion().equals(Main.APP_VERSION)) {
-        validationErrors.add(ValidationError.TABULATOR_VERSION_NOT_SUPPORTED);
-        Logger.severe("tabulatorVersion %s not supported!", getTabulatorVersion());
-      }
+    } else if (!getTabulatorVersion().equals(Main.APP_VERSION)) {
+      validationErrors.add(ValidationError.TABULATOR_VERSION_NOT_SUPPORTED);
+      Logger.severe("tabulatorVersion %s not supported!", getTabulatorVersion());
     }
     if (validationErrors.contains(ValidationError.TABULATOR_VERSION_MISSING)
         || validationErrors.contains(ValidationError.TABULATOR_VERSION_NOT_SUPPORTED)) {
@@ -1165,7 +1159,7 @@ class ContestConfig {
 
   int getNumDeclaredCandidates() {
     int size = getCandidateNames().size();
-    if (undeclaredWriteInsEnabled()) {
+    if (undeclaredWriteInsExplicitlyEnabled()) {
       // we subtract one for UNDECLARED_WRITE_IN_OUTPUT_LABEL;
       size = size - 1;
     }
@@ -1267,24 +1261,25 @@ class ContestConfig {
     }
 
     // If any of the sources support undeclared write-ins, we need to recognize them as a valid
-    // "candidate" option.
-    if (undeclaredWriteInsEnabled()) {
+    // "candidate" option. Note: it's possible that
+    if (undeclaredWriteInsExplicitlyEnabled()) {
       candidateNames.add(Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
       candidateAliasesToNameMap.put(
           Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL);
     }
   }
 
-  private boolean undeclaredWriteInsEnabled() {
-    boolean includeUwi = false;
+  /**
+   * Note: it is possible for UWIs to be _implictly_ declared, e.g., if images are found in ES&S
+   * .XLSXs, we assume they are UWIs.
+   */
+  private boolean undeclaredWriteInsExplicitlyEnabled() {
     for (CvrSource source : rawConfig.cvrFileSources) {
-      if (!isNullOrBlank(source.getUndeclaredWriteInLabel())
-          || source.getTreatBlankAsUndeclaredWriteIn()) {
-        includeUwi = true;
-        break;
+      if (!isNullOrBlank(source.getUndeclaredWriteInLabel())) {
+        return true;
       }
     }
-    return includeUwi;
+    return false;
   }
 
   // Possible validation errors
@@ -1296,7 +1291,6 @@ class ContestConfig {
     CVR_NO_FILES_SPECIFIED,
     CVR_FILE_PATH_MISSING,
     CVR_OVERVOTE_LABEL_INVALID,
-    CVR_SKIPPED_RANK_LABEL_INVALID,
     CVR_UWI_LABEL_INVALID,
     CVR_PROVIDER_INVALID,
     CVR_FIRST_VOTE_COLUMN_INVALID,
@@ -1306,7 +1300,6 @@ class ContestConfig {
     CVR_PRECINCT_COLUMN_INVALID,
     CVR_OVERVOTE_DELIMITER_INVALID,
     CVR_CDF_FILE_PATH_INVALID,
-    CVR_TREAT_BLANK_AS_UWI_UNEXPECTEDLY_TRUE,
     CVR_CONTEST_ID_INVALID,
     CVR_DUPLICATE_FILE_PATHS,
     CVR_FILE_PATH_INVALID,
@@ -1323,7 +1316,6 @@ class ContestConfig {
     CVR_ID_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_BATCH_COLUMN_UNEXPECTEDLY_DEFINED,
     CVR_PRECINCT_COLUMN_UNEXPECTEDLY_DEFINED,
-    CVR_SKIPPED_RANK_LABEL_UNEXPECTEDLY_DEFINED,
     CVR_CONTEST_ID_UNEXPECTEDLY_DEFINED,
     CVR_OUTPUT_NOT_ALLOWED_IN_USER_DIRECTORY,
     CANDIDATE_NAME_MISSING,

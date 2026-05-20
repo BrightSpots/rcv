@@ -1,0 +1,222 @@
+{
+  "config" : {
+    "contest" : "ES&S Multi-Contest",
+    "date" : "",
+    "generatedBy" : "RCTab 2.0.2",
+    "jurisdiction" : "",
+    "office" : ""
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "Abraham Lincoln" : "2",
+      "Bugs Bunny" : "7",
+      "George Washington" : "0",
+      "Indiana Jones" : "5",
+      "John Oliver" : "5",
+      "Luke Skywalker" : "6",
+      "Michael Jackson" : "10",
+      "Mickey Mouse" : "4",
+      "Undeclared Write-ins" : "0",
+      "Zelda" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "George Washington",
+      "transfers" : { }
+    } ],
+    "threshold" : "21"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "Abraham Lincoln" : "2",
+      "Bugs Bunny" : "7",
+      "Indiana Jones" : "5",
+      "John Oliver" : "5",
+      "Luke Skywalker" : "6",
+      "Michael Jackson" : "10",
+      "Mickey Mouse" : "4",
+      "Undeclared Write-ins" : "0",
+      "Zelda" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Undeclared Write-ins",
+      "transfers" : { }
+    } ],
+    "threshold" : "21"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "Abraham Lincoln" : "2",
+      "Bugs Bunny" : "7",
+      "Indiana Jones" : "5",
+      "John Oliver" : "5",
+      "Luke Skywalker" : "6",
+      "Michael Jackson" : "10",
+      "Mickey Mouse" : "4",
+      "Zelda" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Abraham Lincoln",
+      "transfers" : {
+        "Michael Jackson" : "2"
+      }
+    } ],
+    "threshold" : "21"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "Bugs Bunny" : "7",
+      "Indiana Jones" : "5",
+      "John Oliver" : "5",
+      "Luke Skywalker" : "6",
+      "Michael Jackson" : "12",
+      "Mickey Mouse" : "4",
+      "Zelda" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Zelda",
+      "transfers" : {
+        "Indiana Jones" : "2"
+      }
+    } ],
+    "threshold" : "21"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 5,
+    "tally" : {
+      "Bugs Bunny" : "7",
+      "Indiana Jones" : "7",
+      "John Oliver" : "5",
+      "Luke Skywalker" : "6",
+      "Michael Jackson" : "12",
+      "Mickey Mouse" : "4"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Mickey Mouse",
+      "transfers" : {
+        "John Oliver" : "2",
+        "Michael Jackson" : "2"
+      }
+    } ],
+    "threshold" : "21"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 6,
+    "tally" : {
+      "Bugs Bunny" : "7",
+      "Indiana Jones" : "7",
+      "John Oliver" : "7",
+      "Luke Skywalker" : "6",
+      "Michael Jackson" : "14"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Luke Skywalker",
+      "transfers" : {
+        "Bugs Bunny" : "3",
+        "John Oliver" : "3"
+      }
+    } ],
+    "threshold" : "21"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 7,
+    "tally" : {
+      "Bugs Bunny" : "10",
+      "Indiana Jones" : "7",
+      "John Oliver" : "10",
+      "Michael Jackson" : "14"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Indiana Jones",
+      "transfers" : {
+        "Bugs Bunny" : "7"
+      }
+    } ],
+    "threshold" : "21"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 8,
+    "tally" : {
+      "Bugs Bunny" : "17",
+      "John Oliver" : "10",
+      "Michael Jackson" : "14"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "John Oliver",
+      "transfers" : {
+        "Bugs Bunny" : "3",
+        "exhausted" : "7"
+      }
+    } ],
+    "threshold" : "21"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "7",
+      "overvotes" : "3",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 9,
+    "tally" : {
+      "Bugs Bunny" : "20",
+      "Michael Jackson" : "14"
+    },
+    "tallyResults" : [ {
+      "elected" : "Bugs Bunny",
+      "transfers" : { }
+    } ],
+    "threshold" : "18"
+  } ],
+  "summary" : {
+    "finalThreshold" : "18",
+    "numCandidates" : 10,
+    "numWinners" : 1,
+    "totalNumBallots" : "44",
+    "undervotes" : 0
+  }
+}

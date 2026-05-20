@@ -30,17 +30,14 @@
       "Miller, Markos S." : "3",
       "Rathband, Jed" : "2",
       "Strimling, Ethan K." : "1",
-      "Undeclared Write-ins" : "0",
-      "Vail, Christopher L." : "6"
+      "Undeclared Write-ins" : "1",
+      "Vail, Christopher L." : "5"
     },
     "tallyResults" : [ {
-      "eliminated" : "Strimling, Ethan K.",
+      "eliminated" : "Undeclared Write-ins",
       "transfers" : {
         "Vail, Christopher L." : "1"
       }
-    }, {
-      "eliminated" : "Undeclared Write-ins",
-      "transfers" : { }
     } ],
     "threshold" : "50"
   }, {
@@ -51,6 +48,38 @@
       "skippedRankings" : "0"
     },
     "round" : 2,
+    "tally" : {
+      "Bragdon, Charles E." : "11",
+      "Brennan, Michael F." : "6",
+      "Bryant, Peter G." : "9",
+      "Carmona, Ralph C." : "12",
+      "Dodge, Richard A." : "10",
+      "Duson, Jill C." : "5",
+      "Eder, John M." : "3",
+      "Haadoow, Hamza A." : "8",
+      "Lapchick, Jodie L." : "7",
+      "Marshall, David A." : "2",
+      "Mavodones, Nicholas M. Jr." : "13",
+      "Miller, Markos S." : "3",
+      "Rathband, Jed" : "2",
+      "Strimling, Ethan K." : "1",
+      "Vail, Christopher L." : "6"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Strimling, Ethan K.",
+      "transfers" : {
+        "Vail, Christopher L." : "1"
+      }
+    } ],
+    "threshold" : "50"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "1",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -81,7 +110,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
     },
-    "round" : 3,
+    "round" : 4,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -111,7 +140,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
     },
-    "round" : 4,
+    "round" : 5,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -140,7 +169,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
     },
-    "round" : 5,
+    "round" : 6,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -168,7 +197,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
     },
-    "round" : 6,
+    "round" : 7,
     "tally" : {
       "Bragdon, Charles E." : "11",
       "Brennan, Michael F." : "6",
@@ -197,7 +226,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "0"
     },
-    "round" : 7,
+    "round" : 8,
     "tally" : {
       "Bragdon, Charles E." : "14",
       "Bryant, Peter G." : "11",
@@ -224,7 +253,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "1"
     },
-    "round" : 8,
+    "round" : 9,
     "tally" : {
       "Bragdon, Charles E." : "14",
       "Bryant, Peter G." : "11",
@@ -250,7 +279,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "1"
     },
-    "round" : 9,
+    "round" : 10,
     "tally" : {
       "Bragdon, Charles E." : "14",
       "Bryant, Peter G." : "11",
@@ -276,7 +305,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "1"
     },
-    "round" : 10,
+    "round" : 11,
     "tally" : {
       "Bragdon, Charles E." : "14",
       "Bryant, Peter G." : "12",
@@ -300,7 +329,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "1"
     },
-    "round" : 11,
+    "round" : 12,
     "tally" : {
       "Bragdon, Charles E." : "14",
       "Bryant, Peter G." : "12",
@@ -324,7 +353,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "1"
     },
-    "round" : 12,
+    "round" : 13,
     "tally" : {
       "Bragdon, Charles E." : "23",
       "Carmona, Ralph C." : "17",
@@ -347,7 +376,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "1"
     },
-    "round" : 13,
+    "round" : 14,
     "tally" : {
       "Bragdon, Charles E." : "24",
       "Carmona, Ralph C." : "28",
@@ -369,7 +398,7 @@
       "repeatedRankings" : "0",
       "skippedRankings" : "1"
     },
-    "round" : 14,
+    "round" : 15,
     "tally" : {
       "Carmona, Ralph C." : "40",
       "Mavodones, Nicholas M. Jr." : "54"

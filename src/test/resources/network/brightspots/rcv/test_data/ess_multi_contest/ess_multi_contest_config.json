@@ -1,9 +1,9 @@
 {
   "tabulatorVersion" : "TEST",
   "outputSettings" : {
-    "contestName" : "treatBlankAsUndeclaredWriteIn test",
+    "contestName" : "ES&S Multi-Contest",
     "outputDirectory" : "output",
-    "contestDate" : "2019-03-06",
+    "contestDate" : "",
     "contestJurisdiction" : "",
     "contestOffice" : "",
     "tabulateByBatch" : false,
@@ -11,56 +11,76 @@
     "generateCdfJson" : false
   },
   "cvrFileSources" : [ {
-    "filePath" : "test_set_treat_blank_as_undeclared_write_in_cvr.xlsx",
+    "filePath" : "ess_multi_contest_cvr.xlsx",
     "contestId" : "",
-    "firstVoteColumnIndex" : "2",
+    "firstVoteColumnIndex" : "9",
     "firstVoteRowIndex" : "2",
-    "idColumnIndex" : "1",
-    "batchColumnIndex" : "",
-    "precinctColumnIndex" : "",
+    "idColumnIndex" : "4",
+    "batchColumnIndex" : "5",
+    "precinctColumnIndex" : "7",
     "overvoteDelimiter" : "",
     "provider" : "ess",
     "overvoteLabel" : "overvote",
     "skippedRankLabel" : "undervote",
-    "undeclaredWriteInLabel" : "UWI",
-    "treatBlankAsUndeclaredWriteIn" : true
+    "undeclaredWriteInLabel" : "Write-in",
+    "treatBlankAsUndeclaredWriteIn" : false
   } ],
   "candidates" : [ {
-    "name" : "A",
+    "name" : "Mickey Mouse",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "B",
+    "name" : "George Washington",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "C",
+    "name" : "Luke Skywalker",
     "excluded" : false,
     "aliases" : [ ]
   }, {
-    "name" : "D",
+    "name" : "Zelda",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Abraham Lincoln",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Michael Jackson",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Indiana Jones",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Bugs Bunny",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "John Oliver",
     "excluded" : false,
     "aliases" : [ ]
   } ],
   "rules" : {
-    "tiebreakMode" : "random",
+    "tiebreakMode" : "useCandidateOrder",
     "overvoteRule" : "exhaustImmediately",
     "winnerElectionMode" : "singleWinnerMajority",
-    "randomSeed" : "0",
+    "randomSeed" : "",
     "numberOfWinners" : "1",
     "multiSeatBottomsUpPercentageThreshold" : "",
-    "decimalPlacesForVoteArithmetic" : "1",
-    "minimumVoteThreshold" : "0",
-    "maxSkippedRanksAllowed" : "4",
-    "maxRankingsAllowed" : "4",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "maxSkippedRanksAllowed" : "1",
+    "maxRankingsAllowed" : "5",
     "nonIntegerWinningThreshold" : false,
     "doesFirstRoundDetermineThreshold" : false,
     "hareQuota" : false,
     "batchElimination" : false,
+    "cutoffElimination" : false,
     "continueUntilTwoCandidatesRemain" : false,
     "stopTabulationEarlyAfterRound" : "",
     "exhaustOnDuplicateCandidate" : false,
-    "rulesDescription" : "test",
+    "rulesDescription" : "",
     "treatBlankAsUndeclaredWriteIn" : false
   }
 }

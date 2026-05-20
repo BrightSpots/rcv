@@ -19,8 +19,10 @@ package network.brightspots.rcv;
 
 import static network.brightspots.rcv.Utils.isNullOrBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -77,11 +79,12 @@ public class RawContestConfig {
     private final SimpleStringProperty overvoteDelimiter = new SimpleStringProperty();
     private final SimpleStringProperty provider = new SimpleStringProperty();
     private final SimpleStringProperty overvoteLabel = new SimpleStringProperty();
-    private final SimpleStringProperty skippedRankLabel = new SimpleStringProperty();
     private final SimpleStringProperty undeclaredWriteInLabel = new SimpleStringProperty();
-    private final SimpleBooleanProperty treatBlankAsUndeclaredWriteIn = new SimpleBooleanProperty();
+
 
     // Deprecated fields
+    private String skippedRankLabel;
+    private boolean treatBlankAsUndeclaredWriteIn;
     private String undervoteLabel;
 
     CvrSource() {}
@@ -97,9 +100,7 @@ public class RawContestConfig {
         String provider,
         String contestId,
         String overvoteLabel,
-        String skippedRankLabel,
-        String undeclaredWriteInLabel,
-        boolean treatBlankAsUndeclaredWriteIn) {
+        String undeclaredWriteInLabel) {
       this.filePath.set(filePath);
       this.firstVoteColumnIndex.set(firstVoteColumnIndex);
       this.firstVoteRowIndex.set(firstVoteRowIndex);
@@ -110,9 +111,7 @@ public class RawContestConfig {
       this.provider.set(provider);
       this.contestId.set(contestId);
       this.overvoteLabel.set(overvoteLabel);
-      this.skippedRankLabel.set(skippedRankLabel);
       this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
-      this.treatBlankAsUndeclaredWriteIn.set(treatBlankAsUndeclaredWriteIn);
     }
 
     public String getFilePath() {
@@ -199,14 +198,6 @@ public class RawContestConfig {
       this.overvoteLabel.set(overvoteLabel);
     }
 
-    public String getSkippedRankLabel() {
-      return skippedRankLabel.get();
-    }
-
-    public void setSkippedRankLabel(String skippedRankLabel) {
-      this.skippedRankLabel.set(skippedRankLabel);
-    }
-
     public String getUndeclaredWriteInLabel() {
       return undeclaredWriteInLabel.get();
     }
@@ -215,12 +206,23 @@ public class RawContestConfig {
       this.undeclaredWriteInLabel.set(undeclaredWriteInLabel);
     }
 
+    /**
+     * The following properties are deprecated.
+     */
+    public String getSkippedRankLabel() {
+      return skippedRankLabel;
+    }
+
+    public void setSkippedRankLabel(String skippedRankLabel) {
+      this.skippedRankLabel = skippedRankLabel;
+    }
+
     public boolean getTreatBlankAsUndeclaredWriteIn() {
-      return treatBlankAsUndeclaredWriteIn.get();
+      return treatBlankAsUndeclaredWriteIn;
     }
 
     public void setTreatBlankAsUndeclaredWriteIn(Boolean treatBlankAsUndeclaredWriteIn) {
-      this.treatBlankAsUndeclaredWriteIn.set(treatBlankAsUndeclaredWriteIn);
+      this.treatBlankAsUndeclaredWriteIn = treatBlankAsUndeclaredWriteIn;
     }
 
     /**
@@ -267,21 +269,8 @@ public class RawContestConfig {
       return overvoteLabel;
     }
 
-    public SimpleStringProperty skippedRankLabelProperty() {
-      return skippedRankLabel;
-    }
-
     public SimpleStringProperty undeclaredWriteInLabelProperty() {
       return undeclaredWriteInLabel;
-    }
-
-    public SimpleBooleanProperty treatBlankAsUndeclaredWriteInProperty() {
-      return treatBlankAsUndeclaredWriteIn;
-    }
-
-    // Deprecated fields
-    public String getUndervoteLabel() {
-      return undervoteLabel;
     }
   }
 
@@ -451,11 +440,11 @@ public class RawContestConfig {
     public boolean exhaustOnDuplicateCandidate;
     public String rulesDescription;
 
-    // These are deprecated (moved to individual CVRs), but we need to leave them in place here for
+    // These field have been moved to individual CVRs, but we need to leave them in place here for
     // the purpose of supporting automatic migration from older config versions.
-    public boolean treatBlankAsUndeclaredWriteIn;
+    // Fields that were not moved/renamed, but rather were deleted, are not included here:
+    // when loading CVRs with those fields, they will simply be ignored and deleted on when saved.
     public String overvoteLabel;
-    public String undervoteLabel;
     public String undeclaredWriteInLabel;
   }
 }
