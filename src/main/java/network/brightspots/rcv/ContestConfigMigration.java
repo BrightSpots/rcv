@@ -99,7 +99,7 @@ final class ContestConfigMigration {
               && !"undervote".equals(source.getSkippedRankLabel())) {
         Logger.warning(
                 "Migrating config to v2.1.0 - the previously configured undervote label "
-                + source.getSkippedRankLabel()
+                + "\"" + source.getSkippedRankLabel() + "\""
                 + " is not compatible with the ES&S default of \"undervote\". Please review your "
                 + "CVR to ensure undervotes are properly identified with \"undervote\".");
         source.setSkippedRankLabel(null);
