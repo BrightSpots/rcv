@@ -183,11 +183,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TableColumn<CvrSource, String> tableColumnCvrOvervoteLabel;
   @FXML
-  private TableColumn<CvrSource, String> tableColumnCvrSkippedRankLabel;
-  @FXML
   private TableColumn<CvrSource, String> tableColumnCvrUndeclaredWriteInLabel;
-  @FXML
-  private TableColumn<CvrSource, Boolean> tableColumnCvrTreatBlankAsUndeclaredWriteIn;
   @FXML
   private ChoiceBox<Provider> choiceCvrProvider;
   @FXML
@@ -213,11 +209,7 @@ public class GuiConfigController implements Initializable {
   @FXML
   private TextField textFieldCvrOvervoteLabel;
   @FXML
-  private TextField textFieldCvrSkippedRankLabel;
-  @FXML
   private TextField textFieldCvrUndeclaredWriteInLabel;
-  @FXML
-  private CheckBox checkBoxCvrTreatBlankAsUndeclaredWriteIn;
   @FXML
   private TableView<Candidate> tableViewCandidates;
   @FXML
@@ -848,9 +840,7 @@ public class GuiConfigController implements Initializable {
     String provider = getProviderChoice(choiceCvrProvider).getInternalLabel();
     String contestId = getTextOrEmptyString(textFieldCvrContestId);
     String overvoteLabel = getTextOrEmptyString(textFieldCvrOvervoteLabel);
-    String skippedRankLabel = getTextOrEmptyString(textFieldCvrSkippedRankLabel);
     String undeclaredWriteInLabel = getTextOrEmptyString(textFieldCvrUndeclaredWriteInLabel);
-    boolean treatBlankAsUndeclaredWriteIn = checkBoxCvrTreatBlankAsUndeclaredWriteIn.isSelected();
 
     cvrPaths.forEach(filePath -> {
       CvrSource cvrSource =
@@ -865,9 +855,7 @@ public class GuiConfigController implements Initializable {
               provider,
               contestId,
               overvoteLabel,
-              skippedRankLabel,
-              undeclaredWriteInLabel,
-              treatBlankAsUndeclaredWriteIn
+              undeclaredWriteInLabel
           );
       Set<ValidationError> validationErrors =
           ContestConfig.performBasicCvrSourceValidation(cvrSource);
@@ -893,7 +881,6 @@ public class GuiConfigController implements Initializable {
         textFieldCvrPrecinctCol,
         textFieldCvrOvervoteDelimiter,
         textFieldCvrOvervoteLabel,
-        textFieldCvrSkippedRankLabel,
         textFieldCvrUndeclaredWriteInLabel
     );
     controlsToClear.forEach(GuiConfigController::clearErrorStyling);
@@ -941,10 +928,6 @@ public class GuiConfigController implements Initializable {
       addErrorStyling(textFieldCvrOvervoteLabel);
     }
 
-    if (validationErrors.contains(ValidationError.CVR_SKIPPED_RANK_LABEL_INVALID)) {
-      addErrorStyling(textFieldCvrSkippedRankLabel);
-    }
-
     if (validationErrors.contains(ValidationError.CVR_UWI_LABEL_INVALID)) {
       addErrorStyling(textFieldCvrUndeclaredWriteInLabel);
     }
@@ -985,12 +968,8 @@ public class GuiConfigController implements Initializable {
     textFieldCvrContestId.setDisable(true);
     textFieldCvrOvervoteLabel.clear();
     textFieldCvrOvervoteLabel.setDisable(true);
-    textFieldCvrSkippedRankLabel.clear();
-    textFieldCvrSkippedRankLabel.setDisable(true);
     textFieldCvrUndeclaredWriteInLabel.clear();
     textFieldCvrUndeclaredWriteInLabel.setDisable(true);
-    checkBoxCvrTreatBlankAsUndeclaredWriteIn.setSelected(false);
-    checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(true);
   }
 
   /**
@@ -1199,8 +1178,8 @@ public class GuiConfigController implements Initializable {
                           .writeValueAsString(configFromFile);
           if (currentConfigString.equals(savedConfigString)) {
             comparisonResult = ConfigComparisonResult.SAME;
-          } else if (configFromFile.tabulatorVersion.equals(ContestConfig.AUTOMATED_TEST_VERSION)) {
-            comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST;
+          } else if (ContestConfig.isConfigFileInTestDir(selectedFile.getAbsolutePath())) {
+            comparisonResult = ConfigComparisonResult.DIFFERENT_BUT_FILE_IN_TEST_DIR;
           }
           // Otherwise, comparisonResult should remain ConfigComparisonResult.DIFFERENT
         }
@@ -1281,7 +1260,7 @@ public class GuiConfigController implements Initializable {
 
       // Pop up either a two-button or three-button alert
       Alert alert;
-      if (comparisonResult == ConfigComparisonResult.DIFFERENT_BUT_VERSION_IS_TEST) {
+      if (comparisonResult == ConfigComparisonResult.DIFFERENT_BUT_FILE_IN_TEST_DIR) {
         alert =
             new Alert(
                 AlertType.WARNING,
@@ -1359,6 +1338,8 @@ public class GuiConfigController implements Initializable {
     choiceCvrProvider.setOnAction(event -> {
       clearAndDisableCvrFilesTabFields();
       textFieldCvrUndeclaredWriteInLabel.setDisable(false);
+      textFieldCvrUndeclaredWriteInLabel.setText(ContestConfig.SUGGESTED_UWI_LABEL);
+
       switch (getProviderChoice(choiceCvrProvider)) {
         case ESS -> {
           buttonAddCvrFile.setDisable(false);
@@ -1379,11 +1360,6 @@ public class GuiConfigController implements Initializable {
           textFieldCvrOvervoteDelimiter.setDisable(false);
           textFieldCvrOvervoteLabel.setDisable(false);
           textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
-          textFieldCvrSkippedRankLabel.setDisable(false);
-          textFieldCvrSkippedRankLabel.setText(ContestConfig.SUGGESTED_SKIPPED_RANK_LABEL);
-          checkBoxCvrTreatBlankAsUndeclaredWriteIn.setDisable(false);
-          checkBoxCvrTreatBlankAsUndeclaredWriteIn
-              .setSelected(ContestConfig.SUGGESTED_TREAT_BLANK_AS_UNDECLARED_WRITE_IN);
         }
         case CSV -> {
           buttonAddCvrFile.setDisable(false);
@@ -1443,11 +1419,8 @@ public class GuiConfigController implements Initializable {
         new EditableColumnString(tableColumnCvrOvervoteDelimiter, "overvoteDelimiter"),
         new EditableColumnString(tableColumnCvrContestId, "contestId"),
         new EditableColumnString(tableColumnCvrOvervoteLabel, "overvoteLabel"),
-        new EditableColumnString(tableColumnCvrSkippedRankLabel, "skippedRankLabel"),
         new EditableColumnString(tableColumnCvrUndeclaredWriteInLabel,
            "undeclaredWriteInLabel"),
-        new EditableColumnBoolean(tableColumnCvrTreatBlankAsUndeclaredWriteIn,
-           "treatBlankAsUndeclaredWriteIn"),
     };
     setUpEditableTableStrings(cvrStringColumnsAndProperties);
 
@@ -1460,12 +1433,8 @@ public class GuiConfigController implements Initializable {
     );
     tableColumnCvrContestId.setCellValueFactory(new PropertyValueFactory<>("contestId"));
     tableColumnCvrOvervoteLabel.setCellValueFactory(new PropertyValueFactory<>("overvoteLabel"));
-    tableColumnCvrSkippedRankLabel
-        .setCellValueFactory(new PropertyValueFactory<>("skippedRankLabel"));
     tableColumnCvrUndeclaredWriteInLabel
         .setCellValueFactory(new PropertyValueFactory<>("undeclaredWriteInLabel"));
-    tableColumnCvrTreatBlankAsUndeclaredWriteIn
-        .setCellValueFactory(new PropertyValueFactory<>("treatBlankAsUndeclaredWriteIn"));
     tableViewCvrFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tableViewCvrFiles.setEditable(true);
     tableViewCvrFiles.getColumns().add(0, NumberTableCellFactory.createNumberColumn("#", 1));
@@ -1642,7 +1611,6 @@ public class GuiConfigController implements Initializable {
   private void loadConfig(ContestConfig config) throws ConfigVersionIsNewerThanAppVersionException {
     clearConfig();
     RawContestConfig rawConfig = config.getRawConfig();
-    ContestConfigMigration.migrateConfigVersion(config);
     OutputSettings outputSettings = rawConfig.outputSettings;
     textFieldContestName.setText(outputSettings.contestName);
     textFieldOutputDirectory.setText(config.getOutputDirectoryRaw());
@@ -1767,8 +1735,6 @@ public class GuiConfigController implements Initializable {
       source.setContestId(source.getContestId() != null ? source.getContestId().trim() : "");
       source.setOvervoteLabel(
           source.getOvervoteLabel() != null ? source.getOvervoteLabel().trim() : "");
-      source.setSkippedRankLabel(
-          source.getSkippedRankLabel() != null ? source.getSkippedRankLabel().trim() : "");
       source.setUndeclaredWriteInLabel(
           source.getUndeclaredWriteInLabel() != null ? source.getUndeclaredWriteInLabel().trim()
               : "");
@@ -1820,7 +1786,7 @@ public class GuiConfigController implements Initializable {
     GUI_IS_EMPTY,
     SAME,
     DIFFERENT,
-    DIFFERENT_BUT_VERSION_IS_TEST,
+    DIFFERENT_BUT_FILE_IN_TEST_DIR,
   }
 
   /**
@@ -1869,53 +1835,8 @@ public class GuiConfigController implements Initializable {
           new Task<>() {
             @Override
             protected Void call() {
-              Logger.info("Auto-loading candidates from CVR files...");
-              boolean cvrsSpecified = true;
-              if (sources.isEmpty()) {
-                Logger.warning("No CVR files specified!");
-                cvrsSpecified = false;
-              }
-              if (cvrsSpecified) {
-                // Gather unloaded names from each of the sources and place into the HashSet
-                HashSet<Candidate> unloadedCandidates = new HashSet<>();
-                for (CvrSource source : sources) {
-                  Provider provider = ContestConfig.getProvider(source);
-                  try {
-                    List<CastVoteRecord> castVoteRecords = new ArrayList<>();
-                    BaseCvrReader reader = provider.constructReader(config, source);
-                    Set<Candidate> unknownCandidates =
-                            reader.gatherUnknownCandidates(castVoteRecords);
-                    unloadedCandidates.addAll(unknownCandidates);
-                  } catch (ContestConfig.UnrecognizedProviderException e) {
-                    Logger.severe(
-                        "Unrecognized provider \"%s\" in source file \"%s\": %s",
-                        source.getProvider(), source.getFilePath(), e.getMessage());
-                  } catch (CastVoteRecord.CvrParseException | IOException e) {
-                    Logger.severe(
-                        "Failed to read source file \"%s\": ",
-                        source.getFilePath(), e.getMessage());
-                  }
-                }
-
-                // Validate each name and add to the table of candidates
-                int successCount = 0;
-                for (Candidate candidate : unloadedCandidates) {
-                  Set<ValidationError> validationErrors =
-                      ContestConfig.performBasicCandidateValidation(candidate);
-                  if (validationErrors.isEmpty()) {
-                    tableViewCandidates.getItems().add(candidate);
-                    successCount++;
-                  } else {
-                    String errors = validationErrors.stream()
-                            .map(x -> x.toString())
-                            .collect(Collectors.joining(", "));
-                    Logger.warning("Autoloaded candidate %s but did not pass validation."
-                        + " (%s)", candidate, errors);
-                  }
-                }
-
-                Logger.info("Auto-loaded %d candidates.", successCount);
-              }
+              Set<Candidate> newCandidates = gatherAutoloadedCandidates(config, sources);
+              tableViewCandidates.getItems().addAll(newCandidates);
               return null;
             }
           };
@@ -1925,6 +1846,57 @@ public class GuiConfigController implements Initializable {
               task.getException()));
       return task;
     }
+  }
+
+  /**
+   * Reads all CVR sources and returns candidates found in the CVRs that are not already listed
+   * in the config. Candidates that fail basic validation are logged and excluded from the result.
+   */
+  static Set<Candidate> gatherAutoloadedCandidates(
+      ContestConfig config, List<CvrSource> sources) {
+    Logger.info("Auto-loading candidates from CVR files...");
+    if (sources.isEmpty()) {
+      Logger.warning("No CVR files specified!");
+      return Set.of();
+    }
+
+    // Gather unknown candidates across all sources into a single set
+    HashSet<Candidate> unloadedCandidates = new HashSet<>();
+    for (CvrSource source : sources) {
+      Provider provider = ContestConfig.getProvider(source);
+      try {
+        List<CastVoteRecord> castVoteRecords = new ArrayList<>();
+        BaseCvrReader reader = provider.constructReader(config, source);
+        unloadedCandidates.addAll(reader.gatherUnknownCandidates(castVoteRecords));
+      } catch (ContestConfig.UnrecognizedProviderException e) {
+        Logger.severe(
+            "Unrecognized provider \"%s\" in source file \"%s\": %s",
+            source.getProvider(), source.getFilePath(), e.getMessage());
+      } catch (CastVoteRecord.CvrParseException | IOException e) {
+        Logger.severe(
+            "Failed to read source file \"%s\": ",
+            source.getFilePath(), e.getMessage());
+      }
+    }
+
+    // Filter out candidates that fail basic validation
+    HashSet<Candidate> validCandidates = new HashSet<>();
+    for (Candidate candidate : unloadedCandidates) {
+      Set<ValidationError> validationErrors =
+          ContestConfig.performBasicCandidateValidation(candidate);
+      if (validationErrors.isEmpty()) {
+        validCandidates.add(candidate);
+      } else {
+        String errors = validationErrors.stream()
+            .map(ValidationError::toString)
+            .collect(Collectors.joining(", "));
+        Logger.warning(
+            "Autoloaded candidate %s but did not pass validation. (%s)", candidate, errors);
+      }
+    }
+
+    Logger.info("Auto-loaded %d candidates.", validCandidates.size());
+    return validCandidates;
   }
 
   private static class ValidatorService extends GenericService<Boolean> {

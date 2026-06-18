@@ -1,0 +1,52 @@
+{
+  "tabulatorVersion" : "TEST",
+  "outputSettings" : {
+    "contestName" : "Aliases test (JSON CDF Format)",
+    "outputDirectory" : "output",
+    "contestDate" : "2023-03-23",
+    "contestJurisdiction" : "TestSets_Single_winner",
+    "contestOffice" : "Aliases test",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
+  },
+  "cvrFileSources" : [],
+  "candidates" : [ {
+    "name" : "Candidate A Name",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Candidate B Name",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Candidate C Name",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "Candidate D Name",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "random",
+    "overvoteRule" : "alwaysSkipToNextRank",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "0",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "1",
+    "minimumVoteThreshold" : "0",
+    "maxSkippedRanksAllowed" : "4",
+    "maxRankingsAllowed" : "4",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Duplicate choice skip",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

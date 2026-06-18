@@ -21,9 +21,15 @@ import static network.brightspots.rcv.Utils.isNullOrBlank;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidParameterException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.util.Pair;
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,19 +37,27 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.openxml4j.opc.PackageRelationship;
+import org.apache.poi.openxml4j.opc.PackageRelationshipCollection;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFComment;
+import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 final class StreamingCvrReader extends BaseCvrReader {
 
+  // this indicates a voter did not use this ranking
+  private static final String SKIPPED_RANK_STRING = "undervote";
   // this indicates a missing precinct ID in output files
   private static final String MISSING_PRECINCT_ID = "missing_precinct_id";
   // this indicates a missing batch ID in output files
@@ -63,15 +77,11 @@ final class StreamingCvrReader extends BaseCvrReader {
   // optional delimiter for cells that contain multiple candidates
   private final String overvoteDelimiter;
   private final String overvoteLabel;
-  private final String skippedRankLabel;
   private final String undeclaredWriteInLabel;
-  private final boolean treatBlankAsUndeclaredWriteIn;
   // used for generating CVR IDs
   private int cvrIndex = 0;
   // list of currentRankings for CVR in progress
   private LinkedList<Pair<Integer, String>> currentRankings;
-  // list of raw strings for CVR in progress
-  private LinkedList<String> currentCvrData;
   // supplied CVR ID for CVR in progress
   private String currentSuppliedCvrId;
   // batch ID for CVR in progress
@@ -82,8 +92,18 @@ final class StreamingCvrReader extends BaseCvrReader {
   private List<CastVoteRecord> cvrList;
   // last rankings cell observed for CVR in progress
   private int lastRankSeen;
+  // has this CVR had any blank candidate cells?
+  private boolean hasSeenAnyBlankCandidateCells;
+  // has this CVR had any non-blank candidate cells?
+  private boolean hasSeenAnyNonBlankCandidateCells;
+  // total number of rows where there were only blank candidates
+  private int numRowsIgnoredBecauseAllBlank;
   // flag indicating data issues during parsing
   private boolean encounteredDataErrors = false;
+  // map of row → set of columns that contain images in the drawing layer (both 0-based)
+  private Map<Integer, Set<Integer>> imageCells = new HashMap<>();
+  // 0-based row index of the row currently being parsed
+  private int currentRowIndex;
 
   StreamingCvrReader(ContestConfig config, RawContestConfig.CvrSource source) {
     super(config, source);
@@ -106,9 +126,7 @@ final class StreamingCvrReader extends BaseCvrReader {
             : null;
     this.overvoteDelimiter = source.getOvervoteDelimiter();
     this.overvoteLabel = source.getOvervoteLabel();
-    this.skippedRankLabel = source.getSkippedRankLabel();
     this.undeclaredWriteInLabel = source.getUndeclaredWriteInLabel();
-    this.treatBlankAsUndeclaredWriteIn = source.getTreatBlankAsUndeclaredWriteIn();
   }
 
   // given Excel-style address string return the cell address as a pair of Integers
@@ -154,11 +172,18 @@ final class StreamingCvrReader extends BaseCvrReader {
   // occur in a ranking's cell.
   // param: currentRank the rank at which we stop inferring empty cells for this invocation
   private void handleEmptyCells(int currentRank) {
+    Set<Integer> rowImageCols = imageCells.getOrDefault(currentRowIndex, Set.of());
     for (int rank = lastRankSeen + 1; rank < currentRank; rank++) {
-      currentCvrData.add("empty cell");
-      // add UWI ranking if required by settings
-      if (treatBlankAsUndeclaredWriteIn) {
+      int col = firstVoteColumnIndex + rank - 1;
+      if (rowImageCols.contains(col)) {
+        rowImageCols.remove(col);
+        if (rowImageCols.isEmpty()) {
+          imageCells.remove(currentRowIndex);
+        }
         currentRankings.add(new Pair<>(rank, Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL));
+        hasSeenAnyNonBlankCandidateCells = true;
+      } else {
+        hasSeenAnyBlankCandidateCells = true;
       }
     }
   }
@@ -167,11 +192,12 @@ final class StreamingCvrReader extends BaseCvrReader {
   private void beginCvr() {
     cvrIndex++;
     currentRankings = new LinkedList<>();
-    currentCvrData = new LinkedList<>();
     currentSuppliedCvrId = null;
     currentBatch = null;
     currentPrecinct = null;
     lastRankSeen = 0;
+    hasSeenAnyNonBlankCandidateCells = false;
+    hasSeenAnyBlankCandidateCells = false;
   }
 
   // complete construction of new CVR object
@@ -179,9 +205,30 @@ final class StreamingCvrReader extends BaseCvrReader {
     // handle any empty cells which may appear at the end of this row
     if (!config.isMaxRankingsSetToMaximum()) {
       handleEmptyCells(config.getMaxRankingsAllowedWhenNotSetToMaximum() + 1);
+    } else {
+      // With no upper bound on rankings, trailing blank cells are never visited by the SAX
+      // parser, so we must still sweep up any write-in images that sit beyond lastRankSeen.
+      Set<Integer> rowImageCols = imageCells.getOrDefault(currentRowIndex, Set.of());
+      if (!rowImageCols.isEmpty()) {
+        int maxImageRank = Collections.max(rowImageCols) - firstVoteColumnIndex + 1;
+        if (maxImageRank > lastRankSeen) {
+          handleEmptyCells(maxImageRank + 1);
+        }
+      }
     }
     String computedCastVoteRecordId =
         String.format("%s-%d", OutputWriter.sanitizeStringForOutput(excelFileName), cvrIndex);
+
+    if (hasSeenAnyNonBlankCandidateCells && hasSeenAnyBlankCandidateCells) {
+      Logger.severe("Blank cells are not allowed unless the entire row is blank (CVR %s)",
+              computedCastVoteRecordId);
+      encounteredDataErrors = true;
+    } else if (!hasSeenAnyNonBlankCandidateCells) {
+      Logger.auditable(
+              "Skipping CVR for irrelevant contest: %s", computedCastVoteRecordId);
+      numRowsIgnoredBecauseAllBlank++;
+      return;
+    }
 
     // add precinct ID if needed
     if (precinctColumnIndex != null) {
@@ -228,7 +275,6 @@ final class StreamingCvrReader extends BaseCvrReader {
 
   // handle CVR cell data callback
   private void cvrCell(int col, String cellData) {
-    currentCvrData.add(cellData);
     if (precinctColumnIndex != null && col == precinctColumnIndex) {
       currentPrecinct = cellData;
     } else if (batchColumnIndex != null && col == batchColumnIndex) {
@@ -259,16 +305,19 @@ final class StreamingCvrReader extends BaseCvrReader {
 
       for (String candidate : candidates) {
         candidate = candidate.trim();
-        if (candidates.length > 1 && (candidate.isBlank() || candidate.equals(skippedRankLabel))) {
+        hasSeenAnyNonBlankCandidateCells |= !candidate.isBlank();
+        hasSeenAnyBlankCandidateCells |= candidate.isBlank();
+        if (candidates.length > 1 && candidate.isBlank()) {
           Logger.severe(
               "If a cell contains multiple candidates split by the overvote delimiter, "
                   + "it's not valid for any of them to be blank or an explicit skipped ranking.");
           encounteredDataErrors = true;
-        } else if (!candidate.equals(skippedRankLabel)) {
-          // map overvotes to our internal overvote string
-          if (candidate.equals(overvoteLabel)) {
+        } else if (!candidate.isBlank()) {
+          if (candidate.equals(SKIPPED_RANK_STRING)) {
+            continue;
+          } else if (candidate.equals(overvoteLabel)) {
             candidate = Tabulator.EXPLICIT_OVERVOTE_LABEL;
-          } else if (candidate.equals(undeclaredWriteInLabel)) {
+          } else if (isUndeclaredWriteIn(candidate)) {
             candidate = Tabulator.UNDECLARED_WRITE_IN_OUTPUT_LABEL;
           }
           Pair<Integer, String> ranking = new Pair<>(currentRank, candidate);
@@ -278,6 +327,10 @@ final class StreamingCvrReader extends BaseCvrReader {
       // update lastRankSeen - used to handle empty ranking cells
       lastRankSeen = currentRank;
     }
+  }
+
+  boolean isUndeclaredWriteIn(String candidateName) {
+    return candidateName.equals(undeclaredWriteInLabel);
   }
 
   @Override
@@ -291,6 +344,7 @@ final class StreamingCvrReader extends BaseCvrReader {
       Logger.info(
           "ES&S cast vote record files must be Microsoft Excel Workbook "
               + "format.\nStrict Open XML and Open Office are not supported.");
+      Logger.info("Actual error: " + e.getMessage());
       throw new CastVoteRecord.CvrParseException();
     } catch (CvrDataFormatException exception) {
       Logger.severe("Data format error while parsing source file: %s", cvrPath);
@@ -311,6 +365,8 @@ final class StreamingCvrReader extends BaseCvrReader {
 
     cvrList = castVoteRecords;
 
+    // handle at least 10 million write-in images
+    ZipSecureFile.setMaxFileCount(10_000_000);
     // open the zip package
     OPCPackage pkg = OPCPackage.open(cvrPath);
     // pull out strings
@@ -319,11 +375,14 @@ final class StreamingCvrReader extends BaseCvrReader {
     XSSFReader xssfReader = new XSSFReader(pkg);
     // styles data is used for creating ContentHandler
     StylesTable styles = xssfReader.getStylesTable();
+    // pre-scan drawing XML to map image positions to cells before streaming
+    imageCells = buildImageCellSet(xssfReader, pkg);
     // object for handling Excel parsing callbacks
     SheetContentsHandler sheetContentsHandler =
         new SheetContentsHandler() {
           @Override
           public void startRow(int i) {
+            currentRowIndex = i;
             if (i >= firstVoteRowIndex) {
               beginCvr();
             }
@@ -366,11 +425,160 @@ final class StreamingCvrReader extends BaseCvrReader {
     xmlReader.setContentHandler(handler);
     // parse
     xmlReader.parse(new InputSource(xssfReader.getSheetsData().next()));
+
+    for (Map.Entry<Integer, Set<Integer>> entry : imageCells.entrySet()) {
+      for (int col : entry.getValue()) {
+        Logger.severe("Image at row %d, col %d was never visited during parsing",
+            entry.getKey(), col);
+        encounteredDataErrors = true;
+      }
+    }
+
     // close zip file without saving
     pkg.revert();
 
+    if (numRowsIgnoredBecauseAllBlank > 0) {
+      Logger.warning("Ignored %d rows because the ES&S CVR format indicates the "
+              + "configured contest did not appear on those ballots.",
+          numRowsIgnoredBecauseAllBlank);
+    }
+
     if (encounteredDataErrors) {
       throw new CvrDataFormatException();
+    }
+  }
+
+  // Pre-scan the drawing XML for the first sheet to find cells containing images.
+  // Images in xlsx are floating objects in a separate drawing part, not embedded in cell data,
+  // so they never appear in XSSFSheetXMLHandler callbacks. The anchor's "from" element gives the
+  // 0-based (col, row) of the cell the image is anchored to.
+  private Map<Integer, Set<Integer>> buildImageCellSet(XSSFReader xssfReader, OPCPackage pkg)
+      throws OpenXML4JException, IOException, SAXException, ParserConfigurationException {
+    Map<Integer, Set<Integer>> cells = new HashMap<>();
+    XSSFReader.SheetIterator sheetIter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
+    if (!sheetIter.hasNext()) {
+      return cells;
+    }
+    // Advance to the first sheet so getSheetPart() is populated, then close the stream.
+    try (InputStream ignored = sheetIter.next()) {
+      // nothing to read; we only need the sheet's package relationships
+    }
+    PackagePart sheetPart = sheetIter.getSheetPart();
+    PackageRelationshipCollection drawingRels = sheetPart.getRelationshipsByType(
+        "http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing");
+
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    factory.setNamespaceAware(true);
+    int lastVoteColExclusive = config.isMaxRankingsSetToMaximum()
+        ? Integer.MAX_VALUE
+        : firstVoteColumnIndex + config.getMaxRankingsAllowedWhenNotSetToMaximum();
+    for (PackageRelationship rel : drawingRels) {
+      PackagePart drawingPart = sheetPart.getRelatedPart(rel);
+      DrawingImageHandler handler = new DrawingImageHandler(
+          cells, firstVoteRowIndex, firstVoteColumnIndex, lastVoteColExclusive);
+      try (InputStream is = drawingPart.getInputStream()) {
+        factory.newSAXParser().parse(is, handler);
+      }
+    }
+    return cells;
+  }
+
+  // SAX handler that parses a spreadsheet drawing XML and records the anchor cell of every picture.
+  private static class DrawingImageHandler extends DefaultHandler {
+    // namespace for spreadsheet drawing elements (xdr:*)
+    private static final String XDR_NS =
+        "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
+
+    private final Map<Integer, Set<Integer>> imageCells;
+    private final int firstVoteRowIndex;
+    private final int firstVoteColumnIndex;
+    private final int lastVoteColExclusive;
+    private boolean inFrom = false;
+    private boolean inCol = false;
+    private boolean inRow = false;
+    private boolean hasPic = false;
+    private int fromCol = -1;
+    private int fromRow = -1;
+    private final StringBuilder text = new StringBuilder();
+
+    DrawingImageHandler(Map<Integer, Set<Integer>> imageCells,
+        int firstVoteRowIndex, int firstVoteColumnIndex, int lastVoteColExclusive) {
+      this.imageCells = imageCells;
+      this.firstVoteRowIndex = firstVoteRowIndex;
+      this.firstVoteColumnIndex = firstVoteColumnIndex;
+      this.lastVoteColExclusive = lastVoteColExclusive;
+    }
+
+    @Override
+    public void startElement(String uri, String localName, String qualifiedName, Attributes attrs) {
+      text.setLength(0);
+      if (!XDR_NS.equals(uri)) {
+        return;
+      }
+      switch (localName) {
+        case "twoCellAnchor", "oneCellAnchor" -> {
+          fromCol = -1;
+          fromRow = -1;
+          hasPic = false;
+        }
+        case "from" -> {
+          inFrom = true;
+        }
+        case "col" -> {
+          if (inFrom) {
+            inCol = true;
+          }
+        }
+        case "row" -> {
+          if (inFrom) {
+            inRow = true;
+          }
+        }
+        case "pic" -> {
+          hasPic = true;
+        }
+        default -> {}
+      }
+    }
+
+    @Override
+    public void endElement(String uri, String localName, String qualifiedName) {
+      if (XDR_NS.equals(uri)) {
+        switch (localName) {
+          case "from" -> {
+            inFrom = false;
+          }
+          case "col" -> {
+            if (inCol) {
+              fromCol = Integer.parseInt(text.toString().trim());
+              inCol = false;
+            }
+          }
+          case "row" -> {
+            if (inRow) {
+              fromRow = Integer.parseInt(text.toString().trim());
+              inRow = false;
+            }
+          }
+          case "twoCellAnchor", "oneCellAnchor" -> {
+            if (hasPic && fromRow >= firstVoteRowIndex
+                && fromCol >= firstVoteColumnIndex && fromCol < lastVoteColExclusive) {
+              boolean added =
+                  imageCells.computeIfAbsent(fromRow, k -> new HashSet<>()).add(fromCol);
+              if (!added) {
+                Logger.severe("Multiple images found in cell at row %d, col %d", fromRow, fromCol);
+              }
+            }
+          }
+          default -> {}
+        }
+      }
+      text.setLength(0);
+    }
+
+    @Override
+    public void characters(char[] ch, int start, int length) {
+      text.append(ch, start, length);
     }
   }
 

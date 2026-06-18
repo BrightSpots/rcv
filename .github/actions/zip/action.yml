@@ -27,4 +27,14 @@ runs:
     - name: "Generate zip for Windows"
       if: runner.os == 'Windows'
       shell: powershell
-      run: Compress-Archive -Path ${{inputs.input}} -Destination ${{inputs.zipFilename}}
+      run: |
+        $inputPath = "${{inputs.input}}"
+        # Git Bash on Windows emits Unix-style paths like /c/Users/... instead of C:\Users\...
+        if ($inputPath -match '^/([a-zA-Z])/(.+)$') {
+            # Convert /c/some/path -> C:\some\path
+            $inputPath = $Matches[1].ToUpper() + ':' + ($Matches[2] -replace '/', '\')
+        } else {
+            # Expand ~ since PowerShell cmdlets don't resolve it in string arguments
+            $inputPath = $inputPath -replace '^~', $HOME
+        }
+        Compress-Archive -Path $inputPath -Destination ${{inputs.zipFilename}}

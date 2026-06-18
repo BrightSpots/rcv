@@ -1,0 +1,17 @@
+[
+  {
+    "filePath" : "ess_cvr.xlsx",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "6",
+    "firstVoteRowIndex" : "3",
+    "idColumnIndex" : "3",
+    "batchColumnIndex" : "",
+    "precinctColumnIndex" : "",
+    "overvoteDelimiter" : "",
+    "provider" : "ess",
+    "overvoteLabel" : "overvote",
+    "skippedRankLabel" : "undervote",
+    "undeclaredWriteInLabel" : "",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+]
