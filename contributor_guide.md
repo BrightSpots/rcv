@@ -11,6 +11,11 @@ provide this software and support for free, directly to jurisdictions and indivi
 ranked-choice elections. The RCVRC also provides flexible licensing to commercial vendors wishing to use RCTab with
 their election systems. This keeps RCTab open source and helps offset development and support costs.
 
+### AI disclosure policy:
+
+You may use AI tools to help write issues and contributions, but you must disclose it and you must have
+personally verified everything you submit. Undisclosed AI-generated issues will be closed.
+
 ### How to make a contribution:
 
 1. If you’re interested in contributing code please fill out a copy of

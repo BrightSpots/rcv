@@ -1,0 +1,31 @@
+name: Bug Report or Feature Request
+description: Report a problem with RCTab or propose an improvement
+body:
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue type
+      options:
+        - Bug report
+        - Feature request
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the issue
+      description: >-
+        For bugs, include the exact steps to reproduce — the command or GUI actions, your config,
+        and CVR files if possible (drag files into this field to attach them).
+    validations:
+      required: true
+  - type: textarea
+    id: ai-disclosure
+    attributes:
+      label: AI disclosure
+      description: >-
+        Was AI used to create this issue? To what extent? If AI was used, you must have personally
+        verified every claim in this issue. Undisclosed AI-generated issues will be closed.
+      placeholder: e.g. "No AI used" or "Claude found this bug; I confirmed it by running the steps above myself."
+    validations:
+      required: true
