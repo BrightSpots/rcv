@@ -1,36 +1,114 @@
-
-.help-text-area{
-    -fx-control-inner-background:#eaeaea;
+/* General styles */
+.root {
+    -fx-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f4f4f4;
 }
 
-.console-text-area{
-    -fx-control-inner-background:#282828;
+/* Button styles */
+.button {
+    -fx-background-color: #0078d7;
+    -fx-text-fill: white;
+    -fx-padding: 5px 10px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.button:hover {
+    -fx-background-color: #005a9e;
+}
+
+.button:focused {
+    -fx-background-color: #005a9e;
+    -fx-border-color: #003f6b;
+    -fx-border-width: 1px;
+}
+
+/* TextField styles */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #c4c4c4;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+
+.text-field:focused {
+    -fx-border-color: #0078d7;
+}
+
+/* TextArea styles */
+.text-area {
+    -fx-background-color: white;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px;
+}
+
+/* Table styles */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #c4c4c4;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #0078d7;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: black;
+}
+
+/* ScrollPane styles */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: white;
+}
+
+/* Tooltip styles */
+.tooltip {
+    -fx-background-color: #333333;
+    -fx-text-fill: white;
+    -fx-padding: 10px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+/* Error styles */
+.error, .check-box-error .box {
+    -fx-focus-color: #d35244;
+    -fx-faint-focus-color: #d3524422;
+    -fx-highlight-fill: -fx-accent;
+    -fx-highlight-text-fill: white;
+    -fx-background-color: -fx-focus-color, -fx-control-inner-background, -fx-faint-focus-color, linear-gradient(from 0px 0px to 0px 5px, derive(-fx-control-inner-background, -9%), -fx-control-inner-background);
+    -fx-background-insets: -0.2, 1, -1.4, 3;
+    -fx-background-radius: 3, 2, 4, 0;
+    -fx-prompt-text-fill: transparent;
+}
+
+/* Custom styles */
+.help-text-area {
+    -fx-control-inner-background: #eaeaea;
+}
+
+.console-text-area {
+    -fx-control-inner-background: #282828;
+    -fx-text-fill: #ffffff;
     -fx-highlight-fill: #ffffff;
     -fx-highlight-text-fill: #000000;
-    -fx-text-fill: #ffffff;
 }
 
 .bordered-box {
-    -fx-border-color: #C4C4C4;
+    -fx-border-color: #c4c4c4;
     -fx-border-width: 1px;
     -fx-border-style: solid;
     -fx-border-radius: 8px;
- }
-
-.error, .check-box-error .box {
-  -fx-focus-color: #d35244;
-  -fx-faint-focus-color: #d3524422;
-
-  -fx-highlight-fill: -fx-accent;
-  -fx-highlight-text-fill: white;
-  -fx-background-color:
-      -fx-focus-color,
-      -fx-control-inner-background,
-      -fx-faint-focus-color,
-      linear-gradient(from 0px 0px to 0px 5px,
-        derive(-fx-control-inner-background, -9%),
-        -fx-control-inner-background);
-  -fx-background-insets: -0.2, 1, -1.4, 3;
-  -fx-background-radius: 3, 2, 4, 0;
-  -fx-prompt-text-fill: transparent;
 }
