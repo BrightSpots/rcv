@@ -187,10 +187,11 @@ Config file must be valid JSON format. Examples can be found in the test_data fo
 
       "overvoteRule" required
         how the program should handle an overvote when it encounters one
-        value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing"
+        value: "alwaysSkipToNextRank" | "exhaustImmediately" | "exhaustIfMultipleContinuing" | "countWhenSingleContinuing"
         "alwaysSkipToNextRank": when we encounter an overvote, ignore this rank and look at the next rank in the cast vote record
         "exhaustImmediately": exhaust a ballot as soon as we encounter an overvote
         "exhaustIfMultipleContinuing": if more than one candidate in an overvote are continuing, exhaust the ballot; if only one, assign the vote to them; if none, continue to the next rank (not valid with an ES&S source unless overvoteDelimiter is supplied)
+        "countWhenSingleContinuing": if more than one candidate in an overvote are continuing, count the ballot as inactive for this counting round; when the overvoted candidates include only one continuing candidate, count the ballot for for the single continuing candidate; when all the overvoted candidates are not continuing, ignore this rank and look at the next rank in the cast vote record
 
       "winnerElectionMode" required
         whether the program should apply a special process for selecting the winner(s)

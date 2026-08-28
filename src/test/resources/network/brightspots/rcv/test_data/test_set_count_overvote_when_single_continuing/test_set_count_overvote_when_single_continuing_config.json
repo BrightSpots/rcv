@@ -1,0 +1,74 @@
+{
+  "tabulatorVersion" : "2.0.1",
+  "outputSettings" : {
+    "contestName" : "Count-overvote-when-single-continuing",
+    "outputDirectory" : "/home/aw/RCTab/rcv/src/test/resources/network/brightspots/rcv/test_data/test_set_count_overvote_when_single_continuing/output",
+    "contestDate" : "2026-01-26",
+    "contestJurisdiction" : "Portlandia",
+    "contestOffice" : "Mayor",
+    "tabulateByBatch" : false,
+    "tabulateByPrecinct" : false,
+    "generateCdfJson" : true
+  },
+  "cvrFileSources" : [ {
+    "filePath" : "test_set_count_overvote_when_single_continuing_ballots.csv",
+    "contestId" : "",
+    "firstVoteColumnIndex" : "4",
+    "firstVoteRowIndex" : "2",
+    "idColumnIndex" : "1",
+    "batchColumnIndex" : "3",
+    "precinctColumnIndex" : "2",
+    "overvoteDelimiter" : "",
+    "provider" : "genericCsv",
+    "overvoteLabel" : "",
+    "skippedRankLabel" : "",
+    "undeclaredWriteInLabel" : "Write-In",
+    "treatBlankAsUndeclaredWriteIn" : false
+  } ],
+  "candidates" : [ {
+    "name" : "cand_A",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "cand_B",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "cand_C",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "cand_D",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "cand_E",
+    "excluded" : false,
+    "aliases" : [ ]
+  }, {
+    "name" : "cand_F",
+    "excluded" : false,
+    "aliases" : [ ]
+  } ],
+  "rules" : {
+    "tiebreakMode" : "useCandidateOrder",
+    "overvoteRule" : "countWhenSingleContinuing",
+    "winnerElectionMode" : "singleWinnerMajority",
+    "randomSeed" : "2435",
+    "numberOfWinners" : "1",
+    "multiSeatBottomsUpPercentageThreshold" : "",
+    "decimalPlacesForVoteArithmetic" : "4",
+    "maxSkippedRanksAllowed" : "unlimited",
+    "maxRankingsAllowed" : "10",
+    "nonIntegerWinningThreshold" : false,
+    "doesFirstRoundDetermineThreshold" : false,
+    "hareQuota" : false,
+    "batchElimination" : false,
+    "cutoffElimination" : false,
+    "continueUntilTwoCandidatesRemain" : false,
+    "stopTabulationEarlyAfterRound" : "",
+    "exhaustOnDuplicateCandidate" : false,
+    "rulesDescription" : "Test_Case",
+    "treatBlankAsUndeclaredWriteIn" : false
+  }
+}

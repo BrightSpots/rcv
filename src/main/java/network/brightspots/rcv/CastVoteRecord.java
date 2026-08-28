@@ -147,7 +147,9 @@ class CastVoteRecord {
     if (outcomeType == VoteOutcomeType.IGNORED) {
       logStringBuilder.append(" [was ignored] ");
     } else if (outcomeType == VoteOutcomeType.EXHAUSTED) {
-      logStringBuilder.append(" [became inactive] ");
+      logStringBuilder.append(" [is exhausted] ");
+    } else if (outcomeType == VoteOutcomeType.INACTIVE_OVERVOTED) {
+      logStringBuilder.append(" [counted as inactive by overvote] ");
     } else {
       if (round == 1) {
         logStringBuilder.append(" [counted for] ");
@@ -186,8 +188,16 @@ class CastVoteRecord {
     this.currentRoundStatus = status;
   }
 
+  // check if exhausted, but this check ignores the possibility of a ballot being
+  // temporarily inactive during multiple continuing overvoted candidates
   boolean isExhausted() {
     return currentRoundStatus != StatusForRound.ACTIVE;
+  }
+
+  // check if ballot is inactive by overvote, which can be temporary
+  // when overvote rule is count when single continuing
+  boolean isInactiveByOvervote() {
+    return currentRoundStatus != StatusForRound.INVALIDATED_BY_OVERVOTE;
   }
 
   StatusForRound getBallotStatus() {
@@ -303,6 +313,7 @@ class CastVoteRecord {
     COUNTED,
     IGNORED,
     EXHAUSTED,
+    INACTIVE_OVERVOTED,
   }
 
   static class CvrParseException extends Exception {}

@@ -626,7 +626,7 @@ class ContestConfig {
             && getOvervoteRule() != Tabulator.OvervoteRule.ALWAYS_SKIP_TO_NEXT_RANK) {
           validationErrors.add(ValidationError.CVR_OVERVOTE_LABEL_OVERVOTE_RULE_MISMATCH);
           Logger.severe(
-              "When overvoteLabel is supplied, overvoteRule must be either \"%s\" or \"%s\"!",
+              "When overvoteLabel is supplied, overvoteRule must be \"%s\" or \"%s\"!",
               Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT,
               Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
         }
@@ -655,12 +655,14 @@ class ContestConfig {
                     cvrPath);
           }
           if (isNullOrBlank(source.getOvervoteDelimiter())
-              && getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING) {
+              && (getOvervoteRule() == OvervoteRule.EXHAUST_IF_MULTIPLE_CONTINUING
+              || getOvervoteRule() == OvervoteRule.COUNT_WHEN_SINGLE_CONTINUING)) {
             validationErrors.add(ValidationError.CVR_OVERVOTE_DELIMITER_MISSING);
             Logger.severe(
                 "overvoteDelimiter is required for an ES&S CVR source when overvoteRule "
-                    + "is set to \"%s\".",
-                Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
+                    + "is set to \"%s\" or \"%s\".",
+                Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT,
+                Tabulator.OVERVOTE_RULE_COUNT_WHEN_SINGLE_TEXT);
           }
         }
       }

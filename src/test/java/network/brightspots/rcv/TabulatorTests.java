@@ -1044,4 +1044,17 @@ class TabulatorTests {
   void essMultiContest() {
     runTabulationTest("ess_multi_contest");
   }
+
+  @Test
+  @DisplayName("count overvote when single continuing")
+  void countOvervoteWhenSingleContinuing() {
+    runTabulationTest("test_set_count_overvote_when_single_continuing");
+  }
+
+  @Test
+  @DisplayName("count overvote when single for multi-winner")
+  void countOvervoteWhenSingleForMultiWinner() {
+    runTabulationTest("test_set_count_overvote_when_single_for_multi_winner");
+  }
+
 }

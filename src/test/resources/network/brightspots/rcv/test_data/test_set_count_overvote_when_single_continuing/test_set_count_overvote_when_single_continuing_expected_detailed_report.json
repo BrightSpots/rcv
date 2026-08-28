@@ -1,0 +1,143 @@
+{
+  "config" : {
+    "contest" : "Count-overvote-when-single-continuing",
+    "date" : "2026-01-26",
+    "generatedBy" : "RCTab 2.0.1",
+    "jurisdiction" : "Portlandia",
+    "office" : "Mayor"
+  },
+  "jsonFormatVersion" : "1",
+  "results" : [ {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 1,
+    "tally" : {
+      "Undeclared Write-ins" : "0",
+      "cand_A" : "6",
+      "cand_B" : "5",
+      "cand_C" : "4",
+      "cand_D" : "3",
+      "cand_E" : "2",
+      "cand_F" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "Undeclared Write-ins",
+      "transfers" : { }
+    } ],
+    "threshold" : "11"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "0",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 2,
+    "tally" : {
+      "cand_A" : "6",
+      "cand_B" : "5",
+      "cand_C" : "4",
+      "cand_D" : "3",
+      "cand_E" : "2",
+      "cand_F" : "1"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "cand_F",
+      "transfers" : {
+        "exhausted" : "1"
+      }
+    } ],
+    "threshold" : "11"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "1",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 3,
+    "tally" : {
+      "cand_A" : "6",
+      "cand_B" : "5",
+      "cand_C" : "4",
+      "cand_D" : "3",
+      "cand_E" : "2"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "cand_E",
+      "transfers" : {
+        "exhausted" : "2"
+      }
+    } ],
+    "threshold" : "11"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "3",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 4,
+    "tally" : {
+      "cand_A" : "6",
+      "cand_B" : "5",
+      "cand_C" : "4",
+      "cand_D" : "3"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "cand_D",
+      "transfers" : {
+        "exhausted" : "3"
+      }
+    } ],
+    "threshold" : "10"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "6",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 5,
+    "tally" : {
+      "cand_A" : "6",
+      "cand_B" : "5",
+      "cand_C" : "4"
+    },
+    "tallyResults" : [ {
+      "eliminated" : "cand_C",
+      "transfers" : {
+        "exhausted" : "4"
+      }
+    } ],
+    "threshold" : "8"
+  }, {
+    "inactiveBallots" : {
+      "exhaustedChoices" : "10",
+      "overvotes" : "4",
+      "repeatedRankings" : "0",
+      "skippedRankings" : "0"
+    },
+    "round" : 6,
+    "tally" : {
+      "cand_A" : "6",
+      "cand_B" : "5"
+    },
+    "tallyResults" : [ {
+      "elected" : "cand_A",
+      "transfers" : { }
+    } ],
+    "threshold" : "6"
+  } ],
+  "summary" : {
+    "finalThreshold" : "6",
+    "numCandidates" : 7,
+    "numWinners" : 1,
+    "totalNumBallots" : "25",
+    "undervotes" : 0
+  }
+}
