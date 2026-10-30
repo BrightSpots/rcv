@@ -349,6 +349,31 @@ class TabulatorSession {
   }
 
   /**
+   * Write a hash of a configured CVR source to the audit log, so auditors can verify that
+   * tabulation ran on the intended input files.
+   *
+   * @param sourceIndex Zero-based index of the source in the config.
+   * @param cvrPath Resolved path of the source: a single file, or a folder of files.
+   */
+  private static void logCvrSourceHash(int sourceIndex, String cvrPath) {
+    File cvrFile = new File(cvrPath);
+    if (cvrFile.isDirectory()) {
+      FileUtils.DirectoryHashResult result =
+          FileUtils.getDirectoryHashBytes(cvrFile, "SHA-512");
+      Logger.info("CVR Source %d | Folder hash (SHA-512): %s",
+              sourceIndex + 1, Utils.bytesToHex(result.hashBytes()));
+      Logger.info("CVR Source %d | The folder hash was computed by hashing each of the folder's"
+              + " %d file(s) (searched recursively) with SHA-512, sorting the files alphabetically"
+              + " by their path relative to the folder, concatenating the raw per-file hashes in"
+              + " that order, and hashing the concatenation with SHA-512.",
+              sourceIndex + 1, result.numFiles());
+    } else {
+      Logger.info("CVR Source %d | File hash (SHA-512): %s",
+              sourceIndex + 1, Utils.bytesToHex(FileUtils.getHashBytes(cvrFile, "SHA-512")));
+    }
+  }
+
+  /**
    * Parse CVR files referenced in the ContestConfig object into a list of CastVoteRecords.
    *
    * @param config Object containing CVR file paths to parse.
@@ -373,6 +398,7 @@ class TabulatorSession {
       RawContestConfig.CvrSource source = config.rawConfig.cvrFileSources.get(sourceIndex);
       String cvrPath = config.resolveConfigPath(source.getFilePath());
       Provider provider = ContestConfig.getProvider(source);
+      logCvrSourceHash(sourceIndex, cvrPath);
       try {
         BaseCvrReader reader = provider.constructReader(config, source);
         Logger.info("CVR Source %d | Reading %s cast vote records from: %s...",
