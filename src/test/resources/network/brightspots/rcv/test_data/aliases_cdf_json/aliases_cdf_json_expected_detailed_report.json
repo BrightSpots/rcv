@@ -2,11 +2,12 @@
   "config" : {
     "contest" : "Aliases test (JSON CDF Format)",
     "date" : "2023-03-23",
+    "generatedAt" : "2026-10-30T12:00:00-04:00",
     "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "TestSets_Single_winner",
     "office" : "Aliases test"
   },
-  "jsonFormatVersion" : "1",
+  "jsonFormatVersion" : "2",
   "results" : [ {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",

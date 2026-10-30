@@ -2,11 +2,12 @@
   "config" : {
     "contest" : "Batch example",
     "date" : "2017-11-07",
+    "generatedAt" : "2026-10-30T12:00:00-04:00",
     "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "Minneapolis, MN",
     "office" : "Mayor"
   },
-  "jsonFormatVersion" : "1",
+  "jsonFormatVersion" : "2",
   "results" : [ {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",

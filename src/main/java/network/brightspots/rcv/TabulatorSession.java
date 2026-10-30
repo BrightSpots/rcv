@@ -46,6 +46,10 @@ import network.brightspots.rcv.Tabulator.TabulationAbortedException;
 @SuppressWarnings("RedundantSuppression")
 class TabulatorSession {
 
+  // pattern for the timestamp embedded in output file names; OutputWriter derives the
+  // "Generated At" field in reports from it so the two always match
+  static final String TIMESTAMP_PATTERN = "yyyy-MM-dd_HH-mm";
+
   private final String configPath;
   private final String timestampString;
   private String outputPath;
@@ -55,8 +59,7 @@ class TabulatorSession {
     this.configPath = configPath;
 
     // current date-time formatted as a string used for creating unique output files names
-    String timestampPattern = "yyyy-MM-dd_HH-mm";
-    String baseTimestampString = new SimpleDateFormat(timestampPattern).format(new Date());
+    String baseTimestampString = new SimpleDateFormat(TIMESTAMP_PATTERN).format(new Date());
     String currTimestampString = baseTimestampString;
 
     // If there are multiple runs in the same minute, resolve collisions

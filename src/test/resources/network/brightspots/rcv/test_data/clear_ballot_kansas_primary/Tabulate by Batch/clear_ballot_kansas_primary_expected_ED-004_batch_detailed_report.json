@@ -3,11 +3,12 @@
     "batch" : "ED-004",
     "contest" : "Democratic Primary",
     "date" : "",
+    "generatedAt" : "2026-10-30T12:00:00-04:00",
     "generatedBy" : "RCTab 2.0.2",
     "jurisdiction" : "Kansas",
     "office" : "Democratic Presidential Primary"
   },
-  "jsonFormatVersion" : "1",
+  "jsonFormatVersion" : "2",
   "results" : [ {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",

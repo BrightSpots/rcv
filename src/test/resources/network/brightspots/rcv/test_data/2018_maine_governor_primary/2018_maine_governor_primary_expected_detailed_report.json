@@ -2,11 +2,12 @@
   "config" : {
     "contest" : "Maine 2018 Democratic Governor Primary race",
     "date" : "2018-06-12",
+    "generatedAt" : "2026-10-30T12:00:00-04:00",
     "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "Maine",
     "office" : "Governor"
   },
-  "jsonFormatVersion" : "1",
+  "jsonFormatVersion" : "2",
   "results" : [ {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",

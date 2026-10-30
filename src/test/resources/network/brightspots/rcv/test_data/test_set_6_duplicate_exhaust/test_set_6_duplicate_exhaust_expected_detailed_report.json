@@ -2,11 +2,12 @@
   "config" : {
     "contest" : "test set 6",
     "date" : "2019-03-06",
+    "generatedAt" : "2026-10-30T12:00:00-04:00",
     "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "TestSets_Single_winner",
     "office" : "Duplicate choice exhaust"
   },
-  "jsonFormatVersion" : "1",
+  "jsonFormatVersion" : "2",
   "results" : [ {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",

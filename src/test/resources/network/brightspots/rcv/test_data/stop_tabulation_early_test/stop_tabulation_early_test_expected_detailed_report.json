@@ -2,11 +2,12 @@
   "config" : {
     "contest" : "Stop Tabulation Early Test",
     "date" : "2023-03-14",
+    "generatedAt" : "2026-10-30T12:00:00-04:00",
     "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "Funkytown, USA",
     "office" : "Sergeant-at-Arms"
   },
-  "jsonFormatVersion" : "1",
+  "jsonFormatVersion" : "2",
   "results" : [ {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
