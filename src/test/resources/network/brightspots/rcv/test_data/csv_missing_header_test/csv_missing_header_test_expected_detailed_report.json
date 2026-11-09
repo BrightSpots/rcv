@@ -2,11 +2,12 @@
   "config" : {
     "contest" : "Missing Header CSV Test",
     "date" : "2024-06-14",
+    "generatedAt" : "2026-10-30T12:00:00-04:00",
     "generatedBy" : "RCTab 2.0.0",
     "jurisdiction" : "Portland, ME",
     "office" : "Mayor"
   },
-  "jsonFormatVersion" : "1",
+  "jsonFormatVersion" : "2",
   "results" : [ {
     "inactiveBallots" : {
       "exhaustedChoices" : "0",
