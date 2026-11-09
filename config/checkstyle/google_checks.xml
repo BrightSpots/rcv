@@ -60,6 +60,12 @@
   </module>
 
   <module name="TreeWalker">
+    <!-- VVSG 2.0 requirement 2.4-C: functions should not exceed 180 lines -->
+    <module name="MethodLength">
+      <property name="tokens" value="METHOD_DEF, CTOR_DEF, COMPACT_CTOR_DEF"/>
+      <property name="max" value="180"/>
+      <property name="countEmpty" value="false"/>
+    </module>
     <module name="OuterTypeFilename"/>
     <module name="IllegalTokenText">
       <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
