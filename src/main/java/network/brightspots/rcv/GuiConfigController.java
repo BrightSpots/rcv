@@ -1332,83 +1332,118 @@ public class GuiConfigController implements Initializable {
           }
         });
 
+    setUpCvrProviderChoice();
+    setUpCvrAndCandidateTables();
+
+    setUpWinningRulesChoices();
+
+    radioOvervoteAlwaysSkip.setText(Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT);
+    radioOvervoteExhaustImmediately.setText(Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
+    radioOvervoteExhaustIfMultiple.setText(Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
+    checkBoxMaxSkippedRanksAllowedUnlimited.setOnAction(event -> {
+      textFieldMaxSkippedRanksAllowed.clear();
+      textFieldMaxSkippedRanksAllowed.setDisable(
+          checkBoxMaxSkippedRanksAllowedUnlimited.isSelected());
+    });
+
+    setDefaultValues();
+
+    try {
+      emptyConfigString =
+          new ObjectMapper()
+              .writer()
+              .withDefaultPrettyPrinter()
+              .writeValueAsString(createRawContestConfig());
+    } catch (JsonProcessingException exception) {
+      Logger.warning(
+          "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
+          exception);
+    }
+  }
+
+  private void setUpCvrProviderChoice() {
     clearAndDisableCvrFilesTabFields();
     choiceCvrProvider.getItems().addAll(Provider.values());
     choiceCvrProvider.getItems().remove(Provider.PROVIDER_UNKNOWN);
-    choiceCvrProvider.setOnAction(event -> {
-      clearAndDisableCvrFilesTabFields();
-      textFieldCvrUndeclaredWriteInLabel.setDisable(false);
-      textFieldCvrUndeclaredWriteInLabel.setText(ContestConfig.SUGGESTED_UWI_LABEL);
+    choiceCvrProvider.setOnAction(event -> onCvrProviderChanged());
+  }
 
-      switch (getProviderChoice(choiceCvrProvider)) {
-        case ESS -> {
-          buttonAddCvrFile.setDisable(false);
-          textFieldCvrFilePath.setDisable(false);
-          buttonCvrFilePath.setDisable(false);
-          textFieldCvrFirstVoteCol.setDisable(false);
-          textFieldCvrFirstVoteCol
-              .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_COLUMN));
-          textFieldCvrFirstVoteRow.setDisable(false);
-          textFieldCvrFirstVoteRow
-              .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
-          textFieldCvrIdCol.setDisable(false);
-          textFieldCvrIdCol.setText(String.valueOf(ContestConfig.SUGGESTED_CVR_ID_COLUMN));
-          textFieldCvrBatchCol.setDisable(false);
-          textFieldCvrPrecinctCol.setDisable(false);
-          textFieldCvrPrecinctCol
-              .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_PRECINCT_COLUMN));
-          textFieldCvrOvervoteDelimiter.setDisable(false);
-          textFieldCvrOvervoteLabel.setDisable(false);
-          textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
-        }
-        case CSV -> {
-          buttonAddCvrFile.setDisable(false);
-          textFieldCvrFilePath.setDisable(false);
-          buttonCvrFilePath.setDisable(false);
-          textFieldCvrFirstVoteCol.setDisable(false);
-          textFieldCvrFirstVoteCol.setText("1");
-          textFieldCvrFirstVoteRow.setDisable(false);
-          textFieldCvrFirstVoteRow
-                  .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
-          textFieldCvrBatchCol.setDisable(false);
-          textFieldCvrIdCol.setDisable(false);
-          textFieldCvrIdCol.setText("");
-          textFieldCvrPrecinctCol.setDisable(false);
-          textFieldCvrPrecinctCol.setText("");
-        }
-        case CLEAR_BALLOT, DOMINION, HART -> {
-          buttonAddCvrFile.setDisable(false);
-          textFieldCvrFilePath.setDisable(false);
-          buttonCvrFilePath.setDisable(false);
-          textFieldCvrContestId.setDisable(false);
-        }
-        case CDF -> {
-          buttonAddCvrFile.setDisable(false);
-          textFieldCvrFilePath.setDisable(false);
-          buttonCvrFilePath.setDisable(false);
-          textFieldCvrContestId.setDisable(false);
-          textFieldCvrOvervoteLabel.setDisable(false);
-          textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
-        }
-        case PROVIDER_UNKNOWN -> {
-          // do nothing
-        }
-        default -> throw new IllegalStateException(
-            "Unexpected value: " + getProviderChoice(choiceCvrProvider));
+  private void onCvrProviderChanged() {
+    clearAndDisableCvrFilesTabFields();
+    textFieldCvrUndeclaredWriteInLabel.setDisable(false);
+    textFieldCvrUndeclaredWriteInLabel.setText(ContestConfig.SUGGESTED_UWI_LABEL);
+
+    switch (getProviderChoice(choiceCvrProvider)) {
+      case ESS -> {
+        buttonAddCvrFile.setDisable(false);
+        textFieldCvrFilePath.setDisable(false);
+        buttonCvrFilePath.setDisable(false);
+        textFieldCvrFirstVoteCol.setDisable(false);
+        textFieldCvrFirstVoteCol
+            .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_COLUMN));
+        textFieldCvrFirstVoteRow.setDisable(false);
+        textFieldCvrFirstVoteRow
+            .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
+        textFieldCvrIdCol.setDisable(false);
+        textFieldCvrIdCol.setText(String.valueOf(ContestConfig.SUGGESTED_CVR_ID_COLUMN));
+        textFieldCvrBatchCol.setDisable(false);
+        textFieldCvrPrecinctCol.setDisable(false);
+        textFieldCvrPrecinctCol
+            .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_PRECINCT_COLUMN));
+        textFieldCvrOvervoteDelimiter.setDisable(false);
+        textFieldCvrOvervoteLabel.setDisable(false);
+        textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
       }
-      // Now set the "Select" button label
-      // These don't correspond exactly to the switch statement above, so
-      // do this in its own switch statement.
-      Provider choice = getProviderChoice(choiceCvrProvider);
-      switch (choice) {
-        case CDF -> buttonCvrFilePath.setText("Select JSON/XML file(s)");
-        case CLEAR_BALLOT, CSV -> buttonCvrFilePath.setText("Select CSV file(s)");
-        case DOMINION, HART -> buttonCvrFilePath.setText("Select a folder");
-        case ESS -> buttonCvrFilePath.setText("Select Excel file(s)");
-        case PROVIDER_UNKNOWN -> buttonCvrFilePath.setText("Select");
-        default -> throw new IllegalStateException("Unexpected value: " + choice);
+      case CSV -> {
+        buttonAddCvrFile.setDisable(false);
+        textFieldCvrFilePath.setDisable(false);
+        buttonCvrFilePath.setDisable(false);
+        textFieldCvrFirstVoteCol.setDisable(false);
+        textFieldCvrFirstVoteCol.setText("1");
+        textFieldCvrFirstVoteRow.setDisable(false);
+        textFieldCvrFirstVoteRow
+                .setText(String.valueOf(ContestConfig.SUGGESTED_CVR_FIRST_VOTE_ROW));
+        textFieldCvrBatchCol.setDisable(false);
+        textFieldCvrIdCol.setDisable(false);
+        textFieldCvrIdCol.setText("");
+        textFieldCvrPrecinctCol.setDisable(false);
+        textFieldCvrPrecinctCol.setText("");
       }
-    });
+      case CLEAR_BALLOT, DOMINION, HART -> {
+        buttonAddCvrFile.setDisable(false);
+        textFieldCvrFilePath.setDisable(false);
+        buttonCvrFilePath.setDisable(false);
+        textFieldCvrContestId.setDisable(false);
+      }
+      case CDF -> {
+        buttonAddCvrFile.setDisable(false);
+        textFieldCvrFilePath.setDisable(false);
+        buttonCvrFilePath.setDisable(false);
+        textFieldCvrContestId.setDisable(false);
+        textFieldCvrOvervoteLabel.setDisable(false);
+        textFieldCvrOvervoteLabel.setText(ContestConfig.SUGGESTED_OVERVOTE_LABEL);
+      }
+      case PROVIDER_UNKNOWN -> {
+        // do nothing
+      }
+      default -> throw new IllegalStateException(
+          "Unexpected value: " + getProviderChoice(choiceCvrProvider));
+    }
+    // Now set the "Select" button label
+    // These don't correspond exactly to the switch statement above, so
+    // do this in its own switch statement.
+    Provider choice = getProviderChoice(choiceCvrProvider);
+    switch (choice) {
+      case CDF -> buttonCvrFilePath.setText("Select JSON/XML file(s)");
+      case CLEAR_BALLOT, CSV -> buttonCvrFilePath.setText("Select CSV file(s)");
+      case DOMINION, HART -> buttonCvrFilePath.setText("Select a folder");
+      case ESS -> buttonCvrFilePath.setText("Select Excel file(s)");
+      case PROVIDER_UNKNOWN -> buttonCvrFilePath.setText("Select");
+      default -> throw new IllegalStateException("Unexpected value: " + choice);
+    }
+  }
+
+  private void setUpCvrAndCandidateTables() {
     EditableColumn[] cvrStringColumnsAndProperties = new EditableColumn[]{
         new EditableColumnString(tableColumnCvrFilePath, "filePath"),
         new EditableColumnString(tableColumnCvrFirstVoteCol, "firstVoteColumnIndex"),
@@ -1471,7 +1506,9 @@ public class GuiConfigController implements Initializable {
     if (isAnyPropertyValueFunctionMissing(candidateStringColumnsAndProperties, Candidate.class)) {
       throw new RuntimeException("Not all PropertyValueFactory functions exist for Candidate");
     }
+  }
 
+  private void setUpWinningRulesChoices() {
     clearAndDisableWinningRuleFields();
     choiceTiebreakMode.getItems().addAll(TiebreakMode.values());
     choiceTiebreakMode.getItems().remove(TiebreakMode.MODE_UNKNOWN);
@@ -1538,29 +1575,6 @@ public class GuiConfigController implements Initializable {
       textFieldMaxRankingsAllowed.setDisable(
           checkBoxMaxRankingsAllowedMax.isSelected());
     });
-
-    radioOvervoteAlwaysSkip.setText(Tabulator.OVERVOTE_RULE_ALWAYS_SKIP_TEXT);
-    radioOvervoteExhaustImmediately.setText(Tabulator.OVERVOTE_RULE_EXHAUST_IMMEDIATELY_TEXT);
-    radioOvervoteExhaustIfMultiple.setText(Tabulator.OVERVOTE_RULE_EXHAUST_IF_MULTIPLE_TEXT);
-    checkBoxMaxSkippedRanksAllowedUnlimited.setOnAction(event -> {
-      textFieldMaxSkippedRanksAllowed.clear();
-      textFieldMaxSkippedRanksAllowed.setDisable(
-          checkBoxMaxSkippedRanksAllowedUnlimited.isSelected());
-    });
-
-    setDefaultValues();
-
-    try {
-      emptyConfigString =
-          new ObjectMapper()
-              .writer()
-              .withDefaultPrettyPrinter()
-              .writeValueAsString(createRawContestConfig());
-    } catch (JsonProcessingException exception) {
-      Logger.warning(
-          "Unable to set emptyConfigString, but everything should work fine anyway!\n%s",
-          exception);
-    }
   }
 
   public String getLastTabulatorSessionOutputDirectory() {

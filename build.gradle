@@ -65,6 +65,8 @@ checkstyle {
     // 2. Add the following property into the MissingJavadocMethod module
     // to allow omitting Javadoc on short functions:
     // <property name="minLineCount" value="2"/>
+    //
+    // 3. Re-add the MethodLength module (max 180) to enforce VVSG 2.0 requirement 2.4-C.
     configFile = file("$projectDir/config/checkstyle/google_checks.xml")
     maxWarnings = 0
     ignoreFailures = false
