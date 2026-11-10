@@ -366,7 +366,13 @@ class TabulatorSession {
               + " %d file(s) (searched recursively) with SHA-512, sorting the files alphabetically"
               + " by their path relative to the folder, concatenating the raw per-file hashes in"
               + " that order, and hashing the concatenation with SHA-512.",
-              sourceIndex + 1, result.numFiles());
+              sourceIndex + 1, result.fileHashes().size());
+      // Per-file hashes let auditors pinpoint exactly which file differs on a mismatch.
+      // Logged as auditable so large folders (e.g. one file per ballot) don't clutter the UI.
+      for (FileUtils.FileHash fileHash : result.fileHashes()) {
+        Logger.auditable("CVR Source %d | File hash (SHA-512) of %s: %s",
+                sourceIndex + 1, fileHash.relativePath(), Utils.bytesToHex(fileHash.hashBytes()));
+      }
     } else {
       Logger.info("CVR Source %d | File hash (SHA-512): %s",
               sourceIndex + 1, Utils.bytesToHex(FileUtils.getHashBytes(cvrFile, "SHA-512")));

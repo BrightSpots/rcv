@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,12 @@ class FileUtilsTests {
 
     FileUtils.DirectoryHashResult result =
         FileUtils.getDirectoryHashBytes(tempDir.toFile(), "SHA-512");
-    assertEquals(3, result.numFiles());
+    assertEquals(
+        List.of("a.txt", "b.txt", "subdir/c.txt"),
+        result.fileHashes().stream().map(FileUtils.FileHash::relativePath).toList());
+    assertEquals(
+        Utils.bytesToHex(FileUtils.getHashBytes(subdir.resolve("c.txt").toFile(), "SHA-512")),
+        Utils.bytesToHex(result.fileHashes().get(2).hashBytes()));
     assertEquals(
         Utils.bytesToHex(expectedDigest.digest()), Utils.bytesToHex(result.hashBytes()));
   }

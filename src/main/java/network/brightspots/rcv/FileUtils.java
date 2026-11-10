@@ -29,7 +29,6 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -107,7 +106,8 @@ final class FileUtils {
    * sorted alphabetically by their path relative to the directory, the raw per-file hashes are
    * concatenated in that order, and the concatenation is hashed with the same algorithm.
    *
-   * @return the combined hash and the number of files it covers.
+   * @return the combined hash, plus each file's relative path and hash (in sorted order) so a
+   *     mismatch can be traced to the specific file(s) that differ.
    */
   static DirectoryHashResult getDirectoryHashBytes(File directory, String algorithm) {
     MessageDigest digest;
@@ -115,38 +115,40 @@ final class FileUtils {
       digest = MessageDigest.getInstance(algorithm);
     } catch (NoSuchAlgorithmException e) {
       Logger.severe("Failed to get the %s algorithm".formatted(algorithm));
-      return new DirectoryHashResult(HASH_NOT_AVAILABLE, 0);
+      return new DirectoryHashResult(HASH_NOT_AVAILABLE, List.of());
     }
 
     Path root = directory.toPath();
-    List<Path> files;
+    List<FileHash> fileHashes;
     try (Stream<Path> paths = Files.walk(root)) {
-      files =
+      fileHashes =
           paths
               .filter(Files::isRegularFile)
-              .sorted(
-                  Comparator.comparing(
-                      path -> root.relativize(path).toString().replace(File.separatorChar, '/')))
+              .map(path -> root.relativize(path).toString().replace(File.separatorChar, '/'))
+              .sorted()
+              .map(relativePath -> new FileHash(
+                  relativePath, getHashBytes(root.resolve(relativePath).toFile(), algorithm)))
               .toList();
     } catch (IOException e) {
       Logger.severe("Failed to list files in directory: %s", directory.getAbsolutePath());
-      return new DirectoryHashResult(HASH_NOT_AVAILABLE, 0);
+      return new DirectoryHashResult(HASH_NOT_AVAILABLE, List.of());
     }
 
-    for (Path file : files) {
-      byte[] fileHash = getHashBytes(file.toFile(), algorithm);
-      if (Arrays.equals(fileHash, HASH_NOT_AVAILABLE)) {
+    for (FileHash fileHash : fileHashes) {
+      if (Arrays.equals(fileHash.hashBytes(), HASH_NOT_AVAILABLE)) {
         // getHashBytes already logged the failure; a combined hash missing any
         // file's hash would not be reproducible, so don't report one
-        return new DirectoryHashResult(HASH_NOT_AVAILABLE, files.size());
+        return new DirectoryHashResult(HASH_NOT_AVAILABLE, fileHashes);
       }
-      digest.update(fileHash);
+      digest.update(fileHash.hashBytes());
     }
 
-    return new DirectoryHashResult(digest.digest(), files.size());
+    return new DirectoryHashResult(digest.digest(), fileHashes);
   }
 
-  record DirectoryHashResult(byte[] hashBytes, int numFiles) {}
+  record FileHash(String relativePath, byte[] hashBytes) {}
+
+  record DirectoryHashResult(byte[] hashBytes, List<FileHash> fileHashes) {}
 
   static class UnableToCreateDirectoryException extends Exception {
 
