@@ -596,6 +596,16 @@ public class GuiConfigController implements Initializable {
           "Please wait for the current operation to complete before changing memory settings.");
       return;
     }
+    promptToIncreaseMemory(null);
+  }
+
+  /**
+   * Offer to restart RCTab with the recommended amount of memory.
+   *
+   * @param reason why we're asking, shown at the top of each dialog, or null if user-initiated
+   */
+  private void promptToIncreaseMemory(String reason) {
+    String prefix = reason == null ? "" : reason + System.lineSeparator() + System.lineSeparator();
 
     // Calculate recommended memory
     long recommendedMb = MemoryManager.calculateRecommendedMemoryMb();
@@ -606,7 +616,8 @@ public class GuiConfigController implements Initializable {
               ApplicationRestarter.buildRestartCommand("12800m"));
       showErrorDialog(
           "Unable to Determine Memory",
-          "Could not determine your system's total RAM. Please restart RCTab manually "
+          prefix
+              + "Could not determine your system's total RAM. Please restart RCTab manually "
               + "with the -Xmx parameter to increase memory. Example: "
               + restartCommand
               + "\n\n");
@@ -615,19 +626,30 @@ public class GuiConfigController implements Initializable {
 
     // Check if recommended is less than or equal to current
     if (recommendedMb <= currentMb) {
-      showInfoDialog(
-          "Memory Already Optimized",
-          String.format(
-              "RCTab is already running with %s of memory.%n%n"
-                  + "Recommended memory based on your system (80%% of total RAM): %s%n%n"
-                  + "No restart needed.",
-              MemoryManager.formatMemorySize(currentMb),
-              MemoryManager.formatMemorySize(recommendedMb)));
+      if (reason == null) {
+        showInfoDialog(
+            "Memory Already Optimized",
+            String.format(
+                "RCTab is already running with %s of memory.%n%n"
+                    + "Recommended memory based on your system (80%% of total RAM): %s%n%n"
+                    + "No restart needed.",
+                MemoryManager.formatMemorySize(currentMb),
+                MemoryManager.formatMemorySize(recommendedMb)));
+      } else {
+        showErrorDialog(
+            "Out of Memory",
+            prefix
+                + String.format(
+                    "RCTab is already running with %s of memory, the recommended maximum for "
+                        + "this computer. Try closing other applications, or run RCTab on a "
+                        + "computer with more memory.",
+                    MemoryManager.formatMemorySize(currentMb)));
+      }
       return;
     }
 
     // Show confirmation dialog
-    boolean confirmed = showMemoryIncreaseConfirmation(currentMb, recommendedMb);
+    boolean confirmed = showMemoryIncreaseConfirmation(prefix, currentMb, recommendedMb);
     if (!confirmed) {
       return;
     }
@@ -650,21 +672,23 @@ public class GuiConfigController implements Initializable {
     }
   }
 
-  private boolean showMemoryIncreaseConfirmation(long currentMb, long recommendedMb) {
+  private boolean showMemoryIncreaseConfirmation(
+      String prefix, long currentMb, long recommendedMb) {
     ButtonType restartButton = new ButtonType("Restart Now", ButtonBar.ButtonData.YES);
     ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
     Alert alert =
         new Alert(
             AlertType.CONFIRMATION,
-            String.format(
-                "RCTab will restart with increased memory.%n%n"
-                    + "Current memory: %s%n"
-                    + "New memory: %s%n%n"
-                    + "This will close RCTab and reopen it with the new memory settings.%n"
-                    + "Any unsaved changes will be lost.",
-                MemoryManager.formatMemorySize(currentMb),
-                MemoryManager.formatMemorySize(recommendedMb)),
+            prefix
+                + String.format(
+                    "RCTab will restart with increased memory.%n%n"
+                        + "Current memory: %s%n"
+                        + "New memory: %s%n%n"
+                        + "This will close RCTab and reopen it with the new memory settings.%n"
+                        + "Any unsaved changes will be lost.",
+                    MemoryManager.formatMemorySize(currentMb),
+                    MemoryManager.formatMemorySize(recommendedMb)),
             restartButton,
             cancelButton);
     alert.setTitle("Increase RCTab Memory");
@@ -693,6 +717,10 @@ public class GuiConfigController implements Initializable {
 
     if (service.hasSetOutputDirectory()) {
       this.lastTabulatorSessionOutputDirectory = service.getOutputDirectory();
+    }
+
+    if (service.ranOutOfMemory) {
+      promptToIncreaseMemory("RCTab ran out of memory while reading cast vote records.");
     }
   }
 
@@ -1797,6 +1825,7 @@ public class GuiConfigController implements Initializable {
    */
   public abstract static class GenericService<T> extends Service<T> {
     protected String outputDirectory;
+    protected boolean ranOutOfMemory = false;
 
     /**
      * Get the output directory set by the service if one was set.
@@ -1988,6 +2017,7 @@ public class GuiConfigController implements Initializable {
               List<String> errors = session.tabulate(
                       operatorName, expectedCvrStatistics, this::updateProgress);
               svc.outputDirectory = session.getOutputPath();
+              svc.ranOutOfMemory = session.ranOutOfMemory();
               if (errors.isEmpty()) {
                 succeeded();
               } else {
@@ -2019,6 +2049,7 @@ public class GuiConfigController implements Initializable {
               TabulatorSession session = new TabulatorSession(configPath);
               boolean succeeded = session.convertToCdf(this::updateProgress);
               svc.outputDirectory = session.getOutputPath();
+              svc.ranOutOfMemory = session.ranOutOfMemory();
               return succeeded;
             }
           };
@@ -2057,6 +2088,7 @@ public class GuiConfigController implements Initializable {
 
             }
             svc.outputDirectory = session.getOutputPath();
+            svc.ranOutOfMemory = session.ranOutOfMemory();
             return cvrStatics;
           }
         };

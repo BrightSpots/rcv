@@ -54,6 +54,8 @@ class TabulatorSession {
   private final String timestampString;
   private String outputPath;
   private String rctabCvrFilePath;
+  // set if the JVM ran out of memory while parsing CVRs
+  private boolean ranOutOfMemory = false;
 
   TabulatorSession(String configPath) {
     this.configPath = configPath;
@@ -93,6 +95,10 @@ class TabulatorSession {
     }
     // No need to throw errors for these, because they'll be caught by validateTabulatorVersion()
     // during validation
+  }
+
+  boolean ranOutOfMemory() {
+    return ranOutOfMemory;
   }
 
   // Visible for testing
@@ -432,6 +438,19 @@ class TabulatorSession {
       } catch (Exception exception) {
         Logger.severe("Unexpected error parsing source file: %s\n%s", cvrPath, exception);
         encounteredSourceProblem = true;
+      } catch (OutOfMemoryError error) {
+        // Release what we've parsed so far so there's enough memory to log and recover.
+        castVoteRecords = new ArrayList<>();
+        cvrSourceData = new ArrayList<>();
+        ranOutOfMemory = true;
+        encounteredSourceProblem = true;
+        Logger.severe(
+            "RCTab ran out of memory while reading cast vote records from: %s", cvrPath);
+        Logger.severe(
+            "RCTab is using up to %s of memory. Use \"Increase RCTab Memory\" in the Tools menu,"
+                + " or restart RCTab with a larger -Xmx value, and try again.",
+            MemoryManager.formatMemorySize(MemoryManager.getCurrentMaxHeapMb()));
+        break;
       }
 
       // Update the service % complete
