@@ -360,8 +360,8 @@ class TabulatorSession {
     if (cvrFile.isDirectory()) {
       FileUtils.DirectoryHashResult result =
           FileUtils.getDirectoryHashBytes(cvrFile, "SHA-512");
-      Logger.info("CVR Source %d | Folder hash (SHA-512): %s",
-              sourceIndex + 1, Utils.bytesToHex(result.hashBytes()));
+      Logger.info("CVR Source %d | Folder hash (SHA-512) of %s: %s",
+              sourceIndex + 1, cvrFile.getAbsolutePath(), Utils.bytesToHex(result.hashBytes()));
       Logger.info("CVR Source %d | The folder hash was computed by hashing each of the folder's"
               + " %d file(s) (searched recursively) with SHA-512, sorting the files alphabetically"
               + " by their path relative to the folder, concatenating the raw per-file hashes in"
@@ -374,8 +374,9 @@ class TabulatorSession {
                 sourceIndex + 1, fileHash.relativePath(), Utils.bytesToHex(fileHash.hashBytes()));
       }
     } else {
-      Logger.info("CVR Source %d | File hash (SHA-512): %s",
-              sourceIndex + 1, Utils.bytesToHex(FileUtils.getHashBytes(cvrFile, "SHA-512")));
+      Logger.info("CVR Source %d | File hash (SHA-512) of %s: %s",
+              sourceIndex + 1, cvrFile.getAbsolutePath(),
+              Utils.bytesToHex(FileUtils.getHashBytes(cvrFile, "SHA-512")));
     }
   }
 
