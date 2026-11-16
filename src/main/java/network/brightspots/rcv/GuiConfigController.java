@@ -596,61 +596,67 @@ public class GuiConfigController implements Initializable {
           "Please wait for the current operation to complete before changing memory settings.");
       return;
     }
-    promptToIncreaseMemory(null);
-  }
 
-  /**
-   * Offer to restart RCTab with the recommended amount of memory.
-   *
-   * @param reason why we're asking, shown at the top of each dialog, or null if user-initiated
-   */
-  private void promptToIncreaseMemory(String reason) {
-    String prefix = reason == null ? "" : reason + System.lineSeparator() + System.lineSeparator();
-
-    // Calculate recommended memory
     long recommendedMb = MemoryManager.calculateRecommendedMemoryMb();
     long currentMb = MemoryManager.getCurrentMaxHeapMb();
 
     if (recommendedMb <= 0) {
-      String restartCommand = String.join(" ",
-              ApplicationRestarter.buildRestartCommand("12800m"));
+      showUnknownMemoryDialog("");
+    } else if (recommendedMb <= currentMb) {
+      showInfoDialog(
+          "Memory Already Optimized",
+          String.format(
+              "RCTab is already running with %s of memory.%n%n"
+                  + "Recommended memory based on your system (80%% of total RAM): %s%n%n"
+                  + "No restart needed.",
+              MemoryManager.formatMemorySize(currentMb),
+              MemoryManager.formatMemorySize(recommendedMb)));
+    } else {
+      confirmAndRestartWithMemory("", currentMb, recommendedMb);
+    }
+  }
+
+  /**
+   * Warn the user that RCTab ran out of memory, and offer to restart with more if possible.
+   */
+  private void warnOutOfMemory() {
+    String intro = String.format(
+        "RCTab ran out of memory while reading cast vote records.%n%n");
+    long recommendedMb = MemoryManager.calculateRecommendedMemoryMb();
+    long currentMb = MemoryManager.getCurrentMaxHeapMb();
+
+    if (recommendedMb <= 0) {
+      showUnknownMemoryDialog(intro);
+    } else if (recommendedMb <= currentMb) {
       showErrorDialog(
-          "Unable to Determine Memory",
-          prefix
-              + "Could not determine your system's total RAM. Please restart RCTab manually "
-              + "with the -Xmx parameter to increase memory. Example: "
-              + restartCommand
-              + "\n\n");
-      return;
+          "Out of Memory",
+          intro
+              + String.format(
+                  "RCTab is already running with %s of memory, the recommended maximum for "
+                      + "this computer. Try closing other applications, or run RCTab on a "
+                      + "computer with more memory.",
+                  MemoryManager.formatMemorySize(currentMb)));
+    } else {
+      confirmAndRestartWithMemory(intro, currentMb, recommendedMb);
     }
+  }
 
-    // Check if recommended is less than or equal to current
-    if (recommendedMb <= currentMb) {
-      if (reason == null) {
-        showInfoDialog(
-            "Memory Already Optimized",
-            String.format(
-                "RCTab is already running with %s of memory.%n%n"
-                    + "Recommended memory based on your system (80%% of total RAM): %s%n%n"
-                    + "No restart needed.",
-                MemoryManager.formatMemorySize(currentMb),
-                MemoryManager.formatMemorySize(recommendedMb)));
-      } else {
-        showErrorDialog(
-            "Out of Memory",
-            prefix
-                + String.format(
-                    "RCTab is already running with %s of memory, the recommended maximum for "
-                        + "this computer. Try closing other applications, or run RCTab on a "
-                        + "computer with more memory.",
-                    MemoryManager.formatMemorySize(currentMb)));
-      }
-      return;
-    }
+  private void showUnknownMemoryDialog(String intro) {
+    String restartCommand = String.join(" ",
+            ApplicationRestarter.buildRestartCommand("12800m"));
+    showErrorDialog(
+        "Unable to Determine Memory",
+        intro
+            + "Could not determine your system's total RAM. Please restart RCTab manually "
+            + "with the -Xmx parameter to increase memory. Example: "
+            + restartCommand
+            + "\n\n");
+  }
 
-    // Show confirmation dialog
-    boolean confirmed = showMemoryIncreaseConfirmation(prefix, currentMb, recommendedMb);
-    if (!confirmed) {
+  // Ask the user to confirm, then restart RCTab with recommendedMb of memory.
+  // intro is prepended to the confirmation message.
+  private void confirmAndRestartWithMemory(String intro, long currentMb, long recommendedMb) {
+    if (!showMemoryIncreaseConfirmation(intro, currentMb, recommendedMb)) {
       return;
     }
 
@@ -673,14 +679,14 @@ public class GuiConfigController implements Initializable {
   }
 
   private boolean showMemoryIncreaseConfirmation(
-      String prefix, long currentMb, long recommendedMb) {
+      String intro, long currentMb, long recommendedMb) {
     ButtonType restartButton = new ButtonType("Restart Now", ButtonBar.ButtonData.YES);
     ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
     Alert alert =
         new Alert(
             AlertType.CONFIRMATION,
-            prefix
+            intro
                 + String.format(
                     "RCTab will restart with increased memory.%n%n"
                         + "Current memory: %s%n"
@@ -720,7 +726,7 @@ public class GuiConfigController implements Initializable {
     }
 
     if (service.ranOutOfMemory) {
-      promptToIncreaseMemory("RCTab ran out of memory while reading cast vote records.");
+      warnOutOfMemory();
     }
   }
 
