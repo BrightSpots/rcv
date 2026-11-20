@@ -1,0 +1,342 @@
+/* =============================================================================
+   RCTabTheme.css  —  JavaFX stylesheet for the RCTab Tabulator GUI
+   Brand: Ranked Choice Voting Resource Center / RCTab
+   Drop-in replacement & superset of src/main/resources/.../GuiStyles.css
+   -----------------------------------------------------------------------------
+   This is JavaFX CSS (a subset of W3C CSS): only -fx-* properties are valid,
+   there is no var() — brand colors are declared as "looked-up colors" on .root
+   and referenced by name. Fonts must be loaded at startup (see FONT NOTE below).
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   1. BRAND LOOKED-UP COLORS  (define once on .root, reference everywhere)
+   ----------------------------------------------------------------------------- */
+.root {
+    /* Navy (primary) */
+    -rc-navy-900: #0a2c47;
+    -rc-navy-800: #0d3960;
+    -rc-navy-700: #11436b;   /* core brand navy */
+    -rc-navy-600: #1c557f;
+    -rc-navy-500: #2f6c96;
+    -rc-navy-100: #d3deea;
+
+    /* Teal (secondary / accent) */
+    -rc-teal-700: #2f93a0;
+    -rc-teal-600: #46aeb8;
+    -rc-teal-500: #56bdc8;   /* wordmark "Tab" teal */
+    -rc-teal-400: #80cfd6;   /* logo bar teal */
+    -rc-teal-100: #d3edee;   /* pale tint */
+    -rc-teal-050: #eef7f8;
+
+    /* Red (alert / destructive) */
+    -rc-red-600:  #cc1b30;
+    -rc-red-500:  #e22138;
+    -rc-red-100:  #fbdde1;
+
+    /* Neutrals */
+    -rc-white:    #ffffff;
+    -rc-gray-050: #f6f8f9;
+    -rc-gray-100: #eef1f3;
+    -rc-gray-200: #e0e6ea;
+    -rc-gray-300: #c8d2d8;
+    -rc-gray-500: #7d8d96;
+    -rc-gray-600: #5a6a73;
+    -rc-gray-700: #3d4b53;
+    -rc-gray-800: #283238;
+    -rc-ink:      #1c1c1c;   /* console surface */
+
+    /* Status */
+    -rc-green-500: #2e8b6b;
+    -rc-amber-500: #d99016;
+
+    /* ---- JavaFX base wiring ---- */
+    -fx-base: -rc-white;
+    -fx-background: -rc-white;
+    -fx-control-inner-background: -rc-white;
+    -fx-accent: -rc-navy-700;                 /* selection / highlight */
+    -fx-default-button: -rc-navy-700;
+    -fx-focus-color: -rc-teal-500;            /* focus ring */
+    -fx-faint-focus-color: #56bdc822;
+    -fx-text-base-color: -rc-gray-800;
+    -fx-text-background-color: -rc-gray-800;
+
+    /* FONT NOTE: requires the families to be loaded via Font.loadFont() at
+       startup (see RCTabTheme-FontLoader snippet in the handoff doc). If a
+       family is missing JavaFX silently falls back to the system sans. */
+    -fx-font-family: "Public Sans", "Segoe UI", "System";
+    -fx-font-size: 13px;
+}
+
+/* -----------------------------------------------------------------------------
+   2. TYPOGRAPHY HELPERS  (add styleClass to Labels)
+   ----------------------------------------------------------------------------- */
+.h1-display {
+    -fx-font-family: "Montserrat", "Public Sans", "System";
+    -fx-font-weight: 800;
+    -fx-font-size: 30px;
+    -fx-text-fill: -rc-navy-700;
+}
+.h2-heading {
+    -fx-font-family: "Montserrat", "Public Sans", "System";
+    -fx-font-weight: 700;
+    -fx-font-size: 20px;
+    -fx-text-fill: -rc-navy-800;
+}
+.section-title {
+    -fx-font-weight: 700;
+    -fx-font-size: 16px;
+    -fx-text-fill: -rc-navy-700;
+}
+.field-label {
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+    -fx-text-fill: -rc-navy-700;
+}
+.hint-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: -rc-gray-600;
+}
+.eyebrow {
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -rc-gray-600;
+}
+.required-asterisk { -fx-text-fill: -rc-red-500; }
+
+/* -----------------------------------------------------------------------------
+   3. BUTTONS
+   ----------------------------------------------------------------------------- */
+.button {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-padding: 8px 18px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-background-insets: 0;
+}
+
+/* Primary (navy) — apply styleClass "btn-primary" */
+.button.btn-primary {
+    -fx-background-color: -rc-navy-700;
+    -fx-text-fill: -rc-white;
+}
+.button.btn-primary:hover   { -fx-background-color: -rc-navy-800; }
+.button.btn-primary:pressed { -fx-background-color: -rc-navy-900; }
+
+/* Accent (teal) — "btn-accent" */
+.button.btn-accent {
+    -fx-background-color: -rc-teal-500;
+    -fx-text-fill: -rc-navy-900;
+}
+.button.btn-accent:hover   { -fx-background-color: -rc-teal-600; }
+.button.btn-accent:pressed { -fx-background-color: -rc-teal-700; }
+
+/* Secondary (navy outline) — "btn-secondary" */
+.button.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: -rc-navy-700;
+    -fx-border-color: -rc-navy-700;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 8px;
+}
+.button.btn-secondary:hover   { -fx-background-color: -rc-teal-050; }
+.button.btn-secondary:pressed { -fx-background-color: -rc-teal-100; }
+
+/* Ghost — "btn-ghost" */
+.button.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -rc-navy-700;
+}
+.button.btn-ghost:hover   { -fx-background-color: -rc-gray-100; }
+.button.btn-ghost:pressed { -fx-background-color: -rc-gray-200; }
+
+/* Danger (red) — "btn-danger" */
+.button.btn-danger {
+    -fx-background-color: -rc-red-500;
+    -fx-text-fill: -rc-white;
+}
+.button.btn-danger:hover   { -fx-background-color: -rc-red-600; }
+
+.button:disabled { -fx-opacity: 0.5; -fx-cursor: default; }
+
+/* -----------------------------------------------------------------------------
+   4. TEXT FIELDS / TEXT AREAS
+   ----------------------------------------------------------------------------- */
+.text-field, .text-area {
+    -fx-background-color: -rc-white;
+    -fx-border-color: -rc-gray-300;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 7px 10px;
+    -fx-prompt-text-fill: -rc-gray-500;
+    -fx-text-fill: -rc-gray-800;
+}
+.text-field:focused, .text-area:focused {
+    -fx-border-color: -rc-teal-500;
+    -fx-effect: dropshadow(gaussian, #56bdc873, 6, 0.3, 0, 0);  /* teal focus ring */
+}
+
+/* -----------------------------------------------------------------------------
+   5. COMBO BOX  (rule-mode pickers)
+   ----------------------------------------------------------------------------- */
+.combo-box-base {
+    -fx-background-color: -rc-white;
+    -fx-border-color: -rc-gray-300;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+.combo-box-base:focused { -fx-border-color: -rc-teal-500; }
+.combo-box .list-cell { -fx-text-fill: -rc-gray-800; -fx-padding: 5px 9px; }
+.combo-box-popup .list-view {
+    -fx-background-color: -rc-white;
+    -fx-border-color: -rc-gray-300;
+    -fx-effect: dropshadow(gaussian, #0d39601f, 18, 0.18, 0, 6);
+}
+.combo-box-popup .list-cell:filled:hover    { -fx-background-color: -rc-teal-050; }
+.combo-box-popup .list-cell:filled:selected { -fx-background-color: -rc-teal-100; -fx-text-fill: -rc-navy-900; }
+
+/* -----------------------------------------------------------------------------
+   6. CHECK BOX  (boolean rule toggles)
+   ----------------------------------------------------------------------------- */
+.check-box .box {
+    -fx-background-color: -rc-white;
+    -fx-border-color: -rc-gray-300;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 2px;
+}
+.check-box:selected .box  { -fx-background-color: -rc-navy-700; -fx-border-color: -rc-navy-700; }
+.check-box:selected .mark { -fx-background-color: -rc-white; }
+.check-box .text          { -fx-fill: -rc-gray-800; -fx-font-size: 13px; }
+
+/* -----------------------------------------------------------------------------
+   7. TAB PANE  (Contest Info / CVR Files / Candidates / Winning Rules / …)
+   ----------------------------------------------------------------------------- */
+.tab-pane > .tab-header-area > .tab-header-background { -fx-background-color: -rc-white; }
+.tab-pane > .tab-header-area { -fx-padding: 0 0 0 12px; -fx-border-color: transparent transparent -rc-gray-300 transparent; -fx-border-width: 0 0 1.5px 0; }
+.tab {
+    -fx-background-color: transparent;
+    -fx-padding: 9px 16px;
+    -fx-background-radius: 0;
+}
+.tab .tab-label { -fx-text-fill: -rc-gray-600; -fx-font-size: 13px; -fx-font-weight: 500; }
+.tab:hover    .tab-label { -fx-text-fill: -rc-navy-600; }
+.tab:selected .tab-label { -fx-text-fill: -rc-navy-700; -fx-font-weight: 700; }
+.tab:selected {
+    -fx-border-color: transparent transparent -rc-teal-500 transparent;
+    -fx-border-width: 0 0 3px 0;
+}
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator { -fx-border-color: transparent; }
+
+/* -----------------------------------------------------------------------------
+   8. TABLE VIEW  (candidates, CVR sources)
+   ----------------------------------------------------------------------------- */
+.table-view {
+    -fx-background-color: -rc-white;
+    -fx-border-color: -rc-gray-200;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+.table-view .column-header-background { -fx-background-color: -rc-gray-050; }
+.table-view .column-header, .table-view .filler { -fx-background-color: transparent; -fx-size: 34px; -fx-border-color: transparent transparent -rc-gray-200 transparent; }
+.table-view .column-header .label {
+    -fx-text-fill: -rc-navy-700; -fx-font-size: 11px; -fx-font-weight: 700; -fx-alignment: center-left;
+}
+.table-row-cell { -fx-background-color: -rc-white; -fx-border-color: transparent transparent -rc-gray-100 transparent; -fx-cell-size: 36px; }
+.table-row-cell:odd { -fx-background-color: -rc-gray-050; }
+.table-row-cell:selected { -fx-background-color: -rc-teal-100; }
+.table-view .table-cell { -fx-text-fill: -rc-gray-800; -fx-alignment: center-left; -fx-padding: 0 12px; }
+
+/* -----------------------------------------------------------------------------
+   9. MENU BAR
+   ----------------------------------------------------------------------------- */
+.menu-bar { -fx-background-color: -rc-gray-050; -fx-border-color: transparent transparent -rc-gray-200 transparent; -fx-border-width: 0 0 1px 0; }
+.menu-bar .label { -fx-text-fill: -rc-gray-800; }
+.menu:hover, .menu:showing { -fx-background-color: -rc-gray-200; }
+.menu-item:focused { -fx-background-color: -rc-teal-050; }
+.menu-item .label { -fx-text-fill: -rc-gray-800; }
+.context-menu { -fx-background-color: -rc-white; -fx-border-color: -rc-gray-300; -fx-effect: dropshadow(gaussian, #0d39601f, 18, 0.18, 0, 6); }
+
+/* -----------------------------------------------------------------------------
+   10. HELP PANEL  (per-tab "Hints")  — extends repo's .help-text-area
+   ----------------------------------------------------------------------------- */
+.help-text-area {
+    -fx-control-inner-background: -rc-gray-100;
+    -fx-background-color: -rc-gray-100;
+    -fx-border-color: -rc-gray-300;
+    -fx-border-width: 0 0 0 4px;          /* left rule */
+    -fx-border-radius: 0 5px 5px 0;
+    -fx-background-radius: 0 5px 5px 0;
+    -fx-text-fill: -rc-gray-800;
+    -fx-font-size: 13px;
+}
+/* Tinted variant for an active/info hint: add styleClass "help-info" */
+.help-text-area.help-info { -fx-control-inner-background: -rc-teal-050; -fx-background-color: -rc-teal-050; -fx-border-color: -rc-teal-400; }
+
+/* -----------------------------------------------------------------------------
+   11. CONSOLE  (validation / tabulation output / audit log) — extends repo class
+   ----------------------------------------------------------------------------- */
+.console-text-area {
+    -fx-control-inner-background: -rc-ink;
+    -fx-background-color: -rc-ink;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: -rc-gray-800;
+    -fx-border-width: 1px;
+    -fx-highlight-fill: -rc-teal-500;
+    -fx-highlight-text-fill: -rc-ink;
+    -fx-text-fill: #e8e8e8;
+    -fx-font-family: "IBM Plex Mono", "Consolas", "monospace";
+    -fx-font-size: 13px;
+}
+.console-text-area .content { -fx-background-color: -rc-ink; }
+
+/* -----------------------------------------------------------------------------
+   12. CARD / BORDERED BOX  — extends repo's .bordered-box
+   ----------------------------------------------------------------------------- */
+.bordered-box {
+    -fx-border-color: -rc-gray-200;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-radius: 8px;
+    -fx-background-color: -rc-white;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, #0d396014, 6, 0.06, 0, 1);
+}
+/* Teal top accent: add styleClass "card-accent" */
+.bordered-box.card-accent { -fx-border-color: -rc-teal-500 -rc-gray-200 -rc-gray-200 -rc-gray-200; -fx-border-width: 3px 1px 1px 1px; }
+
+/* -----------------------------------------------------------------------------
+   13. ERROR STATE  — preserved from repo GuiStyles.css (brand red)
+   ----------------------------------------------------------------------------- */
+.error, .check-box-error .box {
+    -fx-focus-color: -rc-red-500;
+    -fx-faint-focus-color: #e2213822;
+    -fx-highlight-fill: -fx-accent;
+    -fx-highlight-text-fill: white;
+    -fx-border-color: -rc-red-500;
+    -fx-background-color:
+        -fx-focus-color,
+        -fx-control-inner-background,
+        -fx-faint-focus-color,
+        linear-gradient(from 0px 0px to 0px 5px,
+            derive(-fx-control-inner-background, -9%),
+            -fx-control-inner-background);
+    -fx-background-insets: -0.2, 1, -1.4, 3;
+    -fx-background-radius: 3, 2, 4, 0;
+    -fx-prompt-text-fill: transparent;
+}
+
+/* -----------------------------------------------------------------------------
+   14. STATUS PILLS  (apply to a Label inside an HBox)  — optional
+   ----------------------------------------------------------------------------- */
+.badge { -fx-padding: 3px 10px; -fx-background-radius: 999px; -fx-font-size: 12px; -fx-font-weight: 600; }
+.badge.badge-success { -fx-background-color: #d8efe6; -fx-text-fill: -rc-green-500; }
+.badge.badge-teal    { -fx-background-color: -rc-teal-100; -fx-text-fill: -rc-teal-700; }
+.badge.badge-warning { -fx-background-color: #fbecd0; -fx-text-fill: -rc-amber-500; }
+.badge.badge-danger  { -fx-background-color: -rc-red-100; -fx-text-fill: -rc-red-600; }
+.badge.badge-navy    { -fx-background-color: -rc-navy-100; -fx-text-fill: -rc-navy-800; }

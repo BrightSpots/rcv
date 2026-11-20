@@ -107,6 +107,12 @@ public class GuiTabulateController {
             GuiConfigController.NumberTableCellFactory.createNumberColumn("#", 1));
     perSourceCvrCountTable.setVisible(false);
 
+    tabulateButton.getStyleClass().add("btn-primary");
+    loadCvrButton.getStyleClass().add("btn-secondary");
+    openResultsButton.getStyleClass().add("btn-secondary");
+    saveButton.getStyleClass().add("btn-secondary");
+    tempSaveButton.getStyleClass().add("btn-ghost");
+
     initializeSaveButtonStatuses();
     setTabulationButtonStatus();
     updateProgressText();

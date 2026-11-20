@@ -25,6 +25,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -34,8 +35,25 @@ class GuiApplication extends Application {
   private static final int STAGE_HEIGHT = 1000;
   private static final int STAGE_WIDTH = 1200;
 
+  private void loadBrandFonts() {
+    String base = "/network/brightspots/rcv/fonts/";
+    String[] fonts = {
+        "PublicSans-Regular.ttf", "PublicSans-Medium.ttf",
+        "PublicSans-SemiBold.ttf", "PublicSans-Bold.ttf",
+        "Montserrat-Bold.ttf", "Montserrat-ExtraBold.ttf",
+        "IBMPlexMono-Regular.ttf", "IBMPlexMono-Medium.ttf"
+    };
+    for (String f : fonts) {
+      try (var in = getClass().getResourceAsStream(base + f)) {
+        if (in != null) Font.loadFont(in, 12);
+      } catch (Exception e) { /* falls back to system sans */ }
+    }
+  }
+
   @Override
   public void start(Stage window) {
+    loadBrandFonts();
+
     GuiContext context = GuiContext.getInstance();
     context.setMainWindow(window);
 
@@ -44,7 +62,11 @@ class GuiApplication extends Application {
     try {
       Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(resourcePath)));
       window.setTitle(Main.APP_NAME);
-      window.setScene(new Scene(root));
+      Scene scene = new Scene(root);
+      scene.getStylesheets().add(
+          Objects.requireNonNull(
+              getClass().getResource("/network/brightspots/rcv/RCTabTheme.css")).toExternalForm());
+      window.setScene(scene);
 
       Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconPath)));
       window.getIcons().add(icon);
